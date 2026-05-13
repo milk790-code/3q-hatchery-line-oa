@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>3Q Hatchery — LINE OA Kit</title>
+  <link rel="stylesheet" href="../../colors_and_type.css"/>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: #1A1814; min-height: 100vh; }
+    body {
+      font-family: var(--font-sans);
+      color: var(--fg-2);
+      padding: 48px 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* === Outer layout: phone in center, asset gallery underneath === */
+    .stage { max-width: 1280px; width: 100%; display: flex; flex-direction: column; gap: 80px; align-items: center; }
+    .stage-header { text-align: center; }
+    .stage-header .eyebrow { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--color-gold); }
+    .stage-header h1 { font-family: var(--font-serif); font-weight: 300; font-size: 38px; letter-spacing: 0.2em; color: var(--color-paper); margin: 18px 0 8px; }
+    .stage-header p { font-family: var(--font-sans); font-weight: 300; font-size: 12px; letter-spacing: 0.15em; color: var(--color-stone); margin: 0; }
+
+    /* === Phone === */
+    .phone {
+      width: 380px;
+      height: 760px;
+      background: #F5F2EC;
+      border-radius: 44px;
+      box-shadow: 0 40px 80px -30px rgba(0,0,0,0.7);
+      border: 1px solid #2A2620;
+      overflow: hidden;
+      position: relative;
+    }
+    .phone-notch {
+      position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 28px; background: #0A0A0A; border-radius: 14px; z-index: 10;
+    }
+
+    /* === LINE chrome === */
+    .line-frame { width: 100%; height: 100%; display: flex; flex-direction: column; background: #DCD6CB; padding-top: 56px; }
+    .line-top {
+      background: #F5F2EC;
+      display: grid;
+      grid-template-columns: 32px 1fr 32px;
+      align-items: center;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(10,10,10,0.06);
+      gap: 8px;
+    }
+    .line-top-c { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .line-top-c img, .line-top-c .avatar-wrap { width: 32px; height: 32px; }
+    .line-top-name { font-family: var(--font-serif); font-weight: 300; font-size: 16px; letter-spacing: 0.15em; color: var(--color-black); }
+
+    .line-msgs { flex: 1; overflow-y: auto; padding: 16px 14px; display: flex; flex-direction: column; gap: 12px; }
+    .line-day { display: flex; justify-content: center; }
+    .line-day span { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--color-stone); background: rgba(10,10,10,0.04); padding: 4px 12px; border-radius: 999px; }
+    .line-bubble {
+      max-width: 80%;
+      padding: 10px 14px;
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: 13px;
+      line-height: 1.6;
+      letter-spacing: 0.04em;
+    }
+    .line-bubble.in { background: #FFFFFF; color: var(--color-ink); align-self: flex-start; border-radius: 4px 14px 14px 14px; }
+    .line-bubble.out { background: var(--color-black); color: var(--color-paper); align-self: flex-end; border-radius: 14px 4px 14px 14px; }
+    .line-card {
+      align-self: flex-start;
+      width: 84%;
+      background: var(--color-paper);
+      border: 1px solid rgba(10,10,10,0.08);
+    }
+
+    .line-menu-tab {
+      background: var(--color-paper);
+      border-top: 1px solid rgba(10,10,10,0.08);
+      padding: 12px 18px;
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer;
+      font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--color-stone);
+      user-select: none;
+    }
+    .line-menu-tab.open { color: var(--color-black); }
+
+    /* Rich menu drawer */
+    .menu-drawer {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .5s var(--ease-editorial);
+      background: var(--color-black);
+      z-index: 5;
+    }
+    .menu-drawer.open { max-height: 540px; }
+    .menu-drawer-close {
+      display: flex; justify-content: center; padding: 10px 0; cursor: pointer;
+      background: var(--color-paper);
+      font-size: 10px; letter-spacing: 0.3em; color: var(--color-stone); text-transform: uppercase;
+    }
+
+    /* === Asset gallery below the phone === */
+    .gallery {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 56px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(184,146,74,0.15);
+    }
+    .gallery h2 { font-family: var(--font-serif); font-weight: 300; font-size: 13px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--color-gold); margin: 0 0 16px; }
+    .gallery .item { background: var(--color-paper); padding: 0; }
+    .gallery .caption { margin-top: 12px; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--color-stone); display: flex; justify-content: space-between; }
+    .gallery .full { grid-column: span 2; }
+
+    /* Helper — fit overflowing assets into card */
+    .frame { display: flex; justify-content: center; align-items: center; padding: 24px; background: #2A2620; }
+
+    /* Phone "stage" wrapper */
+    .phone-stage {
+      position: relative; padding: 32px;
+      background: radial-gradient(circle at 40% 30%, #2E2A24, #0F0D0A);
+      border-radius: 32px;
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+
+    <div class="stage-header">
+      <div class="eyebrow">UI Kit · 01</div>
+      <h1>LINE Official Account</h1>
+      <p>Avatar · Cover · Rich Menu · Welcome · Carousel</p>
+      <p style="margin-top: 14px;">
+        <a href="launch.html" style="color: var(--color-gold); font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; text-decoration: none; border-bottom: 1px solid var(--color-gold); padding-bottom: 2px;">→ 上線文件 Launch Kit</a>
+        <span style="display:inline-block; width:24px;"></span>
+        <a href="calendar.html" style="color: var(--color-gold); font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; text-decoration: none; border-bottom: 1px solid var(--color-gold); padding-bottom: 2px;">→ 30 天排程</a>
+        <span style="display:inline-block; width:24px;"></span>
+        <a href="sop.html" style="color: var(--color-gold); font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; text-decoration: none; border-bottom: 1px solid var(--color-gold); padding-bottom: 2px;">→ 上線 SOP (PDF)</a>
+      </p>
+    </div>
+
+    <div class="phone-stage">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div id="app"></div>
+      </div>
+    </div>
+
+    <div class="gallery">
+
+      <div class="item full">
+        <h2 data-screen-label="Cover">Cover · 1080 × 878</h2>
+        <div class="frame" id="cover-mount"></div>
+        <div class="caption"><span>3Q-HATCHERY_cover_1080x878</span><span>60 / 40 split</span></div>
+      </div>
+
+      <div class="item full">
+        <h2 data-screen-label="Rich Menu">Rich Menu · 2500 × 1686</h2>
+        <div class="frame" id="richmenu-mount"></div>
+        <div class="caption"><span>3Q-HATCHERY_richmenu_2500x1686</span><span>hero band + 4-grid</span></div>
+      </div>
+
+      <div class="item">
+        <h2 data-screen-label="Avatar">Avatar · 640 × 640</h2>
+        <div class="frame" id="avatar-mount"></div>
+        <div class="caption"><span>3Q-HATCHERY_avatar_640x640</span><span>circle crop</span></div>
+      </div>
+
+      <div class="item">
+        <h2 data-screen-label="Welcome">Welcome · 1040 × 1040</h2>
+        <div class="frame" id="welcome-mount"></div>
+        <div class="caption"><span>3Q-HATCHERY_welcome_1040x1040</span><span>top photo · bottom type</span></div>
+      </div>
+
+      <div class="item full">
+        <h2 data-screen-label="Carousel">Carousel Series</h2>
+        <div class="frame" style="justify-content: flex-start; overflow-x: auto;" id="carousel-mount"></div>
+        <div class="caption"><span>3Q-HATCHERY_carousel_1040x1040_series</span><span>locked LUT · 3-5 cards</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="Avatar.jsx"></script>
+  <script type="text/babel" src="CoverImage.jsx"></script>
+  <script type="text/babel" src="RichMenu.jsx"></script>
+  <script type="text/babel" src="WelcomeCard.jsx"></script>
+  <script type="text/babel" src="Carousel.jsx"></script>
+  <script type="text/babel" src="LineChrome.jsx"></script>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    function App() {
+      const [menuOpen, setMenuOpen] = useState(false);
+
+      const avatar = <div className="avatar-wrap"><Avatar size={32}/></div>;
+
+      return (
+        <>
+          <LineChrome
+            avatar={avatar}
+            accountName="3Q貢丸"
+            onMenu={() => setMenuOpen(o => !o)}
+            menuOpen={menuOpen}
+          >
+            <LineDayDivider label="今天" />
+
+            <LineMessageBubble side="in">
+              只要你願意說，我們就幫你被看見。
+            </LineMessageBubble>
+
+            <div className="line-card">
+              <WelcomeCard width={300} />
+            </div>
+
+            <LineMessageBubble side="in">
+              不管你的需求、想法、產品 — 多大、多小、多複雜，
+              我們都有適合的平台、舞台、後台。點下方圖文選單，說說你的店。
+            </LineMessageBubble>
+
+            <LineMessageBubble side="out">
+              我想讓我的米，被好好看見一次
+            </LineMessageBubble>
+
+            <LineMessageBubble side="in">
+              這是本月入駐品牌的「好物・好照」，給你參考。
+            </LineMessageBubble>
+
+            <div style={{ alignSelf: 'flex-start', width: '100%' }}>
+              <Carousel cardWidth={220} />
+            </div>
+          </LineChrome>
+
+          <div className={`menu-drawer ${menuOpen ? 'open' : ''}`}>
+            <div className="menu-drawer-close" onClick={() => setMenuOpen(false)}>收合 ▾</div>
+            <RichMenu width={380} />
+          </div>
+        </>
+      );
+    }
+
+    function mount(id, el) {
+      const node = document.getElementById(id);
+      if (node) ReactDOM.createRoot(node).render(el);
+    }
+
+    // Phone
+    mount('app', <App />);
+
+    // Static gallery mounts
+    mount('avatar-mount',   <Avatar size={260} />);
+    mount('cover-mount',    <CoverImage width={900} height={Math.round(900 * 878/1080)} photo="bowl" />);
+    mount('richmenu-mount', <RichMenu width={900} />);
+    mount('welcome-mount',  <WelcomeCard width={360} />);
+    mount('carousel-mount', <Carousel cardWidth={300} />);
+  </script>
+</body>
+</html>

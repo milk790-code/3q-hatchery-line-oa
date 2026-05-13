@@ -1,0 +1,898 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>3Q 孵化所 · LINE 官方帳號上線操作手冊</title>
+  <link rel="stylesheet" href="../../colors_and_type.css"/>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: #0F0D0A; min-height: 100vh; color: var(--color-paper); font-family: var(--font-sans); }
+    .doc { max-width: 980px; margin: 0 auto; padding: 56px 32px 96px; }
+
+    /* Header */
+    .head { display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: flex-end; padding-bottom: 32px; border-bottom: 1px solid rgba(184,146,74,0.18); margin-bottom: 48px; }
+    .head .eyebrow { font-size: 10px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--color-gold); margin-bottom: 14px; }
+    .head h1 { font-family: var(--font-serif); font-weight: 300; font-size: 52px; letter-spacing: 0.05em; line-height: 1.05; margin: 0; }
+    .head h1 em { font-style: italic; color: var(--color-gold); }
+    .head .sub { font-size: 12px; line-height: 1.7; letter-spacing: 0.15em; color: rgba(245,242,236,0.65); max-width: 540px; margin-top: 14px; }
+    .head .r { text-align: right; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(245,242,236,0.5); line-height: 2; }
+
+    /* Stages */
+    .stage { padding: 56px 0; border-top: 1px solid rgba(184,146,74,0.12); page-break-inside: avoid; }
+    .stage:first-of-type { border-top: 0; padding-top: 24px; }
+    .stage-head { display: grid; grid-template-columns: 100px 1fr auto; gap: 28px; align-items: baseline; padding-bottom: 18px; margin-bottom: 28px; border-bottom: 1px solid rgba(184,146,74,0.15); }
+    .stage-head .no { font-family: var(--font-serif); font-style: italic; font-weight: 300; font-size: 56px; color: var(--color-gold); line-height: 1; }
+    .stage-head h2 { font-family: var(--font-serif); font-weight: 300; font-size: 32px; letter-spacing: 0.15em; color: var(--color-paper); margin: 0; line-height: 1.2; }
+    .stage-head .est { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--color-gold); border: 1px solid rgba(184,146,74,0.4); padding: 5px 12px; font-family: ui-monospace, monospace; align-self: center; }
+
+    .pathbar {
+      background: rgba(184,146,74,0.06);
+      border-left: 1px solid var(--color-gold);
+      padding: 14px 18px;
+      margin: 0 0 24px;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      font-size: 12px; letter-spacing: 0.06em; color: rgba(245,242,236,0.88);
+    }
+    .pathbar .l { font-family: var(--font-sans); font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--color-gold); display: block; margin-bottom: 6px; }
+
+    /* Step grid */
+    .steps { display: flex; flex-direction: column; gap: 18px; }
+    .step {
+      display: grid; grid-template-columns: 44px 1fr 1fr; gap: 28px;
+      background: #15110C; border: 1px solid rgba(184,146,74,0.15);
+      padding: 22px 24px;
+      page-break-inside: avoid;
+    }
+    .step-no {
+      font-family: var(--font-serif); font-style: italic;
+      font-weight: 300; font-size: 28px; color: var(--color-gold);
+      line-height: 1; padding-top: 2px;
+    }
+    .step-body h3 { font-family: var(--font-serif); font-weight: 300; font-size: 18px; letter-spacing: 0.12em; color: var(--color-paper); margin: 0 0 8px; }
+    .step-body p { font-size: 12px; line-height: 1.8; color: rgba(245,242,236,0.78); letter-spacing: 0.05em; margin: 0; }
+    .step-body ul { margin: 8px 0 0; padding-left: 18px; }
+    .step-body li { font-size: 12px; line-height: 1.75; color: rgba(245,242,236,0.78); letter-spacing: 0.05em; margin-bottom: 4px; }
+    .step-body code, .step-body em.kbd { font-family: ui-monospace, monospace; font-size: 11px; background: rgba(184,146,74,0.10); padding: 1px 6px; color: var(--color-gold); font-style: normal; letter-spacing: 0.04em; }
+
+    /* Screenshot placeholder */
+    .shot {
+      background: #1F1A12;
+      border: 1px dashed rgba(184,146,74,0.35);
+      min-height: 160px;
+      display: flex; align-items: stretch; justify-content: stretch;
+      position: relative;
+      overflow: hidden;
+    }
+    .shot-mock {
+      flex: 1; padding: 14px; display: flex; flex-direction: column; gap: 8px;
+      font-family: ui-monospace, monospace;
+      position: relative;
+    }
+    .shot-label {
+      position: absolute; top: 8px; right: 10px;
+      font-size: 8px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(184,146,74,0.55);
+    }
+    .shot-mock .chrome {
+      display: flex; align-items: center; gap: 6px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(245,242,236,0.08);
+      margin-bottom: 4px;
+    }
+    .shot-mock .chrome .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(245,242,236,0.2); }
+    .shot-mock .chrome .url { flex: 1; font-size: 9px; letter-spacing: 0.05em; color: rgba(245,242,236,0.5); padding-left: 8px; }
+    .shot-mock .nav { display: flex; gap: 14px; font-size: 9px; letter-spacing: 0.18em; color: rgba(245,242,236,0.55); padding: 4px 0; border-bottom: 1px solid rgba(245,242,236,0.06); }
+    .shot-mock .nav .active { color: var(--color-gold); }
+    .shot-mock .grid { display: grid; grid-template-columns: 60px 1fr; gap: 4px 14px; font-size: 9px; color: rgba(245,242,236,0.65); padding-top: 6px; }
+    .shot-mock .grid .k { color: rgba(184,146,74,0.7); letter-spacing: 0.15em; text-transform: uppercase; font-size: 8px; }
+    .shot-mock .grid .v { color: rgba(245,242,236,0.85); }
+    .shot-mock .field {
+      background: rgba(245,242,236,0.04);
+      border: 1px solid rgba(245,242,236,0.1);
+      padding: 6px 8px;
+      font-size: 9px;
+      color: rgba(245,242,236,0.6);
+    }
+    .shot-mock .marker {
+      position: absolute;
+      border: 1px solid var(--color-gold);
+      background: rgba(184,146,74,0.08);
+      pointer-events: none;
+    }
+    .shot-mock .marker::before {
+      content: attr(data-label);
+      position: absolute; top: -16px; left: 0;
+      font-size: 8px; letter-spacing: 0.25em; color: var(--color-gold);
+      background: var(--color-black); padding: 2px 6px;
+      white-space: nowrap;
+    }
+
+    /* Caution box */
+    .caution {
+      background: rgba(184,146,74,0.06);
+      border-left: 1px solid var(--color-gold);
+      padding: 14px 18px;
+      margin-top: 24px;
+      font-size: 12px; line-height: 1.85; color: rgba(245,242,236,0.85);
+      letter-spacing: 0.04em;
+    }
+    .caution .l { font-family: var(--font-sans); font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--color-gold); display: block; margin-bottom: 6px; }
+    .caution em { font-style: italic; color: var(--color-gold); }
+
+    /* TOC */
+    .toc {
+      background: rgba(184,146,74,0.04);
+      border: 1px solid rgba(184,146,74,0.18);
+      padding: 24px 28px;
+      margin-bottom: 64px;
+      page-break-after: always;
+    }
+    .toc h3 { font-family: var(--font-serif); font-weight: 300; font-size: 22px; letter-spacing: 0.15em; color: var(--color-paper); margin: 0 0 18px; }
+    .toc-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 28px; list-style: none; padding: 0; margin: 0; }
+    .toc-row { display: flex; align-items: baseline; gap: 12px; font-size: 12px; letter-spacing: 0.05em; }
+    .toc-row .no { font-family: var(--font-serif); font-style: italic; color: var(--color-gold); font-size: 16px; }
+    .toc-row .name { font-family: var(--font-serif); font-weight: 300; color: var(--color-paper); flex: 1; letter-spacing: 0.1em; }
+    .toc-row .est { font-size: 9px; color: rgba(245,242,236,0.5); letter-spacing: 0.25em; text-transform: uppercase; }
+
+    /* QA */
+    .qa-list { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(184,146,74,0.15); }
+    .qa-item {
+      background: #15110C; padding: 14px 18px;
+      display: grid; grid-template-columns: 18px 1fr; gap: 12px; align-items: flex-start;
+      cursor: pointer;
+    }
+    .qa-mark { width: 14px; height: 14px; border: 1px solid rgba(184,146,74,0.5); margin-top: 2px; }
+    .qa-item.on .qa-mark { background: var(--color-gold); }
+    .qa-text { font-size: 12px; line-height: 1.7; letter-spacing: 0.04em; color: rgba(245,242,236,0.85); }
+    .qa-item.on .qa-text { opacity: 0.6; }
+
+    /* Foot */
+    .doc-foot { margin-top: 80px; padding-top: 28px; border-top: 1px solid rgba(184,146,74,0.18); display: flex; justify-content: space-between; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(245,242,236,0.4); }
+
+    /* PRINT */
+    @media print {
+      @page { size: A4; margin: 16mm 14mm; }
+      html, body { background: #FFFFFF; color: #0A0A0A; }
+      .doc { padding: 0; max-width: none; }
+      .head, .head h1 { color: #0A0A0A; }
+      .head h1 em { color: #8E6F32; }
+      .head .sub, .head .r, .stage-head h2 { color: #0A0A0A; }
+      .stage { border-top-color: rgba(10,10,10,0.2); page-break-inside: auto; }
+      .stage-head { border-bottom-color: rgba(10,10,10,0.2); }
+      .stage-head .no { color: #8E6F32; }
+      .stage-head .est { color: #8E6F32; border-color: #8E6F32; }
+      .pathbar { background: rgba(142,111,50,0.06); border-left-color: #8E6F32; color: #0A0A0A; }
+      .pathbar .l { color: #8E6F32; }
+      .step { background: #FAF8F2; border-color: rgba(10,10,10,0.15); page-break-inside: avoid; }
+      .step-no { color: #8E6F32; }
+      .step-body h3, .step-body p, .step-body li { color: #0A0A0A; }
+      .step-body code, .step-body em.kbd { background: rgba(142,111,50,0.10); color: #8E6F32; }
+      .shot { background: #FFFFFF; border-color: rgba(142,111,50,0.45); }
+      .shot-mock { color: #0A0A0A; }
+      .shot-mock .chrome { border-color: rgba(0,0,0,0.1); }
+      .shot-mock .chrome .url, .shot-mock .nav, .shot-mock .grid .v, .shot-mock .field { color: #444; }
+      .shot-mock .field { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.1); }
+      .shot-label { color: rgba(142,111,50,0.7); }
+      .shot-mock .grid .k, .shot-mock .nav .active, .shot-mock .marker { color: #8E6F32; }
+      .shot-mock .marker { background: rgba(142,111,50,0.07); border-color: #8E6F32; }
+      .shot-mock .marker::before { background: #8E6F32; color: #FFFFFF; }
+      .caution { background: rgba(142,111,50,0.06); border-left-color: #8E6F32; color: #0A0A0A; }
+      .caution .l, .caution em { color: #8E6F32; }
+      .toc { background: rgba(142,111,50,0.04); border-color: rgba(142,111,50,0.3); }
+      .toc h3, .toc-row .name { color: #0A0A0A; }
+      .toc-row .no { color: #8E6F32; }
+      .toc-row .est { color: #888; }
+      .qa-list { background: rgba(10,10,10,0.15); }
+      .qa-item { background: #FAF8F2; }
+      .qa-text { color: #0A0A0A; }
+      .qa-mark { border-color: #8E6F32; }
+      .qa-item.on .qa-mark { background: #8E6F32; }
+      .doc-foot { color: #888; border-top-color: rgba(10,10,10,0.2); }
+    }
+  </style>
+</head>
+<body>
+  <div class="doc">
+
+    <header class="head">
+      <div class="l">
+        <div class="eyebrow">3Q HATCHERY · KIT 01 · PAGE 03</div>
+        <h1>上線 <em>操作手冊</em></h1>
+        <p class="sub">這份是「拿著 launch.html 的素材，逐步把它們套進 LINE Official Account Manager 後台」的順序。從開帳號到正式發佈，預估 90 分鐘可完成。</p>
+      </div>
+      <div class="r">
+        <span>8 STAGES</span><br/>
+        <span>~90 MIN</span><br/>
+        <span>A4 PRINT-READY</span>
+        <div style="margin-top: 12px;">
+          <a href="javascript:window.print()" style="color: var(--color-gold); font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; text-decoration: none; border-bottom: 1px solid var(--color-gold); padding-bottom: 2px;">⎙ 列印 / 存 PDF</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- TOC -->
+    <div class="toc">
+      <h3>章節目錄</h3>
+      <ul class="toc-list">
+        <li class="toc-row"><span class="no">00</span><span class="name">建立官方帳號</span><span class="est">10 MIN</span></li>
+        <li class="toc-row"><span class="no">01</span><span class="name">帳號身份</span><span class="est">12 MIN</span></li>
+        <li class="toc-row"><span class="no">02</span><span class="name">開始訊息</span><span class="est">8 MIN</span></li>
+        <li class="toc-row"><span class="no">03</span><span class="name">圖文選單 (最費工)</span><span class="est">25 MIN</span></li>
+        <li class="toc-row"><span class="no">04</span><span class="name">關鍵字自動回覆</span><span class="est">15 MIN</span></li>
+        <li class="toc-row"><span class="no">05</span><span class="name">非營業訊息</span><span class="est">5 MIN</span></li>
+        <li class="toc-row"><span class="no">06</span><span class="name">首推 Carousel</span><span class="est">10 MIN</span></li>
+        <li class="toc-row"><span class="no">07</span><span class="name">上線前 QA · 自我驗證</span><span class="est">10 MIN</span></li>
+      </ul>
+    </div>
+
+    <!-- ========== STAGE 00 ========== -->
+    <section class="stage">
+      <div class="stage-head">
+        <div class="no">00</div>
+        <h2>建立官方帳號</h2>
+        <div class="est">10 MIN</div>
+      </div>
+      <div class="pathbar"><span class="l">起點</span>https://manager.line.biz</div>
+      <div class="steps">
+
+        <div class="step">
+          <div class="step-no">01</div>
+          <div class="step-body">
+            <h3>登入 LINE Business ID</h3>
+            <p>用平常使用的 LINE 個人帳號登入。如果還沒有 Business ID，會跳出綁定流程。</p>
+            <ul>
+              <li>選「<em class="kbd">建立帳號</em>」</li>
+              <li>類型選「<em class="kbd">一般帳號（免費）</em>」</li>
+            </ul>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">SCREEN · 登入</span>
+              <div class="chrome"><span class="dot"/><span class="dot"/><span class="dot"/><span class="url">manager.line.biz/login</span></div>
+              <div class="field" style="margin-top:14px">3Q@example.com</div>
+              <div class="field">••••••••</div>
+              <div style="margin-top:8px; display:inline-block; padding:5px 10px; background:rgba(184,146,74,0.2); color:var(--color-gold); font-size:9px; letter-spacing:0.2em;">LOGIN →</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-no">02</div>
+          <div class="step-body">
+            <h3>填基本資料</h3>
+            <p>建立新帳號時要填的欄位：</p>
+            <ul>
+              <li>帳號名稱：<em class="kbd">3Q貢丸 · 台灣在地品牌孵化所</em></li>
+              <li>業種：<em class="kbd">廣告／代理／公關</em></li>
+              <li>子業種：<em class="kbd">行銷顧問</em></li>
+              <li>電子郵件：營運用信箱</li>
+            </ul>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">SCREEN · 帳號建立</span>
+              <div class="grid">
+                <span class="k">名稱</span><span class="v">3Q貢丸 · 台灣在地品牌孵化所</span>
+                <span class="k">業種</span><span class="v">廣告／代理／公關</span>
+                <span class="k">子業種</span><span class="v">行銷顧問</span>
+                <span class="k">EMAIL</span><span class="v">hello@3q-hatchery.tw</span>
+              </div>
+              <div style="margin-top:auto; display:flex; gap:8px;">
+                <div style="padding:5px 10px; border:1px solid rgba(245,242,236,0.3); font-size:9px; letter-spacing:0.2em; color:rgba(245,242,236,0.6);">取消</div>
+                <div style="padding:5px 10px; background:var(--color-gold); color:#0F0D0A; font-size:9px; letter-spacing:0.2em;">建立 →</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-no">03</div>
+          <div class="step-body">
+            <h3>記下 LINE ID</h3>
+            <p>建立成功後，到 <em class="kbd">設定 → 帳號設定 → 基本資料</em>，畫面下方會顯示 LINE ID（格式 <em class="kbd">@xxxxxxx</em>）。</p>
+            <p>把這個 ID 抄起來貼到 launch.html 第 01 段「帳號名稱」旁，所有對外資料都會用到。</p>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">SCREEN · 基本資料</span>
+              <div class="nav"><span>主頁</span><span class="active">設定</span><span>分析</span></div>
+              <div class="grid" style="margin-top:8px">
+                <span class="k">LINE ID</span><span class="v" style="color:var(--color-gold)">@121LKSPE</span>
+                <span class="k">狀態</span><span class="v">準備中</span>
+                <span class="k">類型</span><span class="v">一般帳號</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="caution"><span class="l">提醒</span>一個 LINE 個人帳號最多建立 <em>100 個 OA</em>，但每次建立都要重新驗證手機。建議用<em>營運專用</em>的 LINE 帳號，不要綁老闆的私人帳號。</div>
+    </section>
+
+    <!-- ========== STAGE 01 ========== -->
+    <section class="stage">
+      <div class="stage-head">
+        <div class="no">01</div>
+        <h2>帳號身份</h2>
+        <div class="est">12 MIN</div>
+      </div>
+      <div class="pathbar"><span class="l">後台路徑</span>主頁 → 設定 → 帳號設定 → 基本資料</div>
+      <div class="steps">
+
+        <div class="step">
+          <div class="step-no">01</div>
+          <div class="step-body">
+            <h3>上傳大頭照 Avatar</h3>
+            <p>從 launch.html 的「01 帳號身份 → Avatar」區塊右鍵→儲存圖片，得到 <em class="kbd">3Q-HATCHERY_avatar_640x640.png</em></p>
+            <ul>
+              <li>規格 <em class="kbd">640×640 · ≤3MB</em></li>
+              <li>LINE 會自動裁切成圓形，邊緣留 <em>10% 安全區</em></li>
+              <li>點「<em class="kbd">上傳照片</em>」按鈕選檔</li>
+            </ul>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">UPLOAD</span>
+              <div class="chrome"><span class="dot"/><span class="dot"/><span class="dot"/><span class="url">manager.line.biz/.../profile</span></div>
+              <div style="display:flex; gap:14px; padding-top:14px; align-items:center;">
+                <div style="width:60px; height:60px; border-radius:50%; background:#0A0A0A; border:1px solid var(--color-gold); display:flex; align-items:center; justify-content:center; font-family:var(--font-serif); font-size:24px; color:var(--color-gold);">3Q</div>
+                <div style="font-size:9px; color:rgba(245,242,236,0.55); line-height:1.7;">
+                  <div style="color:var(--color-gold); letter-spacing:0.15em;">3Q-HATCHERY_avatar_640x640.png</div>
+                  <div>640 × 640 · 0.4 MB</div>
+                  <div style="margin-top:6px; padding:3px 8px; background:rgba(184,146,74,0.15); display:inline-block; letter-spacing:0.2em;">變更照片</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-no">02</div>
+          <div class="step-body">
+            <h3>上傳封面照片 Cover</h3>
+            <p>同樣從 launch.html 下載 <em class="kbd">3Q-HATCHERY_cover_1080x878.jpg</em>。</p>
+            <ul>
+              <li>規格 <em class="kbd">1080×878 · ≤3MB</em></li>
+              <li>上方 <em>150px</em> 會被頭像 + 帳號名遮住</li>
+              <li>重要視覺 (米紙白 type block) 放右側 40%</li>
+            </ul>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">PREVIEW · 個人檔案頁</span>
+              <div style="position:relative; height:90px; background:linear-gradient(90deg, #2A2620 60%, var(--color-paper) 60%); border:1px solid rgba(245,242,236,0.1); margin-top: 6px;">
+                <div class="marker" data-label="A · 安全區 (頭像)" style="left:8px; top:8px; width:54px; height:54px; border-radius:50%; background:rgba(184,146,74,0.15);"></div>
+                <div class="marker" data-label="B · 主視覺" style="right:6px; top:18px; width:120px; height:54px;"></div>
+              </div>
+              <div class="grid" style="margin-top:10px">
+                <span class="k">尺寸</span><span class="v">1080 × 878</span>
+                <span class="k">FILE</span><span class="v" style="color:var(--color-gold)">cover_1080x878.jpg · 1.1 MB</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-no">03</div>
+          <div class="step-body">
+            <h3>填帳號名稱與狀態消息</h3>
+            <p>到 launch.html → 點「帳號名稱」與「狀態消息」旁的 <em class="kbd">複製</em> 按鈕，逐欄貼上。</p>
+            <ul>
+              <li>狀態消息上限 <em>20 字</em>，我們的版本 19 字</li>
+              <li>關於 / 介紹（About）可貼較長文案，到 <em>500 字</em></li>
+            </ul>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">FORM · 帳號設定</span>
+              <div class="grid">
+                <span class="k">DISPLAY NAME</span><span class="v">3Q貢丸 · 台灣在地品牌孵化所</span>
+              </div>
+              <div class="field" style="margin-top:8px">只要你願意說，我們就幫你被看見。</div>
+              <span class="k" style="font-size:8px; color:rgba(184,146,74,0.6); letter-spacing:0.2em; margin-top:6px;">STATUS · 19 / 20 字</span>
+              <div class="field" style="margin-top:6px; height:32px;">台灣在地品牌孵化所。不管你的店多大多小⋯</div>
+              <span class="k" style="font-size:8px; color:rgba(184,146,74,0.6); letter-spacing:0.2em; margin-top:4px;">ABOUT</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========== STAGE 02 ========== -->
+    <section class="stage">
+      <div class="stage-head">
+        <div class="no">02</div>
+        <h2>開始訊息</h2>
+        <div class="est">8 MIN</div>
+      </div>
+      <div class="pathbar"><span class="l">後台路徑</span>主頁 → 自動回應訊息 → 加入好友的歡迎訊息</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-no">01</div>
+          <div class="step-body">
+            <h3>新增「圖片訊息」</h3>
+            <p>從 launch.html 第 02 段把 <em class="kbd">WelcomeCard 1040×1040</em> 截圖或匯出存成 JPG。</p>
+            <ul>
+              <li>點「<em class="kbd">+ 新增</em>」→ 圖片</li>
+              <li>上傳檔案 → 預覽 → 儲存</li>
+            </ul>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">EDITOR</span>
+              <div class="nav"><span class="active">圖片</span><span>文字</span><span>影片</span><span>貼圖</span></div>
+              <div style="display:flex; gap:14px; padding-top:10px;">
+                <div style="width:60px; height:60px; background:var(--color-paper); border:1px solid var(--color-gold);"></div>
+                <div style="font-size:9px; color:rgba(245,242,236,0.65); line-height:1.7;">
+                  <div style="color:var(--color-gold); letter-spacing:0.15em;">welcome_1040x1040.jpg</div>
+                  <div>1040 × 1040 · 0.6 MB</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-no">02</div>
+          <div class="step-body">
+            <h3>新增「文字訊息」</h3>
+            <p>從 launch.html「02 開始訊息 → GREETING TEXT」點複製，貼到後台「文字訊息」框。</p>
+            <ul>
+              <li>上限 <em>500 字</em>（我們版本 ~120 字）</li>
+              <li>排序：<em>圖片在上、文字在下</em></li>
+              <li>點「<em class="kbd">儲存並啟用</em>」</li>
+            </ul>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">EDITOR · 訊息順序</span>
+              <div style="background:rgba(245,242,236,0.05); padding:8px; margin-top:6px; display:flex; gap:8px; align-items:center;">
+                <span style="font-size:8px; color:var(--color-gold);">1</span>
+                <div style="flex:1; padding:5px 8px; background:rgba(245,242,236,0.08); font-size:9px;">圖片 · welcome.jpg</div>
+              </div>
+              <div style="background:rgba(245,242,236,0.05); padding:8px; margin-top:4px; display:flex; gap:8px; align-items:center;">
+                <span style="font-size:8px; color:var(--color-gold);">2</span>
+                <div style="flex:1; padding:5px 8px; background:rgba(245,242,236,0.08); font-size:9px;">文字 · 你好，這裡是 3Q貢丸⋯</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== STAGE 03 ========== -->
+    <section class="stage">
+      <div class="stage-head">
+        <div class="no">03</div>
+        <h2>圖文選單 · 最費工的一步</h2>
+        <div class="est">25 MIN</div>
+      </div>
+      <div class="pathbar"><span class="l">後台路徑</span>主頁 → 圖文選單 → 建立</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-no">01</div>
+          <div class="step-body">
+            <h3>選範本與版型</h3>
+            <ul>
+              <li>範本 → <em class="kbd">大型（2500×1686）</em></li>
+              <li>版型 → <em class="kbd">自訂版型</em></li>
+              <li>填顯示名稱：<em class="kbd">主選單</em></li>
+              <li>顯示時間：<em class="kbd">無限期</em></li>
+              <li>開啟「<em class="kbd">預設顯示</em>」</li>
+            </ul>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">範本選擇</span>
+              <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px; padding-top:8px;">
+                <div style="border:1px solid var(--color-gold); padding:6px; font-size:8px; color:var(--color-gold); letter-spacing:0.15em;">大型<br/>2500×1686</div>
+                <div style="border:1px solid rgba(245,242,236,0.15); padding:6px; font-size:8px; color:rgba(245,242,236,0.5); letter-spacing:0.15em;">小型<br/>2500×843</div>
+                <div style="border:1px solid rgba(245,242,236,0.15); padding:6px; font-size:8px; color:rgba(245,242,236,0.5); letter-spacing:0.15em;">自訂</div>
+              </div>
+              <div style="padding-top:8px; display:grid; grid-template-columns:repeat(2,1fr); gap:4px;">
+                <div style="height:34px; border:1px solid rgba(245,242,236,0.15);"></div>
+                <div style="height:34px; border:1px solid var(--color-gold); background:rgba(184,146,74,0.06); font-size:8px; color:var(--color-gold); padding:4px; letter-spacing:0.1em;">自訂版型 · 1+4</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-no">02</div>
+          <div class="step-body">
+            <h3>上傳 Rich Menu 整張圖</h3>
+            <p>從 launch.html 第 03 段下載 <em class="kbd">richmenu_2500x1686.jpg</em>。</p>
+            <ul>
+              <li><em>檔案必須 ≤ 1 MB</em> — 如果太大用 <em class="kbd">tinyjpg.com</em> 壓縮</li>
+              <li>JPG quality 80 通常剛好壓進 0.8 MB</li>
+            </ul>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">UPLOAD</span>
+              <div style="aspect-ratio: 2500/1686; background:var(--color-paper); margin-top:8px; position:relative;">
+                <div class="marker" data-label="HERO" style="left:2%; top:4%; right:2%; height:42%; border:1px solid rgba(184,146,74,0.5);"></div>
+                <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--color-gold); position:absolute; left:2%; right:2%; bottom:4%; height:52%;">
+                  <div style="background:var(--color-black);"></div><div style="background:var(--color-black);"></div><div style="background:var(--color-black);"></div><div style="background:var(--color-black);"></div>
+                </div>
+              </div>
+              <div style="font-size:9px; color:rgba(245,242,236,0.55); padding-top:8px; letter-spacing:0.1em;">richmenu_2500x1686.jpg · 0.78 MB ✓</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-no">03</div>
+          <div class="step-body">
+            <h3>畫 5 個 tap zone</h3>
+            <p>後台是用滑鼠拉框，但 launch.html 第 03 段給了精確座標。對齊步驟：</p>
+            <ul>
+              <li>點「<em class="kbd">+ 新增區塊</em>」開始畫</li>
+              <li>畫好後右側可手動修改 x/y/w/h 數字</li>
+              <li>HERO (0, 0, 2500, 800) → 動作：URI</li>
+              <li>B / C / D / E (y=800, 各寬 625) → 動作：訊息</li>
+            </ul>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">TAP ZONES</span>
+              <div style="aspect-ratio: 2500/1686; background:var(--color-paper); margin-top:6px; position:relative;">
+                <div class="marker" data-label="A" style="left:0; top:0; right:0; height:47.4%;"></div>
+                <div class="marker" data-label="B" style="left:0; top:47.4%; width:25%; bottom:0;"></div>
+                <div class="marker" data-label="C" style="left:25%; top:47.4%; width:25%; bottom:0;"></div>
+                <div class="marker" data-label="D" style="left:50%; top:47.4%; width:25%; bottom:0;"></div>
+                <div class="marker" data-label="E" style="left:75%; top:47.4%; width:25%; bottom:0;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-no">04</div>
+          <div class="step-body">
+            <h3>對每個區塊設定動作</h3>
+            <ul>
+              <li><em>A · HERO</em>：類型「<em class="kbd">連結</em>」→ URI <em class="kbd">https://3q-hatchery.tw</em></li>
+              <li><em>B</em>：類型「<em class="kbd">文字</em>」→ <em class="kbd">我想說說我的店</em></li>
+              <li><em>C</em>：類型「<em class="kbd">文字</em>」→ <em class="kbd">我想了解好物・好照</em></li>
+              <li><em>D</em>：類型「<em class="kbd">文字</em>」→ <em class="kbd">我想要客製行銷</em></li>
+              <li><em>E</em>：類型「<em class="kbd">文字</em>」→ <em class="kbd">查我的進度</em></li>
+            </ul>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">ACTION FORM · 區塊 B</span>
+              <div class="grid">
+                <span class="k">區塊</span><span class="v">B · (0, 800, 625, 886)</span>
+                <span class="k">類型</span><span class="v">文字</span>
+                <span class="k">文字</span><span class="v" style="color:var(--color-gold);">我想說說我的店</span>
+              </div>
+              <div style="margin-top:8px; padding:5px 10px; background:var(--color-gold); color:#0F0D0A; font-size:9px; letter-spacing:0.2em; align-self:flex-start;">儲存</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="caution"><span class="l">關鍵</span>區塊 B–E 的「文字」必須跟「<em>關鍵字自動回覆</em>」（下一段）的 keyword <em>完全相同</em>，才會觸發對應的回應。launch.html 上的兩處我已對齊過了。</div>
+    </section>
+
+    <!-- ========== STAGE 04 ========== -->
+    <section class="stage">
+      <div class="stage-head">
+        <div class="no">04</div>
+        <h2>關鍵字自動回覆</h2>
+        <div class="est">15 MIN · 6 組</div>
+      </div>
+      <div class="pathbar"><span class="l">後台路徑</span>主頁 → 自動回應訊息 → 關鍵字回應 → 新增</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-no">01</div>
+          <div class="step-body">
+            <h3>對 launch.html 6 組逐一建立</h3>
+            <p>每組重複下面流程：</p>
+            <ul>
+              <li>關鍵字（多個用<em>半形逗號</em>分隔）— 從 launch.html 複製</li>
+              <li>回應訊息類型 → <em class="kbd">文字</em></li>
+              <li>內文 — 從 launch.html「複製」</li>
+              <li>儲存</li>
+            </ul>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">關鍵字 · 第 1 組</span>
+              <div class="field" style="margin-top:6px;">我想說說我的店, 我的店, 我想說</div>
+              <span class="k" style="font-size:8px; color:rgba(184,146,74,0.6); letter-spacing:0.2em; margin-top:4px;">3 個 KEYWORD</span>
+              <div class="field" style="margin-top:6px; flex:1; min-height:48px; font-size:8px; line-height:1.6;">好。先告訴我們三件事：1. 你的店在哪裡⋯</div>
+              <div style="margin-top:6px; padding:4px 10px; background:var(--color-gold); color:#0F0D0A; font-size:9px; letter-spacing:0.2em; align-self:flex-start;">儲存並啟用</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="caution"><span class="l">提醒</span>關鍵字是 <em>完全比對</em>，不是模糊比對。「我想說說我的店」與「我想 說 說 我的店」(中間有空格) 不會觸發同一條規則。直接從 launch.html 複製貼上，避免手打錯。</div>
+    </section>
+
+    <!-- ========== STAGE 05 ========== -->
+    <section class="stage">
+      <div class="stage-head">
+        <div class="no">05</div>
+        <h2>非營業訊息</h2>
+        <div class="est">5 MIN</div>
+      </div>
+      <div class="pathbar"><span class="l">後台路徑</span>主頁 → 自動回應訊息 → 一般回應訊息</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-no">01</div>
+          <div class="step-body">
+            <h3>設定回應時間</h3>
+            <ul>
+              <li>開啟「<em class="kbd">使用回應時間設定</em>」</li>
+              <li>營業時間：<em class="kbd">週一至週五 10:00–19:00</em></li>
+              <li>時區：<em class="kbd">Asia/Taipei</em></li>
+            </ul>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">SCHEDULE</span>
+              <div class="grid">
+                <span class="k">MON–FRI</span><span class="v">10:00 – 19:00</span>
+                <span class="k">SAT–SUN</span><span class="v" style="color:rgba(245,242,236,0.4);">休息（自動回覆）</span>
+                <span class="k">時區</span><span class="v">Asia / Taipei (UTC+8)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-no">02</div>
+          <div class="step-body">
+            <h3>貼上 Away message</h3>
+            <p>從 launch.html「06 非營業訊息 → AWAY MESSAGE」複製，貼到「非營業時間的回應訊息」框。儲存。</p>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">AWAY MESSAGE</span>
+              <div class="field" style="margin-top:6px; min-height:48px; font-size:9px; line-height:1.7;">收到你的訊息了 — 我們會在 24 小時內回你⋯</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== STAGE 06 ========== -->
+    <section class="stage">
+      <div class="stage-head">
+        <div class="no">06</div>
+        <h2>首推 Carousel</h2>
+        <div class="est">10 MIN</div>
+      </div>
+      <div class="pathbar"><span class="l">後台路徑</span>主頁 → 群發訊息 → 建立 → 圖片輪播</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-no">01</div>
+          <div class="step-body">
+            <h3>建 4 張卡</h3>
+            <ul>
+              <li>每張上傳 <em class="kbd">1040×1040 JPG</em></li>
+              <li>標題：從 launch.html 第 05 段複製</li>
+              <li>每張的「點擊動作」→ 訊息 → 複製 launch.html 上的 ACTION text</li>
+              <li>排序：01 入駐 → 02 好物・好照 → 03 三代米舖 → 04 鹿港織坊</li>
+            </ul>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">CAROUSEL · 4 cards</span>
+              <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px; padding-top:6px;">
+                <div style="aspect-ratio:1/1; background:var(--color-paper); border:1px solid rgba(184,146,74,0.4); position:relative;"><span style="position:absolute; bottom:3px; left:3px; font-size:7px; color:var(--color-gold); letter-spacing:0.2em;">01</span></div>
+                <div style="aspect-ratio:1/1; background:var(--color-paper); border:1px solid rgba(184,146,74,0.4); position:relative;"><span style="position:absolute; bottom:3px; left:3px; font-size:7px; color:var(--color-gold); letter-spacing:0.2em;">02</span></div>
+                <div style="aspect-ratio:1/1; background:var(--color-paper); border:1px solid rgba(184,146,74,0.4); position:relative;"><span style="position:absolute; bottom:3px; left:3px; font-size:7px; color:var(--color-gold); letter-spacing:0.2em;">03</span></div>
+                <div style="aspect-ratio:1/1; background:var(--color-paper); border:1px solid rgba(184,146,74,0.4); position:relative;"><span style="position:absolute; bottom:3px; left:3px; font-size:7px; color:var(--color-gold); letter-spacing:0.2em;">04</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-no">02</div>
+          <div class="step-body">
+            <h3>排程</h3>
+            <ul>
+              <li>對象：<em class="kbd">所有好友</em></li>
+              <li>傳送時間：先存草稿，正式開幕日當天上午 11:00 發</li>
+            </ul>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">SCHEDULE</span>
+              <div class="grid">
+                <span class="k">對象</span><span class="v">所有好友</span>
+                <span class="k">時間</span><span class="v">2026 / 03 / 02 · 11:00</span>
+                <span class="k">狀態</span><span class="v" style="color:var(--color-gold);">草稿</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== STAGE 07 ========== -->
+    <section class="stage">
+      <div class="stage-head">
+        <div class="no">07</div>
+        <h2>上線前 QA · 自我驗證</h2>
+        <div class="est">10 MIN</div>
+      </div>
+      <div class="pathbar"><span class="l">怎麼測</span>用你自己的個人 LINE 加官方帳號當好友 → 逐項點過</div>
+      <div class="qa-list" id="qa-mount"></div>
+    </section>
+
+    <!-- ========== APPENDIX ========== -->
+    <section class="stage">
+      <div class="stage-head">
+        <div class="no">A</div>
+        <h2>附錄 · LINE 專屬規則</h2>
+        <div class="est">FYI</div>
+      </div>
+      <div class="steps">
+
+        <div class="step">
+          <div class="step-no">A1</div>
+          <div class="step-body">
+            <h3>免費版的訊息上限</h3>
+            <p>一般帳號（未驗證）每月有 <em class="kbd">200 則群發訊息</em> 配額。一對一回覆、自動回覆 <em>不計入</em>，只有「群發訊息」算。</p>
+            <ul>
+              <li>用 carousel push 一次發給所有好友 = 1 則（按好友數計算）</li>
+              <li>超過 200 則需升級「<em class="kbd">輕用量方案</em>」NT$800/月，5000 則</li>
+              <li>初期建議：<em>一週 1 推 carousel</em>，先觀察 open rate</li>
+            </ul>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">QUOTA</span>
+              <div class="grid">
+                <span class="k">免費</span><span class="v">200 則 / 月</span>
+                <span class="k">輕用量</span><span class="v">5,000 則 · NT$800</span>
+                <span class="k">中用量</span><span class="v">15,000 則 · NT$4,000</span>
+                <span class="k">本月</span><span class="v" style="color:var(--color-gold);">12 / 200 已用</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-no">A2</div>
+          <div class="step-body">
+            <h3>申請藍勾勾驗證帳號</h3>
+            <p>驗證帳號可以在 LINE 內被搜尋（一般帳號只能掃 QR 碼或點短網址加入），對接觸新客很重要。</p>
+            <ul>
+              <li>條件 1：月發訊量穩定達 <em>200 則以上</em></li>
+              <li>條件 2：提供 <em>統編 + 公司登記證明</em></li>
+              <li>條件 3：實體店面照片 / 官網 URL</li>
+              <li>路徑：主頁 → 設定 → 帳號設定 → <em class="kbd">申請驗證</em></li>
+              <li>審核期 5–7 工作天，免費</li>
+            </ul>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">VERIFICATION</span>
+              <div style="display:flex; gap:14px; padding-top:8px; align-items:center;">
+                <div style="width:36px; height:36px; border-radius:50%; background:rgba(184,146,74,0.15); border:1px solid var(--color-gold); display:flex; align-items:center; justify-content:center; color:var(--color-gold); font-size:18px;">✓</div>
+                <div style="font-size:9px; color:rgba(245,242,236,0.65); line-height:1.7;">
+                  <div style="color:var(--color-gold); letter-spacing:0.15em;">驗證帳號 (藍勾勾)</div>
+                  <div>可在 LINE 內被搜尋</div>
+                  <div>顯示綠色驗證標章</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-no">A3</div>
+          <div class="step-body">
+            <h3>下載 QR Code · 印實體</h3>
+            <ul>
+              <li>路徑：主頁 → <em class="kbd">增加好友</em> → 取得網址</li>
+              <li>下載 <em class="kbd">512×512 / 1024×1024 PNG</em>，貼在名片、店面、海報</li>
+              <li>短網址 <em class="kbd">lin.ee/121LKSPE</em> 也在這頁，給數位用</li>
+              <li>建議印的位置：<em>店門外 · 收銀台 · 名片背面</em></li>
+            </ul>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">QR ASSET</span>
+              <div style="display:flex; gap:14px; padding-top:10px;">
+                <div style="width:64px; height:64px; background:var(--color-paper); border:1px solid var(--color-gold); position:relative;">
+                  <div style="position:absolute; inset:4px; background-image: repeating-linear-gradient(0deg, #0A0A0A 0 4px, transparent 4px 8px), repeating-linear-gradient(90deg, #0A0A0A 0 4px, transparent 4px 8px); opacity: 0.65;"></div>
+                </div>
+                <div style="font-size:9px; color:rgba(245,242,236,0.65); line-height:1.7;">
+                  <div style="color:var(--color-gold); letter-spacing:0.15em;">qr_1024.png · 1024×1024</div>
+                  <div>lin.ee/121LKSPE</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-no">A4</div>
+          <div class="step-body">
+            <h3>標籤分類 · 分群推播</h3>
+            <p>好友越多，分群越重要。LINE 後台可以對好友打「標籤」，下次群發只發給某個標籤。</p>
+            <ul>
+              <li>建議標籤：<em class="kbd">入駐中 · 等待諮詢 · 已成案 · 已合作完</em></li>
+              <li>路徑：主頁 → 聊天 → 點對方頭像 → <em class="kbd">加標籤</em></li>
+              <li>群發時可選「只發給 標籤＝XX 的好友」</li>
+            </ul>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">TAGS · 4 個</span>
+              <div style="display:flex; flex-wrap:wrap; gap:6px; padding-top:10px;">
+                <span style="font-size:8px; padding:3px 8px; border:1px solid rgba(184,146,74,0.4); color:var(--color-gold); letter-spacing:0.15em;">入駐中 · 12</span>
+                <span style="font-size:8px; padding:3px 8px; border:1px solid rgba(184,146,74,0.4); color:var(--color-gold); letter-spacing:0.15em;">等待諮詢 · 8</span>
+                <span style="font-size:8px; padding:3px 8px; border:1px solid rgba(184,146,74,0.4); color:var(--color-gold); letter-spacing:0.15em;">已成案 · 4</span>
+                <span style="font-size:8px; padding:3px 8px; border:1px solid rgba(184,146,74,0.4); color:var(--color-gold); letter-spacing:0.15em;">已合作完 · 2</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-no">A5</div>
+          <div class="step-body">
+            <h3>LINE 通知設定（你這邊）</h3>
+            <p>用戶傳訊息進來時，你要收得到通知。</p>
+            <ul>
+              <li>下載 <em class="kbd">LINE Official Account App</em>（iOS / Android）</li>
+              <li>用 Business ID 登入</li>
+              <li>開啟「<em class="kbd">推播通知</em>」</li>
+              <li>「<em class="kbd">優先回應時間</em>」設成早 9 點到晚 9 點，半夜不打擾</li>
+            </ul>
+          </div>
+          <div class="shot">
+            <div class="shot-mock">
+              <span class="shot-label">MOBILE APP</span>
+              <div style="display:flex; flex-direction:column; gap:6px; padding-top:8px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:9px; color:rgba(245,242,236,0.7);"><span>推播通知</span><span style="color:var(--color-gold);">●</span></div>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:9px; color:rgba(245,242,236,0.7);"><span>聲音</span><span style="color:var(--color-gold);">●</span></div>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:9px; color:rgba(245,242,236,0.7);"><span>振動</span><span style="color:var(--color-gold);">●</span></div>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:9px; color:rgba(245,242,236,0.45);"><span>勿擾時段</span><span>21:00 – 09:00</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <footer class="doc-foot">
+      <span>3Q 貢丸 · 上線操作手冊 · V1.0</span>
+      <span>2026 · TAIPEI</span>
+    </footer>
+  </div>
+
+  <script>
+    // Simple QA checklist — vanilla JS, no React needed.
+    const items = [
+      '加好友 → 跳出 Welcome 圖卡 + Greeting 文字',
+      '點 Rich Menu A · HERO → 連到官網 / lin.ee 短網址',
+      '點 B「說說你的店」→ 收到引導 3 件事的回覆',
+      '點 C「好物・好照」→ 收到 500 元起方案介紹',
+      '點 D「陪你被看見」→ 收到客製行銷介紹',
+      '點 E「走到哪了」→ 收到進度查詢引導',
+      '半夜 23:00 留言 → 收到 Away message',
+      '試打「諮詢」→ 收到約時段回應',
+      '試打「實例」→ 收到 3 個入駐案例',
+      '試打「好物」→ 收到「好物・好照」說明',
+      'Carousel push 預覽 → 4 張卡都正確',
+      '頭像 + 封面 + 狀態消息 → 個人檔案頁看起來合身',
+    ];
+    const mount = document.getElementById('qa-mount');
+    items.forEach((t, i) => {
+      const el = document.createElement('div');
+      el.className = 'qa-item';
+      el.innerHTML = `<div class="qa-mark"></div><div class="qa-text">${t}</div>`;
+      el.addEventListener('click', () => el.classList.toggle('on'));
+      mount.appendChild(el);
+    });
+  </script>
+</body>
+</html>

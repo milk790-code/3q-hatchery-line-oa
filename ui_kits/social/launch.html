@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>3Q 孵化所 · 社群上線文件</title>
+  <link rel="stylesheet" href="../../colors_and_type.css"/>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: #0F0D0A; min-height: 100vh; color: var(--color-paper); font-family: var(--font-sans); }
+    .doc { max-width: 1280px; margin: 0 auto; padding: 56px 32px 96px; }
+
+    .head { display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: flex-end; padding-bottom: 32px; border-bottom: 1px solid rgba(184,146,74,0.18); margin-bottom: 56px; }
+    .head .eyebrow { font-size: 10px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--color-gold); margin-bottom: 14px; }
+    .head h1 { font-family: var(--font-serif); font-weight: 300; font-size: 52px; letter-spacing: 0.05em; line-height: 1.05; margin: 0; }
+    .head h1 em { font-style: italic; color: var(--color-gold); }
+    .head .sub { font-size: 12px; line-height: 1.7; letter-spacing: 0.15em; color: rgba(245,242,236,0.65); max-width: 540px; margin-top: 14px; }
+    .head .r { text-align: right; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(245,242,236,0.5); line-height: 2; }
+
+    /* Channel sections */
+    section.ch { padding: 64px 0; border-top: 1px solid rgba(184,146,74,0.12); display: grid; grid-template-columns: 220px 1fr; gap: 56px; }
+    section.ch:first-of-type { border-top: 0; padding-top: 24px; }
+    section.ch .nav .no { font-family: var(--font-serif); font-style: italic; font-weight: 300; font-size: 56px; line-height: 1; color: var(--color-gold); margin-bottom: 12px; }
+    section.ch .nav .nm { font-family: var(--font-serif); font-weight: 300; font-size: 26px; letter-spacing: 0.2em; color: var(--color-paper); line-height: 1.3; }
+    section.ch .nav .en { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(245,242,236,0.45); margin-top: 8px; }
+    section.ch .nav .handle { margin-top: 14px; font-family: ui-monospace, monospace; font-size: 12px; letter-spacing: 0.1em; color: var(--color-gold); }
+    section.ch .nav .cadence { margin-top: 8px; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,236,0.55); font-style: italic; }
+
+    section.ch .body { display: flex; flex-direction: column; gap: 28px; }
+
+    /* Speccard */
+    .speccard {
+      display: grid; grid-template-columns: 1.1fr 1fr; gap: 32px;
+      background: #15110C;
+      border: 1px solid rgba(184,146,74,0.18);
+      padding: 28px;
+    }
+    .speccard .prev { background: #1F1A12; padding: 20px; display: flex; align-items: center; justify-content: center; min-height: 240px; }
+    .speccard dl { display: grid; grid-template-columns: 100px 1fr; gap: 6px 16px; margin: 0; }
+    .speccard dt { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(245,242,236,0.45); padding-top: 3px; }
+    .speccard dd { margin: 0; font-size: 12px; line-height: 1.7; color: rgba(245,242,236,0.85); letter-spacing: 0.04em; font-family: ui-monospace, monospace; }
+    .speccard dd.note { font-family: var(--font-sans); font-style: italic; color: rgba(245,242,236,0.55); }
+
+    /* Paste */
+    .paste { background: #181410; border-left: 1px solid var(--color-gold); padding: 18px 20px; font-size: 13px; line-height: 1.85; letter-spacing: 0.03em; color: rgba(245,242,236,0.92); white-space: pre-wrap; position: relative; font-weight: 300; }
+    .paste-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .paste-label { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--color-gold); }
+    .paste-count { font-size: 9px; letter-spacing: 0.2em; color: rgba(245,242,236,0.4); font-family: ui-monospace, monospace; }
+    .paste-copy { position: absolute; right: 18px; top: 14px; background: transparent; border: 1px solid rgba(184,146,74,0.4); color: var(--color-gold); font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; padding: 5px 12px; cursor: pointer; }
+    .paste-copy:hover, .paste-copy.copied { background: var(--color-gold); color: #0F0D0A; }
+
+    /* Highlight covers */
+    .highlights { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+    .hl-cover {
+      aspect-ratio: 1 / 1;
+      background: var(--color-paper);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+      padding: 18px; position: relative;
+      border-radius: 50%;
+      border: 1px solid rgba(184,146,74,0.3);
+    }
+    .hl-cover img { width: 26px; height: 26px; opacity: 0.85; }
+    .hl-cover .zh { font-family: var(--font-serif); font-weight: 300; font-size: 14px; letter-spacing: 0.15em; color: var(--color-black); }
+    .hl-cover .en { font-size: 7px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--color-gold); }
+
+    /* Threads card examples */
+    .th-examples { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .th-card {
+      background: #181410; border: 1px solid rgba(184,146,74,0.18);
+      padding: 22px;
+    }
+    .th-card .h { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--color-gold); }
+    .th-card .h::after { content: ""; flex: 1; height: 1px; background: rgba(184,146,74,0.3); }
+    .th-card .t { font-family: var(--font-serif); font-weight: 300; font-size: 17px; line-height: 1.65; letter-spacing: 0.08em; color: var(--color-paper); white-space: pre-line; }
+
+    /* TikTok episodes */
+    .eps { display: flex; flex-direction: column; gap: 1px; background: rgba(184,146,74,0.15); }
+    .ep-row {
+      background: #15110C; padding: 16px 22px;
+      display: grid; grid-template-columns: 60px 1fr auto auto; gap: 24px; align-items: center;
+    }
+    .ep-no { font-family: var(--font-serif); font-style: italic; font-size: 22px; color: var(--color-gold); letter-spacing: 0.05em; }
+    .ep-title { font-family: var(--font-serif); font-weight: 300; font-size: 17px; letter-spacing: 0.12em; color: var(--color-paper); }
+    .ep-meta { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(245,242,236,0.45); font-family: ui-monospace, monospace; }
+
+    /* Checklist */
+    .checklist { display: flex; flex-direction: column; gap: 1px; background: rgba(184,146,74,0.15); margin-top: 14px; }
+    .ck-row { background: #15110C; padding: 14px 22px; display: grid; grid-template-columns: 28px 1fr auto auto; gap: 16px; align-items: center; cursor: pointer; }
+    .ck-mark { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(184,146,74,0.45); display: flex; align-items: center; justify-content: center; }
+    .ck-row.done .ck-mark { background: var(--color-gold); }
+    .ck-row.done .ck-mark::after { content: ""; width: 4px; height: 7px; border: solid #0F0D0A; border-width: 0 1px 1px 0; transform: rotate(45deg) translate(-1px, -1px); }
+    .ck-label { font-family: var(--font-serif); font-weight: 300; font-size: 16px; letter-spacing: 0.12em; color: var(--color-paper); }
+    .ck-row.done .ck-label { opacity: 0.65; }
+    .ck-detail { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,236,0.5); font-family: ui-monospace, monospace; }
+    .ck-stat { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(184,146,74,0.7); }
+    .ck-row.done .ck-stat { color: var(--color-gold); }
+
+    .doc-foot { margin-top: 64px; padding-top: 28px; border-top: 1px solid rgba(184,146,74,0.18); display: flex; justify-content: space-between; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(245,242,236,0.4); }
+
+    @media print {
+      @page { size: A3 portrait; margin: 14mm; }
+      html, body { background: #FFFFFF; color: #0A0A0A; }
+      .doc { padding: 0; max-width: none; }
+      .head, .head h1 { color: #0A0A0A; }
+      .head h1 em { color: #8E6F32; }
+      .head .sub, .head .r { color: #555; }
+      .speccard { background: #FAF8F2; border-color: rgba(10,10,10,0.15); page-break-inside: avoid; }
+      .speccard .prev { background: #FFFFFF; }
+      .speccard dt { color: #888; }
+      .speccard dd, .speccard dd.note { color: #0A0A0A; }
+      .paste { background: #FAF8F2; color: #0A0A0A; border-left-color: #8E6F32; }
+      .paste-label { color: #8E6F32; }
+      .paste-count { color: #888; }
+      .paste-copy { display: none !important; }
+      section.ch { color: #0A0A0A; border-top-color: rgba(10,10,10,0.2); page-break-inside: avoid; }
+      section.ch .nav .no { color: #8E6F32; }
+      section.ch .nav .nm { color: #0A0A0A; }
+      section.ch .nav .handle { color: #8E6F32; }
+      .hl-cover { background: #FAF8F2; }
+      .hl-cover .zh { color: #0A0A0A; }
+      .th-card { background: #FAF8F2; border-color: rgba(10,10,10,0.15); }
+      .th-card .t { color: #0A0A0A; }
+      .eps, .checklist { background: rgba(10,10,10,0.15); }
+      .ep-row, .ck-row { background: #FAF8F2; page-break-inside: avoid; }
+      .ep-title, .ck-label { color: #0A0A0A; }
+    }
+  </style>
+</head>
+<body>
+  <div class="doc">
+
+    <header class="head">
+      <div class="l">
+        <div class="eyebrow">3Q HATCHERY · KIT 02 · SOCIAL</div>
+        <h1>準備上 <em>社群</em></h1>
+        <p class="sub">把 LINE OA 的語氣、視覺、節奏延伸到 IG / Threads / TikTok。每個平台都有對應的規格、文案、目標、上線清單。</p>
+      </div>
+      <div class="r">
+        <span>3 PLATFORMS</span><br/>
+        <span>17 ASSETS</span><br/>
+        <span>10 CHECKS</span>
+        <div style="margin-top: 12px;">
+          <a href="javascript:window.print()" style="color: var(--color-gold); font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; text-decoration: none; border-bottom: 1px solid var(--color-gold); padding-bottom: 2px;">⎙ 列印 / 存 PDF</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== INSTAGRAM ===== -->
+    <section class="ch">
+      <div class="nav">
+        <div class="no">01</div>
+        <div class="nm">Instagram</div>
+        <div class="en">Feed · Story · Highlights</div>
+        <div class="handle" id="ig-handle"></div>
+        <div class="cadence" id="ig-cadence"></div>
+      </div>
+      <div class="body" id="ig-body"></div>
+    </section>
+
+    <!-- ===== THREADS ===== -->
+    <section class="ch">
+      <div class="nav">
+        <div class="no">02</div>
+        <div class="nm">Threads</div>
+        <div class="en">手記 · Weekly Note</div>
+        <div class="handle" id="th-handle"></div>
+        <div class="cadence" id="th-cadence"></div>
+      </div>
+      <div class="body" id="th-body"></div>
+    </section>
+
+    <!-- ===== TIKTOK ===== -->
+    <section class="ch">
+      <div class="nav">
+        <div class="no">03</div>
+        <div class="nm">TikTok</div>
+        <div class="en">Episode Series</div>
+        <div class="handle" id="tt-handle"></div>
+        <div class="cadence" id="tt-cadence"></div>
+      </div>
+      <div class="body" id="tt-body"></div>
+    </section>
+
+    <!-- ===== Checklist ===== -->
+    <section class="ch">
+      <div class="nav">
+        <div class="no">04</div>
+        <div class="nm">上線清單</div>
+        <div class="en">Pre-launch Checks</div>
+      </div>
+      <div class="body" id="ck-body"></div>
+    </section>
+
+    <footer class="doc-foot">
+      <span>3Q 貢丸 · 台灣在地品牌孵化所</span>
+      <span>LINE @121LKSPE · IG @3q.hatchery · TikTok @3q.hatchery</span>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script src="SocialSpecs.js"></script>
+  <script type="text/babel" src="IGPost.jsx"></script>
+  <script type="text/babel" src="IGStory.jsx"></script>
+  <script type="text/babel" src="TikTokCover.jsx"></script>
+  <script type="text/babel" src="ThreadsPost.jsx"></script>
+  <script type="text/babel" src="social-launch-views.jsx"></script>
+</body>
+</html>

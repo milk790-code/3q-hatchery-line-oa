@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>3Q 孵化所 · 30 天內容排程</title>
+  <link rel="stylesheet" href="../../colors_and_type.css"/>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: #0F0D0A; min-height: 100vh; color: var(--color-paper); font-family: var(--font-sans); }
+    .doc { max-width: 1280px; margin: 0 auto; padding: 56px 32px 96px; }
+
+    /* Header */
+    .head { display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: flex-end; padding-bottom: 32px; border-bottom: 1px solid rgba(184,146,74,0.18); margin-bottom: 48px; }
+    .head .eyebrow { font-size: 10px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--color-gold); margin-bottom: 14px; }
+    .head h1 { font-family: var(--font-serif); font-weight: 300; font-size: 52px; letter-spacing: 0.05em; line-height: 1.05; margin: 0; color: var(--color-paper); }
+    .head h1 em { font-style: italic; color: var(--color-gold); }
+    .head .sub { font-size: 12px; line-height: 1.7; letter-spacing: 0.15em; color: rgba(245,242,236,0.65); max-width: 540px; margin-top: 14px; }
+    .head .r {
+      text-align: right; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(245,242,236,0.5);
+      line-height: 2.2;
+    }
+    .head .r .stat { font-family: var(--font-serif); font-style: italic; font-size: 28px; color: var(--color-gold); letter-spacing: 0.05em; }
+
+    /* Cadence */
+    .cadence { background: rgba(184,146,74,0.06); border-left: 1px solid var(--color-gold); padding: 18px 22px; margin-bottom: 56px; }
+    .cadence .l { font-size: 9px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--color-gold); margin-bottom: 8px; }
+    .cadence .t { font-family: var(--font-serif); font-weight: 300; font-size: 18px; letter-spacing: 0.12em; color: var(--color-paper); }
+
+    /* Theme banner per week */
+    .week { margin-bottom: 64px; }
+    .week-head { display: grid; grid-template-columns: 140px 1fr; gap: 32px; align-items: baseline; padding-bottom: 18px; border-bottom: 1px solid rgba(184,146,74,0.15); margin-bottom: 18px; }
+    .week-head .l { font-family: var(--font-serif); font-style: italic; font-weight: 300; font-size: 36px; color: var(--color-gold); letter-spacing: 0.05em; line-height: 1; }
+    .week-head .r { display: flex; flex-direction: column; gap: 8px; }
+    .week-head h2 { font-family: var(--font-serif); font-weight: 300; font-size: 32px; letter-spacing: 0.15em; color: var(--color-paper); margin: 0; }
+    .week-head .meta { display: flex; gap: 18px; font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(245,242,236,0.5); }
+    .week-head .meta em { font-style: italic; color: var(--color-gold); letter-spacing: 0.1em; }
+    .week-head .focus { font-size: 12px; line-height: 1.7; letter-spacing: 0.05em; color: rgba(245,242,236,0.7); margin-top: 4px; }
+
+    /* Entry rows */
+    .entries { display: flex; flex-direction: column; gap: 1px; background: rgba(184,146,74,0.12); }
+    .entry {
+      background: #15110C; padding: 18px 22px;
+      display: grid; grid-template-columns: 60px 100px 120px 1fr; gap: 24px;
+      align-items: flex-start;
+    }
+    .entry .day { font-family: var(--font-serif); font-style: italic; font-weight: 300; font-size: 26px; color: var(--color-gold); line-height: 1; padding-top: 4px; }
+    .entry .day .wd { display: block; font-family: var(--font-sans); font-style: normal; font-size: 9px; letter-spacing: 0.3em; color: rgba(245,242,236,0.45); margin-top: 6px; }
+    .entry .channel {
+      display: inline-flex; padding: 4px 10px;
+      font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase;
+      border: 1px solid rgba(184,146,74,0.4); color: var(--color-gold);
+      align-self: flex-start;
+      font-family: ui-monospace, monospace;
+    }
+    .entry .channel.LINE { border-color: rgba(0,193,71,0.4); color: #0CC557; }
+    .entry .channel.IG { border-color: rgba(225,48,108,0.4); color: #E1306C; }
+    .entry .channel.IG-STORY { border-color: rgba(225,48,108,0.3); color: rgba(225,48,108,0.85); font-size: 8px; }
+    .entry .channel.THREADS { border-color: rgba(245,242,236,0.4); color: var(--color-paper); }
+    .entry .channel.TIKTOK { border-color: rgba(0,242,234,0.4); color: #00F2EA; }
+    .entry .format { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,236,0.5); font-family: ui-monospace, monospace; padding-top: 4px; line-height: 1.5; }
+    .entry .body {}
+    .entry .title { font-family: var(--font-serif); font-weight: 300; font-size: 19px; letter-spacing: 0.12em; color: var(--color-paper); line-height: 1.35; margin: 0 0 8px; }
+    .entry .copy { font-size: 13px; line-height: 1.85; color: rgba(245,242,236,0.85); letter-spacing: 0.04em; white-space: pre-line; margin: 0; }
+    .entry .meta { display: flex; gap: 18px; margin-top: 10px; font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(245,242,236,0.4); }
+    .entry .meta .asset { font-family: ui-monospace, monospace; letter-spacing: 0.1em; }
+    .entry .meta .cta { color: var(--color-gold); }
+
+    /* Distribution chart */
+    .dist {
+      display: flex; align-items: flex-end; gap: 6px;
+      margin-top: 12px;
+    }
+    .dist-bar {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+    }
+    .dist-bar .bar {
+      width: 100%; background: rgba(184,146,74,0.6);
+      transition: opacity .2s;
+    }
+    .dist-bar .lbl { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,236,0.5); }
+    .dist-bar .n { font-family: var(--font-serif); font-style: italic; font-size: 14px; color: var(--color-paper); }
+
+    .doc-foot {
+      margin-top: 64px;
+      padding-top: 28px;
+      border-top: 1px solid rgba(184,146,74,0.18);
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(245,242,236,0.4);
+    }
+
+    @media print {
+      @page { size: A3 portrait; margin: 14mm; }
+      html, body { background: #FFFFFF; color: #0A0A0A; }
+      .doc { padding: 0; max-width: none; }
+      .head, .head h1 { color: #0A0A0A; }
+      .head h1 em { color: #8E6F32; }
+      .head .sub, .head .r, .week-head .meta, .entry .copy, .entry .meta { color: #555; }
+      .head .r .stat, .week-head .l, .entry .day { color: #8E6F32; }
+      .cadence { background: rgba(142,111,50,0.06); border-left-color: #8E6F32; }
+      .cadence .l { color: #8E6F32; }
+      .week-head { border-bottom-color: rgba(10,10,10,0.15); }
+      .week-head h2 { color: #0A0A0A; }
+      .entries { background: rgba(10,10,10,0.15); }
+      .entry { background: #FAF8F2; page-break-inside: avoid; }
+      .entry .title { color: #0A0A0A; }
+      .entry .copy { color: #0A0A0A; }
+      .week { page-break-inside: auto; }
+      .week + .week { page-break-before: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="doc">
+
+    <header class="head">
+      <div class="l">
+        <div class="eyebrow">3Q HATCHERY · KIT 01 · PAGE 02</div>
+        <h1>30 天 <em>內容排程</em></h1>
+        <p class="sub">第一個月的完整排程 — 4 個主題、每週 7 篇、橫跨 LINE / IG / Threads / TikTok。每一篇的標題、文案、圖片資產、CTA 都已寫好。</p>
+      </div>
+      <div class="r">
+        <span class="stat">30</span> 天<br/>
+        <span class="stat">4</span> 個主題週<br/>
+        <span class="stat">28</span> 篇貼文<br/>
+        <div style="margin-top: 12px;">
+          <a href="javascript:window.print()" style="color: var(--color-gold); font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; text-decoration: none; border-bottom: 1px solid var(--color-gold); padding-bottom: 2px;">⎙ 列印 / 存 PDF</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="cadence" id="cadence-mount"></div>
+
+    <div id="dist-mount"></div>
+
+    <div id="weeks-mount"></div>
+
+    <footer class="doc-foot">
+      <span>3Q 貢丸 · 台灣在地品牌孵化所</span>
+      <span>LINE @121LKSPE · IG @3q.hatchery</span>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script src="CalendarData.js"></script>
+  <script type="text/babel">
+    const C = window.CONTENT_CALENDAR;
+    const root = (id, el) => { const n = document.getElementById(id); if (n) ReactDOM.createRoot(n).render(el); };
+
+    function Cadence() {
+      return (
+        <>
+          <div className="l">CADENCE · 每週節奏</div>
+          <div className="t">{C.cadenceNote}</div>
+        </>
+      );
+    }
+    root('cadence-mount', <Cadence/>);
+
+    function Distribution() {
+      const counts = {};
+      C.entries.forEach(e => { counts[e.channel] = (counts[e.channel] || 0) + 1; });
+      const channels = ['LINE','IG','IG-STORY','THREADS','TIKTOK'];
+      const max = Math.max(...Object.values(counts));
+      return (
+        <div style={{marginBottom: 48}}>
+          <div style={{fontSize: 9, letterSpacing: '0.35em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: 12}}>CHANNEL MIX · 30 天分布</div>
+          <div className="dist">
+            {channels.map(c => (
+              <div key={c} className="dist-bar">
+                <div className="n">{counts[c] || 0}</div>
+                <div className="bar" style={{ height: ((counts[c] || 0) / max) * 80 }}/>
+                <div className="lbl">{c}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    root('dist-mount', <Distribution/>);
+
+    function Weeks() {
+      const byWeek = {};
+      C.themes.forEach(th => byWeek[th.id] = []);
+      byWeek['W4+'] = [];
+      C.entries.forEach(e => {
+        if (!byWeek[e.week]) byWeek[e.week] = [];
+        byWeek[e.week].push(e);
+      });
+
+      return (
+        <>
+          {C.themes.map(th => (
+            <div key={th.id} className="week">
+              <div className="week-head">
+                <div className="l">{th.label}</div>
+                <div className="r">
+                  <h2>{th.name}</h2>
+                  <div className="meta"><span>{th.sub}</span><em>{byWeek[th.id].length} 篇</em></div>
+                  <div className="focus">{th.focus}</div>
+                </div>
+              </div>
+              <div className="entries">
+                {byWeek[th.id].map(e => (
+                  <Entry key={e.day} e={e}/>
+                ))}
+              </div>
+            </div>
+          ))}
+
+          {byWeek['W4+'].length > 0 && (
+            <div className="week">
+              <div className="week-head">
+                <div className="l">W4+</div>
+                <div className="r">
+                  <h2>本月收尾</h2>
+                  <div className="meta"><span>WRAP · 月末複盤</span><em>{byWeek['W4+'].length} 篇</em></div>
+                  <div className="focus">數據回顧、感謝、預告下月。</div>
+                </div>
+              </div>
+              <div className="entries">
+                {byWeek['W4+'].map(e => <Entry key={e.day} e={e}/>)}
+              </div>
+            </div>
+          )}
+        </>
+      );
+    }
+
+    function Entry({ e }) {
+      return (
+        <div className="entry">
+          <div className="day">{String(e.day).padStart(2,'0')}<span className="wd">週{e.weekday}</span></div>
+          <div className={`channel ${e.channel}`}>{e.channel}</div>
+          <div className="format">{e.format}</div>
+          <div className="body">
+            <h3 className="title">{e.title}</h3>
+            <p className="copy">{e.copy}</p>
+            <div className="meta">
+              {e.asset && <span className="asset">{e.asset}</span>}
+              {e.cta && <span className="cta">CTA · {e.cta}</span>}
+            </div>
+          </div>
+        </div>
+      );
+    }
+    root('weeks-mount', <Weeks/>);
+  </script>
+</body>
+</html>

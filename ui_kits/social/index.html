@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>3Q Hatchery — Social Extensions</title>
+  <link rel="stylesheet" href="../../colors_and_type.css"/>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: #1A1814; min-height: 100vh; color: var(--fg-2); }
+    body { font-family: var(--font-sans); padding: 64px 32px; }
+
+    .stage { max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: 64px; }
+    .head { text-align: center; }
+    .head .eyebrow { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--color-gold); }
+    .head h1 { font-family: var(--font-serif); font-weight: 300; font-size: 38px; letter-spacing: 0.2em; color: var(--color-paper); margin: 18px 0 8px; }
+    .head p { font-size: 12px; letter-spacing: 0.15em; color: var(--color-stone); margin: 0; }
+
+    .section h2 { font-family: var(--font-serif); font-weight: 300; font-size: 13px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--color-gold); margin: 0 0 18px; }
+    .row { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
+    .frame { background: #2A2620; padding: 28px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+    .caption { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--color-stone); }
+
+    /* Phone-frame variants for the vertical formats */
+    .phone-mini {
+      position: relative;
+      border-radius: 28px;
+      overflow: hidden;
+      border: 1px solid #3A3530;
+      box-shadow: 0 30px 60px -25px rgba(0,0,0,0.7);
+    }
+
+    .toggle-bar { display: flex; gap: 16px; align-items: center; padding: 14px 20px; background: #0A0A0A; border: 1px solid #3A3530; align-self: flex-start; }
+    .toggle-bar label { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--color-stone); display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+    .toggle-bar input { accent-color: var(--color-gold); }
+
+    .safe-overlay {
+      position: absolute; inset: 0; pointer-events: none;
+      background: linear-gradient(180deg, rgba(184,146,74,0.22) 0%, rgba(184,146,74,0) 12%, rgba(184,146,74,0) 88%, rgba(184,146,74,0.22) 100%);
+      border-top: 1px dashed rgba(184,146,74,0.5);
+      border-bottom: 1px dashed rgba(184,146,74,0.5);
+      display: none;
+    }
+    .safe-overlay.on { display: block; }
+  </style>
+</head>
+<body>
+  <div class="stage">
+
+    <div class="head">
+      <div class="eyebrow">UI Kit · 02</div>
+      <h1>Social Extensions</h1>
+      <p>Instagram · Threads · TikTok</p>
+    </div>
+
+    <div class="toggle-bar">
+      <label><input type="checkbox" id="safe"/> show platform safe-area</label>
+    </div>
+
+    <div class="section">
+      <h2 data-screen-label="IG Feed">Instagram Feed · 1080 × 1350 (4:5)</h2>
+      <div class="row" id="ig-feed-row"></div>
+    </div>
+
+    <div class="section">
+      <h2 data-screen-label="IG Story">IG Story / Threads Image · 1080 × 1920</h2>
+      <div class="row" id="ig-story-row"></div>
+    </div>
+
+    <div class="section">
+      <h2 data-screen-label="TikTok">TikTok / Reels Cover · 1080 × 1920</h2>
+      <div class="row" id="tiktok-row"></div>
+    </div>
+
+    <div class="section">
+      <h2 data-screen-label="Threads">Threads Post · 1080 × 1350 (text-driven)</h2>
+      <div class="row" id="threads-row"></div>
+    </div>
+
+  </div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="IGPost.jsx"></script>
+  <script type="text/babel" src="IGStory.jsx"></script>
+  <script type="text/babel" src="TikTokCover.jsx"></script>
+  <script type="text/babel" src="ThreadsPost.jsx"></script>
+
+  <script type="text/babel">
+    function Frame({ label, children, vertical }) {
+      return (
+        <div className="frame">
+          <div className={`phone-mini ${vertical ? 'vertical' : ''}`}>
+            {children}
+            <div className="safe-overlay"></div>
+          </div>
+          <div className="caption">{label}</div>
+        </div>
+      );
+    }
+
+    const igFeed = [
+      { photo: 'assets/photography/still-bowl-rice.svg', eyebrow: 'NO. 01', title: '本月入駐', sub: '阿婆雜貨店' },
+      { photo: 'assets/photography/ink-stone.svg',       eyebrow: 'NO. 02', title: '好物・好照', sub: '值得好好被看見' },
+      { photo: 'assets/photography/raw-linen.svg',       eyebrow: 'NO. 03', title: '原麻布', sub: '鹿港・織坊' },
+    ];
+    const igStory = [
+      { photo: 'assets/photography/cupped-palm-light.svg', line: '被照亮，被托住' },
+      { photo: 'assets/photography/rice-stalk.svg',         line: '一束稻，一個故事' },
+    ];
+    const tiktok = [
+      { photo: 'assets/photography/rice-stalk.svg',       title: '一束稻\n一個故事',     meta: 'EP. 03 · 工坊' },
+      { photo: 'assets/photography/ink-stone.svg',        title: '一塊墨\n寫出招牌',     meta: 'EP. 04 · 字體' },
+    ];
+    const threads = [
+      { eyebrow: 'NO. 04', body: '一張像樣的照片，\n是一間店被陌生人\n看見的第一個機會。', meta: '— 孵化所手記' },
+      { eyebrow: 'NO. 05', body: '你以為的小，\n別人眼中是專注。', meta: '— 孵化所手記' },
+    ];
+
+    function mount(id, el) { ReactDOM.createRoot(document.getElementById(id)).render(el); }
+
+    mount('ig-feed-row',   <>{igFeed.map((p,i) => <Frame key={i} label={`IG · 1080x1350 · ${p.eyebrow}`}><IGPost width={240} {...p}/></Frame>)}</>);
+    mount('ig-story-row',  <>{igStory.map((p,i) => <Frame key={i} label="IG STORY · 1080x1920" vertical><IGStory width={220} {...p}/></Frame>)}</>);
+    mount('tiktok-row',    <>{tiktok.map((p,i) => <Frame key={i} label={`TIKTOK · ${p.meta}`} vertical><TikTokCover width={220} {...p}/></Frame>)}</>);
+    mount('threads-row',   <>{threads.map((p,i) => <Frame key={i} label={`THREADS · ${p.eyebrow}`}><ThreadsPost width={240} {...p}/></Frame>)}</>);
+
+    // Safe-area toggle
+    document.getElementById('safe').addEventListener('change', (e) => {
+      document.querySelectorAll('.safe-overlay').forEach(el => el.classList.toggle('on', e.target.checked));
+    });
+  </script>
+</body>
+</html>
