@@ -1,0 +1,73 @@
+name: Inspect deploy state
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      WORKER_NAME: 3q-hatchery-webhook
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Probe CF, LINE, Worker
+        env:
+          CF_TOKEN:       ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID:  ${{ secrets.CF_ACCOUNT_ID }}
+          LINE_TOKEN:     ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -uo pipefail
+          mkdir -p _debug/inspect
+
+          # 1. CF workers subdomain
+          curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/workers/subdomain" \
+            > _debug/inspect/cf-subdomain.json
+          SUB=$(jq -r '.result.subdomain' _debug/inspect/cf-subdomain.json)
+          WORKER_URL="https://${WORKER_NAME}.${SUB}.workers.dev"
+          echo "$WORKER_URL" > _debug/inspect/worker-url.txt
+          echo "Worker URL: $WORKER_URL"
+
+          # 2. Smoke test Worker
+          curl -sS "$WORKER_URL" > _debug/inspect/worker-status.json || echo '{"error":"unreachable"}' > _debug/inspect/worker-status.json
+          cat _debug/inspect/worker-status.json
+
+          # 3. LINE webhook info
+          curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
+            "https://api.line.me/v2/bot/channel/webhook/endpoint" \
+            > _debug/inspect/line-webhook.json
+          cat _debug/inspect/line-webhook.json
+
+          # 4. LINE default rich menu
+          set +e
+          http=$(curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
+            "https://api.line.me/v2/bot/user/all/richmenu" \
+            -o _debug/inspect/line-default-richmenu.json -w "%{http_code}")
+          set -e
+          echo "$http" > _debug/inspect/line-default-richmenu-http.txt
+          echo "default rich menu http: $http"
+          cat _debug/inspect/line-default-richmenu.json
+          echo
+
+          # 5. All rich menus
+          curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
+            "https://api.line.me/v2/bot/richmenu/list" \
+            > _debug/inspect/line-all-richmenus.json
+          echo "rich menu count: $(jq '.richmenus | length' _debug/inspect/line-all-richmenus.json)"
+
+      - name: Commit inspect results
+        if: always()
+        run: |
+          set -euo pipefail
+          git config user.email "actions@github.com"
+          git config user.name "github-actions[bot]"
+          git add _debug/
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+          else
+            git commit -m "inspect: state snapshot from run ${{ github.run_id }}"
+            git push origin HEAD:main
+          fi
