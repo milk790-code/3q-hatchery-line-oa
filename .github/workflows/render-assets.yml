@@ -9,6 +9,7 @@ on:
       - 'ui_kits/line_oa/_cover-export.html'
       - 'ui_kits/line_oa/_richmenu-export.html'
       - 'ui_kits/line_oa/_welcome-card-export.html'
+      - 'ui_kits/line_oa/_chat-bg-export.html'
       - 'ui_kits/line_oa/_carousel-export.html'
       - 'ui_kits/line_oa/LineSpecs.js'
       - 'scripts/render-pngs.mjs'

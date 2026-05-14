@@ -15,6 +15,7 @@ const PAGES = [
   { url: `${BASE}/_cover-export.html?download=1&photo=bowl`,            file: '3q-cover-bowl-1080x878.png'  },
   { url: `${BASE}/_richmenu-export.html?download=1`,                    file: '3q-richmenu-2500x1686.png'   },
   { url: `${BASE}/_welcome-card-export.html?download=1`,                file: '3q-welcome-card-1040.png'    },
+  { url: `${BASE}/_chat-bg-export.html?download=1`,                     file: '3q-chat-bg-1080x2340.jpg'    },
   { url: `${BASE}/_carousel-export.html?download=1&card=1`,             file: '3q-carousel-01-1040.png'     },
   { url: `${BASE}/_carousel-export.html?download=1&card=2`,             file: '3q-carousel-02-1040.png'     },
   { url: `${BASE}/_carousel-export.html?download=1&card=3`,             file: '3q-carousel-03-1040.png'     },
