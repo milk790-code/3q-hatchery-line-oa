@@ -1,0 +1,77 @@
+name: Probe webhook (debug)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test webhook delivery from LINE side
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -uo pipefail
+          mkdir -p _debug/probe
+          WORKER_URL="https://3q-hatchery-webhook.milk790.workers.dev"
+
+          echo "=== 1. LINE → POST webhook test ==="
+          curl -sS -X POST \
+            https://api.line.me/v2/bot/channel/webhook/test \
+            -H "Authorization: Bearer $LINE_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"endpoint\":\"$WORKER_URL\"}" \
+            > _debug/probe/webhook-test.json
+          cat _debug/probe/webhook-test.json | jq .
+
+          echo
+          echo "=== 2. Webhook config check ==="
+          curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
+            https://api.line.me/v2/bot/channel/webhook/endpoint \
+            > _debug/probe/webhook-endpoint.json
+          cat _debug/probe/webhook-endpoint.json | jq .
+
+          echo
+          echo "=== 3. Bot info (verify token still valid) ==="
+          curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
+            https://api.line.me/v2/bot/info \
+            > _debug/probe/bot-info.json
+          cat _debug/probe/bot-info.json | jq .
+
+          echo
+          echo "=== 4. Worker GET status ==="
+          curl -sS "$WORKER_URL" > _debug/probe/worker-get.json
+          cat _debug/probe/worker-get.json | jq .
+
+          echo
+          echo "=== Analysis ==="
+          status=$(jq -r '.statusCode // empty' _debug/probe/webhook-test.json)
+          success=$(jq -r '.success // empty' _debug/probe/webhook-test.json)
+          reason=$(jq -r '.reason // empty' _debug/probe/webhook-test.json)
+          echo "webhook test success: $success"
+          echo "webhook test statusCode: $status"
+          echo "webhook test reason: $reason"
+          case "$status" in
+            200) echo "::notice::Webhook OK — Worker accepts events" ;;
+            401) echo "::error::Worker returned 401 — LINE_CHANNEL_SECRET in Cloudflare doesn't match LINE Developers Console. Need to re-set Cloudflare binding." ;;
+            ''|null) echo "::warning::No statusCode (network/dns)" ;;
+            *)   echo "::warning::Worker returned $status — investigate" ;;
+          esac
+
+      - name: Commit probe results
+        if: always()
+        run: |
+          set -euo pipefail
+          git config user.email "actions@github.com"
+          git config user.name "github-actions[bot]"
+          git add _debug/probe/ 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+          else
+            git commit -m "probe: webhook diagnostic from run ${{ github.run_id }}"
+            git push origin HEAD:main
+          fi
