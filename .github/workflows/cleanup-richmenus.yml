@@ -90,10 +90,13 @@ jobs:
 
           echo
           echo "=== 5. Set keeper as default for all users ==="
+          # LINE endpoint requires explicit Content-Length:0 (or empty body); curl -X POST without body sends no header → 411
           set +e
           http=$(curl -sS -X POST \
             "https://api.line.me/v2/bot/user/all/richmenu/$KEEP" \
             -H "Authorization: Bearer $LINE_TOKEN" \
+            -H "Content-Length: 0" \
+            -d "" \
             -o _debug/cleanup/setdefault.json -w "%{http_code}")
           set -e
           echo "HTTP $http"
