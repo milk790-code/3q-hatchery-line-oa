@@ -54,7 +54,8 @@ jobs:
           LINE_TOKEN:  ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
           LINE_SECRET: ${{ secrets.LINE_CHANNEL_SECRET }}
         run: |
-          set -euo pipefail
+          set -uo pipefail
+          mkdir -p _debug
           cat > /tmp/metadata.json <<JSON
           {
             "main_module": "worker.js",
@@ -67,17 +68,50 @@ jobs:
           }
           JSON
 
-          resp=$(curl -sS -X PUT \
+          # Sanitize metadata.json for debug (mask secret values)
+          jq '(.bindings[] | select(.type=="secret_text") | .text) = "***MASKED***"' /tmp/metadata.json > _debug/metadata-sanitized.json
+
+          # Run the deploy with stderr captured
+          set +e
+          http_code=$(curl -sS -X PUT \
             "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}" \
             -H "Authorization: Bearer $CF_TOKEN" \
             -F "metadata=@/tmp/metadata.json;type=application/json" \
-            -F "worker.js=@webhook/worker.js;type=application/javascript+module")
-          ok=$(echo "$resp" | jq -r '.success')
+            -F "worker.js=@webhook/worker.js;type=application/javascript+module" \
+            -o _debug/cf-deploy-response.json -w "%{http_code}")
+          curl_exit=$?
+          set -e
+
+          echo "$http_code" > _debug/cf-deploy-http-code.txt
+          echo "$curl_exit" > _debug/cf-deploy-curl-exit.txt
+
+          ok=$(jq -r '.success // false' _debug/cf-deploy-response.json 2>/dev/null || echo "parse-error")
           if [ "$ok" != "true" ]; then
-            echo "::error::CF deploy failed: $(echo "$resp" | jq -c '.errors')"
+            echo "DEPLOY FAILED — http=$http_code curl_exit=$curl_exit ok=$ok"
+            echo "Response:"
+            cat _debug/cf-deploy-response.json
             exit 1
           fi
-          echo "::notice::Worker uploaded (etag=$(echo "$resp" | jq -r '.result.etag'))"
+          echo "Worker uploaded (etag=$(jq -r '.result.etag' _debug/cf-deploy-response.json))"
+
+      - name: Commit debug artifacts (always)
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ ! -d _debug ]; then
+            echo "no _debug/ to commit"
+            exit 0
+          fi
+          ls -la _debug/
+          git config user.email "actions@github.com"
+          git config user.name "github-actions[bot]"
+          git add _debug/
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+          else
+            git commit -m "ci: debug artifacts from run ${{ github.run_id }}"
+            git push origin HEAD:main || echo "push failed (non-fatal for debug)"
+          fi
 
       - name: Enable workers.dev subdomain
         env:
