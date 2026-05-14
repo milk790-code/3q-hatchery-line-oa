@@ -1,0 +1,88 @@
+name: Inspect deployed Worker code
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      WORKER_NAME: 3q-hatchery-webhook
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch deployed Worker script content
+        env:
+          CF_TOKEN:      ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          set -uo pipefail
+          mkdir -p _debug/worker-code
+
+          # GET the script content (returns a multipart response for module scripts)
+          curl -sS -o _debug/worker-code/deployed.txt -w "HTTP %{http_code}\n" \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}" \
+            -H "Authorization: Bearer $CF_TOKEN"
+
+          echo "=== first 30 lines of deployed script ==="
+          head -30 _debug/worker-code/deployed.txt
+
+          echo
+          echo "=== key markers ==="
+          for marker in 'POSTBACK_MAP' 'menu:my-store' 'handleIntent' "ev.type === 'postback'" "ev.postback?.data"; do
+            if grep -qF "$marker" _debug/worker-code/deployed.txt; then
+              echo "  ✓ found: $marker"
+            else
+              echo "  ✗ MISSING: $marker"
+            fi
+          done
+
+          echo
+          echo "=== compare local vs deployed (worker.js) ==="
+          # Extract just the worker.js part from the multipart response
+          awk '/^--/{p=0} p{print} /Content-Disposition.*worker.js/{p=1}' _debug/worker-code/deployed.txt > _debug/worker-code/deployed-worker.js 2>/dev/null || true
+          # If extraction failed (response is JSON error), keep raw
+          if [ -s _debug/worker-code/deployed-worker.js ]; then
+            wc -l webhook/worker.js _debug/worker-code/deployed-worker.js
+            diff -q webhook/worker.js _debug/worker-code/deployed-worker.js && echo "IDENTICAL" || echo "DIFFER"
+          else
+            echo "(multipart extraction failed — see deployed.txt head above)"
+          fi
+
+      - name: Commit inspection (redacted)
+        if: always()
+        run: |
+          set -uo pipefail
+          # Only commit the markers report, not raw script (size + may include bindings metadata)
+          {
+            echo "# Worker code inspection — $(date -u +%FT%TZ)"
+            echo
+            echo "## Markers"
+            for marker in 'POSTBACK_MAP' 'menu:my-store' 'handleIntent' 'ev.type === postback' 'ev.postback'; do
+              if grep -qF "$marker" _debug/worker-code/deployed.txt 2>/dev/null; then
+                echo "- ✓ $marker"
+              else
+                echo "- ✗ MISSING $marker"
+              fi
+            done
+            echo
+            echo "## Diff"
+            if [ -s _debug/worker-code/deployed-worker.js ]; then
+              diff -q webhook/worker.js _debug/worker-code/deployed-worker.js || true
+            else
+              echo "(extraction failed)"
+            fi
+          } > _debug/worker-code/report.md
+
+          git config user.email "actions@github.com"
+          git config user.name "github-actions[bot]"
+          rm -f _debug/worker-code/deployed.txt _debug/worker-code/deployed-worker.js
+          git add _debug/worker-code/report.md 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+          else
+            git commit -m "inspect-worker-code: report from run ${{ github.run_id }}"
+            git push origin HEAD:main
+          fi
