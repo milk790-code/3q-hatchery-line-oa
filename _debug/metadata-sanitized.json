@@ -1,0 +1,21 @@
+{
+  "main_module": "worker.js",
+  "compatibility_date": "2024-12-01",
+  "bindings": [
+    {
+      "name": "LINE_CHANNEL_ACCESS_TOKEN",
+      "type": "secret_text",
+      "text": "***MASKED***"
+    },
+    {
+      "name": "LINE_CHANNEL_SECRET",
+      "type": "secret_text",
+      "text": "***MASKED***"
+    },
+    {
+      "name": "PNG_BASE_URL",
+      "type": "plain_text",
+      "text": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports"
+    }
+  ]
+}
