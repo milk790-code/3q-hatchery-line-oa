@@ -6,11 +6,16 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
     env:
       PNG_BASE_URL: https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports
       WORKER_NAME: 3q-hatchery-webhook
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify Cloudflare token
         env:
@@ -96,6 +101,8 @@ jobs:
 
       - name: Commit debug artifacts (always)
         if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           if [ ! -d _debug ]; then
@@ -103,6 +110,22 @@ jobs:
             exit 0
           fi
           ls -la _debug/
+          echo "=== contents preview ==="
+          for f in _debug/*; do
+            echo "--- $f ---"
+            head -c 2000 "$f"
+            echo
+          done
+          # Also dump to job summary
+          echo "## CF Deploy Debug" >> $GITHUB_STEP_SUMMARY
+          for f in _debug/*; do
+            echo "### $f" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            head -c 3000 "$f" >> $GITHUB_STEP_SUMMARY
+            echo >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          done
+
           git config user.email "actions@github.com"
           git config user.name "github-actions[bot]"
           git add _debug/
@@ -110,7 +133,13 @@ jobs:
             echo "nothing to commit"
           else
             git commit -m "ci: debug artifacts from run ${{ github.run_id }}"
-            git push origin HEAD:main || echo "push failed (non-fatal for debug)"
+            if ! git push origin HEAD:main; then
+              echo "git push failed — falling back to gh api issue create"
+              gh issue create \
+                --title "CI debug from run ${{ github.run_id }}" \
+                --body-file <(for f in _debug/*; do echo "### $f"; echo '```'; head -c 3000 "$f"; echo; echo '```'; echo; done) \
+                || echo "issue create also failed"
+            fi
           fi
 
       - name: Enable workers.dev subdomain
