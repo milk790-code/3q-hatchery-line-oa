@@ -1,0 +1,11 @@
+name = "3q-hatchery-webhook"
+main = "worker.js"
+compatibility_date = "2024-12-01"
+
+# Secrets configured separately:
+#   wrangler secret put LINE_CHANNEL_ACCESS_TOKEN
+#   wrangler secret put LINE_CHANNEL_SECRET
+#
+# Public variable (set via dashboard or [vars]):
+[vars]
+PNG_BASE_URL = "https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports"
