@@ -1,0 +1,37 @@
+{
+  "rendered_at": "2026-05-14T07:50:10.653Z",
+  "files": {
+    "3q-avatar-640.png": {
+      "bytes": 46333,
+      "sha256_16": "c2df806585348273"
+    },
+    "3q-cover-bowl-1080x878.png": {
+      "bytes": 859158,
+      "sha256_16": "e020145e468c8f8d"
+    },
+    "3q-richmenu-2500x1686.png": {
+      "bytes": 1136063,
+      "sha256_16": "78958fef65b77a3e"
+    },
+    "3q-welcome-card-1040.png": {
+      "bytes": 743937,
+      "sha256_16": "7fd6847eeaa09e41"
+    },
+    "3q-carousel-01-1040.png": {
+      "bytes": 1101114,
+      "sha256_16": "8f56b7877c928ee5"
+    },
+    "3q-carousel-02-1040.png": {
+      "bytes": 1011474,
+      "sha256_16": "83fcb2fa43b96a2a"
+    },
+    "3q-carousel-03-1040.png": {
+      "bytes": 746191,
+      "sha256_16": "3bcb58137c507621"
+    },
+    "3q-carousel-04-1040.png": {
+      "bytes": 1029465,
+      "sha256_16": "bebb9fc4e07cb30c"
+    }
+  }
+}
