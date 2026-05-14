@@ -1,0 +1,217 @@
+name: Deploy 3Q Hatchery LINE OA
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      PNG_BASE_URL: https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports
+      WORKER_NAME: 3q-hatchery-webhook
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify Cloudflare token
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          resp=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            https://api.cloudflare.com/client/v4/user/tokens/verify)
+          echo "$resp" | jq -e '.success == true' > /dev/null
+          echo "::notice::CF token OK ($(echo "$resp" | jq -r '.result.status'))"
+
+      - name: Verify LINE token
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          resp=$(curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
+            https://api.line.me/v2/bot/info)
+          name=$(echo "$resp" | jq -r '.displayName // empty')
+          if [ -z "$name" ]; then
+            echo "::error::LINE token bad: $resp"
+            exit 1
+          fi
+          echo "::notice::LINE bot: $name ($(echo "$resp" | jq -r '.basicId'))"
+
+      - name: Resolve Cloudflare account ID
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          resp=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            https://api.cloudflare.com/client/v4/accounts)
+          ACC_ID=$(echo "$resp" | jq -r '.result[0].id // empty')
+          ACC_NAME=$(echo "$resp" | jq -r '.result[0].name // empty')
+          if [ -z "$ACC_ID" ]; then
+            echo "::error::no CF accounts visible: $resp"
+            exit 1
+          fi
+          echo "CF_ACCOUNT_ID=$ACC_ID" >> $GITHUB_ENV
+          echo "::notice::CF account: $ACC_NAME ($ACC_ID)"
+
+      - name: Deploy Worker
+        env:
+          CF_TOKEN:    ${{ secrets.CF_API_TOKEN }}
+          LINE_TOKEN:  ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_SECRET: ${{ secrets.LINE_CHANNEL_SECRET }}
+        run: |
+          set -euo pipefail
+          cat > /tmp/metadata.json <<JSON
+          {
+            "main_module": "worker.js",
+            "compatibility_date": "2024-12-01",
+            "bindings": [
+              {"name": "LINE_CHANNEL_ACCESS_TOKEN", "type": "secret_text", "text": $(jq -Rn --arg t "$LINE_TOKEN" '$t')},
+              {"name": "LINE_CHANNEL_SECRET",       "type": "secret_text", "text": $(jq -Rn --arg t "$LINE_SECRET" '$t')},
+              {"name": "PNG_BASE_URL",              "type": "plain_text",  "text": $(jq -Rn --arg t "$PNG_BASE_URL" '$t')}
+            ]
+          }
+          JSON
+
+          resp=$(curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -F "metadata=@/tmp/metadata.json;type=application/json" \
+            -F "worker.js=@webhook/worker.js;type=application/javascript+module")
+          ok=$(echo "$resp" | jq -r '.success')
+          if [ "$ok" != "true" ]; then
+            echo "::error::CF deploy failed: $(echo "$resp" | jq -c '.errors')"
+            exit 1
+          fi
+          echo "::notice::Worker uploaded (etag=$(echo "$resp" | jq -r '.result.etag'))"
+
+      - name: Enable workers.dev subdomain
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/subdomain" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"enabled": true}' \
+            | jq -e '.success == true' > /dev/null
+
+          SUB=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/subdomain" \
+            | jq -r '.result.subdomain')
+          WORKER_URL="https://${WORKER_NAME}.${SUB}.workers.dev"
+          echo "WORKER_URL=$WORKER_URL" >> $GITHUB_ENV
+          echo "::notice::Worker URL: $WORKER_URL"
+
+      - name: Smoke-test Worker URL
+        run: |
+          set -euo pipefail
+          sleep 5
+          resp=$(curl -sS "$WORKER_URL")
+          echo "$resp" | jq .
+          echo "$resp" | jq -e '.ok == true and .configured.token == true and .configured.secret == true' > /dev/null
+          echo "::notice::Worker is alive and configured"
+
+      - name: Create LINE Rich Menu
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          cat > /tmp/richmenu.json <<'JSON'
+          {
+            "size": {"width": 2500, "height": 1686},
+            "selected": false,
+            "name": "3Q Hatchery - 1 hero + 4 cells",
+            "chatBarText": "圖文選單",
+            "areas": [
+              {"bounds": {"x":    0, "y":   0, "width": 2500, "height": 800}, "action": {"type": "uri",     "uri":  "https://3q-hatchery.tw"}},
+              {"bounds": {"x":    0, "y": 800, "width":  625, "height": 886}, "action": {"type": "message", "text": "我想說說我的店"}},
+              {"bounds": {"x":  625, "y": 800, "width":  625, "height": 886}, "action": {"type": "message", "text": "我想了解好物・好照"}},
+              {"bounds": {"x": 1250, "y": 800, "width":  625, "height": 886}, "action": {"type": "message", "text": "我想要客製行銷"}},
+              {"bounds": {"x": 1875, "y": 800, "width":  625, "height": 886}, "action": {"type": "message", "text": "查我的進度"}}
+            ]
+          }
+          JSON
+
+          resp=$(curl -sS -X POST https://api.line.me/v2/bot/richmenu \
+            -H "Authorization: Bearer $LINE_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d @/tmp/richmenu.json)
+          RM_ID=$(echo "$resp" | jq -r '.richMenuId // empty')
+          if [ -z "$RM_ID" ]; then
+            echo "::error::Rich Menu create failed: $resp"
+            exit 1
+          fi
+          echo "RICH_MENU_ID=$RM_ID" >> $GITHUB_ENV
+          echo "::notice::Rich Menu created: $RM_ID"
+
+      - name: Upload Rich Menu binary
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          ls -la assets/exports/3q-richmenu-2500x1686.jpg
+          curl -sS -f -X POST \
+            "https://api-data.line.me/v2/bot/richmenu/${RICH_MENU_ID}/content" \
+            -H "Authorization: Bearer $LINE_TOKEN" \
+            -H "Content-Type: image/jpeg" \
+            --data-binary @assets/exports/3q-richmenu-2500x1686.jpg
+          echo "::notice::Rich Menu binary uploaded"
+
+      - name: Set Rich Menu as default for all users
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -f -X POST \
+            "https://api.line.me/v2/bot/user/all/richmenu/${RICH_MENU_ID}" \
+            -H "Authorization: Bearer $LINE_TOKEN"
+          echo "::notice::Rich Menu set as default"
+
+      - name: Set LINE webhook URL
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -f -X PUT \
+            https://api.line.me/v2/bot/channel/webhook/endpoint \
+            -H "Authorization: Bearer $LINE_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"endpoint\":\"$WORKER_URL\"}"
+          echo "::notice::Webhook URL set to $WORKER_URL"
+
+      - name: Test webhook from LINE side
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          resp=$(curl -sS -X POST \
+            https://api.line.me/v2/bot/channel/webhook/test \
+            -H "Authorization: Bearer $LINE_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"endpoint\":\"$WORKER_URL\"}")
+          echo "$resp" | jq .
+          if echo "$resp" | jq -e '.success == true' > /dev/null; then
+            echo "::notice::Webhook verification: SUCCESS"
+          else
+            echo "::warning::Webhook test returned non-success — may still work for real events. $resp"
+          fi
+
+      - name: Deploy summary
+        run: |
+          echo "## Deploy complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Worker URL | \`$WORKER_URL\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Rich Menu ID | \`$RICH_MENU_ID\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Webhook | configured |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Manual steps remaining" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "1. **LINE Developers Console** → Messaging API tab:" >> $GITHUB_STEP_SUMMARY
+          echo "   - Auto-reply messages: OFF" >> $GITHUB_STEP_SUMMARY
+          echo "   - Greeting messages: OFF" >> $GITHUB_STEP_SUMMARY
+          echo "   - Use webhook: ON" >> $GITHUB_STEP_SUMMARY
+          echo "2. **LINE OA Manager** → upload Avatar + Cover from assets/exports/" >> $GITHUB_STEP_SUMMARY
+          echo "3. **Self-test**: add bot as friend, send \`好物\` / \`實例\`" >> $GITHUB_STEP_SUMMARY
+          echo "4. **Revoke** all 3 tokens used" >> $GITHUB_STEP_SUMMARY
