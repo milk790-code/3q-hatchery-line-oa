@@ -40,12 +40,24 @@ const AUTO_REPLIES = [
   { keywords: ['諮詢', '預約'],
     response: '好。先簡單告訴我們：\n你的店名 / 你的角色 / 想聊什麼\n\n我們會在 24 小時內寄時段給你。' },
   { keywords: ['01', '阿婆', '切仔麵'],
-    response: '案例 01 — 阿婆ㄟ切仔麵店（雲林）\n\n我們幫她做的：\n・店招重做（保留手寫，補質感）\n・產品照 6 張（鏡頭以下視角，自然光）\n・FB / IG 一頁式介紹\n\n預算：5,000 元，2 週交付。' },
+    response: '案例 01 — 阿婆ㄟ切仔麵店（雲林）\n\n我們幫她做的：\n・店招重做（保留手寫，補質感）\n・產品照 6 張（鏡頭以下視角，自然光）\n・FB / IG 一頁式介紹\n\n預算：5,000 元，2 週交付。',
+    image: '3q-carousel-01-1040.png' },
   { keywords: ['02', '三代米舖', '米舖'],
-    response: '案例 02 — 三代米舖（台南）\n\n我們幫他做的：\n・品牌故事 1 篇（從爺爺到孫）\n・包裝改版（保留紅章，紙改厚磅）\n・通路上架（誠品 / 茶水間）\n\n預算：15,000 元，6 週交付。' },
+    response: '案例 02 — 三代米舖（台南）\n\n我們幫他做的：\n・品牌故事 1 篇（從爺爺到孫）\n・包裝改版（保留紅章，紙改厚磅）\n・通路上架（誠品 / 茶水間）\n\n預算：15,000 元，6 週交付。',
+    image: '3q-carousel-03-1040.png' },
   { keywords: ['03', '鹿港', '織坊'],
-    response: '案例 03 — 鹿港織坊\n\n我們幫她做的：\n・產品分類（從 30 種收斂到 5 種）\n・MOQ 重新定價（從 500 起 → 從 1 條起）\n・通路接洽（手工市集 + 線上）\n\n預算：3,000 元 + 抽成，1 個月交付。' },
+    response: '案例 03 — 鹿港織坊\n\n我們幫她做的：\n・產品分類（從 30 種收斂到 5 種）\n・MOQ 重新定價（從 500 起 → 從 1 條起）\n・通路接洽（手工市集 + 線上）\n\n預算：3,000 元 + 抽成，1 個月交付。',
+    image: '3q-carousel-04-1040.png' },
 ];
+
+// Rich menu postback data → synthetic user-intent text.
+// Used so rich menu taps DON'T pollute the chat with visible "我想說說我的店" bubbles.
+const POSTBACK_MAP = {
+  'menu:my-store':  '我想說說我的店',
+  'menu:imagery':   '我想了解好物・好照',
+  'menu:marketing': '我想要客製行銷',
+  'menu:progress':  '查我的進度',
+};
 
 const CAROUSEL_CARDS = [
   { id: 1, eyebrow: 'NO. 01', title: '本月入駐\n阿婆ㄟ切仔麵店', meta: 'YUNLIN · 2026',
@@ -109,9 +121,13 @@ async function handleEvent(ev, env) {
     return sendWelcome(ev.replyToken, env);
   }
   if (ev.type === 'message' && ev.message?.type === 'text') {
-    return handleTextMessage(ev, env);
+    return handleIntent(ev.message.text || '', ev.replyToken, env);
   }
-  // Ignore unfollow, join, leave, postback (for now), etc.
+  if (ev.type === 'postback') {
+    const synthetic = POSTBACK_MAP[ev.postback?.data];
+    if (synthetic) return handleIntent(synthetic, ev.replyToken, env);
+  }
+  // Ignore unfollow, join, leave, sticker, image, etc.
 }
 
 async function sendWelcome(replyToken, env) {
@@ -128,21 +144,26 @@ async function sendWelcome(replyToken, env) {
   return reply(replyToken, messages, env);
 }
 
-async function handleTextMessage(ev, env) {
-  const userText = ev.message.text || '';
+async function handleIntent(userText, replyToken, env) {
   const match = AUTO_REPLIES.find(r => r.keywords.some(kw => userText.includes(kw)));
 
   const messages = [];
   if (match) {
+    if (match.image && env.PNG_BASE_URL) {
+      messages.push({
+        type: 'image',
+        originalContentUrl: `${env.PNG_BASE_URL}/${match.image}`,
+        previewImageUrl: `${env.PNG_BASE_URL}/${match.image}`,
+      });
+    }
     messages.push({ type: 'text', text: match.response });
     if (match.carousel && env.PNG_BASE_URL) {
       messages.push(buildCarouselMessage(env.PNG_BASE_URL));
     }
   } else {
-    // Fallback: away message + nudge to use rich menu
     messages.push({ type: 'text', text: AWAY_TEXT });
   }
-  return reply(ev.replyToken, messages, env);
+  return reply(replyToken, messages, env);
 }
 
 function buildCarouselMessage(pngBase) {

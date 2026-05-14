@@ -9,7 +9,7 @@ jobs:
     permissions:
       contents: write
     env:
-      RICH_MENU_NAME: '3Q Hatchery - 1 hero + 4 cells'
+      RICH_MENU_NAME: '3Q Hatchery · MENU (postback v3)'
     steps:
       - uses: actions/checkout@v4
 
