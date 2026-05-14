@@ -217,14 +217,27 @@ jobs:
           echo "::notice::Rich Menu binary uploaded"
 
       - name: Set Rich Menu as default for all users
+        continue-on-error: true
         env:
           LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
         run: |
-          set -euo pipefail
-          curl -sS -f -X POST \
+          set -uo pipefail
+          mkdir -p _debug
+          set +e
+          http=$(curl -sS -X POST \
             "https://api.line.me/v2/bot/user/all/richmenu/${RICH_MENU_ID}" \
-            -H "Authorization: Bearer $LINE_TOKEN"
-          echo "::notice::Rich Menu set as default"
+            -H "Authorization: Bearer $LINE_TOKEN" \
+            -o _debug/setrm-response.json -w "%{http_code}")
+          set -e
+          echo "$http" > _debug/setrm-http.txt
+          echo "HTTP $http"
+          cat _debug/setrm-response.json || true
+          echo
+          if [ "$http" != "200" ]; then
+            echo "::warning::Set default rich menu failed (http=$http). Webhook+other steps will continue. User can set default via LINE OA Manager UI."
+          else
+            echo "::notice::Default rich menu set OK"
+          fi
 
       - name: Set LINE webhook URL
         env:
