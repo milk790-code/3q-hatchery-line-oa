@@ -39,13 +39,34 @@ jobs:
           echo "$KEEP" > _debug/cleanup/keep-id.txt
 
           echo
-          echo "=== 3. Re-upload binary to keeper (insurance) ==="
-          curl -sS -f -X POST \
+          echo "=== 3. Verify keeper has binary uploaded ==="
+          set +e
+          http=$(curl -sS -X GET \
             "https://api-data.line.me/v2/bot/richmenu/${KEEP}/content" \
             -H "Authorization: Bearer $LINE_TOKEN" \
-            -H "Content-Type: image/jpeg" \
-            --data-binary @assets/exports/3q-richmenu-2500x1686.jpg
-          echo "binary uploaded"
+            -o /tmp/probe-binary -w "%{http_code}")
+          set -e
+          echo "GET binary HTTP $http"
+          if [ "$http" = "200" ]; then
+            ls -la /tmp/probe-binary
+            echo "binary exists ($(wc -c < /tmp/probe-binary) bytes)"
+          else
+            echo "::warning::keeper $KEEP has no binary (http=$http). Uploading..."
+            set +e
+            up_http=$(curl -sS -X POST \
+              "https://api-data.line.me/v2/bot/richmenu/${KEEP}/content" \
+              -H "Authorization: Bearer $LINE_TOKEN" \
+              -H "Content-Type: image/jpeg" \
+              --data-binary @assets/exports/3q-richmenu-2500x1686.jpg \
+              -o _debug/cleanup/binary-upload.json -w "%{http_code}")
+            set -e
+            echo "upload HTTP $up_http"
+            cat _debug/cleanup/binary-upload.json 2>/dev/null
+            if [ "$up_http" != "200" ]; then
+              echo "::error::Failed to upload binary to $KEEP"
+              exit 1
+            fi
+          fi
 
           echo
           echo "=== 4. Delete all OTHER rich menus ==="
