@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3Q · LINE OA Manager 操作手冊</title>
+<style>
+  :root {
+    --black: #0A0A0A;
+    --bg: #0F0D0A;
+    --paper: #F5F2EC;
+    --ink: #15110C;
+    --card: #181410;
+    --sand: #1F1A12;
+    --gold: #B8924A;
+    --rule: rgba(184,146,74,0.18);
+    --dim: rgba(245,242,236,0.55);
+    --serif: "Cormorant Garamond","Noto Serif TC","Songti TC",serif;
+    --sans:  "Inter","Noto Sans TC",-apple-system,system-ui,sans-serif;
+    --mono:  ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--paper); font-family: var(--sans); font-weight: 300; letter-spacing: 0.03em; line-height: 1.75; }
+  a { color: var(--gold); }
+
+  .doc { max-width: 1180px; margin: 0 auto; padding: 56px 32px 96px; }
+
+  header.h { display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: flex-end; padding-bottom: 36px; border-bottom: 1px solid var(--rule); margin-bottom: 56px; }
+  .eyebrow { font-size: 10px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+  header.h h1 { font-family: var(--serif); font-weight: 300; font-size: 56px; line-height: 1.05; letter-spacing: 0.04em; margin: 0; color: var(--paper); }
+  header.h h1 em { font-style: italic; color: var(--gold); font-weight: 300; }
+  header.h p { font-size: 12px; letter-spacing: 0.13em; line-height: 1.75; color: var(--dim); max-width: 560px; margin: 14px 0 0; }
+  header.h .r { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--dim); text-align: right; line-height: 2.2; }
+  header.h .pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border: 1px solid rgba(184,146,74,0.4); color: var(--gold); margin-bottom: 10px; }
+  header.h .pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+
+  section.s { display: grid; grid-template-columns: 200px 1fr; gap: 56px; padding: 56px 0; border-top: 1px solid rgba(184,146,74,0.12); }
+  section.s .idx .no { font-family: var(--serif); font-style: italic; font-weight: 300; font-size: 56px; line-height: 1; color: var(--gold); }
+  section.s .idx .nm { font-family: var(--serif); font-weight: 300; font-size: 22px; letter-spacing: 0.18em; margin-top: 14px; }
+  section.s .idx .en { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--dim); margin-top: 6px; }
+  section.s .idx .time { font-size: 9px; letter-spacing: 0.25em; color: var(--gold); margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(184,146,74,0.2); }
+  section.s .body { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+  section.s .body .lede { font-size: 13px; color: var(--dim); line-height: 1.9; max-width: 700px; }
+
+  .field { background: var(--ink); border: 1px solid var(--rule); padding: 22px 24px; }
+  .field .row { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; margin-bottom: 12px; }
+  .field .row:last-child { margin-bottom: 0; }
+  .field .label { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); }
+  .field .hint  { font-size: 10px; letter-spacing: 0.2em; color: var(--dim); margin-top: 6px; }
+  .value { background: #11100D; border-left: 1px solid var(--gold); padding: 14px 18px; font-size: 13px; line-height: 1.85; color: rgba(245,242,236,0.92); white-space: pre-wrap; word-break: break-word; font-family: var(--sans); margin-top: 8px; position: relative; }
+  .value.mono { font-family: var(--mono); font-size: 12px; }
+  .copy { position: absolute; top: 10px; right: 12px; background: transparent; border: 1px solid rgba(184,146,74,0.5); color: var(--gold); font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; padding: 5px 12px; cursor: pointer; font-family: var(--sans); transition: all .2s; }
+  .copy:hover { background: var(--gold); color: var(--black); }
+  .copy.ok { background: var(--gold); color: var(--black); }
+  .count { font-size: 9px; letter-spacing: 0.2em; color: var(--dim); margin-top: 6px; font-family: var(--mono); }
+  .count.warn { color: #D9745C; }
+
+  /* Where-to-go directions */
+  .where { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 12px 16px; background: rgba(184,146,74,0.06); border: 1px dashed rgba(184,146,74,0.3); font-size: 11px; color: rgba(245,242,236,0.85); letter-spacing: 0.06em; }
+  .where .arrow { color: var(--gold); margin: 0 4px; font-family: var(--mono); }
+  .where .crumb { color: var(--paper); }
+  .where .crumb.last { color: var(--gold); border-bottom: 1px solid var(--gold); padding-bottom: 2px; }
+
+  /* Image preview cards */
+  .imgcard { display: grid; grid-template-columns: 200px 1fr; gap: 24px; background: var(--ink); border: 1px solid var(--rule); padding: 22px 24px; align-items: center; }
+  .imgcard .pv { background: var(--sand); padding: 14px; display: flex; align-items: center; justify-content: center; min-height: 180px; }
+  .imgcard .pv img { max-width: 100%; max-height: 200px; display: block; }
+  .imgcard .pv img.round { border-radius: 50%; }
+  .imgcard .meta dl { display: grid; grid-template-columns: 100px 1fr; gap: 6px 16px; margin: 0; font-family: var(--mono); font-size: 12px; }
+  .imgcard .meta dt { color: var(--dim); font-family: var(--sans); font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; padding-top: 3px; }
+  .imgcard .meta dd { margin: 0; color: rgba(245,242,236,0.92); }
+  .imgcard .meta .dl { display: inline-block; margin-top: 12px; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); border-bottom: 1px solid var(--gold); padding-bottom: 2px; text-decoration: none; font-family: var(--sans); }
+
+  /* Switch states */
+  .switch-list { display: flex; flex-direction: column; gap: 1px; background: rgba(184,146,74,0.15); }
+  .switch-row { background: var(--ink); padding: 14px 20px; display: grid; grid-template-columns: 1fr 90px 1fr; gap: 18px; align-items: center; }
+  .sw-label { font-family: var(--serif); font-weight: 300; font-size: 17px; letter-spacing: 0.1em; color: var(--paper); }
+  .sw-state { text-align: center; font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; padding: 4px 0; border: 1px solid; }
+  .sw-state.off { color: #D9745C; border-color: #D9745C; }
+  .sw-state.on  { color: var(--gold); border-color: var(--gold); }
+  .sw-why { font-size: 11px; color: var(--dim); letter-spacing: 0.05em; line-height: 1.6; }
+
+  /* Verify block */
+  .verify { background: var(--ink); border: 1px solid var(--rule); padding: 22px 24px; }
+  .verify ol { padding-left: 18px; margin: 0; }
+  .verify li { font-size: 13px; line-height: 2; color: rgba(245,242,236,0.92); letter-spacing: 0.04em; }
+  .verify code { font-family: var(--mono); background: rgba(184,146,74,0.1); color: var(--gold); padding: 1px 8px; font-size: 12px; }
+
+  footer { margin-top: 80px; padding-top: 36px; border-top: 1px solid var(--rule); display: flex; justify-content: space-between; align-items: center; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--dim); }
+  footer .line { width: 80px; height: 1px; background: var(--gold); }
+
+  /* Done indicator */
+  .doneflag { display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px; font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); border: 1px solid rgba(184,146,74,0.4); cursor: pointer; margin-top: 12px; user-select: none; }
+  .doneflag::before { content: ""; width: 8px; height: 8px; border: 1px solid var(--gold); display: inline-block; }
+  .doneflag.done { background: var(--gold); color: var(--black); }
+  .doneflag.done::before { background: var(--black); }
+
+  @media (max-width: 800px) {
+    section.s { grid-template-columns: 1fr; gap: 24px; }
+    .imgcard { grid-template-columns: 1fr; }
+    .switch-row { grid-template-columns: 1fr; gap: 8px; }
+    .sw-state { width: 90px; }
+  }
+
+  @media print {
+    @page { size: A4; margin: 16mm; }
+    html, body { background: #fff; color: #0A0A0A; }
+    .doc { padding: 0; max-width: none; }
+    header.h, section.s, .field, .imgcard, .verify, .switch-row { border-color: rgba(10,10,10,0.15) !important; background: #fff !important; color: #0A0A0A !important; }
+    .label, .eyebrow, .nm, .doneflag, .where .arrow, .where .crumb.last, footer .line { color: #8E6F32 !important; }
+    .copy, .doneflag { display: none !important; }
+    .value { background: #FAF8F2 !important; color: #0A0A0A !important; border-left-color: #8E6F32 !important; }
+    .where { background: #FAF8F2 !important; border-color: rgba(142,111,50,0.4) !important; color: #0A0A0A !important; }
+    .sw-state.off { color: #C8553D !important; border-color: #C8553D !important; }
+    .sw-state.on  { color: #8E6F32 !important; border-color: #8E6F32 !important; }
+    section.s { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="doc">
+
+<header class="h">
+  <div>
+    <div class="eyebrow">3Q HATCHERY · KIT 02 · OA MANAGER · 手動套用</div>
+    <h1>把 Launch Kit 套到<em>真實後台</em></h1>
+    <p>所有不能透過 API 設定的東西 — 帳號名、頭像、封面、About、回應模式 — 都列在這份手冊。每個欄位都附「該貼什麼」+「貼到哪」+「複製按鈕」。預估 12 分鐘做完。</p>
+  </div>
+  <div class="r">
+    <div class="pill">12 MIN · MANUAL</div><br>
+    <span>OA · @121LKSPE</span><br>
+    <span>2026 · TAIPEI</span><br>
+    <a href="javascript:window.print()" style="color:var(--gold);text-decoration:none;border-bottom:1px solid var(--gold);padding-bottom:2px;margin-top:10px;display:inline-block;">⎙ 列印 / PDF</a>
+  </div>
+</header>
+
+<!-- ============================================================
+     SECTION A — Basic info: account name + status message
+============================================================ -->
+<section class="s">
+  <div class="idx">
+    <div class="no">A</div>
+    <div class="nm">帳號身份</div>
+    <div class="en">Account · Name · Status</div>
+    <div class="time">2 MIN</div>
+  </div>
+  <div class="body">
+    <p class="lede">這三個欄位顯示在所有用戶的「聊天列表」與「OA 個人檔案頁」。狀態消息有 20 字限制（我們用 19）。</p>
+
+    <div class="where">
+      <span class="crumb">manager.line.biz</span><span class="arrow">→</span>
+      <span class="crumb">選 @121LKSPE</span><span class="arrow">→</span>
+      <span class="crumb">Settings</span><span class="arrow">→</span>
+      <span class="crumb last">Account settings · Basic information</span>
+    </div>
+
+    <div class="field">
+      <div class="row"><span class="label">Account name 帳號名稱</span><span class="count">19 chars</span></div>
+      <div class="value" data-v="3Q貢丸 · 台灣在地品牌孵化所">3Q貢丸 · 台灣在地品牌孵化所<button class="copy">COPY</button></div>
+    </div>
+
+    <div class="field">
+      <div class="row"><span class="label">Status message 狀態消息</span><span class="count">19 / 20 chars</span></div>
+      <div class="value" data-v="只要你願意說，我們就幫你被看見。">只要你願意說，我們就幫你被看見。<button class="copy">COPY</button></div>
+    </div>
+
+    <span class="doneflag">A 完成 / DONE</span>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION B — Profile: About text
+============================================================ -->
+<section class="s">
+  <div class="idx">
+    <div class="no">B</div>
+    <div class="nm">關於我們</div>
+    <div class="en">Profile · About</div>
+    <div class="time">2 MIN</div>
+  </div>
+  <div class="body">
+    <p class="lede">用戶點 OA 頭像 → 看到的個人檔案頁。第一段話決定他要不要把你留下來。</p>
+
+    <div class="where">
+      <span class="crumb">Home</span><span class="arrow">→</span>
+      <span class="crumb">Profile</span><span class="arrow">→</span>
+      <span class="crumb last">Account page / Cover · 編輯</span>
+    </div>
+
+    <div class="field">
+      <div class="row"><span class="label">About 介紹</span><span class="count">7 行</span></div>
+      <div class="value" data-v="台灣在地品牌孵化所。
+不管你的店多大多小，
+我們都有適合的平台、舞台、後台。
+——
+・好物・好照 · FROM 500
+・陪你被看見 · 客製行銷
+・走到哪了 · 進度追蹤">台灣在地品牌孵化所。
+不管你的店多大多小，
+我們都有適合的平台、舞台、後台。
+——
+・好物・好照 · FROM 500
+・陪你被看見 · 客製行銷
+・走到哪了 · 進度追蹤<button class="copy">COPY</button></div>
+    </div>
+
+    <span class="doneflag">B 完成 / DONE</span>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION C — Image uploads
+============================================================ -->
+<section class="s">
+  <div class="idx">
+    <div class="no">C</div>
+    <div class="nm">頭像 + 封面</div>
+    <div class="en">Avatar + Cover</div>
+    <div class="time">2 MIN</div>
+  </div>
+  <div class="body">
+    <p class="lede">圖片已渲染好放在 GitHub Pages。直接點下載連結存到桌面，再去後台上傳。</p>
+
+    <div class="where">
+      <span class="crumb">Home</span><span class="arrow">→</span>
+      <span class="crumb">Profile</span><span class="arrow">→</span>
+      <span class="crumb last">Profile image · Cover photo</span>
+    </div>
+
+    <div class="imgcard">
+      <div class="pv"><img class="round" src="assets/exports/3q-avatar-640.png" alt="avatar"></div>
+      <div class="meta">
+        <dl>
+          <dt>Spec</dt><dd>640 × 640 · PNG · 45 KB</dd>
+          <dt>File</dt><dd>3q-avatar-640.png</dd>
+          <dt>Note</dt><dd style="font-family:var(--sans);color:var(--dim);">圓形裁切自動處理</dd>
+        </dl>
+        <a class="dl" href="assets/exports/3q-avatar-640.png" download>⬇ 下載 AVATAR</a>
+      </div>
+    </div>
+
+    <div class="imgcard">
+      <div class="pv"><img src="assets/exports/3q-cover-bowl-1080x878.png" alt="cover"></div>
+      <div class="meta">
+        <dl>
+          <dt>Spec</dt><dd>1080 × 878 · PNG · 839 KB</dd>
+          <dt>File</dt><dd>3q-cover-bowl-1080x878.png</dd>
+          <dt>Note</dt><dd style="font-family:var(--sans);color:var(--dim);">上 150px 會被頭像+帳號名遮住，重要資訊在下半部</dd>
+        </dl>
+        <a class="dl" href="assets/exports/3q-cover-bowl-1080x878.png" download>⬇ 下載 COVER</a>
+      </div>
+    </div>
+
+    <span class="doneflag">C 完成 / DONE</span>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION D — Response settings: hand over to Worker
+============================================================ -->
+<section class="s">
+  <div class="idx">
+    <div class="no">D</div>
+    <div class="nm">回應設定</div>
+    <div class="en">Response · Hand over to Worker</div>
+    <div class="time">3 MIN</div>
+  </div>
+  <div class="body">
+    <p class="lede"><strong style="color:var(--gold);">重要</strong> — 您已經有一個 Cloudflare Worker 在處理所有 greeting / auto-reply / away message（內容跟 Launch Kit 1:1 一致）。<br>OA Manager 後台的這三個功能必須關掉，否則會跟 Worker 重複回覆。</p>
+
+    <div class="where">
+      <span class="crumb">Home</span><span class="arrow">→</span>
+      <span class="crumb">Settings</span><span class="arrow">→</span>
+      <span class="crumb last">Response settings</span>
+    </div>
+
+    <div class="switch-list">
+      <div class="switch-row">
+        <div class="sw-label">Chat 模式</div>
+        <div class="sw-state on">BOT</div>
+        <div class="sw-why">用機器人模式（不是 Chat），讓 Webhook 可以攔截訊息</div>
+      </div>
+      <div class="switch-row">
+        <div class="sw-label">Greeting message 加入時訊息</div>
+        <div class="sw-state off">OFF</div>
+        <div class="sw-why">Worker 已處理 follow 事件，會送 welcome card + greeting 文字</div>
+      </div>
+      <div class="switch-row">
+        <div class="sw-label">Auto-response 自動回應</div>
+        <div class="sw-state off">OFF</div>
+        <div class="sw-why">Worker 已實作 6 組關鍵字 + 3 組案例，更靈活</div>
+      </div>
+      <div class="switch-row">
+        <div class="sw-label">AI auto response AI 智慧聊天</div>
+        <div class="sw-state off">OFF</div>
+        <div class="sw-why">避免污染品牌語調</div>
+      </div>
+      <div class="switch-row">
+        <div class="sw-label">Webhook</div>
+        <div class="sw-state on">ON</div>
+        <div class="sw-why">URL 就是您現有的 Worker（下方），驗證已通過</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="row"><span class="label">Webhook URL</span><span class="count">Cloudflare Worker</span></div>
+      <div class="value mono" data-v="https://3q-hatchery-webhook.milk790.workers.dev">https://3q-hatchery-webhook.milk790.workers.dev<button class="copy">COPY</button></div>
+      <div class="hint">如果這個欄位已有正確值，無須改動 — 可直接按「Verify」確認</div>
+    </div>
+
+    <span class="doneflag">D 完成 / DONE</span>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION E — Rich menu sanity check
+============================================================ -->
+<section class="s">
+  <div class="idx">
+    <div class="no">E</div>
+    <div class="nm">圖文選單檢查</div>
+    <div class="en">Rich Menu · Sanity</div>
+    <div class="time">1 MIN</div>
+  </div>
+  <div class="body">
+    <p class="lede">Rich menu 由 Messaging API 推送，OA Manager 看得到但不要在這裡編輯（會跟 API 版本衝突）。本節只檢查 — 確認後台顯示的是對的版本。</p>
+
+    <div class="where">
+      <span class="crumb">Home</span><span class="arrow">→</span>
+      <span class="crumb last">Rich menu</span>
+    </div>
+
+    <div class="imgcard">
+      <div class="pv"><img src="assets/exports/3q-richmenu-2500x1686.jpg" alt="rich menu"></div>
+      <div class="meta">
+        <dl>
+          <dt>Layout</dt><dd>1 hero + 4 cells</dd>
+          <dt>Spec</dt><dd>2500 × 1686 · JPG · 115 KB</dd>
+          <dt>Tap A</dt><dd>HERO → 官網 URI</dd>
+          <dt>Tap B</dt><dd>"我想說說我的店"</dd>
+          <dt>Tap C</dt><dd>"我想了解好物・好照"</dd>
+          <dt>Tap D</dt><dd>"我想要客製行銷"</dd>
+          <dt>Tap E</dt><dd>"查我的進度"</dd>
+        </dl>
+        <div style="font-family:var(--sans);color:var(--dim);font-size:11px;margin-top:14px;line-height:1.7;">
+          如果後台顯示的是 6-cell 舊版（"3Q貢丸主選單v2"，按鈕：諮詢/500/行銷/進度/客服/約諮詢），<br>
+          代表 API 推送還沒 set-default — 請我跑 <span style="color:var(--gold);">set-default-and-cleanup.sh</span> 就會切換。
+        </div>
+      </div>
+    </div>
+
+    <span class="doneflag">E 完成 / DONE</span>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION F — Verification
+============================================================ -->
+<section class="s">
+  <div class="idx">
+    <div class="no">F</div>
+    <div class="nm">驗證</div>
+    <div class="en">Verify · 用自己的 LINE 測</div>
+    <div class="time">2 MIN</div>
+  </div>
+  <div class="body">
+    <p class="lede">用個人 LINE 帳號加 OA 為好友，照下方順序確認每一個 surface。如果有任一項對不上 — 不要繼續，回頭找對應 section。</p>
+
+    <div class="verify">
+      <ol>
+        <li>加好友 — 應立刻收到 <strong>welcome card 圖片</strong> + <strong>greeting 文字</strong>（不是空白）</li>
+        <li>打 <code>我的店</code> — 收到「請告訴我們三件事」回覆</li>
+        <li>打 <code>500</code> — 收到「好物・好照」說明</li>
+        <li>打 <code>進度</code> — 收到進度查詢提示</li>
+        <li>打 <code>案例</code> — 收到本月入駐 + 4 卡輪播（必須出現 4 張圖）</li>
+        <li>打 <code>01</code> — 收到「阿婆ㄟ切仔麵店」詳細案例</li>
+        <li>打隨便字串 ex. <code>你好</code> — 收到 away message fallback</li>
+        <li>點 rich menu 第二格「說說你的店」— 應發送「我想說說我的店」並收到對應回覆</li>
+        <li>點 rich menu hero — 應開啟 <code>https://3q-hatchery.tw</code></li>
+      </ol>
+    </div>
+
+    <span class="doneflag">F 完成 / DONE</span>
+  </div>
+</section>
+
+<footer>
+  <span>3Q 貢丸 · 台灣在地品牌孵化所</span>
+  <span class="line"></span>
+  <span>LINE @121LKSPE</span>
+</footer>
+
+</div>
+
+<script>
+// Copy buttons — use data-v attribute (avoids escaping issues with the button text node)
+document.querySelectorAll('.value').forEach(el => {
+  const btn = el.querySelector('.copy');
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    const v = el.getAttribute('data-v') || '';
+    try {
+      await navigator.clipboard.writeText(v);
+      btn.classList.add('ok');
+      btn.textContent = 'COPIED';
+      setTimeout(() => { btn.classList.remove('ok'); btn.textContent = 'COPY'; }, 1400);
+    } catch (e) {
+      btn.textContent = 'FAIL';
+    }
+  });
+});
+
+// Done flags — toggle + persist in localStorage
+document.querySelectorAll('.doneflag').forEach((el, i) => {
+  const key = 'oa-manual-done-' + i;
+  if (localStorage.getItem(key) === '1') el.classList.add('done');
+  el.addEventListener('click', () => {
+    el.classList.toggle('done');
+    localStorage.setItem(key, el.classList.contains('done') ? '1' : '0');
+  });
+});
+</script>
+
+</body>
+</html>
