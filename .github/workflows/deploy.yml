@@ -36,21 +36,17 @@ jobs:
           fi
           echo "::notice::LINE bot: $name ($(echo "$resp" | jq -r '.basicId'))"
 
-      - name: Resolve Cloudflare account ID
+      - name: Set Cloudflare account ID
         env:
-          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
         run: |
           set -euo pipefail
-          resp=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
-            https://api.cloudflare.com/client/v4/accounts)
-          ACC_ID=$(echo "$resp" | jq -r '.result[0].id // empty')
-          ACC_NAME=$(echo "$resp" | jq -r '.result[0].name // empty')
-          if [ -z "$ACC_ID" ]; then
-            echo "::error::no CF accounts visible: $resp"
+          if [ -z "$CF_ACCOUNT_ID" ]; then
+            echo "::error::CF_ACCOUNT_ID secret is empty"
             exit 1
           fi
-          echo "CF_ACCOUNT_ID=$ACC_ID" >> $GITHUB_ENV
-          echo "::notice::CF account: $ACC_NAME ($ACC_ID)"
+          echo "CF_ACCOUNT_ID=$CF_ACCOUNT_ID" >> $GITHUB_ENV
+          echo "::notice::Using CF account ID (hidden)"
 
       - name: Deploy Worker
         env:
