@@ -1,0 +1,170 @@
+name: Update rich menu hero URI (one-shot)
+
+# Creates a new rich menu (v4) with hero pointing to Launch Kit, sets it as
+# default, deletes all others. Idempotent — running multiple times converges
+# to a single v4 menu.
+#
+# Does NOT touch Cloudflare Worker bindings, so the secret stays correct.
+
+on:
+  workflow_dispatch:
+    inputs:
+      hero_uri:
+        description: 'URL the hero band should open'
+        required: true
+        type: string
+        default: 'https://milk790-code.github.io/3q-hatchery-line-oa/3Q-LINE-OA-Launch-Kit.html'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      RM_NAME: '3Q Hatchery · MENU (postback v4)'
+      OLD_RM_NAME: '3Q Hatchery · MENU (postback v3)'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create new rich menu with updated hero
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          HERO_URI:   ${{ inputs.hero_uri }}
+        run: |
+          set -euo pipefail
+          mkdir -p _debug/v4
+
+          # Check if v4 already exists (idempotent)
+          existing=$(curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
+            https://api.line.me/v2/bot/richmenu/list \
+            | jq -r --arg n "$RM_NAME" '.richmenus[] | select(.name == $n) | .richMenuId' \
+            | head -1)
+          if [ -n "$existing" ]; then
+            echo "RICH_MENU_ID=$existing" >> $GITHUB_ENV
+            echo "::notice::v4 already exists: $existing"
+            exit 0
+          fi
+
+          # Build definition (4 cells = postback, hero = uri)
+          jq -nc --arg uri "$HERO_URI" --arg name "$RM_NAME" '{
+            size: {width: 2500, height: 1686},
+            selected: false,
+            name: $name,
+            chatBarText: "MENU",
+            areas: [
+              {bounds: {x: 0,    y: 0,   width: 2500, height: 800}, action: {type: "uri",      uri: $uri}},
+              {bounds: {x: 0,    y: 800, width: 625,  height: 886}, action: {type: "postback", data: "menu:my-store"}},
+              {bounds: {x: 625,  y: 800, width: 625,  height: 886}, action: {type: "postback", data: "menu:imagery"}},
+              {bounds: {x: 1250, y: 800, width: 625,  height: 886}, action: {type: "postback", data: "menu:marketing"}},
+              {bounds: {x: 1875, y: 800, width: 625,  height: 886}, action: {type: "postback", data: "menu:progress"}}
+            ]
+          }' > _debug/v4/definition.json
+          cat _debug/v4/definition.json | jq .
+
+          resp=$(curl -sS -X POST https://api.line.me/v2/bot/richmenu \
+            -H "Authorization: Bearer $LINE_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data @_debug/v4/definition.json)
+          RM_ID=$(echo "$resp" | jq -r '.richMenuId // empty')
+          if [ -z "$RM_ID" ]; then
+            echo "::error::Create failed: $resp"
+            exit 1
+          fi
+          echo "RICH_MENU_ID=$RM_ID" >> $GITHUB_ENV
+          echo "::notice::Created v4: $RM_ID"
+
+      - name: Upload binary to v4
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          # Probe existing binary
+          set +e
+          probe=$(curl -sS -o /tmp/p -w "%{http_code}" \
+            "https://api-data.line.me/v2/bot/richmenu/${RICH_MENU_ID}/content" \
+            -H "Authorization: Bearer $LINE_TOKEN")
+          set -e
+          size=$(wc -c < /tmp/p 2>/dev/null || echo 0)
+          if [ "$probe" = "200" ] && [ "$size" -gt 1000 ]; then
+            echo "::notice::Binary already uploaded ($size bytes)"
+            exit 0
+          fi
+          curl -sS -f -X POST \
+            "https://api-data.line.me/v2/bot/richmenu/${RICH_MENU_ID}/content" \
+            -H "Authorization: Bearer $LINE_TOKEN" \
+            -H "Content-Type: image/jpeg" \
+            --data-binary @assets/exports/3q-richmenu-2500x1686.jpg
+          echo "::notice::Binary uploaded"
+
+      - name: Set v4 as default
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          pip install --quiet requests
+          python3 - <<'PY'
+          import os, sys, requests
+          rm_id = os.environ['RICH_MENU_ID']
+          token = os.environ['LINE_TOKEN']
+          r = requests.post(
+              f'https://api.line.me/v2/bot/user/all/richmenu/{rm_id}',
+              headers={'Authorization': f'Bearer {token}'},
+              timeout=15,
+          )
+          print(f'HTTP {r.status_code}: {r.text}')
+          if r.status_code != 200:
+              sys.exit(f'set-default failed')
+          PY
+          echo "::notice::v4 is now default"
+
+      - name: Delete all OTHER rich menus
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
+            https://api.line.me/v2/bot/richmenu/list \
+            > _debug/v4/before.json
+          mapfile -t ALL < <(jq -r '.richmenus[].richMenuId' _debug/v4/before.json)
+          : > _debug/v4/deletes.log
+          for id in "${ALL[@]}"; do
+            if [ "$id" = "$RICH_MENU_ID" ]; then
+              echo "keep $id"
+              continue
+            fi
+            http=$(curl -sS -o /dev/null -w "%{http_code}" -X DELETE \
+              "https://api.line.me/v2/bot/richmenu/$id" \
+              -H "Authorization: Bearer $LINE_TOKEN")
+            echo "delete $id → HTTP $http"
+            echo "$http $id" >> _debug/v4/deletes.log
+          done
+
+      - name: Verify final state
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
+            https://api.line.me/v2/bot/richmenu/list \
+            > _debug/v4/after.json
+          jq '.richmenus[] | {id: .richMenuId, name, cbt: .chatBarText, hero: .areas[0].action}' _debug/v4/after.json
+
+          curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
+            https://api.line.me/v2/bot/user/all/richmenu \
+            > _debug/v4/default.json
+          echo "default: $(cat _debug/v4/default.json)"
+
+      - name: Commit
+        if: always()
+        run: |
+          set -euo pipefail
+          git config user.email "actions@github.com"
+          git config user.name "github-actions[bot]"
+          git add _debug/v4/ 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+          else
+            git commit -m "v4: hero URI updated (run ${{ github.run_id }})"
+            git pull --rebase origin main || true
+            git push origin HEAD:main
+          fi
