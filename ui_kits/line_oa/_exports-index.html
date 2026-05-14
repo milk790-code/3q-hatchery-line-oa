@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>3Q 孵化所 · 匯出工具索引</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400&family=Noto+Sans+TC:wght@300;400&family=Noto+Serif+TC:wght@300;400&display=swap"/>
+  <link rel="stylesheet" href="../../colors_and_type.css"/>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: #0F0D0A; color: var(--color-paper); font-family: var(--font-sans); font-weight: 300; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 80px 48px 120px; }
+    .eyebrow { font-size: 11px; letter-spacing: 0.3em; color: var(--color-gold); text-transform: uppercase; margin-bottom: 24px; }
+    h1 { font-family: var(--font-serif); font-weight: 300; font-size: 56px; letter-spacing: 0.05em; line-height: 1.1; margin: 0 0 16px; color: var(--color-paper); }
+    h1 em { font-style: italic; color: var(--color-gold); font-weight: 300; }
+    .lede { font-size: 13px; letter-spacing: 0.1em; line-height: 1.9; color: rgba(245,242,236,0.65); max-width: 640px; margin-bottom: 64px; }
+    .hairline { width: 56px; height: 1px; background: var(--color-gold); margin: 48px 0; }
+
+    .list { display: grid; grid-template-columns: 1fr; gap: 1px; background: rgba(184,146,74,0.18); border: 1px solid rgba(184,146,74,0.18); }
+    .row { background: #0F0D0A; padding: 32px 36px; display: grid; grid-template-columns: 110px 1fr auto; align-items: center; gap: 24px; }
+    .row .no { font-family: var(--font-serif); font-style: italic; font-weight: 300; font-size: 48px; color: var(--color-gold); line-height: 1; }
+    .row .body { display: flex; flex-direction: column; gap: 8px; }
+    .row .name { font-family: var(--font-serif); font-size: 24px; letter-spacing: 0.1em; color: var(--color-paper); }
+    .row .dim  { font-size: 11px; letter-spacing: 0.25em; color: rgba(245,242,236,0.5); text-transform: uppercase; }
+    .row .meta { font-size: 12px; letter-spacing: 0.04em; line-height: 1.7; color: rgba(245,242,236,0.7); max-width: 380px; }
+    .row .actions { display: flex; flex-direction: column; align-items: stretch; gap: 6px; min-width: 200px; }
+    .row .actions a {
+      display: inline-block; text-align: center;
+      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+      padding: 10px 14px; border: 1px solid rgba(184,146,74,0.4); color: var(--color-paper);
+      text-decoration: none; transition: background 0.15s, color 0.15s;
+    }
+    .row .actions a:hover { background: var(--color-gold); color: var(--color-paper); border-color: var(--color-gold); }
+    .row .actions a.primary { border-color: var(--color-gold); color: var(--color-gold); }
+    .row .actions a.primary:hover { background: var(--color-gold); color: var(--color-paper); }
+
+    .row .subnav { display: flex; gap: 4px; }
+    .row .subnav a { flex: 1; padding: 8px 10px; font-size: 10px; }
+
+    @media (max-width: 720px) {
+      .row { grid-template-columns: 1fr; }
+      .row .actions { min-width: 0; }
+    }
+
+    footer { margin-top: 80px; padding-top: 32px; border-top: 1px solid rgba(184,146,74,0.15); display: flex; justify-content: space-between; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(245,242,236,0.4); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">3Q 孵化所 · LINE OA 上線素材</div>
+    <h1>素材<em>匯出</em>工具</h1>
+    <div class="lede">
+      每一個 LINE OA 上線需要的圖檔，都有一個對應的匯出頁。
+      開啟連結 → 按右上「⬇ 下載 PNG」 → 把產出的圖直接上傳到 LINE 後台。
+      若需要自動觸發下載（給 CI 用），加 <code>?download=1</code>。
+      若要乾淨截圖（不顯示工具列、無黑底），加 <code>?bare=1</code>。
+    </div>
+    <div class="hairline"></div>
+
+    <div class="list">
+      <div class="row">
+        <div class="no">01</div>
+        <div class="body">
+          <div class="name">大頭貼 / Avatar</div>
+          <div class="dim">640 × 640 · CIRCLE</div>
+          <div class="meta">3Q 字標 + 金色細線 + BRAND HATCHERY 副標。LINE 縮圖到 56px 仍可辨識。</div>
+        </div>
+        <div class="actions">
+          <a class="primary" href="_avatar-export.html">開啟匯出頁</a>
+          <a href="_avatar-export.html?download=1">一鍵下載 PNG</a>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="no">02</div>
+        <div class="body">
+          <div class="name">封面圖 / Cover</div>
+          <div class="dim">1080 × 878 · 60 / 40 SPLIT</div>
+          <div class="meta">左側 60% 編輯攝影、右側 40% 米紙白文案塊。4 張季節照可切換（bowl / ink / linen / stalk）。</div>
+        </div>
+        <div class="actions">
+          <a class="primary" href="_cover-export.html">開啟匯出頁</a>
+          <div class="subnav">
+            <a href="_cover-export.html?photo=bowl">BOWL</a>
+            <a href="_cover-export.html?photo=ink">INK</a>
+            <a href="_cover-export.html?photo=linen">LINEN</a>
+            <a href="_cover-export.html?photo=stalk">STALK</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="no">03</div>
+        <div class="body">
+          <div class="name">圖文選單 / Rich Menu</div>
+          <div class="dim">2500 × 1686 · HERO + 4-CTA GRID</div>
+          <div class="meta">上方品牌 hero band（800 高）+ 下方 4 格 CTA。匯出大圖約 5-10 秒，預設提供 40% 縮小預覽。</div>
+        </div>
+        <div class="actions">
+          <a class="primary" href="_richmenu-export.html?scale=0.4">開啟匯出頁 (40% 預覽)</a>
+          <a href="_richmenu-export.html?download=1">一鍵下載 PNG</a>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="no">04</div>
+        <div class="body">
+          <div class="name">歡迎卡 / Welcome Card</div>
+          <div class="dim">1040 × 1040 · TOP PHOTO / BOTTOM TYPE</div>
+          <div class="meta">用戶第一次加入 OA 時看到的卡片。信封照 + WELCOME 標 + 主標「只要你願意說，我們就幫你被看見。」</div>
+        </div>
+        <div class="actions">
+          <a class="primary" href="_welcome-card-export.html">開啟匯出頁</a>
+          <a href="_welcome-card-export.html?download=1">一鍵下載 PNG</a>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="no">05</div>
+        <div class="body">
+          <div class="name">輪播主推 / Carousel</div>
+          <div class="dim">1040 × 1040 × 4 CARDS · 70 / 30 SPLIT</div>
+          <div class="meta">本月入駐 / 好物・好照 / 一束稻一個故事 / 原麻布。每張獨立匯出，?card=1..4 指定。</div>
+        </div>
+        <div class="actions">
+          <a class="primary" href="_carousel-export.html?card=1">開啟匯出頁</a>
+          <div class="subnav">
+            <a href="_carousel-export.html?card=1">01</a>
+            <a href="_carousel-export.html?card=2">02</a>
+            <a href="_carousel-export.html?card=3">03</a>
+            <a href="_carousel-export.html?card=4">04</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <span>3Q 貢丸 · 台灣在地品牌孵化所</span>
+      <span><a href="launch.html" style="color: inherit; text-decoration: none;">LAUNCH DOC ↗</a></span>
+    </footer>
+  </div>
+</body>
+</html>
