@@ -2,10 +2,21 @@ name: Deploy 3Q Hatchery LINE OA
 
 on:
   workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'webhook/worker.js'
+      - 'assets/exports/3q-richmenu-2500x1686.jpg'
+      - '.github/workflows/deploy.yml'
+  workflow_run:
+    workflows: ['Render PNG assets']
+    types: [completed]
+    branches: [main]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     permissions:
       contents: write
       issues: write
@@ -99,47 +110,20 @@ jobs:
           fi
           echo "Worker uploaded (etag=$(jq -r '.result.etag' _debug/cf-deploy-response.json))"
 
-      - name: Commit debug artifacts (always)
+      - name: CF deploy diagnostics (summary only)
         if: always()
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          set -euo pipefail
-          if [ ! -d _debug ]; then
-            echo "no _debug/ to commit"
-            exit 0
-          fi
-          ls -la _debug/
-          echo "=== contents preview ==="
-          for f in _debug/*; do
-            echo "--- $f ---"
-            head -c 2000 "$f"
-            echo
-          done
-          # Also dump to job summary
-          echo "## CF Deploy Debug" >> $GITHUB_STEP_SUMMARY
-          for f in _debug/*; do
-            echo "### $f" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            head -c 3000 "$f" >> $GITHUB_STEP_SUMMARY
-            echo >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-          done
-
-          git config user.email "actions@github.com"
-          git config user.name "github-actions[bot]"
-          git add _debug/
-          if git diff --cached --quiet; then
-            echo "nothing to commit"
-          else
-            git commit -m "ci: debug artifacts from run ${{ github.run_id }}"
-            if ! git push origin HEAD:main; then
-              echo "git push failed — falling back to gh api issue create"
-              gh issue create \
-                --title "CI debug from run ${{ github.run_id }}" \
-                --body-file <(for f in _debug/*; do echo "### $f"; echo '```'; head -c 3000 "$f"; echo; echo '```'; echo; done) \
-                || echo "issue create also failed"
-            fi
+          echo "## CF Deploy Diagnostics" >> $GITHUB_STEP_SUMMARY
+          if [ -d _debug ]; then
+            for f in _debug/*; do
+              echo "### \`$f\`" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              head -c 3000 "$f" >> $GITHUB_STEP_SUMMARY
+              echo >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+            done
+            # Wipe _debug so this run does not commit it (the dir is git-tracked from older runs but new files stay untracked)
+            rm -rf _debug
           fi
 
       - name: Enable workers.dev subdomain
@@ -170,11 +154,26 @@ jobs:
           echo "$resp" | jq -e '.ok == true and .configured.token == true and .configured.secret == true' > /dev/null
           echo "::notice::Worker is alive and configured"
 
-      - name: Create LINE Rich Menu
+      - name: Ensure LINE Rich Menu (reuse by name, else create)
         env:
           LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          RM_NAME: '3Q Hatchery - 1 hero + 4 cells'
         run: |
           set -euo pipefail
+
+          # 1. Look for existing rich menu by name
+          existing=$(curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
+            https://api.line.me/v2/bot/richmenu/list \
+            | jq -r --arg n "$RM_NAME" '.richmenus[] | select(.name == $n) | .richMenuId' \
+            | head -1)
+
+          if [ -n "$existing" ]; then
+            echo "RICH_MENU_ID=$existing" >> $GITHUB_ENV
+            echo "::notice::Reusing existing Rich Menu: $existing"
+            exit 0
+          fi
+
+          # 2. Create new
           cat > /tmp/richmenu.json <<'JSON'
           {
             "size": {"width": 2500, "height": 1686},
@@ -201,14 +200,29 @@ jobs:
             exit 1
           fi
           echo "RICH_MENU_ID=$RM_ID" >> $GITHUB_ENV
-          echo "::notice::Rich Menu created: $RM_ID"
+          echo "::notice::Created new Rich Menu: $RM_ID"
 
-      - name: Upload Rich Menu binary
+      - name: Upload Rich Menu binary (skip if already uploaded)
         env:
           LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
         run: |
           set -euo pipefail
           ls -la assets/exports/3q-richmenu-2500x1686.jpg
+
+          # Probe: does this rich menu already have a binary?
+          set +e
+          probe_http=$(curl -sS -o /tmp/probe -w "%{http_code}" \
+            "https://api-data.line.me/v2/bot/richmenu/${RICH_MENU_ID}/content" \
+            -H "Authorization: Bearer $LINE_TOKEN")
+          set -e
+          probe_size=$(wc -c < /tmp/probe 2>/dev/null || echo 0)
+          echo "probe: HTTP $probe_http, $probe_size bytes"
+
+          if [ "$probe_http" = "200" ] && [ "$probe_size" -gt 1000 ]; then
+            echo "::notice::Binary already uploaded ($probe_size bytes), skipping"
+            exit 0
+          fi
+
           curl -sS -f -X POST \
             "https://api-data.line.me/v2/bot/richmenu/${RICH_MENU_ID}/content" \
             -H "Authorization: Bearer $LINE_TOKEN" \
@@ -216,28 +230,28 @@ jobs:
             --data-binary @assets/exports/3q-richmenu-2500x1686.jpg
           echo "::notice::Rich Menu binary uploaded"
 
-      - name: Set Rich Menu as default for all users
-        continue-on-error: true
+      - name: Set Rich Menu as default (via Python requests — defeats Akamai 411)
         env:
           LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
         run: |
-          set -uo pipefail
-          mkdir -p _debug
-          set +e
-          http=$(curl -sS -X POST \
-            "https://api.line.me/v2/bot/user/all/richmenu/${RICH_MENU_ID}" \
-            -H "Authorization: Bearer $LINE_TOKEN" \
-            -o _debug/setrm-response.json -w "%{http_code}")
-          set -e
-          echo "$http" > _debug/setrm-http.txt
-          echo "HTTP $http"
-          cat _debug/setrm-response.json || true
-          echo
-          if [ "$http" != "200" ]; then
-            echo "::warning::Set default rich menu failed (http=$http). Webhook+other steps will continue. User can set default via LINE OA Manager UI."
-          else
-            echo "::notice::Default rich menu set OK"
-          fi
+          set -euo pipefail
+          pip install --quiet requests
+          # The endpoint is fronted by Akamai which rejects empty-body POST from curl with HTTP 411.
+          # Probed 5 body shapes; only `requests.post(url, headers=...)` with NO `data=` arg returns 200.
+          python3 - <<'PY'
+          import os, sys, requests
+          rm_id = os.environ['RICH_MENU_ID']
+          token = os.environ['LINE_TOKEN']
+          r = requests.post(
+              f'https://api.line.me/v2/bot/user/all/richmenu/{rm_id}',
+              headers={'Authorization': f'Bearer {token}'},
+              timeout=15,
+          )
+          print(f'HTTP {r.status_code}: {r.text}')
+          if r.status_code != 200:
+              sys.exit(f'set-default failed: {r.status_code} {r.text}')
+          PY
+          echo "::notice::Default rich menu set"
 
       - name: Set LINE webhook URL
         env:
