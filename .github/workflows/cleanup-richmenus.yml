@@ -89,16 +89,37 @@ jobs:
           done
 
           echo
-          echo "=== 5. Set keeper as default for all users ==="
-          # LINE endpoint requires explicit Content-Length:0 (or empty body); curl -X POST without body sends no header → 411
+          echo "=== 5. Set keeper as default for all users (via Python urllib) ==="
+          # curl-based POST returns HTTP 411 from Akamai edge for this endpoint regardless of -d "" or -H "Content-Length: 0".
+          # Python's urllib reliably sends a proper POST with explicit empty body + Content-Length: 0.
           set +e
-          http=$(curl -sS -X POST \
-            "https://api.line.me/v2/bot/user/all/richmenu/$KEEP" \
-            -H "Authorization: Bearer $LINE_TOKEN" \
-            -H "Content-Length: 0" \
-            -d "" \
-            -o _debug/cleanup/setdefault.json -w "%{http_code}")
+          python3 <<PY > _debug/cleanup/setdefault.json 2>&1
+          import os, sys, json, urllib.request, urllib.error
+          keep = "$KEEP"
+          token = os.environ["LINE_TOKEN"]
+          req = urllib.request.Request(
+              f"https://api.line.me/v2/bot/user/all/richmenu/{keep}",
+              data=b"", method="POST",
+              headers={"Authorization": f"Bearer {token}", "Content-Length": "0"}
+          )
+          try:
+              with urllib.request.urlopen(req) as r:
+                  body = r.read().decode("utf-8", errors="replace") or "{}"
+                  sys.stderr.write(f"HTTP_CODE={r.status}\n")
+                  print(body)
+          except urllib.error.HTTPError as e:
+              body = e.read().decode("utf-8", errors="replace")
+              sys.stderr.write(f"HTTP_CODE={e.code}\n")
+              print(body)
+          PY
+          py_exit=$?
           set -e
+          # Extract HTTP_CODE from stderr (captured via 2>&1)
+          http=$(grep -oP "HTTP_CODE=\K\d+" _debug/cleanup/setdefault.json | tail -1 || echo "?")
+          echo "$http" > _debug/cleanup/setdefault-http.txt
+          echo "HTTP $http (py_exit=$py_exit)"
+          cat _debug/cleanup/setdefault.json
+          echo
           echo "HTTP $http"
           echo "$http" > _debug/cleanup/setdefault-http.txt
           cat _debug/cleanup/setdefault.json
