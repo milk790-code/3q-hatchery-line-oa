@@ -115,7 +115,7 @@ jobs:
         run: |
           echo "## CF Deploy Diagnostics" >> $GITHUB_STEP_SUMMARY
           if [ -d _debug ]; then
-            for f in _debug/*; do
+            for f in _debug/*; do [ -f "$f" ] || continue;
               echo "### \`$f\`" >> $GITHUB_STEP_SUMMARY
               echo '```' >> $GITHUB_STEP_SUMMARY
               head -c 3000 "$f" >> $GITHUB_STEP_SUMMARY
