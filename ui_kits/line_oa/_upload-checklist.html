@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>3Q Hatchery · 上線清單 — Manual upload guide</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Inter:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@300;400&display=swap"/>
+  <link rel="stylesheet" href="../../colors_and_type.css"/>
+
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --asset-base: https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports;
+    }
+    html, body {
+      margin: 0;
+      background: var(--color-paper);
+      color: var(--color-black);
+      font-family: var(--font-sans);
+      font-weight: 300;
+      line-height: 1.6;
+    }
+
+    .page {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 80px 48px 120px;
+    }
+
+    /* Masthead */
+    header.masthead {
+      text-align: center;
+      padding-bottom: 56px;
+      border-bottom: 1px solid var(--color-gold);
+      margin-bottom: 64px;
+    }
+    .eyebrow {
+      font-family: var(--font-sans);
+      font-size: 11px;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: var(--color-gold);
+      margin-bottom: 24px;
+    }
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 64px;
+      letter-spacing: 0.04em;
+      margin: 0 0 12px;
+      color: var(--color-black);
+    }
+    .subtitle {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 300;
+      font-size: 18px;
+      letter-spacing: 0.25em;
+      color: var(--color-ink);
+      margin: 0;
+    }
+    .lede {
+      max-width: 560px;
+      margin: 40px auto 0;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-weight: 300;
+      font-size: 15px;
+      line-height: 1.9;
+      color: var(--color-ink);
+    }
+
+    /* Section */
+    section.task {
+      margin-bottom: 80px;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .task-number {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 14px;
+      letter-spacing: 0.4em;
+      color: var(--color-gold);
+      margin-bottom: 4px;
+    }
+    .task-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 38px;
+      letter-spacing: 0.02em;
+      margin: 0 0 4px;
+      color: var(--color-black);
+    }
+    .task-title-zh {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 300;
+      font-size: 18px;
+      letter-spacing: 0.3em;
+      color: var(--color-ink);
+      margin: 0 0 32px;
+    }
+    .task-divider {
+      width: 60px;
+      height: 1px;
+      background: var(--color-gold);
+      margin: 0 0 32px;
+    }
+
+    .task-body {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+    .task-body.full {
+      grid-template-columns: 1fr;
+    }
+
+    /* Image preview */
+    .preview {
+      background: var(--color-sand);
+      border: 1px solid rgba(184,146,74,0.3);
+      padding: 12px;
+      text-align: center;
+    }
+    .preview img {
+      width: 100%;
+      display: block;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    .preview .meta {
+      margin-top: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-stone);
+    }
+    .preview.tall img { max-height: 320px; width: auto; margin: 0 auto; }
+
+    /* Download links */
+    .dl {
+      display: inline-block;
+      background: var(--color-black);
+      color: var(--color-paper);
+      text-decoration: none;
+      padding: 14px 28px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 12px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      margin: 16px 0 4px;
+      transition: background 0.15s;
+    }
+    .dl:hover { background: var(--color-gold); }
+    .dl-url {
+      display: block;
+      margin-top: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      color: var(--color-stone);
+      word-break: break-all;
+      line-height: 1.4;
+    }
+
+    /* Steps */
+    .steps {
+      list-style: none;
+      padding: 0;
+      margin: 24px 0 0;
+    }
+    .steps li {
+      padding: 14px 0 14px 36px;
+      border-top: 1px solid var(--rule, rgba(10,10,10,0.12));
+      position: relative;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--color-ink);
+    }
+    .steps li:last-child { border-bottom: 1px solid var(--rule, rgba(10,10,10,0.12)); }
+    .steps li::before {
+      content: counter(step) ".";
+      counter-increment: step;
+      position: absolute;
+      left: 0;
+      top: 14px;
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: 18px;
+      color: var(--color-gold);
+      letter-spacing: 0.05em;
+    }
+    .steps { counter-reset: step; }
+    .steps code {
+      font-family: 'Inter', monospace;
+      background: var(--color-sand);
+      padding: 1px 6px;
+      font-size: 13px;
+      letter-spacing: 0;
+      color: var(--color-black);
+      border: 1px solid rgba(184,146,74,0.2);
+    }
+    .steps .path {
+      color: var(--color-stone);
+      letter-spacing: 0.05em;
+    }
+    .steps .arrow {
+      color: var(--color-gold);
+      margin: 0 4px;
+    }
+
+    /* Self-test checklist */
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 32px 0 0;
+      column-count: 2;
+      column-gap: 48px;
+    }
+    .checklist li {
+      break-inside: avoid;
+      padding: 10px 0 10px 32px;
+      position: relative;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--color-ink);
+    }
+    .checklist li::before {
+      content: '☐';
+      position: absolute;
+      left: 0;
+      top: 10px;
+      font-size: 18px;
+      color: var(--color-gold);
+    }
+
+    /* Footer signature */
+    footer.sig {
+      margin-top: 80px;
+      padding-top: 40px;
+      border-top: 1px solid var(--color-gold);
+      text-align: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: 14px;
+      color: var(--color-stone);
+      letter-spacing: 0.15em;
+    }
+    footer.sig .ja {
+      font-family: 'Inter', sans-serif;
+      font-style: normal;
+      font-size: 10px;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    /* Print */
+    @media print {
+      @page { size: A4; margin: 18mm 16mm; }
+      body { background: white; }
+      .page { padding: 0; max-width: none; }
+      .dl, .dl:hover { background: white; color: var(--color-black); border: 1px solid var(--color-black); }
+      .dl::after { content: ' →'; }
+      section.task { margin-bottom: 40px; }
+      header.masthead { padding-bottom: 32px; margin-bottom: 40px; }
+      h1 { font-size: 48px; }
+    }
+
+    /* Screen-only helper */
+    .no-print { }
+    @media print { .no-print { display: none; } }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- Masthead -->
+    <header class="masthead">
+      <div class="eyebrow">3Q HATCHERY · UPLOAD CHECKLIST</div>
+      <h1>4 件最後上手的事</h1>
+      <div class="subtitle">FINAL FOUR · MANUAL UPLOADS</div>
+      <p class="lede">
+        Worker、Rich Menu、Webhook、Pages 全部 API 部署完成。
+        剩下 4 件 LINE 沒給 API、必須在 OA Manager 點擊完成。
+        每件 30 秒到 2 分鐘，照表打卡。
+      </p>
+    </header>
+
+    <!-- TASK 1: Avatar -->
+    <section class="task">
+      <div class="task-number">01 / 04</div>
+      <h2 class="task-title">Avatar</h2>
+      <div class="task-title-zh">大頭照</div>
+      <div class="task-divider"></div>
+
+      <div class="task-body">
+        <div class="preview">
+          <img src="../../assets/exports/3q-avatar-640.png" alt="Avatar 640×640"/>
+          <div class="meta">640 × 640 · PNG · 46 KB</div>
+        </div>
+
+        <div>
+          <a class="dl" href="https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports/3q-avatar-640.png" download>下載 PNG</a>
+          <span class="dl-url">milk790-code.github.io/3q-hatchery-line-oa/assets/exports/3q-avatar-640.png</span>
+
+          <ol class="steps">
+            <li>開 <code>manager.line.biz</code> → 選 OA「3Q貢丸 · 台灣在地品牌孵化所」</li>
+            <li><span class="path">左側</span> <span class="arrow">→</span> <code>設定</code> <span class="arrow">→</span> <code>帳號設定</code> <span class="arrow">→</span> <code>基本檔案</code></li>
+            <li>「相片 / 大頭貼」區塊 <span class="arrow">→</span> <code>編輯</code> 按鈕</li>
+            <li>選剛下載的 <code>3q-avatar-640.png</code> <span class="arrow">→</span> <code>儲存</code></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- TASK 2: Cover -->
+    <section class="task">
+      <div class="task-number">02 / 04</div>
+      <h2 class="task-title">Cover Photo</h2>
+      <div class="task-title-zh">封面照片</div>
+      <div class="task-divider"></div>
+
+      <div class="task-body">
+        <div class="preview">
+          <img src="../../assets/exports/3q-cover-bowl-1080x878.png" alt="Cover 1080×878"/>
+          <div class="meta">1080 × 878 · PNG · 859 KB</div>
+        </div>
+
+        <div>
+          <a class="dl" href="https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports/3q-cover-bowl-1080x878.png" download>下載 PNG</a>
+          <span class="dl-url">milk790-code.github.io/3q-hatchery-line-oa/assets/exports/3q-cover-bowl-1080x878.png</span>
+
+          <ol class="steps">
+            <li>承上頁，<span class="path">基本檔案</span>頁面往下捲</li>
+            <li>「封面照片」區塊 <span class="arrow">→</span> <code>編輯</code></li>
+            <li>選 <code>3q-cover-bowl-1080x878.png</code></li>
+            <li>確認上方 150px 區域不會擋到關鍵內容 <span class="arrow">→</span> <code>儲存</code></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- TASK 3: Chat Background -->
+    <section class="task">
+      <div class="task-number">03 / 04</div>
+      <h2 class="task-title">Chat Background</h2>
+      <div class="task-title-zh">聊天室背景</div>
+      <div class="task-divider"></div>
+
+      <div class="task-body">
+        <div class="preview tall">
+          <img src="../../assets/exports/3q-chat-bg-1080x2340.jpg" alt="Chat BG 1080×2340"/>
+          <div class="meta">1080 × 2340 · JPEG · 84 KB</div>
+        </div>
+
+        <div>
+          <a class="dl" href="https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports/3q-chat-bg-1080x2340.jpg" download>下載 JPEG</a>
+          <span class="dl-url">milk790-code.github.io/3q-hatchery-line-oa/assets/exports/3q-chat-bg-1080x2340.jpg</span>
+
+          <ol class="steps">
+            <li><span class="path">左側</span> <span class="arrow">→</span> <code>設定</code> <span class="arrow">→</span> <code>聊天室</code>（或「聊天設定」）</li>
+            <li>「聊天室背景」/「對話畫面」區塊 <span class="arrow">→</span> <code>上傳</code></li>
+            <li>選 <code>3q-chat-bg-1080x2340.jpg</code></li>
+            <li>確認預覽訊息泡泡仍清楚可讀 <span class="arrow">→</span> <code>儲存</code></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- TASK 4: Toggles -->
+    <section class="task">
+      <div class="task-number">04 / 04</div>
+      <h2 class="task-title">Toggle Off Defaults</h2>
+      <div class="task-title-zh">關閉 LINE 內建自動回應與歡迎訊息</div>
+      <div class="task-divider"></div>
+
+      <div class="task-body full">
+        <p style="margin: 0 0 24px; color: var(--color-ink); font-family: 'Noto Sans TC'; font-size: 14px; line-height: 1.8;">
+          LINE 預設的「自動回應」跟「歡迎訊息」會搶在 Webhook 之前回覆使用者，蓋掉我們設計好的客製訊息。<br/>
+          兩個都關掉，讓 Cloudflare Worker 接管所有對話。
+        </p>
+
+        <ol class="steps">
+          <li><span class="path">左側</span> <span class="arrow">→</span> <code>自動回應</code> <span class="arrow">→</span> 頂部 toggle 切「<code>停用</code>」</li>
+          <li><span class="path">左側</span> <span class="arrow">→</span> <code>加入好友的歡迎訊息</code> <span class="arrow">→</span> toggle 切「<code>停用</code>」</li>
+          <li><span class="path">部分版本</span>把這兩個放在 <code>設定</code> <span class="arrow">→</span> <code>回應設定</code> 底下，找不到時往那邊翻</li>
+          <li>確認頁面狀態顯示「目前狀態：停用」（不是「啟用中」）</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Self-test checklist -->
+    <section class="task">
+      <div class="task-number">VERIFY</div>
+      <h2 class="task-title">Self-test</h2>
+      <div class="task-title-zh">上線前驗收 · 用您的手機</div>
+      <div class="task-divider"></div>
+
+      <p style="margin: 0 0 8px; color: var(--color-ink); font-family: 'Noto Sans TC'; font-size: 14px;">
+        打開 LINE app <span class="arrow">→</span> 搜尋 <code>@121LKSPE</code> <span class="arrow">→</span> 加好友 <span class="arrow">→</span> 對照下列檢查：
+      </p>
+
+      <ul class="checklist">
+        <li>大頭照是 3Q 字樣的圓形</li>
+        <li>點頭像進個人頁，看得到封面（碗 + 米）</li>
+        <li>個人頁有「孵化所」介紹文字</li>
+        <li>進對話 → 聊天背景是深色 + 碗的攝影漸層</li>
+        <li>剛加好友收到歡迎卡圖片</li>
+        <li>歡迎卡後收到一段歡迎文字</li>
+        <li>對話框底部有 Rich Menu（1 條橫幅 + 4 格）</li>
+        <li>點橫幅 → 開啟 3q-hatchery.tw 網站</li>
+        <li>點「說說你的店」格子 → 觸發訊息</li>
+        <li>打「好物」→ 收到 好物・好照 介紹</li>
+        <li>打「客製」→ 收到客製行銷介紹</li>
+        <li>打「進度」→ 收到進度查詢回覆</li>
+        <li>打「實例」→ 文字 + 4 張輪播卡</li>
+        <li>打「諮詢」→ 預約回覆</li>
+        <li>打亂碼 → 收到 24h 回覆承諾的 away 訊息</li>
+        <li>沒看到 LINE 預設的「歡迎您加入！」訊息（代表關 OK）</li>
+      </ul>
+    </section>
+
+    <footer class="sig">
+      <div class="ja">3Q HATCHERY · TAIWAN BRAND HATCHERY</div>
+      只要你願意說，我們就幫你被看見。
+    </footer>
+
+  </div>
+</body>
+</html>
