@@ -70,6 +70,16 @@ const REACTIONS = [
   { name: 'excellent', kw: ['太棒', '太好', '太強'] },
   { name: 'later',     kw: ['等等回', '晚點回', '晚點'] },
   { name: 'goodnight', kw: ['晚安', '掰掰', 'bye'] },
+  { name: 'order',     kw: ['老闆我要', '老闆', '我要', '要這個'] },
+  { name: 'seeyou',    kw: ['下次見', '掰', '下回', '再見'] },
+  { name: 'musthave',  kw: ['檔不住', '擋不住', '實在', '真的'] },
+  { name: 'queue',     kw: ['排隊', '排隊中', '排隊ing'] },
+  { name: 'hungry',    kw: ['想吃', '肚子餓', '餓了'] },
+  { name: 'empty',     kw: ['賣完了', '沒有了', '斷貨'] },
+  { name: 'bold',      kw: ['敢賭', '敢說', '敢肯定'] },
+  { name: 'stellar',   kw: ['絕了', '絕', '真絕', '超絕'] },
+  { name: 'hyper',     kw: ['狂推', '超推', '大推', '爆推'] },
+  { name: 'done',      kw: ['搞定', '搞好', '準備好', '弄好'] },
 ];
 const REACTION_REPLIES = REACTIONS.map(r => ({ keywords: r.kw, image: `3q-reaction-${r.name}-480.png` }));
 

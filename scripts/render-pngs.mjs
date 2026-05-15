@@ -11,7 +11,7 @@ const BASE = process.env.RENDER_BASE_URL || 'http://localhost:8080/ui_kits/line_
 const OUT = process.env.RENDER_OUT_DIR || 'assets/exports';
 
 const SEASONS = ['spring', 'summer', 'autumn', 'winter'];
-const REACTIONS = ['hot', 'recommend', 'thanks', 'wait', 'got-it', 'i-see', 'cheer', 'excellent', 'later', 'goodnight'];
+const REACTIONS = ['hot', 'recommend', 'thanks', 'wait', 'got-it', 'i-see', 'cheer', 'excellent', 'later', 'goodnight', 'order', 'seeyou', 'musthave', 'queue', 'hungry', 'empty', 'bold', 'stellar', 'hyper', 'done'];
 
 const PAGES = [
   { url: `${BASE}/_avatar-export.html?download=1`,                      file: '3q-avatar-640.png'           },

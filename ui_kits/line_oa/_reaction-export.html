@@ -58,16 +58,26 @@
 
   <script type="text/babel">
     const rx = [
-      { name: 'hot',       label: '好燙',   sub: 'TOO HOT',     icon: 'fire-thin.svg' },
-      { name: 'recommend', label: '推薦',   sub: 'RECOMMEND',   icon: 'sparkle-thin.svg' },
-      { name: 'thanks',    label: '謝謝',   sub: 'THANK YOU',   icon: 'heart-thin.svg' },
-      { name: 'wait',      label: '稍等',   sub: 'ONE MOMENT',  icon: 'hourglass-thin.svg' },
-      { name: 'got-it',    label: '收到',   sub: 'GOT IT',      icon: 'chat-circle-text-thin.svg' },
-      { name: 'i-see',     label: '我懂',   sub: 'I SEE',       icon: 'lightbulb-thin.svg' },
-      { name: 'cheer',     label: '加油',   sub: 'CHEER ON',    icon: 'hand-heart-thin.svg' },
-      { name: 'excellent', label: '太棒了', sub: 'EXCELLENT',   icon: 'star-thin.svg' },
-      { name: 'later',     label: '等等回', sub: 'REPLY LATER', icon: 'clock-thin.svg' },
-      { name: 'goodnight', label: '晚安',   sub: 'GOODNIGHT',   icon: 'moon-thin.svg' },
+      { name: 'hot',       label: '好燙',   sub: 'TOO HOT',         icon: 'fire-thin.svg' },
+      { name: 'recommend', label: '推薦',   sub: 'RECOMMEND',       icon: 'sparkle-thin.svg' },
+      { name: 'thanks',    label: '謝謝',   sub: 'THANK YOU',       icon: 'heart-thin.svg' },
+      { name: 'wait',      label: '稍等',   sub: 'ONE MOMENT',      icon: 'hourglass-thin.svg' },
+      { name: 'got-it',    label: '收到',   sub: 'GOT IT',          icon: 'chat-circle-text-thin.svg' },
+      { name: 'i-see',     label: '我懂',   sub: 'I SEE',           icon: 'lightbulb-thin.svg' },
+      { name: 'cheer',     label: '加油',   sub: 'CHEER ON',        icon: 'hand-heart-thin.svg' },
+      { name: 'excellent', label: '太棒了', sub: 'EXCELLENT',       icon: 'star-thin.svg' },
+      { name: 'later',     label: '等等回', sub: 'REPLY LATER',     icon: 'clock-thin.svg' },
+      { name: 'goodnight', label: '晚安',   sub: 'GOODNIGHT',       icon: 'moon-thin.svg' },
+      { name: 'order',     label: '老闆我要', sub: 'ORDER UP',      icon: 'fork-knife-thin.svg' },
+      { name: 'seeyou',    label: '下次見', sub: 'SEE YOU NEXT',    icon: 'paper-plane-tilt-thin.svg' },
+      { name: 'musthave',  label: '檔不住', sub: 'CAN\'T RESIST',   icon: 'gift-thin.svg' },
+      { name: 'queue',     label: '排隊中', sub: 'QUEUING',         icon: 'basket-thin.svg' },
+      { name: 'hungry',    label: '想吃',   sub: 'HUNGRY',          icon: 'cherries-thin.svg' },
+      { name: 'empty',     label: '賣完了', sub: 'SOLD OUT',        icon: 'cloud-rain-thin.svg' },
+      { name: 'bold',      label: '敢賭',   sub: 'I DARE',          icon: 'coin-thin.svg' },
+      { name: 'stellar',   label: '絕了',   sub: 'STELLAR',         icon: 'sun-thin.svg' },
+      { name: 'hyper',     label: '狂推',   sub: 'HIGHLY RECOMMEND',icon: 'coffee-thin.svg' },
+      { name: 'done',      label: '搞定',   sub: 'SORTED',          icon: 'scroll-thin.svg' },
     ];
     let name = qs.get('name') || 'hot';
     if (!rx.find(r => r.name === name)) name = 'hot';
