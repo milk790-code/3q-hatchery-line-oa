@@ -50,6 +50,39 @@ const AUTO_REPLIES = [
     image: '3q-carousel-04-1040.png' },
 ];
 
+// Seasonal hero campaigns — image-only reply (1080×878 PNG).
+const SEASONS = [
+  { season: 'spring', kw: ['春', '春茶', '春天', '清明', '春季入駐'] },
+  { season: 'summer', kw: ['夏', '夏天', '夏日', '夏味', '夏季'] },
+  { season: 'autumn', kw: ['秋', '秋天', '中秋', '桂花', '秋季'] },
+  { season: 'winter', kw: ['冬', '冬天', '冬至', '紅豆湯', '冬季'] },
+];
+const SEASONAL_REPLIES = SEASONS.map(s => ({
+  keywords: s.kw,
+  image: `3q-seasonal-${s.season}-1080x878.png`,
+}));
+
+// Reaction stickers — small image-only reply (480×480 PNG).
+const REACTIONS = [
+  { name: 'hot',       kw: ['好燙', '燙'] },
+  { name: 'recommend', kw: ['推薦', '讚', '好棒'] },
+  { name: 'thanks',    kw: ['謝謝', '感謝', '謝啦', 'thanks'] },
+  { name: 'wait',      kw: ['稍等', '等等', '等一下'] },
+  { name: 'got-it',    kw: ['收到', '了解', '知道'] },
+  { name: 'i-see',     kw: ['我懂', '懂', '明白'] },
+  { name: 'cheer',     kw: ['加油'] },
+  { name: 'excellent', kw: ['太棒', '太好', '太強'] },
+  { name: 'later',     kw: ['等等回', '晚點回', '晚點'] },
+  { name: 'goodnight', kw: ['晚安', '掰掰', 'bye'] },
+];
+const REACTION_REPLIES = REACTIONS.map(r => ({
+  keywords: r.kw,
+  image: `3q-reaction-${r.name}-480.png`,
+}));
+
+// Order matters — AUTO_REPLIES first (specific case keywords win over short seasonal/reaction).
+const ALL_REPLIES = [...AUTO_REPLIES, ...SEASONAL_REPLIES, ...REACTION_REPLIES];
+
 // Rich menu postback data → synthetic user-intent text.
 // Used so rich menu taps DON'T pollute the chat with visible "我想說說我的店" bubbles.
 const POSTBACK_MAP = {
@@ -145,7 +178,7 @@ async function sendWelcome(replyToken, env) {
 }
 
 async function handleIntent(userText, replyToken, env) {
-  const match = AUTO_REPLIES.find(r => r.keywords.some(kw => userText.includes(kw)));
+  const match = ALL_REPLIES.find(r => r.keywords.some(kw => userText.includes(kw)));
 
   const messages = [];
   if (match) {
@@ -156,7 +189,9 @@ async function handleIntent(userText, replyToken, env) {
         previewImageUrl: `${env.PNG_BASE_URL}/${match.image}`,
       });
     }
-    messages.push({ type: 'text', text: match.response });
+    if (match.response) {
+      messages.push({ type: 'text', text: match.response });
+    }
     if (match.carousel && env.PNG_BASE_URL) {
       messages.push(buildCarouselMessage(env.PNG_BASE_URL));
     }
