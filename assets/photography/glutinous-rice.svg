@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 878" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="bg" cx="70%" cy="25%" r="100%"><stop offset="0%" stop-color="#F2EDDF"/><stop offset="100%" stop-color="#7A6E58"/></radialGradient>
+    <radialGradient id="mound" cx="50%" cy="35%" r="55%"><stop offset="0%" stop-color="#FBF6E8"/><stop offset="100%" stop-color="#A89968"/></radialGradient>
+    <filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.95" numOctaves="2" seed="21"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.10 0"/></filter>
+  </defs>
+  <rect width="1080" height="878" fill="url(#bg)"/>
+  <ellipse cx="400" cy="680" rx="280" ry="28" fill="#0A0908" opacity="0.32"/>
+  <ellipse cx="400" cy="600" rx="240" ry="100" fill="url(#mound)"/>
+  <g fill="#F8F0DA" opacity="0.95">
+    <ellipse cx="320" cy="560" rx="5" ry="2"/><ellipse cx="340" cy="550" rx="5" ry="2"/><ellipse cx="368" cy="545" rx="5" ry="2"/>
+    <ellipse cx="395" cy="540" rx="5" ry="2"/><ellipse cx="425" cy="543" rx="5" ry="2"/><ellipse cx="455" cy="552" rx="5" ry="2"/>
+    <ellipse cx="478" cy="565" rx="5" ry="2"/><ellipse cx="305" cy="580" rx="5" ry="2"/><ellipse cx="338" cy="575" rx="5" ry="2"/>
+    <ellipse cx="372" cy="568" rx="5" ry="2"/><ellipse cx="410" cy="568" rx="5" ry="2"/><ellipse cx="448" cy="578" rx="5" ry="2"/>
+    <ellipse cx="488" cy="585" rx="5" ry="2"/><ellipse cx="325" cy="600" rx="5" ry="2"/><ellipse cx="370" cy="595" rx="5" ry="2"/>
+    <ellipse cx="420" cy="600" rx="5" ry="2"/><ellipse cx="465" cy="610" rx="5" ry="2"/>
+  </g>
+  <rect width="1080" height="878" filter="url(#g)" opacity="0.55"/>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 878" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="bg" cx="30%" cy="20%" r="100%"><stop offset="0%" stop-color="#5A4830"/><stop offset="100%" stop-color="#0A0908"/></radialGradient>
+    <radialGradient id="stove" cx="50%" cy="50%" r="70%"><stop offset="0%" stop-color="#5A3828"/><stop offset="60%" stop-color="#2A1810"/><stop offset="100%" stop-color="#0A0408"/></radialGradient>
+    <radialGradient id="fire" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#F8D880"/><stop offset="50%" stop-color="#D87A20" stop-opacity="0.9"/><stop offset="100%" stop-color="#5A1808" stop-opacity="0"/></radialGradient>
+    <filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="33"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.10 0"/></filter>
+  </defs>
+  <rect width="1080" height="878" fill="url(#bg)"/>
+  <ellipse cx="380" cy="780" rx="280" ry="28" fill="#0A0908" opacity="0.6"/>
+  <ellipse cx="380" cy="600" rx="220" ry="180" fill="url(#stove)"/>
+  <ellipse cx="380" cy="550" rx="120" ry="50" fill="#0A0408"/>
+  <ellipse cx="380" cy="555" rx="100" ry="40" fill="url(#fire)"/>
+  <ellipse cx="380" cy="555" rx="50" ry="20" fill="#FBE8A8" opacity="0.7"/>
+  <ellipse cx="380" cy="420" rx="55" ry="80" fill="url(#fire)" opacity="0.35"/>
+  <ellipse cx="370" cy="320" rx="35" ry="50" fill="url(#fire)" opacity="0.2"/>
+  <rect width="1080" height="878" filter="url(#g)" opacity="0.55"/>
+</svg>

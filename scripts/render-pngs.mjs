@@ -10,6 +10,9 @@ import { createHash } from 'node:crypto';
 const BASE = process.env.RENDER_BASE_URL || 'http://localhost:8080/ui_kits/line_oa';
 const OUT = process.env.RENDER_OUT_DIR || 'assets/exports';
 
+const SEASONS = ['spring', 'summer', 'autumn', 'winter'];
+const REACTIONS = ['hot', 'recommend', 'thanks', 'wait', 'got-it', 'i-see', 'cheer', 'excellent', 'later', 'goodnight'];
+
 const PAGES = [
   { url: `${BASE}/_avatar-export.html?download=1`,                      file: '3q-avatar-640.png'           },
   { url: `${BASE}/_cover-export.html?download=1&photo=bowl`,            file: '3q-cover-bowl-1080x878.png'  },
@@ -20,6 +23,14 @@ const PAGES = [
   { url: `${BASE}/_carousel-export.html?download=1&card=2`,             file: '3q-carousel-02-1040.png'     },
   { url: `${BASE}/_carousel-export.html?download=1&card=3`,             file: '3q-carousel-03-1040.png'     },
   { url: `${BASE}/_carousel-export.html?download=1&card=4`,             file: '3q-carousel-04-1040.png'     },
+  ...SEASONS.map(s => ({
+    url:  `${BASE}/_seasonal-export.html?download=1&season=${s}`,
+    file: `3q-seasonal-${s}-1080x878.png`,
+  })),
+  ...REACTIONS.map(n => ({
+    url:  `${BASE}/_reaction-export.html?download=1&name=${n}`,
+    file: `3q-reaction-${n}-480.png`,
+  })),
 ];
 
 await mkdir(OUT, { recursive: true });

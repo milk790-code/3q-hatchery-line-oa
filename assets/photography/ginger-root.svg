@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 878" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="bg" cx="62%" cy="25%" r="100%"><stop offset="0%" stop-color="#EFEAE0"/><stop offset="100%" stop-color="#5A4830"/></radialGradient>
+    <linearGradient id="ginger" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#E8C898"/><stop offset="100%" stop-color="#8A6A40"/></linearGradient>
+    <filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="55"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.11 0"/></filter>
+  </defs>
+  <rect width="1080" height="878" fill="url(#bg)"/>
+  <ellipse cx="380" cy="660" rx="240" ry="22" fill="#0A0908" opacity="0.4"/>
+  <g fill="url(#ginger)">
+    <ellipse cx="280" cy="540" rx="85" ry="55" transform="rotate(-15 280 540)"/>
+    <ellipse cx="400" cy="500" rx="100" ry="60" transform="rotate(20 400 500)"/>
+    <ellipse cx="500" cy="565" rx="80" ry="48" transform="rotate(-10 500 565)"/>
+    <ellipse cx="345" cy="600" rx="70" ry="38" transform="rotate(35 345 600)"/>
+    <ellipse cx="450" cy="600" rx="65" ry="35" transform="rotate(-25 450 600)"/>
+  </g>
+  <g stroke="#5A3818" stroke-width="1" fill="none" opacity="0.5">
+    <path d="M 210 545 Q 280 530, 340 535"/>
+    <path d="M 320 488 Q 400 480, 470 490"/>
+    <path d="M 430 565 Q 500 555, 570 568"/>
+  </g>
+  <rect width="1080" height="878" filter="url(#g)" opacity="0.55"/>
+</svg>

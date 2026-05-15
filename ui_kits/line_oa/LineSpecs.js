@@ -140,6 +140,34 @@ window.LINE_SPECS = {
     ],
   },
 
+  seasonalHero: {
+    spec: '1080 × 878 px · PNG · 季節 campaign banner',
+    note: '加入 LINE OA chat tab / push message 用。對話框內傳「春/夏/秋/冬」觸發。',
+    seasons: [
+      { season: 'spring', char: '春', label: '春季入駐 · 新品牌登場',     keywords: ['春', '春茶', '春天', '清明'] },
+      { season: 'summer', char: '夏', label: '夏日專案 · 在地夏味',       keywords: ['夏', '夏天', '夏日', '夏味'] },
+      { season: 'autumn', char: '秋', label: '秋季特輯 · 桂花滿地',       keywords: ['秋', '秋天', '中秋', '桂花'] },
+      { season: 'winter', char: '冬', label: '冬至圍爐 · 年終孵化',       keywords: ['冬', '冬天', '冬至', '紅豆湯'] },
+    ],
+  },
+
+  reactions: {
+    spec: '480 × 480 px · PNG · sticker 風小圖（非 LINE Sticker Shop）',
+    note: 'Bot 自動回覆當作 image message 送，看起來像貼圖。10 組情境。',
+    items: [
+      { name: 'hot',       label: '好燙',   sub: 'TOO HOT',     keywords: ['好燙', '燙'] },
+      { name: 'recommend', label: '推薦',   sub: 'RECOMMEND',   keywords: ['推薦', '讚', '好棒'] },
+      { name: 'thanks',    label: '謝謝',   sub: 'THANK YOU',   keywords: ['謝謝', '感謝', '謝啦'] },
+      { name: 'wait',      label: '稍等',   sub: 'ONE MOMENT',  keywords: ['稍等', '等等', '等一下'] },
+      { name: 'got-it',    label: '收到',   sub: 'GOT IT',      keywords: ['收到', '了解', '知道'] },
+      { name: 'i-see',     label: '我懂',   sub: 'I SEE',       keywords: ['我懂', '懂', '明白'] },
+      { name: 'cheer',     label: '加油',   sub: 'CHEER ON',    keywords: ['加油'] },
+      { name: 'excellent', label: '太棒了', sub: 'EXCELLENT',   keywords: ['太棒', '太好', '太強'] },
+      { name: 'later',     label: '等等回', sub: 'REPLY LATER', keywords: ['等等回', '晚點回', '晚點'] },
+      { name: 'goodnight', label: '晚安',   sub: 'GOODNIGHT',   keywords: ['晚安', '掰掰', 'bye'] },
+    ],
+  },
+
   checklist: [
     { id: 'cover',   label: '上傳封面圖 Cover',                detail: '1080 × 878 px',      done: true },
     { id: 'avatar',  label: '上傳大頭照 Avatar',                detail: '640 × 640 px',       done: true },

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=480, initial-scale=1"/>
+  <title>3Q 孵化所 · Reaction Sticker 匯出 (480×480)</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400&family=Noto+Sans+TC:wght@300;400&family=Noto+Serif+TC:wght@300;400&display=swap"/>
+  <link rel="stylesheet" href="../../colors_and_type.css"/>
+
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: #1A1612; font-family: var(--font-sans); color: var(--color-paper); }
+    .stage { min-height: 100vh; display: grid; place-items: center; padding: 48px; }
+    #card { width: 480px; height: 480px; box-shadow: 0 30px 80px rgba(0,0,0,0.45); }
+    .toolbar { position: fixed; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 9999; font-size: 11px; letter-spacing: 0.15em; flex-wrap: wrap; max-width: calc(100vw - 40px); justify-content: flex-end; }
+    .toolbar button, .toolbar a {
+      background: var(--color-paper); color: var(--color-black);
+      border: 1px solid var(--color-gold); padding: 8px 14px;
+      font-family: var(--font-sans); font-weight: 400; letter-spacing: 0.12em;
+      text-transform: uppercase; cursor: pointer; text-decoration: none;
+    }
+    .toolbar button:hover, .toolbar a:hover { background: var(--color-gold); color: var(--color-paper); }
+    .toolbar .status { padding: 8px 12px; color: var(--color-gold); border: 1px dashed rgba(184,146,74,0.4); }
+    .toolbar .quick { display: flex; gap: 3px; max-width: 600px; flex-wrap: wrap; }
+    .toolbar .quick a.active { background: var(--color-gold); color: var(--color-paper); }
+    .toolbar.hidden { display: none; }
+    @media print { body { background: white; } .stage { padding: 0; min-height: auto; } #card { box-shadow: none; } .toolbar { display: none !important; } }
+    body.bare { background: transparent; }
+    body.bare .stage { padding: 0; min-height: 480px; }
+    body.bare #card { box-shadow: none; }
+  </style>
+</head>
+<body>
+  <div class="toolbar" id="toolbar">
+    <span class="status" id="status">載入中…</span>
+    <div class="quick" id="rxLinks"></div>
+    <button id="downloadBtn" disabled>⬇ 下載</button>
+    <a href="launch.html">← launch.html</a>
+  </div>
+
+  <main class="stage"><div id="card"></div></main>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js" crossorigin="anonymous"></script>
+
+  <script>
+    var qs = new URLSearchParams(location.search);
+    if (qs.get('bare') === '1') document.body.classList.add('bare');
+    if (qs.get('clean') === '1' || qs.get('bare') === '1') document.getElementById('toolbar').classList.add('hidden');
+  </script>
+
+  <script type="text/babel" src="Reaction.jsx"></script>
+
+  <script type="text/babel">
+    const rx = [
+      { name: 'hot',       label: '好燙',   sub: 'TOO HOT',     icon: 'fire-thin.svg' },
+      { name: 'recommend', label: '推薦',   sub: 'RECOMMEND',   icon: 'sparkle-thin.svg' },
+      { name: 'thanks',    label: '謝謝',   sub: 'THANK YOU',   icon: 'heart-thin.svg' },
+      { name: 'wait',      label: '稍等',   sub: 'ONE MOMENT',  icon: 'hourglass-thin.svg' },
+      { name: 'got-it',    label: '收到',   sub: 'GOT IT',      icon: 'chat-circle-text-thin.svg' },
+      { name: 'i-see',     label: '我懂',   sub: 'I SEE',       icon: 'lightbulb-thin.svg' },
+      { name: 'cheer',     label: '加油',   sub: 'CHEER ON',    icon: 'hand-heart-thin.svg' },
+      { name: 'excellent', label: '太棒了', sub: 'EXCELLENT',   icon: 'star-thin.svg' },
+      { name: 'later',     label: '等等回', sub: 'REPLY LATER', icon: 'clock-thin.svg' },
+      { name: 'goodnight', label: '晚安',   sub: 'GOODNIGHT',   icon: 'moon-thin.svg' },
+    ];
+    let name = qs.get('name') || 'hot';
+    if (!rx.find(r => r.name === name)) name = 'hot';
+    const current = rx.find(r => r.name === name);
+    const iconUrl = `../../assets/icons/phosphor/${current.icon}`;
+
+    const linksHost = document.getElementById('rxLinks');
+    rx.forEach(r => {
+      const a = document.createElement('a');
+      a.href = '?name=' + r.name + (qs.get('bare') === '1' ? '&bare=1' : '');
+      a.textContent = r.label;
+      if (r.name === name) a.className = 'active';
+      linksHost.appendChild(a);
+    });
+
+    const root = ReactDOM.createRoot(document.getElementById('card'));
+    root.render(<Reaction width={480} height={480} icon={iconUrl} label={current.label} sub={current.sub} />);
+
+    async function whenReady() {
+      if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
+      await new Promise(resolve => {
+        const img = new Image();
+        img.onload = img.onerror = resolve;
+        img.src = iconUrl;
+      });
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    }
+
+    async function exportPNG() {
+      const btn = document.getElementById('downloadBtn');
+      const status = document.getElementById('status');
+      btn.disabled = true; status.textContent = '匯出中…';
+      const canvas = await html2canvas(document.getElementById('card'), {
+        width: 480, height: 480, scale: 1, backgroundColor: null, useCORS: true, logging: false,
+      });
+      await new Promise(resolve => {
+        canvas.toBlob(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url; a.download = `3q-reaction-${name}-480.png`;
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          resolve();
+        }, 'image/png');
+      });
+      status.textContent = '✓ 已下載'; btn.disabled = false;
+    }
+
+    whenReady().then(() => {
+      const btn = document.getElementById('downloadBtn');
+      btn.disabled = false;
+      btn.addEventListener('click', exportPNG);
+      document.getElementById('status').textContent = `就緒 · ${current.label} · 480×480`;
+      window.__reactionReady = true;
+      if (qs.get('download') === '1') setTimeout(exportPNG, 500);
+    });
+  </script>
+</body>
+</html>

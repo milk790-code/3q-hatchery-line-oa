@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <defs>
+    <filter id="g"><feTurbulence type="turbulence" baseFrequency="0.02 0.4" numOctaves="2" seed="9"/><feColorMatrix values="0 0 0 0 0.40  0 0 0 0 0.30  0 0 0 0 0.20  0 0 0 0.40 0"/></filter>
+  </defs>
+  <rect width="800" height="800" fill="#6A5A3A"/>
+  <rect width="800" height="800" filter="url(#g)"/>
+</svg>
