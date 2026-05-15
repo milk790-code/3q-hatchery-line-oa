@@ -1,5 +1,5 @@
 {
-  "rendered_at": "2026-05-14T08:35:35.614Z",
+  "rendered_at": "2026-05-15T22:54:03.098Z",
   "files": {
     "3q-avatar-640.png": {
       "bytes": 46333,
@@ -36,6 +36,62 @@
     "3q-carousel-04-1040.png": {
       "bytes": 1029465,
       "sha256_16": "bebb9fc4e07cb30c"
+    },
+    "3q-seasonal-spring-1080x878.png": {
+      "bytes": 1264036,
+      "sha256_16": "33d52054c7e68233"
+    },
+    "3q-seasonal-summer-1080x878.png": {
+      "bytes": 1258639,
+      "sha256_16": "25f58e50786ef1fd"
+    },
+    "3q-seasonal-autumn-1080x878.png": {
+      "bytes": 740038,
+      "sha256_16": "30131e5f00f9f103"
+    },
+    "3q-seasonal-winter-1080x878.png": {
+      "bytes": 1253459,
+      "sha256_16": "3ae3b4a3829ac9f8"
+    },
+    "3q-reaction-hot-480.png": {
+      "bytes": 292388,
+      "sha256_16": "686fb6610dadce00"
+    },
+    "3q-reaction-recommend-480.png": {
+      "bytes": 291553,
+      "sha256_16": "0ea07aad3ea50b5f"
+    },
+    "3q-reaction-thanks-480.png": {
+      "bytes": 293474,
+      "sha256_16": "b414c894c37d53f1"
+    },
+    "3q-reaction-wait-480.png": {
+      "bytes": 292153,
+      "sha256_16": "836548b58ef341c3"
+    },
+    "3q-reaction-got-it-480.png": {
+      "bytes": 292286,
+      "sha256_16": "1f64fd18838a2735"
+    },
+    "3q-reaction-i-see-480.png": {
+      "bytes": 292761,
+      "sha256_16": "bf7dfce763d14bf1"
+    },
+    "3q-reaction-cheer-480.png": {
+      "bytes": 290336,
+      "sha256_16": "93c45a7d3b48584f"
+    },
+    "3q-reaction-excellent-480.png": {
+      "bytes": 291212,
+      "sha256_16": "86fbfcb1c9499ce3"
+    },
+    "3q-reaction-later-480.png": {
+      "bytes": 293306,
+      "sha256_16": "7e1c4b6a3ba72115"
+    },
+    "3q-reaction-goodnight-480.png": {
+      "bytes": 292922,
+      "sha256_16": "eb3bcfaa12159b3c"
     }
   }
 }
