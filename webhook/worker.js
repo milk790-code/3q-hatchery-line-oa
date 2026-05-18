@@ -35,7 +35,6 @@ const AUTO_REPLIES = [
     response: '請告訴我們你的店名 / 報名編號，\n我們會回你目前進行到哪一步、下次要做什麼。' },
   { keywords: ['實例', '案例', '看作品'],
     response: '本月入駐：\n01 阿婆ㄟ切仔麵店 (雲林)\n02 三代米舖 (台南)\n03 鹿港織坊\n\n回「01 / 02 / 03」看單一案例。',
-    // Also send the carousel as a bonus
     carousel: true },
   { keywords: ['諮詢', '預約'],
     response: '好。先簡單告訴我們：\n你的店名 / 你的角色 / 想聊什麼\n\n我們會在 24 小時內寄時段給你。' },
@@ -84,7 +83,6 @@ const REACTION_REPLIES = REACTIONS.map(r => ({
 const ALL_REPLIES = [...AUTO_REPLIES, ...SEASONAL_REPLIES, ...REACTION_REPLIES];
 
 // Rich menu postback data → synthetic user-intent text.
-// Used so rich menu taps DON'T pollute the chat with visible "我想說說我的店" bubbles.
 const POSTBACK_MAP = {
   'menu:my-store':  '我想說說我的店',
   'menu:imagery':   '我想了解好物・好照',
@@ -121,6 +119,7 @@ export default {
           secret: Boolean(env.LINE_CHANNEL_SECRET),
           png_base: env.PNG_BASE_URL || null,
         },
+        backends_md: 'https://github.com/milk790-code/3q-hatchery-line-oa/blob/main/BACKENDS.md',
       }, null, 2), { headers: { 'Content-Type': 'application/json' } });
     }
 
