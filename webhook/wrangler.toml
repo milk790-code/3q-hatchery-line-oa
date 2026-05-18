@@ -2,10 +2,15 @@ name = "3q-hatchery-webhook"
 main = "worker.js"
 compatibility_date = "2024-12-01"
 
-# Secrets configured separately:
-#   wrangler secret put LINE_CHANNEL_ACCESS_TOKEN
-#   wrangler secret put LINE_CHANNEL_SECRET
-#
-# Public variable (set via dashboard or [vars]):
+# Secrets (via wrangler secret put):
+#   LINE_CHANNEL_ACCESS_TOKEN
+#   LINE_CHANNEL_SECRET
+#   OWNER_USER_ID   (optional — your LINE userId for new-inquiry push alerts)
+
 [vars]
 PNG_BASE_URL = "https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports"
+
+# KV namespace for guided-flow session state (2h TTL per user)
+[[kv_namespaces]]
+binding = "SESSION"
+id = "20a68b10afc84764ba770b64f0f33f30"
