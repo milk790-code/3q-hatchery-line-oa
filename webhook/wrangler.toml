@@ -14,3 +14,9 @@ PNG_BASE_URL = "https://milk790-code.github.io/3q-hatchery-line-oa/assets/export
 [[kv_namespaces]]
 binding = "SESSION"
 id = "20a68b10afc84764ba770b64f0f33f30"
+
+# D1 database for inquiries CRM persistence
+[[d1_databases]]
+binding = "CRM"
+database_name = "3q-hatchery-crm"
+database_id = "e54671b1-d15e-4552-babf-cef367267568"
