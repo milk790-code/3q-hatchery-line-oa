@@ -1,5 +1,5 @@
 // Cloudflare Worker — LINE OA webhook for 3Q Hatchery.
-// v3 — Guided Flex Message flow + Cloudflare KV session state
+// v3.1 — Guided Flex Message flow + Cloudflare KV session state + escape keyword
 //
 // Env vars required:
 //   LINE_CHANNEL_ACCESS_TOKEN   LINE_CHANNEL_SECRET   PNG_BASE_URL
@@ -83,6 +83,9 @@ const SERVICE_LABELS  = { imagery: '好物・好照', marketing: '客製行銷',
 const SERVICE_DESC    = { imagery: '一張像樣的產品照，500 元起', marketing: '季度規劃，目標承諾書，深度陪跑', seasonal: '節慶視覺，限時活動圖文', consult: '先聊聊，再決定怎麼做' };
 const BUDGET_LABELS   = { low: '5,000 元以下', mid: '5,000–20,000 元', high: '20,000 元以上' };
 const TIMELINE_LABELS = { urgent: '一個月內', normal: '一到三個月', relaxed: '三個月以上' };
+
+// Escape keywords — clear session and exit flow
+const ESCAPE_RE = /^(取消|退出|結束|重來|重新開始|cancel|exit)$/i;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Cloudflare KV session (2h TTL)
@@ -172,7 +175,7 @@ function timelineCard(svc, bgt) {
 // Step 4 — free text prompt
 const freeTextPrompt = () => ({
   type: 'text',
-  text: '最後一題，也是最重要的。\n\n用一句話說說你的店，或這次最想解決的事。\n\n不用寫得漂亮，直接說就好。',
+  text: '最後一題，也是最重要的。\n\n用一句話說說你的店，或這次最想解決的事。\n\n（想跳出隨時打「取消」）',
 });
 
 // Step 5 — summary + confirm
@@ -223,7 +226,7 @@ export default {
     if (request.method === 'GET') {
       return new Response(JSON.stringify({
         service: '3Q Hatchery LINE OA webhook',
-        ok: true, version: 3,
+        ok: true, version: 3.1,
         configured: {
           token:       Boolean(env.LINE_CHANNEL_ACCESS_TOKEN),
           secret:      Boolean(env.LINE_CHANNEL_SECRET),
@@ -278,6 +281,15 @@ async function handleEvent(ev, env) {
 
   if (ev.type === 'message' && ev.message?.type === 'text') {
     const text = ev.message.text || '';
+
+    // Escape hatch — clear session and exit flow at any step
+    if (ESCAPE_RE.test(text.trim())) {
+      await clearSession(uid, env);
+      return replyMsg(ev.replyToken, [{
+        type: 'text',
+        text: '已取消。\n\n要重新開始，傳「說說我的店」。\n或直接傳關鍵字（春茶 / 謝謝 / 實例 / 推薦 ...）。',
+      }], env);
+    }
 
     // Free-text capture step
     const session = await getSession(uid, env);
