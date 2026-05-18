@@ -90,6 +90,13 @@ const ALL_REPLIES = [...AUTO_REPLIES, ...SEASONAL_REPLIES, ...REACTION_REPLIES];
 // ─────────────────────────────────────────────────────────────────────────
 // Guided flow labels
 // ─────────────────────────────────────────────────────────────────────────
+// Rich menu postback data → synthetic user-intent text.
+const POSTBACK_MAP = {
+  'menu:my-store':  '我想說說我的店',
+  'menu:imagery':   '我想了解好物・好照',
+  'menu:marketing': '我想要客製行銷',
+  'menu:progress':  '查我的進度',
+};
 
 const SERVICE_LABELS  = { imagery: '好物・好照', marketing: '客製行銷', seasonal: '季節活動', consult: '說說我的店' };
 const SERVICE_DESC    = { imagery: '一張像樣的產品照，500 元起', marketing: '季度規劃，目標承諾書，深度陪跑', seasonal: '節慶視覺，限時活動圖文', consult: '先聊聊，再決定怎麼做' };
