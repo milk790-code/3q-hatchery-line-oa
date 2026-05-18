@@ -1,5 +1,5 @@
 // Cloudflare Worker — LINE OA webhook for 3Q Hatchery.
-// v3.2 — Guided Flex Message flow + KV session + D1 inquiries persistence
+// v3.3 — Premium Flex Message visuals: hero images on welcome, service, budget cards
 //
 // Env vars required:
 //   LINE_CHANNEL_ACCESS_TOKEN   LINE_CHANNEL_SECRET   PNG_BASE_URL
@@ -11,19 +11,8 @@
 //   CRM      — D1 database `3q-hatchery-crm` for inquiries persistence
 
 // ─────────────────────────────────────────────────────────────────────────
-// Keyword auto-reply content (v2, unchanged)
+// Keyword auto-reply content
 // ─────────────────────────────────────────────────────────────────────────
-
-const GREETING_TEXT = [
-  '你好，這裡是 3Q貢丸 · 台灣在地品牌孵化所。',
-  '',
-  '只要你願意說，我們就幫你被看見。',
-  '不管你的店多大多小、新舊、簡單複雜，',
-  '我們都有適合的平台、舅台、後台。',
-  '',
-  '點下方圖文選單 「說說你的店」',
-  '我們會幫你找出下一步該被拍下、被講出、被看見的，是哪一件事。',
-].join('\n');
 
 const AWAY_TEXT = [
   '收到你的訊息了 — 我們會在 24 小時內回你。',
@@ -38,12 +27,12 @@ const AUTO_REPLIES = [
   { keywords: ['進度', '走到哪'],
     response: '請告訴我們你的店名 / 報名編號，\n我們會回你目前進行到哪一步、下次要做什麼。' },
   { keywords: ['實例', '案例', '看作品'],
-    response: '本月入駐：\n01 阿婆ㄧ切仔麵店 (雲林)\n02 三代米舖 (台南)\n03 鹿港織坊\n\n回「01 / 02 / 03」看單一案例。',
+    response: '本月入駐：\n01 阿婆ㄟ切仔麵店 (雲林)\n02 三代米舖 (台南)\n03 鹿港織坊\n\n回「01 / 02 / 03」看單一案例。',
     carousel: true },
   { keywords: ['諮詢', '預約'],
     response: '好。先簡單告訴我們：\n你的店名 / 你的角色 / 想聊什麼\n\n我們會在 24 小時內寄時段給你。' },
   { keywords: ['01', '阿婆', '切仔麵'],
-    response: '案例 01 — 阿婆ㄧ切仔麵店（雲林）\n\n我們幫她做的：\n・店招重做（保留手寫，補質感）\n・產品照 6 張（鏡頭以下視角，自然光）\n・FB / IG 一頁式介紹\n\n預算：5,000 元，2 週交付。',
+    response: '案例 01 — 阿婆ㄟ切仔麵店（雲林）\n\n我們幫她做的：\n・店招重做（保留手寫，補質感）\n・產品照 6 張（鏡頭以下視角，自然光）\n・FB / IG 一頁式介紹\n\n預算：5,000 元，2 週交付。',
     image: '3q-carousel-01-1040.png' },
   { keywords: ['02', '三代米舖', '米舖'],
     response: '案例 02 — 三代米舖（台南）\n\n我們幫他做的：\n・品牌故事 1 篇（從爺爺到孫）\n・包裝改版（保留紅章，紙改厚磅）\n・通路上架（誠品 / 茶水間）\n\n預算：15,000 元，6 週交付。',
@@ -78,7 +67,7 @@ const REACTIONS = [
   { name: 'queue',     kw: ['排隊', '排隊中', '排隊ing'] },
   { name: 'hungry',    kw: ['想吃', '肚子餓', '餓了'] },
   { name: 'empty',     kw: ['賣完了', '沒有了', '斷貨'] },
-  { name: 'bold',      kw: ['敢賤', '敢說', '敢肯定'] },
+  { name: 'bold',      kw: ['敢賭', '敢說', '敢肯定'] },
   { name: 'stellar',   kw: ['絕了', '絕', '真絕', '超絕'] },
   { name: 'hyper',     kw: ['狂推', '超推', '大推', '爆推'] },
   { name: 'done',      kw: ['搞定', '搞好', '準備好', '弄好'] },
@@ -90,18 +79,19 @@ const ALL_REPLIES = [...AUTO_REPLIES, ...SEASONAL_REPLIES, ...REACTION_REPLIES];
 // ─────────────────────────────────────────────────────────────────────────
 // Guided flow labels
 // ─────────────────────────────────────────────────────────────────────────
-// Rich menu postback data → synthetic user-intent text.
-const POSTBACK_MAP = {
-  'menu:my-store':  '我想說說我的店',
-  'menu:imagery':   '我想了解好物・好照',
-  'menu:marketing': '我想要客製行銷',
-  'menu:progress':  '查我的進度',
-};
 
 const SERVICE_LABELS  = { imagery: '好物・好照', marketing: '客製行銷', seasonal: '季節活動', consult: '說說我的店' };
 const SERVICE_DESC    = { imagery: '一張像樣的產品照，500 元起', marketing: '季度規劃，目標承諾書，深度陪跑', seasonal: '節慶視覺，限時活動圖文', consult: '先聊聊，再決定怎麼做' };
 const BUDGET_LABELS   = { low: '5,000 元以下', mid: '5,000–20,000 元', high: '20,000 元以上' };
 const TIMELINE_LABELS = { urgent: '一個月內', normal: '一到三個月', relaxed: '三個月以上' };
+
+// Hero image per service for budget card
+const SERVICE_HERO = {
+  imagery:   { file: '3q-carousel-02-1040.png', ratio: '1:1'   },
+  marketing: { file: '3q-cover-bowl-1080x878.png', ratio: '20:16' },
+  seasonal:  { file: '3q-seasonal-spring-1080x878.png', ratio: '20:16' },
+  consult:   { file: '3q-cover-bowl-1080x878.png', ratio: '20:16' },
+};
 
 const ESCAPE_RE = /^(取消|退出|結束|重來|重新開始|cancel|exit)$/i;
 
@@ -141,8 +131,11 @@ async function saveInquiry(uid, a, env) {
 // Flex Message builders — 3Q Hatchery brand
 // ─────────────────────────────────────────────────────────────────────────
 
-const FLEX   = (alt, bubble) => ({ type: 'flex', altText: alt, contents: bubble });
-const BUBBLE = (header, body) => ({ type: 'bubble', size: 'mega', header, body });
+const HERO = (url, ratio = '20:13') => ({
+  type: 'image', url, size: 'full', aspectRatio: ratio, aspectMode: 'cover',
+});
+
+const FLEX = (alt, bubble) => ({ type: 'flex', altText: alt, contents: bubble });
 
 const DARK_HEADER = (title, sub) => ({
   type: 'box', layout: 'vertical', backgroundColor: '#0A0A0A', paddingAll: '24px',
@@ -166,40 +159,50 @@ const BTN = (label, data, primary = true, display) => ({
   height: 'sm',
 });
 
-function serviceCard() {
-  return FLEX('你想做什麼？', BUBBLE(
-    DARK_HEADER('你想做什麼', '選一個最接近的，我們從這裡開始'),
-    LIGHT_BODY([
+function serviceCard(base) {
+  const bubble = {
+    type: 'bubble', size: 'mega',
+    header: DARK_HEADER('你想做什麼', '選一個最接近的，我們從這裡開始'),
+    body: LIGHT_BODY([
       BTN('📸 好物・好照　質感生圖',  'flow:service=imagery',   true,  '好物・好照'),
       BTN('🎯 客製行銷　品牌陪跑',    'flow:service=marketing', true,  '客製行銷'),
       BTN('🌸 季節活動　節慶視覺',    'flow:service=seasonal',  true,  '季節活動'),
       BTN('💬 先說說我的店',          'flow:service=consult',   false, '先說說我的店'),
     ]),
-  ));
+  };
+  if (base) bubble.hero = HERO(`${base}/3q-cover-bowl-1080x878.png`, '20:16');
+  return FLEX('你想做什麼？', bubble);
 }
 
-function budgetCard(svc) {
-  return FLEX('預算大概在哪裡？', BUBBLE(
-    DARK_HEADER(SERVICE_LABELS[svc] || svc, SERVICE_DESC[svc] || ''),
-    LIGHT_BODY([
+function budgetCard(svc, base) {
+  const bubble = {
+    type: 'bubble', size: 'mega',
+    header: DARK_HEADER(SERVICE_LABELS[svc] || svc, SERVICE_DESC[svc] || ''),
+    body: LIGHT_BODY([
       { type: 'text', text: '預算大概在哪裡', color: '#1A1A1A', size: 'md', weight: 'bold' },
       { type: 'separator', margin: 'sm', color: '#E8DFD0' },
       BTN('🌱 5,000 元以下　試水溫',  `flow:budget=low&s=${svc}`,  true, '5,000 元以下'),
       BTN('⚡ 5,000–20,000　認真做',  `flow:budget=mid&s=${svc}`,  true, '5,000–20,000 元'),
       BTN('✨ 20,000 以上　深度合作', `flow:budget=high&s=${svc}`, true, '20,000 元以上'),
     ]),
-  ));
+  };
+  if (base) {
+    const h = SERVICE_HERO[svc] || { file: '3q-cover-bowl-1080x878.png', ratio: '20:16' };
+    bubble.hero = HERO(`${base}/${h.file}`, h.ratio);
+  }
+  return FLEX('預算大概在哪裡？', bubble);
 }
 
 function timelineCard(svc, bgt) {
-  return FLEX('時間上大概是？', BUBBLE(
-    DARK_HEADER('時間上大概是', `${SERVICE_LABELS[svc] || svc}　${BUDGET_LABELS[bgt] || bgt}`),
-    LIGHT_BODY([
+  return FLEX('時間上大概是？', {
+    type: 'bubble', size: 'mega',
+    header: DARK_HEADER('時間上大概是', `${SERVICE_LABELS[svc] || svc}　${BUDGET_LABELS[bgt] || bgt}`),
+    body: LIGHT_BODY([
       BTN('🔥 一個月內　急',         `flow:timeline=urgent&s=${svc}&b=${bgt}`,  true, '一個月內'),
       BTN('🎵 一到三個月　正常節奏',  `flow:timeline=normal&s=${svc}&b=${bgt}`,  true, '一到三個月'),
       BTN('☕ 三個月以上　慢慢來',    `flow:timeline=relaxed&s=${svc}&b=${bgt}`, true, '三個月以上'),
     ]),
-  ));
+  });
 }
 
 const freeTextPrompt = () => ({
@@ -214,9 +217,10 @@ function summaryCard(a) {
     ['時間', TIMELINE_LABELS[a.timeline] || a.timeline   || '—'],
     ['你說', a.freeText                                  || '—'],
   ];
-  return FLEX('確認需求', BUBBLE(
-    DARK_HEADER('確認一下', '這是我們收到的資訊'),
-    {
+  return FLEX('確認需求', {
+    type: 'bubble', size: 'mega',
+    header: DARK_HEADER('確認一下', '這是我們收到的資訊'),
+    body: {
       type: 'box', layout: 'vertical',
       backgroundColor: '#F5F2EC', paddingAll: '20px', spacing: 'md',
       contents: [
@@ -231,7 +235,7 @@ function summaryCard(a) {
         BTN('↩️ 重新填寫', 'flow:reset',  false, '重新填寫'),
       ],
     },
-  ));
+  });
 }
 
 function flowParams(data) {
@@ -249,7 +253,7 @@ export default {
     if (request.method === 'GET') {
       return new Response(JSON.stringify({
         service: '3Q Hatchery LINE OA webhook',
-        ok: true, version: 3.2,
+        ok: true, version: 3.3,
         configured: {
           token:       Boolean(env.LINE_CHANNEL_ACCESS_TOKEN),
           secret:      Boolean(env.LINE_CHANNEL_SECRET),
@@ -258,7 +262,6 @@ export default {
           crm_d1:      Boolean(env.CRM),
           owner_push:  Boolean(env.OWNER_USER_ID),
         },
-        backends_md: 'https://github.com/milk790-code/3q-hatchery-line-oa/blob/main/BACKENDS.md',
       }, null, 2), { headers: { 'Content-Type': 'application/json' } });
     }
     if (request.method !== 'POST') return new Response('Method Not Allowed', { status: 405 });
@@ -295,9 +298,9 @@ async function handleEvent(ev, env) {
     const d = ev.postback?.data || '';
     if (d.startsWith('flow:')) return handleFlow(d, uid, ev.replyToken, env);
     const MENU = {
-      'menu:my-store':  () => replyMsg(ev.replyToken, [serviceCard()], env),
-      'menu:imagery':   () => replyMsg(ev.replyToken, [budgetCard('imagery')], env),
-      'menu:marketing': () => replyMsg(ev.replyToken, [budgetCard('marketing')], env),
+      'menu:my-store':  () => replyMsg(ev.replyToken, [serviceCard(env.PNG_BASE_URL)], env),
+      'menu:imagery':   () => replyMsg(ev.replyToken, [budgetCard('imagery', env.PNG_BASE_URL)], env),
+      'menu:marketing': () => replyMsg(ev.replyToken, [budgetCard('marketing', env.PNG_BASE_URL)], env),
       'menu:progress':  () => handleIntent('查我的進度', ev.replyToken, env),
     };
     if (MENU[d]) return MENU[d]();
@@ -323,7 +326,7 @@ async function handleEvent(ev, env) {
 
     if (/說說.*店|說說我|開始填/.test(text)) {
       await clearSession(uid, env);
-      return replyMsg(ev.replyToken, [serviceCard()], env);
+      return replyMsg(ev.replyToken, [serviceCard(env.PNG_BASE_URL)], env);
     }
 
     return handleIntent(text, ev.replyToken, env);
@@ -339,7 +342,7 @@ async function handleFlow(data, uid, replyToken, env) {
 
   if (p.service !== undefined) {
     await clearSession(uid, env);
-    return replyMsg(replyToken, [budgetCard(p.service)], env);
+    return replyMsg(replyToken, [budgetCard(p.service, env.PNG_BASE_URL)], env);
   }
   if (p.budget !== undefined) {
     return replyMsg(replyToken, [timelineCard(p.s, p.budget)], env);
@@ -359,7 +362,7 @@ async function handleFlow(data, uid, replyToken, env) {
   }
   if (data === 'flow:reset') {
     await clearSession(uid, env);
-    return replyMsg(replyToken, [serviceCard()], env);
+    return replyMsg(replyToken, [serviceCard(env.PNG_BASE_URL)], env);
   }
 }
 
@@ -383,17 +386,47 @@ async function pushToOwner(a, env) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Existing keyword routing (v2, unchanged)
+// Welcome — Full Flex Bubble with hero image
 // ─────────────────────────────────────────────────────────────────────────
 
 async function sendWelcome(replyToken, env) {
-  const msgs = [];
-  if (env.PNG_BASE_URL) msgs.push({ type: 'image',
-    originalContentUrl: `${env.PNG_BASE_URL}/3q-welcome-card-1040.png`,
-    previewImageUrl:    `${env.PNG_BASE_URL}/3q-welcome-card-1040.png` });
-  msgs.push({ type: 'text', text: GREETING_TEXT });
-  return replyMsg(replyToken, msgs, env);
+  const base = env.PNG_BASE_URL;
+  if (!base) {
+    return replyMsg(replyToken, [{ type: 'text', text: '你好，這裡是 3Q Hatchery · 台灣在地品牌孵化所。\n\n只要你願意說，我們就幫你被看見。' }], env);
+  }
+  const flex = {
+    type: 'flex',
+    altText: '歡迎加入 3Q Hatchery · 台灣在地品牌孵化所',
+    contents: {
+      type: 'bubble', size: 'mega',
+      hero: HERO(`${base}/3q-welcome-card-1040.png`, '1:1'),
+      body: {
+        type: 'box', layout: 'vertical', backgroundColor: '#0A0A0A',
+        paddingAll: '20px', spacing: 'sm',
+        contents: [
+          { type: 'text', text: 'TAIWAN BRAND HATCHERY', color: '#B8924A', size: 'xxs', weight: 'bold', letterSpacing: '3px' },
+          { type: 'text', text: '只要你願意說\n我們就幫你被看見。', color: '#F5F2EC', size: 'lg', weight: 'bold', wrap: true, margin: 'sm' },
+          { type: 'separator', margin: 'md', color: '#B8924A' },
+          { type: 'text', text: '不管你的店多大多小，都有適合你的平台、舞台、後台。', color: '#8A8A8A', size: 'sm', wrap: true, margin: 'md' },
+        ],
+      },
+      footer: {
+        type: 'box', layout: 'vertical', backgroundColor: '#F5F2EC',
+        paddingAll: '16px',
+        contents: [{
+          type: 'button',
+          action: { type: 'postback', label: '說說你的店，從這裡開始', data: 'menu:my-store', displayText: '說說你的店' },
+          style: 'primary', color: '#0A0A0A', height: 'sm',
+        }],
+      },
+    },
+  };
+  return replyMsg(replyToken, [flex], env);
 }
+
+// ─────────────────────────────────────────────────────────────────────────
+// Keyword routing
+// ─────────────────────────────────────────────────────────────────────────
 
 async function handleIntent(userText, replyToken, env) {
   const match = ALL_REPLIES.find(r => r.keywords.some(kw => userText.includes(kw)));
@@ -415,7 +448,7 @@ function carouselMsg(base) {
   return {
     type: 'template', altText: '本月入駐 · 4 件作品',
     template: { type: 'image_carousel', columns: [
-      { imageUrl: `${base}/3q-carousel-01-1040.png`, action: { type: 'message', text: '看 01 阿婆ㄧ切仔麵店' } },
+      { imageUrl: `${base}/3q-carousel-01-1040.png`, action: { type: 'message', text: '看 01 阿婆ㄟ切仔麵店' } },
       { imageUrl: `${base}/3q-carousel-02-1040.png`, action: { type: 'message', text: '我想了解好物・好照' } },
       { imageUrl: `${base}/3q-carousel-03-1040.png`, action: { type: 'message', text: '看 03 三代米舖' } },
       { imageUrl: `${base}/3q-carousel-04-1040.png`, action: { type: 'message', text: '看 04 鹿港織坊' } },
