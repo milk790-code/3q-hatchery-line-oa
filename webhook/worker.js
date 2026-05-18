@@ -135,10 +135,10 @@ function serviceCard() {
   return FLEX('你想做什麼？', BUBBLE(
     DARK_HEADER('你想做什麼', '選一個最接近的，我們從這裡開始'),
     LIGHT_BODY([
-      BTN('好物・好照　質感生圖',  'flow:service=imagery',   true,  '好物・好照'),
-      BTN('客製行銷　品牌陪跑',    'flow:service=marketing', true,  '客製行銷'),
-      BTN('季節活動　節慶視覺',    'flow:service=seasonal',  true,  '季節活動'),
-      BTN('先說說我的店',          'flow:service=consult',   false, '先說說我的店'),
+      BTN('📸 好物・好照　質感生圖',  'flow:service=imagery',   true,  '好物・好照'),
+      BTN('🎯 客製行銷　品牌陪跑',    'flow:service=marketing', true,  '客製行銷'),
+      BTN('🌸 季節活動　節慶視覺',    'flow:service=seasonal',  true,  '季節活動'),
+      BTN('💬 先說說我的店',          'flow:service=consult',   false, '先說說我的店'),
     ]),
   ));
 }
@@ -150,9 +150,9 @@ function budgetCard(svc) {
     LIGHT_BODY([
       { type: 'text', text: '預算大概在哪裡', color: '#1A1A1A', size: 'md', weight: 'bold' },
       { type: 'separator', margin: 'sm', color: '#E8DFD0' },
-      BTN('5,000 元以下　試水溫',  `flow:budget=low&s=${svc}`,  true, '5,000 元以下'),
-      BTN('5,000–20,000　認真做',  `flow:budget=mid&s=${svc}`,  true, '5,000–20,000 元'),
-      BTN('20,000 以上　深度合作', `flow:budget=high&s=${svc}`, true, '20,000 元以上'),
+      BTN('🌱 5,000 元以下　試水溫',  `flow:budget=low&s=${svc}`,  true, '5,000 元以下'),
+      BTN('⚡ 5,000–20,000　認真做',  `flow:budget=mid&s=${svc}`,  true, '5,000–20,000 元'),
+      BTN('✨ 20,000 以上　深度合作', `flow:budget=high&s=${svc}`, true, '20,000 元以上'),
     ]),
   ));
 }
@@ -162,9 +162,9 @@ function timelineCard(svc, bgt) {
   return FLEX('時間上大概是？', BUBBLE(
     DARK_HEADER('時間上大概是', `${SERVICE_LABELS[svc] || svc}　${BUDGET_LABELS[bgt] || bgt}`),
     LIGHT_BODY([
-      BTN('一個月內　急',         `flow:timeline=urgent&s=${svc}&b=${bgt}`,  true, '一個月內'),
-      BTN('一到三個月　正常節奏',  `flow:timeline=normal&s=${svc}&b=${bgt}`,  true, '一到三個月'),
-      BTN('三個月以上　慢慢來',    `flow:timeline=relaxed&s=${svc}&b=${bgt}`, true, '三個月以上'),
+      BTN('🔥 一個月內　急',         `flow:timeline=urgent&s=${svc}&b=${bgt}`,  true, '一個月內'),
+      BTN('🎵 一到三個月　正常節奏',  `flow:timeline=normal&s=${svc}&b=${bgt}`,  true, '一到三個月'),
+      BTN('☕ 三個月以上　慢慢來',    `flow:timeline=relaxed&s=${svc}&b=${bgt}`, true, '三個月以上'),
     ]),
   ));
 }
@@ -196,8 +196,8 @@ function summaryCard(a) {
           ],
         })),
         { type: 'separator', margin: 'lg', color: '#E8DFD0' },
-        BTN('確認送出', 'flow:submit', true,  '確認送出'),
-        BTN('重新填寫', 'flow:reset',  false, '重新填寫'),
+        BTN('✅ 確認送出', 'flow:submit', true,  '確認送出'),
+        BTN('↩️ 重新填寫', 'flow:reset',  false, '重新填寫'),
       ],
     },
   ));
