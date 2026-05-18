@@ -24,6 +24,7 @@ jobs:
       PNG_BASE_URL: https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports
       WORKER_NAME: 3q-hatchery-webhook
       SESSION_KV_ID: 20a68b10afc84764ba770b64f0f33f30
+      CRM_D1_ID: e54671b1-d15e-4552-babf-cef367267568
     steps:
       - uses: actions/checkout@v4
         with:
@@ -67,9 +68,10 @@ jobs:
 
       - name: Deploy Worker
         env:
-          CF_TOKEN:    ${{ secrets.CF_API_TOKEN }}
-          LINE_TOKEN:  ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
-          LINE_SECRET: ${{ secrets.LINE_CHANNEL_SECRET }}
+          CF_TOKEN:      ${{ secrets.CF_API_TOKEN }}
+          LINE_TOKEN:    ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_SECRET:   ${{ secrets.LINE_CHANNEL_SECRET }}
+          OWNER_USER_ID: ${{ secrets.OWNER_USER_ID }}
         run: |
           set -uo pipefail
           mkdir -p _debug
@@ -80,8 +82,10 @@ jobs:
             "bindings": [
               {"name": "LINE_CHANNEL_ACCESS_TOKEN", "type": "secret_text", "text": $(jq -Rn --arg t "$LINE_TOKEN" '$t')},
               {"name": "LINE_CHANNEL_SECRET",       "type": "secret_text", "text": $(jq -Rn --arg t "$LINE_SECRET" '$t')},
+              {"name": "OWNER_USER_ID",             "type": "secret_text", "text": $(jq -Rn --arg t "$OWNER_USER_ID" '$t')},
               {"name": "PNG_BASE_URL",              "type": "plain_text",  "text": $(jq -Rn --arg t "$PNG_BASE_URL" '$t')},
-              {"name": "SESSION",                   "type": "kv_namespace", "namespace_id": "$SESSION_KV_ID"}
+              {"name": "SESSION",                   "type": "kv_namespace", "namespace_id": "$SESSION_KV_ID"},
+              {"name": "CRM",                       "type": "d1",          "id": "$CRM_D1_ID"}
             ]
           }
           JSON
@@ -149,8 +153,8 @@ jobs:
           sleep 5
           resp=$(curl -sS "$WORKER_URL")
           echo "$resp" | jq .
-          echo "$resp" | jq -e '.ok == true and .configured.token == true and .configured.secret == true and .configured.session_kv == true' > /dev/null
-          echo "::notice::Worker alive — token, secret, KV all configured"
+          echo "$resp" | jq -e '.ok == true and .configured.token == true and .configured.secret == true and .configured.session_kv == true and .configured.crm_d1 == true' > /dev/null
+          echo "::notice::Worker alive — token, secret, KV, D1 all configured"
 
       - name: Ensure LINE Rich Menu (reuse by name, else create)
         env:
@@ -271,11 +275,12 @@ jobs:
           echo "|---|---|" >> $GITHUB_STEP_SUMMARY
           echo "| Worker URL | \`$WORKER_URL\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Rich Menu ID | \`$RICH_MENU_ID\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| KV namespace | \`$SESSION_KV_ID\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| KV namespace (SESSION) | \`$SESSION_KV_ID\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| D1 database (CRM) | \`$CRM_D1_ID\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Webhook | configured |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Manual steps remaining" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "1. LINE OA Manager: upload Avatar + Cover" >> $GITHUB_STEP_SUMMARY
-          echo "2. Optional: set OWNER_USER_ID secret for inquiry push alerts" >> $GITHUB_STEP_SUMMARY
-          echo "3. Self-test: add bot → tap menu → step through flow" >> $GITHUB_STEP_SUMMARY
+          echo "1. Optional: set OWNER_USER_ID secret for inquiry push alerts" >> $GITHUB_STEP_SUMMARY
+          echo "2. Query D1: \`wrangler d1 execute 3q-hatchery-crm --command 'SELECT * FROM inquiries ORDER BY id DESC LIMIT 10'\`" >> $GITHUB_STEP_SUMMARY
+          echo "3. Self-test: add bot → tap menu → step through flow → confirm → check D1 row" >> $GITHUB_STEP_SUMMARY
