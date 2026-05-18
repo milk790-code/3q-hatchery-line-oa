@@ -23,6 +23,7 @@ jobs:
     env:
       PNG_BASE_URL: https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports
       WORKER_NAME: 3q-hatchery-webhook
+      SESSION_KV_ID: 20a68b10afc84764ba770b64f0f33f30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -79,15 +80,14 @@ jobs:
             "bindings": [
               {"name": "LINE_CHANNEL_ACCESS_TOKEN", "type": "secret_text", "text": $(jq -Rn --arg t "$LINE_TOKEN" '$t')},
               {"name": "LINE_CHANNEL_SECRET",       "type": "secret_text", "text": $(jq -Rn --arg t "$LINE_SECRET" '$t')},
-              {"name": "PNG_BASE_URL",              "type": "plain_text",  "text": $(jq -Rn --arg t "$PNG_BASE_URL" '$t')}
+              {"name": "PNG_BASE_URL",              "type": "plain_text",  "text": $(jq -Rn --arg t "$PNG_BASE_URL" '$t')},
+              {"name": "SESSION",                   "type": "kv_namespace", "namespace_id": "$SESSION_KV_ID"}
             ]
           }
           JSON
 
-          # Sanitize metadata.json for debug (mask secret values)
           jq '(.bindings[] | select(.type=="secret_text") | .text) = "***MASKED***"' /tmp/metadata.json > _debug/metadata-sanitized.json
 
-          # Run the deploy with stderr captured
           set +e
           http_code=$(curl -sS -X PUT \
             "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}" \
@@ -104,7 +104,6 @@ jobs:
           ok=$(jq -r '.success // false' _debug/cf-deploy-response.json 2>/dev/null || echo "parse-error")
           if [ "$ok" != "true" ]; then
             echo "DEPLOY FAILED — http=$http_code curl_exit=$curl_exit ok=$ok"
-            echo "Response:"
             cat _debug/cf-deploy-response.json
             exit 1
           fi
@@ -122,7 +121,6 @@ jobs:
               echo >> $GITHUB_STEP_SUMMARY
               echo '```' >> $GITHUB_STEP_SUMMARY
             done
-            # Wipe _debug so this run does not commit it (the dir is git-tracked from older runs but new files stay untracked)
             rm -rf _debug
           fi
 
@@ -151,8 +149,8 @@ jobs:
           sleep 5
           resp=$(curl -sS "$WORKER_URL")
           echo "$resp" | jq .
-          echo "$resp" | jq -e '.ok == true and .configured.token == true and .configured.secret == true' > /dev/null
-          echo "::notice::Worker is alive and configured"
+          echo "$resp" | jq -e '.ok == true and .configured.token == true and .configured.secret == true and .configured.session_kv == true' > /dev/null
+          echo "::notice::Worker alive — token, secret, KV all configured"
 
       - name: Ensure LINE Rich Menu (reuse by name, else create)
         env:
@@ -160,20 +158,15 @@ jobs:
           RM_NAME: '3Q Hatchery · MENU (postback v3)'
         run: |
           set -euo pipefail
-
-          # 1. Look for existing rich menu by name
           existing=$(curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
             https://api.line.me/v2/bot/richmenu/list \
             | jq -r --arg n "$RM_NAME" '.richmenus[] | select(.name == $n) | .richMenuId' \
             | head -1)
-
           if [ -n "$existing" ]; then
             echo "RICH_MENU_ID=$existing" >> $GITHUB_ENV
             echo "::notice::Reusing existing Rich Menu: $existing"
             exit 0
           fi
-
-          # 2. Create new
           cat > /tmp/richmenu.json <<'JSON'
           {
             "size": {"width": 2500, "height": 1686},
@@ -189,16 +182,12 @@ jobs:
             ]
           }
           JSON
-
           resp=$(curl -sS -X POST https://api.line.me/v2/bot/richmenu \
             -H "Authorization: Bearer $LINE_TOKEN" \
             -H "Content-Type: application/json" \
             -d @/tmp/richmenu.json)
           RM_ID=$(echo "$resp" | jq -r '.richMenuId // empty')
-          if [ -z "$RM_ID" ]; then
-            echo "::error::Rich Menu create failed: $resp"
-            exit 1
-          fi
+          if [ -z "$RM_ID" ]; then echo "::error::Rich Menu create failed: $resp"; exit 1; fi
           echo "RICH_MENU_ID=$RM_ID" >> $GITHUB_ENV
           echo "::notice::Created new Rich Menu: $RM_ID"
 
@@ -207,22 +196,16 @@ jobs:
           LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
         run: |
           set -euo pipefail
-          ls -la assets/exports/3q-richmenu-2500x1686.jpg
-
-          # Probe: does this rich menu already have a binary?
           set +e
           probe_http=$(curl -sS -o /tmp/probe -w "%{http_code}" \
             "https://api-data.line.me/v2/bot/richmenu/${RICH_MENU_ID}/content" \
             -H "Authorization: Bearer $LINE_TOKEN")
           set -e
           probe_size=$(wc -c < /tmp/probe 2>/dev/null || echo 0)
-          echo "probe: HTTP $probe_http, $probe_size bytes"
-
           if [ "$probe_http" = "200" ] && [ "$probe_size" -gt 1000 ]; then
             echo "::notice::Binary already uploaded ($probe_size bytes), skipping"
             exit 0
           fi
-
           curl -sS -f -X POST \
             "https://api-data.line.me/v2/bot/richmenu/${RICH_MENU_ID}/content" \
             -H "Authorization: Bearer $LINE_TOKEN" \
@@ -236,8 +219,6 @@ jobs:
         run: |
           set -euo pipefail
           pip install --quiet requests
-          # The endpoint is fronted by Akamai which rejects empty-body POST from curl with HTTP 411.
-          # Probed 5 body shapes; only `requests.post(url, headers=...)` with NO `data=` arg returns 200.
           python3 - <<'PY'
           import os, sys, requests
           rm_id = os.environ['RICH_MENU_ID']
@@ -290,14 +271,11 @@ jobs:
           echo "|---|---|" >> $GITHUB_STEP_SUMMARY
           echo "| Worker URL | \`$WORKER_URL\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Rich Menu ID | \`$RICH_MENU_ID\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| KV namespace | \`$SESSION_KV_ID\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Webhook | configured |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Manual steps remaining" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "1. **LINE Developers Console** → Messaging API tab:" >> $GITHUB_STEP_SUMMARY
-          echo "   - Auto-reply messages: OFF" >> $GITHUB_STEP_SUMMARY
-          echo "   - Greeting messages: OFF" >> $GITHUB_STEP_SUMMARY
-          echo "   - Use webhook: ON" >> $GITHUB_STEP_SUMMARY
-          echo "2. **LINE OA Manager** → upload Avatar + Cover from assets/exports/" >> $GITHUB_STEP_SUMMARY
-          echo "3. **Self-test**: add bot as friend, send \`好物\` / \`實例\`" >> $GITHUB_STEP_SUMMARY
-          echo "4. **Revoke** all 3 tokens used" >> $GITHUB_STEP_SUMMARY
+          echo "1. LINE OA Manager: upload Avatar + Cover" >> $GITHUB_STEP_SUMMARY
+          echo "2. Optional: set OWNER_USER_ID secret for inquiry push alerts" >> $GITHUB_STEP_SUMMARY
+          echo "3. Self-test: add bot → tap menu → step through flow" >> $GITHUB_STEP_SUMMARY
