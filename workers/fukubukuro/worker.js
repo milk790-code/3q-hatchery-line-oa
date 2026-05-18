@@ -2,11 +2,18 @@
 // Taipei cron slots: 07:30 / 12:30 / 18:30 / 22:00
 // UTC cron:          23:30 /  04:30 / 10:30 / 14:00
 
-const SLOTS = {
+const CRON_SLOTS = {
   '30 23 * * *': { label: '晨光福袋', file: '01_0730.png' },
   '30 4 * * *':  { label: '午陽福袋', file: '02_1230.png' },
   '30 10 * * *': { label: '暮色福袋', file: '03_1830.png' },
   '0 14 * * *':  { label: '月光福袋', file: '04_2200.png' },
+};
+
+const HTTP_SLOTS = {
+  '0730': { label: '晨光福袋', file: '01_0730.png' },
+  '1230': { label: '午陽福袋', file: '02_1230.png' },
+  '1830': { label: '暮色福袋', file: '03_1830.png' },
+  '2200': { label: '月光福袋', file: '04_2200.png' },
 };
 
 async function pushFukubukuro(env, file, label) {
@@ -38,7 +45,7 @@ async function pushFukubukuro(env, file, label) {
 
 export default {
   async scheduled(controller, env, ctx) {
-    const slot = SLOTS[controller.cron];
+    const slot = CRON_SLOTS[controller.cron];
     if (!slot) {
       console.error('Unknown cron expression:', controller.cron);
       return;
@@ -52,13 +59,14 @@ export default {
 
   async fetch(request, env) {
     const url = new URL(request.url);
-    // Manual trigger: GET /push?slot=0730|1230|1830|2200&token=SECRET
+
+    // Manual trigger: GET /push?slot=0730|1230|1830|2200&token=TRIGGER_TOKEN
     if (url.pathname === '/push') {
       if (url.searchParams.get('token') !== env.TRIGGER_TOKEN) {
         return new Response('Unauthorized', { status: 401 });
       }
       const slotKey = url.searchParams.get('slot');
-      const entry = Object.values(SLOTS).find(s => s.file.startsWith(`0${['0730','1230','1830','2200'].indexOf(slotKey) + 1}_`));
+      const entry = HTTP_SLOTS[slotKey];
       if (!entry) {
         return new Response('Unknown slot. Use slot=0730|1230|1830|2200', { status: 400 });
       }
@@ -74,11 +82,14 @@ export default {
         });
       }
     }
+
     if (url.pathname === '/health') {
-      return new Response(JSON.stringify({ ok: true, worker: '3q-fukubukuro-push', slots: Object.keys(SLOTS) }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({ ok: true, worker: '3q-fukubukuro-push', slots: Object.keys(HTTP_SLOTS) }),
+        { headers: { 'Content-Type': 'application/json' } }
+      );
     }
+
     return new Response('3q-fukubukuro-push worker', { status: 200 });
   },
 };
