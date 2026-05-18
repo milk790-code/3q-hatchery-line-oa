@@ -1,0 +1,75 @@
+================================================
+3Q Hatchery LINE OA 後台設定指令
+================================================
+
+任務目標
+─────────
+把 LINE Official Account Manager 的所有預設回覆全部關閉，
+讓所有訊息都交給 Cloudflare Worker（webhook）處理，
+不會出現「感謝您的訊息!很抱歉，本帳號無法個別回覆」這種預設回覆。
+
+
+安全紅線（絕對不可違反）
+─────────────────────────
+1. 只動 LINE Official Account Manager 的設定
+2. 不要動 LINE Developers Console 的 channel 設定
+3. 不要動 webhook URL
+4. 不要動 Channel access token 或 Channel secret
+5. 不要刪除 OA 帳號本身
+6. 任何不確定的步驟，停下描述畫面，等主管介入
+
+
+執行步驟
+─────────
+
+【步驟 1】關閉 Response settings 內的所有自動回覆
+
+進入 https://manager.line.biz/
+→ 選 3Q Hatchery OA
+→ 上方選單點「Settings」（或右上齒輪）
+→ 左側選「Response settings」
+
+依下表設定：
+─────────────────────────────────────────────
+  Response mode               Bot
+  Greeting message            OFF
+  Auto-response message       OFF
+  AI auto-response            OFF
+  Webhook                     ON
+─────────────────────────────────────────────
+
+關鍵：Response mode 必須是「Bot」
+Webhook 必須保持 ON
+
+點右上「Save」儲存
+
+
+【步驟 2】確認 Webhook URL 已設定
+
+LINE Developers Console → Messaging API tab
+→ Webhook URL 應為 Cloudflare Worker URL：
+  https://3q-hatchery-webhook.<subdomain>.workers.dev
+→ 點「Verify」確認回 200
+
+
+【步驟 3】二次確認 Greeting message 已清空
+
+左側選單找「Greeting messages」
+→ 若看到預設訊息 → 整個刪除或關閉開關
+→ 點 Save
+
+
+【步驟 4】確認結果
+
+依以下清單最後檢查一遍：
+─────────────────────────────────────────────
+  [ ] Response mode = Bot
+  [ ] Greeting message = OFF 或內容已清空
+  [ ] Auto-response message = OFF
+  [ ] AI auto-response = OFF（若有此選項）
+  [ ] Webhook = ON
+  [ ] Webhook URL 已填入 Cloudflare Worker URL
+  [ ] Webhook 驗證 = 200 OK
+─────────────────────────────────────────────
+
+7 項全勾才算完成
