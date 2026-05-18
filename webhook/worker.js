@@ -1,5 +1,5 @@
 // Cloudflare Worker — LINE OA webhook for 3Q Hatchery.
-// v3.1 — Guided Flex Message flow + Cloudflare KV session state + escape keyword
+// v3.2 — Guided Flex Message flow + KV session + D1 inquiries persistence
 //
 // Env vars required:
 //   LINE_CHANNEL_ACCESS_TOKEN   LINE_CHANNEL_SECRET   PNG_BASE_URL
@@ -7,17 +7,19 @@
 //   OWNER_USER_ID  — your LINE userId; receives push when inquiry submitted
 // KV binding required:
 //   SESSION  — KV namespace for conversation state (2-hour TTL)
+// D1 binding required:
+//   CRM      — D1 database `3q-hatchery-crm` for inquiries persistence
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 // Keyword auto-reply content (v2, unchanged)
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 
 const GREETING_TEXT = [
   '你好，這裡是 3Q貢丸 · 台灣在地品牌孵化所。',
   '',
   '只要你願意說，我們就幫你被看見。',
   '不管你的店多大多小、新舊、簡單複雜，',
-  '我們都有適合的平台、舞台、後台。',
+  '我們都有適合的平台、舅台、後台。',
   '',
   '點下方圖文選單 「說說你的店」',
   '我們會幫你找出下一步該被拍下、被講出、被看見的，是哪一件事。',
@@ -36,12 +38,12 @@ const AUTO_REPLIES = [
   { keywords: ['進度', '走到哪'],
     response: '請告訴我們你的店名 / 報名編號，\n我們會回你目前進行到哪一步、下次要做什麼。' },
   { keywords: ['實例', '案例', '看作品'],
-    response: '本月入駐：\n01 阿婆ㄟ切仔麵店 (雲林)\n02 三代米舖 (台南)\n03 鹿港織坊\n\n回「01 / 02 / 03」看單一案例。',
+    response: '本月入駐：\n01 阿婆ㄧ切仔麵店 (雲林)\n02 三代米舖 (台南)\n03 鹿港織坊\n\n回「01 / 02 / 03」看單一案例。',
     carousel: true },
   { keywords: ['諮詢', '預約'],
     response: '好。先簡單告訴我們：\n你的店名 / 你的角色 / 想聊什麼\n\n我們會在 24 小時內寄時段給你。' },
   { keywords: ['01', '阿婆', '切仔麵'],
-    response: '案例 01 — 阿婆ㄟ切仔麵店（雲林）\n\n我們幫她做的：\n・店招重做（保留手寫，補質感）\n・產品照 6 張（鏡頭以下視角，自然光）\n・FB / IG 一頁式介紹\n\n預算：5,000 元，2 週交付。',
+    response: '案例 01 — 阿婆ㄧ切仔麵店（雲林）\n\n我們幫她做的：\n・店招重做（保留手寫，補質感）\n・產品照 6 張（鏡頭以下視角，自然光）\n・FB / IG 一頁式介紹\n\n預算：5,000 元，2 週交付。',
     image: '3q-carousel-01-1040.png' },
   { keywords: ['02', '三代米舖', '米舖'],
     response: '案例 02 — 三代米舖（台南）\n\n我們幫他做的：\n・品牌故事 1 篇（從爺爺到孫）\n・包裝改版（保留紅章，紙改厚磅）\n・通路上架（誠品 / 茶水間）\n\n預算：15,000 元，6 週交付。',
@@ -76,7 +78,7 @@ const REACTIONS = [
   { name: 'queue',     kw: ['排隊', '排隊中', '排隊ing'] },
   { name: 'hungry',    kw: ['想吃', '肚子餓', '餓了'] },
   { name: 'empty',     kw: ['賣完了', '沒有了', '斷貨'] },
-  { name: 'bold',      kw: ['敢賭', '敢說', '敢肯定'] },
+  { name: 'bold',      kw: ['敢賤', '敢說', '敢肯定'] },
   { name: 'stellar',   kw: ['絕了', '絕', '真絕', '超絕'] },
   { name: 'hyper',     kw: ['狂推', '超推', '大推', '爆推'] },
   { name: 'done',      kw: ['搞定', '搞好', '準備好', '弄好'] },
@@ -85,21 +87,20 @@ const REACTION_REPLIES = REACTIONS.map(r => ({ keywords: r.kw, image: `3q-reacti
 
 const ALL_REPLIES = [...AUTO_REPLIES, ...SEASONAL_REPLIES, ...REACTION_REPLIES];
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 // Guided flow labels
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 
 const SERVICE_LABELS  = { imagery: '好物・好照', marketing: '客製行銷', seasonal: '季節活動', consult: '說說我的店' };
 const SERVICE_DESC    = { imagery: '一張像樣的產品照，500 元起', marketing: '季度規劃，目標承諾書，深度陪跑', seasonal: '節慶視覺，限時活動圖文', consult: '先聊聊，再決定怎麼做' };
 const BUDGET_LABELS   = { low: '5,000 元以下', mid: '5,000–20,000 元', high: '20,000 元以上' };
 const TIMELINE_LABELS = { urgent: '一個月內', normal: '一到三個月', relaxed: '三個月以上' };
 
-// Escape keywords — clear session and exit flow
 const ESCAPE_RE = /^(取消|退出|結束|重來|重新開始|cancel|exit)$/i;
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 // Cloudflare KV session (2h TTL)
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 
 async function getSession(uid, env) {
   if (!env.SESSION || !uid) return null;
@@ -114,9 +115,24 @@ async function clearSession(uid, env) {
   try { await env.SESSION.delete(uid); } catch {}
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
+// D1 inquiries persistence
+// ─────────────────────────────────────────────────────────────────────────
+
+async function saveInquiry(uid, a, env) {
+  if (!env.CRM) return;
+  try {
+    await env.CRM.prepare(
+      'INSERT INTO inquiries (user_id, service, budget, timeline, free_text) VALUES (?, ?, ?, ?, ?)'
+    ).bind(uid || 'unknown', a.service || null, a.budget || null, a.timeline || null, a.freeText || null).run();
+  } catch (err) {
+    console.error('D1 inquiries insert failed:', err.message);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
 // Flex Message builders — 3Q Hatchery brand
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 
 const FLEX   = (alt, bubble) => ({ type: 'flex', altText: alt, contents: bubble });
 const BUBBLE = (header, body) => ({ type: 'bubble', size: 'mega', header, body });
@@ -143,7 +159,6 @@ const BTN = (label, data, primary = true, display) => ({
   height: 'sm',
 });
 
-// Step 1 — service selection
 function serviceCard() {
   return FLEX('你想做什麼？', BUBBLE(
     DARK_HEADER('你想做什麼', '選一個最接近的，我們從這裡開始'),
@@ -156,7 +171,6 @@ function serviceCard() {
   ));
 }
 
-// Step 2 — budget selection
 function budgetCard(svc) {
   return FLEX('預算大概在哪裡？', BUBBLE(
     DARK_HEADER(SERVICE_LABELS[svc] || svc, SERVICE_DESC[svc] || ''),
@@ -170,7 +184,6 @@ function budgetCard(svc) {
   ));
 }
 
-// Step 3 — timeline selection
 function timelineCard(svc, bgt) {
   return FLEX('時間上大概是？', BUBBLE(
     DARK_HEADER('時間上大概是', `${SERVICE_LABELS[svc] || svc}　${BUDGET_LABELS[bgt] || bgt}`),
@@ -182,13 +195,11 @@ function timelineCard(svc, bgt) {
   ));
 }
 
-// Step 4 — free text prompt
 const freeTextPrompt = () => ({
   type: 'text',
   text: '最後一題，也是最重要的。\n\n用一句話說說你的店，或這次最想解決的事。\n\n（想跳出隨時打「取消」）',
 });
 
-// Step 5 — summary + confirm
 function summaryCard(a) {
   const rows = [
     ['需求', SERVICE_LABELS[a.service]   || a.service   || '—'],
@@ -216,32 +227,28 @@ function summaryCard(a) {
   ));
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Parse flow postback data
-// "flow:budget=mid&s=imagery" → {budget:'mid', s:'imagery'}
-// ─────────────────────────────────────────────────────────────────────────────
-
 function flowParams(data) {
   const body = data.slice('flow:'.length);
   if (!body.includes('=')) return {};
   return Object.fromEntries(body.split('&').map(kv => kv.split('=')));
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 // Main fetch handler
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 
 export default {
   async fetch(request, env, ctx) {
     if (request.method === 'GET') {
       return new Response(JSON.stringify({
         service: '3Q Hatchery LINE OA webhook',
-        ok: true, version: 3.1,
+        ok: true, version: 3.2,
         configured: {
           token:       Boolean(env.LINE_CHANNEL_ACCESS_TOKEN),
           secret:      Boolean(env.LINE_CHANNEL_SECRET),
           png_base:    env.PNG_BASE_URL || null,
           session_kv:  Boolean(env.SESSION),
+          crm_d1:      Boolean(env.CRM),
           owner_push:  Boolean(env.OWNER_USER_ID),
         },
         backends_md: 'https://github.com/milk790-code/3q-hatchery-line-oa/blob/main/BACKENDS.md',
@@ -265,9 +272,9 @@ export default {
   },
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 // Event routing
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 
 async function handleEvent(ev, env) {
   const uid = ev.source?.userId;
@@ -292,7 +299,6 @@ async function handleEvent(ev, env) {
   if (ev.type === 'message' && ev.message?.type === 'text') {
     const text = ev.message.text || '';
 
-    // Escape hatch — clear session and exit flow at any step
     if (ESCAPE_RE.test(text.trim())) {
       await clearSession(uid, env);
       return replyMsg(ev.replyToken, [{
@@ -301,7 +307,6 @@ async function handleEvent(ev, env) {
       }], env);
     }
 
-    // Free-text capture step
     const session = await getSession(uid, env);
     if (session?.step === 'freetext') {
       const answers = { service: session.service, budget: session.budget, timeline: session.timeline, freeText: text };
@@ -309,7 +314,6 @@ async function handleEvent(ev, env) {
       return replyMsg(ev.replyToken, [summaryCard(answers)], env);
     }
 
-    // Flow trigger
     if (/說說.*店|說說我|開始填/.test(text)) {
       await clearSession(uid, env);
       return replyMsg(ev.replyToken, [serviceCard()], env);
@@ -319,9 +323,9 @@ async function handleEvent(ev, env) {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 // Flow state machine
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 
 async function handleFlow(data, uid, replyToken, env) {
   const p = flowParams(data);
@@ -339,7 +343,10 @@ async function handleFlow(data, uid, replyToken, env) {
   }
   if (data === 'flow:submit') {
     const session = await getSession(uid, env);
-    if (session && env.OWNER_USER_ID) await pushToOwner(session, env);
+    if (session) {
+      await saveInquiry(uid, session, env);
+      if (env.OWNER_USER_ID) await pushToOwner(session, env);
+    }
     await clearSession(uid, env);
     return replyMsg(replyToken, [{ type: 'text', text: '收到了。\n\n24 小時內我們會主動聯繫你。\n想先看案例，回覆「實例」。' }], env);
   }
@@ -349,9 +356,9 @@ async function handleFlow(data, uid, replyToken, env) {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 // Owner push notification
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 
 async function pushToOwner(a, env) {
   const text = [
@@ -368,9 +375,9 @@ async function pushToOwner(a, env) {
   });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 // Existing keyword routing (v2, unchanged)
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 
 async function sendWelcome(replyToken, env) {
   const msgs = [];
@@ -401,7 +408,7 @@ function carouselMsg(base) {
   return {
     type: 'template', altText: '本月入駐 · 4 件作品',
     template: { type: 'image_carousel', columns: [
-      { imageUrl: `${base}/3q-carousel-01-1040.png`, action: { type: 'message', text: '看 01 阿婆ㄟ切仔麵店' } },
+      { imageUrl: `${base}/3q-carousel-01-1040.png`, action: { type: 'message', text: '看 01 阿婆ㄧ切仔麵店' } },
       { imageUrl: `${base}/3q-carousel-02-1040.png`, action: { type: 'message', text: '我想了解好物・好照' } },
       { imageUrl: `${base}/3q-carousel-03-1040.png`, action: { type: 'message', text: '看 03 三代米舖' } },
       { imageUrl: `${base}/3q-carousel-04-1040.png`, action: { type: 'message', text: '看 04 鹿港織坊' } },
@@ -409,9 +416,9 @@ function carouselMsg(base) {
   };
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 // LINE API helpers
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 
 async function replyMsg(replyToken, messages, env) {
   const res = await fetch('https://api.line.me/v2/bot/message/reply', {
