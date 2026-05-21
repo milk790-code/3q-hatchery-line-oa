@@ -19,6 +19,15 @@ const AWAY_TEXT = [
   '謝謝你願意說。',
 ].join('\n');
 
+// Taiwan business hours: Mon–Fri 10:00–19:00 (UTC+8)
+
+function isBusinessHours() {
+    const tw = new Date(Date.now() + 8 * 3600 * 1000);
+    const day = tw.getUTCDay();
+    const hour = tw.getUTCHours();
+    return day >= 1 && day <= 5 && hour >= 10 && hour < 19;
+}
+
 const AUTO_REPLIES = [
   { keywords: ['好物', '好照', '生圖', '拍照'],
     response: '「好物・好照」從一個產品開始，500 元起。\n包含：1 張像樣的產品照 + 1 段別人讀得進去的介紹文。\n\n點選下方選單「好物・好照」了解完整流程。' },
@@ -58,6 +67,12 @@ const REACTIONS = [
   { name: 'got-it',    kw: ['收到', '了解', '知道'] },
   { name: 'i-see',     kw: ['我懂', '懂', '明白'] },
   { name: 'cheer',     kw: ['加油'] },
+
+  const AWAY_HOURS_TEXT = [
+    '收到你的訊息了。',
+    '我們的服務時間是週一至週五 10:00–19:00。',
+    '會在下個工作日回覆你，謝謝你願意說。',
+  ].join('\n');
   { name: 'excellent', kw: ['太棒', '太好', '太強'] },
   { name: 'later',     kw: ['等等回', '晚點回', '晚點'] },
   { name: 'goodnight', kw: ['晚安', '掰掰', 'bye'] },
@@ -984,13 +999,13 @@ async function handleIntent(userText, replyToken, env, uid) {
     if (match.response) msgs.push({ type: 'text', text: match.response });
     if (match.carousel && env.PNG_BASE_URL) msgs.push(carouselMsg(env.PNG_BASE_URL));
   } else {
-    // No keyword match → try AI fallback (Workers AI LLM, rate-limited per uid)
-    const aiReply = await aiFallback(userText, env, uid);
-    if (aiReply) {
-      msgs.push({ type: 'text', text: aiReply });
-    } else {
-      msgs.push({ type: 'text', text: AWAY_TEXT });
-    }
+    }// No keyword match → check business hours, then try AI fallback
+        if (!isBusinessHours()) {
+                msgs.push({ type: 'text', text: AWAY_HOURS_TEXT });
+        } else {
+                const aiReply = await aiFallback(userText, env, uid);
+                msgs.push({ type: 'text', text: aiReply || AWAY_TEXT });
+        }
   }
   return replyMsg(replyToken, msgs, env);
 }
