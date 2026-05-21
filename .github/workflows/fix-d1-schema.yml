@@ -1,0 +1,72 @@
+name: Fix D1 schema (run statements individually)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      D1_ID: e54671b1-d15e-4552-babf-cef367267568
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run each schema statement
+        env:
+          CF_TOKEN:      ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          mkdir -p _debug/d1-fix
+
+          # Statement 1: CREATE TABLE inquiries
+          SQL1='CREATE TABLE IF NOT EXISTS inquiries (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT NOT NULL, service TEXT, budget TEXT, timeline TEXT, free_text TEXT, created_at TEXT NOT NULL DEFAULT (datetime(''now'')))'
+          echo "Statement 1: CREATE TABLE inquiries"
+          curl -sS -X POST -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/d1/database/$D1_ID/query" \
+            -d "$(jq -cn --arg sql "$SQL1" '{sql: $sql}')" | tee _debug/d1-fix/stmt1.json | jq .
+
+          # Statement 2: index on user_id
+          SQL2='CREATE INDEX IF NOT EXISTS idx_inquiries_user_id ON inquiries(user_id)'
+          echo "Statement 2: index user_id"
+          curl -sS -X POST -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/d1/database/$D1_ID/query" \
+            -d "$(jq -cn --arg sql "$SQL2" '{sql: $sql}')" | tee _debug/d1-fix/stmt2.json | jq .
+
+          # Statement 3: index on created_at
+          SQL3='CREATE INDEX IF NOT EXISTS idx_inquiries_created_at ON inquiries(created_at)'
+          echo "Statement 3: index created_at"
+          curl -sS -X POST -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/d1/database/$D1_ID/query" \
+            -d "$(jq -cn --arg sql "$SQL3" '{sql: $sql}')" | tee _debug/d1-fix/stmt3.json | jq .
+
+          # Verify
+          echo "=== Final tables ==="
+          curl -sS -X POST -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/d1/database/$D1_ID/query" \
+            -d '{"sql": "SELECT name FROM sqlite_master WHERE type=\"table\""}' \
+            | tee _debug/d1-fix/tables.json | jq .
+
+          # Get schema of inquiries table
+          echo "=== Inquiries schema ==="
+          curl -sS -X POST -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/d1/database/$D1_ID/query" \
+            -d '{"sql": "PRAGMA table_info(inquiries)"}' \
+            | tee _debug/d1-fix/inquiries-info.json | jq .
+
+      - name: Commit debug
+        if: always()
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add _debug/d1-fix/
+          git diff --cached --quiet || git commit -m "d1-fix: schema setup debug"
+          git push || true
