@@ -1,81 +1,81 @@
 {
-  "generated_at": "2026-05-21T09:48:51.053Z",
+  "generated_at": "2026-05-21T10:00:40.156Z",
   "model": "@cf/stabilityai/stable-diffusion-xl-base-1.0",
   "results": [
     {
       "file": "3q-ai-welcome-1040.png",
-      "error": "HTTP 401 (application/json): {\"result\":null,\"success\":false,\"errors\":[{\"code\":10000,\"message\":\"Authentication error\"}],\"messages\":[]}",
-      "ok": false
+      "bytes": 369788,
+      "ok": true
     },
     {
       "file": "3q-ai-cover-bowl-1080x878.png",
-      "error": "HTTP 401 (application/json): {\"result\":null,\"success\":false,\"errors\":[{\"code\":10000,\"message\":\"Authentication error\"}],\"messages\":[]}",
-      "ok": false
+      "bytes": 447069,
+      "ok": true
     },
     {
       "file": "3q-ai-carousel-01-noodle-1040.png",
-      "error": "HTTP 401 (application/json): {\"result\":null,\"success\":false,\"errors\":[{\"code\":10000,\"message\":\"Authentication error\"}],\"messages\":[]}",
-      "ok": false
+      "bytes": 600107,
+      "ok": true
     },
     {
       "file": "3q-ai-carousel-02-product-1040.png",
-      "error": "HTTP 401 (application/json): {\"result\":null,\"success\":false,\"errors\":[{\"code\":10000,\"message\":\"Authentication error\"}],\"messages\":[]}",
-      "ok": false
+      "bytes": 340108,
+      "ok": true
     },
     {
       "file": "3q-ai-carousel-03-rice-1040.png",
-      "error": "HTTP 401 (application/json): {\"result\":null,\"success\":false,\"errors\":[{\"code\":10000,\"message\":\"Authentication error\"}],\"messages\":[]}",
-      "ok": false
+      "bytes": 778139,
+      "ok": true
     },
     {
       "file": "3q-ai-carousel-04-linen-1040.png",
-      "error": "HTTP 401 (application/json): {\"result\":null,\"success\":false,\"errors\":[{\"code\":10000,\"message\":\"Authentication error\"}],\"messages\":[]}",
-      "ok": false
+      "bytes": 809193,
+      "ok": true
     },
     {
       "file": "3q-ai-seasonal-spring-1080x878.png",
-      "error": "HTTP 401 (application/json): {\"result\":null,\"success\":false,\"errors\":[{\"code\":10000,\"message\":\"Authentication error\"}],\"messages\":[]}",
-      "ok": false
+      "bytes": 332233,
+      "ok": true
     },
     {
       "file": "3q-ai-seasonal-summer-1080x878.png",
-      "error": "HTTP 401 (application/json): {\"result\":null,\"success\":false,\"errors\":[{\"code\":10000,\"message\":\"Authentication error\"}],\"messages\":[]}",
-      "ok": false
+      "bytes": 502002,
+      "ok": true
     },
     {
       "file": "3q-ai-seasonal-autumn-1080x878.png",
-      "error": "HTTP 401 (application/json): {\"result\":null,\"success\":false,\"errors\":[{\"code\":10000,\"message\":\"Authentication error\"}],\"messages\":[]}",
-      "ok": false
+      "bytes": 434720,
+      "ok": true
     },
     {
       "file": "3q-ai-seasonal-winter-1080x878.png",
-      "error": "HTTP 401 (application/json): {\"result\":null,\"success\":false,\"errors\":[{\"code\":10000,\"message\":\"Authentication error\"}],\"messages\":[]}",
-      "ok": false
+      "bytes": 394209,
+      "ok": true
     },
     {
       "file": "3q-ai-lucky-bag-main-1040.png",
-      "error": "HTTP 401 (application/json): {\"result\":null,\"success\":false,\"errors\":[{\"code\":10000,\"message\":\"Authentication error\"}],\"messages\":[]}",
-      "ok": false
+      "bytes": 416179,
+      "ok": true
     },
     {
       "file": "3q-ai-lucky-bag-morning-1040.png",
-      "error": "HTTP 401 (application/json): {\"result\":null,\"success\":false,\"errors\":[{\"code\":10000,\"message\":\"Authentication error\"}],\"messages\":[]}",
-      "ok": false
+      "bytes": 398238,
+      "ok": true
     },
     {
       "file": "3q-ai-lucky-bag-noon-1040.png",
-      "error": "HTTP 401 (application/json): {\"result\":null,\"success\":false,\"errors\":[{\"code\":10000,\"message\":\"Authentication error\"}],\"messages\":[]}",
-      "ok": false
+      "bytes": 747666,
+      "ok": true
     },
     {
       "file": "3q-ai-lucky-bag-evening-1040.png",
-      "error": "HTTP 401 (application/json): {\"result\":null,\"success\":false,\"errors\":[{\"code\":10000,\"message\":\"Authentication error\"}],\"messages\":[]}",
-      "ok": false
+      "bytes": 605941,
+      "ok": true
     },
     {
       "file": "3q-ai-lucky-bag-night-1040.png",
-      "error": "HTTP 401 (application/json): {\"result\":null,\"success\":false,\"errors\":[{\"code\":10000,\"message\":\"Authentication error\"}],\"messages\":[]}",
-      "ok": false
+      "bytes": 445273,
+      "ok": true
     }
   ]
 }
