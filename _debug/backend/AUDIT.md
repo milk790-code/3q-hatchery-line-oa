@@ -1,4 +1,4 @@
-## LINE OA Backend Audit (run 26225341174)
+## LINE OA Backend Audit (run 26228692925)
 
 **Manager URL:** https://manager.line.biz/account/@121lkspe
 
@@ -14,9 +14,9 @@
 - Active: true
 
 ### 3. Rich menus
-- 3Q Hatchery · MENU (postback v4) (id: richmenu-4f437407a49edc82abe167f021d4489c, 5 areas)
-- 3Q Hatchery · MENU (postback v3) (id: richmenu-66632d2b833924137844acde0895dbb0, 5 areas)
-- Default: richmenu-66632d2b833924137844acde0895dbb0
+- 3Q Hatchery · MENU (postback v3) (id: richmenu-d6882f0e160fccb9e14aa216f659cb8d, 5 areas)
+- 3Q Hatchery · MENU (postback v4) (id: richmenu-4df221c59271e22500d744b62db6c66f, 5 areas)
+- Default: richmenu-d6882f0e160fccb9e14aa216f659cb8d
 
 ### 4. Followers
 - Followers (yesterday): 2
@@ -26,7 +26,7 @@
 ### 5. Message quota
 - Plan type: limited
 - Monthly limit: 3000
-- Used this month: 0
+- Used this month: 5
 
 
 ---
