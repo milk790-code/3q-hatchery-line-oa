@@ -1,31 +1,39 @@
 // Cloudflare Worker — LINE OA webhook for 3Q Hatchery.
-// v3.1 — Guided Flex Message flow + Cloudflare KV session state + escape keyword
+// v3.4 — Campaign system, quote calculator, AI fallback, follow-up pushes
 //
 // Env vars required:
 //   LINE_CHANNEL_ACCESS_TOKEN   LINE_CHANNEL_SECRET   PNG_BASE_URL
 // Optional:
 //   OWNER_USER_ID  — your LINE userId; receives push when inquiry submitted
+//   TRIGGER_TOKEN  — bearer token for /api/csv export
 // KV binding required:
 //   SESSION  — KV namespace for conversation state (2-hour TTL)
+// D1 binding required:
+//   CRM      — D1 database `3q-hatchery-crm` for inquiries persistence
+// AI binding (optional):
+//   AI       — Workers AI for unmatched keyword fallback
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Keyword auto-reply content (v2, unchanged)
-// ─────────────────────────────────────────────────────────────────────────────
-
-const GREETING_TEXT = [
-  '你好，這裡是 3Q貢丸 · 台灣在地品牌孵化所。',
-  '',
-  '只要你願意說，我們就幫你被看見。',
-  '不管你的店多大多小、新舊、簡單複雜，',
-  '我們都有適合的平台、舞台、後台。',
-  '',
-  '點下方圖文選單 「說說你的店」',
-  '我們會幫你找出下一步該被拍下、被講出、被看見的，是哪一件事。',
-].join('\n');
+// ─────────────────────────────────────────────────────────────────────────
+// Keyword auto-reply content
+// ─────────────────────────────────────────────────────────────────────────
 
 const AWAY_TEXT = [
   '收到你的訊息了 — 我們會在 24 小時內回你。',
   '謝謝你願意說。',
+].join('\n');
+
+// Taiwan business hours: Mon–Fri 10:00–19:00 (UTC+8)
+function isBusinessHours() {
+  const tw = new Date(Date.now() + 8 * 3600 * 1000);
+  const day = tw.getUTCDay();
+  const hour = tw.getUTCHours();
+  return day >= 1 && day <= 5 && hour >= 10 && hour < 19;
+}
+
+const AWAY_HOURS_TEXT = [
+  '收到你的訊息了。',
+  '我們的服務時間是週一至週五 10:00–19:00。',
+  '會在下個工作日回覆你，謝謝你願意說。',
 ].join('\n');
 
 const AUTO_REPLIES = [
@@ -85,25 +93,193 @@ const REACTION_REPLIES = REACTIONS.map(r => ({ keywords: r.kw, image: `3q-reacti
 
 const ALL_REPLIES = [...AUTO_REPLIES, ...SEASONAL_REPLIES, ...REACTION_REPLIES];
 
-// Rich menu postback data → synthetic user-intent text.
-const POSTBACK_MAP = {
-  'menu:my-store':  '我想說說我的店',
-  'menu:imagery':   '我想了解好物・好照',
-  'menu:marketing': '我想要客製行銷',
-  'menu:progress':  '查我的進度',
+// ─────────────────────────────────────────────────────────────────────────
+// Campaign — 好物・好照 限時招募 (30 slots, 3 price tiers)
+// ─────────────────────────────────────────────────────────────────────────
+
+const CAMPAIGN_KEY = 'campaign:2026:photoshot';
+const CAMPAIGN_TIERS = {
+  tier1: { max: 10, price: 100, label: '前 10 位',  action: '截圖點讚回傳' },
+  tier2: { max: 10, price: 200, label: '11–20 位',  action: '回傳 👍' },
+  tier3: { max: 10, price: 300, label: '21–30 位',  action: '回傳「我要」' },
 };
+
+async function getCampaignSlots(env) {
+  if (!env.SESSION) return { tier1: [], tier2: [], tier3: [] };
+  try {
+    const v = await env.SESSION.get(CAMPAIGN_KEY);
+    return v ? JSON.parse(v) : { tier1: [], tier2: [], tier3: [] };
+  } catch { return { tier1: [], tier2: [], tier3: [] }; }
+}
+
+async function registerCampaignSlot(uid, tier, env) {
+  if (!uid || !CAMPAIGN_TIERS[tier]) return 'error';
+  const slots = await getCampaignSlots(env);
+  if (slots[tier].includes(uid)) return 'already';
+  if (slots[tier].length >= CAMPAIGN_TIERS[tier].max) return 'full';
+  slots[tier].push(uid);
+  await env.SESSION.put(CAMPAIGN_KEY, JSON.stringify(slots));
+  return 'ok';
+}
+
+function campaignCard(slots) {
+  const remaining = (tier) => Math.max(0, CAMPAIGN_TIERS[tier].max - slots[tier].length);
+  const full = (tier) => remaining(tier) === 0;
+  const remLabel = (tier) => full(tier) ? '· 額滿' : `· 剩 ${remaining(tier)} 位`;
+  return FLEX('好物・好照 限時招募', BUBBLE(
+    DARK_HEADER('好物・好照 · 限時招募', '業界 2,000 起跳的攝影棚美食圖，這次 500 元起'),
+    LIGHT_BODY([
+      { type: 'text', text: '目前名額狀況', color: '#8A8A8A', size: 'sm', margin: 'none' },
+      { type: 'separator', margin: 'sm', color: '#E8DFD0' },
+      ...(['tier1', 'tier2', 'tier3']).map(t => ({
+        type: 'box', layout: 'horizontal', margin: 'sm',
+        contents: [
+          { type: 'text', text: `${CAMPAIGN_TIERS[t].label} · ${CAMPAIGN_TIERS[t].price} 元`, flex: 3, size: 'sm', color: '#1A1A1A' },
+          { type: 'text', text: remLabel(t), flex: 1, size: 'sm', align: 'end',
+            color: full(t) ? '#D04040' : '#B8924A' },
+        ],
+      })),
+      { type: 'separator', margin: 'lg', color: '#E8DFD0' },
+      BTN(full('tier1') ? '前 10 位 · 額滿' : `前 10 位 · 100 元 (剩 ${remaining('tier1')})`,
+          'flow:campaign=tier1', !full('tier1'), '我要前10位 100元'),
+      BTN(full('tier2') ? '11–20 位 · 額滿' : `11–20 位 · 200 元 (剩 ${remaining('tier2')})`,
+          'flow:campaign=tier2', !full('tier2'), '我要11-20位 200元'),
+      BTN(full('tier3') ? '21–30 位 · 額滿' : `21–30 位 · 300 元 (剩 ${remaining('tier3')})`,
+          'flow:campaign=tier3', !full('tier3'), '我要21-30位 300元'),
+    ]),
+  ));
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Quote Calculator
+// ─────────────────────────────────────────────────────────────────────────
+
+const QTY_LABELS  = { '1-3': '1-3 個產品', '4-10': '4-10 個產品', '10+': '10 個以上' };
+const USE_LABELS  = { ig: 'IG 社群', shop: '蝦皮/官網', channel: '通路上架/包裝', all: '全部都要' };
+const RUSH_LABELS = { week: '一週內', biweek: '兩週內', month: '一個月內' };
+
+function quotePriceRange(qty, use, rush) {
+  let base = qty === '1-3' ? 500 : qty === '4-10' ? 400 : 300;
+  let count = qty === '1-3' ? 2 : qty === '4-10' ? 6 : 12;
+  const useMul = use === 'all' ? 1.5 : use === 'channel' ? 1.3 : use === 'shop' ? 1.1 : 1.0;
+  const rushMul = rush === 'week' ? 1.4 : rush === 'biweek' ? 1.15 : 1.0;
+  const low  = Math.round(base * count * useMul * rushMul / 100) * 100;
+  const high = Math.round(low * 1.6 / 100) * 100;
+  return { low, high };
+}
+
+function quoteQtyCard() {
+  return FLEX('你有幾個產品？', BUBBLE(
+    DARK_HEADER('產品數量', '我們幫你估個區間，馬上知道'),
+    LIGHT_BODY([
+      { type: 'text', text: '幾個產品要拍？', color: '#1A1A1A', size: 'md', weight: 'bold' },
+      { type: 'separator', margin: 'sm', color: '#E8DFD0' },
+      BTN('🌱 1-3 個 · 試水溫',  'flow:qty=1-3',  true, '1-3 個'),
+      BTN('⚡ 4-10 個 · 認真做', 'flow:qty=4-10', true, '4-10 個'),
+      BTN('✨ 10 個以上 · 整套', 'flow:qty=10+',  true, '10 個以上'),
+    ]),
+  ));
+}
+
+function quoteUseCard(qty) {
+  return FLEX('用在哪裡？', BUBBLE(
+    DARK_HEADER('使用場景', `${QTY_LABELS[qty]}　|　下一步`),
+    LIGHT_BODY([
+      { type: 'text', text: '主要用在哪？', color: '#1A1A1A', size: 'md', weight: 'bold' },
+      { type: 'separator', margin: 'sm', color: '#E8DFD0' },
+      BTN('📱 IG / 社群',     `flow:use=ig&q=${qty}`,      true, 'IG'),
+      BTN('🛒 蝦皮 / 官網',   `flow:use=shop&q=${qty}`,    true, '蝦皮/官網'),
+      BTN('📦 通路 / 包裝',   `flow:use=channel&q=${qty}`, true, '通路/包裝'),
+      BTN('🎯 全部都要',       `flow:use=all&q=${qty}`,     true, '全部'),
+    ]),
+  ));
+}
+
+function quoteRushCard(qty, use) {
+  return FLEX('多急？', BUBBLE(
+    DARK_HEADER('交期', `${QTY_LABELS[qty]}　|　${USE_LABELS[use]}`),
+    LIGHT_BODY([
+      { type: 'text', text: '什麼時候要？', color: '#1A1A1A', size: 'md', weight: 'bold' },
+      { type: 'separator', margin: 'sm', color: '#E8DFD0' },
+      BTN('🔥 一週內 · 急', `flow:rush=week&q=${qty}&u=${use}`,    true, '一週內'),
+      BTN('🎵 兩週內',      `flow:rush=biweek&q=${qty}&u=${use}`,  true, '兩週內'),
+      BTN('☕ 一個月內',    `flow:rush=month&q=${qty}&u=${use}`,   true, '一個月'),
+    ]),
+  ));
+}
+
+function postInquiryNextStepsCard() {
+  return FLEX('下一步可以做什麼', BUBBLE(
+    DARK_HEADER('下一步', '在等我們回覆的時候，可以先做這些'),
+    LIGHT_BODY([
+      { type: 'text', text: '不一定要等。先做這個更有效：', color: '#1A1A1A', size: 'sm', wrap: true },
+      { type: 'separator', margin: 'md', color: '#E8DFD0' },
+      BTN('📂 看本月入駐案例',  'flow:nxt=cases',       true,  '實例'),
+      BTN('🎯 試算我的方案價格', 'flow:nxt=quote',        true,  '試算'),
+      BTN('🔥 +1 招募名額',     'flow:nxt=campaign',     true,  '+1'),
+      BTN('🌸 看四季活動',       'flow:nxt=seasonal',     false, '春茶'),
+    ]),
+  ));
+}
+
+function postCampaignNextStepsCard(tier, price, action) {
+  return FLEX('報名後下一步', BUBBLE(
+    DARK_HEADER('報名成功 ✓', `${tier} · NT$ ${price}`),
+    LIGHT_BODY([
+      { type: 'text', text: `動作：${action}`, color: '#1A1A1A', size: 'md', weight: 'bold' },
+      { type: 'separator', margin: 'sm', color: '#E8DFD0' },
+      { type: 'text', text: '收到動作後，我們會：', color: '#8A8A8A', size: 'sm', margin: 'sm' },
+      { type: 'text', text: '1. 24h 內回覆收費連結', color: '#1A1A1A', size: 'sm' },
+      { type: 'text', text: '2. 收款後 48h 內安排第一次對接', color: '#1A1A1A', size: 'sm' },
+      { type: 'text', text: '3. 7-14 天內成片交付', color: '#1A1A1A', size: 'sm' },
+      { type: 'separator', margin: 'md', color: '#E8DFD0' },
+      BTN('💬 想先聊聊',        'flow:nxt=consult', false, '說說我的店'),
+      BTN('📂 看其他案例',       'flow:nxt=cases',   false, '實例'),
+    ]),
+  ));
+}
+
+function quoteResultCard(qty, use, rush) {
+  const { low, high } = quotePriceRange(qty, use, rush);
+  return FLEX('估價結果', BUBBLE(
+    DARK_HEADER('你的方案估價', `${QTY_LABELS[qty]}　|　${USE_LABELS[use]}　|　${RUSH_LABELS[rush]}`),
+    LIGHT_BODY([
+      { type: 'box', layout: 'vertical', spacing: 'sm', contents: [
+        { type: 'text', text: '預估價格區間', color: '#8A8A8A', size: 'sm' },
+        { type: 'text', text: `NT$ ${low.toLocaleString()} – ${high.toLocaleString()}`,
+          color: '#B8924A', size: 'xxl', weight: 'bold' },
+        { type: 'separator', margin: 'md', color: '#E8DFD0' },
+        { type: 'text', text: '・含產品攝影 + 介紹文', color: '#1A1A1A', size: 'sm' },
+        { type: 'text', text: '・本月招募活動可享優惠（前 30 位）', color: '#1A1A1A', size: 'sm' },
+        { type: 'separator', margin: 'md', color: '#E8DFD0' },
+      ]},
+      BTN('🎯 立即下定 · 走招募名額', 'flow:qty_to_campaign', true, '+1'),
+      BTN('💬 想再聊聊',              'flow:qty_to_consult',  false, '說說我的店'),
+    ]),
+  ));
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Guided flow labels
+// ─────────────────────────────────────────────────────────────────────────
 
 const SERVICE_LABELS  = { imagery: '好物・好照', marketing: '客製行銷', seasonal: '季節活動', consult: '說說我的店' };
 const SERVICE_DESC    = { imagery: '一張像樣的產品照，500 元起', marketing: '季度規劃，目標承諾書，深度陪跑', seasonal: '節慶視覺，限時活動圖文', consult: '先聊聊，再決定怎麼做' };
 const BUDGET_LABELS   = { low: '5,000 元以下', mid: '5,000–20,000 元', high: '20,000 元以上' };
 const TIMELINE_LABELS = { urgent: '一個月內', normal: '一到三個月', relaxed: '三個月以上' };
 
-// Escape keywords — clear session and exit flow
+const SERVICE_HERO = {
+  imagery:   { file: '3q-carousel-02-1040.png', ratio: '1:1'   },
+  marketing: { file: '3q-cover-bowl-1080x878.png', ratio: '20:16' },
+  seasonal:  { file: '3q-seasonal-spring-1080x878.png', ratio: '20:16' },
+  consult:   { file: '3q-cover-bowl-1080x878.png', ratio: '20:16' },
+};
+
 const ESCAPE_RE = /^(取消|退出|結束|重來|重新開始|cancel|exit)$/i;
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 // Cloudflare KV session (2h TTL)
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 
 async function getSession(uid, env) {
   if (!env.SESSION || !uid) return null;
@@ -118,11 +294,222 @@ async function clearSession(uid, env) {
   try { await env.SESSION.delete(uid); } catch {}
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Flex Message builders — 3Q Hatchery brand
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
+// D1 inquiries persistence
+// ─────────────────────────────────────────────────────────────────────────
 
-const FLEX   = (alt, bubble) => ({ type: 'flex', altText: alt, contents: bubble });
+async function saveInquiry(uid, a, env) {
+  if (!env.CRM) return;
+  try {
+    await env.CRM.prepare(
+      'INSERT INTO inquiries (user_id, service, budget, timeline, free_text) VALUES (?, ?, ?, ?, ?)'
+    ).bind(uid || 'unknown', a.service || null, a.budget || null, a.timeline || null, a.freeText || null).run();
+  } catch (err) {
+    console.error('D1 inquiries insert failed:', err.message);
+  }
+}
+
+async function saveCampaignRegistration(uid, tier, price, env) {
+  if (!env.CRM) return;
+  try {
+    await env.CRM.prepare(
+      'INSERT INTO campaigns (user_id, tier, price) VALUES (?, ?, ?)'
+    ).bind(uid || 'unknown', tier, price).run();
+  } catch (err) {
+    console.error('D1 campaigns insert failed:', err.message);
+  }
+}
+
+async function updateCampaignSamplePick(uid, pick, env) {
+  if (!env.CRM) return;
+  try {
+    await env.CRM.prepare(
+      'UPDATE campaigns SET sample_pick = ? WHERE user_id = ? AND sample_pick IS NULL ORDER BY id DESC LIMIT 1'
+    ).bind(pick, uid).run();
+  } catch (err) {
+    console.error('D1 campaigns update failed:', err.message);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Dashboard stats + CSV
+// ─────────────────────────────────────────────────────────────────────────
+
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, OPTIONS',
+};
+
+function tokensMatch(a, b) {
+  if (!a || !b || a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+async function statsHandler(env) {
+  if (!env.CRM) {
+    return new Response(JSON.stringify({ error: 'D1 not bound' }), {
+      status: 500, headers: { 'Content-Type': 'application/json', ...CORS },
+    });
+  }
+  try {
+    const today = "datetime('now','localtime','start of day')";
+    const [inquiriesTotal, inquiriesToday, campaignsTotal, campaignsToday, slotsKV] = await Promise.all([
+      env.CRM.prepare('SELECT COUNT(*) AS n FROM inquiries').first(),
+      env.CRM.prepare(`SELECT COUNT(*) AS n FROM inquiries WHERE created_at >= ${today}`).first(),
+      env.CRM.prepare('SELECT COUNT(*) AS n FROM campaigns').first(),
+      env.CRM.prepare(`SELECT COUNT(*) AS n FROM campaigns WHERE created_at >= ${today}`).first(),
+      getCampaignSlots(env),
+    ]);
+    const revenue = await env.CRM.prepare('SELECT SUM(price) AS total FROM campaigns').first();
+    const tierBreakdown = await env.CRM.prepare(
+      'SELECT tier, COUNT(*) AS n, SUM(price) AS revenue FROM campaigns GROUP BY tier'
+    ).all();
+    return new Response(JSON.stringify({
+      ok: true,
+      now: new Date().toISOString(),
+      inquiries: {
+        total: inquiriesTotal?.n || 0,
+        today: inquiriesToday?.n || 0,
+      },
+      campaigns: {
+        total: campaignsTotal?.n || 0,
+        today: campaignsToday?.n || 0,
+        revenue: revenue?.total || 0,
+        slots_filled: {
+          tier1: slotsKV.tier1.length,
+          tier2: slotsKV.tier2.length,
+          tier3: slotsKV.tier3.length,
+        },
+        slots_max: {
+          tier1: CAMPAIGN_TIERS.tier1.max,
+          tier2: CAMPAIGN_TIERS.tier2.max,
+          tier3: CAMPAIGN_TIERS.tier3.max,
+        },
+        by_tier: tierBreakdown?.results || [],
+      },
+    }, null, 2), { headers: { 'Content-Type': 'application/json', ...CORS } });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500, headers: { 'Content-Type': 'application/json', ...CORS },
+    });
+  }
+}
+
+async function csvExportHandler(table, env) {
+  if (!env.CRM) return new Response('D1 not bound', { status: 500 });
+  const TABLE_SQL = {
+    inquiries: 'SELECT * FROM inquiries ORDER BY id LIMIT 10000',
+    campaigns: 'SELECT * FROM campaigns ORDER BY id LIMIT 10000',
+  };
+  const sql = TABLE_SQL[table];
+  if (!sql) return new Response('invalid table', { status: 400 });
+  try {
+    const rows = await env.CRM.prepare(sql).all();
+    const items = rows?.results || [];
+    if (items.length === 0) return new Response('id\n', { headers: { 'Content-Type': 'text/csv; charset=utf-8' } });
+    const headers = Object.keys(items[0]);
+    const escape = (v) => v == null ? '' : `"${String(v).replace(/"/g, '""')}"`;
+    const csv = [headers.join(',')]
+      .concat(items.map(r => headers.map(h => escape(r[h])).join(',')))
+      .join('\n');
+    return new Response(csv, {
+      headers: {
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Content-Disposition': `attachment; filename="3q-${table}-${Date.now()}.csv"`,
+      },
+    });
+  } catch (err) {
+    return new Response(`error: ${err.message}`, { status: 500 });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Scheduled — follow-up pushes (24h / 72h / 168h after inquiry)
+// ─────────────────────────────────────────────────────────────────────────
+
+const FOLLOW_UPS = [
+  { col: 'followed_up_24h',  hours: 24,  message: '收到你的諮詢 24 小時了 — 想到什麼了嗎？\n\n我們本月還有「+1」限時招募，前 30 位有優惠。也可以直接傳「實例」看作品。' },
+  { col: 'followed_up_72h',  hours: 72,  message: '3 天過去了 — 你還記得我們嗎？\n\n本月入駐 3 個店：阿婆ㄟ切仔麵 / 三代米舖 / 鹿港織坊。傳「01 / 02 / 03」單獨看。' },
+  { col: 'followed_up_168h', hours: 168, message: '一週了 — 沒消息我們就不再打擾。\n\n如果還有興趣，傳「諮詢」我們重新對接。或傳「+1」進招募名單。' },
+];
+
+async function runFollowUps(env) {
+  if (!env.CRM || !env.LINE_CHANNEL_ACCESS_TOKEN) return { ran: 0, sent: 0 };
+  let sent = 0;
+  for (const fu of FOLLOW_UPS) {
+    const due = await env.CRM.prepare(
+      `SELECT id, user_id FROM inquiries WHERE ${fu.col} = 0 AND created_at <= datetime('now', '-${fu.hours} hours') LIMIT 50`
+    ).all();
+    for (const row of (due?.results || [])) {
+      try {
+        await fetch('https://api.line.me/v2/bot/message/push', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ to: row.user_id, messages: [{ type: 'text', text: fu.message }] }),
+        });
+        await env.CRM.prepare(`UPDATE inquiries SET ${fu.col} = 1 WHERE id = ?`).bind(row.id).run();
+        sent++;
+      } catch (err) {
+        console.error(`Follow-up ${fu.col} push failed for uid ${row.user_id}:`, err.message);
+      }
+    }
+  }
+  return { sent };
+}
+
+async function runWeeklyDigest(env) {
+  if (!env.CRM || !env.OWNER_USER_ID || !env.LINE_CHANNEL_ACCESS_TOKEN) {
+    return { skipped: 'missing env' };
+  }
+  try {
+    const since = "datetime('now', '-7 days')";
+    const [inq, cmp, rev] = await Promise.all([
+      env.CRM.prepare(`SELECT COUNT(*) AS n FROM inquiries WHERE created_at >= ${since}`).first(),
+      env.CRM.prepare(`SELECT COUNT(*) AS n FROM campaigns WHERE created_at >= ${since}`).first(),
+      env.CRM.prepare(`SELECT COALESCE(SUM(price), 0) AS r FROM campaigns WHERE created_at >= ${since}`).first(),
+    ]);
+    const slots = await getCampaignSlots(env);
+    const total_slots = slots.tier1.length + slots.tier2.length + slots.tier3.length;
+    const text = [
+      '📊 3Q 週報 (本週)',
+      '',
+      `新諮詢：${inq?.n || 0} 筆`,
+      `新報名：${cmp?.n || 0} 位`,
+      `本週收入：NT$ ${(rev?.r || 0).toLocaleString()}`,
+      '',
+      `招募進度：${total_slots}/30 位`,
+      `  · 100元梯：${slots.tier1.length}/10`,
+      `  · 200元梯：${slots.tier2.length}/10`,
+      `  · 300元梯：${slots.tier3.length}/10`,
+      '',
+      'Dashboard: https://milk790-code.github.io/3q-hatchery-line-oa/ui_kits/dashboard/',
+    ].join('\n');
+
+    await fetch('https://api.line.me/v2/bot/message/push', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to: env.OWNER_USER_ID, messages: [{ type: 'text', text }] }),
+    });
+    return { inq: inq?.n, cmp: cmp?.n, rev: rev?.r };
+  } catch (err) {
+    console.error('Weekly digest failed:', err.message);
+    return { error: err.message };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Flex Message builders — 3Q Hatchery brand
+// ─────────────────────────────────────────────────────────────────────────
+
+const HERO = (url, ratio = '20:13') => ({
+  type: 'image', url, size: 'full', aspectRatio: ratio, aspectMode: 'cover',
+});
+
+const FLEX = (alt, bubble) => ({ type: 'flex', altText: alt, contents: bubble });
+
+// FIX 2: BUBBLE helper was missing — defined here
 const BUBBLE = (header, body) => ({ type: 'bubble', size: 'mega', header, body });
 
 const DARK_HEADER = (title, sub) => ({
@@ -147,52 +534,57 @@ const BTN = (label, data, primary = true, display) => ({
   height: 'sm',
 });
 
-// Step 1 — service selection
-function serviceCard() {
-  return FLEX('你想做什麼？', BUBBLE(
-    DARK_HEADER('你想做什麼', '選一個最接近的，我們從這裡開始'),
-    LIGHT_BODY([
+function serviceCard(base) {
+  const bubble = {
+    type: 'bubble', size: 'mega',
+    header: DARK_HEADER('你想做什麼', '選一個最接近的，我們從這裡開始'),
+    body: LIGHT_BODY([
       BTN('📸 好物・好照　質感生圖',  'flow:service=imagery',   true,  '好物・好照'),
       BTN('🎯 客製行銷　品牌陪跑',    'flow:service=marketing', true,  '客製行銷'),
       BTN('🌸 季節活動　節慶視覺',    'flow:service=seasonal',  true,  '季節活動'),
       BTN('💬 先說說我的店',          'flow:service=consult',   false, '先說說我的店'),
     ]),
-  ));
+  };
+  if (base) bubble.hero = HERO(`${base}/3q-cover-bowl-1080x878.png`, '20:16');
+  return FLEX('你想做什麼？', bubble);
 }
 
-// Step 2 — budget selection
-function budgetCard(svc) {
-  return FLEX('預算大概在哪裡？', BUBBLE(
-    DARK_HEADER(SERVICE_LABELS[svc] || svc, SERVICE_DESC[svc] || ''),
-    LIGHT_BODY([
+function budgetCard(svc, base) {
+  const bubble = {
+    type: 'bubble', size: 'mega',
+    header: DARK_HEADER(SERVICE_LABELS[svc] || svc, SERVICE_DESC[svc] || ''),
+    body: LIGHT_BODY([
       { type: 'text', text: '預算大概在哪裡', color: '#1A1A1A', size: 'md', weight: 'bold' },
       { type: 'separator', margin: 'sm', color: '#E8DFD0' },
       BTN('🌱 5,000 元以下　試水溫',  `flow:budget=low&s=${svc}`,  true, '5,000 元以下'),
       BTN('⚡ 5,000–20,000　認真做',  `flow:budget=mid&s=${svc}`,  true, '5,000–20,000 元'),
       BTN('✨ 20,000 以上　深度合作', `flow:budget=high&s=${svc}`, true, '20,000 元以上'),
     ]),
-  ));
+  };
+  if (base) {
+    const h = SERVICE_HERO[svc] || { file: '3q-cover-bowl-1080x878.png', ratio: '20:16' };
+    bubble.hero = HERO(`${base}/${h.file}`, h.ratio);
+  }
+  return FLEX('預算大概在哪裡？', bubble);
 }
 
-// Step 3 — timeline selection
 function timelineCard(svc, bgt) {
-  return FLEX('時間上大概是？', BUBBLE(
-    DARK_HEADER('時間上大概是', `${SERVICE_LABELS[svc] || svc}　${BUDGET_LABELS[bgt] || bgt}`),
-    LIGHT_BODY([
+  return FLEX('時間上大概是？', {
+    type: 'bubble', size: 'mega',
+    header: DARK_HEADER('時間上大概是', `${SERVICE_LABELS[svc] || svc}　${BUDGET_LABELS[bgt] || bgt}`),
+    body: LIGHT_BODY([
       BTN('🔥 一個月內　急',         `flow:timeline=urgent&s=${svc}&b=${bgt}`,  true, '一個月內'),
       BTN('🎵 一到三個月　正常節奏',  `flow:timeline=normal&s=${svc}&b=${bgt}`,  true, '一到三個月'),
       BTN('☕ 三個月以上　慢慢來',    `flow:timeline=relaxed&s=${svc}&b=${bgt}`, true, '三個月以上'),
     ]),
-  ));
+  });
 }
 
-// Step 4 — free text prompt
 const freeTextPrompt = () => ({
   type: 'text',
   text: '最後一題，也是最重要的。\n\n用一句話說說你的店，或這次最想解決的事。\n\n（想跳出隨時打「取消」）',
 });
 
-// Step 5 — summary + confirm
 function summaryCard(a) {
   const rows = [
     ['需求', SERVICE_LABELS[a.service]   || a.service   || '—'],
@@ -200,9 +592,10 @@ function summaryCard(a) {
     ['時間', TIMELINE_LABELS[a.timeline] || a.timeline   || '—'],
     ['你說', a.freeText                                  || '—'],
   ];
-  return FLEX('確認需求', BUBBLE(
-    DARK_HEADER('確認一下', '這是我們收到的資訊'),
-    {
+  return FLEX('確認需求', {
+    type: 'bubble', size: 'mega',
+    header: DARK_HEADER('確認一下', '這是我們收到的資訊'),
+    body: {
       type: 'box', layout: 'vertical',
       backgroundColor: '#F5F2EC', paddingAll: '20px', spacing: 'md',
       contents: [
@@ -217,13 +610,8 @@ function summaryCard(a) {
         BTN('↩️ 重新填寫', 'flow:reset',  false, '重新填寫'),
       ],
     },
-  ));
+  });
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Parse flow postback data
-// "flow:budget=mid&s=imagery" → {budget:'mid', s:'imagery'}
-// ─────────────────────────────────────────────────────────────────────────────
 
 function flowParams(data) {
   const body = data.slice('flow:'.length);
@@ -231,24 +619,39 @@ function flowParams(data) {
   return Object.fromEntries(body.split('&').map(kv => kv.split('=')));
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 // Main fetch handler
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 
 export default {
   async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+
+    if (url.pathname === '/api/stats' && request.method === 'GET') {
+      return await statsHandler(env);
+    }
+
+    if (url.pathname === '/api/csv' && request.method === 'GET') {
+      const auth = request.headers.get('Authorization') || '';
+      const tok = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+      if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return new Response('forbidden', { status: 403 });
+      return await csvExportHandler(url.searchParams.get('table') || 'inquiries', env);
+    }
+
     if (request.method === 'GET') {
       return new Response(JSON.stringify({
         service: '3Q Hatchery LINE OA webhook',
-        ok: true, version: 3.1,
+        ok: true, version: 3.4,
         configured: {
           token:       Boolean(env.LINE_CHANNEL_ACCESS_TOKEN),
           secret:      Boolean(env.LINE_CHANNEL_SECRET),
           png_base:    env.PNG_BASE_URL || null,
           session_kv:  Boolean(env.SESSION),
+          crm_d1:      Boolean(env.CRM),
           owner_push:  Boolean(env.OWNER_USER_ID),
+          ai_llm:      Boolean(env.AI),
+          trigger:     Boolean(env.TRIGGER_TOKEN),
         },
-        backends_md: 'https://github.com/milk790-code/3q-hatchery-line-oa/blob/main/BACKENDS.md',
       }, null, 2), { headers: { 'Content-Type': 'application/json' } });
     }
     if (request.method !== 'POST') return new Response('Method Not Allowed', { status: 405 });
@@ -267,11 +670,20 @@ export default {
 
     return new Response('OK');
   },
+
+  async scheduled(event, env, ctx) {
+    if (event.cron === '5 * * * *') {
+      ctx.waitUntil(runFollowUps(env).then(r => console.log('Follow-up ran:', JSON.stringify(r))));
+    }
+    if (event.cron === '0 13 * * 1') {
+      ctx.waitUntil(runWeeklyDigest(env).then(r => console.log('Weekly digest:', JSON.stringify(r))));
+    }
+  },
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 // Event routing
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 
 async function handleEvent(ev, env) {
   const uid = ev.source?.userId;
@@ -285,10 +697,10 @@ async function handleEvent(ev, env) {
     const d = ev.postback?.data || '';
     if (d.startsWith('flow:')) return handleFlow(d, uid, ev.replyToken, env);
     const MENU = {
-      'menu:my-store':  () => replyMsg(ev.replyToken, [serviceCard()], env),
-      'menu:imagery':   () => replyMsg(ev.replyToken, [budgetCard('imagery')], env),
-      'menu:marketing': () => replyMsg(ev.replyToken, [budgetCard('marketing')], env),
-      'menu:progress':  () => handleIntent('查我的進度', ev.replyToken, env),
+      'menu:my-store':  () => replyMsg(ev.replyToken, [serviceCard(env.PNG_BASE_URL)], env),
+      'menu:imagery':   () => replyMsg(ev.replyToken, [budgetCard('imagery', env.PNG_BASE_URL)], env),
+      'menu:marketing': () => replyMsg(ev.replyToken, [budgetCard('marketing', env.PNG_BASE_URL)], env),
+      'menu:progress':  () => handleIntent('查我的進度', ev.replyToken, env, uid),
     };
     if (MENU[d]) return MENU[d]();
   }
@@ -296,7 +708,6 @@ async function handleEvent(ev, env) {
   if (ev.type === 'message' && ev.message?.type === 'text') {
     const text = ev.message.text || '';
 
-    // Escape hatch — clear session and exit flow at any step
     if (ESCAPE_RE.test(text.trim())) {
       await clearSession(uid, env);
       return replyMsg(ev.replyToken, [{
@@ -305,7 +716,6 @@ async function handleEvent(ev, env) {
       }], env);
     }
 
-    // Free-text capture step
     const session = await getSession(uid, env);
     if (session?.step === 'freetext') {
       const answers = { service: session.service, budget: session.budget, timeline: session.timeline, freeText: text };
@@ -313,26 +723,124 @@ async function handleEvent(ev, env) {
       return replyMsg(ev.replyToken, [summaryCard(answers)], env);
     }
 
-    // Flow trigger
-    if (/說說.*店|說說我|開始填/.test(text)) {
-      await clearSession(uid, env);
-      return replyMsg(ev.replyToken, [serviceCard()], env);
+    if (/^(試算|價格|多少錢|報價|預估)$/.test(text.trim())) {
+      await saveSession(uid, { step: 'quote_qty' }, env);
+      return replyMsg(ev.replyToken, [quoteQtyCard()], env);
     }
 
-    return handleIntent(text, ev.replyToken, env);
+    if (/福袋|今日福袋|驚喜|抽福袋/.test(text.trim())) {
+      const tw = new Date(Date.now() + 8 * 3600 * 1000);
+      const hr = tw.getUTCHours();
+      const slot = hr < 10 ? 'morning' : hr < 15 ? 'noon' : hr < 20 ? 'evening' : 'night';
+      const msgs = [];
+      if (env.PNG_BASE_URL) msgs.push({
+        type: 'image',
+        originalContentUrl: `${env.PNG_BASE_URL}/3q-lucky-bag-${slot}-1040.png`,
+        previewImageUrl:    `${env.PNG_BASE_URL}/3q-lucky-bag-${slot}-1040.png`,
+      });
+      msgs.push({ type: 'text', text:
+        `今日 ${slot === 'morning' ? '晨光' : slot === 'noon' ? '午陽' : slot === 'evening' ? '暮色' : '月光'}福袋\n\n每天四點開袋一次，限量驚喜。\n回「+1」報名活動參加抽福袋。` });
+      return replyMsg(ev.replyToken, msgs, env);
+    }
+
+    if (/^\+1$|招募|活動|報名/.test(text.trim())) {
+      const slots = await getCampaignSlots(env);
+      const msgs = [];
+      if (env.PNG_BASE_URL) {
+        msgs.push({
+          type: 'image',
+          originalContentUrl: `${env.PNG_BASE_URL}/3q-campaign-poster-1080x1040.png`,
+          previewImageUrl:    `${env.PNG_BASE_URL}/3q-campaign-poster-1080x1040.png`,
+        });
+        msgs.push({
+          type: 'template',
+          altText: '產品樣品圖 · 點你喜歡的',
+          template: {
+            type: 'image_carousel',
+            columns: ['s01','s02','s03','s04','s05','s06'].map(p => ({
+              imageUrl: `${env.PNG_BASE_URL}/3q-campaign-sample-${p}-1080x1040.png`,
+              action: { type: 'message', text: `我喜歡 ${p}` },
+            })),
+          },
+        });
+      }
+      msgs.push(campaignCard(slots));
+      return replyMsg(ev.replyToken, msgs, env);
+    }
+
+    const sampleLike = text.trim().match(/^我喜歡\s+(s\d{2})$/);
+    if (sampleLike) {
+      const pick = sampleLike[1];
+      await updateCampaignSamplePick(uid, pick, env);
+      if (env.OWNER_USER_ID) {
+        try {
+          await fetch('https://api.line.me/v2/bot/message/push', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ to: env.OWNER_USER_ID, messages: [{ type: 'text',
+              text: `招募樣品偏好\n用戶選了：${pick}\nUID：${uid}` }] }),
+          });
+        } catch {}
+      }
+      return replyMsg(ev.replyToken, [{ type: 'text', text:
+        `收到！你看上「${pick}」這個樣品。\n\n下一步：傳「+1」打開報名表，選擇方案 (100/200/300 元)，搶前 30 位名額。` }], env);
+    }
+
+    if (/說說.*店|說說我|開始填/.test(text)) {
+      await clearSession(uid, env);
+      return replyMsg(ev.replyToken, [serviceCard(env.PNG_BASE_URL)], env);
+    }
+
+    return handleIntent(text, ev.replyToken, env, uid);
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 // Flow state machine
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 
 async function handleFlow(data, uid, replyToken, env) {
   const p = flowParams(data);
 
+  if (p.qty !== undefined) {
+    return replyMsg(replyToken, [quoteUseCard(p.qty)], env);
+  }
+  if (p.use !== undefined) {
+    return replyMsg(replyToken, [quoteRushCard(p.q, p.use)], env);
+  }
+  if (p.rush !== undefined) {
+    return replyMsg(replyToken, [quoteResultCard(p.q, p.u, p.rush)], env);
+  }
+  if (p.nxt !== undefined) {
+    const target = {
+      cases:    '實例',
+      quote:    '試算',
+      campaign: '+1',
+      seasonal: '春茶',
+      consult:  '我想說我的店',
+    }[p.nxt];
+    if (target) return handleIntent(target, replyToken, env, uid);
+  }
+
+  if (data === 'flow:qty_to_campaign') {
+    const slots = await getCampaignSlots(env);
+    const msgs = [];
+    if (env.PNG_BASE_URL) msgs.push({
+      type: 'image',
+      originalContentUrl: `${env.PNG_BASE_URL}/3q-campaign-poster-1080x1040.png`,
+      previewImageUrl:    `${env.PNG_BASE_URL}/3q-campaign-poster-1080x1040.png`,
+    });
+    msgs.push(campaignCard(slots));
+    return replyMsg(replyToken, msgs, env);
+  }
+  if (data === 'flow:qty_to_consult') {
+    await clearSession(uid, env);
+    return replyMsg(replyToken, [serviceCard(env.PNG_BASE_URL)], env);
+  }
+
   if (p.service !== undefined) {
     await clearSession(uid, env);
-    return replyMsg(replyToken, [budgetCard(p.service)], env);
+    return replyMsg(replyToken, [budgetCard(p.service, env.PNG_BASE_URL)], env);
   }
   if (p.budget !== undefined) {
     return replyMsg(replyToken, [timelineCard(p.s, p.budget)], env);
@@ -343,19 +851,57 @@ async function handleFlow(data, uid, replyToken, env) {
   }
   if (data === 'flow:submit') {
     const session = await getSession(uid, env);
-    if (session && env.OWNER_USER_ID) await pushToOwner(session, env);
+    if (session) {
+      await saveInquiry(uid, session, env);
+      if (env.OWNER_USER_ID) await pushToOwner(session, env);
+    }
     await clearSession(uid, env);
-    return replyMsg(replyToken, [{ type: 'text', text: '收到了。\n\n24 小時內我們會主動聯繫你。\n想先看案例，回覆「實例」。' }], env);
+    return replyMsg(replyToken, [
+      { type: 'text', text: '收到了 ✓\n\n24 小時內我們會主動聯繫你。' },
+      postInquiryNextStepsCard(),
+    ], env);
   }
   if (data === 'flow:reset') {
     await clearSession(uid, env);
-    return replyMsg(replyToken, [serviceCard()], env);
+    return replyMsg(replyToken, [serviceCard(env.PNG_BASE_URL)], env);
+  }
+
+  if (p.campaign && ['tier1', 'tier2', 'tier3'].includes(p.campaign)) {
+    const tier = p.campaign;
+    const result = await registerCampaignSlot(uid, tier, env);
+    const t = CAMPAIGN_TIERS[tier];
+    if (result === 'ok') {
+      await saveCampaignRegistration(uid, tier, t.price, env);
+      if (env.OWNER_USER_ID) {
+        await fetch('https://api.line.me/v2/bot/message/push', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ to: env.OWNER_USER_ID, messages: [{ type: 'text',
+            text: `新招募報名\n方案：${t.label} · ${t.price} 元\n動作：${t.action}\nUID：${uid}` }] }),
+        });
+      }
+      return replyMsg(replyToken, [
+        { type: 'text', text:
+          `已登記 ✓ 你是${t.label}的報名者。\n\n下一步：${t.action}，傳給我們。\n收到後我們會開立 ${t.price} 元的付款連結。\n\n感謝你願意讓我們幫你被看見。` },
+        postCampaignNextStepsCard(t.label, t.price, t.action),
+      ], env);
+    }
+    if (result === 'already') {
+      return replyMsg(replyToken, [{ type: 'text', text: `你已經登記過了。\n\n記得完成動作：${t.action}，傳給我們。` }], env);
+    }
+    if (result === 'full') {
+      const slots = await getCampaignSlots(env);
+      return replyMsg(replyToken, [
+        { type: 'text', text: `${t.label}已額滿。\n\n還有其他方案可以選：` },
+        campaignCard(slots),
+      ], env);
+    }
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 // Owner push notification
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 
 async function pushToOwner(a, env) {
   const text = [
@@ -372,20 +918,62 @@ async function pushToOwner(a, env) {
   });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Existing keyword routing (v2, unchanged)
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
+// Welcome — Full Flex Bubble with hero image
+// ─────────────────────────────────────────────────────────────────────────
 
-async function sendWelcome(replyToken, env) {
-  const msgs = [];
-  if (env.PNG_BASE_URL) msgs.push({ type: 'image',
-    originalContentUrl: `${env.PNG_BASE_URL}/3q-welcome-card-1040.png`,
-    previewImageUrl:    `${env.PNG_BASE_URL}/3q-welcome-card-1040.png` });
-  msgs.push({ type: 'text', text: GREETING_TEXT });
-  return replyMsg(replyToken, msgs, env);
+function twGreeting() {
+  const tw = new Date(Date.now() + 8 * 3600 * 1000);
+  const h = tw.getUTCHours();
+  if (h >= 5 && h < 11) return '早安';
+  if (h >= 11 && h < 14) return '午安';
+  if (h >= 14 && h < 18) return '下午好';
+  if (h >= 18 && h < 22) return '晚安好';
+  return '夜深了';
 }
 
-async function handleIntent(userText, replyToken, env) {
+async function sendWelcome(replyToken, env) {
+  const base = env.PNG_BASE_URL;
+  const greeting = twGreeting();
+  if (!base) {
+    return replyMsg(replyToken, [{ type: 'text', text: `${greeting}，這裡是 3Q Hatchery · 台灣在地品牌孵化所。\n\n只要你願意說，我們就幫你被看見。` }], env);
+  }
+  const welcomeFlex = {
+    type: 'flex',
+    altText: '歡迎加入 3Q Hatchery · 台灣在地品牌孵化所',
+    contents: {
+      type: 'bubble', size: 'mega',
+      hero: HERO(`${base}/3q-welcome-card-1040.png`, '1:1'),
+      body: {
+        type: 'box', layout: 'vertical', backgroundColor: '#0A0A0A',
+        paddingAll: '20px', spacing: 'sm',
+        contents: [
+          { type: 'text', text: 'TAIWAN BRAND HATCHERY', color: '#B8924A', size: 'xxs', weight: 'bold', letterSpacing: '3px' },
+          { type: 'text', text: `${greeting}！\n只要你願意說\n我們就幫你被看見。`, color: '#F5F2EC', size: 'lg', weight: 'bold', wrap: true, margin: 'sm' },
+          { type: 'separator', margin: 'md', color: '#B8924A' },
+          { type: 'text', text: '不管你的店多大多小，都有適合你的平台、舞台、後台。', color: '#8A8A8A', size: 'sm', wrap: true, margin: 'md' },
+        ],
+      },
+      footer: {
+        type: 'box', layout: 'vertical', backgroundColor: '#F5F2EC',
+        paddingAll: '16px',
+        contents: [{
+          type: 'button',
+          action: { type: 'postback', label: '說說你的店，從這裡開始', data: 'menu:my-store', displayText: '說說你的店' },
+          style: 'primary', color: '#0A0A0A', height: 'sm',
+        }],
+      },
+    },
+  };
+  return replyMsg(replyToken, [welcomeFlex, carouselMsg(base), serviceCard(base)], env);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Keyword routing
+// ─────────────────────────────────────────────────────────────────────────
+
+// FIX 1: Restored correct else block structure (was: } else { } with floating if)
+async function handleIntent(userText, replyToken, env, uid) {
   const match = ALL_REPLIES.find(r => r.keywords.some(kw => userText.includes(kw)));
   const msgs = [];
   if (match) {
@@ -396,9 +984,45 @@ async function handleIntent(userText, replyToken, env) {
     if (match.response) msgs.push({ type: 'text', text: match.response });
     if (match.carousel && env.PNG_BASE_URL) msgs.push(carouselMsg(env.PNG_BASE_URL));
   } else {
-    msgs.push({ type: 'text', text: AWAY_TEXT });
+    if (!isBusinessHours()) {
+      msgs.push({ type: 'text', text: AWAY_HOURS_TEXT });
+    } else {
+      const aiReply = await aiFallback(userText, env, uid);
+      msgs.push({ type: 'text', text: aiReply || AWAY_TEXT });
+    }
   }
   return replyMsg(replyToken, msgs, env);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// AI Fallback — Workers AI LLM (Llama-3 fast)
+// ─────────────────────────────────────────────────────────────────────────
+
+async function aiFallback(userText, env, uid) {
+  if (!env.AI) return null;
+  if (env.SESSION && uid) {
+    const key = `rl:ai:${uid}`;
+    const cur = parseInt(await env.SESSION.get(key) || '0', 10);
+    if (cur >= 5) return null;
+    await env.SESSION.put(key, String(cur + 1), { expirationTtl: 60 });
+  }
+  try {
+    const SYSTEM = '你是 3Q 貢丸·台灣在地品牌孵化所的客服助理。回應台灣繁體中文，最多 80 字。\n\n3Q 提供 3 個服務：\n1. 好物・好照 — 產品攝影 + 介紹文，500 元起\n2. 客製行銷 — 季度規劃，從現階段往前 3 個月\n3. 諮詢 — 30 分鐘免費，先聊聊再決定\n\n本月活動：好物・好照限時招募，前 10 位 100 元，名額剩 X 位。傳「+1」可看。\n\n用戶問什麼，你判斷最接近哪個服務，回答 2-3 句話，結尾建議他傳的關鍵字（例如：「回覆『+1』」「點選圖文選單『好物・好照』」）。語氣親切但不要過度熱情，跟用戶平等對話。';
+
+    const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct-fast', {
+      messages: [
+        { role: 'system', content: SYSTEM },
+        { role: 'user', content: userText },
+      ],
+      max_tokens: 200,
+    });
+    const text = (result?.response || '').trim();
+    if (!text || text.length < 5) return null;
+    return text.slice(0, 300);
+  } catch (err) {
+    console.error('AI fallback failed:', err?.message);
+    return null;
+  }
 }
 
 function carouselMsg(base) {
@@ -413,9 +1037,9 @@ function carouselMsg(base) {
   };
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 // LINE API helpers
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 
 async function replyMsg(replyToken, messages, env) {
   const res = await fetch('https://api.line.me/v2/bot/message/reply', {
