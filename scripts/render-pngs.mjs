@@ -33,7 +33,11 @@ const PAGES = [
     url:  `${BASE}/_reaction-export.html?download=1&name=${n}`,
     file: `3q-reaction-${n}-480.png`,
   })),
-  { url: `${BASE}/_campaign-poster-export.html?download=1&photo=bowl`, file: '3q-campaign-poster-1080x1040.png' },
+  { url: `${BASE}/_campaign-poster-export.html?download=1&photo=bowl`,  file: '3q-campaign-poster-bowl-1080x1040.png' },
+  { url: `${BASE}/_campaign-poster-export.html?download=1&photo=ink`,   file: '3q-campaign-poster-ink-1080x1040.png' },
+  { url: `${BASE}/_campaign-poster-export.html?download=1&photo=linen`, file: '3q-campaign-poster-linen-1080x1040.png' },
+  { url: `${BASE}/_campaign-poster-export.html?download=1&photo=stalk`, file: '3q-campaign-poster-stalk-1080x1040.png' },
+  { url: `${BASE}/_campaign-poster-export.html?download=1&photo=ink`,   file: '3q-campaign-poster-1080x1040.png' },
   ...['s01','s02','s03','s04','s05','s06','s07','s08'].map(p => ({
     url:  `${BASE}/_campaign-poster-export.html?download=1&photo=${p}`,
     file: `3q-campaign-sample-${p}-1080x1040.png`,
