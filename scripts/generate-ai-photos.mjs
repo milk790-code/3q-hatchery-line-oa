@@ -10,6 +10,7 @@ const ACCOUNT_ID = process.env.CF_ACCOUNT_ID;
 const TOKEN      = process.env.CF_API_TOKEN;
 const OUT_DIR    = process.env.OUT_DIR || 'assets/photography/ai';
 const MODEL      = process.env.CF_MODEL || '@cf/stabilityai/stable-diffusion-xl-base-1.0';
+const PROMPTS    = process.env.PROMPTS_FILE || 'scripts/ai-prompts.json';
 const NEGATIVE   = 'text, watermark, signature, logo, harsh flash, blurry, low quality, deformed, distorted, ugly, oversaturated, neon colors';
 
 if (!ACCOUNT_ID || !TOKEN) {
@@ -17,7 +18,8 @@ if (!ACCOUNT_ID || !TOKEN) {
   process.exit(1);
 }
 
-const prompts = JSON.parse(await readFile('scripts/ai-prompts.json', 'utf8'));
+console.log(`Loading prompts from: ${PROMPTS}`);
+const prompts = JSON.parse(await readFile(PROMPTS, 'utf8'));
 await mkdir(OUT_DIR, { recursive: true });
 
 const url = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/ai/run/${MODEL}`;
