@@ -97,7 +97,8 @@ jobs:
               {"name": "LINE_CHANNEL_SECRET",       "type": "secret_text", "text": $(jq -Rn --arg t "$LINE_SECRET" '$t')},
               {"name": "OWNER_USER_ID",             "type": "secret_text", "text": $(jq -Rn --arg t "$OWNER_USER_ID" '$t')},
               {"name": "PNG_BASE_URL",              "type": "plain_text",  "text": $(jq -Rn --arg t "$PNG_BASE_URL" '$t')},
-              {"name": "SESSION",                   "type": "kv_namespace", "namespace_id": "$SESSION_KV_ID"}
+              {"name": "SESSION",                   "type": "kv_namespace", "namespace_id": "$SESSION_KV_ID"},
+              {"name": "AI",                        "type": "ai"}
               $CRM_BINDING
             ]
           }

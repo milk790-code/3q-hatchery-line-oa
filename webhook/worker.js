@@ -134,6 +134,87 @@ function campaignCard(slots) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
+// Quote Calculator
+// ─────────────────────────────────────────────────────────────────────────
+
+const QTY_LABELS  = { '1-3': '1-3 個產品', '4-10': '4-10 個產品', '10+': '10 個以上' };
+const USE_LABELS  = { ig: 'IG 社群', shop: '蝦皮/官網', channel: '通路上架/包裝', all: '全部都要' };
+const RUSH_LABELS = { week: '一週內', biweek: '兩週內', month: '一個月內' };
+
+function quotePriceRange(qty, use, rush) {
+  // Base per item
+  let base = qty === '1-3' ? 500 : qty === '4-10' ? 400 : 300;
+  let count = qty === '1-3' ? 2 : qty === '4-10' ? 6 : 12;
+  // Use multiplier
+  const useMul = use === 'all' ? 1.5 : use === 'channel' ? 1.3 : use === 'shop' ? 1.1 : 1.0;
+  // Rush surcharge
+  const rushMul = rush === 'week' ? 1.4 : rush === 'biweek' ? 1.15 : 1.0;
+  const low  = Math.round(base * count * useMul * rushMul / 100) * 100;
+  const high = Math.round(low * 1.6 / 100) * 100;
+  return { low, high };
+}
+
+function quoteQtyCard() {
+  return FLEX('你有幾個產品？', BUBBLE(
+    DARK_HEADER('產品數量', '我們幫你估個區間，馬上知道'),
+    LIGHT_BODY([
+      { type: 'text', text: '幾個產品要拍？', color: '#1A1A1A', size: 'md', weight: 'bold' },
+      { type: 'separator', margin: 'sm', color: '#E8DFD0' },
+      BTN('🌱 1-3 個 · 試水溫',  'flow:qty=1-3',  true, '1-3 個'),
+      BTN('⚡ 4-10 個 · 認真做', 'flow:qty=4-10', true, '4-10 個'),
+      BTN('✨ 10 個以上 · 整套', 'flow:qty=10+',  true, '10 個以上'),
+    ]),
+  ));
+}
+
+function quoteUseCard(qty) {
+  return FLEX('用在哪裡？', BUBBLE(
+    DARK_HEADER('使用場景', `${QTY_LABELS[qty]}　|　下一步`),
+    LIGHT_BODY([
+      { type: 'text', text: '主要用在哪？', color: '#1A1A1A', size: 'md', weight: 'bold' },
+      { type: 'separator', margin: 'sm', color: '#E8DFD0' },
+      BTN('📱 IG / 社群',     `flow:use=ig&q=${qty}`,      true, 'IG'),
+      BTN('🛒 蝦皮 / 官網',   `flow:use=shop&q=${qty}`,    true, '蝦皮/官網'),
+      BTN('📦 通路 / 包裝',   `flow:use=channel&q=${qty}`, true, '通路/包裝'),
+      BTN('🎯 全部都要',       `flow:use=all&q=${qty}`,     true, '全部'),
+    ]),
+  ));
+}
+
+function quoteRushCard(qty, use) {
+  return FLEX('多急？', BUBBLE(
+    DARK_HEADER('交期', `${QTY_LABELS[qty]}　|　${USE_LABELS[use]}`),
+    LIGHT_BODY([
+      { type: 'text', text: '什麼時候要？', color: '#1A1A1A', size: 'md', weight: 'bold' },
+      { type: 'separator', margin: 'sm', color: '#E8DFD0' },
+      BTN('🔥 一週內 · 急', `flow:rush=week&q=${qty}&u=${use}`,    true, '一週內'),
+      BTN('🎵 兩週內',      `flow:rush=biweek&q=${qty}&u=${use}`,  true, '兩週內'),
+      BTN('☕ 一個月內',    `flow:rush=month&q=${qty}&u=${use}`,   true, '一個月'),
+    ]),
+  ));
+}
+
+function quoteResultCard(qty, use, rush) {
+  const { low, high } = quotePriceRange(qty, use, rush);
+  return FLEX('估價結果', BUBBLE(
+    DARK_HEADER('你的方案估價', `${QTY_LABELS[qty]}　|　${USE_LABELS[use]}　|　${RUSH_LABELS[rush]}`),
+    LIGHT_BODY([
+      { type: 'box', layout: 'vertical', spacing: 'sm', contents: [
+        { type: 'text', text: '預估價格區間', color: '#8A8A8A', size: 'sm' },
+        { type: 'text', text: `NT$ ${low.toLocaleString()} – ${high.toLocaleString()}`,
+          color: '#B8924A', size: 'xxl', weight: 'bold' },
+        { type: 'separator', margin: 'md', color: '#E8DFD0' },
+        { type: 'text', text: '・含產品攝影 + 介紹文', color: '#1A1A1A', size: 'sm' },
+        { type: 'text', text: '・本月招募活動可享優惠（前 30 位）', color: '#1A1A1A', size: 'sm' },
+        { type: 'separator', margin: 'md', color: '#E8DFD0' },
+      ]},
+      BTN('🎯 立即下定 · 走招募名額', 'flow:qty_to_campaign', true, '+1'),
+      BTN('💬 想再聊聊',              'flow:qty_to_consult',  false, '說說我的店'),
+    ]),
+  ));
+}
+
+// ─────────────────────────────────────────────────────────────────────────
 // Guided flow labels
 // ─────────────────────────────────────────────────────────────────────────
 
@@ -381,6 +462,12 @@ async function handleEvent(ev, env) {
       return replyMsg(ev.replyToken, [summaryCard(answers)], env);
     }
 
+    // Quote calculator trigger
+    if (/^(試算|價格|多少錢|報價|預估)$/.test(text.trim())) {
+      await saveSession(uid, { step: 'quote_qty' }, env);
+      return replyMsg(ev.replyToken, [quoteQtyCard()], env);
+    }
+
     // Lucky bag trigger — auto-selects time-of-day variant in Taiwan timezone
     if (/福袋|今日福袋|驚喜|抽福袋/.test(text.trim())) {
       const tw = new Date(Date.now() + 8 * 3600 * 1000);
@@ -457,6 +544,32 @@ async function handleEvent(ev, env) {
 
 async function handleFlow(data, uid, replyToken, env) {
   const p = flowParams(data);
+
+  // Quote calculator flow
+  if (p.qty !== undefined) {
+    return replyMsg(replyToken, [quoteUseCard(p.qty)], env);
+  }
+  if (p.use !== undefined) {
+    return replyMsg(replyToken, [quoteRushCard(p.q, p.use)], env);
+  }
+  if (p.rush !== undefined) {
+    return replyMsg(replyToken, [quoteResultCard(p.q, p.u, p.rush)], env);
+  }
+  if (data === 'flow:qty_to_campaign') {
+    const slots = await getCampaignSlots(env);
+    const msgs = [];
+    if (env.PNG_BASE_URL) msgs.push({
+      type: 'image',
+      originalContentUrl: `${env.PNG_BASE_URL}/3q-campaign-poster-1080x1040.png`,
+      previewImageUrl:    `${env.PNG_BASE_URL}/3q-campaign-poster-1080x1040.png`,
+    });
+    msgs.push(campaignCard(slots));
+    return replyMsg(replyToken, msgs, env);
+  }
+  if (data === 'flow:qty_to_consult') {
+    await clearSession(uid, env);
+    return replyMsg(replyToken, [serviceCard(env.PNG_BASE_URL)], env);
+  }
 
   if (p.service !== undefined) {
     await clearSession(uid, env);
@@ -586,9 +699,40 @@ async function handleIntent(userText, replyToken, env) {
     if (match.response) msgs.push({ type: 'text', text: match.response });
     if (match.carousel && env.PNG_BASE_URL) msgs.push(carouselMsg(env.PNG_BASE_URL));
   } else {
-    msgs.push({ type: 'text', text: AWAY_TEXT });
+    // No keyword match → try AI fallback (Workers AI LLM)
+    const aiReply = await aiFallback(userText, env);
+    if (aiReply) {
+      msgs.push({ type: 'text', text: aiReply });
+    } else {
+      msgs.push({ type: 'text', text: AWAY_TEXT });
+    }
   }
   return replyMsg(replyToken, msgs, env);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// AI Fallback — Workers AI LLM (Llama-3 fast)
+// ─────────────────────────────────────────────────────────────────────────
+
+async function aiFallback(userText, env) {
+  if (!env.AI) return null;
+  try {
+    const SYSTEM = '你是 3Q 貢丸·台灣在地品牌孵化所的客服助理。回應台灣繁體中文，最多 80 字。\n\n3Q 提供 3 個服務：\n1. 好物・好照 — 產品攝影 + 介紹文，500 元起\n2. 客製行銷 — 季度規劃，從現階段往前 3 個月\n3. 諮詢 — 30 分鐘免費，先聊聊再決定\n\n本月活動：好物・好照限時招募，前 10 位 100 元，名額剩 X 位。傳「+1」可看。\n\n用戶問什麼，你判斷最接近哪個服務，回答 2-3 句話，結尾建議他傳的關鍵字（例如：「回覆『+1』」「點選圖文選單『好物・好照』」）。語氣親切但不要過度熱情，跟用戶平等對話。';
+
+    const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct-fast', {
+      messages: [
+        { role: 'system', content: SYSTEM },
+        { role: 'user', content: userText },
+      ],
+      max_tokens: 200,
+    });
+    const text = (result?.response || '').trim();
+    if (!text || text.length < 5) return null;
+    return text.slice(0, 300);
+  } catch (err) {
+    console.error('AI fallback failed:', err?.message);
+    return null;
+  }
 }
 
 function carouselMsg(base) {
