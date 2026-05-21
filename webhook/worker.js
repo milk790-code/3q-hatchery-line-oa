@@ -885,7 +885,7 @@ async function handleFlow(data, uid, replyToken, env) {
           `已登記 ✓ 你是${t.label}的報名者。\n\n下一步：${t.action}，傳給我們。\n收到後我們會開立 ${t.price} 元的付款連結。\n\n感謝你願意讓我們幫你被看見。` },
         postCampaignNextStepsCard(t.label, t.price, t.action),
       ], env);
-    }
+    }l
     if (result === 'already') {
       return replyMsg(replyToken, [{ type: 'text', text: `你已經登記過了。\n\n記得完成動作：${t.action}，傳給我們。` }], env);
     }
@@ -939,7 +939,7 @@ async function sendWelcome(replyToken, env) {
   if (!base) {
     return replyMsg(replyToken, [{ type: 'text', text: `${greeting}，這裡是 3Q Hatchery · 台灣在地品牌孵化所。\n\n只要你願意說，我們就幫你被看見。` }], env);
   }
-  const flex = {
+  lll
     type: 'flex',
     altText: '歡迎加入 3Q Hatchery · 台灣在地品牌孵化所',
     contents: {
@@ -966,7 +966,7 @@ async function sendWelcome(replyToken, env) {
       },
     },
   };
-  return replyMsg(replyToken, [flex], env);
+  return replyMsg(replyToken, [welcomeFlex, carouselMsg(base), serviceCard(base)], env);
 }
 
 // ─────────────────────────────────────────────────────────────────────────
