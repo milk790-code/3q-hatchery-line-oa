@@ -939,7 +939,7 @@ async function sendWelcome(replyToken, env) {
   if (!base) {
     return replyMsg(replyToken, [{ type: 'text', text: `${greeting}，這裡是 3Q Hatchery · 台灣在地品牌孵化所。\n\n只要你願意說，我們就幫你被看見。` }], env);
   }
-  lll
+  const welcomeFlex = {
     type: 'flex',
     altText: '歡迎加入 3Q Hatchery · 台灣在地品牌孵化所',
     contents: {
