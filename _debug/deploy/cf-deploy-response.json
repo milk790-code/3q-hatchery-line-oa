@@ -3,8 +3,9 @@
   "success": false,
   "errors": [
     {
-      "code": 10023,
-      "message": "You do not have access to this feature. Please ensure it is enabled. If you are an Enterprise user, reach out to your account team.: kv bindings require kv write perms"
+      "code": 10021,
+      "message": "Uncaught SyntaxError: Unexpected token ':'\n  at worker.js:944:11\n",
+      "documentation_url": "https://developers.cloudflare.com/workers/observability/errors/#validation-errors-10021"
     }
   ],
   "messages": []

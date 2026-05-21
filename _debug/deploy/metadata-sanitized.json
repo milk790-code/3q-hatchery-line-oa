@@ -23,9 +23,23 @@
       "text": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports"
     },
     {
+      "name": "TRIGGER_TOKEN",
+      "type": "secret_text",
+      "text": "***MASKED***"
+    },
+    {
       "name": "SESSION",
       "type": "kv_namespace",
       "namespace_id": "20a68b10afc84764ba770b64f0f33f30"
+    },
+    {
+      "name": "AI",
+      "type": "ai"
+    },
+    {
+      "name": "CRM",
+      "type": "d1",
+      "id": "e54671b1-d15e-4552-babf-cef367267568"
     }
   ]
 }
