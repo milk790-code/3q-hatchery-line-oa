@@ -13,19 +13,9 @@
       "text": "***MASKED***"
     },
     {
-      "name": "OWNER_USER_ID",
-      "type": "secret_text",
-      "text": "***MASKED***"
-    },
-    {
       "name": "PNG_BASE_URL",
       "type": "plain_text",
       "text": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports"
-    },
-    {
-      "name": "SESSION",
-      "type": "kv_namespace",
-      "namespace_id": "20a68b10afc84764ba770b64f0f33f30"
     }
   ]
 }
