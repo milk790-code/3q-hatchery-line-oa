@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RM_NAME: '3Q Hatchery · MENU (postback v4)'
-      HERO_URI: 'https://milk790-code.github.io/3q-hatchery-line-oa/ui_kits/line_oa/launch.html'
+      HERO_URI: 'https://3q-hatchery.tw'
     steps:
       - uses: actions/checkout@v4
 
