@@ -1,57 +1,57 @@
 {
-  "rendered_at": "2026-05-21T10:24:14.121Z",
+  "rendered_at": "2026-05-21T12:07:08.634Z",
   "files": {
     "3q-avatar-640.png": {
       "bytes": 46333,
       "sha256_16": "c2df806585348273"
     },
     "3q-cover-bowl-1080x878.png": {
-      "bytes": 1159025,
-      "sha256_16": "eb69b334281e96fc"
+      "bytes": 1106863,
+      "sha256_16": "9763873336b14054"
     },
     "3q-richmenu-2500x1686.png": {
       "bytes": 1136063,
       "sha256_16": "78958fef65b77a3e"
     },
     "3q-welcome-card-1040.png": {
-      "bytes": 631907,
-      "sha256_16": "29f60b35e447c40a"
+      "bytes": 642790,
+      "sha256_16": "7e16bca2a537a4c6"
     },
     "3q-chat-bg-1080x2340.jpg": {
       "bytes": 84358,
       "sha256_16": "05603d21adaa4feb"
     },
     "3q-carousel-01-1040.png": {
-      "bytes": 907165,
-      "sha256_16": "af7fe43736418670"
+      "bytes": 891927,
+      "sha256_16": "17ecbcc51b66bd16"
     },
     "3q-carousel-02-1040.png": {
-      "bytes": 546875,
-      "sha256_16": "ec6d7a15e3e9e3ff"
+      "bytes": 471273,
+      "sha256_16": "a552dcde72c7abd9"
     },
     "3q-carousel-03-1040.png": {
-      "bytes": 1210700,
-      "sha256_16": "da6a3259ddc47cd1"
+      "bytes": 1372468,
+      "sha256_16": "203e0c8657e2bbfb"
     },
     "3q-carousel-04-1040.png": {
-      "bytes": 1044588,
-      "sha256_16": "be51b3e7f67c2479"
+      "bytes": 967555,
+      "sha256_16": "3aafd92917439ef9"
     },
     "3q-seasonal-spring-1080x878.png": {
-      "bytes": 1520723,
-      "sha256_16": "fb0de3c38b4c0306"
+      "bytes": 1437069,
+      "sha256_16": "e3d7ddbd0360d0c5"
     },
     "3q-seasonal-summer-1080x878.png": {
-      "bytes": 1299069,
-      "sha256_16": "11d0e3206f6f8a97"
+      "bytes": 1210558,
+      "sha256_16": "26e312619e41d512"
     },
     "3q-seasonal-autumn-1080x878.png": {
-      "bytes": 1295979,
-      "sha256_16": "098af6a612b638a9"
+      "bytes": 1366251,
+      "sha256_16": "783529edcd68accd"
     },
     "3q-seasonal-winter-1080x878.png": {
-      "bytes": 1147505,
-      "sha256_16": "9014c847ed2c9eff"
+      "bytes": 1177439,
+      "sha256_16": "045344df21ff4fa3"
     },
     "3q-reaction-hot-480.png": {
       "bytes": 292388,
@@ -134,28 +134,136 @@
       "sha256_16": "7eff0ddec8eab3f2"
     },
     "3q-campaign-poster-1080x1040.png": {
-      "bytes": 1380083,
-      "sha256_16": "82a5790e6255cc92"
+      "bytes": 1890652,
+      "sha256_16": "ff89000187e965e0"
+    },
+    "3q-campaign-sample-s01-1080x1040.png": {
+      "bytes": 1545681,
+      "sha256_16": "26f6430d72ba5f0e"
+    },
+    "3q-campaign-sample-s02-1080x1040.png": {
+      "bytes": 1565800,
+      "sha256_16": "8b4065b80377db6a"
+    },
+    "3q-campaign-sample-s03-1080x1040.png": {
+      "bytes": 1681002,
+      "sha256_16": "069da1433859caf1"
+    },
+    "3q-campaign-sample-s04-1080x1040.png": {
+      "bytes": 1593710,
+      "sha256_16": "e370c040b3c30fc3"
+    },
+    "3q-campaign-sample-s05-1080x1040.png": {
+      "bytes": 1687726,
+      "sha256_16": "6a9398c4b0350ccb"
+    },
+    "3q-campaign-sample-s06-1080x1040.png": {
+      "bytes": 1534087,
+      "sha256_16": "9ec1fe8686dc768a"
+    },
+    "3q-campaign-sample-s07-1080x1040.png": {
+      "bytes": 1473705,
+      "sha256_16": "ab85a68bf8786b76"
+    },
+    "3q-campaign-sample-s08-1080x1040.png": {
+      "bytes": 1489438,
+      "sha256_16": "829b52fa13733482"
     },
     "3q-lucky-bag-main-1040.png": {
-      "bytes": 1352200,
-      "sha256_16": "d4bd62f8fa0e67ce"
+      "bytes": 1379849,
+      "sha256_16": "5d8e7118a05242f6"
     },
     "3q-lucky-bag-morning-1040.png": {
-      "bytes": 1490150,
-      "sha256_16": "dc23249303b7c270"
+      "bytes": 1550342,
+      "sha256_16": "a1f9d843870150a3"
     },
     "3q-lucky-bag-noon-1040.png": {
-      "bytes": 1599124,
-      "sha256_16": "9144dad462d184d7"
+      "bytes": 1704700,
+      "sha256_16": "a82685bc87c36afd"
     },
     "3q-lucky-bag-evening-1040.png": {
-      "bytes": 1341422,
-      "sha256_16": "847de7ec2c50c2e0"
+      "bytes": 1269233,
+      "sha256_16": "8ed2d57db2b05bef"
     },
     "3q-lucky-bag-night-1040.png": {
-      "bytes": 515641,
-      "sha256_16": "fdd7940c24baca21"
+      "bytes": 472423,
+      "sha256_16": "60fa9ea111519f08"
+    },
+    "3q-ig-avatar-1080.png": {
+      "bytes": 89855,
+      "sha256_16": "051d4e67bc706c44"
+    },
+    "3q-ig-feed-01-1080x1350.png": {
+      "bytes": 1859720,
+      "sha256_16": "62dc25d3bec48bed"
+    },
+    "3q-ig-feed-02-1080x1350.png": {
+      "bytes": 663065,
+      "sha256_16": "b216ce1f1a4cd69d"
+    },
+    "3q-ig-feed-03-1080x1350.png": {
+      "bytes": 2400707,
+      "sha256_16": "d0cad1aec5f2b76d"
+    },
+    "3q-ig-feed-04-1080x1350.png": {
+      "bytes": 1832351,
+      "sha256_16": "bfe93938596f0dfe"
+    },
+    "3q-ig-highlight-00-1080x1920.png": {
+      "bytes": 57806,
+      "sha256_16": "2b63f7fc6a9aa6ef"
+    },
+    "3q-ig-highlight-01-1080x1920.png": {
+      "bytes": 58608,
+      "sha256_16": "cacfbc9dc31c8fa1"
+    },
+    "3q-ig-highlight-02-1080x1920.png": {
+      "bytes": 64650,
+      "sha256_16": "4588c50b115dd5e0"
+    },
+    "3q-ig-highlight-03-1080x1920.png": {
+      "bytes": 59100,
+      "sha256_16": "738100707a1289ef"
+    },
+    "3q-ig-highlight-04-1080x1920.png": {
+      "bytes": 60268,
+      "sha256_16": "f45543f9103ec9e7"
+    },
+    "3q-ig-highlight-05-1080x1920.png": {
+      "bytes": 56980,
+      "sha256_16": "0355340f2386a5d0"
+    },
+    "3q-threads-01-1080x1350.png": {
+      "bytes": 80655,
+      "sha256_16": "2fa4edf7814f7477"
+    },
+    "3q-threads-02-1080x1350.png": {
+      "bytes": 66999,
+      "sha256_16": "5eb9f3aa5c71832f"
+    },
+    "3q-threads-03-1080x1350.png": {
+      "bytes": 75040,
+      "sha256_16": "468523551f157d76"
+    },
+    "3q-threads-04-1080x1350.png": {
+      "bytes": 61356,
+      "sha256_16": "924781942961c3d6"
+    },
+    "3q-tiktok-ep01-1080x1920.png": {
+      "bytes": 2145598,
+      "sha256_16": "59e709ff87a9eac0"
+    },
+    "3q-tiktok-ep02-1080x1920.png": {
+      "bytes": 1373182,
+      "sha256_16": "c5f1edcd02f27096"
+    },
+    "3q-tiktok-ep03-1080x1920.png": {
+      "bytes": 1966605,
+      "sha256_16": "9f76ac8349aeb5ec"
+    },
+    "3q-tiktok-ep04-1080x1920.png": {
+      "bytes": 1248658,
+      "sha256_16": "c6f1b9f6d83f82a9"
     }
   }
 }
