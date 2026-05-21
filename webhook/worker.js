@@ -194,6 +194,38 @@ function quoteRushCard(qty, use) {
   ));
 }
 
+// Post-event next-step Flex cards (after inquiry submit / campaign register)
+function postInquiryNextStepsCard() {
+  return FLEX('下一步可以做什麼', BUBBLE(
+    DARK_HEADER('下一步', '在等我們回覆的時候，可以先做這些'),
+    LIGHT_BODY([
+      { type: 'text', text: '不一定要等。先做這個更有效：', color: '#1A1A1A', size: 'sm', wrap: true },
+      { type: 'separator', margin: 'md', color: '#E8DFD0' },
+      BTN('📂 看本月入駐案例',  'flow:nxt=cases',       true,  '實例'),
+      BTN('🎯 試算我的方案價格', 'flow:nxt=quote',        true,  '試算'),
+      BTN('🔥 +1 招募名額',     'flow:nxt=campaign',     true,  '+1'),
+      BTN('🌸 看四季活動',       'flow:nxt=seasonal',     false, '春茶'),
+    ]),
+  ));
+}
+
+function postCampaignNextStepsCard(tier, price, action) {
+  return FLEX('報名後下一步', BUBBLE(
+    DARK_HEADER('報名成功 ✓', `${tier} · NT$ ${price}`),
+    LIGHT_BODY([
+      { type: 'text', text: `動作：${action}`, color: '#1A1A1A', size: 'md', weight: 'bold' },
+      { type: 'separator', margin: 'sm', color: '#E8DFD0' },
+      { type: 'text', text: '收到動作後，我們會：', color: '#8A8A8A', size: 'sm', margin: 'sm' },
+      { type: 'text', text: '1. 24h 內回覆收費連結', color: '#1A1A1A', size: 'sm' },
+      { type: 'text', text: '2. 收款後 48h 內安排第一次對接', color: '#1A1A1A', size: 'sm' },
+      { type: 'text', text: '3. 7-14 天內成片交付', color: '#1A1A1A', size: 'sm' },
+      { type: 'separator', margin: 'md', color: '#E8DFD0' },
+      BTN('💬 想先聊聊',        'flow:nxt=consult', false, '說說我的店'),
+      BTN('📂 看其他案例',       'flow:nxt=cases',   false, '實例'),
+    ]),
+  ));
+}
+
 function quoteResultCard(qty, use, rush) {
   const { low, high } = quotePriceRange(qty, use, rush);
   return FLEX('估價結果', BUBBLE(
@@ -417,6 +449,47 @@ async function runFollowUps(env) {
   return { sent };
 }
 
+// Weekly digest — Monday 21:00 TW, push to OWNER_USER_ID
+async function runWeeklyDigest(env) {
+  if (!env.CRM || !env.OWNER_USER_ID || !env.LINE_CHANNEL_ACCESS_TOKEN) {
+    return { skipped: 'missing env' };
+  }
+  try {
+    const since = "datetime('now', '-7 days')";
+    const [inq, cmp, rev] = await Promise.all([
+      env.CRM.prepare(`SELECT COUNT(*) AS n FROM inquiries WHERE created_at >= ${since}`).first(),
+      env.CRM.prepare(`SELECT COUNT(*) AS n FROM campaigns WHERE created_at >= ${since}`).first(),
+      env.CRM.prepare(`SELECT COALESCE(SUM(price), 0) AS r FROM campaigns WHERE created_at >= ${since}`).first(),
+    ]);
+    const slots = await getCampaignSlots(env);
+    const total_slots = slots.tier1.length + slots.tier2.length + slots.tier3.length;
+    const text = [
+      '📊 3Q 週報 (本週)',
+      '',
+      `新諮詢：${inq?.n || 0} 筆`,
+      `新報名：${cmp?.n || 0} 位`,
+      `本週收入：NT$ ${(rev?.r || 0).toLocaleString()}`,
+      '',
+      `招募進度：${total_slots}/30 位`,
+      `  · 100元梯：${slots.tier1.length}/10`,
+      `  · 200元梯：${slots.tier2.length}/10`,
+      `  · 300元梯：${slots.tier3.length}/10`,
+      '',
+      'Dashboard: https://milk790-code.github.io/3q-hatchery-line-oa/ui_kits/dashboard/',
+    ].join('\n');
+
+    await fetch('https://api.line.me/v2/bot/message/push', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to: env.OWNER_USER_ID, messages: [{ type: 'text', text }] }),
+    });
+    return { inq: inq?.n, cmp: cmp?.n, rev: rev?.r };
+  } catch (err) {
+    console.error('Weekly digest failed:', err.message);
+    return { error: err.message };
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // Flex Message builders — 3Q Hatchery brand
 // ─────────────────────────────────────────────────────────────────────────
@@ -589,7 +662,14 @@ export default {
   },
 
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(runFollowUps(env).then(r => console.log('Follow-up ran:', JSON.stringify(r))));
+    // Hourly: follow-up pushes (24h/72h/168h after inquiry)
+    if (event.cron === '5 * * * *') {
+      ctx.waitUntil(runFollowUps(env).then(r => console.log('Follow-up ran:', JSON.stringify(r))));
+    }
+    // Weekly Monday 21:00 TW (13:00 UTC): digest to owner
+    if (event.cron === '0 13 * * 1') {
+      ctx.waitUntil(runWeeklyDigest(env).then(r => console.log('Weekly digest:', JSON.stringify(r))));
+    }
   },
 };
 
@@ -729,6 +809,18 @@ async function handleFlow(data, uid, replyToken, env) {
   if (p.rush !== undefined) {
     return replyMsg(replyToken, [quoteResultCard(p.q, p.u, p.rush)], env);
   }
+  // Post-event next-step routes — translate to existing intents
+  if (p.nxt !== undefined) {
+    const target = {
+      cases:    '實例',
+      quote:    '試算',
+      campaign: '+1',
+      seasonal: '春茶',
+      consult:  '我想說我的店',
+    }[p.nxt];
+    if (target) return handleIntent(target, replyToken, env, uid);
+  }
+
   if (data === 'flow:qty_to_campaign') {
     const slots = await getCampaignSlots(env);
     const msgs = [];
@@ -763,7 +855,10 @@ async function handleFlow(data, uid, replyToken, env) {
       if (env.OWNER_USER_ID) await pushToOwner(session, env);
     }
     await clearSession(uid, env);
-    return replyMsg(replyToken, [{ type: 'text', text: '收到了。\n\n24 小時內我們會主動聯繫你。\n想先看案例，回覆「實例」。' }], env);
+    return replyMsg(replyToken, [
+      { type: 'text', text: '收到了 ✓\n\n24 小時內我們會主動聯繫你。' },
+      postInquiryNextStepsCard(),
+    ], env);
   }
   if (data === 'flow:reset') {
     await clearSession(uid, env);
@@ -785,8 +880,11 @@ async function handleFlow(data, uid, replyToken, env) {
             text: `新招募報名\n方案：${t.label} · ${t.price} 元\n動作：${t.action}\nUID：${uid}` }] }),
         });
       }
-      return replyMsg(replyToken, [{ type: 'text', text:
-        `已登記！你是${t.label}的報名者。\n\n下一步：${t.action}，傳給我們。\n收到後我們會開立 ${t.price} 元的付款連結。\n\n感謝你願意讓我們幫你被看見。` }], env);
+      return replyMsg(replyToken, [
+        { type: 'text', text:
+          `已登記 ✓ 你是${t.label}的報名者。\n\n下一步：${t.action}，傳給我們。\n收到後我們會開立 ${t.price} 元的付款連結。\n\n感謝你願意讓我們幫你被看見。` },
+        postCampaignNextStepsCard(t.label, t.price, t.action),
+      ], env);
     }
     if (result === 'already') {
       return replyMsg(replyToken, [{ type: 'text', text: `你已經登記過了。\n\n記得完成動作：${t.action}，傳給我們。` }], env);
@@ -824,10 +922,22 @@ async function pushToOwner(a, env) {
 // Welcome — Full Flex Bubble with hero image
 // ─────────────────────────────────────────────────────────────────────────
 
+// Taiwan-time-aware greeting prefix
+function twGreeting() {
+  const tw = new Date(Date.now() + 8 * 3600 * 1000);
+  const h = tw.getUTCHours();
+  if (h >= 5 && h < 11) return '早安';
+  if (h >= 11 && h < 14) return '午安';
+  if (h >= 14 && h < 18) return '下午好';
+  if (h >= 18 && h < 22) return '晚安好';
+  return '夜深了';
+}
+
 async function sendWelcome(replyToken, env) {
   const base = env.PNG_BASE_URL;
+  const greeting = twGreeting();
   if (!base) {
-    return replyMsg(replyToken, [{ type: 'text', text: '你好，這裡是 3Q Hatchery · 台灣在地品牌孵化所。\n\n只要你願意說，我們就幫你被看見。' }], env);
+    return replyMsg(replyToken, [{ type: 'text', text: `${greeting}，這裡是 3Q Hatchery · 台灣在地品牌孵化所。\n\n只要你願意說，我們就幫你被看見。` }], env);
   }
   const flex = {
     type: 'flex',
@@ -840,7 +950,7 @@ async function sendWelcome(replyToken, env) {
         paddingAll: '20px', spacing: 'sm',
         contents: [
           { type: 'text', text: 'TAIWAN BRAND HATCHERY', color: '#B8924A', size: 'xxs', weight: 'bold', letterSpacing: '3px' },
-          { type: 'text', text: '只要你願意說\n我們就幫你被看見。', color: '#F5F2EC', size: 'lg', weight: 'bold', wrap: true, margin: 'sm' },
+          { type: 'text', text: `${greeting}！\n只要你願意說\n我們就幫你被看見。`, color: '#F5F2EC', size: 'lg', weight: 'bold', wrap: true, margin: 'sm' },
           { type: 'separator', margin: 'md', color: '#B8924A' },
           { type: 'text', text: '不管你的店多大多小，都有適合你的平台、舞台、後台。', color: '#8A8A8A', size: 'sm', wrap: true, margin: 'md' },
         ],

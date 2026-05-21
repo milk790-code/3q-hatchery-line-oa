@@ -129,7 +129,7 @@ jobs:
           fi
           echo "Worker uploaded (etag=$(jq -r '.result.etag' _debug/cf-deploy-response.json))"
 
-      - name: Set cron trigger (hourly for follow-ups)
+      - name: Set cron triggers (hourly follow-ups + weekly digest)
         env:
           CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
         run: |
@@ -138,8 +138,8 @@ jobs:
             "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/schedules" \
             -H "Authorization: Bearer $CF_TOKEN" \
             -H "Content-Type: application/json" \
-            -d '[{"cron": "5 * * * *"}]' | jq -e '.success == true' > /dev/null
-          echo "::notice::Cron set: every hour at :05 (UTC)"
+            -d '[{"cron": "5 * * * *"}, {"cron": "0 13 * * 1"}]' | jq -e '.success == true' > /dev/null
+          echo "::notice::Cron set: hourly :05 UTC (follow-ups) + Mon 13:00 UTC = Mon 21:00 TW (weekly digest)"
 
       - name: CF deploy diagnostics (summary + commit on failure)
         if: always()
