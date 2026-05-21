@@ -1,4 +1,4 @@
-## LINE OA Backend Audit (run 26228880951)
+## LINE OA Backend Audit (run 26229265826)
 
 **Manager URL:** https://manager.line.biz/account/@121lkspe
 
@@ -6,17 +6,17 @@
 - Display name: 3Q貢丸 · 台灣在地品牌孵化所
 - Basic ID: @121lkspe
 - Picture URL: https://profile.line-scdn.net/0hZkuJCWYGBURIMxkm1pV6E3R2Cyk_HQMMMAcYJ25kD3FkVBVHdVwfKzoxC3ZiARJBIFwadm07WnVm
-- Chat mode: chat
-- Mark-as-read: manual
+- Chat mode: bot
+- Mark-as-read: auto
 
 ### 2. Webhook
 - Endpoint: https://3q-hatchery-webhook.milk790.workers.dev
 - Active: true
 
 ### 3. Rich menus
+- 3Q Hatchery · MENU (postback v4) (id: richmenu-18a529c4eb32891d4e5447f9faaf9e7b, 5 areas)
 - 3Q Hatchery · MENU (postback v3) (id: richmenu-d6882f0e160fccb9e14aa216f659cb8d, 5 areas)
-- 3Q Hatchery · MENU (postback v4) (id: richmenu-c108b74c3579e545ae6d99fe4bc57b93, 5 areas)
-- Default: richmenu-c108b74c3579e545ae6d99fe4bc57b93
+- Default: richmenu-18a529c4eb32891d4e5447f9faaf9e7b
 
 ### 4. Followers
 - Followers (yesterday): 2
@@ -26,7 +26,7 @@
 ### 5. Message quota
 - Plan type: limited
 - Monthly limit: 3000
-- Used this month: 5
+- Used this month: 9
 
 
 ---
