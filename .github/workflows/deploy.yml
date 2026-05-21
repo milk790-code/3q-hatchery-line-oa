@@ -126,7 +126,7 @@ jobs:
           fi
           echo "Worker uploaded (etag=$(jq -r '.result.etag' _debug/cf-deploy-response.json))"
 
-      - name: CF deploy diagnostics (summary only)
+      - name: CF deploy diagnostics (summary + commit on failure)
         if: always()
         run: |
           echo "## CF Deploy Diagnostics" >> $GITHUB_STEP_SUMMARY
@@ -138,7 +138,19 @@ jobs:
               echo >> $GITHUB_STEP_SUMMARY
               echo '```' >> $GITHUB_STEP_SUMMARY
             done
-            rm -rf _debug
+          fi
+
+      - name: Commit deploy debug files (on failure only)
+        if: failure()
+        run: |
+          if [ -d _debug ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            mkdir -p _debug/deploy
+            mv _debug/* _debug/deploy/ 2>/dev/null || true
+            git add _debug/deploy/
+            git diff --cached --quiet || git commit -m "deploy: debug artifacts from failed run"
+            git push || true
           fi
 
       - name: Enable workers.dev subdomain
