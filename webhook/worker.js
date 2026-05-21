@@ -346,6 +346,11 @@ export default {
 async function handleEvent(ev, env) {
   const uid = ev.source?.userId;
 
+  // Temporary: capture latest userId to KV for OWNER_USER_ID auto-config
+  if (uid && env.SESSION) {
+    try { await env.SESSION.put('__last_user_uid', uid, { expirationTtl: 600 }); } catch {}
+  }
+
   if (ev.type === 'follow') {
     await clearSession(uid, env);
     return sendWelcome(ev.replyToken, env);
