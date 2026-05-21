@@ -1,5 +1,5 @@
 {
-  "rendered_at": "2026-05-21T10:17:45.092Z",
+  "rendered_at": "2026-05-21T10:24:14.121Z",
   "files": {
     "3q-avatar-640.png": {
       "bytes": 46333,
@@ -136,6 +136,26 @@
     "3q-campaign-poster-1080x1040.png": {
       "bytes": 1380083,
       "sha256_16": "82a5790e6255cc92"
+    },
+    "3q-lucky-bag-main-1040.png": {
+      "bytes": 1352200,
+      "sha256_16": "d4bd62f8fa0e67ce"
+    },
+    "3q-lucky-bag-morning-1040.png": {
+      "bytes": 1490150,
+      "sha256_16": "dc23249303b7c270"
+    },
+    "3q-lucky-bag-noon-1040.png": {
+      "bytes": 1599124,
+      "sha256_16": "9144dad462d184d7"
+    },
+    "3q-lucky-bag-evening-1040.png": {
+      "bytes": 1341422,
+      "sha256_16": "847de7ec2c50c2e0"
+    },
+    "3q-lucky-bag-night-1040.png": {
+      "bytes": 515641,
+      "sha256_16": "fdd7940c24baca21"
     }
   }
 }
