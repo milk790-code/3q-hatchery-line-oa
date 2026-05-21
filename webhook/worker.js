@@ -401,13 +401,45 @@ async function handleEvent(ev, env) {
     if (/^\+1$|招募|活動|報名/.test(text.trim())) {
       const slots = await getCampaignSlots(env);
       const msgs = [];
-      if (env.PNG_BASE_URL) msgs.push({
-        type: 'image',
-        originalContentUrl: `${env.PNG_BASE_URL}/3q-campaign-poster-1080x1040.png`,
-        previewImageUrl:    `${env.PNG_BASE_URL}/3q-campaign-poster-1080x1040.png`,
-      });
+      if (env.PNG_BASE_URL) {
+        msgs.push({
+          type: 'image',
+          originalContentUrl: `${env.PNG_BASE_URL}/3q-campaign-poster-1080x1040.png`,
+          previewImageUrl:    `${env.PNG_BASE_URL}/3q-campaign-poster-1080x1040.png`,
+        });
+        // Sample products carousel — let user "點讚" specific sample to qualify
+        msgs.push({
+          type: 'template',
+          altText: '產品樣品圖 · 點你喜歡的',
+          template: {
+            type: 'image_carousel',
+            columns: ['s01','s02','s03','s04','s05','s06','s07','s08'].slice(0, 6).map(p => ({
+              imageUrl: `${env.PNG_BASE_URL}/3q-campaign-sample-${p}-1080x1040.png`,
+              action: { type: 'message', text: `我喜歡 ${p}` },
+            })),
+          },
+        });
+      }
       msgs.push(campaignCard(slots));
       return replyMsg(ev.replyToken, msgs, env);
+    }
+
+    // Sample "like" capture — user picked a specific sample → tier1 fast track
+    const sampleLike = text.trim().match(/^我喜歡\s+(s\d{2})$/);
+    if (sampleLike) {
+      const pick = sampleLike[1];
+      if (env.OWNER_USER_ID) {
+        try {
+          await fetch('https://api.line.me/v2/bot/message/push', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ to: env.OWNER_USER_ID, messages: [{ type: 'text',
+              text: `招募樣品偏好\n用戶選了：${pick}\nUID：${uid}` }] }),
+          });
+        } catch {}
+      }
+      return replyMsg(ev.replyToken, [{ type: 'text', text:
+        `收到！你看上「${pick}」這個樣品。\n\n下一步：傳「+1」打開報名表，選擇方案 (100/200/300 元)，搶前 30 位名額。` }], env);
     }
 
     if (/說說.*店|說說我|開始填/.test(text)) {

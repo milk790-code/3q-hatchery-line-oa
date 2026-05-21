@@ -5,10 +5,18 @@
   <meta name="viewport" content="width=1080, initial-scale=1"/>
   <title>3Q 孵化所 · 活動海報 匯出 (1080×1040)</title>
 
-  <meta name="ext-resource-dependency" content="../../assets/photography/still-bowl-rice.svg" data-resource-id="ph_bowl"/>
-  <meta name="ext-resource-dependency" content="../../assets/photography/ink-stone.svg"      data-resource-id="ph_ink"/>
-  <meta name="ext-resource-dependency" content="../../assets/photography/raw-linen.svg"      data-resource-id="ph_linen"/>
-  <meta name="ext-resource-dependency" content="../../assets/photography/rice-stalk.svg"     data-resource-id="ph_stalk"/>
+  <meta name="ext-resource-dependency" content="../../assets/photography/ai/3q-ai-cover-bowl-1080x878.png"      data-resource-id="ph_bowl"/>
+  <meta name="ext-resource-dependency" content="../../assets/photography/ai/3q-ai-carousel-02-product-1040.png" data-resource-id="ph_ink"/>
+  <meta name="ext-resource-dependency" content="../../assets/photography/ai/3q-ai-carousel-04-linen-1040.png"   data-resource-id="ph_linen"/>
+  <meta name="ext-resource-dependency" content="../../assets/photography/ai/3q-ai-carousel-03-rice-1040.png"    data-resource-id="ph_stalk"/>
+  <meta name="ext-resource-dependency" content="../../assets/photography/ai/3q-sample-01-tea-cake.png"    data-resource-id="ph_s01"/>
+  <meta name="ext-resource-dependency" content="../../assets/photography/ai/3q-sample-02-sauce-bottle.png" data-resource-id="ph_s02"/>
+  <meta name="ext-resource-dependency" content="../../assets/photography/ai/3q-sample-03-noodles.png"     data-resource-id="ph_s03"/>
+  <meta name="ext-resource-dependency" content="../../assets/photography/ai/3q-sample-04-bread.png"       data-resource-id="ph_s04"/>
+  <meta name="ext-resource-dependency" content="../../assets/photography/ai/3q-sample-05-rice.png"        data-resource-id="ph_s05"/>
+  <meta name="ext-resource-dependency" content="../../assets/photography/ai/3q-sample-06-pickles.png"     data-resource-id="ph_s06"/>
+  <meta name="ext-resource-dependency" content="../../assets/photography/ai/3q-sample-07-tea.png"         data-resource-id="ph_s07"/>
+  <meta name="ext-resource-dependency" content="../../assets/photography/ai/3q-sample-08-gift-box.png"    data-resource-id="ph_s08"/>
 
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -65,7 +73,7 @@
   <script type="text/babel" src="CampaignPoster.jsx"></script>
 
   <script type="text/babel">
-    const photos = ['bowl', 'ink', 'linen', 'stalk'];
+    const photos = ['bowl', 'ink', 'linen', 'stalk', 's01', 's02', 's03', 's04', 's05', 's06', 's07', 's08'];
     const photo = photos.includes(qs.get('photo')) ? qs.get('photo') : 'bowl';
 
     const linksHost = document.getElementById('photoLinks');

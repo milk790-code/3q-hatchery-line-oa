@@ -7,6 +7,14 @@ function CampaignPoster({ width = 1080, height = 1040, photo = 'bowl' }) {
     ink:   window.__resources.ph_ink,
     linen: window.__resources.ph_linen,
     stalk: window.__resources.ph_stalk,
+    s01:   window.__resources.ph_s01,
+    s02:   window.__resources.ph_s02,
+    s03:   window.__resources.ph_s03,
+    s04:   window.__resources.ph_s04,
+    s05:   window.__resources.ph_s05,
+    s06:   window.__resources.ph_s06,
+    s07:   window.__resources.ph_s07,
+    s08:   window.__resources.ph_s08,
   };
   const photoUrl = photos[photo] || photos.bowl;
   const half = width / 2;

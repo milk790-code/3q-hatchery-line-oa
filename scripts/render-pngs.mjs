@@ -34,6 +34,10 @@ const PAGES = [
     file: `3q-reaction-${n}-480.png`,
   })),
   { url: `${BASE}/_campaign-poster-export.html?download=1&photo=bowl`, file: '3q-campaign-poster-1080x1040.png' },
+  ...['s01','s02','s03','s04','s05','s06','s07','s08'].map(p => ({
+    url:  `${BASE}/_campaign-poster-export.html?download=1&photo=${p}`,
+    file: `3q-campaign-sample-${p}-1080x1040.png`,
+  })),
   ...LUCKY_BAG_TIMES.map(t => ({
     url:  `${BASE}/_lucky-bag-export.html?download=1&time=${t}`,
     file: `3q-lucky-bag-${t}-1040.png`,
