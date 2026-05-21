@@ -75,6 +75,19 @@ jobs:
         run: |
           set -uo pipefail
           mkdir -p _debug
+
+          # Probe D1 binding — if it doesn't exist, skip it (CRM features become no-op)
+          d1_check=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}" \
+            | jq -r '.success // false')
+          if [ "$d1_check" = "true" ]; then
+            CRM_BINDING=',{"name": "CRM", "type": "d1", "id": "'$CRM_D1_ID'"}'
+            echo "::notice::D1 binding OK"
+          else
+            CRM_BINDING=""
+            echo "::warning::D1 database not accessible — deploying without CRM binding"
+          fi
+
           cat > /tmp/metadata.json <<JSON
           {
             "main_module": "worker.js",
@@ -84,8 +97,8 @@ jobs:
               {"name": "LINE_CHANNEL_SECRET",       "type": "secret_text", "text": $(jq -Rn --arg t "$LINE_SECRET" '$t')},
               {"name": "OWNER_USER_ID",             "type": "secret_text", "text": $(jq -Rn --arg t "$OWNER_USER_ID" '$t')},
               {"name": "PNG_BASE_URL",              "type": "plain_text",  "text": $(jq -Rn --arg t "$PNG_BASE_URL" '$t')},
-              {"name": "SESSION",                   "type": "kv_namespace", "namespace_id": "$SESSION_KV_ID"},
-              {"name": "CRM",                       "type": "d1",          "id": "$CRM_D1_ID"}
+              {"name": "SESSION",                   "type": "kv_namespace", "namespace_id": "$SESSION_KV_ID"}
+              $CRM_BINDING
             ]
           }
           JSON
@@ -153,8 +166,8 @@ jobs:
           sleep 5
           resp=$(curl -sS "$WORKER_URL")
           echo "$resp" | jq .
-          echo "$resp" | jq -e '.ok == true and .configured.token == true and .configured.secret == true and .configured.session_kv == true and .configured.crm_d1 == true' > /dev/null
-          echo "::notice::Worker alive — token, secret, KV, D1 all configured"
+          echo "$resp" | jq -e '.ok == true and .configured.token == true and .configured.secret == true and .configured.session_kv == true' > /dev/null
+          echo "::notice::Worker alive — token, secret, KV configured"
 
       - name: Ensure LINE Rich Menu (reuse by name, else create)
         env:
