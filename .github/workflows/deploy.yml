@@ -66,6 +66,29 @@ jobs:
           echo "CF_ACCOUNT_ID=$CF_ACCOUNT_ID" >> $GITHUB_ENV
           echo "::notice::Using CF account ID (hidden)"
 
+      - name: Run D1 migrations (idempotent)
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          # Create campaigns table
+          curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"sql":"CREATE TABLE IF NOT EXISTS campaigns (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT NOT NULL, tier TEXT NOT NULL, price INTEGER NOT NULL, sample_pick TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)"}' \
+            | jq -r '"campaigns table: " + (.success | tostring)'
+          # Add follow-up columns to inquiries (ignore duplicate column errors)
+          for col in followed_up_24h followed_up_72h followed_up_168h; do
+            result=$(curl -sS -X POST \
+              "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+              -H "Authorization: Bearer $CF_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"sql\":\"ALTER TABLE inquiries ADD COLUMN ${col} INTEGER DEFAULT 0\"}")
+            echo "$result" | jq -r '"inquiries.'"$col"': " + (.success | tostring) + " " + (.errors[0].message // "")'
+          done
+          echo "::notice::D1 migrations complete"
+
       - name: Deploy Worker
         env:
           CF_TOKEN:      ${{ secrets.CF_API_TOKEN }}
@@ -77,12 +100,12 @@ jobs:
           set -uo pipefail
           mkdir -p _debug
 
-          # Probe D1 binding — if it doesn't exist, skip it (CRM features become no-op)
+          # Probe D1 binding — if not accessible, deploy without CRM (becomes no-op)
           d1_check=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
             "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}" \
             | jq -r '.success // false')
           if [ "$d1_check" = "true" ]; then
-            CRM_BINDING=',{"name": "CRM", "type": "d1", "id": "'$CRM_D1_ID'"}'
+            CRM_BINDING=",{\"name\": \"CRM\", \"type\": \"d1\", \"id\": \"$CRM_D1_ID\"}"
             echo "::notice::D1 binding OK"
           else
             CRM_BINDING=""
@@ -96,7 +119,7 @@ jobs:
             "bindings": [
               {"name": "LINE_CHANNEL_ACCESS_TOKEN", "type": "secret_text", "text": $(jq -Rn --arg t "$LINE_TOKEN" '$t')},
               {"name": "LINE_CHANNEL_SECRET",       "type": "secret_text", "text": $(jq -Rn --arg t "$LINE_SECRET" '$t')},
-              {"name": "OWNER_USER_ID",             "type": "secret_text", "text": $(jq -Rn --arg t "$OWNER_USER_ID" '$t')},
+              {"name": "OWNER_USER_ID",             "type": "secret_text", "text": $(jq -Rn --arg t "${OWNER_USER_ID:-}" '$t')},
               {"name": "PNG_BASE_URL",              "type": "plain_text",  "text": $(jq -Rn --arg t "$PNG_BASE_URL" '$t')},
               {"name": "TRIGGER_TOKEN",             "type": "secret_text", "text": $(jq -Rn --arg t "${TRIGGER_TOKEN:-}" '$t')},
               {"name": "SESSION",                   "type": "kv_namespace", "namespace_id": "$SESSION_KV_ID"},
@@ -196,11 +219,87 @@ jobs:
           echo "$resp" | jq -e '.ok == true and .configured.token == true and .configured.secret == true and .configured.session_kv == true' > /dev/null
           echo "::notice::Worker alive — token, secret, KV configured"
 
-      # Rich menu management moved to dedicated workflows:
-      #   - update-rich-menu-hero.yml (create/update v4 with proper hero URI)
-      #   - refresh-richmenu-image.yml (re-upload binary after RichMenu.jsx changes)
-      # Removed from deploy.yml because it kept re-creating the broken v3 menu
-      # and overriding the default set by the v4 workflow.
+      - name: Ensure LINE Rich Menu (reuse by name, else create)
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          RM_NAME: '3Q Hatchery · MENU (postback v3)'
+        run: |
+          set -euo pipefail
+          existing=$(curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
+            https://api.line.me/v2/bot/richmenu/list \
+            | jq -r --arg n "$RM_NAME" '.richmenus[] | select(.name == $n) | .richMenuId' \
+            | head -1)
+          if [ -n "$existing" ]; then
+            echo "RICH_MENU_ID=$existing" >> $GITHUB_ENV
+            echo "::notice::Reusing existing Rich Menu: $existing"
+            exit 0
+          fi
+          cat > /tmp/richmenu.json <<'JSON'
+          {
+            "size": {"width": 2500, "height": 1686},
+            "selected": false,
+            "name": "3Q Hatchery · MENU (postback v3)",
+            "chatBarText": "MENU",
+            "areas": [
+              {"bounds": {"x":    0, "y":   0, "width": 2500, "height": 800}, "action": {"type": "uri",      "uri":  "https://3q-hatchery.tw"}},
+              {"bounds": {"x":    0, "y": 800, "width":  625, "height": 886}, "action": {"type": "postback", "data": "menu:my-store"}},
+              {"bounds": {"x":  625, "y": 800, "width":  625, "height": 886}, "action": {"type": "postback", "data": "menu:imagery"}},
+              {"bounds": {"x": 1250, "y": 800, "width":  625, "height": 886}, "action": {"type": "postback", "data": "menu:marketing"}},
+              {"bounds": {"x": 1875, "y": 800, "width":  625, "height": 886}, "action": {"type": "postback", "data": "menu:progress"}}
+            ]
+          }
+          JSON
+          resp=$(curl -sS -X POST https://api.line.me/v2/bot/richmenu \
+            -H "Authorization: Bearer $LINE_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d @/tmp/richmenu.json)
+          RM_ID=$(echo "$resp" | jq -r '.richMenuId // empty')
+          if [ -z "$RM_ID" ]; then echo "::error::Rich Menu create failed: $resp"; exit 1; fi
+          echo "RICH_MENU_ID=$RM_ID" >> $GITHUB_ENV
+          echo "::notice::Created new Rich Menu: $RM_ID"
+
+      - name: Upload Rich Menu binary (skip if already uploaded)
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          set +e
+          probe_http=$(curl -sS -o /tmp/probe -w "%{http_code}" \
+            "https://api-data.line.me/v2/bot/richmenu/${RICH_MENU_ID}/content" \
+            -H "Authorization: Bearer $LINE_TOKEN")
+          set -e
+          probe_size=$(wc -c < /tmp/probe 2>/dev/null || echo 0)
+          if [ "$probe_http" = "200" ] && [ "$probe_size" -gt 1000 ]; then
+            echo "::notice::Binary already uploaded ($probe_size bytes), skipping"
+            exit 0
+          fi
+          curl -sS -f -X POST \
+            "https://api-data.line.me/v2/bot/richmenu/${RICH_MENU_ID}/content" \
+            -H "Authorization: Bearer $LINE_TOKEN" \
+            -H "Content-Type: image/jpeg" \
+            --data-binary @assets/exports/3q-richmenu-2500x1686.jpg
+          echo "::notice::Rich Menu binary uploaded"
+
+      - name: Set Rich Menu as default (via Python requests)
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          pip install --quiet requests
+          python3 - <<'PY'
+          import os, sys, requests
+          rm_id = os.environ['RICH_MENU_ID']
+          token = os.environ['LINE_TOKEN']
+          r = requests.post(
+              f'https://api.line.me/v2/bot/user/all/richmenu/{rm_id}',
+              headers={'Authorization': f'Bearer {token}'},
+              timeout=15,
+          )
+          print(f'HTTP {r.status_code}: {r.text}')
+          if r.status_code != 200:
+              sys.exit(f'set-default failed: {r.status_code} {r.text}')
+          PY
+          echo "::notice::Default rich menu set"
 
       - name: Set LINE webhook URL
         env:
@@ -246,5 +345,5 @@ jobs:
           echo "## Manual steps remaining" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "1. Optional: set OWNER_USER_ID secret for inquiry push alerts" >> $GITHUB_STEP_SUMMARY
-          echo "2. Query D1: \`wrangler d1 execute 3q-hatchery-crm --command 'SELECT * FROM inquiries ORDER BY id DESC LIMIT 10'\`" >> $GITHUB_STEP_SUMMARY
-          echo "3. Self-test: add bot → tap menu → step through flow → confirm → check D1 row" >> $GITHUB_STEP_SUMMARY
+          echo "2. Optional: set TRIGGER_TOKEN secret for /api/csv export" >> $GITHUB_STEP_SUMMARY
+          echo "3. Self-test: add bot → tap menu → step through flow → confirm → check D1" >> $GITHUB_STEP_SUMMARY
