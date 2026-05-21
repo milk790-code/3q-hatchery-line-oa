@@ -26,13 +26,11 @@ async function generateOne(p) {
   const [genW, genH] = p.gen_size.split('x').map(Number);
   const [tgtW, tgtH] = p.target_size.split('x').map(Number);
 
-  const body = {
-    prompt: p.prompt,
-    width: genW,
-    height: genH,
-    num_steps: 20,
-    negative_prompt: NEGATIVE,
-  };
+  // FLUX has different params from SDXL
+  const isFlux = MODEL.includes('flux');
+  const body = isFlux
+    ? { prompt: p.prompt, steps: 4 }
+    : { prompt: p.prompt, width: genW, height: genH, num_steps: 20, negative_prompt: NEGATIVE };
 
   const res = await fetch(url, {
     method: 'POST',
