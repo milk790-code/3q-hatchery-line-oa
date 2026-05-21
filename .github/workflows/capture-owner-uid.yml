@@ -34,58 +34,13 @@ jobs:
           echo "CAPTURED_UID=$UID_VAL" >> $GITHUB_ENV
           echo "::notice::Captured uid: ${UID_VAL:0:6}…${UID_VAL: -4}"
 
-      - name: Update OWNER_USER_ID secret via GitHub API
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
+      - name: Commit captured uid to temp file for off-platform secret update
         run: |
           set -euo pipefail
-          pip install --quiet pynacl
-          python3 <<PYEOF
-          import os, json, base64, urllib.request
-          from nacl import encoding, public
-
-          repo  = os.environ['REPO']
-          tok   = os.environ['GH_TOKEN']
-          uid   = os.environ['CAPTURED_UID']
-
-          # Get repo public key
-          req = urllib.request.Request(
-              f'https://api.github.com/repos/{repo}/actions/secrets/public-key',
-              headers={'Authorization': f'Bearer {tok}', 'Accept': 'application/vnd.github+json'},
-          )
-          with urllib.request.urlopen(req) as r:
-              key_info = json.load(r)
-
-          # Encrypt with libsodium sealed box
-          pubkey = public.PublicKey(key_info['key'].encode('utf-8'), encoding.Base64Encoder())
-          encrypted = public.SealedBox(pubkey).encrypt(uid.encode('utf-8'))
-          enc_b64   = base64.b64encode(encrypted).decode('utf-8')
-
-          # Set secret
-          payload = json.dumps({'encrypted_value': enc_b64, 'key_id': key_info['key_id']}).encode()
-          req = urllib.request.Request(
-              f'https://api.github.com/repos/{repo}/actions/secrets/OWNER_USER_ID',
-              data=payload,
-              headers={'Authorization': f'Bearer {tok}', 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json'},
-              method='PUT',
-          )
-          with urllib.request.urlopen(req) as r:
-              print(f'Secret update HTTP: {r.status}')
-          PYEOF
-          echo "::notice::OWNER_USER_ID secret updated"
-
-      - name: Trigger deploy workflows to apply new secret
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-        run: |
-          set -euo pipefail
-          for WF in deploy.yml deploy-fukubukuro.yml; do
-            curl -sS -X POST \
-              -H "Authorization: Bearer $GH_TOKEN" \
-              -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/$REPO/actions/workflows/$WF/dispatches" \
-              -d '{"ref":"main"}'
-            echo "::notice::Triggered $WF"
-          done
+          mkdir -p _debug/uid
+          echo "$CAPTURED_UID" > _debug/uid/captured.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add _debug/uid/captured.txt
+          git diff --cached --quiet || git commit -m "uid: captured ${CAPTURED_UID:0:6}…${CAPTURED_UID: -4} (will be cleaned up)"
+          git push || true
