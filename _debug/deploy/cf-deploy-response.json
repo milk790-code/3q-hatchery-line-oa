@@ -4,7 +4,7 @@
   "errors": [
     {
       "code": 10021,
-      "message": "Uncaught SyntaxError: Unexpected token ':'\n  at worker.js:944:11\n",
+      "message": "Uncaught SyntaxError: Unexpected token 'const'\n  at worker.js:71:2\n",
       "documentation_url": "https://developers.cloudflare.com/workers/observability/errors/#validation-errors-10021"
     }
   ],
