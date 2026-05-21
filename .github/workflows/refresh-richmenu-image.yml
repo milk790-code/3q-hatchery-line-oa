@@ -12,16 +12,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Delete existing v4 menu (if any)
+      - name: Delete ALL existing menus (v3 + v4 + any others)
         env:
           LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
         run: |
           set -euo pipefail
-          existing=$(curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
+          all_ids=$(curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
             https://api.line.me/v2/bot/richmenu/list \
-            | jq -r --arg n "$RM_NAME" '.richmenus[] | select(.name == $n) | .richMenuId')
-          for id in $existing; do
-            echo "Deleting old menu: $id"
+            | jq -r '.richmenus[].richMenuId')
+          for id in $all_ids; do
+            echo "Deleting menu: $id"
             curl -sS -X DELETE -H "Authorization: Bearer $LINE_TOKEN" \
               "https://api.line.me/v2/bot/richmenu/$id"
           done
