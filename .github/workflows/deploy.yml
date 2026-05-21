@@ -78,6 +78,7 @@ jobs:
             -H "Content-Type: application/json" \
             -d '{"sql":"CREATE TABLE IF NOT EXISTS campaigns (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT NOT NULL, tier TEXT NOT NULL, price INTEGER NOT NULL, sample_pick TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)"}' \
             | jq -r '"campaigns table: " + (.success | tostring)'
+
           # Add follow-up columns to inquiries (ignore duplicate column errors)
           for col in followed_up_24h followed_up_72h followed_up_168h; do
             result=$(curl -sS -X POST \
@@ -87,6 +88,22 @@ jobs:
               -d "{\"sql\":\"ALTER TABLE inquiries ADD COLUMN ${col} INTEGER DEFAULT 0\"}")
             echo "$result" | jq -r '"inquiries.'"$col"': " + (.success | tostring) + " " + (.errors[0].message // "")'
           done
+
+          # v3.5: Add lead scoring, status tracking, booking columns (ignore if already exist)
+          for col_def in \
+            "lead_score TEXT DEFAULT 'cold'" \
+            "status TEXT DEFAULT 'new'" \
+            "booking_requested INTEGER DEFAULT 0" \
+            "booking_note TEXT"; do
+            col_name=$(echo "$col_def" | awk '{print $1}')
+            result=$(curl -sS -X POST \
+              "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+              -H "Authorization: Bearer $CF_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"sql\":\"ALTER TABLE inquiries ADD COLUMN ${col_def}\"}")
+            echo "$result" | jq -r '"inquiries.'"$col_name"': " + (.success | tostring) + " " + (.errors[0].message // "")'
+          done
+
           echo "::notice::D1 migrations complete"
 
       - name: Deploy Worker
@@ -152,7 +169,7 @@ jobs:
           fi
           echo "Worker uploaded (etag=$(jq -r '.result.etag' _debug/cf-deploy-response.json))"
 
-      - name: Set cron triggers (hourly follow-ups + weekly digest)
+      - name: Set cron triggers
         env:
           CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
         run: |
@@ -161,8 +178,9 @@ jobs:
             "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/schedules" \
             -H "Authorization: Bearer $CF_TOKEN" \
             -H "Content-Type: application/json" \
-            -d '[{"cron": "5 * * * *"}, {"cron": "0 13 * * 1"}]' | jq -e '.success == true' > /dev/null
-          echo "::notice::Cron set: hourly :05 UTC (follow-ups) + Mon 13:00 UTC = Mon 21:00 TW (weekly digest)"
+            -d '[{"cron": "5 * * * *"}, {"cron": "0 13 * * 1"}, {"cron": "0 1 1 3,6,9,12 *"}]' \
+            | jq -e '.success == true' > /dev/null
+          echo "::notice::Cron set: follow-ups (hourly :05) + weekly digest (Mon 21:00 TW) + seasonal push (Mar/Jun/Sep/Dec 1st 09:00 TW)"
 
       - name: CF deploy diagnostics (summary + commit on failure)
         if: always()
@@ -332,7 +350,7 @@ jobs:
 
       - name: Deploy summary
         run: |
-          echo "## Deploy complete" >> $GITHUB_STEP_SUMMARY
+          echo "## Deploy complete — v3.5" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|---|---|" >> $GITHUB_STEP_SUMMARY
@@ -340,10 +358,18 @@ jobs:
           echo "| Rich Menu ID | \`$RICH_MENU_ID\` |" >> $GITHUB_STEP_SUMMARY
           echo "| KV namespace (SESSION) | \`$SESSION_KV_ID\` |" >> $GITHUB_STEP_SUMMARY
           echo "| D1 database (CRM) | \`$CRM_D1_ID\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Webhook | configured |" >> $GITHUB_STEP_SUMMARY
+          echo "| Cron | follow-ups + weekly digest + seasonal push |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## Manual steps remaining" >> $GITHUB_STEP_SUMMARY
+          echo "## New in v3.5" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "1. Optional: set OWNER_USER_ID secret for inquiry push alerts" >> $GITHUB_STEP_SUMMARY
-          echo "2. Optional: set TRIGGER_TOKEN secret for /api/csv export" >> $GITHUB_STEP_SUMMARY
-          echo "3. Self-test: add bot → tap menu → step through flow → confirm → check D1" >> $GITHUB_STEP_SUMMARY
+          echo "- **A1** Lead scoring: 🔥hot/⚡warm/🌱cold per budget in D1 + weekly digest" >> $GITHUB_STEP_SUMMARY
+          echo "- **A2** Owner quick-reply Flex: 已聯繫 / 不感興趣 / 成交 buttons on every new inquiry" >> $GITHUB_STEP_SUMMARY
+          echo "- **A3** Booking flow: tap 預約諮詢 after submit → bot asks preferred time → saves to D1 + pushes owner" >> $GITHUB_STEP_SUMMARY
+          echo "- **B1** Rich menu switching: new→RICHMENU_NEW, inquired→RICHMENU_INQUIRED, won→RICHMENU_CONVERTED (set secrets to enable)" >> $GITHUB_STEP_SUMMARY
+          echo "- **B2** Member card: each follower gets #XXXX card with join date + tier" >> $GITHUB_STEP_SUMMARY
+          echo "- **B3** Subscriber list: text 訂閱/取消訂閱; seasonal push auto-runs Mar/Jun/Sep/Dec 1st" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Manual steps" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "1. Optional: set RICHMENU_NEW / RICHMENU_INQUIRED / RICHMENU_CONVERTED secrets for personalized menus" >> $GITHUB_STEP_SUMMARY
+          echo "2. Self-test: add bot → step through flow → confirm submit → verify owner receives Flex with action buttons" >> $GITHUB_STEP_SUMMARY
