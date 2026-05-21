@@ -24,6 +24,7 @@ jobs:
       PNG_BASE_URL: https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports
       WORKER_NAME: 3q-hatchery-webhook
       SESSION_KV_ID: 20a68b10afc84764ba770b64f0f33f30
+      CRM_D1_ID: e54671b1-d15e-4552-babf-cef367267568
     steps:
       - uses: actions/checkout@v4
         with:
@@ -65,14 +66,52 @@ jobs:
           echo "CF_ACCOUNT_ID=$CF_ACCOUNT_ID" >> $GITHUB_ENV
           echo "::notice::Using CF account ID (hidden)"
 
+      - name: Run D1 migrations (idempotent)
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          # Create campaigns table
+          curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"sql":"CREATE TABLE IF NOT EXISTS campaigns (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT NOT NULL, tier TEXT NOT NULL, price INTEGER NOT NULL, sample_pick TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)"}' \
+            | jq -r '"campaigns table: " + (.success | tostring)'
+          # Add follow-up columns to inquiries (ignore duplicate column errors)
+          for col in followed_up_24h followed_up_72h followed_up_168h; do
+            result=$(curl -sS -X POST \
+              "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+              -H "Authorization: Bearer $CF_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"sql\":\"ALTER TABLE inquiries ADD COLUMN ${col} INTEGER DEFAULT 0\"}")
+            echo "$result" | jq -r '"inquiries.'"$col"': " + (.success | tostring) + " " + (.errors[0].message // "")'
+          done
+          echo "::notice::D1 migrations complete"
+
       - name: Deploy Worker
         env:
-          CF_TOKEN:    ${{ secrets.CF_API_TOKEN }}
-          LINE_TOKEN:  ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
-          LINE_SECRET: ${{ secrets.LINE_CHANNEL_SECRET }}
+          CF_TOKEN:      ${{ secrets.CF_API_TOKEN }}
+          LINE_TOKEN:    ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_SECRET:   ${{ secrets.LINE_CHANNEL_SECRET }}
+          OWNER_USER_ID: ${{ secrets.OWNER_USER_ID }}
+          TRIGGER_TOKEN: ${{ secrets.TRIGGER_TOKEN }}
         run: |
           set -uo pipefail
           mkdir -p _debug
+
+          # Probe D1 binding — if not accessible, deploy without CRM (becomes no-op)
+          d1_check=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}" \
+            | jq -r '.success // false')
+          if [ "$d1_check" = "true" ]; then
+            CRM_BINDING=",{\"name\": \"CRM\", \"type\": \"d1\", \"id\": \"$CRM_D1_ID\"}"
+            echo "::notice::D1 binding OK"
+          else
+            CRM_BINDING=""
+            echo "::warning::D1 database not accessible — deploying without CRM binding"
+          fi
+
           cat > /tmp/metadata.json <<JSON
           {
             "main_module": "worker.js",
@@ -80,8 +119,12 @@ jobs:
             "bindings": [
               {"name": "LINE_CHANNEL_ACCESS_TOKEN", "type": "secret_text", "text": $(jq -Rn --arg t "$LINE_TOKEN" '$t')},
               {"name": "LINE_CHANNEL_SECRET",       "type": "secret_text", "text": $(jq -Rn --arg t "$LINE_SECRET" '$t')},
+              {"name": "OWNER_USER_ID",             "type": "secret_text", "text": $(jq -Rn --arg t "${OWNER_USER_ID:-}" '$t')},
               {"name": "PNG_BASE_URL",              "type": "plain_text",  "text": $(jq -Rn --arg t "$PNG_BASE_URL" '$t')},
-              {"name": "SESSION",                   "type": "kv_namespace", "namespace_id": "$SESSION_KV_ID"}
+              {"name": "TRIGGER_TOKEN",             "type": "secret_text", "text": $(jq -Rn --arg t "${TRIGGER_TOKEN:-}" '$t')},
+              {"name": "SESSION",                   "type": "kv_namespace", "namespace_id": "$SESSION_KV_ID"},
+              {"name": "AI",                        "type": "ai"}
+              $CRM_BINDING
             ]
           }
           JSON
@@ -109,7 +152,19 @@ jobs:
           fi
           echo "Worker uploaded (etag=$(jq -r '.result.etag' _debug/cf-deploy-response.json))"
 
-      - name: CF deploy diagnostics (summary only)
+      - name: Set cron triggers (hourly follow-ups + weekly digest)
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/schedules" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '[{"cron": "5 * * * *"}, {"cron": "0 13 * * 1"}]' | jq -e '.success == true' > /dev/null
+          echo "::notice::Cron set: hourly :05 UTC (follow-ups) + Mon 13:00 UTC = Mon 21:00 TW (weekly digest)"
+
+      - name: CF deploy diagnostics (summary + commit on failure)
         if: always()
         run: |
           echo "## CF Deploy Diagnostics" >> $GITHUB_STEP_SUMMARY
@@ -121,7 +176,19 @@ jobs:
               echo >> $GITHUB_STEP_SUMMARY
               echo '```' >> $GITHUB_STEP_SUMMARY
             done
-            rm -rf _debug
+          fi
+
+      - name: Commit deploy debug files (on failure only)
+        if: failure()
+        run: |
+          if [ -d _debug ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            mkdir -p _debug/deploy
+            mv _debug/* _debug/deploy/ 2>/dev/null || true
+            git add _debug/deploy/
+            git diff --cached --quiet || git commit -m "deploy: debug artifacts from failed run"
+            git push || true
           fi
 
       - name: Enable workers.dev subdomain
@@ -150,7 +217,7 @@ jobs:
           resp=$(curl -sS "$WORKER_URL")
           echo "$resp" | jq .
           echo "$resp" | jq -e '.ok == true and .configured.token == true and .configured.secret == true and .configured.session_kv == true' > /dev/null
-          echo "::notice::Worker alive — token, secret, KV all configured"
+          echo "::notice::Worker alive — token, secret, KV configured"
 
       - name: Ensure LINE Rich Menu (reuse by name, else create)
         env:
@@ -213,7 +280,7 @@ jobs:
             --data-binary @assets/exports/3q-richmenu-2500x1686.jpg
           echo "::notice::Rich Menu binary uploaded"
 
-      - name: Set Rich Menu as default (via Python requests — defeats Akamai 411)
+      - name: Set Rich Menu as default (via Python requests)
         env:
           LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
         run: |
@@ -271,11 +338,12 @@ jobs:
           echo "|---|---|" >> $GITHUB_STEP_SUMMARY
           echo "| Worker URL | \`$WORKER_URL\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Rich Menu ID | \`$RICH_MENU_ID\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| KV namespace | \`$SESSION_KV_ID\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| KV namespace (SESSION) | \`$SESSION_KV_ID\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| D1 database (CRM) | \`$CRM_D1_ID\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Webhook | configured |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Manual steps remaining" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "1. LINE OA Manager: upload Avatar + Cover" >> $GITHUB_STEP_SUMMARY
-          echo "2. Optional: set OWNER_USER_ID secret for inquiry push alerts" >> $GITHUB_STEP_SUMMARY
-          echo "3. Self-test: add bot → tap menu → step through flow" >> $GITHUB_STEP_SUMMARY
+          echo "1. Optional: set OWNER_USER_ID secret for inquiry push alerts" >> $GITHUB_STEP_SUMMARY
+          echo "2. Optional: set TRIGGER_TOKEN secret for /api/csv export" >> $GITHUB_STEP_SUMMARY
+          echo "3. Self-test: add bot → tap menu → step through flow → confirm → check D1" >> $GITHUB_STEP_SUMMARY
