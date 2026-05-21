@@ -296,6 +296,14 @@ const CORS = {
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
 };
 
+// Constant-time token comparison (prevents timing attacks)
+function tokensMatch(a, b) {
+  if (!a || !b || a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
 async function statsHandler(env) {
   if (!env.CRM) {
     return new Response(JSON.stringify({ error: 'D1 not bound' }), {
@@ -348,10 +356,15 @@ async function statsHandler(env) {
 
 async function csvExportHandler(table, env) {
   if (!env.CRM) return new Response('D1 not bound', { status: 500 });
-  const allowed = ['inquiries', 'campaigns'];
-  if (!allowed.includes(table)) return new Response('invalid table', { status: 400 });
+  // Whitelist table → literal SQL (no string interpolation of user input)
+  const TABLE_SQL = {
+    inquiries: 'SELECT * FROM inquiries ORDER BY id LIMIT 10000',
+    campaigns: 'SELECT * FROM campaigns ORDER BY id LIMIT 10000',
+  };
+  const sql = TABLE_SQL[table];
+  if (!sql) return new Response('invalid table', { status: 400 });
   try {
-    const rows = await env.CRM.prepare(`SELECT * FROM ${table} ORDER BY id`).all();
+    const rows = await env.CRM.prepare(sql).all();
     const items = rows?.results || [];
     if (items.length === 0) return new Response('id\n', { headers: { 'Content-Type': 'text/csv; charset=utf-8' } });
     const headers = Object.keys(items[0]);
@@ -534,10 +547,11 @@ export default {
       return await statsHandler(env);
     }
 
-    // CSV export API (auth via TRIGGER_TOKEN)
+    // CSV export API (auth via Authorization: Bearer <TRIGGER_TOKEN>)
     if (url.pathname === '/api/csv' && request.method === 'GET') {
-      const tok = url.searchParams.get('token');
-      if (!tok || tok !== env.TRIGGER_TOKEN) return new Response('forbidden', { status: 403 });
+      const auth = request.headers.get('Authorization') || '';
+      const tok = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+      if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return new Response('forbidden', { status: 403 });
       return await csvExportHandler(url.searchParams.get('table') || 'inquiries', env);
     }
 
@@ -694,7 +708,7 @@ async function handleEvent(ev, env) {
       return replyMsg(ev.replyToken, [serviceCard(env.PNG_BASE_URL)], env);
     }
 
-    return handleIntent(text, ev.replyToken, env);
+    return handleIntent(text, ev.replyToken, env, uid);
   }
 }
 
@@ -849,7 +863,7 @@ async function sendWelcome(replyToken, env) {
 // Keyword routing
 // ─────────────────────────────────────────────────────────────────────────
 
-async function handleIntent(userText, replyToken, env) {
+async function handleIntent(userText, replyToken, env, uid) {
   const match = ALL_REPLIES.find(r => r.keywords.some(kw => userText.includes(kw)));
   const msgs = [];
   if (match) {
@@ -860,8 +874,8 @@ async function handleIntent(userText, replyToken, env) {
     if (match.response) msgs.push({ type: 'text', text: match.response });
     if (match.carousel && env.PNG_BASE_URL) msgs.push(carouselMsg(env.PNG_BASE_URL));
   } else {
-    // No keyword match → try AI fallback (Workers AI LLM)
-    const aiReply = await aiFallback(userText, env);
+    // No keyword match → try AI fallback (Workers AI LLM, rate-limited per uid)
+    const aiReply = await aiFallback(userText, env, uid);
     if (aiReply) {
       msgs.push({ type: 'text', text: aiReply });
     } else {
@@ -875,8 +889,15 @@ async function handleIntent(userText, replyToken, env) {
 // AI Fallback — Workers AI LLM (Llama-3 fast)
 // ─────────────────────────────────────────────────────────────────────────
 
-async function aiFallback(userText, env) {
+async function aiFallback(userText, env, uid) {
   if (!env.AI) return null;
+  // Rate limit: max 5 AI calls per uid per 60s (KV-based sliding window)
+  if (env.SESSION && uid) {
+    const key = `rl:ai:${uid}`;
+    const cur = parseInt(await env.SESSION.get(key) || '0', 10);
+    if (cur >= 5) return null;
+    await env.SESSION.put(key, String(cur + 1), { expirationTtl: 60 });
+  }
   try {
     const SYSTEM = '你是 3Q 貢丸·台灣在地品牌孵化所的客服助理。回應台灣繁體中文，最多 80 字。\n\n3Q 提供 3 個服務：\n1. 好物・好照 — 產品攝影 + 介紹文，500 元起\n2. 客製行銷 — 季度規劃，從現階段往前 3 個月\n3. 諮詢 — 30 分鐘免費，先聊聊再決定\n\n本月活動：好物・好照限時招募，前 10 位 100 元，名額剩 X 位。傳「+1」可看。\n\n用戶問什麼，你判斷最接近哪個服務，回答 2-3 句話，結尾建議他傳的關鍵字（例如：「回覆『+1』」「點選圖文選單『好物・好照』」）。語氣親切但不要過度熱情，跟用戶平等對話。';
 
