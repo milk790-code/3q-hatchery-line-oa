@@ -188,6 +188,6 @@ window.LINE_SPECS = {
     { id: 'reply',   label: '設定關鍵字自動回覆',                detail: '6 組 keyword → reply', done: true },
     { id: 'away',    label: '設定非營業時間訊息',                detail: '24h 回覆承諾',         done: true },
     { id: 'push',    label: '準備首推輪播訊息',                  detail: '4 張卡 + tap actions', done: true },
-    { id: 'qa',      label: '上線前 QA — 每個按鈕都點過',         detail: '12 個 tap surface',    done: false },
+    { id: 'qa',      label: '上線前 QA — 每個按鈕都點過',         detail: '12 個 tap surface',    done: true },
   ],
 };
