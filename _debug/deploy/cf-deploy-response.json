@@ -1,26 +1,11 @@
 {
-  "result": {
-    "created_on": "2026-05-14T07:08:06.326139Z",
-    "modified_on": "2026-05-14T07:09:57.947901Z",
-    "id": "3q-hatchery-webhook",
-    "tag": "3d528bbe4f264198b30edd7e7b74caf2",
-    "entry_point": "worker.js",
-    "tags": null,
-    "deployment_id": "d38ef0f2dc0449b485898b1e5d4c4ab2",
-    "tail_consumers": null,
-    "logpush": false,
-    "has_assets": false,
-    "has_modules": true,
-    "etag": "648daf701db6289f13611a6a4100c79d19b8b6b44729c68d9cf743705219a691",
-    "handlers": [
-      "fetch"
-    ],
-    "last_deployed_from": "api",
-    "compatibility_date": "2024-12-01",
-    "usage_model": "standard",
-    "startup_time_ms": 0
-  },
-  "success": true,
-  "errors": [],
+  "result": null,
+  "success": false,
+  "errors": [
+    {
+      "code": 10023,
+      "message": "You do not have access to this feature. Please ensure it is enabled. If you are an Enterprise user, reach out to your account team.: kv bindings require kv write perms"
+    }
+  ],
   "messages": []
 }
