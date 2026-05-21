@@ -1,5 +1,5 @@
 {
-  "rendered_at": "2026-05-21T12:07:08.634Z",
+  "rendered_at": "2026-05-21T12:24:44.115Z",
   "files": {
     "3q-avatar-640.png": {
       "bytes": 46333,
@@ -10,8 +10,8 @@
       "sha256_16": "9763873336b14054"
     },
     "3q-richmenu-2500x1686.png": {
-      "bytes": 1136063,
-      "sha256_16": "78958fef65b77a3e"
+      "bytes": 3611326,
+      "sha256_16": "de64e9b4f96f9af7"
     },
     "3q-welcome-card-1040.png": {
       "bytes": 642790,
