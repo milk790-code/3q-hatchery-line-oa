@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>3Q 孵化所 · Owner Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400&family=Noto+Sans+TC:wght@300;400&family=Noto+Serif+TC:wght@300;400&display=swap"/>
+  <link rel="stylesheet" href="../../colors_and_type.css"/>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--color-paper); color: var(--color-black); font-family: var(--font-sans); font-weight: 300; min-height: 100vh; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 48px 32px 80px; }
+    .eyebrow { font-size: 11px; letter-spacing: 0.35em; color: var(--color-gold); text-transform: uppercase; margin-bottom: 14px; }
+    h1 { font-family: var(--font-serif); font-weight: 300; font-size: 44px; letter-spacing: 0.08em; margin: 0 0 6px; color: var(--color-black); }
+    .meta { font-size: 12px; letter-spacing: 0.15em; color: var(--color-stone); text-transform: uppercase; margin-bottom: 36px; }
+    .hairline { width: 56px; height: 1px; background: var(--color-gold); margin: 20px 0 36px; }
+
+    .grid4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1px; background: rgba(184,146,74,0.25); border: 1px solid rgba(184,146,74,0.25); margin-bottom: 48px; }
+    .card { background: var(--color-paper); padding: 28px 24px; }
+    .card .label { font-size: 10px; letter-spacing: 0.3em; color: var(--color-stone); text-transform: uppercase; margin-bottom: 12px; }
+    .card .value { font-family: var(--font-serif); font-style: italic; font-weight: 300; font-size: 56px; color: var(--color-gold); line-height: 1; letter-spacing: -0.01em; }
+    .card .sub { font-size: 12px; letter-spacing: 0.05em; color: var(--color-stone); margin-top: 8px; }
+
+    section h2 { font-family: var(--font-serif); font-weight: 300; font-size: 24px; letter-spacing: 0.12em; margin: 0 0 16px; }
+
+    .tier { display: grid; grid-template-columns: 1fr; gap: 10px; padding: 16px 0; }
+    .tier-row { display: grid; grid-template-columns: 140px 1fr 90px; align-items: center; gap: 16px; font-size: 13px; }
+    .tier-row .name { font-family: var(--font-serif); font-size: 16px; letter-spacing: 0.1em; }
+    .tier-row .bar { background: rgba(184,146,74,0.15); height: 8px; position: relative; overflow: hidden; }
+    .tier-row .bar > div { background: var(--color-gold); height: 100%; transition: width 0.5s ease; }
+    .tier-row .count { font-family: var(--font-sans); font-size: 13px; letter-spacing: 0.1em; color: var(--color-stone); text-align: right; }
+
+    .status { display: inline-block; padding: 4px 10px; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; border: 1px dashed rgba(184,146,74,0.5); color: var(--color-gold); margin-left: 12px; }
+    .status.live { border-style: solid; }
+    .err { color: #C04040; }
+
+    footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid rgba(184,146,74,0.2); font-size: 10px; letter-spacing: 0.3em; color: var(--color-stone); text-transform: uppercase; display: flex; justify-content: space-between; }
+    footer a { color: var(--color-gold); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">3Q HATCHERY · OWNER DASHBOARD</div>
+    <h1>即時數字 <span class="status" id="status">載入中…</span></h1>
+    <div class="meta" id="updated">UPDATED: —</div>
+    <div class="hairline"></div>
+
+    <section>
+      <div class="grid4">
+        <div class="card">
+          <div class="label">今日諮詢</div>
+          <div class="value" id="inq-today">—</div>
+          <div class="sub">總共 <span id="inq-total">—</span> 筆</div>
+        </div>
+        <div class="card">
+          <div class="label">今日報名</div>
+          <div class="value" id="cmp-today">—</div>
+          <div class="sub">總共 <span id="cmp-total">—</span> 位</div>
+        </div>
+        <div class="card">
+          <div class="label">本月收入 (估)</div>
+          <div class="value" id="revenue">—</div>
+          <div class="sub">NT$ · 已報名 × 方案價</div>
+        </div>
+        <div class="card">
+          <div class="label">招募剩餘</div>
+          <div class="value" id="slots-left">—</div>
+          <div class="sub">總名額 30 位</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>招募名額 · 三梯進度</h2>
+      <div class="tier">
+        <div class="tier-row">
+          <div class="name">前 10 位 · 100 元</div>
+          <div class="bar"><div id="bar-t1" style="width:0%"></div></div>
+          <div class="count" id="cnt-t1">—</div>
+        </div>
+        <div class="tier-row">
+          <div class="name">11–20 位 · 200 元</div>
+          <div class="bar"><div id="bar-t2" style="width:0%"></div></div>
+          <div class="count" id="cnt-t2">—</div>
+        </div>
+        <div class="tier-row">
+          <div class="name">21–30 位 · 300 元</div>
+          <div class="bar"><div id="bar-t3" style="width:0%"></div></div>
+          <div class="count" id="cnt-t3">—</div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span>3Q 貢丸 · 台灣在地品牌孵化所</span>
+      <span>數據每 30 秒自動刷新</span>
+    </footer>
+  </div>
+
+  <script>
+    const API = 'https://3q-hatchery-webhook.milk790.workers.dev/api/stats';
+    const $ = (id) => document.getElementById(id);
+
+    async function load() {
+      const status = $('status');
+      try {
+        const r = await fetch(API + '?_=' + Date.now());
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const d = await r.json();
+
+        status.textContent = '已連線'; status.className = 'status live';
+        $('updated').textContent = 'UPDATED: ' + new Date(d.now).toLocaleString('zh-TW', { hour12: false });
+
+        $('inq-today').textContent = d.inquiries.today;
+        $('inq-total').textContent = d.inquiries.total;
+        $('cmp-today').textContent = d.campaigns.today;
+        $('cmp-total').textContent = d.campaigns.total;
+        $('revenue').textContent = '$' + (d.campaigns.revenue || 0).toLocaleString();
+
+        const f = d.campaigns.slots_filled, m = d.campaigns.slots_max;
+        const t1 = f.tier1, t2 = f.tier2, t3 = f.tier3;
+        const totalFilled = t1 + t2 + t3;
+        $('slots-left').textContent = (30 - totalFilled);
+
+        $('cnt-t1').textContent = `${t1} / ${m.tier1}`;
+        $('cnt-t2').textContent = `${t2} / ${m.tier2}`;
+        $('cnt-t3').textContent = `${t3} / ${m.tier3}`;
+        $('bar-t1').style.width = (t1 / m.tier1 * 100) + '%';
+        $('bar-t2').style.width = (t2 / m.tier2 * 100) + '%';
+        $('bar-t3').style.width = (t3 / m.tier3 * 100) + '%';
+      } catch (err) {
+        status.textContent = '錯誤: ' + err.message;
+        status.className = 'status err';
+      }
+    }
+
+    load();
+    setInterval(load, 30000);
+  </script>
+</body>
+</html>
