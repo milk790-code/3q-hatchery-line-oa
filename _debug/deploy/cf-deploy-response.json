@@ -4,7 +4,7 @@
   "errors": [
     {
       "code": 10021,
-      "message": "Uncaught SyntaxError: Unexpected token 'const'\n  at worker.js:71:2\n",
+      "message": "Uncaught SyntaxError: Illegal return statement\n  at worker.js:1010:2\n",
       "documentation_url": "https://developers.cloudflare.com/workers/observability/errors/#validation-errors-10021"
     }
   ],
