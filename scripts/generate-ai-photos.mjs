@@ -40,12 +40,25 @@ async function generateOne(p) {
     body: JSON.stringify(body),
   });
 
+  const ct = res.headers.get('content-type') || '';
   if (!res.ok) {
     const errText = await res.text();
-    throw new Error(`HTTP ${res.status}: ${errText.slice(0, 200)}`);
+    throw new Error(`HTTP ${res.status} (${ct}): ${errText.slice(0, 300)}`);
   }
 
-  const buf = Buffer.from(await res.arrayBuffer());
+  let buf;
+  if (ct.includes('application/json')) {
+    // FLUX and some newer models return JSON with base64
+    const j = await res.json();
+    const b64 = j.result?.image || j.image || j.result?.data || j.data;
+    if (!b64) throw new Error(`JSON response missing image field: ${JSON.stringify(j).slice(0, 200)}`);
+    buf = Buffer.from(b64, 'base64');
+  } else {
+    // Binary PNG (SDXL classic)
+    buf = Buffer.from(await res.arrayBuffer());
+  }
+
+  if (buf.length < 100) throw new Error(`Output too small (${buf.length} bytes)`);
 
   const resized = await sharp(buf)
     .resize(tgtW, tgtH, { fit: 'cover', position: 'center' })
@@ -83,6 +96,8 @@ await writeFile(`${OUT_DIR}/_manifest.json`, JSON.stringify({
 const failed = results.filter(r => !r.ok);
 console.log(`\n=== Done: ${results.length - failed.length}/${results.length} succeeded ===`);
 if (failed.length) {
-  console.error('Failures:', failed);
-  process.exit(1);
+  console.error('Failures:');
+  for (const f of failed) console.error(`  - ${f.file}: ${f.error}`);
+  // Don't exit 1 — let the workflow commit the manifest with errors
 }
+

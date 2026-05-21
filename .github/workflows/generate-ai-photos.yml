@@ -48,9 +48,11 @@ jobs:
         run: node scripts/generate-ai-photos.mjs
 
       - name: Commit results
+        if: always()
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p assets/photography/ai
           git add assets/photography/ai/
           if git diff --cached --quiet; then
             echo "No changes to commit"
