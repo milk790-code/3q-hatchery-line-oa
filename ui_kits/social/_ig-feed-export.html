@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <title>3Q 孵化所 · IG Feed 匯出 (1080×1350)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400&family=Noto+Sans+TC:wght@300;400&family=Noto+Serif+TC:wght@300;400&display=swap"/>
+  <link rel="stylesheet" href="../../colors_and_type.css"/>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: #1A1612; font-family: var(--font-sans); color: var(--color-paper); }
+    .stage { min-height: 100vh; display: grid; place-items: center; padding: 48px; }
+    #card { width: 1080px; height: 1350px; box-shadow: 0 30px 80px rgba(0,0,0,0.45); }
+    .toolbar { position: fixed; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 9999; font-size: 12px; letter-spacing: 0.15em; }
+    .toolbar button, .toolbar a {
+      background: var(--color-paper); color: var(--color-black);
+      border: 1px solid var(--color-gold); padding: 10px 18px;
+      font-family: var(--font-sans); font-weight: 400; letter-spacing: 0.15em;
+      text-transform: uppercase; cursor: pointer; text-decoration: none;
+    }
+    .toolbar .status { padding: 10px 14px; color: var(--color-gold); border: 1px dashed rgba(184,146,74,0.4); }
+    .toolbar.hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="toolbar" id="toolbar">
+    <span class="status" id="status">載入中…</span>
+    <button id="downloadBtn" disabled>⬇ 下載 PNG (1080×1350)</button>
+    <a href="launch.html">← 回到 launch.html</a>
+  </div>
+  <main class="stage"><div id="card"></div></main>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js" crossorigin="anonymous"></script>
+
+  <script>
+    var qs = new URLSearchParams(location.search);
+    if (qs.get('clean') === '1') document.getElementById('toolbar').classList.add('hidden');
+  </script>
+
+  <script type="text/babel" src="IGPost.jsx"></script>
+
+  <script type="text/babel">
+    const CARDS = {
+      1: { eyebrow: 'NO. 01', title: '本月入駐',   sub: '阿婆ㄟ切仔麵店', photo: 'assets/photography/ai/3q-ai-carousel-01-noodle-1040.png' },
+      2: { eyebrow: 'NO. 02', title: '好物',       sub: '值得好照',       photo: 'assets/photography/ai/3q-ai-carousel-02-product-1040.png' },
+      3: { eyebrow: 'NO. 03', title: '一束稻',     sub: '一個故事',       photo: 'assets/photography/ai/3q-ai-carousel-03-rice-1040.png' },
+      4: { eyebrow: 'NO. 04', title: '原麻布',     sub: '沒被命名的好',   photo: 'assets/photography/ai/3q-ai-carousel-04-linen-1040.png' },
+    };
+    const card = qs.get('card') || '1';
+    const props = CARDS[card] || CARDS[1];
+
+    const root = ReactDOM.createRoot(document.getElementById('card'));
+    root.render(<IGPost width={1080} {...props} />);
+
+    async function whenReady() {
+      if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    }
+
+    async function exportPNG() {
+      const btn = document.getElementById('downloadBtn');
+      const status = document.getElementById('status');
+      btn.disabled = true; status.textContent = '匯出中…';
+
+      const canvas = await html2canvas(document.getElementById('card'), {
+        width: 1080, height: 1350, scale: 1, backgroundColor: null, useCORS: true, logging: false,
+      });
+      const filename = `3q-ig-feed-${String(card).padStart(2,'0')}-1080x1350.png`;
+      await new Promise(resolve => {
+        canvas.toBlob(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url; a.download = filename;
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          resolve();
+        }, 'image/png');
+      });
+      status.textContent = '✓ 已下載';
+      btn.disabled = false;
+    }
+
+    whenReady().then(() => {
+      const btn = document.getElementById('downloadBtn');
+      btn.disabled = false;
+      btn.addEventListener('click', exportPNG);
+      document.getElementById('status').textContent = `就緒 · CARD ${card}`;
+      if (qs.get('download') === '1') setTimeout(exportPNG, 600);
+    });
+  </script>
+</body>
+</html>

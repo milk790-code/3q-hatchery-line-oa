@@ -8,6 +8,7 @@ import { mkdir, stat, writeFile, readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 
 const BASE = process.env.RENDER_BASE_URL || 'http://localhost:8080/ui_kits/line_oa';
+const SOCIAL_BASE = process.env.RENDER_SOCIAL_BASE_URL || 'http://localhost:8080/ui_kits/social';
 const OUT = process.env.RENDER_OUT_DIR || 'assets/exports';
 
 const SEASONS = ['spring', 'summer', 'autumn', 'winter'];
@@ -36,6 +37,25 @@ const PAGES = [
   ...LUCKY_BAG_TIMES.map(t => ({
     url:  `${BASE}/_lucky-bag-export.html?download=1&time=${t}`,
     file: `3q-lucky-bag-${t}-1040.png`,
+  })),
+
+  // Social channel exports
+  { url: `${SOCIAL_BASE}/_ig-avatar-export.html?download=1`, file: '3q-ig-avatar-1080.png' },
+  ...[1,2,3,4].map(n => ({
+    url:  `${SOCIAL_BASE}/_ig-feed-export.html?download=1&card=${n}`,
+    file: `3q-ig-feed-${String(n).padStart(2,'0')}-1080x1350.png`,
+  })),
+  ...['00','01','02','03','04','05'].map(id => ({
+    url:  `${SOCIAL_BASE}/_ig-highlight-export.html?download=1&id=${id}`,
+    file: `3q-ig-highlight-${id}-1080x1920.png`,
+  })),
+  ...[1,2,3,4].map(n => ({
+    url:  `${SOCIAL_BASE}/_threads-post-export.html?download=1&card=${n}`,
+    file: `3q-threads-${String(n).padStart(2,'0')}-1080x1350.png`,
+  })),
+  ...['01','02','03','04'].map(ep => ({
+    url:  `${SOCIAL_BASE}/_tiktok-cover-export.html?download=1&ep=${ep}`,
+    file: `3q-tiktok-ep${ep}-1080x1920.png`,
   })),
 ];
 

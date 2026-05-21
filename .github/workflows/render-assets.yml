@@ -5,17 +5,12 @@ on:
   push:
     branches: [main]
     paths:
-      - 'ui_kits/line_oa/_avatar-export.html'
-      - 'ui_kits/line_oa/_cover-export.html'
-      - 'ui_kits/line_oa/_richmenu-export.html'
-      - 'ui_kits/line_oa/_welcome-card-export.html'
-      - 'ui_kits/line_oa/_chat-bg-export.html'
-      - 'ui_kits/line_oa/_carousel-export.html'
-      - 'ui_kits/line_oa/_seasonal-export.html'
-      - 'ui_kits/line_oa/_reaction-export.html'
-      - 'ui_kits/line_oa/SeasonalHero.jsx'
-      - 'ui_kits/line_oa/Reaction.jsx'
+      - 'ui_kits/line_oa/_*.html'
+      - 'ui_kits/line_oa/*.jsx'
       - 'ui_kits/line_oa/LineSpecs.js'
+      - 'ui_kits/social/_*.html'
+      - 'ui_kits/social/*.jsx'
+      - 'ui_kits/social/SocialSpecs.js'
       - 'scripts/render-pngs.mjs'
 
 jobs:

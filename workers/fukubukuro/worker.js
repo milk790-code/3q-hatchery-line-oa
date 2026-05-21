@@ -3,21 +3,21 @@
 // UTC cron:          23:30 /  04:30 / 10:30 / 14:00
 
 const CRON_SLOTS = {
-  '30 23 * * *': { label: '晨光福袋', file: '01_0730.png' },
-  '30 4 * * *':  { label: '午陽福袋', file: '02_1230.png' },
-  '30 10 * * *': { label: '暮色福袋', file: '03_1830.png' },
-  '0 14 * * *':  { label: '月光福袋', file: '04_2200.png' },
+  '30 23 * * *': { label: '晨光福袋', file: '3q-lucky-bag-morning-1040.png' },
+  '30 4 * * *':  { label: '午陽福袋', file: '3q-lucky-bag-noon-1040.png' },
+  '30 10 * * *': { label: '暮色福袋', file: '3q-lucky-bag-evening-1040.png' },
+  '0 14 * * *':  { label: '月光福袋', file: '3q-lucky-bag-night-1040.png' },
 };
 
 const HTTP_SLOTS = {
-  '0730': { label: '晨光福袋', file: '01_0730.png' },
-  '1230': { label: '午陽福袋', file: '02_1230.png' },
-  '1830': { label: '暮色福袋', file: '03_1830.png' },
-  '2200': { label: '月光福袋', file: '04_2200.png' },
+  '0730': { label: '晨光福袋', file: '3q-lucky-bag-morning-1040.png' },
+  '1230': { label: '午陽福袋', file: '3q-lucky-bag-noon-1040.png' },
+  '1830': { label: '暮色福袋', file: '3q-lucky-bag-evening-1040.png' },
+  '2200': { label: '月光福袋', file: '3q-lucky-bag-night-1040.png' },
 };
 
 async function pushFukubukuro(env, file, label) {
-  const imageUrl = `${env.PNG_BASE_URL}/fukubukuro/${file}`;
+  const imageUrl = `${env.PNG_BASE_URL}/${file}`;
   const body = {
     to: env.OWNER_LINE_USER_ID,
     messages: [
