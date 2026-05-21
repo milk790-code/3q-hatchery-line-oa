@@ -12,6 +12,7 @@ const OUT = process.env.RENDER_OUT_DIR || 'assets/exports';
 
 const SEASONS = ['spring', 'summer', 'autumn', 'winter'];
 const REACTIONS = ['hot', 'recommend', 'thanks', 'wait', 'got-it', 'i-see', 'cheer', 'excellent', 'later', 'goodnight', 'order', 'seeyou', 'musthave', 'queue', 'hungry', 'empty', 'bold', 'stellar', 'hyper', 'done'];
+const LUCKY_BAG_TIMES = ['main', 'morning', 'noon', 'evening', 'night'];
 
 const PAGES = [
   { url: `${BASE}/_avatar-export.html?download=1`,                      file: '3q-avatar-640.png'           },
@@ -32,6 +33,10 @@ const PAGES = [
     file: `3q-reaction-${n}-480.png`,
   })),
   { url: `${BASE}/_campaign-poster-export.html?download=1&photo=bowl`, file: '3q-campaign-poster-1080x1040.png' },
+  ...LUCKY_BAG_TIMES.map(t => ({
+    url:  `${BASE}/_lucky-bag-export.html?download=1&time=${t}`,
+    file: `3q-lucky-bag-${t}-1040.png`,
+  })),
 ];
 
 await mkdir(OUT, { recursive: true });

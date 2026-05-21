@@ -381,6 +381,22 @@ async function handleEvent(ev, env) {
       return replyMsg(ev.replyToken, [summaryCard(answers)], env);
     }
 
+    // Lucky bag trigger — auto-selects time-of-day variant in Taiwan timezone
+    if (/福袋|今日福袋|驚喜|抽福袋/.test(text.trim())) {
+      const tw = new Date(Date.now() + 8 * 3600 * 1000);
+      const hr = tw.getUTCHours();
+      const slot = hr < 10 ? 'morning' : hr < 15 ? 'noon' : hr < 20 ? 'evening' : 'night';
+      const msgs = [];
+      if (env.PNG_BASE_URL) msgs.push({
+        type: 'image',
+        originalContentUrl: `${env.PNG_BASE_URL}/3q-lucky-bag-${slot}-1040.png`,
+        previewImageUrl:    `${env.PNG_BASE_URL}/3q-lucky-bag-${slot}-1040.png`,
+      });
+      msgs.push({ type: 'text', text:
+        `今日 ${slot === 'morning' ? '晨光' : slot === 'noon' ? '午陽' : slot === 'evening' ? '暮色' : '月光'}福袋\n\n每天四點開袋一次，限量驚喜。\n回「+1」報名活動參加抽福袋。` });
+      return replyMsg(ev.replyToken, msgs, env);
+    }
+
     // Campaign trigger — +1 / 招募 / 活動 / 報名
     if (/^\+1$|招募|活動|報名/.test(text.trim())) {
       const slots = await getCampaignSlots(env);
