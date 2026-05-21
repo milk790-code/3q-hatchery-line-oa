@@ -1,57 +1,57 @@
 {
-  "rendered_at": "2026-05-21T09:24:03.771Z",
+  "rendered_at": "2026-05-21T10:17:45.092Z",
   "files": {
     "3q-avatar-640.png": {
       "bytes": 46333,
       "sha256_16": "c2df806585348273"
     },
     "3q-cover-bowl-1080x878.png": {
-      "bytes": 859158,
-      "sha256_16": "e020145e468c8f8d"
+      "bytes": 1159025,
+      "sha256_16": "eb69b334281e96fc"
     },
     "3q-richmenu-2500x1686.png": {
       "bytes": 1136063,
       "sha256_16": "78958fef65b77a3e"
     },
     "3q-welcome-card-1040.png": {
-      "bytes": 743937,
-      "sha256_16": "7fd6847eeaa09e41"
+      "bytes": 631907,
+      "sha256_16": "29f60b35e447c40a"
     },
     "3q-chat-bg-1080x2340.jpg": {
       "bytes": 84358,
       "sha256_16": "05603d21adaa4feb"
     },
     "3q-carousel-01-1040.png": {
-      "bytes": 1101114,
-      "sha256_16": "8f56b7877c928ee5"
+      "bytes": 907165,
+      "sha256_16": "af7fe43736418670"
     },
     "3q-carousel-02-1040.png": {
-      "bytes": 1011474,
-      "sha256_16": "83fcb2fa43b96a2a"
+      "bytes": 546875,
+      "sha256_16": "ec6d7a15e3e9e3ff"
     },
     "3q-carousel-03-1040.png": {
-      "bytes": 746191,
-      "sha256_16": "3bcb58137c507621"
+      "bytes": 1210700,
+      "sha256_16": "da6a3259ddc47cd1"
     },
     "3q-carousel-04-1040.png": {
-      "bytes": 1029465,
-      "sha256_16": "bebb9fc4e07cb30c"
+      "bytes": 1044588,
+      "sha256_16": "be51b3e7f67c2479"
     },
     "3q-seasonal-spring-1080x878.png": {
-      "bytes": 1264036,
-      "sha256_16": "33d52054c7e68233"
+      "bytes": 1520723,
+      "sha256_16": "fb0de3c38b4c0306"
     },
     "3q-seasonal-summer-1080x878.png": {
-      "bytes": 1258639,
-      "sha256_16": "25f58e50786ef1fd"
+      "bytes": 1299069,
+      "sha256_16": "11d0e3206f6f8a97"
     },
     "3q-seasonal-autumn-1080x878.png": {
-      "bytes": 740038,
-      "sha256_16": "30131e5f00f9f103"
+      "bytes": 1295979,
+      "sha256_16": "098af6a612b638a9"
     },
     "3q-seasonal-winter-1080x878.png": {
-      "bytes": 1253459,
-      "sha256_16": "3ae3b4a3829ac9f8"
+      "bytes": 1147505,
+      "sha256_16": "9014c847ed2c9eff"
     },
     "3q-reaction-hot-480.png": {
       "bytes": 292388,
