@@ -1,6 +1,7 @@
 // Cloudflare Worker — LINE OA webhook for 3Q Hatchery.
-// v3.5 — A: lead scoring, owner quick-reply Flex, booking flow
+// v3.6 — A: lead scoring, owner quick-reply Flex, booking flow
 //         B: rich menu switching, member card, subscriber list + seasonal push
+//         + 15 Rich Menu keyword routes + project status query
 //
 // Env vars required:
 //   LINE_CHANNEL_ACCESS_TOKEN   LINE_CHANNEL_SECRET   PNG_BASE_URL
@@ -39,6 +40,8 @@ const AWAY_HOURS_TEXT = [
   '會在下個工作日回覆你，謝謝你願意說。',
 ].join('\n');
 
+const CONTACT_TEXT = '想直接聊？\n• LINE: 直接在這裡留訊息\n• Email: hello@3q-hatchery.tw\n• 電話: 02-xxxx-xxxx\n\n我們營業時間內回覆。';
+
 const AUTO_REPLIES = [
   { keywords: ['好物', '好照', '生圖', '拍照'],
     response: '「好物・好照」從一個產品開始，500 元起。\n包含：1 張像樣的產品照 + 1 段別人讀得進去的介紹文。\n\n點選下方選單「好物・好照」了解完整流程。' },
@@ -60,6 +63,17 @@ const AUTO_REPLIES = [
   { keywords: ['03', '鹿港', '織坊'],
     response: '案例 03 — 鹿港織坊\n\n我們幫她做的：\n・產品分類（從 30 種收斂到 5 種）\n・MOQ 重新定價（從 500 起 → 從 1 條起）\n・通路接洽（手工市集 + 線上）\n\n預算：3,000 元 + 抽成，1 個月交付。',
     image: '3q-carousel-04-1040.png' },
+  // Rich Menu tap-zone routes (v3.6)
+  { keywords: ['聯絡我們', '聯絡顧問', '追加服務'],
+    response: CONTACT_TEXT },
+  { keywords: ['優化建議'],
+    response: '看了你的店，三個方向：\n\n1️⃣ 流量入口 — 主視覺+SEO+社群連動\n2️⃣ 文案精準 — 痛點具象+量化承諾\n3️⃣ 商品結構 — 主打/引流/利潤三層分明\n\n想深聊哪一點？' },
+  { keywords: ['看看報價'],
+    response: '想看報價？告訴我：\n1. 你的店類型\n2. 預算範圍\n3. 期待時程\n\n我會給你客製試算。' },
+  { keywords: ['VIP 資源庫', 'VIP資源庫'],
+    response: 'VIP 資源庫整理中…\n預計 v3.7 推出：\n• 行銷模板庫\n• 拍攝指南\n• 顧問月報\n\n敬請期待。' },
+  { keywords: ['介紹新客戶'],
+    response: '介紹朋友來孵化？\n• 你的專屬推薦碼：（v3.7 推出）\n• 朋友成交，你獲得免費品牌健診\n\n先聯絡顧問，我們手動登記。' },
 ];
 
 const SEASONS = [
@@ -455,6 +469,17 @@ async function updateCampaignSamplePick(uid, pick, env) {
   }
 }
 
+// v3.6: project status query for 我的專案狀態 keyword
+async function getMyStatus(uid, env) {
+  if (!env.CRM) return { type: 'text', text: '專案狀態系統還沒接通，請聯絡顧問。' };
+  const row = await env.CRM.prepare(
+    'SELECT service, status, created_at FROM inquiries WHERE user_id=? ORDER BY id DESC LIMIT 1'
+  ).bind(uid).first();
+  if (!row) return { type: 'text', text: '還沒收到你的詢問記錄。\n打「說說我的店」開始填表。' };
+  const STATUS_LABELS = { new: '🆕 新進案', contacted: '📞 已聯繫', quoted: '💰 已報價', converted: '✅ 已成交', closed: '📦 已結案' };
+  return { type: 'text', text: `📋 你的最新專案\n\n服務：${row.service || '未填'}\n狀態：${STATUS_LABELS[row.status] || row.status}\n建立：${row.created_at}\n\n有問題隨時打「聯絡顧問」。` };
+}
+
 // A1: Update inquiry status (owner quick-reply action)
 async function updateInquiryStatus(uid, status, env) {
   if (!env.CRM) return;
@@ -837,7 +862,7 @@ export default {
     if (request.method === 'GET') {
       return new Response(JSON.stringify({
         service: '3Q Hatchery LINE OA webhook',
-        ok: true, version: 3.5,
+        ok: true, version: 3.6,
         configured: {
           token:       Boolean(env.LINE_CHANNEL_ACCESS_TOKEN),
           secret:      Boolean(env.LINE_CHANNEL_SECRET),
@@ -1263,6 +1288,36 @@ async function sendWelcome(replyToken, env, mCard = null) {
 // ─────────────────────────────────────────────────────────────────────────
 
 async function handleIntent(userText, replyToken, env, uid) {
+  // v3.6: Rich Menu tap-zone keyword routes that need function dispatch
+  if (userText.includes('服務一覽')) {
+    return replyMsg(replyToken, [serviceCard(env.PNG_BASE_URL)], env);
+  }
+  if (userText.includes('你好，今天想做什麼') || userText.includes('你好,今天想做什麼')) {
+    return replyMsg(replyToken, [carouselMsg(env.PNG_BASE_URL)], env);
+  }
+  if (userText.includes('我的專案狀態')) {
+    const msg = await getMyStatus(uid, env);
+    return replyMsg(replyToken, [msg], env);
+  }
+  if (userText.includes('品牌孵化是什麼')) {
+    const bubble = BUBBLE(
+      DARK_HEADER('品牌孵化是什麼', '從聽你的店，到把它孵出殼'),
+      LIGHT_BODY([
+        { type: 'text', text: '1. 孵化', weight: 'bold', size: 'md', color: '#1A1A1A' },
+        { type: 'text', text: '聽你的店、了解你的客人與你想成為的樣子。', size: 'sm', color: '#4A4A4A', wrap: true },
+        { type: 'separator', margin: 'md', color: '#E8DFD0' },
+        { type: 'text', text: '2. 成形', weight: 'bold', size: 'md', color: '#1A1A1A', margin: 'md' },
+        { type: 'text', text: '品牌定位 + 內容素材 + 平台呈現，三條線同時收斂。', size: 'sm', color: '#4A4A4A', wrap: true },
+        { type: 'separator', margin: 'md', color: '#E8DFD0' },
+        { type: 'text', text: '3. 出殼', weight: 'bold', size: 'md', color: '#1A1A1A', margin: 'md' },
+        { type: 'text', text: '上線、迭代、看數據。我們陪你跑前 3 個月。', size: 'sm', color: '#4A4A4A', wrap: true },
+      ])
+    );
+    return replyMsg(replyToken, [
+      { type: 'text', text: '品牌孵化分三階段：孵化 → 成形 → 出殼。' },
+      FLEX('品牌孵化是什麼 · 三階段', bubble),
+    ], env);
+  }
   const match = ALL_REPLIES.find(r => r.keywords.some(kw => userText.includes(kw)));
   const msgs = [];
   if (match) {
