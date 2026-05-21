@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <meta name="theme-color" content="#0F0D0A"/>
+  <title>3Q貢丸 · 台灣在地品牌孵化所</title>
+
+  <link rel="stylesheet" href="./colors_and_type.css"/>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      margin: 0; padding: 0;
+      background: #0F0D0A;
+      color: var(--color-paper);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      min-height: 100dvh;
+      overscroll-behavior: none;
+    }
+
+    .stage {
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: max(28px, env(safe-area-inset-top)) 24px max(28px, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: stretch;
+      max-width: 520px;
+      margin: 0 auto;
+      gap: 28px;
+    }
+
+    /* ===== Top: monogram ====== */
+    .brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      padding-top: 18px;
+    }
+    .mono {
+      width: 64px; height: 64px;
+      border: 1px solid rgba(184,146,74,0.55);
+      display: grid; place-items: center;
+      font-family: var(--font-serif);
+      font-weight: 300;
+      font-size: 26px;
+      letter-spacing: 0.04em;
+      color: var(--color-paper);
+      position: relative;
+    }
+    .mono::after {
+      content: "";
+      position: absolute; left: 18%; right: 18%; bottom: 18px;
+      height: 1px;
+      background: rgba(184,146,74,0.6);
+    }
+    .eyebrow {
+      font-size: 9.5px;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+      color: var(--color-gold);
+      opacity: 0.95;
+    }
+    .lineid {
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: rgba(245,242,236,0.55);
+    }
+
+    /* ===== Middle: slogan ===== */
+    .slogan {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      align-items: center;
+    }
+    .slogan h1 {
+      font-family: var(--font-serif);
+      font-weight: 300;
+      font-size: clamp(28px, 8.5vw, 40px);
+      line-height: 1.4;
+      letter-spacing: 0.04em;
+      margin: 0;
+      color: var(--color-paper);
+    }
+    .slogan h1 em {
+      font-style: italic;
+      color: var(--color-gold);
+      font-weight: 300;
+    }
+    .rule {
+      width: 36px;
+      height: 1px;
+      background: rgba(184,146,74,0.6);
+    }
+    .slogan p {
+      margin: 0;
+      font-size: 13.5px;
+      letter-spacing: 0.06em;
+      line-height: 1.85;
+      color: rgba(245,242,236,0.7);
+      max-width: 320px;
+    }
+
+    /* ===== Bottom: CTAs ===== */
+    .ctas {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .cta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px;
+      background: rgba(245,242,236,0.04);
+      border: 1px solid rgba(184,146,74,0.28);
+      color: var(--color-paper);
+      text-decoration: none;
+      font-size: 14px;
+      letter-spacing: 0.05em;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .cta:active { background: rgba(184,146,74,0.14); border-color: var(--color-gold); }
+    .cta .label { display: flex; flex-direction: column; gap: 4px; }
+    .cta .num {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--color-gold);
+    }
+    .cta .zh { font-size: 14px; }
+    .cta .arr {
+      width: 24px; height: 24px;
+      display: grid; place-items: center;
+      color: var(--color-gold);
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 300;
+    }
+
+    .foot {
+      text-align: center;
+      font-size: 9px;
+      letter-spacing: 0.35em;
+      color: rgba(245,242,236,0.35);
+      padding-top: 6px;
+      text-transform: uppercase;
+    }
+    .foot .dot { margin: 0 8px; color: var(--color-gold); }
+
+    /* Larger screens */
+    @media (min-width: 768px) {
+      .stage { max-width: 460px; padding-top: 64px; padding-bottom: 56px; }
+      .mono { width: 78px; height: 78px; font-size: 30px; }
+      .slogan h1 { font-size: 38px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage">
+
+    <header class="brand">
+      <div class="mono" aria-label="3Q monogram">3Q</div>
+      <div class="eyebrow">Taiwan Brand Hatchery</div>
+      <div class="lineid">LINE · @121LKSPE</div>
+    </header>
+
+    <section class="slogan">
+      <h1>你的產品，<br/><em>值得被看見</em>。</h1>
+      <div class="rule"></div>
+      <p>不管你的店多大多小、新舊、簡單複雜，<br/>我們都有適合的平台、舞台、後台。</p>
+    </section>
+
+    <nav class="ctas" aria-label="next steps">
+      <a class="cta" href="https://line.me/R/oaMessage/%40121LKSPE/?%E6%88%91%E6%83%B3%E8%AA%AA%E8%AA%AA%E6%88%91%E7%9A%84%E5%BA%97">
+        <div class="label">
+          <span class="num">NO. 01</span>
+          <span class="zh">說說你的店</span>
+        </div>
+        <span class="arr">→</span>
+      </a>
+      <a class="cta" href="https://line.me/R/oaMessage/%40121LKSPE/?%E6%88%91%E6%83%B3%E4%BA%86%E8%A7%A3%E5%A5%BD%E7%89%A9%C2%B7%E5%A5%BD%E7%85%A7">
+        <div class="label">
+          <span class="num">NO. 02</span>
+          <span class="zh">好物 · 好照 — FROM 500 元</span>
+        </div>
+        <span class="arr">→</span>
+      </a>
+      <a class="cta" href="https://line.me/R/oaMessage/%40121LKSPE/?%E6%88%91%E6%83%B3%E8%A6%81%E5%AE%A2%E8%A3%BD%E8%A1%8C%E9%8A%B7">
+        <div class="label">
+          <span class="num">NO. 03</span>
+          <span class="zh">陪你被看見 · 客製行銷</span>
+        </div>
+        <span class="arr">→</span>
+      </a>
+    </nav>
+
+    <footer class="foot">
+      Taipei <span class="dot">·</span> 2026 <span class="dot">·</span> Hatchery
+    </footer>
+
+  </main>
+</body>
+</html>
