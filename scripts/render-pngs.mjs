@@ -31,6 +31,7 @@ const PAGES = [
     url:  `${BASE}/_reaction-export.html?download=1&name=${n}`,
     file: `3q-reaction-${n}-480.png`,
   })),
+  { url: `${BASE}/_campaign-poster-export.html?download=1&photo=bowl`, file: '3q-campaign-poster-1080x1040.png' },
 ];
 
 await mkdir(OUT, { recursive: true });

@@ -77,6 +77,63 @@ const REACTION_REPLIES = REACTIONS.map(r => ({ keywords: r.kw, image: `3q-reacti
 const ALL_REPLIES = [...AUTO_REPLIES, ...SEASONAL_REPLIES, ...REACTION_REPLIES];
 
 // ─────────────────────────────────────────────────────────────────────────
+// Campaign — 好物・好照 限時招募 (30 slots, 3 price tiers)
+// ─────────────────────────────────────────────────────────────────────────
+
+const CAMPAIGN_KEY = 'campaign:2026:photoshot';
+const CAMPAIGN_TIERS = {
+  tier1: { max: 10, price: 100, label: '前 10 位',  action: '截圖點讚回傳' },
+  tier2: { max: 10, price: 200, label: '11–20 位',  action: '回傳 👍' },
+  tier3: { max: 10, price: 300, label: '21–30 位',  action: '回傳「我要」' },
+};
+
+async function getCampaignSlots(env) {
+  if (!env.SESSION) return { tier1: [], tier2: [], tier3: [] };
+  try {
+    const v = await env.SESSION.get(CAMPAIGN_KEY);
+    return v ? JSON.parse(v) : { tier1: [], tier2: [], tier3: [] };
+  } catch { return { tier1: [], tier2: [], tier3: [] }; }
+}
+
+async function registerCampaignSlot(uid, tier, env) {
+  if (!uid || !CAMPAIGN_TIERS[tier]) return 'error';
+  const slots = await getCampaignSlots(env);
+  if (slots[tier].includes(uid)) return 'already';
+  if (slots[tier].length >= CAMPAIGN_TIERS[tier].max) return 'full';
+  slots[tier].push(uid);
+  await env.SESSION.put(CAMPAIGN_KEY, JSON.stringify(slots));
+  return 'ok';
+}
+
+function campaignCard(slots) {
+  const remaining = (tier) => Math.max(0, CAMPAIGN_TIERS[tier].max - slots[tier].length);
+  const full = (tier) => remaining(tier) === 0;
+  const remLabel = (tier) => full(tier) ? '· 額滿' : `· 剩 ${remaining(tier)} 位`;
+  return FLEX('好物・好照 限時招募', BUBBLE(
+    DARK_HEADER('好物・好照 · 限時招募', '業界 2,000 起跳的攝影棚美食圖，這次 500 元起'),
+    LIGHT_BODY([
+      { type: 'text', text: '目前名額狀況', color: '#8A8A8A', size: 'sm', margin: 'none' },
+      { type: 'separator', margin: 'sm', color: '#E8DFD0' },
+      ...(['tier1', 'tier2', 'tier3']).map(t => ({
+        type: 'box', layout: 'horizontal', margin: 'sm',
+        contents: [
+          { type: 'text', text: `${CAMPAIGN_TIERS[t].label} · ${CAMPAIGN_TIERS[t].price} 元`, flex: 3, size: 'sm', color: '#1A1A1A' },
+          { type: 'text', text: remLabel(t), flex: 1, size: 'sm', align: 'end',
+            color: full(t) ? '#D04040' : '#B8924A' },
+        ],
+      })),
+      { type: 'separator', margin: 'lg', color: '#E8DFD0' },
+      BTN(full('tier1') ? '前 10 位 · 額滿' : `前 10 位 · 100 元 (剩 ${remaining('tier1')})`,
+          'flow:campaign=tier1', !full('tier1'), '我要前10位 100元'),
+      BTN(full('tier2') ? '11–20 位 · 額滿' : `11–20 位 · 200 元 (剩 ${remaining('tier2')})`,
+          'flow:campaign=tier2', !full('tier2'), '我要11-20位 200元'),
+      BTN(full('tier3') ? '21–30 位 · 額滿' : `21–30 位 · 300 元 (剩 ${remaining('tier3')})`,
+          'flow:campaign=tier3', !full('tier3'), '我要21-30位 300元'),
+    ]),
+  ));
+}
+
+// ─────────────────────────────────────────────────────────────────────────
 // Guided flow labels
 // ─────────────────────────────────────────────────────────────────────────
 
@@ -324,6 +381,19 @@ async function handleEvent(ev, env) {
       return replyMsg(ev.replyToken, [summaryCard(answers)], env);
     }
 
+    // Campaign trigger — +1 / 招募 / 活動 / 報名
+    if (/^\+1$|招募|活動|報名/.test(text.trim())) {
+      const slots = await getCampaignSlots(env);
+      const msgs = [];
+      if (env.PNG_BASE_URL) msgs.push({
+        type: 'image',
+        originalContentUrl: `${env.PNG_BASE_URL}/3q-campaign-poster-1080x1040.png`,
+        previewImageUrl:    `${env.PNG_BASE_URL}/3q-campaign-poster-1080x1040.png`,
+      });
+      msgs.push(campaignCard(slots));
+      return replyMsg(ev.replyToken, msgs, env);
+    }
+
     if (/說說.*店|說說我|開始填/.test(text)) {
       await clearSession(uid, env);
       return replyMsg(ev.replyToken, [serviceCard(env.PNG_BASE_URL)], env);
@@ -363,6 +433,35 @@ async function handleFlow(data, uid, replyToken, env) {
   if (data === 'flow:reset') {
     await clearSession(uid, env);
     return replyMsg(replyToken, [serviceCard(env.PNG_BASE_URL)], env);
+  }
+
+  // Campaign tier registration
+  if (p.campaign && ['tier1', 'tier2', 'tier3'].includes(p.campaign)) {
+    const tier = p.campaign;
+    const result = await registerCampaignSlot(uid, tier, env);
+    const t = CAMPAIGN_TIERS[tier];
+    if (result === 'ok') {
+      if (env.OWNER_USER_ID) {
+        await fetch('https://api.line.me/v2/bot/message/push', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ to: env.OWNER_USER_ID, messages: [{ type: 'text',
+            text: `新招募報名\n方案：${t.label} · ${t.price} 元\n動作：${t.action}\nUID：${uid}` }] }),
+        });
+      }
+      return replyMsg(replyToken, [{ type: 'text', text:
+        `已登記！你是${t.label}的報名者。\n\n下一步：${t.action}，傳給我們。\n收到後我們會開立 ${t.price} 元的付款連結。\n\n感謝你願意讓我們幫你被看見。` }], env);
+    }
+    if (result === 'already') {
+      return replyMsg(replyToken, [{ type: 'text', text: `你已經登記過了。\n\n記得完成動作：${t.action}，傳給我們。` }], env);
+    }
+    if (result === 'full') {
+      const slots = await getCampaignSlots(env);
+      return replyMsg(replyToken, [
+        { type: 'text', text: `${t.label}已額滿。\n\n還有其他方案可以選：` },
+        campaignCard(slots),
+      ], env);
+    }
   }
 }
 

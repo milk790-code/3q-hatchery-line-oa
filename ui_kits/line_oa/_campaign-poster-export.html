@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=1080, initial-scale=1"/>
+  <title>3Q 孵化所 · 活動海報 匯出 (1080×1040)</title>
+
+  <meta name="ext-resource-dependency" content="../../assets/photography/still-bowl-rice.svg" data-resource-id="ph_bowl"/>
+  <meta name="ext-resource-dependency" content="../../assets/photography/ink-stone.svg"      data-resource-id="ph_ink"/>
+  <meta name="ext-resource-dependency" content="../../assets/photography/raw-linen.svg"      data-resource-id="ph_linen"/>
+  <meta name="ext-resource-dependency" content="../../assets/photography/rice-stalk.svg"     data-resource-id="ph_stalk"/>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400&family=Noto+Sans+TC:wght@300;400&family=Noto+Serif+TC:wght@300;400&display=swap"/>
+  <link rel="stylesheet" href="../../colors_and_type.css"/>
+
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: #1A1612; font-family: var(--font-sans); color: var(--color-paper); }
+    .stage { min-height: 100vh; display: grid; place-items: center; padding: 48px; }
+    #card { width: 1080px; height: 1040px; box-shadow: 0 30px 80px rgba(0,0,0,0.45); }
+    .toolbar { position: fixed; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 9999; font-size: 12px; letter-spacing: 0.15em; flex-wrap: wrap; max-width: calc(100vw - 40px); justify-content: flex-end; }
+    .toolbar button, .toolbar a {
+      background: var(--color-paper); color: var(--color-black);
+      border: 1px solid var(--color-gold); padding: 10px 18px;
+      font-family: var(--font-sans); font-weight: 400; letter-spacing: 0.15em;
+      text-transform: uppercase; cursor: pointer; text-decoration: none;
+      transition: background 0.15s;
+    }
+    .toolbar button:hover, .toolbar a:hover { background: var(--color-gold); color: var(--color-paper); }
+    .toolbar .status { padding: 10px 14px; color: var(--color-gold); border: 1px dashed rgba(184,146,74,0.4); }
+    .toolbar .quick { display: flex; gap: 4px; }
+    .toolbar .quick a.active { background: var(--color-gold); color: var(--color-paper); }
+    .toolbar.hidden { display: none; }
+    body.bare { background: transparent; }
+    body.bare .stage { padding: 0; min-height: 1040px; }
+    body.bare #card { box-shadow: none; }
+  </style>
+</head>
+<body>
+  <div class="toolbar" id="toolbar">
+    <span class="status" id="status">載入中…</span>
+    <div class="quick" id="photoLinks"></div>
+    <button id="downloadBtn" disabled>⬇ 下載 PNG</button>
+    <a href="launch.html">← launch.html</a>
+  </div>
+  <main class="stage"><div id="card"></div></main>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js" crossorigin="anonymous"></script>
+
+  <script>
+    window.__resources = {};
+    document.querySelectorAll('meta[name="ext-resource-dependency"]').forEach(m => {
+      window.__resources[m.getAttribute('data-resource-id')] = m.getAttribute('content');
+    });
+    var qs = new URLSearchParams(location.search);
+    if (qs.get('bare') === '1') document.body.classList.add('bare');
+    if (qs.get('clean') === '1' || qs.get('bare') === '1') document.getElementById('toolbar').classList.add('hidden');
+  </script>
+
+  <script type="text/babel" src="CampaignPoster.jsx"></script>
+
+  <script type="text/babel">
+    const photos = ['bowl', 'ink', 'linen', 'stalk'];
+    const photo = photos.includes(qs.get('photo')) ? qs.get('photo') : 'bowl';
+
+    const linksHost = document.getElementById('photoLinks');
+    photos.forEach(p => {
+      const a = document.createElement('a');
+      a.href = '?photo=' + p + (qs.get('bare') === '1' ? '&bare=1' : '');
+      a.textContent = p.toUpperCase();
+      if (p === photo) a.className = 'active';
+      linksHost.appendChild(a);
+    });
+
+    const root = ReactDOM.createRoot(document.getElementById('card'));
+    root.render(<CampaignPoster width={1080} height={1040} photo={photo} />);
+
+    async function whenReady() {
+      if (document.fonts?.ready) { try { await document.fonts.ready; } catch (e) {} }
+      await new Promise(resolve => {
+        const img = new Image();
+        img.onload = img.onerror = resolve;
+        img.src = window.__resources[`ph_${photo}`] || '';
+      });
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    }
+
+    async function exportPNG() {
+      const btn = document.getElementById('downloadBtn');
+      const status = document.getElementById('status');
+      btn.disabled = true; status.textContent = '匯出中…';
+      const canvas = await html2canvas(document.getElementById('card'), {
+        width: 1080, height: 1040, scale: 1, backgroundColor: null, useCORS: true, logging: false,
+      });
+      await new Promise(resolve => {
+        canvas.toBlob(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url; a.download = `3q-campaign-poster-${photo}-1080x1040.png`;
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          resolve();
+        }, 'image/png');
+      });
+      status.textContent = '✓ 已下載'; btn.disabled = false;
+    }
+
+    whenReady().then(() => {
+      const btn = document.getElementById('downloadBtn');
+      btn.disabled = false;
+      btn.addEventListener('click', exportPNG);
+      document.getElementById('status').textContent = `就緒 · ${photo.toUpperCase()} · 1080×1040`;
+      window.__campaignReady = true;
+      if (qs.get('download') === '1') setTimeout(exportPNG, 500);
+    });
+  </script>
+</body>
+</html>
