@@ -1,80 +1,45 @@
 {
-  "generated_at": "2026-05-21T11:37:16.580Z",
+  "generated_at": "2026-05-21T11:45:20.753Z",
   "model": "@cf/black-forest-labs/flux-1-schnell",
   "results": [
     {
-      "file": "3q-ai-welcome-1040.png",
-      "bytes": 377625,
+      "file": "3q-sample-01-tea-cake.png",
+      "bytes": 416771,
       "ok": true
     },
     {
-      "file": "3q-ai-cover-bowl-1080x878.png",
-      "bytes": 548436,
+      "file": "3q-sample-02-sauce-bottle.png",
+      "bytes": 379952,
       "ok": true
     },
     {
-      "file": "3q-ai-carousel-01-noodle-1040.png",
-      "bytes": 400189,
+      "file": "3q-sample-03-noodles.png",
+      "bytes": 499457,
       "ok": true
     },
     {
-      "file": "3q-ai-carousel-02-product-1040.png",
-      "bytes": 193814,
+      "file": "3q-sample-04-bread.png",
+      "bytes": 430516,
       "ok": true
     },
     {
-      "file": "3q-ai-carousel-03-rice-1040.png",
-      "bytes": 609809,
+      "file": "3q-sample-05-rice.png",
+      "bytes": 470251,
       "ok": true
     },
     {
-      "file": "3q-ai-carousel-04-linen-1040.png",
-      "bytes": 419385,
+      "file": "3q-sample-06-pickles.png",
+      "bytes": 444635,
       "ok": true
     },
     {
-      "file": "3q-ai-seasonal-spring-1080x878.png",
-      "bytes": 391087,
+      "file": "3q-sample-07-tea.png",
+      "bytes": 390028,
       "ok": true
     },
     {
-      "file": "3q-ai-seasonal-summer-1080x878.png",
-      "bytes": 305842,
-      "ok": true
-    },
-    {
-      "file": "3q-ai-seasonal-autumn-1080x878.png",
-      "bytes": 356437,
-      "ok": true
-    },
-    {
-      "file": "3q-ai-seasonal-winter-1080x878.png",
-      "bytes": 302237,
-      "ok": true
-    },
-    {
-      "file": "3q-ai-lucky-bag-main-1040.png",
-      "bytes": 371108,
-      "ok": true
-    },
-    {
-      "file": "3q-ai-lucky-bag-morning-1040.png",
-      "bytes": 410521,
-      "ok": true
-    },
-    {
-      "file": "3q-ai-lucky-bag-noon-1040.png",
-      "bytes": 463414,
-      "ok": true
-    },
-    {
-      "file": "3q-ai-lucky-bag-evening-1040.png",
-      "bytes": 324007,
-      "ok": true
-    },
-    {
-      "file": "3q-ai-lucky-bag-night-1040.png",
-      "bytes": 95725,
+      "file": "3q-sample-08-gift-box.png",
+      "bytes": 407874,
       "ok": true
     }
   ]
