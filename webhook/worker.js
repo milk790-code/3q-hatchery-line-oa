@@ -265,6 +265,145 @@ async function saveInquiry(uid, a, env) {
   }
 }
 
+async function saveCampaignRegistration(uid, tier, price, env) {
+  if (!env.CRM) return;
+  try {
+    await env.CRM.prepare(
+      'INSERT INTO campaigns (user_id, tier, price) VALUES (?, ?, ?)'
+    ).bind(uid || 'unknown', tier, price).run();
+  } catch (err) {
+    console.error('D1 campaigns insert failed:', err.message);
+  }
+}
+
+async function updateCampaignSamplePick(uid, pick, env) {
+  if (!env.CRM) return;
+  try {
+    await env.CRM.prepare(
+      'UPDATE campaigns SET sample_pick = ? WHERE user_id = ? AND sample_pick IS NULL ORDER BY id DESC LIMIT 1'
+    ).bind(pick, uid).run();
+  } catch (err) {
+    console.error('D1 campaigns update failed:', err.message);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Dashboard stats + CSV
+// ─────────────────────────────────────────────────────────────────────────
+
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, OPTIONS',
+};
+
+async function statsHandler(env) {
+  if (!env.CRM) {
+    return new Response(JSON.stringify({ error: 'D1 not bound' }), {
+      status: 500, headers: { 'Content-Type': 'application/json', ...CORS },
+    });
+  }
+  try {
+    const today = "datetime('now','localtime','start of day')";
+    const [inquiriesTotal, inquiriesToday, campaignsTotal, campaignsToday, slotsKV] = await Promise.all([
+      env.CRM.prepare('SELECT COUNT(*) AS n FROM inquiries').first(),
+      env.CRM.prepare(`SELECT COUNT(*) AS n FROM inquiries WHERE created_at >= ${today}`).first(),
+      env.CRM.prepare('SELECT COUNT(*) AS n FROM campaigns').first(),
+      env.CRM.prepare(`SELECT COUNT(*) AS n FROM campaigns WHERE created_at >= ${today}`).first(),
+      getCampaignSlots(env),
+    ]);
+    const revenue = await env.CRM.prepare('SELECT SUM(price) AS total FROM campaigns').first();
+    const tierBreakdown = await env.CRM.prepare(
+      'SELECT tier, COUNT(*) AS n, SUM(price) AS revenue FROM campaigns GROUP BY tier'
+    ).all();
+    return new Response(JSON.stringify({
+      ok: true,
+      now: new Date().toISOString(),
+      inquiries: {
+        total: inquiriesTotal?.n || 0,
+        today: inquiriesToday?.n || 0,
+      },
+      campaigns: {
+        total: campaignsTotal?.n || 0,
+        today: campaignsToday?.n || 0,
+        revenue: revenue?.total || 0,
+        slots_filled: {
+          tier1: slotsKV.tier1.length,
+          tier2: slotsKV.tier2.length,
+          tier3: slotsKV.tier3.length,
+        },
+        slots_max: {
+          tier1: CAMPAIGN_TIERS.tier1.max,
+          tier2: CAMPAIGN_TIERS.tier2.max,
+          tier3: CAMPAIGN_TIERS.tier3.max,
+        },
+        by_tier: tierBreakdown?.results || [],
+      },
+    }, null, 2), { headers: { 'Content-Type': 'application/json', ...CORS } });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500, headers: { 'Content-Type': 'application/json', ...CORS },
+    });
+  }
+}
+
+async function csvExportHandler(table, env) {
+  if (!env.CRM) return new Response('D1 not bound', { status: 500 });
+  const allowed = ['inquiries', 'campaigns'];
+  if (!allowed.includes(table)) return new Response('invalid table', { status: 400 });
+  try {
+    const rows = await env.CRM.prepare(`SELECT * FROM ${table} ORDER BY id`).all();
+    const items = rows?.results || [];
+    if (items.length === 0) return new Response('id\n', { headers: { 'Content-Type': 'text/csv; charset=utf-8' } });
+    const headers = Object.keys(items[0]);
+    const escape = (v) => v == null ? '' : `"${String(v).replace(/"/g, '""')}"`;
+    const csv = [headers.join(',')]
+      .concat(items.map(r => headers.map(h => escape(r[h])).join(',')))
+      .join('\n');
+    return new Response(csv, {
+      headers: {
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Content-Disposition': `attachment; filename="3q-${table}-${Date.now()}.csv"`,
+      },
+    });
+  } catch (err) {
+    return new Response(`error: ${err.message}`, { status: 500 });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Scheduled — follow-up pushes (24h / 72h / 168h after inquiry)
+// ─────────────────────────────────────────────────────────────────────────
+
+const FOLLOW_UPS = [
+  { col: 'followed_up_24h',  hours: 24,  message: '收到你的諮詢 24 小時了 — 想到什麼了嗎？\n\n我們本月還有「+1」限時招募，前 30 位有優惠。也可以直接傳「實例」看作品。' },
+  { col: 'followed_up_72h',  hours: 72,  message: '3 天過去了 — 你還記得我們嗎？\n\n本月入駐 3 個店：阿婆ㄟ切仔麵 / 三代米舖 / 鹿港織坊。傳「01 / 02 / 03」單獨看。' },
+  { col: 'followed_up_168h', hours: 168, message: '一週了 — 沒消息我們就不再打擾。\n\n如果還有興趣，傳「諮詢」我們重新對接。或傳「+1」進招募名單。' },
+];
+
+async function runFollowUps(env) {
+  if (!env.CRM || !env.LINE_CHANNEL_ACCESS_TOKEN) return { ran: 0, sent: 0 };
+  let sent = 0;
+  for (const fu of FOLLOW_UPS) {
+    const due = await env.CRM.prepare(
+      `SELECT id, user_id FROM inquiries WHERE ${fu.col} = 0 AND created_at <= datetime('now', '-${fu.hours} hours') LIMIT 50`
+    ).all();
+    for (const row of (due?.results || [])) {
+      try {
+        await fetch('https://api.line.me/v2/bot/message/push', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ to: row.user_id, messages: [{ type: 'text', text: fu.message }] }),
+        });
+        await env.CRM.prepare(`UPDATE inquiries SET ${fu.col} = 1 WHERE id = ?`).bind(row.id).run();
+        sent++;
+      } catch (err) {
+        console.error(`Follow-up ${fu.col} push failed for uid ${row.user_id}:`, err.message);
+      }
+    }
+  }
+  return { sent };
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // Flex Message builders — 3Q Hatchery brand
 // ─────────────────────────────────────────────────────────────────────────
@@ -388,10 +527,24 @@ function flowParams(data) {
 
 export default {
   async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+
+    // Dashboard stats API (no auth — read-only, used by public dashboard)
+    if (url.pathname === '/api/stats' && request.method === 'GET') {
+      return await statsHandler(env);
+    }
+
+    // CSV export API (auth via TRIGGER_TOKEN)
+    if (url.pathname === '/api/csv' && request.method === 'GET') {
+      const tok = url.searchParams.get('token');
+      if (!tok || tok !== env.TRIGGER_TOKEN) return new Response('forbidden', { status: 403 });
+      return await csvExportHandler(url.searchParams.get('table') || 'inquiries', env);
+    }
+
     if (request.method === 'GET') {
       return new Response(JSON.stringify({
         service: '3Q Hatchery LINE OA webhook',
-        ok: true, version: 3.3,
+        ok: true, version: 3.4,
         configured: {
           token:       Boolean(env.LINE_CHANNEL_ACCESS_TOKEN),
           secret:      Boolean(env.LINE_CHANNEL_SECRET),
@@ -399,6 +552,8 @@ export default {
           session_kv:  Boolean(env.SESSION),
           crm_d1:      Boolean(env.CRM),
           owner_push:  Boolean(env.OWNER_USER_ID),
+          ai_llm:      Boolean(env.AI),
+          trigger:     Boolean(env.TRIGGER_TOKEN),
         },
       }, null, 2), { headers: { 'Content-Type': 'application/json' } });
     }
@@ -417,6 +572,10 @@ export default {
       ctx.waitUntil(handleEvent(ev, env).catch(e => console.error('event error', e)));
 
     return new Response('OK');
+  },
+
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(runFollowUps(env).then(r => console.log('Follow-up ran:', JSON.stringify(r))));
   },
 };
 
@@ -515,6 +674,7 @@ async function handleEvent(ev, env) {
     const sampleLike = text.trim().match(/^我喜歡\s+(s\d{2})$/);
     if (sampleLike) {
       const pick = sampleLike[1];
+      await updateCampaignSamplePick(uid, pick, env);
       if (env.OWNER_USER_ID) {
         try {
           await fetch('https://api.line.me/v2/bot/message/push', {
@@ -602,6 +762,7 @@ async function handleFlow(data, uid, replyToken, env) {
     const result = await registerCampaignSlot(uid, tier, env);
     const t = CAMPAIGN_TIERS[tier];
     if (result === 'ok') {
+      await saveCampaignRegistration(uid, tier, t.price, env);
       if (env.OWNER_USER_ID) {
         await fetch('https://api.line.me/v2/bot/message/push', {
           method: 'POST',

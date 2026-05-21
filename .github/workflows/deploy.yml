@@ -72,6 +72,7 @@ jobs:
           LINE_TOKEN:    ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
           LINE_SECRET:   ${{ secrets.LINE_CHANNEL_SECRET }}
           OWNER_USER_ID: ${{ secrets.OWNER_USER_ID }}
+          TRIGGER_TOKEN: ${{ secrets.TRIGGER_TOKEN }}
         run: |
           set -uo pipefail
           mkdir -p _debug
@@ -97,6 +98,7 @@ jobs:
               {"name": "LINE_CHANNEL_SECRET",       "type": "secret_text", "text": $(jq -Rn --arg t "$LINE_SECRET" '$t')},
               {"name": "OWNER_USER_ID",             "type": "secret_text", "text": $(jq -Rn --arg t "$OWNER_USER_ID" '$t')},
               {"name": "PNG_BASE_URL",              "type": "plain_text",  "text": $(jq -Rn --arg t "$PNG_BASE_URL" '$t')},
+              {"name": "TRIGGER_TOKEN",             "type": "secret_text", "text": $(jq -Rn --arg t "${TRIGGER_TOKEN:-}" '$t')},
               {"name": "SESSION",                   "type": "kv_namespace", "namespace_id": "$SESSION_KV_ID"},
               {"name": "AI",                        "type": "ai"}
               $CRM_BINDING
@@ -126,6 +128,18 @@ jobs:
             exit 1
           fi
           echo "Worker uploaded (etag=$(jq -r '.result.etag' _debug/cf-deploy-response.json))"
+
+      - name: Set cron trigger (hourly for follow-ups)
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/schedules" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '[{"cron": "5 * * * *"}]' | jq -e '.success == true' > /dev/null
+          echo "::notice::Cron set: every hour at :05 (UTC)"
 
       - name: CF deploy diagnostics (summary + commit on failure)
         if: always()
