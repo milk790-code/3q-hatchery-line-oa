@@ -1,11 +1,15 @@
 // Cloudflare Worker — LINE OA webhook for 3Q Hatchery.
-// v3.4 — Campaign system, quote calculator, AI fallback, follow-up pushes
+// v3.5 — A: lead scoring, owner quick-reply Flex, booking flow
+//         B: rich menu switching, member card, subscriber list + seasonal push
 //
 // Env vars required:
 //   LINE_CHANNEL_ACCESS_TOKEN   LINE_CHANNEL_SECRET   PNG_BASE_URL
 // Optional:
-//   OWNER_USER_ID  — your LINE userId; receives push when inquiry submitted
-//   TRIGGER_TOKEN  — bearer token for /api/csv export
+//   OWNER_USER_ID       — your LINE userId; receives push when inquiry submitted
+//   TRIGGER_TOKEN       — bearer token for /api/csv export
+//   RICHMENU_NEW        — rich menu ID for first-time visitors
+//   RICHMENU_INQUIRED   — rich menu ID for users who submitted an inquiry
+//   RICHMENU_CONVERTED  — rich menu ID for paying customers
 // KV binding required:
 //   SESSION  — KV namespace for conversation state (2-hour TTL)
 // D1 binding required:
@@ -22,7 +26,6 @@ const AWAY_TEXT = [
   '謝謝你願意說。',
 ].join('\n');
 
-// Taiwan business hours: Mon–Fri 10:00–19:00 (UTC+8)
 function isBusinessHours() {
   const tw = new Date(Date.now() + 8 * 3600 * 1000);
   const day = tw.getUTCDay();
@@ -214,10 +217,10 @@ function postInquiryNextStepsCard() {
     LIGHT_BODY([
       { type: 'text', text: '不一定要等。先做這個更有效：', color: '#1A1A1A', size: 'sm', wrap: true },
       { type: 'separator', margin: 'md', color: '#E8DFD0' },
-      BTN('📂 看本月入駐案例',  'flow:nxt=cases',       true,  '實例'),
-      BTN('🎯 試算我的方案價格', 'flow:nxt=quote',        true,  '試算'),
-      BTN('🔥 +1 招募名額',     'flow:nxt=campaign',     true,  '+1'),
-      BTN('🌸 看四季活動',       'flow:nxt=seasonal',     false, '春茶'),
+      BTN('📅 預約 30 分鐘諮詢',  'flow:nxt=book',     true,  '預約諮詢'),
+      BTN('📂 看本月入駐案例',    'flow:nxt=cases',    true,  '實例'),
+      BTN('🎯 試算我的方案價格',  'flow:nxt=quote',    true,  '試算'),
+      BTN('🔥 +1 招募名額',       'flow:nxt=campaign', false, '+1'),
     ]),
   ));
 }
@@ -233,8 +236,8 @@ function postCampaignNextStepsCard(tier, price, action) {
       { type: 'text', text: '2. 收款後 48h 內安排第一次對接', color: '#1A1A1A', size: 'sm' },
       { type: 'text', text: '3. 7-14 天內成片交付', color: '#1A1A1A', size: 'sm' },
       { type: 'separator', margin: 'md', color: '#E8DFD0' },
-      BTN('💬 想先聊聊',        'flow:nxt=consult', false, '說說我的店'),
-      BTN('📂 看其他案例',       'flow:nxt=cases',   false, '實例'),
+      BTN('💬 想先聊聊',  'flow:nxt=consult', false, '說說我的店'),
+      BTN('📂 看其他案例', 'flow:nxt=cases',  false, '實例'),
     ]),
   ));
 }
@@ -278,7 +281,7 @@ const SERVICE_HERO = {
 const ESCAPE_RE = /^(取消|退出|結束|重來|重新開始|cancel|exit)$/i;
 
 // ─────────────────────────────────────────────────────────────────────────
-// Cloudflare KV session (2h TTL)
+// KV session (2h TTL)
 // ─────────────────────────────────────────────────────────────────────────
 
 async function getSession(uid, env) {
@@ -295,15 +298,136 @@ async function clearSession(uid, env) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// D1 inquiries persistence
+// A-B1: Rich Menu switching (requires env.RICHMENU_NEW / _INQUIRED / _CONVERTED)
 // ─────────────────────────────────────────────────────────────────────────
+
+async function switchRichMenu(uid, menuId, env) {
+  if (!uid || !menuId || !env.LINE_CHANNEL_ACCESS_TOKEN) return;
+  try {
+    await fetch(`https://api.line.me/v2/bot/user/${uid}/richmenu/${menuId}`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}` },
+    });
+  } catch (err) {
+    console.error('switchRichMenu failed:', err.message);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// A-B2: Member card (member number + tier stored in KV without TTL)
+// ─────────────────────────────────────────────────────────────────────────
+
+async function issueMemberCard(uid, env) {
+  if (!env.SESSION || !uid) return null;
+  try {
+    const existing = await env.SESSION.get(`member:${uid}`);
+    if (existing) return JSON.parse(existing);
+    const cur = parseInt(await env.SESSION.get('member:next_num') || '0', 10);
+    const num = cur + 1;
+    await env.SESSION.put('member:next_num', String(num));
+    const joinDate = new Date(Date.now() + 8 * 3600000).toISOString().slice(0, 10);
+    const card = { num, joinDate, tier: 'visitor' };
+    await env.SESSION.put(`member:${uid}`, JSON.stringify(card));
+    return card;
+  } catch (err) {
+    console.error('issueMemberCard failed:', err.message);
+    return null;
+  }
+}
+
+async function updateMemberTier(uid, tier, env) {
+  if (!env.SESSION || !uid) return;
+  try {
+    const key = `member:${uid}`;
+    const cur = await env.SESSION.get(key);
+    if (!cur) return;
+    const card = JSON.parse(cur);
+    card.tier = tier;
+    await env.SESSION.put(key, JSON.stringify(card));
+  } catch {}
+}
+
+function memberCardFlex(num, joinDate, tier) {
+  const TIER_LABELS = { visitor: '訪客', inquired: '詢問者', partner: '夥伴' };
+  const TIER_COLORS = { visitor: '#8A8A8A', inquired: '#B8924A', partner: '#B8924A' };
+  const padded = String(num).padStart(4, '0');
+  return FLEX(`3Q 會員卡 #${padded}`, {
+    type: 'bubble', size: 'mega',
+    body: {
+      type: 'box', layout: 'vertical', backgroundColor: '#0A0A0A',
+      paddingAll: '24px', spacing: 'sm',
+      contents: [
+        { type: 'text', text: 'MEMBER', color: '#B8924A', size: 'xxs', weight: 'bold', letterSpacing: '4px' },
+        { type: 'text', text: `# ${padded}`, color: '#F5F2EC', size: 'xxl', weight: 'bold', margin: 'sm' },
+        { type: 'separator', margin: 'sm', color: '#B8924A' },
+        { type: 'box', layout: 'horizontal', margin: 'md', contents: [
+          { type: 'text', text: '加入日期', color: '#8A8A8A', size: 'xs', flex: 1 },
+          { type: 'text', text: joinDate, color: '#F5F2EC', size: 'xs', flex: 2, align: 'end' },
+        ]},
+        { type: 'box', layout: 'horizontal', contents: [
+          { type: 'text', text: '身分', color: '#8A8A8A', size: 'xs', flex: 1 },
+          { type: 'text', text: TIER_LABELS[tier] || tier,
+            color: TIER_COLORS[tier] || '#F5F2EC', size: 'xs', flex: 2, align: 'end', weight: 'bold' },
+        ]},
+        { type: 'separator', margin: 'md', color: '#333333' },
+        { type: 'text', text: '3Q HATCHERY · 台灣在地品牌孵化所',
+          color: '#444444', size: 'xxs', margin: 'sm', align: 'center' },
+      ],
+    },
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// A-B3: Subscriber list (stored in KV, no TTL)
+// ─────────────────────────────────────────────────────────────────────────
+
+const SUBSCRIBERS_KEY = 'subscribers:list';
+
+async function addSubscriber(uid, env) {
+  if (!env.SESSION || !uid) return;
+  try {
+    const cur = await env.SESSION.get(SUBSCRIBERS_KEY);
+    const list = cur ? JSON.parse(cur) : [];
+    if (!list.includes(uid)) {
+      list.push(uid);
+      await env.SESSION.put(SUBSCRIBERS_KEY, JSON.stringify(list));
+    }
+  } catch {}
+}
+
+async function removeSubscriber(uid, env) {
+  if (!env.SESSION || !uid) return;
+  try {
+    const cur = await env.SESSION.get(SUBSCRIBERS_KEY);
+    if (!cur) return;
+    const list = JSON.parse(cur).filter(u => u !== uid);
+    await env.SESSION.put(SUBSCRIBERS_KEY, JSON.stringify(list));
+  } catch {}
+}
+
+async function getSubscribers(env) {
+  if (!env.SESSION) return [];
+  try {
+    const cur = await env.SESSION.get(SUBSCRIBERS_KEY);
+    return cur ? JSON.parse(cur) : [];
+  } catch { return []; }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// D1 helpers
+// ─────────────────────────────────────────────────────────────────────────
+
+function leadScore(budget) {
+  return budget === 'high' ? 'hot' : budget === 'mid' ? 'warm' : 'cold';
+}
 
 async function saveInquiry(uid, a, env) {
   if (!env.CRM) return;
+  const score = leadScore(a.budget);
   try {
     await env.CRM.prepare(
-      'INSERT INTO inquiries (user_id, service, budget, timeline, free_text) VALUES (?, ?, ?, ?, ?)'
-    ).bind(uid || 'unknown', a.service || null, a.budget || null, a.timeline || null, a.freeText || null).run();
+      'INSERT INTO inquiries (user_id, service, budget, timeline, free_text, lead_score) VALUES (?, ?, ?, ?, ?, ?)'
+    ).bind(uid || 'unknown', a.service || null, a.budget || null, a.timeline || null, a.freeText || null, score).run();
   } catch (err) {
     console.error('D1 inquiries insert failed:', err.message);
   }
@@ -324,10 +448,36 @@ async function updateCampaignSamplePick(uid, pick, env) {
   if (!env.CRM) return;
   try {
     await env.CRM.prepare(
-      'UPDATE campaigns SET sample_pick = ? WHERE user_id = ? AND sample_pick IS NULL ORDER BY id DESC LIMIT 1'
+      'UPDATE campaigns SET sample_pick = ? WHERE id = (SELECT id FROM campaigns WHERE user_id = ? AND sample_pick IS NULL ORDER BY id DESC LIMIT 1)'
     ).bind(pick, uid).run();
   } catch (err) {
     console.error('D1 campaigns update failed:', err.message);
+  }
+}
+
+// A1: Update inquiry status (owner quick-reply action)
+async function updateInquiryStatus(uid, status, env) {
+  if (!env.CRM) return;
+  try {
+    await env.CRM.prepare(
+      'UPDATE inquiries SET status = ? WHERE id = (SELECT id FROM inquiries WHERE user_id = ? ORDER BY id DESC LIMIT 1)'
+    ).bind(status, uid).run();
+    if (status === 'won')       await updateMemberTier(uid, 'partner',  env);
+    if (status === 'contacted') await updateMemberTier(uid, 'inquired', env);
+  } catch (err) {
+    console.error('updateInquiryStatus failed:', err.message);
+  }
+}
+
+// A3: Save booking request from user
+async function saveBookingRequest(uid, note, env) {
+  if (!env.CRM) return;
+  try {
+    await env.CRM.prepare(
+      'UPDATE inquiries SET booking_requested = 1, booking_note = ? WHERE id = (SELECT id FROM inquiries WHERE user_id = ? ORDER BY id DESC LIMIT 1)'
+    ).bind(note, uid).run();
+  } catch (err) {
+    console.error('saveBookingRequest failed:', err.message);
   }
 }
 
@@ -355,12 +505,17 @@ async function statsHandler(env) {
   }
   try {
     const today = "datetime('now','localtime','start of day')";
-    const [inquiriesTotal, inquiriesToday, campaignsTotal, campaignsToday, slotsKV] = await Promise.all([
+    const [inquiriesTotal, inquiriesToday, campaignsTotal, campaignsToday, slotsKV,
+           hotLeads, warmLeads, coldLeads, wonLeads] = await Promise.all([
       env.CRM.prepare('SELECT COUNT(*) AS n FROM inquiries').first(),
       env.CRM.prepare(`SELECT COUNT(*) AS n FROM inquiries WHERE created_at >= ${today}`).first(),
       env.CRM.prepare('SELECT COUNT(*) AS n FROM campaigns').first(),
       env.CRM.prepare(`SELECT COUNT(*) AS n FROM campaigns WHERE created_at >= ${today}`).first(),
       getCampaignSlots(env),
+      env.CRM.prepare("SELECT COUNT(*) AS n FROM inquiries WHERE lead_score = 'hot'").first(),
+      env.CRM.prepare("SELECT COUNT(*) AS n FROM inquiries WHERE lead_score = 'warm'").first(),
+      env.CRM.prepare("SELECT COUNT(*) AS n FROM inquiries WHERE lead_score = 'cold'").first(),
+      env.CRM.prepare("SELECT COUNT(*) AS n FROM inquiries WHERE status = 'won'").first(),
     ]);
     const revenue = await env.CRM.prepare('SELECT SUM(price) AS total FROM campaigns').first();
     const tierBreakdown = await env.CRM.prepare(
@@ -372,6 +527,8 @@ async function statsHandler(env) {
       inquiries: {
         total: inquiriesTotal?.n || 0,
         today: inquiriesToday?.n || 0,
+        by_score: { hot: hotLeads?.n || 0, warm: warmLeads?.n || 0, cold: coldLeads?.n || 0 },
+        won: wonLeads?.n || 0,
       },
       campaigns: {
         total: campaignsTotal?.n || 0,
@@ -426,11 +583,11 @@ async function csvExportHandler(table, env) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Scheduled — follow-up pushes (24h / 72h / 168h after inquiry)
+// Scheduled — follow-up pushes (24h / 72h / 168h)
 // ─────────────────────────────────────────────────────────────────────────
 
 const FOLLOW_UPS = [
-  { col: 'followed_up_24h',  hours: 24,  message: '收到你的諮詢 24 小時了 — 想到什麼了嗎？\n\n我們本月還有「+1」限時招募，前 30 位有優惠。也可以直接傳「實例」看作品。' },
+  { col: 'followed_up_24h',  hours: 24,  message: '收到你的諮詢 24 小時了 — 想到什麼了嗎？\n\n我們本月還有「+1」限時招募，前 30 位有優惠。也可以直接傳「實例」看作品。\n\n或傳「預約諮詢」預約 30 分鐘免費諮詢。' },
   { col: 'followed_up_72h',  hours: 72,  message: '3 天過去了 — 你還記得我們嗎？\n\n本月入駐 3 個店：阿婆ㄟ切仔麵 / 三代米舖 / 鹿港織坊。傳「01 / 02 / 03」單獨看。' },
   { col: 'followed_up_168h', hours: 168, message: '一週了 — 沒消息我們就不再打擾。\n\n如果還有興趣，傳「諮詢」我們重新對接。或傳「+1」進招募名單。' },
 ];
@@ -465,17 +622,25 @@ async function runWeeklyDigest(env) {
   }
   try {
     const since = "datetime('now', '-7 days')";
-    const [inq, cmp, rev] = await Promise.all([
+    const [inq, cmp, rev, hot, warm, cold, won] = await Promise.all([
       env.CRM.prepare(`SELECT COUNT(*) AS n FROM inquiries WHERE created_at >= ${since}`).first(),
       env.CRM.prepare(`SELECT COUNT(*) AS n FROM campaigns WHERE created_at >= ${since}`).first(),
       env.CRM.prepare(`SELECT COALESCE(SUM(price), 0) AS r FROM campaigns WHERE created_at >= ${since}`).first(),
+      env.CRM.prepare(`SELECT COUNT(*) AS n FROM inquiries WHERE lead_score = 'hot' AND created_at >= ${since}`).first(),
+      env.CRM.prepare(`SELECT COUNT(*) AS n FROM inquiries WHERE lead_score = 'warm' AND created_at >= ${since}`).first(),
+      env.CRM.prepare(`SELECT COUNT(*) AS n FROM inquiries WHERE lead_score = 'cold' AND created_at >= ${since}`).first(),
+      env.CRM.prepare(`SELECT COUNT(*) AS n FROM inquiries WHERE status = 'won' AND created_at >= ${since}`).first(),
     ]);
     const slots = await getCampaignSlots(env);
     const total_slots = slots.tier1.length + slots.tier2.length + slots.tier3.length;
+    const subs = await getSubscribers(env);
     const text = [
       '📊 3Q 週報 (本週)',
       '',
       `新諮詢：${inq?.n || 0} 筆`,
+      `  🔥 熱：${hot?.n || 0}  ⚡ 暖：${warm?.n || 0}  🌱 冷：${cold?.n || 0}`,
+      `  🎉 本週成交：${won?.n || 0} 筆`,
+      '',
       `新報名：${cmp?.n || 0} 位`,
       `本週收入：NT$ ${(rev?.r || 0).toLocaleString()}`,
       '',
@@ -483,6 +648,8 @@ async function runWeeklyDigest(env) {
       `  · 100元梯：${slots.tier1.length}/10`,
       `  · 200元梯：${slots.tier2.length}/10`,
       `  · 300元梯：${slots.tier3.length}/10`,
+      '',
+      `訂閱人數：${subs.length} 人`,
       '',
       'Dashboard: https://milk790-code.github.io/3q-hatchery-line-oa/ui_kits/dashboard/',
     ].join('\n');
@@ -499,8 +666,38 @@ async function runWeeklyDigest(env) {
   }
 }
 
+// A-B3: Seasonal push to subscriber list (runs on 1st of Mar/Jun/Sep/Dec)
+async function runSeasonalPush(env) {
+  if (!env.LINE_CHANNEL_ACCESS_TOKEN) return { skipped: 'no token' };
+  const subscribers = await getSubscribers(env);
+  if (subscribers.length === 0) return { skipped: 'no subscribers' };
+  const month = new Date(Date.now() + 8 * 3600000).getUTCMonth() + 1;
+  const SEASONAL_MSG = {
+    3:  '🌸 春季開始了。\n\n3Q 春季限定：春茶品牌 × 農場攝影，3 月限時招募。\n傳「春茶」看今季活動，或傳「+1」搶先報名。',
+    6:  '☀️ 夏天來了。\n\n3Q 夏季限定：夏日食品 × 清爽風格攝影，6 月限時招募。\n傳「夏日」看今季活動，或傳「+1」搶先報名。',
+    9:  '🍂 秋季到了。\n\n3Q 秋季限定：中秋禮盒 × 溫暖質感攝影，9 月限時招募。\n傳「秋季」看今季活動，或傳「+1」搶先報名。',
+    12: '❄️ 冬天了。\n\n3Q 冬季限定：年節禮品 × 溫暖光影攝影，12 月限時招募。\n傳「冬季」看今季活動，或傳「+1」搶先報名。',
+  };
+  const msg = SEASONAL_MSG[month];
+  if (!msg) return { skipped: 'not a seasonal month' };
+  let sent = 0;
+  for (const uid of subscribers) {
+    try {
+      await fetch('https://api.line.me/v2/bot/message/push', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: uid, messages: [{ type: 'text', text: msg }] }),
+      });
+      sent++;
+    } catch (err) {
+      console.error(`Seasonal push failed for uid ${uid}:`, err.message);
+    }
+  }
+  return { sent, total: subscribers.length, month };
+}
+
 // ─────────────────────────────────────────────────────────────────────────
-// Flex Message builders — 3Q Hatchery brand
+// Flex Message builders
 // ─────────────────────────────────────────────────────────────────────────
 
 const HERO = (url, ratio = '20:13') => ({
@@ -640,7 +837,7 @@ export default {
     if (request.method === 'GET') {
       return new Response(JSON.stringify({
         service: '3Q Hatchery LINE OA webhook',
-        ok: true, version: 3.4,
+        ok: true, version: 3.5,
         configured: {
           token:       Boolean(env.LINE_CHANNEL_ACCESS_TOKEN),
           secret:      Boolean(env.LINE_CHANNEL_SECRET),
@@ -650,6 +847,7 @@ export default {
           owner_push:  Boolean(env.OWNER_USER_ID),
           ai_llm:      Boolean(env.AI),
           trigger:     Boolean(env.TRIGGER_TOKEN),
+          richmenu:    Boolean(env.RICHMENU_NEW),
         },
       }, null, 2), { headers: { 'Content-Type': 'application/json' } });
     }
@@ -677,6 +875,10 @@ export default {
     if (event.cron === '0 13 * * 1') {
       ctx.waitUntil(runWeeklyDigest(env).then(r => console.log('Weekly digest:', JSON.stringify(r))));
     }
+    // Seasonal push: 1st of Mar / Jun / Sep / Dec at 09:00 TW (01:00 UTC)
+    if (event.cron === '0 1 1 3,6,9,12 *') {
+      ctx.waitUntil(runSeasonalPush(env).then(r => console.log('Seasonal push:', JSON.stringify(r))));
+    }
   },
 };
 
@@ -689,12 +891,26 @@ async function handleEvent(ev, env) {
 
   if (ev.type === 'follow') {
     await clearSession(uid, env);
-    return sendWelcome(ev.replyToken, env);
+    const mCard = await issueMemberCard(uid, env);
+    await addSubscriber(uid, env);
+    await switchRichMenu(uid, env.RICHMENU_NEW, env);
+    return sendWelcome(ev.replyToken, env, mCard);
   }
 
   if (ev.type === 'postback') {
     const d = ev.postback?.data || '';
     if (d.startsWith('flow:')) return handleFlow(d, uid, ev.replyToken, env);
+
+    // A2: Owner quick-reply status buttons
+    if (d.startsWith('owner:')) {
+      const params = Object.fromEntries(d.slice('owner:'.length).split('&').map(kv => kv.split('=')));
+      if (params.status && params.uid) {
+        await updateInquiryStatus(params.uid, params.status, env);
+        const labels = { contacted: '已聯繫 ✓', lost: '不感興趣', won: '成交 🎉' };
+        return replyMsg(ev.replyToken, [{ type: 'text', text: `已更新：${labels[params.status] || params.status}` }], env);
+      }
+    }
+
     const MENU = {
       'menu:my-store':  () => replyMsg(ev.replyToken, [serviceCard(env.PNG_BASE_URL)], env),
       'menu:imagery':   () => replyMsg(ev.replyToken, [budgetCard('imagery', env.PNG_BASE_URL)], env),
@@ -715,7 +931,46 @@ async function handleEvent(ev, env) {
       }], env);
     }
 
+    // B3: Subscription management
+    if (text.trim() === '訂閱') {
+      await addSubscriber(uid, env);
+      return replyMsg(ev.replyToken, [{
+        type: 'text',
+        text: '已加入訂閱 ✓\n\n每季活動、限定優惠，我們會第一時間通知你。\n\n傳「取消訂閱」可隨時退出。',
+      }], env);
+    }
+    if (text.trim() === '取消訂閱') {
+      await removeSubscriber(uid, env);
+      return replyMsg(ev.replyToken, [{
+        type: 'text',
+        text: '已取消訂閱。\n\n如果之後想重新加入，傳「訂閱」即可。',
+      }], env);
+    }
+
     const session = await getSession(uid, env);
+
+    // A3: Booking time text step
+    if (session?.step === 'booking') {
+      await saveBookingRequest(uid, text, env);
+      await clearSession(uid, env);
+      if (env.OWNER_USER_ID) {
+        try {
+          await fetch('https://api.line.me/v2/bot/message/push', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: env.OWNER_USER_ID,
+              messages: [{ type: 'text', text: `📅 新預約請求\nUID：${uid}\n希望時段：${text}` }],
+            }),
+          });
+        } catch {}
+      }
+      return replyMsg(ev.replyToken, [{
+        type: 'text',
+        text: '好的！我們會在 24 小時內確認時段並回覆你。\n\n先把你的店名稱和主要想聊的事情準備好，諮詢效率更高 😊',
+      }], env);
+    }
+
     if (session?.step === 'freetext') {
       const answers = { service: session.service, budget: session.budget, timeline: session.timeline, freeText: text };
       await saveSession(uid, { step: 'summary', ...answers }, env);
@@ -810,7 +1065,16 @@ async function handleFlow(data, uid, replyToken, env) {
   if (p.rush !== undefined) {
     return replyMsg(replyToken, [quoteResultCard(p.q, p.u, p.rush)], env);
   }
+
   if (p.nxt !== undefined) {
+    // A3: Booking flow entry
+    if (p.nxt === 'book') {
+      await saveSession(uid, { step: 'booking' }, env);
+      return replyMsg(replyToken, [{
+        type: 'text',
+        text: '好。\n\n告訴我你方便的諮詢時段（例如：週三下午、週六上午），我們會在 24 小時內確認時間。\n\n（打「取消」可離開）',
+      }], env);
+    }
     const target = {
       cases:    '實例',
       quote:    '試算',
@@ -852,7 +1116,11 @@ async function handleFlow(data, uid, replyToken, env) {
     const session = await getSession(uid, env);
     if (session) {
       await saveInquiry(uid, session, env);
-      if (env.OWNER_USER_ID) await pushToOwner(session, env);
+      if (env.OWNER_USER_ID) await pushToOwner(session, env, uid);
+      // B1: Switch rich menu to "inquired" state
+      await switchRichMenu(uid, env.RICHMENU_INQUIRED, env);
+      // B2: Upgrade member tier
+      await updateMemberTier(uid, 'inquired', env);
     }
     await clearSession(uid, env);
     return replyMsg(replyToken, [
@@ -871,12 +1139,15 @@ async function handleFlow(data, uid, replyToken, env) {
     const t = CAMPAIGN_TIERS[tier];
     if (result === 'ok') {
       await saveCampaignRegistration(uid, tier, t.price, env);
+      // B1: Switch to converted rich menu on campaign register
+      await switchRichMenu(uid, env.RICHMENU_CONVERTED, env);
+      await updateMemberTier(uid, 'partner', env);
       if (env.OWNER_USER_ID) {
         await fetch('https://api.line.me/v2/bot/message/push', {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ to: env.OWNER_USER_ID, messages: [{ type: 'text',
-            text: `新招募報名\n方案：${t.label} · ${t.price} 元\n動作：${t.action}\nUID：${uid}` }] }),
+            text: `🎉 新招募報名\n方案：${t.label} · ${t.price} 元\n動作：${t.action}\nUID：${uid}` }] }),
         });
       }
       return replyMsg(replyToken, [
@@ -899,26 +1170,43 @@ async function handleFlow(data, uid, replyToken, env) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Owner push notification
+// A2: Owner push — Flex with lead score + quick-reply action buttons
 // ─────────────────────────────────────────────────────────────────────────
 
-async function pushToOwner(a, env) {
-  const text = [
-    '新詢問',
-    `需求：${SERVICE_LABELS[a.service]   || a.service   || '—'}`,
-    `預算：${BUDGET_LABELS[a.budget]     || a.budget     || '—'}`,
-    `時間：${TIMELINE_LABELS[a.timeline] || a.timeline   || '—'}`,
-    `說的：${a.freeText || '（未填）'}`,
-  ].join('\n');
+async function pushToOwner(a, env, uid) {
+  const score = leadScore(a.budget);
+  const SCORE_EMOJI = { hot: '🔥', warm: '⚡', cold: '🌱' };
+  const emoji = SCORE_EMOJI[score] || '';
+  const infoRows = [
+    ['需求', SERVICE_LABELS[a.service]   || a.service   || '—'],
+    ['預算', BUDGET_LABELS[a.budget]     || a.budget     || '—'],
+    ['時間', TIMELINE_LABELS[a.timeline] || a.timeline   || '—'],
+    ['說的', a.freeText || '（未填）'],
+  ];
+  const ownerFlex = FLEX(`新詢問 ${emoji}`, BUBBLE(
+    DARK_HEADER(`新詢問 ${emoji}`, `${score.toUpperCase()} LEAD · ${new Date(Date.now() + 8*3600000).toISOString().slice(0,16).replace('T',' ')}`),
+    LIGHT_BODY([
+      ...infoRows.map(([label, value]) => ({
+        type: 'box', layout: 'horizontal', contents: [
+          { type: 'text', text: label, color: '#8A8A8A', size: 'sm', flex: 1 },
+          { type: 'text', text: value, color: '#1A1A1A', size: 'sm', flex: 3, wrap: true },
+        ],
+      })),
+      { type: 'separator', margin: 'md', color: '#E8DFD0' },
+      BTN('📞 已聯繫',   `owner:status=contacted&uid=${uid}`, true,  '已聯繫'),
+      BTN('😔 不感興趣', `owner:status=lost&uid=${uid}`,      false, '不感興趣'),
+      BTN('🎉 成交',     `owner:status=won&uid=${uid}`,       false, '成交'),
+    ]),
+  ));
   await fetch('https://api.line.me/v2/bot/message/push', {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ to: env.OWNER_USER_ID, messages: [{ type: 'text', text }] }),
+    body: JSON.stringify({ to: env.OWNER_USER_ID, messages: [ownerFlex] }),
   });
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Welcome — Full Flex Bubble with hero image
+// Welcome — Flex with hero + member card
 // ─────────────────────────────────────────────────────────────────────────
 
 function twGreeting() {
@@ -931,7 +1219,7 @@ function twGreeting() {
   return '夜深了';
 }
 
-async function sendWelcome(replyToken, env) {
+async function sendWelcome(replyToken, env, mCard = null) {
   const base = env.PNG_BASE_URL;
   const greeting = twGreeting();
   if (!base) {
@@ -964,7 +1252,10 @@ async function sendWelcome(replyToken, env) {
       },
     },
   };
-  return replyMsg(replyToken, [welcomeFlex, carouselMsg(base), serviceCard(base)], env);
+  const msgs = [welcomeFlex, carouselMsg(base), serviceCard(base)];
+  // B2: Append member card if issued
+  if (mCard) msgs.push(memberCardFlex(mCard.num, mCard.joinDate, mCard.tier));
+  return replyMsg(replyToken, msgs, env);
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -1006,7 +1297,6 @@ async function aiFallback(userText, env, uid) {
   }
   try {
     const SYSTEM = '你是 3Q 貢丸·台灣在地品牌孵化所的客服助理。回應台灣繁體中文，最多 80 字。\n\n3Q 提供 3 個服務：\n1. 好物・好照 — 產品攝影 + 介紹文，500 元起\n2. 客製行銷 — 季度規劃，從現階段往前 3 個月\n3. 諮詢 — 30 分鐘免費，先聊聊再決定\n\n本月活動：好物・好照限時招募，前 10 位 100 元，名額剩 X 位。傳「+1」可看。\n\n用戶問什麼，你判斷最接近哪個服務，回答 2-3 句話，結尾建議他傳的關鍵字（例如：「回覆『+1』」「點選圖文選單『好物・好照』」）。語氣親切但不要過度熱情，跟用戶平等對話。';
-
     const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct-fast', {
       messages: [
         { role: 'system', content: SYSTEM },
