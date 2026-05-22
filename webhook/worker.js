@@ -972,6 +972,22 @@ async function handleEvent(ev, env) {
       }], env);
     }
 
+    // Owner command: #vip <uid> → switch user to CONVERTED rich menu
+    if (uid === env.OWNER_USER_ID && /^#vip\s+\S+/i.test(text.trim())) {
+      const targetUid = text.trim().split(/\s+/)[1];
+      await switchRichMenu(targetUid, env.RICHMENU_CONVERTED, env);
+      await updateMemberTier(targetUid, 'partner', env);
+      return replyMsg(ev.replyToken, [{ type: 'text', text: `✅ 已切換 ${targetUid} 至 VIP (C版)` }], env);
+    }
+
+    // Owner command: #menu-a <uid> → switch user back to NEW rich menu
+    if (uid === env.OWNER_USER_ID && /^#menu-a\s+\S+/i.test(text.trim())) {
+      const targetUid = text.trim().split(/\s+/)[1];
+      await switchRichMenu(targetUid, env.RICHMENU_NEW, env);
+      await updateMemberTier(targetUid, 'new', env);
+      return replyMsg(ev.replyToken, [{ type: 'text', text: `✅ 已切換 ${targetUid} 至 A版` }], env);
+    }
+
     const session = await getSession(uid, env);
 
     // A3: Booking time text step
@@ -1142,10 +1158,6 @@ async function handleFlow(data, uid, replyToken, env) {
     if (session) {
       await saveInquiry(uid, session, env);
       if (env.OWNER_USER_ID) await pushToOwner(session, env, uid);
-      // B1: Switch rich menu to "inquired" state
-      await switchRichMenu(uid, env.RICHMENU_INQUIRED, env);
-      // B2: Upgrade member tier
-      await updateMemberTier(uid, 'inquired', env);
     }
     await clearSession(uid, env);
     return replyMsg(replyToken, [
@@ -1164,9 +1176,6 @@ async function handleFlow(data, uid, replyToken, env) {
     const t = CAMPAIGN_TIERS[tier];
     if (result === 'ok') {
       await saveCampaignRegistration(uid, tier, t.price, env);
-      // B1: Switch to inquired rich menu on campaign register (payment not confirmed yet)
-      await switchRichMenu(uid, env.RICHMENU_INQUIRED, env);
-      await updateMemberTier(uid, 'inquired', env);
       if (env.OWNER_USER_ID) {
         await fetch('https://api.line.me/v2/bot/message/push', {
           method: 'POST',
