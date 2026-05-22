@@ -1164,9 +1164,9 @@ async function handleFlow(data, uid, replyToken, env) {
     const t = CAMPAIGN_TIERS[tier];
     if (result === 'ok') {
       await saveCampaignRegistration(uid, tier, t.price, env);
-      // B1: Switch to converted rich menu on campaign register
-      await switchRichMenu(uid, env.RICHMENU_CONVERTED, env);
-      await updateMemberTier(uid, 'partner', env);
+      // B1: Switch to inquired rich menu on campaign register (payment not confirmed yet)
+      await switchRichMenu(uid, env.RICHMENU_INQUIRED, env);
+      await updateMemberTier(uid, 'inquired', env);
       if (env.OWNER_USER_ID) {
         await fetch('https://api.line.me/v2/bot/message/push', {
           method: 'POST',
