@@ -1,1 +1,190 @@
-IyEvdXNyL2Jpbi9lbnYgYmFzaAojIDNRIEhhdGNoZXJ5IOKAlCBMSU5FIFJpY2ggTWVudSDkuIDpjbXlu7rnq4sgKyDkuIrlgrPohbPmnKwKIyDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKIyDnlKjpgJTvvJoKIyAgIDEuIOeUqCBMSU5FIE1lc3NhZ2luZyBBUEkg5bu6IDMg5YCLIHJpY2htZW51IHNjaGVtYSAoQSAvIEIgLyBDKQojICAgMi4g5oqK5bCN5oeJ55qEIFBORyDkuIrlgrPliLDmr4/lgIsgc2NoZW1hCiMgICAzLiDmioogQSDniYjoqK3ngrrpoJDoqK0gKOaWsOWlveWPi+WKoOWFpeiHquWLleeci+WIsCkKIyAgIDQuIOWNsOWHuuS4ieWAiyBSSUNITUVOVV9JRCDigJQg5L2g5ou/5Y675aGr5YiwIHdvcmtlci5qcyDljbPlj68KIyDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKIyDkvb/nlKjvvJoKIyAgIGV4cG9ydCBDSEFOTkVMX1RPS0VOPSLkvaDnmoRfbG9uZ19saXZlZF9jaGFubmVsX2FjY2Vzc190b2tlbiIKIyAgIGNkIC9wYXRoL3RvL2Fzc2V0cy9leHBvcnRzLyAgICAjIOW/hemgiOWcqCBQTkcg5ZCM5LiA5YCL6LOH5paZ5aS+CiMgICAuL3VwbG9hZC1yaWNobWVudS5zaAojIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKc2V0IC1ldW8gcGlwZWZhaWwKCiMg4pSA4pSAIC0tcHJ1bmU6IOWIl+WHuuS4puWIqumZpOaJgOacieePvuaciSBSaWNoIE1lbnUg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACmlmIFtbICIkezE6LX0iID09ICItLXBydW5lIiBdXTsgdGhlbgogIGlmIFtbIC16ICIke0NIQU5ORUxfVE9LRU46LX0iIF1dOyB0aGVuCiAgICBlY2hvICLinJcgLS1wcnVuZSDpnIDopoEgQ0hBTk5FTF9UT0tFTiDigJQg5YWIIGV4cG9ydCI7IGV4aXQgMQogIGZpCiAgZWNobyAi4pa4IC0tcHJ1bmU6IOWIl+WHuuS4puWIqumZpOePvuaciSBSaWNoIE1lbnXigKYiCiAgRVhJU1RJTkc9JChjdXJsIC1mc1MgLUggIkF1dGhvcml6YXRpb246IEJlYXJlciAke0NIQU5ORUxfVE9LRU59IiBcCiAgICBodHRwczovL2FwaS5saW5lLm1lL3YyL2JvdC9yaWNobWVudS9saXN0IHwgXAogICAgZ3JlcCAtb0UgJyJyaWNoTWVudUlkIjoiW14iXSoiJyB8IFwKICAgIHNlZCAncy8uKiJcKHJpY2htZW51LVteIl0qXCkiLiovXDEvJykKICBpZiBbWyAteiAiJEVYSVNUSU5HIiBdXTsgdGhlbgogICAgZWNobyAiICDihrMg5rKS5pyJ54++5pyJIFJpY2ggTWVude+8jOi3s+mBjiIKICBlbHNlCiAgICBmb3IgcmlkIGluICRFWElTVElORzsgZG8KICAgICAgZWNobyAiICDihrMgREVMRVRFICRyaWQiCiAgICAgIGN1cmwgLWZzUyAtWCBERUxFVEUgLUggIkF1dGhvcml6YXRpb246IEJlYXJlciAke0NIQU5ORUxfVE9LRU59IiBcCiAgICAgICAgImh0dHBzOi8vYXBpLmxpbmUubWUvdjIvYm90L3JpY2htZW51LyRyaWQiID4gL2Rldi9udWxsIHx8IHRydWUKICAgIGRvbmUKICAgIGVjaG8gIiAg4oazIOa4heWujO+8jOe5vOe6jOW7uuaWsOeJiCIKICBmaQpmaQoKCiMg4pSA4pSAIDApIOaqouafpSDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKaWYgW1sgLXogIiR7Q0hBTk5FTF9UT0tFTjotfSIgXV07IHRoZW4KICBlY2hvICLinJcg55Kw5aKD6K6K5pW4IENIQU5ORUxfVE9LRU4g5rKS6Kit5a6aIgogIGVjaG8gIiAg5Z+36KGM77yaZXhwb3J0IENIQU5ORUxfVE9LRU49XCLkvaDnmoQgdG9rZW5cIiIKICBleGl0IDEKZmkKCmZvciBmIGluIDNRLUhBVENIRVJZX3JpY2htZW51X2FfMjUwMHgxNjg2LnBuZyBcCiAgICAgICAgIDNRLUhBVENIRVJZX3JpY2htZW51X2JfMjUwMHgxNjg2LnBuZyBcCiAgICAgICAgIDNRLUhBVENIRVJZX3JpY2htZW51X2NfMjUwMHgxNjg2LnBuZyA7IGRvCiAgaWYgW1sgISAtZiAiJGYiIF1dOyB0aGVuCiAgICBlY2hvICLinJcg5om+5LiN5YiwICRmIOKAlCDoq4vnorroqo3kvaDlnKggYXNzZXRzL2V4cG9ydHMvIOizh+aWmeWkviIKICAgIGV4aXQgMQogIGZpCmRvbmUKCkFQST0iaHR0cHM6Ly9hcGkubGluZS5tZS92Mi9ib3QvcmljaG1lbnUiCkFQSV9EQVRBPSJodHRwczovL2FwaS1kYXRhLmxpbmUubWUvdjIvYm90L3JpY2htZW51IgpBVVRIPSJBdXRob3JpemF0aW9uOiBCZWFyZXIgJHtDSEFOTkVMX1RPS0VOfSIKCiMg4pSA4pSAIDEpIOS4ieWAiyByaWNobWVudSBzY2hlbWEg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACiMg5YWx55So54mI5Z6L77yaMyBjb2xzIMOXIDIgcm93cyA9IDYgY2VsbHPvvJtoZXJvIOi3qOW3puS4iiAyIGNlbGwgKGNvbCAxLTIgcm93IDEpCiMg5q+P5YCLIGNlbGwgPSA4MzPDlzg0M++8m2hlcm8gPSAxNjY2w5c4NDMKcmVhZCAtciAtZCAnJyBTQ0hFTUFfQSA8PCdKU09OJyB8fCB0cnVlCnsKICAic2l6ZSI6IHsgIndpZHRoIjogMjUwMCwgImhlaWdodCI6IDE2ODYgfSwKICAic2VsZWN0ZWQiOiB0cnVlLAogICJuYW1lIjogIlJJQ0hNRU5VX05FVyIsCiAgImNoYXRCYXJUZXh0IjogIumBuOWWriIsCiAgImFyZWFzIjogWwogICAgeyAiYm91bmRzIjogeyAieCI6IDAsICAgICJ5IjogMCwgICAgIndpZHRoIjogMTY2NiwgImhlaWdodCI6IDg0MyB9LAogICAgICAiYWN0aW9uIjogeyAidHlwZSI6ICJtZXNzYWdlIiwgInRleHQiOiAi6Kqq6Kqq5oiR55qE5bqXIiB9IH0sCiAgICB7ICJib3VuZHMiOiB7ICJ4IjogMTY2NiwgInkiOiAwLCAgICAid2lkdGgiOiA4MzQsICAiaGVpZ2h0IjogODQzIH0sCiAgICAgICJhY3Rpb24iOiB7ICJ0eXBlIjogIm1lc3NhZ2UiLCAidGV4dCI6ICLlk4HniYzlrbXljJbmmK/ku4DpurwiIH0gfSwKICAgIHsgImJvdW5kcyI6IHsgIngiOiAwLCAgICAieSI6IDg0MywgICJ3aWR0aCI6IDgzMywgICJoZWlnaHQiOiA4NDMgfSwKICAgICAgImFjdGlvbiI6IHsgInR5cGUiOiAibWVzc2FnZSIsICJ0ZXh0IjogIuacjeWLmeS4gOimvSIgfSB9LAogICAgeyAiYm91bmRzIjogeyAieCI6IDgzMywgICJ5IjogODQzLCAgIndpZHRoIjogODM0LCAgImhlaWdodCI6IDg0MyB9LAogICAgICAiYWN0aW9uIjogeyAidHlwZSI6ICJtZXNzYWdlIiwgInRleHQiOiAi5ZCI5L2c5qGI5L6LIiB9IH0sCiAgICB7ICJib3VuZHMiOiB7ICJ4IjogMTY2NywgInkiOiA4NDMsICAid2lkdGgiOiA4MzMsICAiaGVpZ2h0IjogODQzIH0sCiAgICAgICJhY3Rpb24iOiB7ICJ0eXBlIjogIm1lc3NhZ2UiLCAidGV4dCI6ICLoga/ntaHmiJHlgJEiIH0gfQogIF0KfQpKU09OCgpyZWFkIC1yIC1kICcnIFNDSEVNQV9CIDw8J0pTT04nIHx8IHRydWUKewogICJzaXplIjogeyAid2lkdGgiOiAyNTAwLCAiaGVpZ2h0IjogMTY4NiB9LAogICJzZWxlY3RlZCI6IGZhbHNlLAogICJuYW1lIjogIlJJQ0hNRU5VX0lOUVVJUkVEIiwKICAiY2hhdEJhclRleHQiOiAi6YCy6KGM5LitIiwKICAiYXJlYXMiOiBbCiAgICB7ICJib3VuZHMiOiB7ICJ4IjogMCwgICAgInkiOiAwLCAgICAid2lkdGgiOiAxNjY2LCAiaGVpZ2h0IjogODQzIH0sCiAgICAgICJhY3Rpb24iOiB7ICJ0eXBlIjogIm1lc3NhZ2UiLCAidGV4dCI6ICLpoJDntIToq67oqaIiIH0gfSwKICAgIHsgImJvdW5kcyI6IHsgIngiOiAxNjY2LCAieSI6IDAsICAgICJ3aWR0aCI6IDgzNCwgICJoZWlnaHQiOiA4NDMgfSwKICAgICAgImFjdGlvbiI6IHsgInR5cGUiOiAibWVzc2FnZSIsICJ0ZXh0IjogIui/vei5pOmAsuW6piIgfSB9LAogICAgeyAiYm91bmRzIjogeyAieCI6IDAsICAgICJ5IjogODQzLCAgIndpZHRoIjogODMzLCAgImhlaWdodCI6IDg0MyB9LAogICAgICAiYWN0aW9uIjogeyAidHlwZSI6ICJtZXNzYWdlIiwgInRleHQiOiAi55yL55yL5aCx5YO5IiB9IH0sCiAgICB7ICJib3VuZHMiOiB7ICJ4IjogODMzLCAgInkiOiA4NDMsICAid2lkdGgiOiA4MzQsICAiaGVpZ2h0IjogODQzIH0sCiAgICAgICJhY3Rpb24iOiB7ICJ0eXBlIjogIm1lc3NhZ2UiLCAidGV4dCI6ICLlhKrljJblu7rorbAiIH0gfSwKICAgIHsgImJvdW5kcyI6IHsgIngiOiAxNjY3LCAieSI6IDg0MywgICJ3aWR0aCI6IDgzMywgICJoZWlnaHQiOiA4NDMgfSwKICAgICAgImFjdGlvbiI6IHsgInR5cGUiOiAibWVzc2FnZSIsICJ0ZXh0IjogIuiBr+e1oemhp+WVjyIgfSB9CiAgXQp9CkpTT04KCnJlYWQgLXIgLWQgJycgU0NIRU1BX0MgPDwnSlNPTicgfHwgdHJ1ZQp7CiAgInNpemUiOiB7ICJ3aWR0aCI6IDI1MDAsICJoZWlnaHQiOiAxNjg2IH0sCiAgInNlbGVjdGVkIjogZmFsc2UsCiAgIm5hbWUiOiAiUklDSE1FTlVfQ09OVkVSVEVEIiwKICAiY2hhdEJhclRleHQiOiAi5pyD5ZOhIiwKICAiYXJlYXMiOiBbCiAgICB7ICJib3VuZHMiOiB7ICJ4IjogMCwgICAgInkiOiAwLCAgICAid2lkdGgiOiAxNjY2LCAiaGVpZ2h0IjogODQzIH0sCiAgICAgICJhY3Rpb24iOiB7ICJ0eXBlIjogIm1lc3NhZ2UiLCAidGV4dCI6ICLkvaDlpb3vvIzku4rlpKnmg7PlgZrku4DpurwiIH0gfSwKICAgIHsgImJvdW5kcyI6IHsgIngiOiAxNjY2LCAieSI6IDAsICAgICJ3aWR0aCI6IDgzNCwgICJoZWlnaHQiOiA4NDMgfSwKICAgICAgImFjdGlvbiI6IHsgInR5cGUiOiAibWVzc2FnZSIsICJ0ZXh0IjogIuaIkeeahOWwiOahiOeLgOaFiyIgfSB9LAogICAgeyAiYm91bmRzIjogeyAieCI6IDAsICAgICJ5IjogODQzLCAgIndpZHRoIjogODMzLCAgImhlaWdodCI6IDg0MyB9LAogICAgICAiYWN0aW9uIjogeyAidHlwZSI6ICJtZXNzYWdlIiwgInRleHQiOiAi6L+95Yqg5pyN5YuZIiB9IH0sCiAgICB7ICJib3VuZHMiOiB7ICJ4IjogODMzLCAgInkiOiA4NDMsICAid2lkdGgiOiA4MzQsICAiaGVpZ2h0IjogODQzIH0sCiAgICAgICJhY3Rpb24iOiB7ICJ0eXBlIjogIm1lc3NhZ2UiLCAidGV4dCI6ICJWSVAg6LOH5rqQ5bqrIiB9IH0sCiAgICB7ICJib3VuZHMiOiB7ICJ4IjogMTY2NywgInkiOiA4NDMsICAid2lkdGgiOiA4MzMsICAiaGVpZ2h0IjogODQzIH0sCiAgICAgICJhY3Rpb24iOiB7ICJ0eXBlIjogIm1lc3NhZ2UiLCAidGV4dCI6ICLku4vntLnmlrDlrqLmiLYiIH0gfQogIF0KfQpKU09OCgojIOKUgOKUgCAyKSBoZWxwZXLvvJrlu7ogc2NoZW1hIOKGkiDkuIrlgrMgcG5nIOKGkiDlm57lgrMgaWQg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACnVwbG9hZF9vbmUoKSB7CiAgbG9jYWwgbGFiZWw9IiQxIgogIGxvY2FsIHNjaGVtYT0iJDIiCiAgbG9jYWwgcG5nPSIkMyIKCiAgZWNobyAiIgogIGVjaG8gIuKWuCBbJGxhYmVsXSDlu7rnq4sgc2NoZW1h4oCmIgogIGxvY2FsIHJlc3AKICByZXNwPSQoY3VybCAtZnNTIC1YIFBPU1QgIiRBUEkiIFwKICAgIC1IICIkQVVUSCIgXAogICAgLUggIkNvbnRlbnQtVHlwZTogYXBwbGljYXRpb24vanNvbiIgXAogICAgLWQgIiRzY2hlbWEiKQogIGxvY2FsIGlkCiAgaWQ9JChlY2hvICIkcmVzcCIgfCBzZWQgLW4gJ3MvLioicmljaE1lbnVJZCI6IlwoW14iXSpcKSIuKi9cMS9wJykKICBpZiBbWyAteiAiJGlkIiBdXTsgdGhlbgogICAgZWNobyAi4pyXIFskbGFiZWxdIOW7uueri+WkseaVl++8miRyZXNwIgogICAgcmV0dXJuIDEKICBmaQogIGVjaG8gIiAg4oazIHNjaGVtYSDlu7rlpb3vvJokaWQiCgogIGVjaG8gIuKWuCBbJGxhYmVsXSDkuIrlgrMgJHBuZ+KApiIKICBjdXJsIC1mc1MgLVggUE9TVCAiJEFQSV9EQVRBLyRpZC9jb250ZW50IiBcCiAgICAtSCAiJEFVVEgiIFwKICAgIC1IICJDb250ZW50LVR5cGU6IGltYWdlL3BuZyIgXAogICAgLS1kYXRhLWJpbmFyeSAiQCRwbmciID4gL2Rldi9udWxsCiAgZWNobyAiICDihrMg5LiK5YKz5a6M5oiQIgoKICBlY2hvICIkaWQiCn0KCiMg4pSA4pSAIDMpIOi3keS4ieWAiyDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKSURfQT0kKHVwbG9hZF9vbmUgIkEgwrcgTkVXIiAgICAgICAgIiRTQ0hFTUFfQSIgIjNRLUhBVENIRVJZX3JpY2htZW51X2FfMjUwMHgxNjg2LnBuZyIpCklEX0I9JCh1cGxvYWRfb25lICJCIMK3IElOUVVJUkVEIiAgICIkU0NIRU1BX0IiICIzUS1IQVRDSEVSWV9yaWNobWVudV9iXzI1MDB4MTY4Ni5wbmciKQpJRF9DPSQodXBsb2FkX29uZSAiQyDCtyBDT05WRVJURUQiICAiJFNDSEVNQV9DIiAiM1EtSEFUQ0hFUllfcmljaG1lbnVfY18yNTAweDE2ODYucG5nIikKCiMg4pSA4pSAIDQpIEEg54mI6Kit54K65paw5aW95Y+L6aCQ6KitIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAplY2hvICIiCmVjaG8gIuKWuCDoqK3lrpogQSDniYjngrrpoJDoqK0gcmljaCBtZW51ICjmlrDlpb3lj4vnnIvliLDnmoQp4oCmIgpjdXJsIC1mc1MgLVggUE9TVCAiaHR0cHM6Ly9hcGkubGluZS5tZS92Mi9ib3QvdXNlci9hbGwvcmljaG1lbnUvJElEX0EiIFwKICAtSCAiJEFVVEgiID4gL2Rldi9udWxsCmVjaG8gIiAg4oazIOmgkOioreW3suiorSIKCiMg4pSA4pSAIDUpIOWNsOe1kOaenCDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKY2F0IDw8RU9GCgrilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZAKICDinJMg5LiJ54mIIFJpY2ggTWVudSDpg73lu7rlpb3kuobjgILmiorkuIvpnaIgMyDooYzosrzliLAgd29ya2VyLmpz77yaCuKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAoKY29uc3QgUklDSE1FTlVfTkVXICAgICAgID0gJyRJRF9BJzsKY29uc3QgUklDSE1FTlVfSU5RVUlSRUQgID0gJyRJRF9CJzsKY29uc3QgUklDSE1FTlVfQ09OVkVSVEVEID0gJyRJRF9DJzsKCuKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAogIOS4i+S4gOatpe+8mgogIOKAoiDnlKjmuKzoqabluLPomZ/liqAgT0Eg4oaSIOeiuuiqjeeci+WIsCBBIOeJiCAo5paw5aW95Y+L6Ieq5YuVKQogIOKAoiBXb3JrZXIg6Ke455m8IElOUVVJUkVEIOWIh+aPmyDihpIgbGlua1JpY2hNZW51KFwkdXNlcklkLCBSSUNITUVOVV9JTlFVSVJFRCkKICDigKIgV29ya2VyIOinuOeZvCBDT05WRVJURUQg5YiH5o+bIOKGkiBsaW5rUmljaE1lbnUoXCR1c2VySWQsIFJJQ0hNRU5VX0NPTlZFUlRFRCkK4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQCkVPRgo=
+#!/usr/bin/env bash
+# 3Q Hatchery — LINE Rich Menu 一鍵建立 + 上傳素材
+# ───────────────────────────────────────────────────────────────────────────
+# 用途：
+#   1. 用 LINE Messaging API 建 3 個 richmenu schema (A / B / C)
+#   2. 把對應的 PNG 上傳到每個 schema
+#   3. 把 A 版設為預設 (新好友加入自動看到)
+#   4. 印出三個 RICHMENU_ID — 你拿去填到 worker.js 即可
+# ──────────────────────────────────────────────────────────────────────────
+# 使用：
+#   export CHANNEL_TOKEN="你的_long_lived_channel_access_token"
+#   cd /path/to/assets/exports/    # 必須在 PNG 同一個資料夾
+#   ./upload-richmenu.sh
+# ───────────────────────────────────────────────────────────────────────────
+
+set -euo pipefail
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
+# ── --prune: 先列出並刪除所有現有 Rich Menu ────────────────────────────────
+if [[ "${1:-}" == "--prune" ]]; then
+  if [[ -z "${CHANNEL_TOKEN:-}" ]]; then
+    echo "✗ --prune 需要 CHANNEL_TOKEN — 請 export"; exit 1
+  fi
+  echo "▸ --prune: 列出並刪除現有 Rich Menu…"
+  EXISTING=$(curl -fsS -H "Authorization: Bearer ${CHANNEL_TOKEN}" \
+    https://api.line.me/v2/bot/richmenu/list | \
+    grep -oE '"richMenuId":"[^"]*"' | \
+    sed 's/.*"\(richmenu-[^"]*\)".*/\1/')
+  if [[ -z "$EXISTING" ]]; then
+    echo "  ↳ 沒有現有 Rich Menu，跳過"
+  else
+    for rid in $EXISTING; do
+      echo "  ↳ DELETE $rid"
+      curl -fsS -X DELETE -H "Authorization: Bearer ${CHANNEL_TOKEN}" \
+        -H "Content-Length: 0" \
+        "https://api.line.me/v2/bot/richmenu/$rid" > /dev/null || true
+    done
+    echo "  ↳ 清完，繼續建新的"
+  fi
+fi
+
+
+# ── 0) 檢查 ──────────────────────────────────────────────────────────────
+if [[ -z "${CHANNEL_TOKEN:-}" ]]; then
+  echo "✗ 環境變數 CHANNEL_TOKEN 沒設定"
+  echo "  執行：export CHANNEL_TOKEN=\"你的 token\""
+  exit 1
+fi
+
+for f in 3Q-HATCHERY_richmenu_a_2500x1686.png \
+         3Q-HATCHERY_richmenu_b_2500x1686.png \
+         3Q-HATCHERY_richmenu_c_2500x1686.png ; do
+  if [[ ! -f "$f" ]]; then
+    echo "✗ 找不到 $f — 請確認你在 assets/exports/ 資料夾"
+    exit 1
+  fi
+done
+
+API="https://api.line.me/v2/bot/richmenu"
+API_DATA="https://api-data.line.me/v2/bot/richmenu"
+AUTH="Authorization: Bearer ${CHANNEL_TOKEN}"
+
+# ── 1) 三個 richmenu schema ──────────────────────────────────────────────
+# 共用格：3 cols × 2 rows = 6 cells，hero 跨左上 2 cell (col 1-2 row 1)
+# 每個 cell = 833×843，hero = 1666×843
+read -r -d '' SCHEMA_A <<'JSON' || true
+{
+  "size": { "width": 2500, "height": 1686 },
+  "selected": true,
+  "name": "RICHMENU_NEW",
+  "chatBarText": "選單",
+  "areas": [
+    { "bounds": { "x": 0,    "y": 0,    "width": 1666, "height": 843 },
+      "action": { "type": "message", "text": "說說你的店" } },
+    { "bounds": { "x": 1666, "y": 0,    "width": 834,  "height": 843 },
+      "action": { "type": "message", "text": "品牌孵化是什麼" } },
+    { "bounds": { "x": 0,    "y": 843,  "width": 833,  "height": 843 },
+      "action": { "type": "message", "text": "服務一覽" } },
+    { "bounds": { "x": 833,  "y": 843,  "width": 834,  "height": 843 },
+      "action": { "type": "message", "text": "合作案例" } },
+    { "bounds": { "x": 1667, "y": 843,  "width": 833,  "height": 843 },
+      "action": { "type": "message", "text": "聯絡我們" } }
+  ]
+}
+JSON
+
+read -r -d '' SCHEMA_B <<'JSON' || true
+{
+  "size": { "width": 2500, "height": 1686 },
+  "selected": false,
+  "name": "RICHMENU_INQUIRED",
+  "chatBarText": "進行中",
+  "areas": [
+    { "bounds": { "x": 0,    "y": 0,    "width": 1666, "height": 843 },
+      "action": { "type": "message", "text": "預約諮詢" } },
+    { "bounds": { "x": 1666, "y": 0,    "width": 834,  "height": 843 },
+      "action": { "type": "message", "text": "追蹤進度" } },
+    { "bounds": { "x": 0,    "y": 843,  "width": 833,  "height": 843 },
+      "action": { "type": "message", "text": "看看報價" } },
+    { "bounds": { "x": 833,  "y": 843,  "width": 834,  "height": 843 },
+      "action": { "type": "message", "text": "優化建議" } },
+    { "bounds": { "x": 1667, "y": 843,  "width": 833,  "height": 843 },
+      "action": { "type": "message", "text": "聯絡顧問" } }
+  ]
+}
+JSON
+
+read -r -d '' SCHEMA_C <<'JSON' || true
+{
+  "size": { "width": 2500, "height": 1686 },
+  "selected": false,
+  "name": "RICHMENU_CONVERTED",
+  "chatBarText": "會員",
+  "areas": [
+    { "bounds": { "x": 0,    "y": 0,    "width": 1666, "height": 843 },
+      "action": { "type": "message", "text": "你好，今天想做什麼" } },
+    { "bounds": { "x": 1666, "y": 0,    "width": 834,  "height": 843 },
+      "action": { "type": "message", "text": "我的專案狀態" } },
+    { "bounds": { "x": 0,    "y": 843,  "width": 833,  "height": 843 },
+      "action": { "type": "message", "text": "追加服務" } },
+    { "bounds": { "x": 833,  "y": 843,  "width": 834,  "height": 843 },
+      "action": { "type": "message", "text": "VIP 資源庫" } },
+    { "bounds": { "x": 1667, "y": 843,  "width": 833,  "height": 843 },
+      "action": { "type": "message", "text": "介紹新客戶" } }
+  ]
+}
+JSON
+
+# ── 2) helper：建 schema → 上傳 png → 回傳 id ───────────────────────────
+upload_one() {
+  local label="$1"
+  local schema="$2"
+  local png="$3"
+
+  echo ""
+  echo "▸ [$label] 建立 schema…"
+  local resp
+  resp=$(curl -fsS -X POST "$API" \
+    -H "$AUTH" \
+    -H "Content-Type: application/json" \
+    -d "$schema")
+  local id
+  id=$(echo "$resp" | sed -n 's/.*"richMenuId":"\([^"]*\)".*/\1/p')
+  if [[ -z "$id" ]]; then
+    echo "✗ [$label] 建立失敗：$resp"
+    return 1
+  fi
+  echo "  ↳ schema 建好：$id"
+
+  echo "▸ [$label] 上傳 $png…"
+  curl -fsS -X POST "$API_DATA/$id/content" \
+    -H "$AUTH" \
+    -H "Content-Type: image/png" \
+    --data-binary "@$png" > /dev/null
+  echo "  ↳ 上傳完成"
+
+  echo "$id"
+}
+
+# ── 3) 跑三個 ────────────────────────────────────────────────────────────
+ID_A=$(upload_one "A · NEW"        "$SCHEMA_A" "3Q-HATCHERY_richmenu_a_2500x1686.png" | tail -1)
+ID_B=$(upload_one "B · INQUIRED"   "$SCHEMA_B" "3Q-HATCHERY_richmenu_b_2500x1686.png" | tail -1)
+ID_C=$(upload_one "C · CONVERTED"  "$SCHEMA_C" "3Q-HATCHERY_richmenu_c_2500x1686.png" | tail -1)
+
+# ── 4) A 版設為新好友預設 ─────────────────────────────────────────────────
+echo ""
+echo "▸ 設定 A 版為預設 rich menu (新好友到達的)…"
+curl -fsS -X POST "https://api.line.me/v2/bot/user/all/richmenu/$ID_A" \
+  -H "$AUTH" -H "Content-Length: 0" > /dev/null
+echo "  ↳ 預設已設"
+
+# ── 5) 印結果 ─────────────────────────────────────────────────────────────
+cat <<EOF
+
+───────────────────────────────────────────────────────────────────────
+  ✅ 三個 Rich Menu 都建好了。把下面 3 行貼到 worker.js：
+───────────────────────────────────────────────────────────────────────
+
+const RICHMENU_NEW       = '$ID_A';
+const RICHMENU_INQUIRED  = '$ID_B';
+const RICHMENU_CONVERTED = '$ID_C';
+
+───────────────────────────────────────────────────────────────────────
+  下一步：
+  • 用測試帳號加 OA → 確認看到 A 版 (新好友自動)
+  • Worker 觸發 INQUIRED 動作 → linkRichMenu(\$userId, RICHMENU_INQUIRED)
+  • Worker 觸發 CONVERTED 動作 → linkRichMenu(\$userId, RICHMENU_CONVERTED)
+───────────────────────────────────────────────────────────────────────
+EOF
