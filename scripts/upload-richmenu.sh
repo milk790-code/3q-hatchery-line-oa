@@ -164,7 +164,7 @@ ID_C=$(upload_one "C Â· CONVERTED"  "$SCHEMA_C" "3Q-HATCHERY_richmenu_c_2500x1
 echo ""
 echo "â¸ è¨­å® A ççºé è¨­ rich menu (æ°å¥½åçå°ç)â¦"
 curl -fsS -X POST "https://api.line.me/v2/bot/user/all/richmenu/$ID_A" \
-  -H "$AUTH" > /dev/null
+  -H "$AUTH" -H "Content-Length: 0" > /dev/null
 echo "  â³ é è¨­å·²è¨­"
 
 # ââ 5) å°çµæ ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
