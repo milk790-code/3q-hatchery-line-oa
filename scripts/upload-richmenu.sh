@@ -156,9 +156,9 @@ upload_one() {
 }
 
 # ââ 3) è·ä¸å ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-ID_A=$(upload_one "A Â· NEW"        "$SCHEMA_A" "3Q-HATCHERY_richmenu_a_2500x1686.png")
-ID_B=$(upload_one "B Â· INQUIRED"   "$SCHEMA_B" "3Q-HATCHERY_richmenu_b_2500x1686.png")
-ID_C=$(upload_one "C Â· CONVERTED"  "$SCHEMA_C" "3Q-HATCHERY_richmenu_c_2500x1686.png")
+ID_A=$(upload_one "A Â· NEW"        "$SCHEMA_A" "3Q-HATCHERY_richmenu_a_2500x1686.png" | tail -1)
+ID_B=$(upload_one "B Â· INQUIRED"   "$SCHEMA_B" "3Q-HATCHERY_richmenu_b_2500x1686.png" | tail -1)
+ID_C=$(upload_one "C Â· CONVERTED"  "$SCHEMA_C" "3Q-HATCHERY_richmenu_c_2500x1686.png" | tail -1)
 
 # ââ 4) A çè¨­çºæ°å¥½åé è¨­ ââââââââââââââââââââââââââââââââââââââââââââââ
 echo ""
