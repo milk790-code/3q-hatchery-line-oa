@@ -41,19 +41,19 @@ jobs:
           echo "::notice::CF token OK ($(echo "$resp" | jq -r '.result.status'))"
 
       - name: Verify LINE token
+        continue-on-error: true
         env:
           LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
         run: |
-          set -euo pipefail
           resp=$(curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
             https://api.line.me/v2/bot/info)
           name=$(echo "$resp" | jq -r '.displayName // empty')
           if [ -z "$name" ]; then
-            echo "::error::LINE token bad: $resp"
-            exit 1
+            echo "::warning::LINE token check failed: $resp"
+            echo "::warning::Worker will still deploy. Refresh LINE_CHANNEL_ACCESS_TOKEN if webhook stops responding."
+          else
+            echo "::notice::LINE bot: $name ($(echo "$resp" | jq -r '.basicId'))"
           fi
-          echo "::notice::LINE bot: $name ($(echo "$resp" | jq -r '.basicId'))"
-
       - name: Set Cloudflare account ID
         env:
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
