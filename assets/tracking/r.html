@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3Q Hatchery — 正在前往…</title>
+  <style>
+    body { margin: 0; display: flex; align-items: center; justify-content: center;
+           min-height: 100vh; background: #0A0A0A; font-family: sans-serif; }
+    p    { color: #B8924A; font-size: 14px; letter-spacing: 2px; }
+  </style>
+</head>
+<body>
+  <p>正在前往 3Q Hatchery…</p>
+  <script>
+    (function () {
+      var LINE_OA = 'https://line.me/R/ti/p/@121LKSPE';
+      var params = new URLSearchParams(location.search);
+
+      var utmSource   = params.get('utm_source');
+      var utmCampaign = params.get('utm_campaign');
+
+      // Only track if required UTM params are present
+      if (utmSource && utmCampaign) {
+        var workerBase = 'https://3q-hatchery-webhook.' +
+          // Inject the actual worker subdomain at deploy time if needed;
+          // the /track endpoint on the same origin handles it too.
+          // Use the worker /track redirect URL when linking from social.
+          '';
+
+        // Fire-and-forget: record the click via the worker API
+        fetch('https://3q-hatchery-webhook.SUBDOMAIN.workers.dev/api/social-event', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            utm_source:   utmSource,
+            utm_medium:   params.get('utm_medium')  || null,
+            utm_campaign: utmCampaign,
+            utm_content:  params.get('utm_content') || null,
+            event_type:   'click',
+          }),
+          keepalive: true,
+        }).catch(function () {});
+      }
+
+      // Redirect immediately (don't wait for fetch)
+      var dest = params.get('dest') || LINE_OA;
+      // Security: only allow redirects to line.me or 3q-hatchery domains
+      if (!/^https:\/\/(line\.me|3q-hatchery\.tw|milk790-code\.github\.io)/.test(dest)) {
+        dest = LINE_OA;
+      }
+      window.location.replace(dest);
+    })();
+  </script>
+</body>
+</html>

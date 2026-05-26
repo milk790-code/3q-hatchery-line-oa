@@ -435,24 +435,26 @@ function leadScore(budget) {
   return budget === 'high' ? 'hot' : budget === 'mid' ? 'warm' : 'cold';
 }
 
-async function saveInquiry(uid, a, env) {
+async function saveInquiry(uid, a, env, sourceOa = '3q-hatchery') {
   if (!env.CRM) return;
   const score = leadScore(a.budget);
   try {
-    await env.CRM.prepare(
-      'INSERT INTO inquiries (user_id, service, budget, timeline, free_text, lead_score) VALUES (?, ?, ?, ?, ?, ?)'
-    ).bind(uid || 'unknown', a.service || null, a.budget || null, a.timeline || null, a.freeText || null, score).run();
+    const result = await env.CRM.prepare(
+      'INSERT INTO inquiries (user_id, service, budget, timeline, free_text, lead_score, source_oa) VALUES (?, ?, ?, ?, ?, ?, ?)'
+    ).bind(uid || 'unknown', a.service || null, a.budget || null, a.timeline || null, a.freeText || null, score, sourceOa).run();
+    return result?.meta?.last_row_id || null;
   } catch (err) {
     console.error('D1 inquiries insert failed:', err.message);
+    return null;
   }
 }
 
-async function saveCampaignRegistration(uid, tier, price, env) {
+async function saveCampaignRegistration(uid, tier, price, env, sourceOa = '3q-hatchery') {
   if (!env.CRM) return;
   try {
     await env.CRM.prepare(
-      'INSERT INTO campaigns (user_id, tier, price) VALUES (?, ?, ?)'
-    ).bind(uid || 'unknown', tier, price).run();
+      'INSERT INTO campaigns (user_id, tier, price, source_oa) VALUES (?, ?, ?, ?)'
+    ).bind(uid || 'unknown', tier, price, sourceOa).run();
   } catch (err) {
     console.error('D1 campaigns insert failed:', err.message);
   }
@@ -506,13 +508,36 @@ async function saveBookingRequest(uid, note, env) {
   }
 }
 
+// v4: Social event tracking (Phase 4)
+async function saveSocialEvent(data, env) {
+  if (!env.CRM) return null;
+  try {
+    const result = await env.CRM.prepare(
+      'INSERT INTO social_events (utm_source, utm_medium, utm_campaign, utm_content, event_type, user_id, ip_hash, referrer) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+    ).bind(
+      data.utm_source || null,
+      data.utm_medium || null,
+      data.utm_campaign || null,
+      data.utm_content || null,
+      data.event_type || 'click',
+      data.user_id || null,
+      data.ip_hash || null,
+      data.referrer || null,
+    ).run();
+    return result?.meta?.last_row_id || null;
+  } catch (err) {
+    console.error('saveSocialEvent failed:', err.message);
+    return null;
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // Dashboard stats + CSV
 // ─────────────────────────────────────────────────────────────────────────
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 };
 
 function tokensMatch(a, b) {
@@ -582,8 +607,9 @@ async function statsHandler(env) {
 async function csvExportHandler(table, env) {
   if (!env.CRM) return new Response('D1 not bound', { status: 500 });
   const TABLE_SQL = {
-    inquiries: 'SELECT * FROM inquiries ORDER BY id LIMIT 10000',
-    campaigns: 'SELECT * FROM campaigns ORDER BY id LIMIT 10000',
+    inquiries:     'SELECT * FROM inquiries ORDER BY id LIMIT 10000',
+    campaigns:     'SELECT * FROM campaigns ORDER BY id LIMIT 10000',
+    social_events: 'SELECT * FROM social_events ORDER BY id LIMIT 10000',
   };
   const sql = TABLE_SQL[table];
   if (!sql) return new Response('invalid table', { status: 400 });
@@ -857,6 +883,103 @@ export default {
       const tok = auth.startsWith('Bearer ') ? auth.slice(7) : null;
       if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return new Response('forbidden', { status: 403 });
       return await csvExportHandler(url.searchParams.get('table') || 'inquiries', env);
+    }
+
+    // v4: GET /api/member/:userId — cross-bot member lookup
+    if (url.pathname.startsWith('/api/member/') && request.method === 'GET') {
+      const auth = request.headers.get('Authorization') || '';
+      const tok = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+      if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return new Response('forbidden', { status: 403 });
+      const userId = url.pathname.slice('/api/member/'.length);
+      if (!userId) return new Response(JSON.stringify({ ok: false, error: 'userId required' }), { status: 400, headers: { 'Content-Type': 'application/json', ...CORS } });
+      const raw = env.SESSION ? await env.SESSION.get(`member:${userId}`) : null;
+      if (!raw) return new Response(JSON.stringify({ ok: false, error: 'member not found' }), { status: 404, headers: { 'Content-Type': 'application/json', ...CORS } });
+      const card = JSON.parse(raw);
+      return new Response(JSON.stringify({ ok: true, userId, ...card }), { headers: { 'Content-Type': 'application/json', ...CORS } });
+    }
+
+    // v4: POST /api/inquiry — cross-bot inquiry recording
+    if (url.pathname === '/api/inquiry' && request.method === 'POST') {
+      const auth = request.headers.get('Authorization') || '';
+      const tok = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+      if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return new Response('forbidden', { status: 403 });
+      let body;
+      try { body = await request.json(); } catch { return new Response(JSON.stringify({ ok: false, error: 'invalid JSON' }), { status: 400, headers: { 'Content-Type': 'application/json', ...CORS } }); }
+      const uid = body.userId || body.uid;
+      if (!uid) return new Response(JSON.stringify({ ok: false, error: 'userId required' }), { status: 400, headers: { 'Content-Type': 'application/json', ...CORS } });
+      const a = { service: body.service, budget: body.budget, timeline: body.timeline, freeText: body.freeText };
+      const rowId = await saveInquiry(uid, a, env, body.sourceOa || 'external');
+      return new Response(JSON.stringify({ ok: true, id: rowId, leadScore: leadScore(body.budget) }), { status: 201, headers: { 'Content-Type': 'application/json', ...CORS } });
+    }
+
+    // v4: GET /api/member/list — list all member card keys (batch sync)
+    if (url.pathname === '/api/member/list' && request.method === 'GET') {
+      const auth = request.headers.get('Authorization') || '';
+      const tok = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+      if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return new Response('forbidden', { status: 403 });
+      if (!env.SESSION) return new Response(JSON.stringify({ ok: false, error: 'KV not bound' }), { status: 500, headers: { 'Content-Type': 'application/json', ...CORS } });
+      const list = await env.SESSION.list({ prefix: 'member:' });
+      const members = [];
+      for (const key of (list.keys || [])) {
+        if (key.name === 'member:next_num') continue;
+        const raw = await env.SESSION.get(key.name);
+        if (raw) members.push({ userId: key.name.slice('member:'.length), ...JSON.parse(raw) });
+      }
+      return new Response(JSON.stringify({ ok: true, count: members.length, members }), { headers: { 'Content-Type': 'application/json', ...CORS } });
+    }
+
+    // v4: POST /api/social-event — public UTM tracking (no auth — called from redirect page)
+    if (url.pathname === '/api/social-event' && request.method === 'POST') {
+      let body;
+      try { body = await request.json(); } catch { return new Response(JSON.stringify({ ok: false, error: 'invalid JSON' }), { status: 400, headers: { 'Content-Type': 'application/json', ...CORS } }); }
+      if (!body.utm_source || !body.utm_campaign) return new Response(JSON.stringify({ ok: false, error: 'utm_source and utm_campaign required' }), { status: 400, headers: { 'Content-Type': 'application/json', ...CORS } });
+      const ip = request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For') || '';
+      let ip_hash = null;
+      if (ip) {
+        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ip));
+        ip_hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
+      }
+      await saveSocialEvent({ ...body, ip_hash, referrer: request.headers.get('Referer') }, env);
+      return new Response(JSON.stringify({ ok: true }), { status: 201, headers: { 'Content-Type': 'application/json', ...CORS } });
+    }
+
+    // v4: GET /api/social-stats — UTM aggregation (TRIGGER_TOKEN required)
+    if (url.pathname === '/api/social-stats' && request.method === 'GET') {
+      const auth = request.headers.get('Authorization') || '';
+      const tok = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+      if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return new Response('forbidden', { status: 403 });
+      if (!env.CRM) return new Response(JSON.stringify({ ok: false, error: 'D1 not bound' }), { status: 500, headers: { 'Content-Type': 'application/json', ...CORS } });
+      const [byCampaign, bySource] = await Promise.all([
+        env.CRM.prepare("SELECT utm_campaign, event_type, COUNT(*) AS n FROM social_events GROUP BY utm_campaign, event_type ORDER BY n DESC LIMIT 100").all(),
+        env.CRM.prepare("SELECT utm_source, COUNT(*) AS n FROM social_events GROUP BY utm_source ORDER BY n DESC").all(),
+      ]);
+      return new Response(JSON.stringify({ ok: true, by_campaign: byCampaign.results || [], by_source: bySource.results || [] }), { headers: { 'Content-Type': 'application/json', ...CORS } });
+    }
+
+    // v4: GET /track — UTM redirect micropage for social posts
+    if (url.pathname === '/track' && request.method === 'GET') {
+      const params = url.searchParams;
+      const utm_source = params.get('utm_source');
+      const utm_campaign = params.get('utm_campaign');
+      if (utm_source && utm_campaign) {
+        const ip = request.headers.get('CF-Connecting-IP') || '';
+        let ip_hash = null;
+        if (ip) {
+          const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ip));
+          ip_hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
+        }
+        await saveSocialEvent({
+          utm_source,
+          utm_campaign,
+          utm_medium: params.get('utm_medium'),
+          utm_content: params.get('utm_content'),
+          user_id: params.get('ref') || null,
+          ip_hash,
+          referrer: request.headers.get('Referer'),
+        }, env);
+      }
+      const destination = 'https://line.me/R/ti/p/@121LKSPE';
+      return new Response(null, { status: 302, headers: { Location: destination } });
     }
 
     if (request.method === 'GET') {

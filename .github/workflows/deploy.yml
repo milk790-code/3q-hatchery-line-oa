@@ -104,6 +104,40 @@ jobs:
             echo "$result" | jq -r '"inquiries.'"$col_name"': " + (.success | tostring) + " " + (.errors[0].message // "")'
           done
 
+          # v4: Add source_oa to inquiries and campaigns (ignore if already exists)
+          for tbl_col in "inquiries source_oa TEXT DEFAULT '3q-hatchery'" "campaigns source_oa TEXT DEFAULT '3q-hatchery'"; do
+            tbl=$(echo "$tbl_col" | awk '{print $1}')
+            col=$(echo "$tbl_col" | awk '{print $2}')
+            result=$(curl -sS -X POST \
+              "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+              -H "Authorization: Bearer $CF_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"sql\":\"ALTER TABLE ${tbl} ADD COLUMN ${col} TEXT DEFAULT '3q-hatchery'\"}")
+            echo "$result" | jq -r '"'"${tbl}.${col}"': " + (.success | tostring) + " " + (.errors[0].message // "")'
+          done
+
+          # v4: Create social_events table and indexes
+          curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"sql":"CREATE TABLE IF NOT EXISTS social_events (id INTEGER PRIMARY KEY AUTOINCREMENT, utm_source TEXT, utm_medium TEXT, utm_campaign TEXT, utm_content TEXT, event_type TEXT DEFAULT '\''click'\'', user_id TEXT, ip_hash TEXT, referrer TEXT, created_at TEXT NOT NULL DEFAULT (datetime('\''now'\'')))"}' \
+            | jq -r '"social_events table: " + (.success | tostring)'
+
+          for idx_def in \
+            "idx_social_events_campaign ON social_events(utm_campaign)" \
+            "idx_social_events_source ON social_events(utm_source)" \
+            "idx_social_events_created ON social_events(created_at)" \
+            "idx_inquiries_source_oa ON inquiries(source_oa)" \
+            "idx_campaigns_source_oa ON campaigns(source_oa)"; do
+            curl -sS -X POST \
+              "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+              -H "Authorization: Bearer $CF_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"sql\":\"CREATE INDEX IF NOT EXISTS ${idx_def}\"}" \
+              | jq -r '"index '"${idx_def%%ON*}"': " + (.success | tostring)' || true
+          done
+
           echo "::notice::D1 migrations complete"
 
       - name: Build & upload 3 Rich Menus (A/B/C)
