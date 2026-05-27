@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <meta name="theme-color" content="#0F0D0A"/>
+  <meta name="description" content="3Q Hatchery — 台灣在地品牌孵化所。好物好照攝影 500 元起，客製行銷陪跑，讓你的產品值得被看見。"/>
+  <title>你的產品，值得被看見 — 3Q Hatchery</title>
+
+  <!-- ============================================================
+       META PIXEL
+       填入你的 Pixel ID：在 FB 廣告後台 → 事件管理工具 → 你的 Pixel → ID
+       ============================================================ -->
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+
+    // ★ 把下面這行的 YOUR_PIXEL_ID 換成你的真實 Pixel ID ★
+    fbq('init', 'YOUR_PIXEL_ID');
+    fbq('track', 'PageView');
+  </script>
+  <noscript>
+    <img height="1" width="1" style="display:none"
+         src="https://www.facebook.com/tr?id=YOUR_PIXEL_ID&ev=PageView&noscript=1"/>
+  </noscript>
+  <!-- END META PIXEL -->
+
+  <link rel="stylesheet" href="./colors_and_type.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      margin: 0; padding: 0;
+      background: #0F0D0A;
+      color: #F5F2EC;
+      font-family: var(--font-sans, 'Noto Sans TC', sans-serif);
+      overscroll-behavior: none;
+    }
+
+    /* ── HERO ───────────────────────────────────────────── */
+    .hero {
+      min-height: 100dvh;
+      padding: max(32px, env(safe-area-inset-top)) 24px 40px;
+      display: flex; flex-direction: column;
+      justify-content: space-between; gap: 32px;
+      max-width: 520px; margin: 0 auto;
+    }
+
+    .brand-mark {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .mono {
+      width: 48px; height: 48px;
+      border: 1px solid rgba(184,146,74,0.6);
+      display: grid; place-items: center;
+      font-family: var(--font-serif, Georgia, serif); font-weight: 300;
+      font-size: 20px; color: #F5F2EC;
+    }
+    .brand-name { font-size: 11px; letter-spacing: 0.35em; color: rgba(184,146,74,0.9); }
+
+    .headline { display: flex; flex-direction: column; gap: 20px; }
+    .headline h1 {
+      font-family: var(--font-serif, Georgia, serif); font-weight: 300;
+      font-size: clamp(30px, 9vw, 44px); line-height: 1.35;
+      letter-spacing: 0.03em; margin: 0; color: #F5F2EC;
+    }
+    .headline h1 em { font-style: italic; color: #B8924A; }
+    .headline p {
+      margin: 0; font-size: 14.5px; line-height: 1.9;
+      color: rgba(245,242,236,0.68); letter-spacing: 0.04em;
+    }
+
+    /* ── LEAD FORM ──────────────────────────────────────── */
+    .form-card {
+      background: rgba(245,242,236,0.04);
+      border: 1px solid rgba(184,146,74,0.3);
+      padding: 24px 20px;
+    }
+    .form-card h2 {
+      margin: 0 0 6px;
+      font-family: var(--font-serif, Georgia, serif); font-weight: 300;
+      font-size: 18px; letter-spacing: 0.04em;
+    }
+    .form-card .sub {
+      font-size: 12px; color: rgba(245,242,236,0.5);
+      letter-spacing: 0.06em; margin-bottom: 20px;
+    }
+    .form-row { display: flex; flex-direction: column; gap: 12px; }
+    .form-row input {
+      width: 100%; padding: 14px 16px;
+      background: rgba(245,242,236,0.06);
+      border: 1px solid rgba(184,146,74,0.22);
+      color: #F5F2EC; font-size: 15px;
+      font-family: inherit; outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-row input::placeholder { color: rgba(245,242,236,0.35); }
+    .form-row input:focus { border-color: rgba(184,146,74,0.7); }
+    .btn-submit {
+      width: 100%; padding: 16px;
+      background: #B8924A; border: none;
+      color: #0F0D0A; font-size: 15px; font-weight: 600;
+      letter-spacing: 0.1em; cursor: pointer;
+      font-family: inherit; transition: opacity 0.2s;
+    }
+    .btn-submit:active { opacity: 0.85; }
+    .form-note {
+      font-size: 11px; color: rgba(245,242,236,0.35);
+      text-align: center; letter-spacing: 0.05em; margin-top: 10px;
+    }
+
+    /* Thank-you state */
+    .thankyou { display: none; text-align: center; padding: 8px 0; }
+    .thankyou .check { font-size: 32px; margin-bottom: 10px; }
+    .thankyou h3 {
+      font-family: var(--font-serif, Georgia, serif); font-weight: 300;
+      font-size: 20px; margin: 0 0 8px; color: #B8924A;
+    }
+    .thankyou p { font-size: 13px; color: rgba(245,242,236,0.6); margin: 0; line-height: 1.7; }
+
+    /* ── DIVIDER ────────────────────────────────────────── */
+    .divider {
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      padding: 40px 24px 8px; max-width: 520px; margin: 0 auto;
+    }
+    .divider .line { width: 1px; height: 32px; background: rgba(184,146,74,0.5); }
+    .divider .label { font-size: 9px; letter-spacing: 0.4em; color: rgba(245,242,236,0.4); }
+
+    /* ── PROOF ──────────────────────────────────────────── */
+    .proof {
+      max-width: 520px; margin: 0 auto;
+      padding: 0 24px 48px;
+    }
+    .proof h2 {
+      font-family: var(--font-serif, Georgia, serif); font-weight: 300;
+      font-size: 20px; letter-spacing: 0.05em; margin: 0 0 20px;
+      color: rgba(245,242,236,0.9);
+    }
+    .proof-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .proof-card img {
+      display: block; width: 100%; aspect-ratio: 1;
+      object-fit: cover; border: 1px solid rgba(184,146,74,0.18);
+    }
+    .proof-card .cap {
+      font-size: 11px; color: rgba(245,242,236,0.55);
+      letter-spacing: 0.05em; padding: 6px 0 0;
+      line-height: 1.5;
+    }
+    .proof-card .cap b {
+      display: block; font-size: 12px; font-weight: 400;
+      color: rgba(245,242,236,0.85); margin-bottom: 2px;
+    }
+
+    /* ── SERVICES ───────────────────────────────────────── */
+    .services {
+      max-width: 520px; margin: 0 auto;
+      padding: 0 24px 48px;
+    }
+    .services h2 {
+      font-family: var(--font-serif, Georgia, serif); font-weight: 300;
+      font-size: 20px; letter-spacing: 0.05em; margin: 0 0 20px;
+    }
+    .svc-list { display: flex; flex-direction: column; gap: 2px; }
+    .svc {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 18px 16px;
+      border: 1px solid rgba(184,146,74,0.18);
+      background: rgba(245,242,236,0.02);
+    }
+    .svc-num {
+      font-family: var(--font-serif, Georgia, serif); font-style: italic;
+      font-size: 14px; color: #B8924A; white-space: nowrap; padding-top: 2px;
+    }
+    .svc-body {}
+    .svc-title { font-size: 15px; margin: 0 0 4px; letter-spacing: 0.04em; }
+    .svc-desc { font-size: 12.5px; color: rgba(245,242,236,0.55); line-height: 1.7; margin: 0; }
+
+    /* ── LINE CTA ───────────────────────────────────────── */
+    .line-cta {
+      max-width: 520px; margin: 0 auto;
+      padding: 0 24px 56px;
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
+    }
+    .line-cta p {
+      margin: 0; font-size: 13px; color: rgba(245,242,236,0.5);
+      letter-spacing: 0.08em; text-align: center;
+    }
+    .btn-line {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 16px;
+      background: #06C755; border: none;
+      color: #fff; font-size: 15px; font-weight: 600;
+      letter-spacing: 0.08em; cursor: pointer; text-decoration: none;
+      font-family: inherit; transition: opacity 0.2s;
+    }
+    .btn-line:active { opacity: 0.88; }
+    .btn-line svg { flex-shrink: 0; }
+
+    /* ── FOOTER ─────────────────────────────────────────── */
+    .foot {
+      max-width: 520px; margin: 0 auto;
+      padding: 20px 24px max(24px, env(safe-area-inset-bottom));
+      border-top: 1px solid rgba(184,146,74,0.15);
+      font-size: 10px; letter-spacing: 0.3em;
+      color: rgba(245,242,236,0.3); text-align: center;
+    }
+    .foot a { color: rgba(184,146,74,0.6); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <!-- ── HERO ──────────────────────────────────────────── -->
+  <section class="hero">
+
+    <div class="brand-mark">
+      <div class="mono">3Q</div>
+      <span class="brand-name">HATCHERY · 品牌孵化所</span>
+    </div>
+
+    <div class="headline">
+      <h1>你的產品，<br/><em>值得被看見</em>。</h1>
+      <p>不管你的店多大多小、新舊、簡單複雜，<br/>
+         我們都有適合的平台、舞台、後台。<br/>
+         <strong style="color:rgba(245,242,236,0.85)">好物好照攝影 500 元起，品牌陪跑從今天開始。</strong>
+      </p>
+    </div>
+
+    <!-- LEAD FORM -->
+    <div class="form-card">
+      <h2>免費品牌健診，現在預約</h2>
+      <p class="sub">留下聯絡方式，我們 24 小時內主動聯繫</p>
+
+      <form class="form-row" id="leadForm" onsubmit="submitLead(event)">
+        <input type="text"  id="fName"  name="name"  placeholder="你的稱呼（例：小美）" autocomplete="name"/>
+        <input type="tel"   id="fPhone" name="phone" placeholder="手機號碼（例：0912345678）" autocomplete="tel" inputmode="numeric"/>
+        <button type="submit" class="btn-submit">立即預約免費健診 →</button>
+      </form>
+      <p class="form-note">資料僅用於聯繫諮詢，不做其他用途</p>
+
+      <div class="thankyou" id="thankYou">
+        <div class="check">✓</div>
+        <h3>收到了！</h3>
+        <p>我們會在 24 小時內主動聯繫你。<br/>也歡迎直接加 LINE 快速溝通：</p>
+        <a class="btn-line" href="https://line.me/R/ti/p/%40121LKSPE"
+           onclick="trackLineClick()" style="margin-top:14px;max-width:280px;margin-left:auto;margin-right:auto;">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 2C5.58 2 2 5.13 2 9c0 2.42 1.36 4.55 3.43 5.87-.15.52-.55 1.87-.63 2.16-.1.37.14.36.29.26.12-.08 1.9-1.25 2.67-1.77.4.06.82.1 1.24.1 4.42 0 8-3.13 8-7C18 5.13 14.42 2 10 2Z" fill="white"/>
+          </svg>
+          加 LINE 快速諮詢
+        </a>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ── DIVIDER ─────────────────────────────────────────── -->
+  <div class="divider">
+    <div class="line"></div>
+    <div class="label">真實案例</div>
+  </div>
+
+  <!-- ── PROOF ──────────────────────────────────────────── -->
+  <section class="proof">
+    <h2>他們的產品，現在被看見了</h2>
+    <div class="proof-grid">
+      <div class="proof-card">
+        <img src="./assets/exports/3q-carousel-01-1040.png" alt="阿婆ㄟ切仔麵店" loading="lazy"/>
+        <div class="cap"><b>阿婆ㄟ切仔麵店</b>說說你的店 · 品牌重塑</div>
+      </div>
+      <div class="proof-card">
+        <img src="./assets/exports/3q-carousel-02-1040.png" alt="好物值得好照" loading="lazy"/>
+        <div class="cap"><b>好物值得好照</b>500 元攝影 · 主圖升級</div>
+      </div>
+      <div class="proof-card">
+        <img src="./assets/exports/3q-carousel-03-1040.png" alt="一束稻一個故事" loading="lazy"/>
+        <div class="cap"><b>一束稻一個故事</b>農產品 · 品牌故事化</div>
+      </div>
+      <div class="proof-card">
+        <img src="./assets/exports/3q-campaign-poster-ink-1080x1040.png" alt="產品近拍" loading="lazy"/>
+        <div class="cap"><b>產品近拍</b>電商主圖 · 視覺升級</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SERVICES ───────────────────────────────────────── -->
+  <section class="services">
+    <h2>我們能幫你做什麼</h2>
+    <div class="svc-list">
+      <div class="svc">
+        <span class="svc-num">01</span>
+        <div class="svc-body">
+          <p class="svc-title">說說你的店 · 品牌健診</p>
+          <p class="svc-desc">免費分析你的品牌現況，找出最值得被拍下、被講出、被看見的那件事。</p>
+        </div>
+      </div>
+      <div class="svc">
+        <span class="svc-num">02</span>
+        <div class="svc-body">
+          <p class="svc-title">好物好照 · 專業攝影 500 元起</p>
+          <p class="svc-desc">一套主圖，讓你的產品在電商、IG、LINE 看起來像大牌。業界行情 2,000 元，現在 500 元。</p>
+        </div>
+      </div>
+      <div class="svc">
+        <span class="svc-num">03</span>
+        <div class="svc-body">
+          <p class="svc-title">陪你被看見 · 客製行銷陪跑</p>
+          <p class="svc-desc">從社群文案到廣告投放，量身打造適合你的行銷節奏，不用懂行銷也能做行銷。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── LINE CTA ────────────────────────────────────────── -->
+  <div class="line-cta">
+    <p>或者，直接在 LINE 上問我們</p>
+    <a class="btn-line" href="https://line.me/R/ti/p/%40121LKSPE" onclick="trackLineClick()">
+      <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
+        <path d="M10 2C5.58 2 2 5.13 2 9c0 2.42 1.36 4.55 3.43 5.87-.15.52-.55 1.87-.63 2.16-.1.37.14.36.29.26.12-.08 1.9-1.25 2.67-1.77.4.06.82.1 1.24.1 4.42 0 8-3.13 8-7C18 5.13 14.42 2 10 2Z" fill="white"/>
+      </svg>
+      加 LINE · @121LKSPE
+    </a>
+    <p style="font-size:11px">LINE ID：@121LKSPE</p>
+  </div>
+
+  <!-- ── FOOTER ─────────────────────────────────────────── -->
+  <footer class="foot">
+    <span>3Q Hatchery · 台灣在地品牌孵化所 · Taipei 2026</span>
+  </footer>
+
+  <script>
+    const WORKER_URL = 'https://3q-hatchery-webhook.milk790-code.workers.dev';
+
+    async function submitLead(e) {
+      e.preventDefault();
+      const name  = document.getElementById('fName').value.trim();
+      const phone = document.getElementById('fPhone').value.trim();
+      if (!phone) { alert('請填寫手機號碼'); return; }
+
+      // Fire Meta Pixel Lead event
+      if (typeof fbq !== 'undefined') {
+        fbq('track', 'Lead', { content_name: '免費品牌健診', content_category: '廣告表單' });
+      }
+
+      // Send to CRM (best-effort, no auth token needed for public endpoint)
+      try {
+        await fetch(WORKER_URL + '/api/social-event', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            utm_source: getParam('utm_source') || 'facebook',
+            utm_campaign: getParam('utm_campaign') || 'lp',
+            utm_medium: getParam('utm_medium') || 'paid',
+            event_type: 'lead_form',
+            utm_content: name + ' · ' + phone
+          })
+        });
+      } catch (_) {}
+
+      // Show thank-you
+      document.getElementById('leadForm').style.display = 'none';
+      document.getElementById('thankYou').style.display = 'block';
+    }
+
+    function trackLineClick() {
+      if (typeof fbq !== 'undefined') {
+        fbq('track', 'Contact', { content_name: 'LINE加好友', content_category: '廣告頁' });
+      }
+    }
+
+    function getParam(k) {
+      return new URLSearchParams(window.location.search).get(k) || '';
+    }
+  </script>
+
+</body>
+</html>
