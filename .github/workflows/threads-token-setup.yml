@@ -3,20 +3,22 @@ name: Setup Threads Token
 on:
   workflow_dispatch:
     inputs:
-      short_token:
-        description: 'Graph API Explorer 的 token（直接貼，不需要 APP_SECRET）'
+      auth_code:
+        description: '從授權頁面複製的授權碼'
         required: true
         type: string
 
 jobs:
   setup:
-    name: Deploy Threads → Start Posting
+    name: Deploy Threads
     runs-on: ubuntu-latest
     env:
       SOCIAL_WORKER_NAME: 3q-social-publisher
       SESSION_KV_ID: 20a68b10afc84764ba770b64f0f33f30
       CRM_D1_ID: e54671b1-d15e-4552-babf-cef367267568
       PNG_BASE_URL: https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports
+      REDIRECT_URI: https://milk790-code.github.io/3q-hatchery-line-oa/assets/threads-auth.html
+      THREADS_APP_ID: '956987317313843'
     steps:
       - uses: actions/checkout@v4
 
@@ -25,115 +27,88 @@ jobs:
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
         run: echo "CF_ACCOUNT_ID=$CF_ACCOUNT_ID" >> $GITHUB_ENV
 
-      - name: Try to exchange for long-lived token (optional)
+      - name: Exchange auth code for token
         env:
-          THREADS_APP_ID:     ${{ secrets.THREADS_APP_ID }}
           THREADS_APP_SECRET: ${{ secrets.THREADS_APP_SECRET }}
-          SHORT_TOKEN:        ${{ inputs.short_token }}
+          AUTH_CODE: ${{ inputs.auth_code }}
         run: |
           set -euo pipefail
-          if [ -n "${THREADS_APP_ID:-}" ] && [ -n "${THREADS_APP_SECRET:-}" ]; then
-            echo "Exchanging for 60-day long-lived token..."
-            resp=$(curl -sS "https://graph.threads.net/access_token?grant_type=th_exchange_token&client_id=${THREADS_APP_ID}&client_secret=${THREADS_APP_SECRET}&access_token=${SHORT_TOKEN}")
-            LONG_TOKEN=$(echo "$resp" | jq -r '.access_token // empty')
-            if [ -n "$LONG_TOKEN" ]; then
-              echo "THREADS_ACCESS_TOKEN=$LONG_TOKEN" >> $GITHUB_ENV
-              echo "::notice::60-day token obtained"
-            else
-              echo "::warning::Exchange failed — using short token directly"
-              echo "THREADS_ACCESS_TOKEN=$SHORT_TOKEN" >> $GITHUB_ENV
-            fi
-          else
-            echo "::notice::Using token directly"
-            echo "THREADS_ACCESS_TOKEN=$SHORT_TOKEN" >> $GITHUB_ENV
+          resp=$(curl -sS -X POST "https://graph.threads.net/oauth/access_token" \
+            -F "client_id=${THREADS_APP_ID}" \
+            -F "client_secret=${THREADS_APP_SECRET}" \
+            -F "grant_type=authorization_code" \
+            -F "redirect_uri=${REDIRECT_URI}" \
+            -F "code=${AUTH_CODE}")
+          SHORT=$(echo "$resp" | jq -r '.access_token // empty')
+          if [ -z "$SHORT" ]; then
+            echo "::error::Code exchange failed: $(echo $resp | jq -r '.error_message // .')"
+            exit 1
           fi
+          # Exchange for 60-day long-lived token
+          resp2=$(curl -sS "https://graph.threads.net/access_token?grant_type=th_exchange_token&client_id=${THREADS_APP_ID}&client_secret=${THREADS_APP_SECRET}&access_token=${SHORT}")
+          LONG=$(echo "$resp2" | jq -r '.access_token // empty')
+          TOKEN="${LONG:-$SHORT}"
+          echo "THREADS_ACCESS_TOKEN=$TOKEN" >> $GITHUB_ENV
+          echo "::notice::Token obtained"
 
       - name: Get Threads User ID
         run: |
           set -euo pipefail
           resp=$(curl -sS "https://graph.threads.net/v1.0/me?access_token=${THREADS_ACCESS_TOKEN}")
-          echo "$resp" | jq .
           USER_ID=$(echo "$resp" | jq -r '.id // empty')
           if [ -z "$USER_ID" ]; then
-            echo "::error::Token invalid or expired. Get a fresh token from Graph API Explorer."
-            exit 1
+            echo "::error::$resp"; exit 1
           fi
           echo "THREADS_USER_ID=$USER_ID" >> $GITHUB_ENV
-          echo "::notice::Threads User ID: $USER_ID"
+          echo "::notice::User ID: $USER_ID"
 
-      - name: Deploy 3q-social-publisher with Threads credentials
+      - name: Deploy 3q-social-publisher
         env:
-          CF_TOKEN:      ${{ secrets.CF_API_TOKEN }}
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
           TRIGGER_TOKEN: ${{ secrets.TRIGGER_TOKEN }}
         run: |
           set -euo pipefail
-          cat > /tmp/social-metadata.json <<JSON
-          {
-            "main_module": "worker.js",
-            "compatibility_date": "2024-12-01",
-            "bindings": [
-              {"name": "PNG_BASE_URL",         "type": "plain_text",  "text": "$PNG_BASE_URL"},
-              {"name": "TRIGGER_TOKEN",         "type": "secret_text", "text": $(jq -Rn --arg t "${TRIGGER_TOKEN:-}" '$t')},
-              {"name": "SESSION",               "type": "kv_namespace","namespace_id": "$SESSION_KV_ID"},
-              {"name": "CRM",                   "type": "d1",          "id": "$CRM_D1_ID"},
-              {"name": "AI",                    "type": "ai"},
-              {"name": "THREADS_ACCESS_TOKEN",  "type": "secret_text", "text": $(jq -Rn --arg t "$THREADS_ACCESS_TOKEN" '$t')},
-              {"name": "THREADS_USER_ID",       "type": "secret_text", "text": $(jq -Rn --arg t "$THREADS_USER_ID" '$t')},
-              {"name": "IG_ACCESS_TOKEN",       "type": "secret_text", "text": ""},
-              {"name": "IG_USER_ID",            "type": "secret_text", "text": ""},
-              {"name": "TIKTOK_ACCESS_TOKEN",   "type": "secret_text", "text": ""},
-              {"name": "GOOGLE_SERVICE_ACCOUNT","type": "secret_text", "text": ""},
-              {"name": "GOOGLE_LOCATION_NAME",  "type": "secret_text", "text": ""}
-            ]
-          }
+          cat > /tmp/meta.json <<JSON
+          {"main_module":"worker.js","compatibility_date":"2024-12-01","bindings":[
+            {"name":"PNG_BASE_URL","type":"plain_text","text":"$PNG_BASE_URL"},
+            {"name":"TRIGGER_TOKEN","type":"secret_text","text":$(jq -Rn --arg t "${TRIGGER_TOKEN:-}" '$t')},
+            {"name":"SESSION","type":"kv_namespace","namespace_id":"$SESSION_KV_ID"},
+            {"name":"CRM","type":"d1","id":"$CRM_D1_ID"},
+            {"name":"AI","type":"ai"},
+            {"name":"THREADS_ACCESS_TOKEN","type":"secret_text","text":$(jq -Rn --arg t "$THREADS_ACCESS_TOKEN" '$t')},
+            {"name":"THREADS_USER_ID","type":"secret_text","text":$(jq -Rn --arg t "$THREADS_USER_ID" '$t')},
+            {"name":"IG_ACCESS_TOKEN","type":"secret_text","text":""},
+            {"name":"IG_USER_ID","type":"secret_text","text":""},
+            {"name":"TIKTOK_ACCESS_TOKEN","type":"secret_text","text":""},
+            {"name":"GOOGLE_SERVICE_ACCOUNT","type":"secret_text","text":""},
+            {"name":"GOOGLE_LOCATION_NAME","type":"secret_text","text":""}
+          ]}
           JSON
-
           resp=$(curl -sS -X PUT \
             "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${SOCIAL_WORKER_NAME}" \
             -H "Authorization: Bearer $CF_TOKEN" \
-            -F "metadata=@/tmp/social-metadata.json;type=application/json" \
+            -F "metadata=@/tmp/meta.json;type=application/json" \
             -F "worker.js=@workers/social-publisher/worker.js;type=application/javascript+module")
           echo "$resp" | jq -e '.success == true' > /dev/null
-          echo "::notice::3q-social-publisher deployed"
 
-      - name: Set cron triggers
+      - name: Set crons + enable subdomain
         env:
           CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
         run: |
-          set -euo pipefail
           curl -sS -X PUT \
             "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${SOCIAL_WORKER_NAME}/schedules" \
-            -H "Authorization: Bearer $CF_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d '[{"cron":"0 1 * * 2-4"},{"cron":"0 4 * * 3"},{"cron":"30 12 * * *"}]' \
-            | jq -e '.success == true' > /dev/null
-
-      - name: Enable workers.dev subdomain
-        env:
-          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
-        run: |
+            -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" \
+            -d '[{"cron":"0 1 * * 2-4"},{"cron":"0 4 * * 3"},{"cron":"30 12 * * *"}]' | jq -e '.success == true' > /dev/null
           curl -sS -X POST \
             "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${SOCIAL_WORKER_NAME}/subdomain" \
-            -H "Authorization: Bearer $CF_TOKEN" \
-            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" \
             -d '{"enabled": true}' | jq -e '.success == true' > /dev/null
           SUB=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
-            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/subdomain" \
-            | jq -r '.result.subdomain')
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/subdomain" | jq -r '.result.subdomain')
           echo "SOCIAL_URL=https://${SOCIAL_WORKER_NAME}.${SUB}.workers.dev" >> $GITHUB_ENV
-
-      - name: Smoke test
-        run: |
-          sleep 5
-          resp=$(curl -sS "${SOCIAL_URL}/health" || echo '{}')
-          echo "$resp" | jq . || true
 
       - name: Summary
         run: |
-          echo "## Threads 自動發文已啟動" >> $GITHUB_STEP_SUMMARY
-          echo "| | |" >> $GITHUB_STEP_SUMMARY
-          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
-          echo "| Worker | \`$SOCIAL_URL\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Threads User ID | \`$THREADS_USER_ID\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| 發文時間 | 09:00 週二-四 · 12:00 週三 · 20:30 每日（台北時間）|" >> $GITHUB_STEP_SUMMARY
-          echo "| 預備貼文 | 10 篇（AI 生成文案後自動發布）|" >> $GITHUB_STEP_SUMMARY
+          echo "## Threads 啟動完成" >> $GITHUB_STEP_SUMMARY
+          echo "Worker: $SOCIAL_URL | User ID: $THREADS_USER_ID" >> $GITHUB_STEP_SUMMARY
+          echo "發文時間：09:00 週二-四 · 12:00 週三 · 20:30 每日（台北）" >> $GITHUB_STEP_SUMMARY
