@@ -1,0 +1,99 @@
+{
+  "project": "3Q貢丸 · 台灣在地品牌孵化所",
+  "version": "2.0",
+  "built": "2026-05-27",
+  "line_id": "https://lin.ee/UKKodJj",
+  "github_assets": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports",
+  "deliverables": {
+    "line_oa": {
+      "label": "LINE 官方帳號素材",
+      "files": {
+        "Rich Menu v2.html": "三版 Rich Menu 預覽 + 匯出按鈕（點『匯出全部 PNG』→ 得到 2500×1686 PNG）",
+        "Welcome Carousel.html": "5 張歡迎 Carousel 預覽 + Flex Message JSON（頁底複製貼到 LINE 後台）",
+        "export/src/welcome-card-v2.html": "歡迎卡 v2 源碼（1040×1040）",
+        "export/src/rich-menu-a-v2.html": "Rich Menu A 源碼（新訪客）",
+        "export/src/rich-menu-b-v2.html": "Rich Menu B 源碼（已詢問）",
+        "export/src/rich-menu-c-v2.html": "Rich Menu C 源碼（會員）",
+        "export/upload-richmenu.sh": "一鍵上傳 Rich Menu 腳本",
+        "export/upload-richmenu.README.md": "腳本使用說明"
+      }
+    },
+    "brand_visual": {
+      "label": "品牌視覺",
+      "files": {
+        "Landing Page.html": "官網首頁（已接真實 LINE URL）",
+        "landing-styles.css": "官網樣式表（Landing Page 依賴）",
+        "Brand Animation.html": "30 秒品牌動畫（1920×1080）",
+        "animations.jsx": "動畫引擎（Brand Animation 依賴）",
+        "ios-frame.jsx": "iOS 框架（App 原型依賴）"
+      }
+    },
+    "social": {
+      "label": "社群素材",
+      "files": {
+        "IG Posts.html": "10 張 IG 貼文（1080×1350）預覽 + 匯出",
+        "TikTok Covers.html": "4 張 TikTok 封面（1080×1920）預覽 + 匯出"
+      }
+    },
+    "planning": {
+      "label": "規劃工具",
+      "files": {
+        "Content Calendar June 2026.html": "30 天內容排程表（6月）",
+        "LINE OA 操作手冊 v2.html": "部署步驟 + 打勾清單",
+        "LINE Flex 設定圖解.html": "LINE 後台操作圖解",
+        "Welcome Carousel.html": "包含可複製的 Flex JSON"
+      }
+    },
+    "app": {
+      "label": "App 原型",
+      "files": {
+        "3Q App.html": "iOS App 原型（5 畫面可互動：主頁/專案/聊天/服務/預約）"
+      }
+    },
+    "experience": {
+      "label": "互動診斷",
+      "files": {
+        "experience/index.html": "10 題品牌診斷體驗 × 6 persona × 4 tier"
+      }
+    },
+    "exports": {
+      "label": "已匯出 PNG（可直接上傳 LINE）",
+      "files": {
+        "export/3Q-HATCHERY_richmenu_a_2500x1686.png": "Rich Menu A v1（備用）",
+        "export/3Q-HATCHERY_richmenu_b_2500x1686.png": "Rich Menu B v1（備用）",
+        "export/3Q-HATCHERY_richmenu_c_2500x1686.png": "Rich Menu C v1（備用）",
+        "export/3Q-HATCHERY_welcome-card_1040x1040.png": "歡迎卡（可直接上傳）",
+        "export/3Q-HATCHERY_member-card-bg_1040x585.png": "會員卡背景"
+      }
+    },
+    "design_system": {
+      "label": "設計系統",
+      "files": {
+        "colors_and_type.css": "品牌 CSS 變數（7 色 + 字體 + 間距）",
+        "assets/logo/": "Logo SVG × 3（水平 / 堆疊 / 標誌）",
+        "assets/icons/": "品牌圖示 SVG × 12",
+        "assets/photography/": "攝影佔位圖 SVG × 6",
+        "ui_kits/line_oa/": "LINE OA 元件庫",
+        "ui_kits/social/": "社群元件庫（IG / Threads / TikTok）"
+      }
+    }
+  },
+  "line_flex_json_location": "Welcome Carousel.html → 頁底 → 點『複製』",
+  "rich_menu_zone_spec": {
+    "A": {
+      "hero": "0,0,1666,843",
+      "02": "1666,0,834,843",
+      "03": "0,843,833,843",
+      "04": "833,843,834,843",
+      "05": "1667,843,833,843"
+    }
+  },
+  "keywords": {
+    "說說我的店|我的店|我想說": "好。先告訴我們三件事：1. 你的店在哪裡 2. 你做的東西是什麼 3. 你現在最頭痛的一件事",
+    "好物|好照|拍照|500": "「好物・好照」從一個產品開始，500 元起。回「實例」看三個。",
+    "客製|行銷|陪跑": "客製行銷是季度規劃。先約 30 分鐘免費諮詢。回「諮詢」開時段。",
+    "進度|走到哪": "請告訴我們你的店名 / 報名編號，會回你目前進度。",
+    "實例|案例|看作品": "本月入駐：01 阿婆ㄟ切仔麵店 02 三代米舖 03 鹿港織坊。回 01/02/03 看。",
+    "諮詢|預約": "好。告訴我們：店名 / 角色 / 想聊什麼。24h 內寄時段。"
+  }
+}

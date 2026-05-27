@@ -1,0 +1,20 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 0; background: #F5F2EC; font-family: var(--font-sans); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; height: 320px; }
+  .cell { display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .cell + .cell { border-left: 1px solid rgba(10,10,10,0.08); }
+  .cell img { width: 100%; max-width: 200px; height: auto; }
+  .label { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: #B8924A; white-space: nowrap; }
+  .wrap { position: relative; width: 100%; display: flex; justify-content: center; }
+  .dark { background: #0A0A0A; }
+  .dark img { filter: invert(1) hue-rotate(180deg) brightness(1.05); }
+</style>
+</head><body>
+<div class="grid">
+  <div class="cell"><div class="wrap"><img src="../assets/logo/logo-stacked.svg"><div class="label">Primary · Stacked</div></div></div>
+  <div class="cell dark"><div class="wrap"><img src="../assets/logo/logo-mark-3Q.svg"><div class="label" style="color:#B8924A">Mark · 3Q</div></div></div>
+  <div class="cell"><div class="wrap"><img src="../assets/logo/logo-horizontal.svg" style="max-width:280px"><div class="label">Horizontal · Page Header</div></div></div>
+</div>
+</body></html>

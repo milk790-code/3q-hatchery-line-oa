@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>3Q 孵化所 · LINE OA 上線文件</title>
+
+  <meta name="ext-resource-dependency" content="../../assets/photography/still-bowl-rice.svg"   data-resource-id="ph_bowl"/>
+  <meta name="ext-resource-dependency" content="../../assets/photography/ink-stone.svg"          data-resource-id="ph_ink"/>
+  <meta name="ext-resource-dependency" content="../../assets/photography/raw-linen.svg"          data-resource-id="ph_linen"/>
+  <meta name="ext-resource-dependency" content="../../assets/photography/rice-stalk.svg"         data-resource-id="ph_stalk"/>
+  <meta name="ext-resource-dependency" content="../../assets/photography/cupped-palm-light.svg"  data-resource-id="ph_palm"/>
+  <meta name="ext-resource-dependency" content="../../assets/photography/envelope-flat.svg"      data-resource-id="ph_envelope"/>
+  <meta name="ext-resource-dependency" content="../../assets/icons/consultation.svg"             data-resource-id="ic_consultation"/>
+  <meta name="ext-resource-dependency" content="../../assets/icons/camera.svg"                   data-resource-id="ic_camera"/>
+  <meta name="ext-resource-dependency" content="../../assets/icons/compass.svg"                  data-resource-id="ic_compass"/>
+  <meta name="ext-resource-dependency" content="../../assets/icons/clock.svg"                    data-resource-id="ic_clock"/>
+  <meta name="ext-resource-dependency" content="../../assets/icons/arrow-right.svg"              data-resource-id="ic_arrow_right"/>
+  <meta name="ext-resource-dependency" content="../../assets/icons/arrow-down.svg"               data-resource-id="ic_arrow_down"/>
+  <meta name="ext-resource-dependency" content="../../assets/icons/menu.svg"                     data-resource-id="ic_menu"/>
+
+  <template id="__bundler_thumbnail">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+      <rect width="200" height="200" fill="#0F0D0A"/>
+      <rect x="60" y="60" width="80" height="80" fill="none" stroke="#B8924A" stroke-width="1"/>
+      <text x="100" y="108" text-anchor="middle" font-family="Georgia, serif" font-weight="300"
+            font-size="32" fill="#F5F2EC" letter-spacing="3">3Q</text>
+      <line x1="80" y1="124" x2="120" y2="124" stroke="#B8924A" stroke-width="1"/>
+      <text x="100" y="160" text-anchor="middle" font-family="Arial, sans-serif" font-weight="300"
+            font-size="8" fill="#B8924A" letter-spacing="3">LINE OA · LAUNCH KIT</text>
+    </svg>
+  </template>
+
+  <link rel="stylesheet" href="../../colors_and_type.css"/>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: #0F0D0A; min-height: 100vh; color: var(--color-paper); font-family: var(--font-sans); }
+
+    /* ===== Layout ============================================== */
+    .doc { max-width: 1280px; margin: 0 auto; padding: 56px 32px 96px; }
+
+    .doc-header { display: grid; grid-template-columns: 1fr auto; align-items: flex-end; gap: 24px; padding-bottom: 36px; border-bottom: 1px solid rgba(184,146,74,0.18); margin-bottom: 64px; }
+    .doc-header .l { display: flex; flex-direction: column; gap: 14px; }
+    .doc-header .eyebrow { font-size: 10px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--color-gold); }
+    .doc-header h1 { font-family: var(--font-serif); font-weight: 300; font-size: 56px; letter-spacing: 0.05em; line-height: 1.05; margin: 0; color: var(--color-paper); }
+    .doc-header h1 em { font-style: italic; color: var(--color-gold); font-weight: 300; }
+    .doc-header .sub { font-size: 12px; letter-spacing: 0.15em; line-height: 1.7; color: rgba(245,242,236,0.6); max-width: 540px; }
+    .doc-header .r {
+      text-align: right;
+      font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(245,242,236,0.5);
+      line-height: 2;
+    }
+    .doc-header .r .pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border: 1px solid rgba(184,146,74,0.35); color: var(--color-gold); margin-bottom: 8px; }
+    .doc-header .r .pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--color-gold); }
+
+    /* ===== Section frame ====================================== */
+    section.kit { display: grid; grid-template-columns: 220px 1fr; gap: 56px; padding: 56px 0; border-top: 1px solid rgba(184,146,74,0.12); }
+    section.kit:first-of-type { border-top: 0; padding-top: 32px; }
+    section.kit .index { display: flex; flex-direction: column; gap: 12px; }
+    section.kit .index .no { font-family: var(--font-serif); font-style: italic; font-weight: 300; font-size: 56px; line-height: 1; color: var(--color-gold); }
+    section.kit .index .nm { font-family: var(--font-serif); font-weight: 300; font-size: 22px; letter-spacing: 0.18em; color: var(--color-paper); line-height: 1.4; }
+    section.kit .index .en { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(245,242,236,0.4); }
+    section.kit .body { display: flex; flex-direction: column; gap: 32px; }
+
+    /* ===== Spec card ========================================== */
+    .speccard {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 32px;
+      background: #15110C;
+      border: 1px solid rgba(184,146,74,0.18);
+      padding: 28px;
+    }
+    .speccard .preview { background: #1F1A12; padding: 20px; display: flex; align-items: center; justify-content: center; min-height: 240px; }
+    .speccard .spec-meta { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+    .speccard .spec-meta dl { display: grid; grid-template-columns: 100px 1fr; gap: 6px 16px; margin: 0; }
+    .speccard .spec-meta dt { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(245,242,236,0.4); padding-top: 3px; }
+    .speccard .spec-meta dd { margin: 0; font-size: 12px; line-height: 1.7; color: rgba(245,242,236,0.85); letter-spacing: 0.04em; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+    .speccard .spec-meta dd.note { font-family: var(--font-sans); font-style: italic; color: rgba(245,242,236,0.55); }
+
+    /* ===== Paste-ready text block ============================= */
+    .paste {
+      background: #181410;
+      border-left: 1px solid var(--color-gold);
+      padding: 18px 20px;
+      font-family: var(--font-sans);
+      font-weight: 300;
+      font-size: 13px;
+      line-height: 1.85;
+      letter-spacing: 0.03em;
+      color: rgba(245,242,236,0.92);
+      white-space: pre-wrap;
+      position: relative;
+    }
+    .paste-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .paste-head .label { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--color-gold); font-family: var(--font-sans); }
+    .paste-head .count { font-size: 9px; letter-spacing: 0.2em; color: rgba(245,242,236,0.4); font-family: ui-monospace, monospace; }
+    .paste-copy {
+      position: absolute; right: 18px; top: 14px;
+      background: transparent; border: 1px solid rgba(184,146,74,0.4);
+      color: var(--color-gold);
+      font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase;
+      padding: 5px 12px;
+      cursor: pointer;
+      transition: all .25s;
+    }
+    .paste-copy:hover { background: var(--color-gold); color: #0F0D0A; }
+    .paste-copy.copied { background: var(--color-gold); color: #0F0D0A; }
+
+    /* ===== Tap zone diagram ===================================== */
+    .tapdiagram { position: relative; background: #1F1A12; padding: 0; display: flex; justify-content: center; align-items: center; }
+    .tapdiagram .img-wrap { position: relative; line-height: 0; }
+    .tapdiagram svg.zones { position: absolute; inset: 0; }
+    .tapdiagram .zone {
+      stroke: var(--color-gold); stroke-width: 1.5;
+      fill: rgba(184,146,74,0.07);
+      transition: fill .2s;
+    }
+    .tapdiagram .zone:hover { fill: rgba(184,146,74,0.18); }
+    .tapdiagram .zlabel {
+      position: absolute;
+      background: var(--color-black); color: var(--color-paper);
+      font-family: var(--font-sans); font-weight: 300;
+      font-size: 9px; letter-spacing: 0.25em;
+      padding: 4px 8px;
+      border: 1px solid var(--color-gold);
+      pointer-events: none;
+    }
+
+    /* ===== Auto-reply table ==================================== */
+    .ar-list { display: flex; flex-direction: column; gap: 1px; background: rgba(184,146,74,0.15); }
+    .ar-row { background: #15110C; padding: 16px 20px; display: grid; grid-template-columns: 240px 1fr; gap: 24px; }
+    .ar-keys { display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; }
+    .ar-key {
+      font-size: 10px; letter-spacing: 0.1em;
+      padding: 3px 9px;
+      background: rgba(184,146,74,0.1);
+      border: 1px solid rgba(184,146,74,0.35);
+      color: var(--color-gold);
+    }
+    .ar-reply { font-size: 12px; line-height: 1.8; color: rgba(245,242,236,0.85); white-space: pre-wrap; letter-spacing: 0.04em; }
+
+    /* ===== Checklist ============================================ */
+    .checklist { display: flex; flex-direction: column; gap: 1px; background: rgba(184,146,74,0.15); margin-top: 16px; }
+    .ck-row {
+      background: #15110C; padding: 14px 20px;
+      display: grid; grid-template-columns: 28px 1fr auto auto; gap: 16px; align-items: center;
+    }
+    .ck-mark {
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 1px solid rgba(184,146,74,0.45);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ck-mark::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--color-gold); opacity: 0; transition: opacity .2s; }
+    .ck-row.done .ck-mark::after { opacity: 1; }
+    .ck-row.done .ck-mark { background: var(--color-gold); }
+    .ck-row.done .ck-mark::after { background: #0F0D0A; opacity: 1; }
+    .ck-label { font-family: var(--font-serif); font-weight: 300; font-size: 17px; letter-spacing: 0.12em; color: var(--color-paper); }
+    .ck-row.done .ck-label { opacity: 0.7; }
+    .ck-detail { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,236,0.5); font-family: ui-monospace, monospace; }
+    .ck-status { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(184,146,74,0.7); }
+    .ck-row.done .ck-status { color: var(--color-gold); }
+    .ck-row:not(.done) .ck-status { color: rgba(245,242,236,0.45); }
+
+    /* ===== Phone preview (smaller, contextual) =============== */
+    .phone-mini {
+      width: 320px; height: 640px;
+      background: #F5F2EC;
+      border-radius: 38px;
+      box-shadow: 0 30px 60px -25px rgba(0,0,0,0.7);
+      border: 1px solid #2A2620;
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .phone-mini .notch { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 100px; height: 24px; background: #0A0A0A; border-radius: 12px; z-index: 10; }
+
+    .doc-foot {
+      margin-top: 80px;
+      padding-top: 36px;
+      border-top: 1px solid rgba(184,146,74,0.18);
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(245,242,236,0.4);
+    }
+    .doc-foot .r-line { width: 80px; height: 1px; background: var(--color-gold); }
+
+    .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+
+    .h-rule { width: 100%; height: 1px; background: rgba(184,146,74,0.15); }
+
+    /* Override the components' inherited color tokens for dark mode preview frames */
+    .preview { color: #0A0A0A; }
+
+    /* ===== PRINT — flips to light editorial layout =================== */
+    @media print {
+      @page { size: A4; margin: 18mm 16mm; }
+      html, body { background: #FFFFFF; color: #0A0A0A; }
+      .doc { padding: 0; max-width: none; }
+      .doc-header { color: #0A0A0A; border-bottom-color: rgba(10,10,10,0.2); padding-bottom: 18mm; margin-bottom: 12mm; page-break-after: avoid; }
+      .doc-header h1, .doc-header h1 em { color: #0A0A0A; }
+      .doc-header h1 em { color: #8E6F32; }
+      .doc-header .sub { color: #555; }
+      .doc-header .r { color: #555; }
+      .doc-header .pill { color: #8E6F32; border-color: #8E6F32; }
+      .doc-header .pill::before { background: #8E6F32; }
+      section.kit { color: #0A0A0A; border-top-color: rgba(10,10,10,0.2); page-break-inside: avoid; padding: 14mm 0; }
+      section.kit .index .no { color: #8E6F32; }
+      section.kit .index .nm { color: #0A0A0A; }
+      section.kit .index .en { color: #888; }
+      .speccard { background: #FAF8F2; border-color: rgba(10,10,10,0.15); page-break-inside: avoid; }
+      .speccard .preview { background: #FFFFFF; }
+      .speccard .spec-meta dt { color: #888; }
+      .speccard .spec-meta dd { color: #0A0A0A; }
+      .speccard .spec-meta dd.note { color: #555; }
+      .paste { background: #FAF8F2; border-left-color: #8E6F32; color: #0A0A0A; }
+      .paste-head .label { color: #8E6F32; }
+      .paste-head .count { color: #888; }
+      .paste-copy { display: none !important; }
+      .ar-list { background: rgba(10,10,10,0.15); }
+      .ar-row { background: #FAF8F2; page-break-inside: avoid; }
+      .ar-key { background: rgba(142,111,50,0.08); border-color: rgba(142,111,50,0.5); color: #8E6F32; }
+      .ar-reply { color: #0A0A0A; }
+      .checklist { background: rgba(10,10,10,0.15); }
+      .ck-row { background: #FAF8F2; page-break-inside: avoid; }
+      .ck-label { color: #0A0A0A; }
+      .ck-detail { color: #555; }
+      .ck-status { color: #8E6F32; }
+      .ck-row:not(.done) .ck-status { color: #999; }
+      .ck-mark { border-color: #8E6F32; }
+      .ck-row.done .ck-mark { background: #8E6F32; }
+      .doc-foot { color: #888; border-top-color: rgba(10,10,10,0.2); }
+      .doc-foot .r-line { background: #8E6F32; }
+      .phone-mini { box-shadow: 0 6px 12px rgba(0,0,0,0.15); border-color: rgba(10,10,10,0.3); }
+      .tapdiagram { background: #FFFFFF; }
+      .zlabel { background: #0A0A0A; color: #FFFFFF; }
+      .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
+    }
+
+    /* Carousel row */
+    .carousel-row { display: flex; gap: 14px; overflow-x: auto; padding: 12px 0; }
+
+    /* LINE chat preview chrome */
+    .line-frame { width: 100%; height: 100%; display: flex; flex-direction: column; background: #DCD6CB; padding-top: 56px; }
+    .line-top { background: #F5F2EC; display: grid; grid-template-columns: 28px 1fr 28px; align-items: center; padding: 10px 12px; border-bottom: 1px solid rgba(10,10,10,0.06); gap: 8px; color: #0A0A0A; }
+    .line-top-c { display: flex; align-items: center; gap: 8px; }
+    .line-top-name { font-family: var(--font-serif); font-weight: 300; font-size: 13px; letter-spacing: 0.12em; color: #0A0A0A; }
+    .line-msgs { flex: 1; overflow-y: auto; padding: 14px 12px; display: flex; flex-direction: column; gap: 10px; }
+    .line-bubble { max-width: 80%; padding: 9px 12px; font-size: 12px; line-height: 1.55; letter-spacing: 0.03em; color: #0A0A0A; }
+    .line-bubble.in { background: #FFFFFF; align-self: flex-start; border-radius: 4px 12px 12px 12px; }
+    .line-bubble.out { background: #0A0A0A; color: #F5F2EC; align-self: flex-end; border-radius: 12px 4px 12px 12px; }
+    .line-day { display: flex; justify-content: center; }
+    .line-day span { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(10,10,10,0.5); background: rgba(10,10,10,0.04); padding: 3px 10px; border-radius: 999px; }
+    .line-card { align-self: flex-start; width: 78%; border: 1px solid rgba(10,10,10,0.08); }
+  </style>
+</head>
+<body>
+  <div class="doc">
+
+    <header class="doc-header">
+      <div class="l">
+        <div class="eyebrow">3Q HATCHERY · KIT 01 · LINE OFFICIAL ACCOUNT</div>
+        <h1>準備上 <em>LINE 官方帳號</em></h1>
+        <p class="sub">這份文件把所有要上傳到 LINE Official Account Manager 的素材、文案、設定、按鈕對應，整合成一份可交付的清單。每一段都可以複製貼上到後台。</p>
+      </div>
+      <div class="r">
+        <div class="pill">READY TO SHIP</div><br/>
+        <span>RELEASE · V1.0</span><br/>
+        <span>2026 · TAIPEI</span>
+        <div style="margin-top: 12px;">
+          <a href="javascript:window.print()" style="color: var(--color-gold); font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; text-decoration: none; border-bottom: 1px solid var(--color-gold); padding-bottom: 2px;">⎙ 列印 / 存 PDF</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== Section 0: Checklist ===== -->
+    <section class="kit">
+      <div class="index">
+        <div class="no">00</div>
+        <div class="nm">上線清單</div>
+        <div class="en">Pre-launch Checklist</div>
+      </div>
+      <div class="body">
+        <p class="sub" style="margin:0; font-size:13px; line-height:1.85; color: rgba(245,242,236,0.7);">
+          每一項對應後台的一個設定。下方各 section 提供素材與貼上文案。<br/>
+          完成後請逐項打勾 — 最後一項是「上線前 QA」，每個按鈕都要點過一次。
+        </p>
+        <div id="checklist-mount"></div>
+      </div>
+    </section>
+
+    <!-- ===== Section 1: Account profile ===== -->
+    <section class="kit">
+      <div class="index">
+        <div class="no">01</div>
+        <div class="nm">帳號身份</div>
+        <div class="en">Profile · Name · Status</div>
+      </div>
+      <div class="body" id="profile-body"></div>
+    </section>
+
+    <!-- ===== Section 2: Greeting ===== -->
+    <section class="kit">
+      <div class="index">
+        <div class="no">02</div>
+        <div class="nm">開始訊息</div>
+        <div class="en">Greeting · 第一則訊息</div>
+      </div>
+      <div class="body" id="greeting-body"></div>
+    </section>
+
+    <!-- ===== Section 3: Rich Menu ===== -->
+    <section class="kit">
+      <div class="index">
+        <div class="no">03</div>
+        <div class="nm">圖文選單</div>
+        <div class="en">Rich Menu · 2500 × 1686</div>
+      </div>
+      <div class="body" id="richmenu-body"></div>
+    </section>
+
+    <!-- ===== Section 4: Auto-reply ===== -->
+    <section class="kit">
+      <div class="index">
+        <div class="no">04</div>
+        <div class="nm">關鍵字自動回覆</div>
+        <div class="en">Keyword Auto-replies</div>
+      </div>
+      <div class="body" id="autoreply-body"></div>
+    </section>
+
+    <!-- ===== Section 5: Carousel push ===== -->
+    <section class="kit">
+      <div class="index">
+        <div class="no">05</div>
+        <div class="nm">輪播主推</div>
+        <div class="en">Carousel Push · 本月入駐</div>
+      </div>
+      <div class="body" id="carousel-body"></div>
+    </section>
+
+    <!-- ===== Section 6: Away message ===== -->
+    <section class="kit">
+      <div class="index">
+        <div class="no">06</div>
+        <div class="nm">非營業訊息</div>
+        <div class="en">Away · Off-hours</div>
+      </div>
+      <div class="body" id="away-body"></div>
+    </section>
+
+    <!-- ===== Section 7: Live preview ===== -->
+    <section class="kit">
+      <div class="index">
+        <div class="no">07</div>
+        <div class="nm">情境預覽</div>
+        <div class="en">In-context · 用戶第一次加入時看到的</div>
+      </div>
+      <div class="body" id="preview-body"></div>
+    </section>
+
+    <footer class="doc-foot">
+      <span>3Q 貢丸 · 台灣在地品牌孵化所</span>
+      <span class="r-line"></span>
+      <span>LINE @121LKSPE</span>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script src="LineSpecs.js"></script>
+  <script type="text/babel" src="Avatar.jsx"></script>
+  <script type="text/babel" src="CoverImage.jsx"></script>
+  <script type="text/babel" src="RichMenu.jsx"></script>
+  <script type="text/babel" src="WelcomeCard.jsx"></script>
+  <script type="text/babel" src="Carousel.jsx"></script>
+  <script type="text/babel" src="LineChrome.jsx"></script>
+  <script type="text/babel" src="launch-views.jsx"></script>
+</body>
+</html>

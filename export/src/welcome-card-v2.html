@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<title>3Q Welcome Card v2 · 1040×1040</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400&family=Noto+Serif+TC:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#0C0A08;font-family:"Noto Sans TC",sans-serif;width:520px;height:520px;color:#F5F2EC;overflow:hidden}
+  .card{width:520px;height:520px;background:#0C0A08;position:relative;overflow:hidden;padding:44px 40px 36px;display:flex;flex-direction:column;align-items:center}
+  
+  /* Warm glow — single light source top-right */
+  .light{position:absolute;top:-80px;right:-80px;width:360px;height:360px;background:radial-gradient(circle,rgba(184,146,74,0.12),rgba(184,146,74,0));pointer-events:none;z-index:0}
+  
+  /* Film grain */
+  .grain{position:absolute;inset:0;opacity:0.35;pointer-events:none;mix-blend-mode:overlay;z-index:10}
+  
+  /* Eyebrow */
+  .eyebrow{position:relative;z-index:2;font-size:5px;letter-spacing:.45em;text-transform:uppercase;color:#B8924A;font-weight:300;align-self:flex-start}
+  
+  /* Mark area */
+  .mark{position:relative;z-index:2;margin:auto;width:130px;height:130px;display:flex;align-items:center;justify-content:center}
+  
+  /* Hairline */
+  .hair{width:36px;height:0.5px;background:linear-gradient(90deg,rgba(184,146,74,0.15),#B8924A,rgba(184,146,74,0.15));margin:0 auto 14px}
+  
+  /* Brand name */
+  .zh{position:relative;z-index:2;font-family:"Noto Serif TC",serif;font-weight:300;font-size:24px;letter-spacing:.22em;text-align:center;line-height:1}
+  
+  /* English sub */
+  .en{position:relative;z-index:2;font-size:5.5px;letter-spacing:.5em;text-transform:uppercase;color:rgba(245,242,236,0.45);margin-top:9px;text-align:center;font-weight:300}
+  
+  /* Services row */
+  .services{position:relative;z-index:2;display:flex;align-items:center;gap:5px;margin-top:14px;flex-wrap:wrap;justify-content:center}
+  .services .tag{font-size:4px;font-weight:300;letter-spacing:.10em;color:rgba(245,242,236,0.30)}
+  .services .sep{width:1.5px;height:1.5px;border-radius:50%;background:rgba(184,146,74,0.25);flex-shrink:0}
+  
+  /* Tagline */
+  .tagline{position:relative;z-index:2;text-align:center;font-family:"Noto Serif TC",serif;font-weight:300;font-style:italic;font-size:8.5px;letter-spacing:.16em;color:rgba(245,242,236,0.65);line-height:1.7;margin-top:20px}
+  
+  /* Bottom brand */
+  .bottom{position:relative;z-index:2;margin-top:auto;font-size:4px;letter-spacing:.4em;text-transform:uppercase;color:rgba(184,146,74,0.25);font-weight:300}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="light"></div>
+  
+  <div class="eyebrow">WELCOME · 來</div>
+  
+  <div class="mark">
+    <svg viewBox="0 0 280 280" fill="none" stroke="#B8924A" stroke-width="1" stroke-linecap="round">
+      <line x1="140" y1="60" x2="140" y2="240"/>
+      <path d="M140 80 Q 120 90 110 110 Q 120 105 140 100"/>
+      <path d="M140 80 Q 160 90 170 110 Q 160 105 140 100"/>
+      <path d="M140 110 Q 110 120 95 145 Q 115 138 140 130"/>
+      <path d="M140 110 Q 170 120 185 145 Q 165 138 140 130"/>
+      <path d="M140 140 Q 100 152 80 180 Q 110 170 140 162"/>
+      <path d="M140 140 Q 180 152 200 180 Q 170 170 140 162"/>
+      <path d="M140 170 Q 95 182 75 215 Q 110 202 140 195"/>
+      <path d="M140 170 Q 185 182 205 215 Q 170 202 140 195"/>
+      <circle cx="140" cy="48" r="3" fill="#B8924A" stroke="none"/>
+      <circle cx="140" cy="48" r="12" stroke-opacity="0.35"/>
+      <circle cx="140" cy="48" r="22" stroke-opacity="0.15"/>
+      <line x1="90" y1="248" x2="190" y2="248" stroke-opacity="0.4"/>
+    </svg>
+  </div>
+  
+  <div class="hair"></div>
+  <div class="zh">3Q貢丸</div>
+  <div class="en">TAIWAN BRAND HATCHERY</div>
+  
+  <div class="services">
+    <span class="tag">品牌孵化</span><span class="sep"></span>
+    <span class="tag">官網</span><span class="sep"></span>
+    <span class="tag">App</span><span class="sep"></span>
+    <span class="tag">影音</span><span class="sep"></span>
+    <span class="tag">外送圖</span><span class="sep"></span>
+    <span class="tag">美編</span>
+  </div>
+  
+  <div class="tagline">
+    只要你願意說，<br/>
+    我們就幫你被看見。
+  </div>
+  
+  <div class="bottom">3Q · BRAND HATCHERY</div>
+  
+  <svg class="grain" xmlns="http://www.w3.org/2000/svg">
+    <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="5"/>
+    <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.12 0"/></filter>
+    <rect width="100%" height="100%" filter="url(#n)"/>
+  </svg>
+</div>
+</body>
+</html>

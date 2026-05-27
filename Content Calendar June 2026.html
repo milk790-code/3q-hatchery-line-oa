@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>3Q · 30 天內容排程 · 2026年6月</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400&family=Noto+Serif+TC:wght@200;300;400&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bk:#0C0A08;--pa:#F5F2EC;--go:#B8924A;--st:#8A8A8A;
+  --serif:"Noto Serif TC",serif;--sans:"Noto Sans TC",sans-serif;
+  --line:#00B900;--ig:#C13584;--threads:#000;--tiktok:#FF0050;--rest:#555;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#111;font-family:var(--sans);font-weight:300;color:var(--pa);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1200px;margin:0 auto;padding:44px 32px}
+
+/* Header */
+.hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:36px;gap:24px}
+.hd h1{font-family:var(--serif);font-weight:300;font-size:22px;letter-spacing:.1em}
+.hd .month{font-size:11px;color:var(--go);letter-spacing:.35em;text-transform:uppercase;margin-bottom:6px}
+.hd .note{font-size:11px;color:#555;letter-spacing:.04em;margin-top:6px;line-height:1.6;max-width:360px}
+
+/* Legend */
+.legend{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.08em;color:#888}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* Week themes */
+.week-themes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:28px}
+.wt{padding:10px 14px;background:rgba(184,146,74,0.05);border-left:2px solid rgba(184,146,74,0.3)}
+.wt .wn{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--go);margin-bottom:4px}
+.wt .wl{font-family:var(--serif);font-size:13px;letter-spacing:.06em;margin-bottom:3px}
+.wt .ws{font-size:10px;color:#555;letter-spacing:.04em}
+
+/* Calendar grid */
+.cal-header{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:2px}
+.cal-header .dh{text-align:center;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#555;padding:6px 0}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+
+/* Day cell */
+.day{background:#1A1A1A;border-radius:3px;min-height:110px;padding:8px;display:flex;flex-direction:column;gap:4px;cursor:default;transition:background .2s}
+.day:hover{background:#222}
+.day.empty{background:transparent;pointer-events:none}
+.day.weekend{background:#161616}
+.day-num{font-size:11px;font-weight:300;color:#666;letter-spacing:.05em;margin-bottom:2px}
+.day.today .day-num{color:var(--go)}
+.ev{border-radius:2px;padding:3px 5px;font-size:9px;line-height:1.4;letter-spacing:.03em;display:flex;align-items:flex-start;gap:4px}
+.ev-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:2px}
+.ev-txt{flex:1;word-break:break-all}
+.ev.LINE{background:rgba(0,185,0,0.12);color:#88dd88}
+.ev.IG{background:rgba(193,53,132,0.12);color:#ee88bb}
+.ev.STORY{background:rgba(193,53,132,0.08);color:rgba(238,136,187,0.7)}
+.ev.THREADS{background:rgba(255,255,255,0.05);color:#888}
+.ev.TIKTOK{background:rgba(255,0,80,0.10);color:#ff8899}
+
+/* Copy panel */
+.copy-wrap{margin-top:32px}
+.copy-head{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--go);margin-bottom:16px}
+.copy-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.copy-card{background:#1A1A1A;border-radius:4px;padding:14px 16px}
+.copy-card .dc{font-size:9px;color:var(--go);letter-spacing:.2em;margin-bottom:6px}
+.copy-card .tt{font-family:var(--serif);font-size:13px;letter-spacing:.06em;margin-bottom:6px;color:var(--pa)}
+.copy-card .cp{font-size:11px;line-height:1.7;color:#888;white-space:pre-line;letter-spacing:.03em}
+.copy-card .ct{font-size:9px;color:rgba(184,146,74,0.6);letter-spacing:.12em;margin-top:8px;border-top:1px solid rgba(184,146,74,0.1);padding-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hd">
+    <div>
+      <div class="month">CONTENT CALENDAR · 內容排程表</div>
+      <h1>3Q貢丸 · 2026年6月</h1>
+      <p class="note">節奏：每週一 LINE 主推 · 每週三五 IG 貼文 · 每日 IG Story · 每週日 Threads 手記 · 每兩週 TikTok</p>
+    </div>
+    <div class="legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#00B900"></div>LINE</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#C13584"></div>IG Feed</div>
+      <div class="leg-item"><div class="leg-dot" style="background:rgba(193,53,132,0.45)"></div>IG Story</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#555"></div>Threads</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#FF0050"></div>TikTok</div>
+    </div>
+  </div>
+
+  <!-- Week themes -->
+  <div class="week-themes">
+    <div class="wt"><div class="wn">WEEK 1 · 6/1–7</div><div class="wl">只要你願意說</div><div class="ws">OPENING · 自我介紹週</div></div>
+    <div class="wt"><div class="wn">WEEK 2 · 6/8–14</div><div class="wl">六種方式</div><div class="ws">SERVICES · 服務介紹週</div></div>
+    <div class="wt"><div class="wn">WEEK 3 · 6/15–21</div><div class="wl">他們的故事</div><div class="ws">PORTFOLIO · 案例展示週</div></div>
+    <div class="wt"><div class="wn">WEEK 4 · 6/22–30</div><div class="wl">下一個是誰</div><div class="ws">INVITATION · 招募收尾週</div></div>
+  </div>
+
+  <!-- Calendar -->
+  <div class="cal-header">
+    <div class="dh">一 MON</div><div class="dh">二 TUE</div><div class="dh">三 WED</div>
+    <div class="dh">四 THU</div><div class="dh">五 FRI</div><div class="dh">六 SAT</div><div class="dh">日 SUN</div>
+  </div>
+  <div class="cal-grid" id="calGrid"></div>
+
+  <!-- Copy reference -->
+  <div class="copy-wrap">
+    <div class="copy-head">KEY COPY · 重點文案參考</div>
+    <div class="copy-grid">
+      <div class="copy-card">
+        <div class="dc">LINE · 6/1 (一) · 開帳公告</div>
+        <div class="tt">歡迎來到 3Q貢丸</div>
+        <div class="cp">只要你願意說，我們就幫你被看見。
+不管你的店多大多小，從 10 元茶葉蛋到上市企業，我們都接得住。
+往右滑，看看我們能幫你做什麼。</div>
+        <div class="ct">CTA: 回「說說我的店」開始</div>
+      </div>
+      <div class="copy-card">
+        <div class="dc">IG Feed · 6/3 (三) · 開帳號公告</div>
+        <div class="tt">我們來了。</div>
+        <div class="cp">只要你願意說，
+我們就幫你被看見。
+
+品牌孵化 · 官網設計 · App
+影音剪輯 · 外送美圖 · 後台美編</div>
+        <div class="ct">CTA: 連結在 bio · lin.ee/UKKodJj</div>
+      </div>
+      <div class="copy-card">
+        <div class="dc">LINE · 6/8 (一) · 服務一覽</div>
+        <div class="tt">六種方式，幫你被看見</div>
+        <div class="cp">不管你想做什麼，我們都有辦法。
+往右滑，看我們幫你做的六件事。
+
+01 品牌孵化 → 從零到一
+02 官網設計 → 一個讓人記住的網站
+03 App 設計 → 手機上的體驗
+04 影音剪輯 → 用畫面好好說一次
+05 外送美圖 → 讓人滑到就想點
+06 後台美編 → 日常視覺交給我們</div>
+        <div class="ct">CTA: 回「服務」看詳細內容</div>
+      </div>
+      <div class="copy-card">
+        <div class="dc">IG Feed · 6/24 (三) · 招募</div>
+        <div class="tt">你以為的小，是別人眼中的專注</div>
+        <div class="cp">一個攤位、一個品項、一個你自己照顧的店 ──
+那不是小，那是專注。
+
+我們替專注的人做事。
+
+7 月入駐名額開放，現在開始諮詢。</div>
+        <div class="ct">CTA: 回「諮詢」預約免費 30 分鐘</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const JUNE = [
+  // Week 1
+  {d:1,w:'一',evs:[
+    {ch:'LINE',   t:'歡迎 Carousel 上線'},
+    {ch:'STORY',  t:'品牌介紹 Story'},
+  ]},
+  {d:2,w:'二',evs:[{ch:'STORY',t:'品牌哲學：從 10 元茶葉蛋說起'}]},
+  {d:3,w:'三',evs:[
+    {ch:'IG',     t:'開帳號公告 · 我們來了'},
+    {ch:'STORY',  t:'服務預告'},
+  ]},
+  {d:4,w:'四',evs:[{ch:'STORY',t:'品牌孵化是什麼 Story'}]},
+  {d:5,w:'五',evs:[
+    {ch:'IG',     t:'服務介紹：品牌孵化'},
+    {ch:'STORY',  t:'品牌孵化細節'},
+  ]},
+  {d:6,w:'六',evs:[{ch:'STORY',t:'週六靜物 · 工作室一角'}]},
+  {d:7,w:'日',evs:[{ch:'THREADS',t:'手記 01 · 只要你願意說'}]},
+  // Week 2
+  {d:8,w:'一',evs:[
+    {ch:'LINE',   t:'服務一覽 Carousel'},
+    {ch:'STORY',  t:'服務系列預熱'},
+  ]},
+  {d:9,w:'二',evs:[{ch:'STORY',t:'官網設計 Story'}]},
+  {d:10,w:'三',evs:[
+    {ch:'IG',     t:'服務：官網設計'},
+    {ch:'STORY',  t:'App 設計 Story'},
+  ]},
+  {d:11,w:'四',evs:[{ch:'STORY',t:'影音剪輯 Story'}]},
+  {d:12,w:'五',evs:[
+    {ch:'IG',     t:'服務：App + 影音剪輯'},
+    {ch:'STORY',  t:'外送美圖 Story'},
+  ]},
+  {d:13,w:'六',evs:[
+    {ch:'TIKTOK', t:'EP.01 品牌開帳封面'},
+    {ch:'STORY',  t:'後台美編 Story'},
+  ]},
+  {d:14,w:'日',evs:[{ch:'THREADS',t:'手記 02 · 六種方式'}]},
+  // Week 3
+  {d:15,w:'一',evs:[
+    {ch:'LINE',   t:'合作案例 Carousel 上線'},
+    {ch:'STORY',  t:'案例預告 Story'},
+  ]},
+  {d:16,w:'二',evs:[{ch:'STORY',t:'案例細節：品牌孵化成果'}]},
+  {d:17,w:'三',evs:[
+    {ch:'IG',     t:'合作案例預告貼文'},
+    {ch:'STORY',  t:'過程透明：拍攝工序'},
+  ]},
+  {d:18,w:'四',evs:[{ch:'STORY',t:'客戶心聲 Story'}]},
+  {d:19,w:'五',evs:[
+    {ch:'IG',     t:'客戶見證格式貼文'},
+    {ch:'STORY',  t:'入駐品牌回顧'},
+  ]},
+  {d:20,w:'六',evs:[{ch:'STORY',t:'週六靜物 · 設計過程'}]},
+  {d:21,w:'日',evs:[{ch:'THREADS',t:'手記 03 · 被照亮，被托住'}]},
+  // Week 4
+  {d:22,w:'一',evs:[
+    {ch:'LINE',   t:'招募下一批 Carousel'},
+    {ch:'STORY',  t:'名額開放公告'},
+  ]},
+  {d:23,w:'二',evs:[{ch:'STORY',t:'諮詢流程說明 Story'}]},
+  {d:24,w:'三',evs:[
+    {ch:'IG',     t:'招募貼文 · 下一個是誰'},
+    {ch:'STORY',  t:'申請方式 Story'},
+  ]},
+  {d:25,w:'四',evs:[{ch:'STORY',t:'常見問題 Q&A Story'}]},
+  {d:26,w:'五',evs:[
+    {ch:'IG',     t:'客戶聲音 · 收尾貼文'},
+    {ch:'STORY',  t:'倒數公告'},
+  ]},
+  {d:27,w:'六',evs:[
+    {ch:'TIKTOK', t:'EP.04 諮詢招募封面'},
+    {ch:'STORY',  t:'週六感謝 Story'},
+  ]},
+  {d:28,w:'日',evs:[{ch:'THREADS',t:'手記 04 · 下一個'}]},
+  {d:29,w:'一',evs:[
+    {ch:'LINE',   t:'月度回顧 + 7月預告'},
+    {ch:'STORY',  t:'本月回顧 Story'},
+  ]},
+  {d:30,w:'二',evs:[
+    {ch:'IG',     t:'謝謝你願意說 · 收尾貼'},
+    {ch:'STORY',  t:'下月預告 Story'},
+  ]},
+];
+
+const CH_CLASS = { LINE:'LINE', IG:'IG', STORY:'STORY', THREADS:'THREADS', TIKTOK:'TIKTOK' };
+
+function buildCalendar() {
+  const grid = document.getElementById('calGrid');
+  // June 1 2026 is Monday → offset = 0
+  // Add cells: 30 days in June
+  // No empty cells before day 1 (Monday = col 0)
+  const total = 30;
+  for (let d = 1; d <= total; d++) {
+    const entry = JUNE.find(e => e.d === d);
+    const dayOfWeek = (d - 1) % 7; // 0=Mon...6=Sun
+    const isWeekend = dayOfWeek >= 5;
+    const cell = document.createElement('div');
+    cell.className = 'day' + (isWeekend ? ' weekend' : '');
+
+    const num = document.createElement('div');
+    num.className = 'day-num';
+    num.textContent = d;
+    cell.appendChild(num);
+
+    if (entry) {
+      entry.evs.forEach(ev => {
+        const evEl = document.createElement('div');
+        evEl.className = 'ev ' + CH_CLASS[ev.ch];
+        const dot = document.createElement('div');
+        dot.className = 'ev-dot';
+        const colors = { LINE:'#00B900', IG:'#C13584', STORY:'rgba(193,53,132,0.5)', THREADS:'#555', TIKTOK:'#FF0050' };
+        dot.style.background = colors[ev.ch] || '#555';
+        const txt = document.createElement('div');
+        txt.className = 'ev-txt';
+        txt.textContent = `${ev.ch} · ${ev.t}`;
+        evEl.appendChild(dot);
+        evEl.appendChild(txt);
+        cell.appendChild(evEl);
+      });
+    }
+    grid.appendChild(cell);
+  }
+}
+
+buildCalendar();
+</script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 24px; background: #F5F2EC; font-family: var(--font-sans); }
+  h3 { font-family: var(--font-sans); font-weight: 300; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; margin: 0 0 16px; color: #B8924A; }
+  .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+  .chip { aspect-ratio: 1/1; position: relative; display: flex; align-items: center; justify-content: center; }
+  .chip::after { content: ""; position: absolute; inset: 0; border-top: 1px solid #B8924A; transform: rotate(-22deg) translateY(50%); }
+  .chip .x { position: absolute; top: 8px; left: 8px; font-size: 10px; color: #0A0A0A; letter-spacing: 0.2em; }
+  .label { margin-top: 6px; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: #8A8A8A; text-align: center; }
+</style>
+</head><body>
+<h3>禁用色 — Banned Palette</h3>
+<div class="row">
+  <div>
+    <div class="chip" style="background:#FFD700"><span class="x">✕</span></div>
+    <div class="label">Bright Gold</div>
+  </div>
+  <div>
+    <div class="chip" style="background:#E8C39E"><span class="x">✕</span></div>
+    <div class="label">Champagne</div>
+  </div>
+  <div>
+    <div class="chip" style="background:#E0B0A0"><span class="x">✕</span></div>
+    <div class="label">Rose Gold</div>
+  </div>
+  <div>
+    <div class="chip" style="background:linear-gradient(135deg,#FFD700,#B8924A,#FFD700)"><span class="x">✕</span></div>
+    <div class="label">Gradient Gold</div>
+  </div>
+  <div>
+    <div class="chip" style="background:#FFFFFF; background-image:repeating-linear-gradient(45deg,#FFFFFF,#FFFFFF 4px,#E8DFD0 4px,#E8DFD0 8px)"><span class="x">✕</span></div>
+    <div class="label">Marble Stock</div>
+  </div>
+</div>
+</body></html>
