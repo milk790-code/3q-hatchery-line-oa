@@ -3,55 +3,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Threads 授權</title>
+<title>3Q 社群一鍵授權</title>
 <style>
-body{font-family:system-ui,sans-serif;max-width:560px;margin:60px auto;padding:0 20px;background:#0a0a0a;color:#fff}
-h2{font-size:1.4rem;margin-bottom:8px}
+body{font-family:system-ui,sans-serif;max-width:600px;margin:60px auto;padding:0 20px;background:#0a0a0a;color:#fff}
+h2{font-size:1.4rem;margin-bottom:4px}
+.sub{color:#888;font-size:.9rem;margin-bottom:24px}
 .card{background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:24px;margin:16px 0}
-code{background:#2a2a2a;padding:12px 16px;border-radius:8px;display:block;word-break:break-all;font-size:0.85rem;color:#7ef77e;margin:12px 0;user-select:all;cursor:pointer}
-.btn{display:inline-block;background:#0095f6;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:1rem;margin-top:8px}
-.warn{color:#f7c97e;font-size:0.85rem;margin-top:8px}
+.btn{display:inline-block;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:1rem;cursor:pointer;border:none;color:#fff}
+.btn-blue{background:#0095f6}.btn-blue:hover{background:#0081d6}
+.btn-gray{background:#333}.btn-gray:hover{background:#444}
+code{background:#2a2a2a;padding:12px 16px;border-radius:8px;display:block;word-break:break-all;font-size:.85rem;color:#7ef77e;margin:12px 0;cursor:pointer;user-select:all}
 .success{color:#7ef77e;font-weight:600}
 .error{color:#f77e7e}
+.warn{color:#f7c97e;font-size:.85rem;margin-top:8px}
+.badge{display:inline-block;background:#1a3a1a;color:#7ef77e;padding:2px 8px;border-radius:4px;font-size:.75rem;margin-left:6px}
 </style>
 </head>
 <body>
-<h2>3Q Hatchery — 一鍵授權</h2>
+<h2>3Q Hatchery — 社群平台一鍵授權</h2>
+<p class="sub">授權一次，系統永久自動發文（每 50 天自動續期）</p>
 
-<div id="auth-section" class="card">
-  <p>點下方按鈕，用你的 Threads 帳號授權（IG 同一個帳號）：</p>
-  <a id="authBtn" href="#" class="btn">&#x1f517; Threads 一鍵授權</a>
-  <p class="warn">授權後自動跳回此頁，複製授權碼貼到 GitHub</p>
+<div id="auth-section">
+  <div class="card">
+    <b>Threads + Instagram</b> <span class="badge">Meta 同一授權</span>
+    <p style="margin:12px 0 16px;color:#aaa;font-size:.9rem">點下方按鈕，用你的 Threads/IG 帳號授權。授權後頁面自動顯示授權碼。</p>
+    <a id="authBtn" href="#" class="btn btn-blue">&#x1F517; 立即授權 Threads + IG</a>
+    <p class="warn">授權後頁面會自動跳回並顯示授權碼</p>
+  </div>
 </div>
 
 <div id="code-section" class="card" style="display:none">
-  <p class="success">&#x2705; 授權成功！複製下方授權碼：</p>
-  <code id="codeDisplay" onclick="navigator.clipboard.writeText(this.innerText);this.innerText='已複製 ✓'">載入中...</code>
-  <p class="warn">點一下自動複製。此碼只能用一次，立即貼到 GitHub workflow。</p>
+  <p class="success">&#x2705; 授權成功！複製授權碼：</p>
+  <code id="codeDisplay" onclick="copyCode(this)">載入中...</code>
+  <p class="warn">點一下自動複製 &nbsp;·&nbsp; 此碼只能用一次，立即貼到 GitHub workflow</p>
   <br>
-  <a href="https://github.com/milk790-code/3q-hatchery-line-oa/actions/workflows/threads-token-setup.yml" class="btn" target="_blank">&#x27A1;&#xFE0F; 前往 GitHub Actions</a>
+  <a href="https://github.com/milk790-code/3q-hatchery-line-oa/actions/workflows/threads-token-setup.yml" class="btn btn-blue" target="_blank">&#x27A1;&#xFE0F; 前往 GitHub Actions 執行 workflow</a>
 </div>
 
 <div id="error-section" class="card" style="display:none">
   <p class="error">&#x274C; 授權失敗：<span id="errorMsg"></span></p>
-  <button onclick="location.reload()" class="btn">重試</button>
+  <button onclick="location.reload()" class="btn btn-gray">重試</button>
 </div>
 
 <script>
-const APP_ID = '956987317313843';
+const APP_ID   = '956987317313843';
 const REDIRECT = 'https://milk790-code.github.io/3q-hatchery-line-oa/assets/threads-auth.html';
-const SCOPE = 'threads_basic,threads_content_publish';
-const authUrl = `https://www.threads.net/oauth/authorize?client_id=${APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT)}&scope=${SCOPE}&response_type=code`;
+const SCOPE    = 'threads_basic,threads_content_publish,instagram_basic,instagram_content_publish';
+const authUrl  = `https://www.threads.net/oauth/authorize?client_id=${APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT)}&scope=${SCOPE}&response_type=code`;
 document.getElementById('authBtn').href = authUrl;
+
+function copyCode(el) {
+  navigator.clipboard.writeText(el.innerText).then(() => {
+    el.style.background = '#1a3a1a';
+    el.title = '已複製';
+  });
+}
+
 const params = new URLSearchParams(location.search);
-const code = params.get('code');
-const err = params.get('error_description') || params.get('error');
+const code   = params.get('code');
+const err    = params.get('error_description') || params.get('error');
 if (code) {
   document.getElementById('auth-section').style.display = 'none';
-  document.getElementById('code-section').style.display = 'block';
+  document.getElementById('code-section').style.display  = 'block';
   document.getElementById('codeDisplay').innerText = code;
 } else if (err) {
-  document.getElementById('auth-section').style.display = 'none';
+  document.getElementById('auth-section').style.display  = 'none';
   document.getElementById('error-section').style.display = 'block';
   document.getElementById('errorMsg').innerText = err;
 }
