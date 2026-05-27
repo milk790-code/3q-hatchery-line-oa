@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - 'webhook/worker.js'
+      - 'workers/social-publisher/worker.js'
       - 'assets/exports/3q-richmenu-2500x1686.jpg'
       - '.github/workflows/deploy.yml'
   workflow_run:
@@ -104,6 +105,40 @@ jobs:
             echo "$result" | jq -r '"inquiries.'"$col_name"': " + (.success | tostring) + " " + (.errors[0].message // "")'
           done
 
+          # v4: Add source_oa to inquiries and campaigns (ignore if already exists)
+          for tbl_col in "inquiries source_oa TEXT DEFAULT '3q-hatchery'" "campaigns source_oa TEXT DEFAULT '3q-hatchery'"; do
+            tbl=$(echo "$tbl_col" | awk '{print $1}')
+            col=$(echo "$tbl_col" | awk '{print $2}')
+            result=$(curl -sS -X POST \
+              "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+              -H "Authorization: Bearer $CF_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"sql\":\"ALTER TABLE ${tbl} ADD COLUMN ${col} TEXT DEFAULT '3q-hatchery'\"}")
+            echo "$result" | jq -r '"'"${tbl}.${col}"': " + (.success | tostring) + " " + (.errors[0].message // "")'
+          done
+
+          # v4: Create social_events table and indexes
+          curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"sql":"CREATE TABLE IF NOT EXISTS social_events (id INTEGER PRIMARY KEY AUTOINCREMENT, utm_source TEXT, utm_medium TEXT, utm_campaign TEXT, utm_content TEXT, event_type TEXT DEFAULT '\''click'\'', user_id TEXT, ip_hash TEXT, referrer TEXT, created_at TEXT NOT NULL DEFAULT (datetime('\''now'\'')))"}' \
+            | jq -r '"social_events table: " + (.success | tostring)'
+
+          for idx_def in \
+            "idx_social_events_campaign ON social_events(utm_campaign)" \
+            "idx_social_events_source ON social_events(utm_source)" \
+            "idx_social_events_created ON social_events(created_at)" \
+            "idx_inquiries_source_oa ON inquiries(source_oa)" \
+            "idx_campaigns_source_oa ON campaigns(source_oa)"; do
+            curl -sS -X POST \
+              "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+              -H "Authorization: Bearer $CF_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"sql\":\"CREATE INDEX IF NOT EXISTS ${idx_def}\"}" \
+              | jq -r '"index '"${idx_def%%ON*}"': " + (.success | tostring)' || true
+          done
+
           echo "::notice::D1 migrations complete"
 
       - name: Build & upload 3 Rich Menus (A/B/C)
@@ -130,6 +165,31 @@ jobs:
           else
             echo "::warning::One or more Rich Menu IDs not captured — menu switching may be inactive"
           fi
+
+      - name: Migration 004 — content_queue table
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"sql":"CREATE TABLE IF NOT EXISTS content_queue (id INTEGER PRIMARY KEY AUTOINCREMENT, platform TEXT NOT NULL, image_url TEXT, caption_seed TEXT, caption TEXT, topic_tag TEXT, scheduled_at TEXT, published_at TEXT, status TEXT NOT NULL DEFAULT '\''pending'\'', error_msg TEXT, source_oa TEXT NOT NULL DEFAULT '\''3q-hatchery'\'', created_at TEXT NOT NULL DEFAULT (datetime('\''now'\'')))"}' \
+            | jq -r '"content_queue table: " + (.success | tostring)'
+
+          for idx_def in \
+            "idx_content_queue_platform_status ON content_queue(platform, status)" \
+            "idx_content_queue_scheduled ON content_queue(scheduled_at)" \
+            "idx_content_queue_created ON content_queue(created_at)"; do
+            curl -sS -X POST \
+              "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+              -H "Authorization: Bearer $CF_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"sql\":\"CREATE INDEX IF NOT EXISTS ${idx_def}\"}" \
+              | jq -r '"index '"${idx_def%%ON*}"': " + (.success | tostring)' || true
+          done
+          echo "::notice::content_queue table ready"
 
       - name: Deploy Worker
         env:
@@ -321,3 +381,109 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "1. Optional: set RICHMENU_NEW / RICHMENU_INQUIRED / RICHMENU_CONVERTED secrets for personalized menus" >> $GITHUB_STEP_SUMMARY
           echo "2. Self-test: add bot → step through flow → confirm submit → verify owner receives Flex with action buttons" >> $GITHUB_STEP_SUMMARY
+
+  deploy-social-publisher:
+    name: Deploy Social Publisher
+    runs-on: ubuntu-latest
+    needs: deploy
+    env:
+      SOCIAL_WORKER_NAME: 3q-social-publisher
+      SESSION_KV_ID: 20a68b10afc84764ba770b64f0f33f30
+      CRM_D1_ID: e54671b1-d15e-4552-babf-cef367267568
+      PNG_BASE_URL: https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set Cloudflare account ID
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          echo "CF_ACCOUNT_ID=$CF_ACCOUNT_ID" >> $GITHUB_ENV
+
+      - name: Deploy Social Publisher Worker
+        env:
+          CF_TOKEN:        ${{ secrets.CF_API_TOKEN }}
+          TRIGGER_TOKEN:   ${{ secrets.TRIGGER_TOKEN }}
+          THREADS_ACCESS_TOKEN:  ${{ secrets.THREADS_ACCESS_TOKEN }}
+          THREADS_USER_ID:       ${{ secrets.THREADS_USER_ID }}
+          IG_ACCESS_TOKEN:       ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID:            ${{ secrets.IG_USER_ID }}
+          TIKTOK_ACCESS_TOKEN:   ${{ secrets.TIKTOK_ACCESS_TOKEN }}
+          GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
+          GOOGLE_LOCATION_NAME:   ${{ secrets.GOOGLE_LOCATION_NAME }}
+        run: |
+          set -euo pipefail
+          cat > /tmp/social-metadata.json <<JSON
+          {
+            "main_module": "worker.js",
+            "compatibility_date": "2024-12-01",
+            "bindings": [
+              {"name": "PNG_BASE_URL",   "type": "plain_text", "text": "$PNG_BASE_URL"},
+              {"name": "TRIGGER_TOKEN",  "type": "secret_text", "text": $(jq -Rn --arg t "${TRIGGER_TOKEN:-}" '$t')},
+              {"name": "SESSION",        "type": "kv_namespace", "namespace_id": "$SESSION_KV_ID"},
+              {"name": "CRM",            "type": "d1", "id": "$CRM_D1_ID"},
+              {"name": "AI",             "type": "ai"},
+              {"name": "THREADS_ACCESS_TOKEN", "type": "secret_text", "text": $(jq -Rn --arg t "${THREADS_ACCESS_TOKEN:-}" '$t')},
+              {"name": "THREADS_USER_ID",      "type": "secret_text", "text": $(jq -Rn --arg t "${THREADS_USER_ID:-}" '$t')},
+              {"name": "IG_ACCESS_TOKEN",      "type": "secret_text", "text": $(jq -Rn --arg t "${IG_ACCESS_TOKEN:-}" '$t')},
+              {"name": "IG_USER_ID",           "type": "secret_text", "text": $(jq -Rn --arg t "${IG_USER_ID:-}" '$t')},
+              {"name": "TIKTOK_ACCESS_TOKEN",  "type": "secret_text", "text": $(jq -Rn --arg t "${TIKTOK_ACCESS_TOKEN:-}" '$t')},
+              {"name": "GOOGLE_SERVICE_ACCOUNT","type": "secret_text","text": $(jq -Rn --arg t "${GOOGLE_SERVICE_ACCOUNT:-}" '$t')},
+              {"name": "GOOGLE_LOCATION_NAME", "type": "secret_text", "text": $(jq -Rn --arg t "${GOOGLE_LOCATION_NAME:-}" '$t')}
+            ]
+          }
+          JSON
+
+          resp=$(curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${SOCIAL_WORKER_NAME}" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -F "metadata=@/tmp/social-metadata.json;type=application/json" \
+            -F "worker.js=@workers/social-publisher/worker.js;type=application/javascript+module")
+          echo "$resp" | jq -e '.success == true' > /dev/null
+          echo "::notice::3q-social-publisher deployed (etag=$(echo "$resp" | jq -r '.result.etag'))"
+
+      - name: Set Social Publisher cron triggers
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${SOCIAL_WORKER_NAME}/schedules" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '[{"cron":"0 1 * * 2-4"},{"cron":"0 4 * * 3"},{"cron":"30 12 * * *"}]' \
+            | jq -e '.success == true' > /dev/null
+          echo "::notice::Social publisher crons set: 09:00 TW (Tue-Thu) + 12:00 TW (Wed) + 20:30 TW (daily)"
+
+      - name: Enable social-publisher workers.dev subdomain
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${SOCIAL_WORKER_NAME}/subdomain" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"enabled": true}' \
+            | jq -e '.success == true' > /dev/null
+
+          SUB=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/subdomain" \
+            | jq -r '.result.subdomain')
+          SOCIAL_URL="https://${SOCIAL_WORKER_NAME}.${SUB}.workers.dev"
+          echo "SOCIAL_URL=$SOCIAL_URL" >> $GITHUB_ENV
+          echo "::notice::Social publisher URL: $SOCIAL_URL"
+
+      - name: Social publisher summary
+        run: |
+          echo "## Social Publisher deployed" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Worker | \`$SOCIAL_URL\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Crons | 09:00 TW Tue-Thu · 12:00 TW Wed · 20:30 TW daily |" >> $GITHUB_STEP_SUMMARY
+          echo "| Platforms | Threads ✓ · IG ✓ · TikTok ✓ (tokens optional) |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Add GitHub secrets: THREADS_ACCESS_TOKEN + THREADS_USER_ID → re-deploy" >> $GITHUB_STEP_SUMMARY
+          echo "2. POST to \`/api/content\` (Bearer TRIGGER_TOKEN) to queue posts" >> $GITHUB_STEP_SUMMARY
+          echo "3. GET \`/health\` to verify which platforms are connected" >> $GITHUB_STEP_SUMMARY
