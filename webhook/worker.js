@@ -22,10 +22,7 @@
 // Keyword auto-reply content
 // ─────────────────────────────────────────────────────────────────────────
 
-const AWAY_TEXT = [
-  '收到你的訊息了 — 我們會在 24 小時內回你。',
-  '謝謝你願意說。',
-].join('\n');
+const AWAY_TEXT = '收到你的訊息了 — 我們會在 24 小時內回覆你。';
 
 function isBusinessHours() {
   const tw = new Date(Date.now() + 8 * 3600 * 1000);
@@ -1502,12 +1499,7 @@ async function handleIntent(userText, replyToken, env, uid) {
     if (match.response) msgs.push({ type: 'text', text: match.response });
     if (match.carousel && env.PNG_BASE_URL) msgs.push(carouselMsg(env.PNG_BASE_URL));
   } else {
-    if (!isBusinessHours()) {
-      msgs.push({ type: 'text', text: AWAY_HOURS_TEXT });
-    } else {
-      const aiReply = await aiFallback(userText, env, uid);
-      msgs.push({ type: 'text', text: aiReply || AWAY_TEXT });
-    }
+    msgs.push({ type: 'text', text: AWAY_TEXT });
   }
   return replyMsg(replyToken, msgs, env);
 }
