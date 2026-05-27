@@ -50,6 +50,7 @@ function syncAll() {
   syncTable_(cfg, 'inquiries');
   syncTable_(cfg, 'campaigns');
   syncTable_(cfg, 'social_events');
+  syncTable_(cfg, 'content_queue');
   syncDashboard_(cfg);
 
   console.log('✅ 同步完成：' + new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' }));

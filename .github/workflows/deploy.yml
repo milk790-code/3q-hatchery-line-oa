@@ -165,6 +165,31 @@ jobs:
             echo "::warning::One or more Rich Menu IDs not captured — menu switching may be inactive"
           fi
 
+      - name: Migration 004 — content_queue table
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"sql":"CREATE TABLE IF NOT EXISTS content_queue (id INTEGER PRIMARY KEY AUTOINCREMENT, platform TEXT NOT NULL, image_url TEXT, caption_seed TEXT, caption TEXT, topic_tag TEXT, scheduled_at TEXT, published_at TEXT, status TEXT NOT NULL DEFAULT '\''pending'\'', error_msg TEXT, source_oa TEXT NOT NULL DEFAULT '\''3q-hatchery'\'', created_at TEXT NOT NULL DEFAULT (datetime('\''now'\'')))"}' \
+            | jq -r '"content_queue table: " + (.success | tostring)'
+
+          for idx_def in \
+            "idx_content_queue_platform_status ON content_queue(platform, status)" \
+            "idx_content_queue_scheduled ON content_queue(scheduled_at)" \
+            "idx_content_queue_created ON content_queue(created_at)"; do
+            curl -sS -X POST \
+              "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+              -H "Authorization: Bearer $CF_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"sql\":\"CREATE INDEX IF NOT EXISTS ${idx_def}\"}" \
+              | jq -r '"index '"${idx_def%%ON*}"': " + (.success | tostring)' || true
+          done
+          echo "::notice::content_queue table ready"
+
       - name: Deploy Worker
         env:
           CF_TOKEN:      ${{ secrets.CF_API_TOKEN }}

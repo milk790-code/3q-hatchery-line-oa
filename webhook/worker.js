@@ -609,7 +609,8 @@ async function csvExportHandler(table, env) {
   const TABLE_SQL = {
     inquiries:     'SELECT * FROM inquiries ORDER BY id LIMIT 10000',
     campaigns:     'SELECT * FROM campaigns ORDER BY id LIMIT 10000',
-    social_events: 'SELECT * FROM social_events ORDER BY id LIMIT 10000',
+    social_events:  'SELECT * FROM social_events ORDER BY id LIMIT 10000',
+    content_queue:  'SELECT * FROM content_queue ORDER BY id LIMIT 10000',
   };
   const sql = TABLE_SQL[table];
   if (!sql) return new Response('invalid table', { status: 400 });
@@ -982,10 +983,60 @@ export default {
       return new Response(null, { status: 302, headers: { Location: destination } });
     }
 
+    // v4: Content queue CRUD — POST /api/content, GET /api/content, PATCH /api/content/:id
+    if (url.pathname === '/api/content' && request.method === 'POST') {
+      const auth = request.headers.get('Authorization') || '';
+      const tok = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+      if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return new Response('forbidden', { status: 403 });
+      if (!env.CRM) return new Response(JSON.stringify({ ok: false, error: 'D1 not bound' }), { status: 500, headers: { 'Content-Type': 'application/json', ...CORS } });
+      let body;
+      try { body = await request.json(); } catch { return new Response(JSON.stringify({ ok: false, error: 'invalid JSON' }), { status: 400, headers: { 'Content-Type': 'application/json', ...CORS } }); }
+      const { platform, image_url, caption_seed, caption, topic_tag, scheduled_at } = body;
+      if (!platform) return new Response(JSON.stringify({ ok: false, error: 'platform required' }), { status: 400, headers: { 'Content-Type': 'application/json', ...CORS } });
+      const result = await env.CRM.prepare(
+        'INSERT INTO content_queue (platform, image_url, caption_seed, caption, topic_tag, scheduled_at) VALUES (?, ?, ?, ?, ?, ?)'
+      ).bind(platform, image_url || null, caption_seed || null, caption || null, topic_tag || null, scheduled_at || null).run();
+      return new Response(JSON.stringify({ ok: true, id: result?.meta?.last_row_id }), { status: 201, headers: { 'Content-Type': 'application/json', ...CORS } });
+    }
+
+    if (url.pathname === '/api/content' && request.method === 'GET') {
+      const auth = request.headers.get('Authorization') || '';
+      const tok = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+      if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return new Response('forbidden', { status: 403 });
+      if (!env.CRM) return new Response(JSON.stringify({ ok: false, error: 'D1 not bound' }), { status: 500, headers: { 'Content-Type': 'application/json', ...CORS } });
+      const platform = url.searchParams.get('platform') || null;
+      const status   = url.searchParams.get('status')   || 'pending';
+      const limit    = Math.min(parseInt(url.searchParams.get('limit') || '50', 10), 200);
+      let sql = 'SELECT * FROM content_queue WHERE status = ?';
+      const binds = [status];
+      if (platform) { sql += ' AND platform = ?'; binds.push(platform); }
+      sql += ' ORDER BY scheduled_at ASC, id ASC LIMIT ?';
+      binds.push(limit);
+      const rows = await env.CRM.prepare(sql).bind(...binds).all();
+      return new Response(JSON.stringify({ ok: true, count: rows.results?.length || 0, posts: rows.results || [] }), { headers: { 'Content-Type': 'application/json', ...CORS } });
+    }
+
+    if (url.pathname.startsWith('/api/content/') && request.method === 'PATCH') {
+      const auth = request.headers.get('Authorization') || '';
+      const tok = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+      if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return new Response('forbidden', { status: 403 });
+      if (!env.CRM) return new Response(JSON.stringify({ ok: false, error: 'D1 not bound' }), { status: 500, headers: { 'Content-Type': 'application/json', ...CORS } });
+      const id = parseInt(url.pathname.slice('/api/content/'.length), 10);
+      if (!id) return new Response(JSON.stringify({ ok: false, error: 'invalid id' }), { status: 400, headers: { 'Content-Type': 'application/json', ...CORS } });
+      let body;
+      try { body = await request.json(); } catch { return new Response(JSON.stringify({ ok: false, error: 'invalid JSON' }), { status: 400, headers: { 'Content-Type': 'application/json', ...CORS } }); }
+      const fields = ['caption', 'caption_seed', 'image_url', 'topic_tag', 'scheduled_at', 'status'];
+      const updates = fields.filter(f => body[f] !== undefined);
+      if (updates.length === 0) return new Response(JSON.stringify({ ok: false, error: 'no fields to update' }), { status: 400, headers: { 'Content-Type': 'application/json', ...CORS } });
+      const sql = `UPDATE content_queue SET ${updates.map(f => `${f} = ?`).join(', ')} WHERE id = ?`;
+      await env.CRM.prepare(sql).bind(...updates.map(f => body[f]), id).run();
+      return new Response(JSON.stringify({ ok: true, id }), { headers: { 'Content-Type': 'application/json', ...CORS } });
+    }
+
     if (request.method === 'GET') {
       return new Response(JSON.stringify({
         service: '3Q Hatchery LINE OA webhook',
-        ok: true, version: 3.6,
+        ok: true, version: 3.7,
         configured: {
           token:       Boolean(env.LINE_CHANNEL_ACCESS_TOKEN),
           secret:      Boolean(env.LINE_CHANNEL_SECRET),

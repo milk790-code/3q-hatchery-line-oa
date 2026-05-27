@@ -1,0 +1,49 @@
+name = "3q-social-publisher"
+main = "worker.js"
+compatibility_date = "2024-12-01"
+
+[vars]
+PNG_BASE_URL = "https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports"
+
+# Secrets (set via wrangler secret put <SECRET_NAME>):
+#
+#   Required for Threads:
+#     THREADS_ACCESS_TOKEN   — Meta Threads API long-lived user token
+#     THREADS_USER_ID        — Numeric Threads user ID (from Graph API /me)
+#
+#   Required for Instagram:
+#     IG_ACCESS_TOKEN        — Instagram Graph API long-lived token
+#     IG_USER_ID             — Instagram business user ID
+#
+#   Optional — TikTok (requires Content Posting API approval):
+#     TIKTOK_ACCESS_TOKEN
+#
+#   Optional — Google Business Profile:
+#     GOOGLE_SERVICE_ACCOUNT  — Full JSON of Google service account key
+#     GOOGLE_LOCATION_NAME    — e.g. accounts/123456/locations/789012
+#
+#   Required for manual /publish trigger:
+#     TRIGGER_TOKEN
+
+[[kv_namespaces]]
+binding = "SESSION"
+id = "20a68b10afc84764ba770b64f0f33f30"
+
+[[d1_databases]]
+binding = "CRM"
+database_name = "3q-hatchery-crm"
+database_id = "e54671b1-d15e-4552-babf-cef367267568"
+
+[ai]
+binding = "AI"
+
+# Cron schedule (Taipei time):
+#   01:00 UTC = 09:00 TW  (weekday morning, best engagement)
+#   04:00 UTC = 12:00 TW  (Wednesday lunch peak)
+#   12:30 UTC = 20:30 TW  (evening light content)
+[[triggers.crons]]
+crons = [
+  "0 1 * * 2-4",
+  "0 4 * * 3",
+  "30 12 * * *"
+]
