@@ -1,24 +1,111 @@
-// 3Q Hatchery — Social Publisher Worker v1.0
+// 3Q Hatchery — Social Publisher Worker v2.0
 // Auto-posts to Threads, Instagram, TikTok, Google Business Profile
-// Cron schedule (Taipei time):
-//   01:00 UTC = 09:00 TW (weekday morning — best engagement)
-//   04:00 UTC = 12:00 TW (Wednesday lunch peak)
-//   12:30 UTC = 20:30 TW (evening light content)
+// Tokens stored in SESSION KV and auto-refreshed every 50 days — no manual renewal.
 //
-// Required secrets (wrangler secret put):
-//   THREADS_ACCESS_TOKEN     — Threads API long-lived token
-//   THREADS_USER_ID          — Numeric Threads user ID
-//   IG_ACCESS_TOKEN          — Instagram Graph API long-lived token
-//   IG_USER_ID               — Instagram business account user ID
-//   TIKTOK_ACCESS_TOKEN      — TikTok Content Posting API token (optional)
-//   GOOGLE_SERVICE_ACCOUNT   — JSON string of Google service account (optional)
-//   GOOGLE_LOCATION_NAME     — e.g. accounts/123/locations/456 (optional)
-//   TRIGGER_TOKEN            — For manual /publish?token=... HTTP trigger
+// Vars (wrangler.toml):
+//   THREADS_APP_ID           — Meta App ID (public, safe in vars)
+//
+// Secrets (wrangler secret put):
+//   THREADS_APP_SECRET       — Meta App Secret (for token refresh)
+//   TRIGGER_TOKEN            — For manual /publish and /oauth/callback endpoints
+//
+// KV keys (SESSION namespace):
+//   token:threads:access     — Threads long-lived access token
+//   token:threads:user_id    — Threads numeric user ID
+//   token:threads:expires    — ISO expiry timestamp
+//   token:ig:access          — Instagram long-lived access token
+//   token:ig:user_id         — Instagram business user ID
+//   token:ig:expires         — ISO expiry timestamp
 
 // ─────────────────────────────────────────────────────────────────────────
 // Platform daily limits (to avoid spam signals)
 // ─────────────────────────────────────────────────────────────────────────
 const DAILY_LIMITS = { threads: 3, instagram: 1, tiktok: 1, google_biz: 1 };
+
+// ─────────────────────────────────────────────────────────────────────────
+// KV-backed token storage (permanent, auto-refreshed)
+// ─────────────────────────────────────────────────────────────────────────
+
+async function getToken(platform, key, env) {
+  if (!env.SESSION) return env[key] || null;
+  const kvVal = await env.SESSION.get(`token:${platform}:${key.toLowerCase().replace('_access_token','access').replace('_user_id','user_id')}`);
+  return kvVal || env[key] || null;
+}
+
+async function saveTokenToKV(platform, access, userId, expiresInSecs, env) {
+  if (!env.SESSION) return;
+  const expires = new Date(Date.now() + expiresInSecs * 1000).toISOString();
+  await Promise.all([
+    env.SESSION.put(`token:${platform}:access`,   access,  { expirationTtl: expiresInSecs }),
+    env.SESSION.put(`token:${platform}:user_id`,  userId,  { expirationTtl: expiresInSecs }),
+    env.SESSION.put(`token:${platform}:expires`,  expires, { expirationTtl: expiresInSecs }),
+  ]);
+}
+
+async function refreshMetaToken(platform, env) {
+  const appId     = env.THREADS_APP_ID;
+  const appSecret = env.THREADS_APP_SECRET;
+  if (!appId || !appSecret) return null;
+
+  const currentToken = await getToken(platform, platform === 'threads' ? 'THREADS_ACCESS_TOKEN' : 'IG_ACCESS_TOKEN', env);
+  if (!currentToken) return null;
+
+  const host = platform === 'threads' ? 'graph.threads.net' : 'graph.facebook.com';
+  const resp = await fetch(
+    `https://${host}/refresh_access_token?grant_type=th_refresh_token&access_token=${currentToken}&client_id=${appId}&client_secret=${appSecret}`
+  );
+  if (!resp.ok) return null;
+  const data = await resp.json();
+  if (!data.access_token) return null;
+
+  const userId = await env.SESSION?.get(`token:${platform}:user_id`) || '';
+  await saveTokenToKV(platform, data.access_token, userId, data.expires_in || 5184000, env);
+  return data.access_token;
+}
+
+async function refreshTokensIfNeeded(env) {
+  if (!env.SESSION || !env.THREADS_APP_SECRET) return;
+  const tenDays = 10 * 24 * 60 * 60 * 1000;
+  for (const platform of ['threads', 'ig']) {
+    const expires = await env.SESSION.get(`token:${platform}:expires`);
+    if (!expires) continue;
+    if (new Date(expires).getTime() - Date.now() < tenDays) {
+      console.log(`[social-publisher] refreshing ${platform} token`);
+      await refreshMetaToken(platform, env).catch(e => console.error(`refresh ${platform} failed:`, e.message));
+    }
+  }
+}
+
+// Exchange OAuth auth code for tokens and store in KV
+async function exchangeCodeAndStore(code, platform, redirectUri, env) {
+  const appId     = env.THREADS_APP_ID;
+  const appSecret = env.THREADS_APP_SECRET;
+  if (!appId || !appSecret) throw new Error('THREADS_APP_ID or THREADS_APP_SECRET not set');
+
+  const host = platform === 'threads' ? 'graph.threads.net' : 'graph.facebook.com';
+  // Step 1: short-lived token
+  const shortResp = await fetch(`https://${host}/oauth/access_token`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ client_id: appId, client_secret: appSecret, grant_type: 'authorization_code', redirect_uri: redirectUri, code }).toString(),
+  });
+  const shortData = await shortResp.json();
+  if (!shortData.access_token) throw new Error(`Code exchange failed: ${JSON.stringify(shortData)}`);
+
+  // Step 2: long-lived token (60 days)
+  const longResp = await fetch(`https://${host}/access_token?grant_type=th_exchange_token&client_id=${appId}&client_secret=${appSecret}&access_token=${shortData.access_token}`);
+  const longData = await longResp.json();
+  const finalToken = longData.access_token || shortData.access_token;
+  const expiresIn  = longData.expires_in  || shortData.expires_in || 5184000;
+
+  // Step 3: user ID
+  const meResp = await fetch(`https://${host}/v1.0/me?access_token=${finalToken}`);
+  const meData = await meResp.json();
+  if (!meData.id) throw new Error(`Could not get user ID: ${JSON.stringify(meData)}`);
+
+  await saveTokenToKV(platform, finalToken, meData.id, expiresIn, env);
+  return { access_token: finalToken, user_id: meData.id, expires_in: expiresIn };
+}
 
 // Threads topic tag → 3Q brand territory (Mosseri advice: 1 tag per post)
 const DEFAULT_TOPIC_TAGS = {
@@ -94,12 +181,11 @@ async function generateCaption(seed, platform, env) {
 // ─────────────────────────────────────────────────────────────────────────
 
 async function publishToThreads(post, env) {
-  if (!env.THREADS_ACCESS_TOKEN || !env.THREADS_USER_ID) {
-    return { ok: false, error: 'THREADS_ACCESS_TOKEN or THREADS_USER_ID not set' };
+  const token  = await getToken('threads', 'THREADS_ACCESS_TOKEN', env);
+  const userId = await getToken('threads', 'THREADS_USER_ID', env);
+  if (!token || !userId) {
+    return { ok: false, error: 'Threads token not set — authorize at /oauth/callback' };
   }
-
-  const userId = env.THREADS_USER_ID;
-  const token  = env.THREADS_ACCESS_TOKEN;
   const base   = 'https://graph.threads.net/v1.0';
 
   // Step 1: Create media container
@@ -145,15 +231,14 @@ async function publishToThreads(post, env) {
 // ─────────────────────────────────────────────────────────────────────────
 
 async function publishToInstagram(post, env) {
-  if (!env.IG_ACCESS_TOKEN || !env.IG_USER_ID) {
-    return { ok: false, error: 'IG_ACCESS_TOKEN or IG_USER_ID not set' };
+  const token  = await getToken('ig', 'IG_ACCESS_TOKEN', env);
+  const userId = await getToken('ig', 'IG_USER_ID', env);
+  if (!token || !userId) {
+    return { ok: false, error: 'IG token not set — authorize at /oauth/callback' };
   }
   if (!post.image_url) {
     return { ok: false, error: 'Instagram requires an image_url' };
   }
-
-  const userId = env.IG_USER_ID;
-  const token  = env.IG_ACCESS_TOKEN;
   const base   = 'https://graph.facebook.com/v19.0';
 
   // Step 1: Create media object
@@ -412,6 +497,7 @@ export default {
     ctx.waitUntil(
       runPublishLoop(env)
         .then(r => console.log('[social-publisher] done:', JSON.stringify(r)))
+        .then(() => refreshTokensIfNeeded(env))
         .catch(err => console.error('[social-publisher] error:', err.message))
     );
   },
@@ -424,20 +510,44 @@ export default {
 
     // Health check
     if (url.pathname === '/health') {
+      const [threadsToken, igToken] = await Promise.all([
+        getToken('threads', 'THREADS_ACCESS_TOKEN', env),
+        getToken('ig', 'IG_ACCESS_TOKEN', env),
+      ]);
       return json({
         ok: true,
         worker: '3q-social-publisher',
-        version: '1.0',
+        version: '2.0',
         platforms: Object.keys(DAILY_LIMITS),
         configured: {
-          threads:    Boolean(env.THREADS_ACCESS_TOKEN && env.THREADS_USER_ID),
-          instagram:  Boolean(env.IG_ACCESS_TOKEN && env.IG_USER_ID),
+          threads:    Boolean(threadsToken),
+          instagram:  Boolean(igToken),
           tiktok:     Boolean(env.TIKTOK_ACCESS_TOKEN),
           google_biz: Boolean(env.GOOGLE_SERVICE_ACCOUNT && env.GOOGLE_LOCATION_NAME),
           crm_d1:     Boolean(env.CRM),
           ai:         Boolean(env.AI),
+          auto_refresh: Boolean(env.THREADS_APP_SECRET),
         },
       });
+    }
+
+    // OAuth callback: POST /oauth/callback (TRIGGER_TOKEN protected)
+    // Body: { platform: "threads"|"ig", code: "...", redirect_uri: "..." }
+    if (url.pathname === '/oauth/callback' && request.method === 'POST') {
+      const auth = request.headers.get('Authorization') || '';
+      const tok  = auth.startsWith('Bearer ') ? auth.slice(7) : url.searchParams.get('token');
+      if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return new Response('forbidden', { status: 403 });
+      const body = await request.json().catch(() => ({}));
+      const platform    = body.platform || 'threads';
+      const code        = body.code;
+      const redirectUri = body.redirect_uri || 'https://milk790-code.github.io/3q-hatchery-line-oa/assets/threads-auth.html';
+      if (!code) return json({ ok: false, error: 'code required' }, 400);
+      try {
+        const result = await exchangeCodeAndStore(code, platform, redirectUri, env);
+        return json({ ok: true, platform, user_id: result.user_id, expires_in: result.expires_in });
+      } catch (err) {
+        return json({ ok: false, error: err.message }, 400);
+      }
     }
 
     // Manual publish trigger: POST /publish?token=TRIGGER_TOKEN[&platform=threads]

@@ -3,27 +3,20 @@ main = "worker.js"
 compatibility_date = "2024-12-01"
 
 [vars]
-PNG_BASE_URL = "https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports"
+PNG_BASE_URL   = "https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports"
+THREADS_APP_ID = "956987317313843"
 
-# Secrets (set via wrangler secret put <SECRET_NAME>):
+# Secrets (set via wrangler secret put or GitHub Actions deploy):
 #
-#   Required for Threads:
-#     THREADS_ACCESS_TOKEN   — Meta Threads API long-lived user token
-#     THREADS_USER_ID        — Numeric Threads user ID (from Graph API /me)
+#   THREADS_APP_SECRET  — Meta App Secret (enables auto token-refresh every 50 days)
+#   TRIGGER_TOKEN       — Protects /publish and /oauth/callback endpoints
 #
-#   Required for Instagram:
-#     IG_ACCESS_TOKEN        — Instagram Graph API long-lived token
-#     IG_USER_ID             — Instagram business user ID
+# Tokens are stored in SESSION KV (auto-refreshed) — no need to set these manually:
+#   THREADS_ACCESS_TOKEN, THREADS_USER_ID, IG_ACCESS_TOKEN, IG_USER_ID
 #
-#   Optional — TikTok (requires Content Posting API approval):
-#     TIKTOK_ACCESS_TOKEN
-#
-#   Optional — Google Business Profile:
-#     GOOGLE_SERVICE_ACCOUNT  — Full JSON of Google service account key
-#     GOOGLE_LOCATION_NAME    — e.g. accounts/123456/locations/789012
-#
-#   Required for manual /publish trigger:
-#     TRIGGER_TOKEN
+# Optional:
+#   TIKTOK_ACCESS_TOKEN
+#   GOOGLE_SERVICE_ACCOUNT, GOOGLE_LOCATION_NAME
 
 [[kv_namespaces]]
 binding = "SESSION"
