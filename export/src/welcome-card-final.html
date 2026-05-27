@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<title>3Q Welcome Card · 1040×1040 (rendered 520×520)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #0A0A0A; font-family: "Noto Sans TC","Helvetica Neue",Arial,sans-serif; width: 520px; height: 520px; color: #F5F2EC; }
+  .card { width: 520px; height: 520px; background: #0A0A0A; position: relative; overflow: hidden;
+    padding: 40px; display: flex; flex-direction: column; }
+  .card::before { content: ""; position: absolute; inset: 14px;
+    border: 0.5px solid rgba(184,146,74,0.22); pointer-events: none; }
+
+  .light { position: absolute; top: -100px; right: -100px; width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(184,146,74,0.18), rgba(184,146,74,0)); pointer-events: none; }
+
+  .grain { position: absolute; inset: 0; opacity: 0.4; pointer-events: none; mix-blend-mode: overlay; }
+
+  .head { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: flex-start; }
+  .eyebrow { font-size: 5.5px; letter-spacing: 0.5em; text-transform: uppercase; color: #B8924A; font-weight: 300; }
+  .num { font-family: "Noto Serif TC",serif; font-style: italic; font-weight: 300; font-size: 7px; letter-spacing: 0.2em; color: rgba(184,146,74,0.65); }
+
+  .mark { position: relative; z-index: 2; margin: auto;
+    width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; }
+
+  .body { position: relative; z-index: 2; text-align: center; margin-bottom: 16px; }
+  .body .hair { width: 30px; height: 0.5px; background: #B8924A; margin: 0 auto 16px; }
+  .body .zh { font-family: "Noto Serif TC","Cormorant Garamond","Georgia",serif; font-weight: 300; font-size: 24px; letter-spacing: 0.22em; color: #F5F2EC; line-height: 1; }
+  .body .en { font-size: 6px; letter-spacing: 0.5em; text-transform: uppercase; color: rgba(245,242,236,0.55); margin-top: 9px; font-weight: 300; }
+
+  .foot { position: relative; z-index: 2; text-align: center;
+    font-family: "Noto Serif TC","Cormorant Garamond",serif; font-weight: 300; font-style: italic;
+    font-size: 9px; letter-spacing: 0.18em; color: rgba(245,242,236,0.7); line-height: 1.6; }
+  .reserve { height: 40px; }
+
+  .corner { position: absolute; width: 12px; height: 12px; border: 0.5px solid #B8924A; z-index: 3; pointer-events: none; }
+  .corner.tl { top: 28px; left: 28px; border-right: 0; border-bottom: 0; }
+  .corner.tr { top: 28px; right: 28px; border-left: 0; border-bottom: 0; }
+  .corner.bl { bottom: 78px; left: 28px; border-right: 0; border-top: 0; }
+  .corner.br { bottom: 78px; right: 28px; border-left: 0; border-top: 0; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="light"></div>
+  <div class="corner tl"></div>
+  <div class="corner tr"></div>
+
+  <div class="head">
+    <span class="eyebrow">WELCOME · 來</span>
+    <span class="num">No. 001</span>
+  </div>
+
+  <div class="mark">
+    <svg viewBox="0 0 280 280" fill="none" stroke="#B8924A" stroke-width="1" stroke-linecap="round">
+      <line x1="140" y1="60" x2="140" y2="240"/>
+      <path d="M140 80 Q 120 90 110 110 Q 120 105 140 100"/>
+      <path d="M140 80 Q 160 90 170 110 Q 160 105 140 100"/>
+      <path d="M140 110 Q 110 120 95 145 Q 115 138 140 130"/>
+      <path d="M140 110 Q 170 120 185 145 Q 165 138 140 130"/>
+      <path d="M140 140 Q 100 152 80 180 Q 110 170 140 162"/>
+      <path d="M140 140 Q 180 152 200 180 Q 170 170 140 162"/>
+      <path d="M140 170 Q 95 182 75 215 Q 110 202 140 195"/>
+      <path d="M140 170 Q 185 182 205 215 Q 170 202 140 195"/>
+      <circle cx="140" cy="48" r="3" fill="#B8924A" stroke="none"/>
+      <circle cx="140" cy="48" r="12" stroke-opacity="0.4"/>
+      <circle cx="140" cy="48" r="22" stroke-opacity="0.2"/>
+      <line x1="80" y1="248" x2="200" y2="248" stroke-opacity="0.5"/>
+    </svg>
+  </div>
+
+  <div class="body">
+    <div class="hair"></div>
+    <div class="zh">3Q貢丸</div>
+    <div class="en">TAIWAN BRAND HATCHERY</div>
+  </div>
+
+  <div class="foot">
+    只要你願意說，<br/>
+    我們就幫你被看見。
+  </div>
+
+  <div class="corner bl"></div>
+  <div class="corner br"></div>
+
+  <div class="reserve"></div>
+
+  <svg class="grain" xmlns="http://www.w3.org/2000/svg">
+    <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.92" numOctaves="2" seed="3"/>
+      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.13 0"/></filter>
+    <rect width="100%" height="100%" filter="url(#n)"/>
+  </svg>
+</div>
+</body>
+</html>

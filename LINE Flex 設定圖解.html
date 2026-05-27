@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LINE OA · Flex Message 設定圖解</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400&family=Noto+Serif+TC:wght@200;300;400&display=swap" rel="stylesheet"/>
+<style>
+:root{--gold:#B8924A;--black:#0C0A08;--paper:#F5F2EC;--sans:"Noto Sans TC",sans-serif;--serif:"Noto Serif TC",serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);font-family:var(--sans);font-weight:300;color:var(--black);-webkit-font-smoothing:antialiased}
+.wrap{max-width:800px;margin:0 auto;padding:48px 32px}
+
+.hd{margin-bottom:40px}
+.hd-eye{font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.hd h1{font-family:var(--serif);font-weight:300;font-size:24px;letter-spacing:.1em;margin-bottom:8px}
+.hd .sub{font-size:12px;color:#8A8A8A;line-height:1.7}
+
+.step-block{margin-bottom:40px}
+.step-block h2{font-size:13px;letter-spacing:.1em;margin-bottom:4px;display:flex;align-items:center;gap:10px}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--gold);color:white;font-size:10px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-desc{font-size:12px;color:#8A8A8A;line-height:1.7;margin:8px 0 16px 32px}
+
+/* mock LINE OA UI */
+.mock{border:1px solid rgba(0,0,0,0.1);border-radius:8px;overflow:hidden;background:#fff;box-shadow:0 2px 16px rgba(0,0,0,0.08)}
+.mock-bar{background:#00B900;padding:10px 16px;display:flex;align-items:center;gap:8px;color:#fff;font-size:12px;font-weight:500}
+.mock-bar .logo{width:24px;height:24px;background:#004B00;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+.mock-sidebar{display:flex}
+.mock-nav{width:140px;background:#f8f8f8;border-right:1px solid #eee;padding:16px 0;flex-shrink:0}
+.mock-nav-item{padding:8px 16px;font-size:11px;color:#666;cursor:pointer;white-space:nowrap}
+.mock-nav-item.active{background:#e8f5e9;color:#00B900;border-right:2px solid #00B900}
+.mock-nav-item.highlight{background:rgba(184,146,74,0.08);color:var(--gold);border-right:2px solid var(--gold);font-weight:400}
+.mock-content{flex:1;padding:20px}
+.mock-title{font-size:14px;font-weight:500;margin-bottom:16px;color:#111}
+.mock-btn{display:inline-block;background:#00B900;color:#fff;font-size:11px;padding:7px 16px;border-radius:4px;cursor:pointer;border:none;margin-right:8px;margin-bottom:8px}
+.mock-btn.outline{background:none;border:1px solid #ddd;color:#333}
+.mock-btn.gold{background:var(--gold);color:#fff}
+.mock-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}
+.mock-table th{background:#f5f5f5;padding:8px 12px;text-align:left;font-weight:400;color:#666;border-bottom:1px solid #eee}
+.mock-table td{padding:8px 12px;border-bottom:1px solid #f5f5f5;color:#333}
+
+/* Modal */
+.mock-modal{background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;padding:16px}
+.modal-box{background:#fff;border-radius:8px;width:100%;max-width:480px;overflow:hidden}
+.modal-hd{padding:16px 20px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+.modal-hd span{font-size:13px;font-weight:500}
+.modal-close{color:#999;font-size:16px;cursor:pointer}
+.modal-body{padding:16px 20px}
+.modal-label{font-size:11px;color:#666;margin-bottom:6px}
+.modal-select{width:100%;border:1px solid #ddd;border-radius:4px;padding:8px 10px;font-size:12px;margin-bottom:14px;color:#333}
+.modal-tabs{display:flex;border-bottom:1px solid #eee;margin-bottom:12px}
+.modal-tab{padding:8px 16px;font-size:11px;color:#666;cursor:pointer;border-bottom:2px solid transparent}
+.modal-tab.active{color:#00B900;border-bottom-color:#00B900}
+.modal-tab.active-gold{color:var(--gold);border-bottom-color:var(--gold);font-weight:400}
+.mock-textarea{width:100%;border:1px solid #ddd;border-radius:4px;padding:10px;font-size:11px;font-family:monospace;resize:none;height:140px;color:#333;line-height:1.5}
+.mock-textarea.highlight-area{border-color:var(--gold);background:rgba(184,146,74,0.03)}
+.modal-ft{padding:12px 20px;border-top:1px solid #eee;display:flex;justify-content:flex-end;gap:8px}
+.modal-ft .save{background:#00B900;color:#fff;border:none;padding:7px 20px;border-radius:4px;font-size:12px;cursor:pointer}
+.modal-ft .cancel{background:none;border:1px solid #ddd;color:#666;padding:7px 16px;border-radius:4px;font-size:12px;cursor:pointer}
+
+/* Hotspot arrows */
+.arrow-box{position:relative;margin-top:8px}
+.arrow-note{background:var(--gold);color:#fff;font-size:10px;padding:3px 10px;border-radius:3px;display:inline-block;margin-left:4px;letter-spacing:.05em}
+.arrow-line{display:inline-block;width:20px;height:1px;background:var(--gold);vertical-align:middle;margin:0 4px}
+
+/* separator */
+.sep{height:1px;background:rgba(184,146,74,0.15);margin:40px 0}
+
+/* path pill */
+.path{display:inline-flex;align-items:center;gap:6px;background:#F0EDE7;padding:4px 12px;border-radius:20px;font-size:11px;color:#555;letter-spacing:.03em;flex-wrap:wrap}
+.path span{color:#999}
+.path strong{color:var(--black);font-weight:400}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd">
+    <div class="hd-eye">STEP BY STEP · 圖解操作</div>
+    <h1>Flex Message 設定 + 歡迎訊息</h1>
+    <p class="sub">從 LINE Official Account Manager 後台，把 Carousel JSON 設為歡迎訊息的完整步驟。</p>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step-block">
+    <h2><span class="step-num">1</span>進入「訊息設定」→「歡迎訊息」</h2>
+    <p class="step-desc">
+      路徑：<span class="path"><strong>LINE Official Account Manager</strong> <span>›</span> <strong>主頁</strong> <span>›</span> <strong>訊息設定</strong> <span>›</span> <strong>歡迎訊息</strong> <span>›</span> <strong>編輯</strong></span>
+    </p>
+    <div class="mock">
+      <div class="mock-bar"><div class="logo">L</div>LINE Official Account Manager</div>
+      <div class="mock-sidebar">
+        <div class="mock-nav">
+          <div class="mock-nav-item">主頁</div>
+          <div class="mock-nav-item">訊息</div>
+          <div class="mock-nav-item active">訊息設定</div>
+          <div class="mock-nav-item" style="padding-left:24px;font-size:10px">自動回應</div>
+          <div class="mock-nav-item highlight" style="padding-left:24px;font-size:10px">▶ 歡迎訊息</div>
+          <div class="mock-nav-item">數據</div>
+        </div>
+        <div class="mock-content">
+          <div class="mock-title">歡迎訊息</div>
+          <p style="font-size:11px;color:#888;margin-bottom:14px">使用者加入好友時自動發送的訊息。</p>
+          <button class="mock-btn gold">+ 新增訊息</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step-block">
+    <h2><span class="step-num">2</span>新增訊息 → 選「Flex Message」</h2>
+    <p class="step-desc">點「+ 新增訊息」後，在訊息類型下拉選單選「Flex Message」。</p>
+    <div class="mock">
+      <div class="mock-modal">
+        <div class="modal-box">
+          <div class="modal-hd"><span>新增訊息</span><span class="modal-close">×</span></div>
+          <div class="modal-body">
+            <div class="modal-label">訊息類型</div>
+            <select class="modal-select">
+              <option>文字</option>
+              <option>圖片</option>
+              <option>影片</option>
+              <option selected style="color:var(--gold);font-weight:400">✓ Flex Message ← 選這個</option>
+              <option>多頁訊息</option>
+            </select>
+          </div>
+          <div class="modal-ft">
+            <button class="cancel">取消</button>
+            <button class="save">下一步</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step-block">
+    <h2><span class="step-num">3</span>切換到「JSON」編輯模式</h2>
+    <p class="step-desc">在 Flex Message 編輯器右上角，點「JSON」Tab 切換到 JSON 模式（預設是視覺化模式）。</p>
+    <div class="mock">
+      <div class="modal-box" style="border-radius:8px;overflow:hidden;border:1px solid #eee">
+        <div class="modal-hd"><span>Flex Message 編輯器</span></div>
+        <div class="modal-body">
+          <div class="modal-tabs">
+            <div class="modal-tab">視覺化</div>
+            <div class="modal-tab active-gold">JSON ← 點這個</div>
+          </div>
+          <div class="modal-label">貼上你的 JSON：</div>
+          <textarea class="mock-textarea highlight-area" readonly>← 把 Welcome Carousel.html 頁底的 JSON 複製貼到這裡</textarea>
+        </div>
+        <div class="modal-ft">
+          <button class="cancel">取消</button>
+          <button class="save">預覽</button>
+          <button class="save" style="background:var(--gold)">儲存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- KEYWORD trigger -->
+  <div class="step-block">
+    <h2><span class="step-num">4</span>（可選）設為關鍵字觸發</h2>
+    <p class="step-desc">如果不只歡迎訊息，還想讓用戶輸入「服務」「介紹」時也觸發 Carousel，在自動回應訊息建立關鍵字規則。</p>
+    <div class="mock">
+      <div class="mock-bar"><div class="logo">L</div>LINE Official Account Manager</div>
+      <div class="mock-sidebar">
+        <div class="mock-nav">
+          <div class="mock-nav-item">訊息設定</div>
+          <div class="mock-nav-item highlight" style="padding-left:16px;font-size:10px">▶ 自動回應訊息</div>
+        </div>
+        <div class="mock-content">
+          <div class="mock-title">自動回應訊息 — 建立</div>
+          <table class="mock-table">
+            <tr><th>關鍵字</th><th>回應內容</th><th>狀態</th></tr>
+            <tr><td style="color:var(--gold)">服務 / 介紹 / 我們做什麼</td><td style="color:var(--gold)">Flex Message (Carousel)</td><td><span style="color:#00B900;font-size:10px">● 啟用</span></td></tr>
+            <tr><td>諮詢 / 預約</td><td>文字回覆</td><td><span style="color:#00B900;font-size:10px">● 啟用</span></td></tr>
+          </table>
+          <div style="margin-top:12px">
+            <button class="mock-btn">+ 新增關鍵字規則</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- Quick copy -->
+  <div class="step-block">
+    <h2><span class="step-num">5</span>快速複製 JSON</h2>
+    <p class="step-desc">打開 <strong>Welcome Carousel.html</strong>，滾動到最底部，點「複製」按鈕，再回到 LINE 後台貼上即可。</p>
+    <div style="background:#111;border-radius:8px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:12px;color:rgba(245,242,236,0.5);letter-spacing:.05em">Welcome Carousel.html → 頁底 Flex JSON 區塊</span>
+      <a href="Welcome Carousel.html" style="background:var(--gold);color:white;font-size:11px;padding:7px 16px;border-radius:4px;text-decoration:none;letter-spacing:.1em">開啟 →</a>
+    </div>
+  </div>
+
+  <div style="background:rgba(184,146,74,0.06);border:1px solid rgba(184,146,74,0.2);border-radius:6px;padding:16px 20px;margin-top:8px">
+    <p style="font-size:12px;line-height:1.7;color:#555">
+      <strong style="color:var(--black)">注意：</strong>LINE 的 Flex Message 歡迎訊息目前每次最多發送 5 個 bubble（已符合我們的 5 張設計）。如果看不到 JSON 模式，確認你的帳號類型是「官方帳號」而非「個人帳號」。
+    </p>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<title>3Q · LINE 歡迎 Carousel · 5 張</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400&family=Noto+Serif+TC:wght@200;300;400&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1C1C1C;font-family:"Noto Sans TC",sans-serif;padding:32px;min-height:100vh;display:flex;flex-direction:column;gap:40px}
+h1{color:#F5F2EC;font-size:15px;font-weight:300;letter-spacing:.15em}
+h1 span{color:#B8924A}
+.note{font-size:11px;color:rgba(245,242,236,0.35);letter-spacing:.05em;margin-top:6px;line-height:1.6}
+
+/* LINE chrome */
+.line-wrap{display:flex;flex-direction:column;gap:0;background:#87CEEB;border-radius:16px;padding:16px;max-width:420px}
+.line-header{background:#00B900;color:#fff;padding:12px 16px;border-radius:12px 12px 0 0;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;margin-bottom:12px}
+.line-header .dot{width:32px;height:32px;border-radius:50%;background:#004B00;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:700}
+.carousel-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x mandatory}
+.carousel-row::-webkit-scrollbar{height:3px}
+.carousel-row::-webkit-scrollbar-track{background:rgba(0,0,0,0.1)}
+.carousel-row::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.2);border-radius:2px}
+
+/* Bubble card */
+.bubble{flex:0 0 240px;scroll-snap-align:start;border-radius:14px;overflow:hidden;background:#F5F2EC;display:flex;flex-direction:column;box-shadow:0 2px 12px rgba(0,0,0,0.15)}
+.bubble-hero{height:160px;position:relative;display:flex;align-items:center;justify-content:center;background:#0C0A08;overflow:hidden}
+.bubble-hero .glow{position:absolute;top:-30%;right:-20%;width:80%;height:80%;background:radial-gradient(circle,rgba(184,146,74,0.12),transparent);pointer-events:none}
+.bubble-body{padding:16px 14px 12px;flex:1;display:flex;flex-direction:column;gap:6px}
+.bubble-eyebrow{font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:#B8924A;font-weight:300}
+.bubble-title{font-family:"Noto Serif TC",serif;font-weight:300;font-size:15px;letter-spacing:.1em;color:#0A0A0A;line-height:1.4}
+.bubble-text{font-size:10px;line-height:1.7;letter-spacing:.04em;color:#8A8A8A;font-weight:300;margin-top:2px}
+.bubble-footer{padding:0 14px 14px}
+.bubble-btn{display:block;text-align:center;padding:9px 0;background:#0C0A08;color:#B8924A;font-size:10px;letter-spacing:.2em;text-decoration:none;font-weight:300;border-radius:6px;transition:background .3s}
+.bubble-btn:hover{background:#1a1a1a}
+
+/* SVG icon sizes in hero */
+.bubble-hero svg{width:64px;height:64px}
+
+/* JSON section */
+.json-wrap{background:#111;border-radius:12px;padding:20px;max-width:680px}
+.json-label{font-size:11px;color:#B8924A;letter-spacing:.25em;text-transform:uppercase;margin-bottom:12px}
+.json-copy{background:none;border:0.5px solid rgba(184,146,74,0.4);color:#B8924A;font-size:10px;letter-spacing:.15em;padding:4px 12px;cursor:pointer;border-radius:4px;float:right;font-family:inherit}
+pre{font-family:"SFMono-Regular",Menlo,monospace;font-size:11px;color:rgba(245,242,236,0.55);line-height:1.5;overflow-x:auto;max-height:320px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+
+<div>
+  <h1>3Q貢丸 · LINE 歡迎 Carousel <span>· 5 張</span></h1>
+  <p class="note">連結全部指向 https://lin.ee/UKKodJj · 以下為 LINE Flex Message 預覽 + JSON</p>
+</div>
+
+<!-- LINE 模擬 -->
+<div class="line-wrap">
+  <div class="line-header">
+    <div class="dot">3Q</div>
+    3Q貢丸 · 品牌孵化所
+  </div>
+  <div class="carousel-row">
+
+    <!-- Card 1: 歡迎 + 品牌介紹 -->
+    <div class="bubble">
+      <div class="bubble-hero">
+        <div class="glow"></div>
+        <svg viewBox="0 0 280 280" fill="none" stroke="#B8924A" stroke-width="1.2" stroke-linecap="round">
+          <line x1="140" y1="60" x2="140" y2="240"/>
+          <path d="M140 80 Q120 90 110 110 Q120 105 140 100"/><path d="M140 80 Q160 90 170 110 Q160 105 140 100"/>
+          <path d="M140 110 Q110 120 95 145 Q115 138 140 130"/><path d="M140 110 Q170 120 185 145 Q165 138 140 130"/>
+          <path d="M140 140 Q100 152 80 180 Q110 170 140 162"/><path d="M140 140 Q180 152 200 180 Q170 170 140 162"/>
+          <circle cx="140" cy="48" r="3" fill="#B8924A" stroke="none"/>
+          <circle cx="140" cy="48" r="12" stroke-opacity="0.3"/>
+        </svg>
+      </div>
+      <div class="bubble-body">
+        <div class="bubble-eyebrow">WELCOME · 來</div>
+        <div class="bubble-title">歡迎來到<br/>3Q貢丸</div>
+        <div class="bubble-text">只要你願意說，<br/>我們就幫你被看見。</div>
+      </div>
+      <div class="bubble-footer"><a class="bubble-btn" href="https://lin.ee/UKKodJj" target="_blank">說說你的店 →</a></div>
+    </div>
+
+    <!-- Card 2: 服務一覽 -->
+    <div class="bubble">
+      <div class="bubble-hero">
+        <div class="glow"></div>
+        <svg viewBox="0 0 80 80" fill="none" stroke="#B8924A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="8" y="8" width="26" height="26"/><rect x="46" y="8" width="26" height="26"/>
+          <rect x="8" y="46" width="26" height="26"/><rect x="46" y="46" width="26" height="26"/>
+        </svg>
+        <div style="position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:8px;letter-spacing:.2em;color:rgba(184,146,74,0.6);font-weight:300;text-transform:uppercase">SERVICES</div>
+      </div>
+      <div class="bubble-body">
+        <div class="bubble-eyebrow">WHAT WE DO</div>
+        <div class="bubble-title">六種方式<br/>幫你被看見</div>
+        <div class="bubble-text">品牌孵化 · 官網設計 · App<br/>影音剪輯 · 外送美圖 · 後台美編</div>
+      </div>
+      <div class="bubble-footer"><a class="bubble-btn" href="https://lin.ee/UKKodJj" target="_blank">查看服務 →</a></div>
+    </div>
+
+    <!-- Card 3: 合作案例 -->
+    <div class="bubble">
+      <div class="bubble-hero" style="background:linear-gradient(135deg,#0C0A08,#1a1510)">
+        <div class="glow"></div>
+        <svg viewBox="0 0 80 80" fill="none" stroke="#B8924A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M40 18 L49 36 L68 38 L54 51 L58 70 L40 60 L22 70 L26 51 L12 38 L31 36Z"/>
+        </svg>
+        <div style="position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:8px;letter-spacing:.2em;color:rgba(184,146,74,0.6);font-weight:300;text-transform:uppercase">PORTFOLIO</div>
+      </div>
+      <div class="bubble-body">
+        <div class="bubble-eyebrow">CASE STUDY</div>
+        <div class="bubble-title">合作案例<br/>預覽</div>
+        <div class="bubble-text">從小店到品牌，<br/>每一個成功都有故事。</div>
+      </div>
+      <div class="bubble-footer"><a class="bubble-btn" href="https://lin.ee/UKKodJj" target="_blank">看看案例 →</a></div>
+    </div>
+
+    <!-- Card 4: 諮詢 CTA -->
+    <div class="bubble">
+      <div class="bubble-hero" style="background:linear-gradient(135deg,#0f0c09,#0C0A08)">
+        <div class="glow" style="top:-20%;left:-20%;right:auto;width:70%;height:70%"></div>
+        <svg viewBox="0 0 80 80" fill="none" stroke="#B8924A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="40" cy="40" r="22"/>
+          <path d="M40 28v12l10 6"/>
+        </svg>
+        <div style="position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:8px;letter-spacing:.2em;color:rgba(184,146,74,0.6);font-weight:300;text-transform:uppercase">FREE CONSULT</div>
+      </div>
+      <div class="bubble-body">
+        <div class="bubble-eyebrow">諮詢</div>
+        <div class="bubble-title">免費 30 分鐘<br/>諮詢</div>
+        <div class="bubble-text">不確定從哪裡開始？<br/>跟我們聊聊，不強迫。</div>
+      </div>
+      <div class="bubble-footer"><a class="bubble-btn" href="https://lin.ee/UKKodJj" target="_blank">預約諮詢 →</a></div>
+    </div>
+
+    <!-- Card 5: 常見問題 -->
+    <div class="bubble">
+      <div class="bubble-hero">
+        <div class="glow"></div>
+        <svg viewBox="0 0 80 80" fill="none" stroke="#B8924A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 22h44a4 4 0 014 4v22a4 4 0 01-4 4H32l-12 10V52h-6a4 4 0 01-4-4V26a4 4 0 014-4z"/>
+          <line x1="24" y1="34" x2="56" y2="34"/><line x1="24" y1="42" x2="44" y2="42"/>
+        </svg>
+        <div style="position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:8px;letter-spacing:.2em;color:rgba(184,146,74,0.6);font-weight:300;text-transform:uppercase">FAQ</div>
+      </div>
+      <div class="bubble-body">
+        <div class="bubble-eyebrow">常見問題</div>
+        <div class="bubble-title">你可能想<br/>知道的事</div>
+        <div class="bubble-text">什麼是品牌孵化？<br/>多少錢？多久能完成？</div>
+      </div>
+      <div class="bubble-footer"><a class="bubble-btn" href="https://lin.ee/UKKodJj" target="_blank">看看答案 →</a></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Flex JSON -->
+<div class="json-wrap">
+  <div class="json-label">LINE Flex Message JSON
+    <button class="json-copy" onclick="copyJSON()">複製</button>
+  </div>
+  <pre id="flexJSON">{
+  "type": "carousel",
+  "contents": [
+    {
+      "type": "bubble",
+      "hero": { "type": "image", "url": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports/3Q-HATCHERY_welcome-card_1040x1040.png", "size": "full", "aspectRatio": "20:13", "aspectMode": "cover" },
+      "body": { "type": "box", "layout": "vertical", "paddingAll": "20px", "contents": [
+        { "type": "text", "text": "WELCOME · 來", "size": "xxs", "color": "#B8924A", "letterSpacing": "3px" },
+        { "type": "text", "text": "歡迎來到 3Q貢丸", "weight": "bold", "size": "lg", "margin": "md", "wrap": true },
+        { "type": "text", "text": "只要你願意說，我們就幫你被看見。", "size": "sm", "color": "#8A8A8A", "wrap": true, "margin": "sm" }
+      ]},
+      "footer": { "type": "box", "layout": "vertical", "contents": [
+        { "type": "button", "action": { "type": "uri", "label": "說說你的店", "uri": "https://lin.ee/UKKodJj" }, "style": "primary", "color": "#0C0A08" }
+      ]}
+    },
+    {
+      "type": "bubble",
+      "body": { "type": "box", "layout": "vertical", "paddingAll": "20px", "contents": [
+        { "type": "text", "text": "WHAT WE DO", "size": "xxs", "color": "#B8924A", "letterSpacing": "3px" },
+        { "type": "text", "text": "六種方式幫你被看見", "weight": "bold", "size": "lg", "margin": "md", "wrap": true },
+        { "type": "text", "text": "品牌孵化・官網設計・App・影音剪輯・外送美圖・後台美編", "size": "sm", "color": "#8A8A8A", "wrap": true, "margin": "sm" }
+      ]},
+      "footer": { "type": "box", "layout": "vertical", "contents": [
+        { "type": "button", "action": { "type": "uri", "label": "查看服務", "uri": "https://lin.ee/UKKodJj" }, "style": "primary", "color": "#0C0A08" }
+      ]}
+    },
+    {
+      "type": "bubble",
+      "body": { "type": "box", "layout": "vertical", "paddingAll": "20px", "contents": [
+        { "type": "text", "text": "CASE STUDY", "size": "xxs", "color": "#B8924A", "letterSpacing": "3px" },
+        { "type": "text", "text": "合作案例預覽", "weight": "bold", "size": "lg", "margin": "md", "wrap": true },
+        { "type": "text", "text": "從小店到品牌，每一個成功都有故事。", "size": "sm", "color": "#8A8A8A", "wrap": true, "margin": "sm" }
+      ]},
+      "footer": { "type": "box", "layout": "vertical", "contents": [
+        { "type": "button", "action": { "type": "uri", "label": "看看案例", "uri": "https://lin.ee/UKKodJj" }, "style": "primary", "color": "#0C0A08" }
+      ]}
+    },
+    {
+      "type": "bubble",
+      "body": { "type": "box", "layout": "vertical", "paddingAll": "20px", "contents": [
+        { "type": "text", "text": "諮詢", "size": "xxs", "color": "#B8924A", "letterSpacing": "3px" },
+        { "type": "text", "text": "免費 30 分鐘諮詢", "weight": "bold", "size": "lg", "margin": "md", "wrap": true },
+        { "type": "text", "text": "不確定從哪裡開始？跟我們聊聊，不強迫。", "size": "sm", "color": "#8A8A8A", "wrap": true, "margin": "sm" }
+      ]},
+      "footer": { "type": "box", "layout": "vertical", "contents": [
+        { "type": "button", "action": { "type": "uri", "label": "預約諮詢", "uri": "https://lin.ee/UKKodJj" }, "style": "primary", "color": "#0C0A08" }
+      ]}
+    },
+    {
+      "type": "bubble",
+      "body": { "type": "box", "layout": "vertical", "paddingAll": "20px", "contents": [
+        { "type": "text", "text": "常見問題", "size": "xxs", "color": "#B8924A", "letterSpacing": "3px" },
+        { "type": "text", "text": "你可能想知道的事", "weight": "bold", "size": "lg", "margin": "md", "wrap": true },
+        { "type": "text", "text": "什麼是品牌孵化？多少錢？多久能完成？", "size": "sm", "color": "#8A8A8A", "wrap": true, "margin": "sm" }
+      ]},
+      "footer": { "type": "box", "layout": "vertical", "contents": [
+        { "type": "button", "action": { "type": "uri", "label": "看看答案", "uri": "https://lin.ee/UKKodJj" }, "style": "primary", "color": "#0C0A08" }
+      ]}
+    }
+  ]
+}</pre>
+</div>
+
+<script>
+function copyJSON() {
+  const text = document.getElementById('flexJSON').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.json-copy');
+    btn.textContent = '已複製 ✓';
+    setTimeout(() => btn.textContent = '複製', 2000);
+  });
+}
+</script>
+</body>
+</html>

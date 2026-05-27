@@ -1,0 +1,23 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 24px; background: #F5F2EC; font-family: var(--font-sans); }
+  .l { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: #B8924A; margin-bottom: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 8px; }
+  .col { background: rgba(184,146,74,0.10); height: 200px; border-top: 1px solid #B8924A; border-bottom: 1px solid #B8924A; }
+  .legend { display: flex; gap: 18px; margin-top: 12px; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #8A8A8A; }
+</style>
+</head><body>
+<div class="l">12-Column · 24px Gutter · 48px Margin</div>
+<div class="grid">
+  <div class="col"></div><div class="col"></div><div class="col"></div><div class="col"></div>
+  <div class="col"></div><div class="col"></div><div class="col"></div><div class="col"></div>
+  <div class="col"></div><div class="col"></div><div class="col"></div><div class="col"></div>
+</div>
+<div class="legend">
+  <span>12 cols</span>
+  <span>gutter 24</span>
+  <span>baseline 8pt</span>
+  <span>negative space ≥ 50%</span>
+</div>
+</body></html>

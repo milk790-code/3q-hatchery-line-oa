@@ -1,0 +1,258 @@
+/* =============================================================
+   3Q Hatchery — Design Tokens
+   Brand: 3Q貢丸 台灣在地品牌孵化所 (Taiwan Brand Hatchery)
+   Aesthetic: Dior-restraint translated to Taiwanese material culture
+   ============================================================= */
+
+:root {
+  /* -----------------------------------------------------------
+     COLOR — 7-color palette only. Gold is strictly ≤3% usage.
+     ----------------------------------------------------------- */
+
+  /* Base */
+  --color-black:  #0A0A0A;  /* 孵化墨 — Hatchery Ink. Primary bg, headlines, logo */
+  --color-paper:  #F5F2EC;  /* 米紙白 — Rice Paper White. Secondary bg, cards */
+  --color-white:  #FFFFFF;  /* 純白    — Pure White. Photo bg, minimal layouts */
+
+  /* Accent — line-level use only */
+  --color-gold:   #B8924A;  /* 孵化金 — Hatchery Gold. Hairlines, signatures, ≤3% */
+
+  /* Neutrals */
+  --color-ink:    #1A1A1A;  /* 墨灰 — Ink Gray. Body, secondary info */
+  --color-stone:  #8A8A8A;  /* 石灰 — Stone Gray. Captions, footnotes */
+  --color-sand:   #E8DFD0;  /* 暖砂 — Warm Sand. Card sublayer, button bg */
+
+  /* Semantic foreground / background */
+  --fg-1: var(--color-black);
+  --fg-2: var(--color-ink);
+  --fg-3: var(--color-stone);
+  --fg-on-dark: var(--color-paper);
+  --fg-accent:  var(--color-gold);
+
+  --bg-1: var(--color-paper);
+  --bg-2: var(--color-white);
+  --bg-3: var(--color-sand);
+  --bg-dark: var(--color-black);
+
+  --hairline: var(--color-gold);
+  --rule:     rgba(10, 10, 10, 0.12);
+
+  /* -----------------------------------------------------------
+     TYPE — pair Cormorant Garamond (free Nicolas Cochin proxy)
+              with Noto Serif TC; Inter with Noto Sans TC.
+     ----------------------------------------------------------- */
+
+  --font-serif: "Cormorant Garamond", "Noto Serif TC", "Songti TC", serif;
+  --font-sans:  "Inter", "Noto Sans TC", -apple-system, system-ui, sans-serif;
+
+  /* Weight scale — never go bold. Light/Regular is the discipline. */
+  --w-light:    300;
+  --w-regular:  400;
+  --w-medium:   500;
+
+  /* Type scale */
+  --text-hero:    clamp(48px, 8vw, 96px);
+  --text-display: 72px;
+  --text-h1:      56px;
+  --text-h2:      38px;
+  --text-h3:      28px;
+  --text-lead:    22px;
+  --text-body:    16px;
+  --text-small:   14px;
+  --text-caption: 12px;
+
+  /* Letter-spacing — wide tracking is core to the aesthetic */
+  --tracking-tight:  0.05em;  /* body */
+  --tracking-normal: 0.15em;  /* zh headlines */
+  --tracking-wide:   0.25em;  /* ALL CAPS latin */
+  --tracking-xwide:  0.30em;  /* logo lockups, sublabels */
+
+  /* Line-height — generous for east-asian breathing room */
+  --lh-tight: 1.2;   /* headlines */
+  --lh-snug:  1.4;
+  --lh-body:  1.75;  /* zh body (1.7–1.8) */
+  --lh-loose: 1.9;
+
+  /* -----------------------------------------------------------
+     SPACING — 8pt baseline grid
+     ----------------------------------------------------------- */
+  --space-2:   2px;
+  --space-4:   4px;
+  --space-8:   8px;
+  --space-16:  16px;
+  --space-24:  24px;   /* min whitespace unit */
+  --space-32:  32px;
+  --space-48:  48px;   /* headline ↔ subheadline */
+  --space-64:  64px;
+  --space-96:  96px;   /* block ↔ block */
+  --space-128: 128px;
+
+  /* Layout — 12 columns, 24px gutter */
+  --grid-cols:    12;
+  --grid-gutter:  24px;
+  --grid-margin:  48px;
+
+  /* -----------------------------------------------------------
+     RADII, LINES, ELEVATION
+     We avoid soft round corners. Sharp or hairline.
+     ----------------------------------------------------------- */
+  --radius-0: 0;        /* default — sharp */
+  --radius-1: 2px;      /* subtle, used for inputs */
+  --radius-pill: 999px; /* avoided except for status dots */
+
+  --hairline-w: 1px;
+  --rule-w:     1px;
+
+  /* Shadow system — almost never used.
+     Restraint over depth. If used, single soft drop only. */
+  --shadow-quiet: 0 1px 0 rgba(10,10,10,0.06);
+  --shadow-soft:  0 8px 24px -12px rgba(10,10,10,0.18);
+
+  /* -----------------------------------------------------------
+     MOTION
+     ----------------------------------------------------------- */
+  --ease-editorial: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur-fast:   180ms;
+  --dur-base:   320ms;
+  --dur-slow:   640ms;
+}
+
+/* =============================================================
+   SEMANTIC TYPE CLASSES
+   ============================================================= */
+
+.t-hero {
+  font-family: var(--font-serif);
+  font-weight: var(--w-light);
+  font-size: var(--text-hero);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-normal);
+  color: var(--fg-1);
+}
+
+.t-display {
+  font-family: var(--font-serif);
+  font-weight: var(--w-light);
+  font-size: var(--text-display);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-normal);
+}
+
+.t-h1 {
+  font-family: var(--font-serif);
+  font-weight: var(--w-light);
+  font-size: var(--text-h1);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-normal);
+}
+
+.t-h2 {
+  font-family: var(--font-serif);
+  font-weight: var(--w-light);
+  font-size: var(--text-h2);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-normal);
+}
+
+.t-h3 {
+  font-family: var(--font-serif);
+  font-weight: var(--w-light);
+  font-size: var(--text-h3);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-normal);
+}
+
+.t-lead {
+  font-family: var(--font-sans);
+  font-weight: var(--w-light);
+  font-size: var(--text-lead);
+  line-height: var(--lh-body);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-2);
+}
+
+.t-body {
+  font-family: var(--font-sans);
+  font-weight: var(--w-regular);
+  font-size: var(--text-body);
+  line-height: var(--lh-body);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-2);
+}
+
+.t-small {
+  font-family: var(--font-sans);
+  font-weight: var(--w-light);
+  font-size: var(--text-small);
+  line-height: var(--lh-body);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-3);
+}
+
+.t-caption {
+  font-family: var(--font-sans);
+  font-weight: var(--w-light);
+  font-size: var(--text-caption);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.t-eyebrow {
+  font-family: var(--font-sans);
+  font-weight: var(--w-light);
+  font-size: var(--text-caption);
+  letter-spacing: var(--tracking-xwide);
+  text-transform: uppercase;
+  color: var(--fg-accent);
+}
+
+.t-num {
+  font-family: var(--font-serif);
+  font-weight: var(--w-medium);
+  font-style: italic;
+  font-variant-numeric: lining-nums;
+}
+
+/* =============================================================
+   ATOMIC UTILITIES
+   ============================================================= */
+
+.divider-gold {
+  width: 40px;
+  height: 1px;
+  background: var(--color-gold);
+  border: 0;
+  display: block;
+}
+.divider-gold--wide  { width: 80px; }
+.divider-gold--full  { width: 100%; }
+
+.divider-rule {
+  width: 100%;
+  height: 1px;
+  background: var(--rule);
+  border: 0;
+}
+
+/* All-caps latin label */
+.caps {
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+/* =============================================================
+   GLOBAL RESETS (opt-in via .hatchery scope or :root)
+   ============================================================= */
+html, body {
+  background: var(--bg-1);
+  color: var(--fg-2);
+  font-family: var(--font-sans);
+  font-weight: var(--w-regular);
+  font-size: var(--text-body);
+  line-height: var(--lh-body);
+  letter-spacing: var(--tracking-tight);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
