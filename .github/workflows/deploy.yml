@@ -106,6 +106,31 @@ jobs:
 
           echo "::notice::D1 migrations complete"
 
+      - name: Build & upload 3 Rich Menus (A/B/C)
+        continue-on-error: true
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -uo pipefail
+          if [ -z "${LINE_TOKEN:-}" ]; then
+            echo "::warning::LINE_CHANNEL_ACCESS_TOKEN not set — skipping Rich Menu upload"
+            exit 0
+          fi
+          cd assets/exports
+          CHANNEL_TOKEN="$LINE_TOKEN" bash "$GITHUB_WORKSPACE/scripts/upload-richmenu.sh" --prune \
+            2>&1 | tee /tmp/rm-ids.txt || true
+          RM_A=$(grep "RICHMENU_NEW"       /tmp/rm-ids.txt | grep -oE "richmenu-[a-z0-9]+" | head -1)
+          RM_B=$(grep "RICHMENU_INQUIRED"  /tmp/rm-ids.txt | grep -oE "richmenu-[a-z0-9]+" | head -1)
+          RM_C=$(grep "RICHMENU_CONVERTED" /tmp/rm-ids.txt | grep -oE "richmenu-[a-z0-9]+" | head -1)
+          echo "RICHMENU_A=${RM_A:-}" >> $GITHUB_ENV
+          echo "RICHMENU_B=${RM_B:-}" >> $GITHUB_ENV
+          echo "RICHMENU_C=${RM_C:-}" >> $GITHUB_ENV
+          if [ -n "$RM_A" ] && [ -n "$RM_B" ] && [ -n "$RM_C" ]; then
+            echo "::notice::Rich Menus A=$RM_A B=$RM_B C=$RM_C"
+          else
+            echo "::warning::One or more Rich Menu IDs not captured — menu switching may be inactive"
+          fi
+
       - name: Deploy Worker
         env:
           CF_TOKEN:      ${{ secrets.CF_API_TOKEN }}
@@ -140,7 +165,10 @@ jobs:
               {"name": "PNG_BASE_URL",              "type": "plain_text",  "text": $(jq -Rn --arg t "$PNG_BASE_URL" '$t')},
               {"name": "TRIGGER_TOKEN",             "type": "secret_text", "text": $(jq -Rn --arg t "${TRIGGER_TOKEN:-}" '$t')},
               {"name": "SESSION",                   "type": "kv_namespace", "namespace_id": "$SESSION_KV_ID"},
-              {"name": "AI",                        "type": "ai"}
+              {"name": "AI",                        "type": "ai"},
+              {"name": "RICHMENU_NEW",       "type": "plain_text", "text": $(jq -Rn --arg t "${RICHMENU_A:-}" '$t')},
+              {"name": "RICHMENU_INQUIRED",  "type": "plain_text", "text": $(jq -Rn --arg t "${RICHMENU_B:-}" '$t')},
+              {"name": "RICHMENU_CONVERTED", "type": "plain_text", "text": $(jq -Rn --arg t "${RICHMENU_C:-}" '$t')}
               $CRM_BINDING
             ]
           }
@@ -236,91 +264,6 @@ jobs:
           echo "$resp" | jq .
           echo "$resp" | jq -e '.ok == true and .configured.token == true and .configured.secret == true and .configured.session_kv == true' > /dev/null
           echo "::notice::Worker alive — token, secret, KV configured"
-
-      - name: Ensure LINE Rich Menu (reuse by name, else create)
-        continue-on-error: true
-        env:
-          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
-          RM_NAME: '3Q Hatchery · MENU (postback v3)'
-        run: |
-          set -euo pipefail
-          existing=$(curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
-            https://api.line.me/v2/bot/richmenu/list \
-            | jq -r --arg n "$RM_NAME" '.richmenus[] | select(.name == $n) | .richMenuId' \
-            | head -1)
-          if [ -n "$existing" ]; then
-            echo "RICH_MENU_ID=$existing" >> $GITHUB_ENV
-            echo "::notice::Reusing existing Rich Menu: $existing"
-            exit 0
-          fi
-          cat > /tmp/richmenu.json <<'JSON'
-          {
-            "size": {"width": 2500, "height": 1686},
-            "selected": false,
-            "name": "3Q Hatchery · MENU (postback v3)",
-            "chatBarText": "MENU",
-            "areas": [
-              {"bounds": {"x":    0, "y":   0, "width": 2500, "height": 800}, "action": {"type": "uri",      "uri":  "https://3q-hatchery.tw"}},
-              {"bounds": {"x":    0, "y": 800, "width":  625, "height": 886}, "action": {"type": "postback", "data": "menu:my-store"}},
-              {"bounds": {"x":  625, "y": 800, "width":  625, "height": 886}, "action": {"type": "postback", "data": "menu:imagery"}},
-              {"bounds": {"x": 1250, "y": 800, "width":  625, "height": 886}, "action": {"type": "postback", "data": "menu:marketing"}},
-              {"bounds": {"x": 1875, "y": 800, "width":  625, "height": 886}, "action": {"type": "postback", "data": "menu:progress"}}
-            ]
-          }
-          JSON
-          resp=$(curl -sS -X POST https://api.line.me/v2/bot/richmenu \
-            -H "Authorization: Bearer $LINE_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d @/tmp/richmenu.json)
-          RM_ID=$(echo "$resp" | jq -r '.richMenuId // empty')
-          if [ -z "$RM_ID" ]; then echo "::error::Rich Menu create failed: $resp"; exit 1; fi
-          echo "RICH_MENU_ID=$RM_ID" >> $GITHUB_ENV
-          echo "::notice::Created new Rich Menu: $RM_ID"
-
-      - name: Upload Rich Menu binary (skip if already uploaded)
-        continue-on-error: true
-        env:
-          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
-        run: |
-          set -euo pipefail
-          set +e
-          probe_http=$(curl -sS -o /tmp/probe -w "%{http_code}" \
-            "https://api-data.line.me/v2/bot/richmenu/${RICH_MENU_ID}/content" \
-            -H "Authorization: Bearer $LINE_TOKEN")
-          set -e
-          probe_size=$(wc -c < /tmp/probe 2>/dev/null || echo 0)
-          if [ "$probe_http" = "200" ] && [ "$probe_size" -gt 1000 ]; then
-            echo "::notice::Binary already uploaded ($probe_size bytes), skipping"
-            exit 0
-          fi
-          curl -sS -f -X POST \
-            "https://api-data.line.me/v2/bot/richmenu/${RICH_MENU_ID}/content" \
-            -H "Authorization: Bearer $LINE_TOKEN" \
-            -H "Content-Type: image/jpeg" \
-            --data-binary @assets/exports/3q-richmenu-2500x1686.jpg
-          echo "::notice::Rich Menu binary uploaded"
-
-      - name: Set Rich Menu as default (via Python requests)
-        continue-on-error: true
-        env:
-          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
-        run: |
-          set -euo pipefail
-          pip install --quiet requests
-          python3 - <<'PY'
-          import os, sys, requests
-          rm_id = os.environ['RICH_MENU_ID']
-          token = os.environ['LINE_TOKEN']
-          r = requests.post(
-              f'https://api.line.me/v2/bot/user/all/richmenu/{rm_id}',
-              headers={'Authorization': f'Bearer {token}'},
-              timeout=15,
-          )
-          print(f'HTTP {r.status_code}: {r.text}')
-          if r.status_code != 200:
-              sys.exit(f'set-default failed: {r.status_code} {r.text}')
-          PY
-          echo "::notice::Default rich menu set"
 
       - name: Set LINE webhook URL
         continue-on-error: true
