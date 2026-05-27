@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MCP Builder · 3Q Hatchery</title>
+<meta name="description" content="Claude Code MCP Server 配置產生器，填表輸出 mcp_config.json。"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@200;300&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#B8924A;--gold-light:#D4AA6A;--gold-dim:rgba(184,146,74,.12);
+  --bg:#080808;--bg2:#0E0E0E;--bg3:#141414;
+  --text:#F0EBE1;--muted:#8A8070;--border:rgba(184,146,74,.18);
+  --serif:'Noto Serif TC',serif;--sans:'Noto Sans TC',sans-serif;
+  --green:rgba(80,180,100,.7);--red:rgba(220,80,80,.7);
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-weight:300;min-height:100vh}
+
+nav{
+  position:sticky;top:0;z-index:99;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 40px;background:rgba(8,8,8,.95);border-bottom:1px solid var(--border);
+  backdrop-filter:blur(8px);
+}
+.nav-logo{font-family:var(--serif);font-weight:200;font-size:.82rem;letter-spacing:.2em;color:var(--gold);text-decoration:none}
+.nav-back{font-size:.7rem;letter-spacing:.15em;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-back:hover{color:var(--gold)}
+
+.container{max-width:960px;margin:0 auto;padding:0 40px}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:32px;padding:48px 0 100px}
+
+/* FORM COLUMN */
+h1{font-family:var(--serif);font-weight:200;font-size:1.8rem;letter-spacing:.1em;margin-bottom:8px}
+.subtitle{font-size:.82rem;color:var(--muted);letter-spacing:.08em;margin-bottom:36px;line-height:1.7}
+
+.field{margin-bottom:20px}
+label{display:block;font-size:.65rem;letter-spacing:.3em;color:var(--gold);text-transform:uppercase;margin-bottom:8px}
+input[type=text],textarea,select{
+  width:100%;background:var(--bg3);border:1px solid var(--border);
+  color:var(--text);padding:10px 14px;font-family:var(--sans);font-size:.85rem;
+  font-weight:300;letter-spacing:.05em;outline:none;resize:vertical;
+  transition:border-color .2s;
+}
+input[type=text]:focus,textarea:focus,select:focus{border-color:var(--gold)}
+select option{background:var(--bg3)}
+textarea{min-height:64px}
+
+.radio-row{display:flex;gap:12px;margin-top:6px}
+.radio-opt{
+  flex:1;border:1px solid var(--border);padding:10px 14px;cursor:pointer;
+  font-size:.78rem;letter-spacing:.1em;color:var(--muted);transition:all .2s;
+  display:flex;align-items:center;gap:8px;
+}
+.radio-opt.active{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
+.radio-dot{width:8px;height:8px;border-radius:50%;border:1px solid currentColor;flex-shrink:0}
+.radio-opt.active .radio-dot{background:currentColor}
+
+/* TOOLS LIST */
+.tools-list{margin-bottom:12px}
+.tool-row{
+  display:flex;gap:8px;align-items:center;
+  border:1px solid var(--border);padding:8px 12px;margin-bottom:6px;
+  background:var(--bg3);
+}
+.tool-row input{border:none;background:transparent;padding:0;font-size:.82rem}
+.tool-row input:focus{border:none}
+.tool-name{flex:1;color:var(--text)}
+.tool-desc{flex:2;color:var(--muted)}
+.tool-del{
+  background:none;border:none;color:var(--muted);cursor:pointer;
+  font-size:1rem;line-height:1;padding:0 4px;transition:color .2s;flex-shrink:0;
+}
+.tool-del:hover{color:#e06060}
+.btn-add{
+  width:100%;padding:8px;border:1px dashed var(--border);background:transparent;
+  color:var(--muted);cursor:pointer;font-size:.72rem;letter-spacing:.2em;
+  text-transform:uppercase;transition:all .2s;font-family:var(--sans);
+}
+.btn-add:hover{border-color:var(--gold);color:var(--gold)}
+
+/* OUTPUT COLUMN */
+.output-panel{position:sticky;top:80px}
+.output-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:0}
+.tab{
+  padding:10px 18px;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;
+}
+.tab.active{color:var(--gold);border-color:var(--gold)}
+.output-box{
+  background:var(--bg3);border:1px solid var(--border);border-top:none;
+  padding:20px;font-family:monospace;font-size:.75rem;line-height:1.7;
+  color:#D4C8B0;min-height:200px;max-height:420px;overflow-y:auto;
+  white-space:pre;tab-size:2;
+}
+.output-actions{display:flex;gap:8px;margin-top:10px}
+.btn{
+  flex:1;padding:10px;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;
+  border:1px solid var(--border);background:transparent;color:var(--text);
+  cursor:pointer;transition:all .2s;font-family:var(--sans);
+}
+.btn:hover{border-color:var(--gold);color:var(--gold)}
+.btn-primary{background:var(--gold);color:#0A0A0A;border-color:var(--gold)}
+.btn-primary:hover{background:var(--gold-light);color:#0A0A0A}
+
+/* DIAGRAM */
+.diagram{
+  border:1px solid var(--border);background:var(--bg3);
+  padding:20px;margin-top:12px;
+}
+.diag-title{font-size:.6rem;letter-spacing:.3em;color:var(--gold);text-transform:uppercase;margin-bottom:12px}
+.diag-node{
+  display:inline-block;border:1px solid var(--border);
+  padding:6px 14px;font-size:.72rem;letter-spacing:.1em;color:var(--muted);
+  margin:4px;transition:all .2s;
+}
+.diag-node.main-node{border-color:var(--gold);color:var(--gold)}
+.diag-arrow{color:var(--muted);font-size:.65rem;margin:0 6px}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:24px;right:24px;
+  background:var(--gold);color:#0A0A0A;
+  padding:10px 20px;font-size:.72rem;letter-spacing:.15em;
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.toast.show{opacity:1}
+
+@media(max-width:768px){
+  nav{padding:14px 20px}
+  .container{padding:0 20px}
+  .layout{grid-template-columns:1fr;gap:24px;padding:32px 0 80px}
+  .output-panel{position:static}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">3Q HATCHERY</a>
+  <a href="/" class="nav-back">← 返回</a>
+</nav>
+
+<div class="container">
+<div class="layout">
+
+  <!-- FORM -->
+  <div>
+    <h1>MCP Builder</h1>
+    <p class="subtitle">填入 MCP Server 資訊，自動產生可直接使用的 <code>mcp_config.json</code> 配置與 Cloudflare Worker 模板。</p>
+
+    <div class="field">
+      <label>Server 名稱</label>
+      <input type="text" id="fName" placeholder="3q-crm-server" spellcheck="false"/>
+    </div>
+
+    <div class="field">
+      <label>描述</label>
+      <input type="text" id="fDesc" placeholder="查詢 3Q Hatchery CRM 資料的 MCP Server"/>
+    </div>
+
+    <div class="field">
+      <label>執行環境</label>
+      <div class="radio-row" id="envRow">
+        <div class="radio-opt active" data-env="stdio">
+          <span class="radio-dot"></span>stdio（本地）
+        </div>
+        <div class="radio-opt" data-env="http">
+          <span class="radio-dot"></span>HTTP Worker（遠端）
+        </div>
+      </div>
+    </div>
+
+    <div class="field" id="workerUrlField" style="display:none">
+      <label>Worker URL</label>
+      <input type="text" id="fWorkerUrl" placeholder="https://my-mcp.workers.dev/mcp"/>
+    </div>
+
+    <div class="field">
+      <label>工具列表</label>
+      <div class="tools-list" id="toolsList"></div>
+      <button class="btn-add" id="btnAddTool">+ 新增工具</button>
+    </div>
+  </div>
+
+  <!-- OUTPUT -->
+  <div class="output-panel">
+    <div class="output-tabs">
+      <div class="tab active" data-tab="config">mcp_config.json</div>
+      <div class="tab" data-tab="worker">Worker 模板</div>
+    </div>
+    <pre class="output-box" id="outputBox"></pre>
+    <div class="output-actions">
+      <button class="btn" id="btnCopy">複製</button>
+      <button class="btn btn-primary" id="btnDown">下載</button>
+    </div>
+
+    <div class="diagram" id="diagram">
+      <p class="diag-title">Server 結構預覽</p>
+      <div id="diagContent"></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="toast" id="toast">已複製到剪貼簿</div>
+
+<script>
+let env = 'stdio';
+let tools = [];
+let activeTab = 'config';
+
+const fName = document.getElementById('fName');
+const fDesc = document.getElementById('fDesc');
+const fWorkerUrl = document.getElementById('fWorkerUrl');
+const outputBox = document.getElementById('outputBox');
+
+function addTool(name = '', desc = '') {
+  const id = Date.now();
+  tools.push({ id, name, desc });
+  renderTools();
+  update();
+}
+
+function removeTool(id) {
+  tools = tools.filter(t => t.id !== id);
+  renderTools();
+  update();
+}
+
+function renderTools() {
+  const list = document.getElementById('toolsList');
+  list.innerHTML = tools.map(t => `
+    <div class="tool-row" data-id="${t.id}">
+      <input class="tool-name" type="text" placeholder="tool-name" value="${t.name}" data-field="name"/>
+      <input class="tool-desc" type="text" placeholder="工具描述..." value="${t.desc}" data-field="desc"/>
+      <button class="tool-del" data-del="${t.id}">×</button>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('input').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const row = e.target.closest('[data-id]');
+      const id = parseInt(row.dataset.id);
+      const t = tools.find(x => x.id === id);
+      if (t) t[e.target.dataset.field] = e.target.value;
+      update();
+    });
+  });
+  list.querySelectorAll('[data-del]').forEach(btn => {
+    btn.addEventListener('click', () => removeTool(parseInt(btn.dataset.del)));
+  });
+}
+
+function genConfig() {
+  const name = fName.value.trim() || 'my-mcp-server';
+  const workerUrl = fWorkerUrl.value.trim() || 'https://my-mcp.workers.dev/mcp';
+  if (env === 'stdio') {
+    return JSON.stringify({
+      mcpServers: {
+        [name]: {
+          command: 'node',
+          args: [`./mcp-servers/${name}/index.js`],
+          env: {}
+        }
+      }
+    }, null, 2);
+  } else {
+    return JSON.stringify({
+      mcpServers: {
+        [name]: {
+          type: 'http',
+          url: workerUrl
+        }
+      }
+    }, null, 2);
+  }
+}
+
+function genWorker() {
+  const name = fName.value.trim() || 'my-mcp-server';
+  const desc = fDesc.value.trim() || 'MCP Server';
+  const toolDefs = tools.map(t => {
+    const n = t.name.trim() || 'tool';
+    const d = t.desc.trim() || '...';
+    return `server.tool(\n  "${n}",\n  "${d}",\n  { /* zod schema */ },\n  async (args) => {\n    // TODO: implement\n    return { content: [{ type: 'text', text: 'ok' }] };\n  }\n);`;
+  }).join('\n\n');
+
+  return `// ${name} — ${desc}
+// Built with 3Q Hatchery MCP Builder
+import { McpServer } from '@cloudflare/workers-mcp';
+
+const server = new McpServer({
+  name: "${name}",
+  version: "1.0.0",
+});
+
+${toolDefs || `server.tool(\n  "example",\n  "範例工具",\n  {},\n  async () => ({ content: [{ type: 'text', text: 'hello' }] })\n);`}
+
+export default {
+  async fetch(req, env, ctx) {
+    return server.fetch(req, env, ctx);
+  }
+};`;
+}
+
+function update() {
+  outputBox.textContent = activeTab === 'config' ? genConfig() : genWorker();
+  updateDiagram();
+}
+
+function updateDiagram() {
+  const name = fName.value.trim() || 'my-mcp-server';
+  const tc = tools.length;
+  const html = `
+    <span class="diag-node">Claude Code</span>
+    <span class="diag-arrow">→ MCP →</span>
+    <span class="diag-node main-node">${name}</span>
+    ${tc > 0 ? '<br/><div style="margin-top:8px;padding-left:20px">' +
+      tools.map(t => `<span class="diag-node" style="font-size:.65rem">${t.name||'tool'}</span>`).join(' ') +
+      '</div>' : ''}
+  `;
+  document.getElementById('diagContent').innerHTML = html;
+}
+
+// Env toggle
+document.getElementById('envRow').addEventListener('click', e => {
+  const opt = e.target.closest('.radio-opt');
+  if (!opt) return;
+  env = opt.dataset.env;
+  document.querySelectorAll('.radio-opt').forEach(o => o.classList.toggle('active', o === opt));
+  document.getElementById('workerUrlField').style.display = env === 'http' ? 'block' : 'none';
+  update();
+});
+
+// Tab toggle
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    activeTab = tab.dataset.tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t === tab));
+    update();
+  });
+});
+
+// Add tool
+document.getElementById('btnAddTool').addEventListener('click', () => addTool());
+
+// Copy
+document.getElementById('btnCopy').addEventListener('click', () => {
+  navigator.clipboard.writeText(outputBox.textContent).then(() => showToast('已複製到剪貼簿'));
+});
+
+// Download
+document.getElementById('btnDown').addEventListener('click', () => {
+  const name = fName.value.trim() || 'mcp-config';
+  const ext = activeTab === 'config' ? '.json' : '.js';
+  const blob = new Blob([outputBox.textContent], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name + ext;
+  a.click();
+});
+
+// Live inputs
+[fName, fDesc, fWorkerUrl].forEach(el => el.addEventListener('input', update));
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// Init with one default tool
+addTool('list-inquiries', '查詢 3Q Hatchery 詢問清單');
+update();
+</script>
+</body>
+</html>
