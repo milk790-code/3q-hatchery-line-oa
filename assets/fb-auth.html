@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Facebook 授權取得 · 3Q Hatchery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#070707;--gold:#B8924A;--gold-hi:#E8C870;--text:#F0EBE1;
+  --muted:#6B6560;--surface:#111010;--border:rgba(184,146,74,.2);
+  --green:#4CAF50;--red:#E55;
+}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;min-height:100vh;padding:2rem 1rem}
+header{text-align:center;padding:3rem 0 2rem;border-bottom:1px solid var(--border)}
+header .eyebrow{font-family:'Space Mono',monospace;font-size:.7rem;letter-spacing:.15em;color:var(--gold);text-transform:uppercase;margin-bottom:1rem}
+header h1{font-family:'Noto Serif TC',serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:400;color:var(--text)}
+header p{margin-top:.75rem;color:var(--muted);font-size:.9rem;max-width:520px;margin-inline:auto;line-height:1.7}
+
+.container{max-width:700px;margin:0 auto;padding:2rem 0}
+
+.step{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:4px;padding:1.75rem 2rem;margin-bottom:1.5rem;
+  position:relative;
+}
+.step-num{
+  position:absolute;top:-1px;left:2rem;
+  background:var(--gold);color:#000;
+  font-family:'Space Mono',monospace;font-size:.65rem;font-weight:700;
+  padding:.2rem .6rem;letter-spacing:.1em;
+}
+.step h2{font-family:'Noto Serif TC',serif;font-size:1.05rem;font-weight:700;margin-bottom:.75rem;margin-top:.25rem}
+.step p,.step li{font-size:.875rem;color:var(--muted);line-height:1.8}
+.step ul{margin:.5rem 0 .5rem 1.25rem}
+.step li{margin-bottom:.25rem}
+.step a{color:var(--gold);text-decoration:none}
+.step a:hover{color:var(--gold-hi)}
+
+kbd{
+  background:#1a1a1a;border:1px solid var(--border);
+  border-radius:3px;padding:.15rem .4rem;
+  font-family:'Space Mono',monospace;font-size:.75rem;color:var(--gold-hi)
+}
+
+.highlight-box{
+  background:rgba(184,146,74,.06);border:1px solid var(--border);
+  border-radius:3px;padding:1rem 1.25rem;margin-top:.75rem;
+  font-family:'Space Mono',monospace;font-size:.75rem;color:var(--gold-hi);
+  line-height:1.7;word-break:break-all;
+}
+
+.btn{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:var(--gold);color:#000;border:none;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;font-size:.85rem;font-weight:500;
+  padding:.65rem 1.5rem;border-radius:2px;text-decoration:none;
+  transition:background .2s,transform .15s;
+}
+.btn:hover{background:var(--gold-hi);transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--gold);border:1px solid var(--gold)}
+.btn-outline:hover{background:rgba(184,146,74,.1);color:var(--gold-hi);border-color:var(--gold-hi)}
+.btn-sm{padding:.45rem 1rem;font-size:.8rem}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{background:#5DBF61}
+
+.permission-list{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.75rem}
+.perm{
+  background:rgba(184,146,74,.1);border:1px solid var(--border);
+  border-radius:2px;padding:.3rem .7rem;
+  font-family:'Space Mono',monospace;font-size:.7rem;color:var(--gold);
+}
+
+.token-area{margin-top:1rem}
+.token-area textarea{
+  width:100%;background:#0d0d0d;border:1px solid var(--border);
+  color:var(--text);font-family:'Space Mono',monospace;font-size:.75rem;
+  padding:.75rem;border-radius:3px;resize:vertical;min-height:90px;outline:none;
+  transition:border-color .2s;
+}
+.token-area textarea:focus{border-color:var(--gold)}
+.token-area label{display:block;font-size:.75rem;color:var(--muted);margin-bottom:.4rem;font-family:'Space Mono',monospace;letter-spacing:.05em}
+
+.result-panel{
+  display:none;background:rgba(76,175,80,.06);
+  border:1px solid rgba(76,175,80,.3);border-radius:4px;padding:1.5rem;margin-top:1rem;
+}
+.result-panel.visible{display:block}
+.result-panel h3{font-family:'Noto Serif TC',serif;font-size:.95rem;color:var(--green);margin-bottom:.75rem}
+.result-panel .token-out{
+  background:#0d0d0d;border:1px solid var(--border);border-radius:3px;
+  padding:.75rem;font-family:'Space Mono',monospace;font-size:.7rem;
+  color:var(--gold-hi);word-break:break-all;line-height:1.7;margin:.5rem 0;
+}
+.result-panel .label-sm{font-size:.7rem;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:.05em}
+
+.error-panel{
+  display:none;background:rgba(229,85,85,.06);
+  border:1px solid rgba(229,85,85,.3);border-radius:4px;padding:1rem 1.25rem;margin-top:1rem;
+}
+.error-panel.visible{display:block}
+.error-panel p{font-size:.8rem;color:#E55;font-family:'Space Mono',monospace;line-height:1.6}
+
+.step-actions{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;margin-top:1rem}
+
+.spinner{display:none;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
+.spinner.active{display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.workflow-link{
+  background:rgba(184,146,74,.06);border:1px solid var(--border);
+  border-radius:4px;padding:1.25rem 1.5rem;
+  margin-top:1rem;
+}
+.workflow-link p{font-size:.875rem;color:var(--muted);line-height:1.7;margin-bottom:.75rem}
+.workflow-link code{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--gold-hi)}
+
+.status-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:#0d0d0d;border-top:1px solid var(--border);
+  padding:.6rem 2rem;display:flex;justify-content:space-between;align-items:center;
+  font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);
+  z-index:100;
+}
+.status-bar .dot{width:6px;height:6px;border-radius:50%;background:var(--muted);margin-right:.4rem;display:inline-block}
+.status-bar .dot.green{background:var(--green)}
+
+.copy-btn{background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;padding:.2rem .6rem;border-radius:2px;font-family:'Space Mono',monospace;font-size:.65rem;transition:all .2s}
+.copy-btn:hover{border-color:var(--gold);color:var(--gold)}
+.copy-btn.copied{border-color:var(--green);color:var(--green)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">3Q Hatchery · 自動化工具</div>
+  <h1>Facebook 頁面授權</h1>
+  <p>自動從 Graph API Explorer 取得頁面永久 Token，<br>一鍵部署到 Cloudflare Worker。</p>
+</header>
+
+<div class="container">
+
+  <!-- Step 1: Open Explorer -->
+  <div class="step">
+    <span class="step-num">STEP 01</span>
+    <h2>開啟 Graph API Explorer</h2>
+    <p>點下方按鈕開啟官方工具，會在新分頁開啟。</p>
+    <div class="step-actions" style="margin-top:1rem">
+      <a class="btn" href="https://developers.facebook.com/tools/explorer/?app_id=956987317313843&version=v21.0" target="_blank" rel="noopener">
+        開啟 Graph API Explorer ↗
+      </a>
+    </div>
+  </div>
+
+  <!-- Step 2: Grant permissions -->
+  <div class="step">
+    <span class="step-num">STEP 02</span>
+    <h2>選擇 App 並授予權限</h2>
+    <p>在 Explorer 右側面板：</p>
+    <ul style="margin-top:.5rem">
+      <li>Meta App → 選 <kbd>3Q Hatchery</kbd>（App ID: 956987317313843）</li>
+      <li>點 <kbd>Generate Access Token</kbd></li>
+      <li>確認勾選以下所有權限再按確認：</li>
+    </ul>
+    <div class="permission-list">
+      <span class="perm">pages_manage_posts</span>
+      <span class="perm">pages_read_engagement</span>
+      <span class="perm">pages_show_list</span>
+      <span class="perm">publish_to_groups</span>
+    </div>
+  </div>
+
+  <!-- Step 3: Copy token -->
+  <div class="step">
+    <span class="step-num">STEP 03</span>
+    <h2>複製短效 User Access Token</h2>
+    <p>授權後 Explorer 頂部會出現一段 Token，複製整段（通常以 <kbd>EAA</kbd> 開頭）貼在下方：</p>
+    <div class="token-area" style="margin-top:.75rem">
+      <label>SHORT-LIVED USER ACCESS TOKEN</label>
+      <textarea id="shortToken" placeholder="EAAMURSFn..." spellcheck="false"></textarea>
+    </div>
+    <div class="step-actions">
+      <button class="btn" onclick="processToken()">
+        自動取得頁面 Token →
+      </button>
+      <div class="spinner" id="spinner"></div>
+    </div>
+    <div class="error-panel" id="errorPanel"><p id="errorMsg"></p></div>
+    <div class="result-panel" id="resultPanel">
+      <h3>✓ 頁面 Token 取得成功</h3>
+      <div class="label-sm">PAGE ACCESS TOKEN（永久有效）</div>
+      <div class="token-out" id="pageTokenOut"></div>
+      <div style="display:flex;gap:.5rem;align-items:center;margin-top:.25rem">
+        <button class="copy-btn" id="copyBtn" onclick="copyToken()">複製</button>
+        <span style="font-size:.75rem;color:var(--muted)">請複製後貼到 GitHub Workflow 的輸入框</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: Trigger workflow -->
+  <div class="step">
+    <span class="step-num">STEP 04</span>
+    <h2>觸發 GitHub Actions 部署</h2>
+    <p>把上方 Page Token 貼到 Workflow 的 <kbd>fb_short_token</kbd> 欄位並執行：</p>
+    <div class="workflow-link">
+      <p>Actions → <code>Setup Facebook Page Token</code> → Run workflow</p>
+      <p>Workflow 會自動把 Token 部署到 Cloudflare Worker，並存入 KV 永久生效。</p>
+      <a class="btn btn-outline btn-sm" href="https://github.com/milk790-code/3q-hatchery-line-oa/actions/workflows/fb-token-setup.yml" target="_blank" rel="noopener">
+        開啟 Workflow ↗
+      </a>
+    </div>
+    <div style="margin-top:1rem">
+      <p style="font-size:.8rem;color:var(--muted)">
+        完成後可繼續執行 <strong style="color:var(--gold)">Seed Content Queue</strong> 把 14 天素材填入 D1，等下次 cron 自動發文。
+      </p>
+      <div style="margin-top:.75rem">
+        <a class="btn btn-green btn-sm" href="https://github.com/milk790-code/3q-hatchery-line-oa/actions/workflows/seed-content-queue.yml" target="_blank" rel="noopener">
+          填入素材 (Seed Content Queue) ↗
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="status-bar">
+  <div><span class="dot" id="statusDot"></span><span id="statusText">等待 Token 輸入</span></div>
+  <div>3Q Hatchery · FB Auto-Setup</div>
+</div>
+
+<script>
+const APP_ID  = '956987317313843';
+const PAGE_ID = '61587003785491';
+
+function setStatus(msg, green) {
+  document.getElementById('statusText').textContent = msg;
+  document.getElementById('statusDot').className = 'dot' + (green ? ' green' : '');
+}
+
+async function processToken() {
+  const raw = document.getElementById('shortToken').value.trim();
+  if (!raw) { alert('請先貼入 Token'); return; }
+
+  document.getElementById('errorPanel').classList.remove('visible');
+  document.getElementById('resultPanel').classList.remove('visible');
+  document.getElementById('spinner').classList.add('active');
+  setStatus('正在驗證 Token…');
+
+  try {
+    // 1. Verify token
+    const verifyUrl = `https://graph.facebook.com/v21.0/me?access_token=${encodeURIComponent(raw)}`;
+    const verifyRes = await fetch(verifyUrl);
+    const verifyData = await verifyRes.json();
+    if (verifyData.error) throw new Error(`Token 無效：${verifyData.error.message}`);
+    setStatus(`Token 有效（用戶：${verifyData.name || verifyData.id}）`, true);
+
+    // 2. Get /me/accounts (page list)
+    const acctUrl = `https://graph.facebook.com/v21.0/me/accounts?access_token=${encodeURIComponent(raw)}`;
+    const acctRes = await fetch(acctUrl);
+    const acctData = await acctRes.json();
+    if (acctData.error) throw new Error(`取得頁面清單失敗：${acctData.error.message}`);
+
+    const pages = acctData.data || [];
+    const page = pages.find(p => p.id === PAGE_ID);
+    if (!page) {
+      const names = pages.map(p => `${p.id} (${p.name})`).join(', ');
+      throw new Error(`找不到頁面 ${PAGE_ID}。你的帳號管理的頁面：${names || '無'}`);
+    }
+
+    const pageToken = page.access_token;
+    document.getElementById('pageTokenOut').textContent = pageToken;
+    document.getElementById('resultPanel').classList.add('visible');
+    setStatus('✓ 頁面 Token 取得成功，請複製後觸發 GitHub Workflow', true);
+
+  } catch(err) {
+    document.getElementById('errorMsg').textContent = err.message;
+    document.getElementById('errorPanel').classList.add('visible');
+    setStatus('錯誤：' + err.message);
+  } finally {
+    document.getElementById('spinner').classList.remove('active');
+  }
+}
+
+function copyToken() {
+  const text = document.getElementById('pageTokenOut').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '已複製 ✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '複製'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// Allow pressing Enter in textarea
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('shortToken').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) processToken();
+  });
+});
+</script>
+</body>
+</html>
