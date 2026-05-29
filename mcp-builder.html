@@ -188,6 +188,7 @@ textarea{min-height:64px}
   <div class="output-panel">
     <div class="output-tabs">
       <div class="tab active" data-tab="config">mcp_config.json</div>
+      <div class="tab" data-tab="toml">wrangler.toml</div>
       <div class="tab" data-tab="worker">Worker 模板</div>
     </div>
     <pre class="output-box" id="outputBox"></pre>
@@ -306,8 +307,35 @@ export default {
 };`;
 }
 
+function genToml() {
+  const name = fName.value.trim() || 'my-mcp-server';
+  const workerUrl = fWorkerUrl.value.trim();
+  const lines = [
+    `name = "${name}"`,
+    `main = "index.js"`,
+    `compatibility_date = "${new Date().toISOString().slice(0,10)}"`,
+    ``,
+    `[vars]`,
+    `# 在此加入非機密環境變數`,
+    `# MY_VAR = "value"`,
+    ``,
+    `# [[kv_namespaces]]`,
+    `# binding = "KV"`,
+    `# id = "your-kv-namespace-id"`,
+    ``,
+    `# [[d1_databases]]`,
+    `# binding = "DB"`,
+    `# database_name = "your-db"`,
+    `# database_id = "your-db-id"`,
+  ];
+  if (workerUrl) lines.push(``, `# Worker URL: ${workerUrl}`);
+  return lines.join('\n');
+}
+
 function update() {
-  outputBox.textContent = activeTab === 'config' ? genConfig() : genWorker();
+  if (activeTab === 'config') outputBox.textContent = genConfig();
+  else if (activeTab === 'toml') outputBox.textContent = genToml();
+  else outputBox.textContent = genWorker();
   updateDiagram();
 }
 
@@ -355,7 +383,7 @@ document.getElementById('btnCopy').addEventListener('click', () => {
 // Download
 document.getElementById('btnDown').addEventListener('click', () => {
   const name = fName.value.trim() || 'mcp-config';
-  const ext = activeTab === 'config' ? '.json' : '.js';
+  const ext = activeTab === 'config' ? '.json' : activeTab === 'toml' ? '.toml' : '.js';
   const blob = new Blob([outputBox.textContent], { type: 'text/plain' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
