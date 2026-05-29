@@ -142,10 +142,32 @@ nav{
 }
 
 /* ─── SECTION BASE ───────────────────────────────── */
-.section{padding:100px 48px;max-width:1080px;margin:0 auto}
+.section{padding:100px 48px;max-width:1080px;margin:0 auto;position:relative}
+/* Oversized ghost Chinese numeral — magazine chapter mark */
+.section[data-ghost]::before{
+  content:attr(data-ghost);
+  position:absolute;top:48px;right:24px;
+  font-family:var(--serif);font-weight:200;
+  font-size:clamp(7rem,16vw,13rem);line-height:.8;
+  color:var(--gold);opacity:.04;pointer-events:none;
+  user-select:none;z-index:0;
+}
+.section > *{position:relative;z-index:1}
+/* Editorial eyebrow: numeral · label ———— rule */
 .section-eyebrow{
+  display:flex;align-items:center;gap:16px;
   font-size:.6rem;letter-spacing:.45em;color:var(--gold);
-  text-transform:uppercase;margin-bottom:20px;
+  text-transform:uppercase;margin-bottom:22px;
+}
+.section-eyebrow[data-idx]::before{
+  content:attr(data-idx);
+  font-family:var(--serif);font-style:italic;font-weight:300;
+  font-size:1.7rem;letter-spacing:0;color:var(--gold);
+  line-height:1;opacity:.92;
+}
+.section-eyebrow::after{
+  content:'';flex:1;max-width:120px;height:1px;
+  background:linear-gradient(to right,var(--gold-bd),transparent);
 }
 .section-title{
   font-family:var(--serif);font-weight:200;
@@ -156,9 +178,72 @@ nav{
   font-size:.9rem;color:var(--muted);line-height:1.9;
   letter-spacing:.06em;max-width:560px;
 }
+/* Editorial drop-cap */
+.dropcap::first-letter{
+  font-family:var(--serif);font-weight:300;font-style:italic;
+  font-size:3.4em;line-height:.8;float:left;
+  color:var(--gold);margin:6px 14px 0 0;
+}
 .gold-line{
   width:48px;height:1px;background:var(--gold);
   display:block;margin:24px 0;opacity:.5;
+}
+/* Ornamental divider — hand-set printer's mark */
+.ornament{
+  display:flex;align-items:center;gap:14px;margin:26px 0;
+  color:var(--gold);
+}
+.ornament::before,.ornament::after{
+  content:'';height:1px;background:var(--gold-bd);
+}
+.ornament::before{width:30px}
+.ornament::after{flex:1;max-width:90px}
+.ornament span{
+  font-family:var(--serif);font-style:italic;font-size:1rem;
+  opacity:.75;letter-spacing:0;
+}
+
+/* ─── MARQUEE TICKER ──────────────────────────────── */
+.marquee{
+  border-top:1px solid var(--gold-bd);border-bottom:1px solid var(--gold-bd);
+  overflow:hidden;white-space:nowrap;background:var(--bg2);
+  padding:14px 0;position:relative;
+}
+.marquee-track{
+  display:inline-block;white-space:nowrap;
+  animation:scroll-x 28s linear infinite;
+}
+.marquee:hover .marquee-track{animation-play-state:paused}
+.marquee-track span{
+  font-family:var(--serif);font-weight:300;font-size:1.05rem;
+  letter-spacing:.14em;color:var(--gold);opacity:.85;
+  padding:0 8px;
+}
+.marquee-track .dot{color:var(--muted);opacity:.5;font-size:.7rem;vertical-align:middle}
+@keyframes scroll-x{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ─── HERO VERTICAL SIDE RAIL ─────────────────────── */
+.side-rail{
+  position:fixed;left:18px;top:50%;transform:translateY(-50%) rotate(180deg);
+  writing-mode:vertical-rl;z-index:90;
+  font-size:.58rem;letter-spacing:.42em;color:var(--muted);
+  text-transform:uppercase;pointer-events:none;
+  display:flex;align-items:center;gap:18px;
+}
+.side-rail::after{content:'';height:60px;width:1px;background:var(--gold-bd)}
+@media(max-width:1100px){.side-rail{display:none}}
+
+/* ─── FILM GRAIN OVERLAY ──────────────────────────── */
+.grain{
+  position:fixed;inset:0;z-index:200;pointer-events:none;
+  opacity:.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  animation:grainShift 8s steps(6) infinite;
+}
+@keyframes grainShift{
+  0%{transform:translate(0,0)}20%{transform:translate(-4%,3%)}
+  40%{transform:translate(3%,-4%)}60%{transform:translate(-3%,2%)}
+  80%{transform:translate(2%,-3%)}100%{transform:translate(0,0)}
 }
 
 /* ─── PAIN POINTS ─────────────────────────────────── */
@@ -464,10 +549,24 @@ footer a{color:var(--gold);text-decoration:none}
   .hook-wrap{padding:40px 24px}
   .timeline-wrap{-webkit-overflow-scrolling:touch}
   footer{flex-direction:column;text-align:center;padding:24px}
+  .section[data-ghost]::before{top:32px;right:12px;font-size:5.5rem;opacity:.05}
+  .section-eyebrow::after{max-width:48px}
+  .marquee-track span{font-size:.92rem}
+  .marquee-track{animation-duration:20s}
+}
+@media(prefers-reduced-motion:reduce){
+  .grain,.marquee-track,.line-btn{animation:none}
+  .hero-title-line{animation:none;transform:none}
 }
 </style>
 </head>
 <body>
+
+<!-- FILM GRAIN -->
+<div class="grain"></div>
+
+<!-- VERTICAL SIDE RAIL -->
+<div class="side-rail">掘 · DIG DEEPER · 限定五席</div>
 
 <!-- NAV -->
 <nav>
@@ -517,10 +616,28 @@ footer a{color:var(--gold);text-decoration:none}
   <p class="hero-note">加入 LINE 後 24 小時內回覆 · 無需承諾，先了解再決定</p>
 </section>
 
+<!-- MARQUEE TICKER -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span>免費部署官網</span><span class="dot">✦</span>
+    <span>先用滿意再付</span><span class="dot">✦</span>
+    <span>每行業限收一名</span><span class="dot">✦</span>
+    <span>月費前高後低</span><span class="dot">✦</span>
+    <span>互推共好</span><span class="dot">✦</span>
+    <span>本期僅剩兩席</span><span class="dot">✦</span>
+    <span>免費部署官網</span><span class="dot">✦</span>
+    <span>先用滿意再付</span><span class="dot">✦</span>
+    <span>每行業限收一名</span><span class="dot">✦</span>
+    <span>月費前高後低</span><span class="dot">✦</span>
+    <span>互推共好</span><span class="dot">✦</span>
+    <span>本期僅剩兩席</span><span class="dot">✦</span>
+  </div>
+</div>
+
 <!-- PAIN POINTS -->
 <div style="border-top:1px solid var(--gold-bd)">
-<div class="section" id="why">
-  <p class="section-eyebrow reveal">你現在的處境</p>
+<div class="section" id="why" data-ghost="壹">
+  <p class="section-eyebrow reveal" data-idx="壹">你現在的處境</p>
   <h2 class="section-title reveal d1">多數台灣好品牌，<br/>都卡在同一個問題。</h2>
   <span class="gold-line reveal d2"></span>
 
@@ -546,11 +663,11 @@ footer a{color:var(--gold);text-decoration:none}
 
 <!-- SERVICE MENU -->
 <div style="border-top:1px solid var(--gold-bd)" id="menu">
-<div class="section">
-  <p class="section-eyebrow reveal">服務菜單</p>
+<div class="section" data-ghost="貳">
+  <p class="section-eyebrow reveal" data-idx="貳">服務菜單</p>
   <h2 class="section-title reveal d1">你選你需要的，<br/>不強迫一刀切。</h2>
-  <span class="gold-line reveal d2"></span>
-  <p class="section-sub reveal d2">不同品牌，需求不同。落地頁、完整官網、電商功能，單選或組合，月費隨方案走。</p>
+  <div class="ornament reveal d2"><span>選配</span></div>
+  <p class="section-sub reveal d2 dropcap">不同品牌，需求不同。落地頁、完整官網、電商功能，單選或組合，月費隨方案走。我們不做一刀切的套裝——你的生意長什麼樣，網站就該長什麼樣。</p>
 
   <div class="menu-grid">
     <div class="menu-card reveal d1">
@@ -609,8 +726,8 @@ footer a{color:var(--gold);text-decoration:none}
 
 <!-- PLAN DETAILS -->
 <div style="border-top:1px solid var(--gold-bd)" id="plan">
-<div class="section">
-  <p class="section-eyebrow reveal">掘計畫 · 一年方案</p>
+<div class="section" data-ghost="參">
+  <p class="section-eyebrow reveal" data-idx="參">掘計畫 · 一年方案</p>
   <h2 class="section-title reveal d1">越早加入，<br/>月費越便宜。</h2>
   <span class="gold-line reveal d2"></span>
   <p class="section-sub reveal d2">月費採「前高後低」結構——早期鎖席成本稍高，但越到後期越划算，一年下來比市場行情省超過一半。</p>
@@ -672,8 +789,8 @@ footer a{color:var(--gold);text-decoration:none}
 
 <!-- HOOK OFFER: AI 生圖 -->
 <div style="border-top:1px solid var(--gold-bd)">
-<div class="section">
-  <p class="section-eyebrow reveal">限定早鳥 · 生圖優惠</p>
+<div class="section" data-ghost="肆">
+  <p class="section-eyebrow reveal" data-idx="肆">限定早鳥 · 生圖優惠</p>
   <h2 class="section-title reveal d1">AI 商品圖，<br/>前 10 個行業特惠。</h2>
   <span class="gold-line reveal d2"></span>
 
@@ -709,8 +826,8 @@ footer a{color:var(--gold);text-decoration:none}
 
 <!-- QUALIFY -->
 <div style="border-top:1px solid var(--gold-bd)">
-<div class="section">
-  <p class="section-eyebrow reveal">入選條件</p>
+<div class="section" data-ghost="伍">
+  <p class="section-eyebrow reveal" data-idx="伍">入選條件</p>
   <h2 class="section-title reveal d1">我們挑客戶，<br/>你也挑我們。</h2>
   <span class="gold-line reveal d2"></span>
   <p class="section-sub reveal d2">掘計畫不只是服務關係——我們會把你的品牌放到我們所有的行銷渠道互推。所以，我們只選本質好、準備好的品牌。</p>
