@@ -408,6 +408,7 @@ jobs:
           THREADS_USER_ID:       ${{ secrets.THREADS_USER_ID }}
           IG_ACCESS_TOKEN:       ${{ secrets.IG_ACCESS_TOKEN }}
           IG_USER_ID:            ${{ secrets.IG_USER_ID }}
+          FB_PAGE_ACCESS_TOKEN:  ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
           TIKTOK_ACCESS_TOKEN:   ${{ secrets.TIKTOK_ACCESS_TOKEN }}
           GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
           GOOGLE_LOCATION_NAME:   ${{ secrets.GOOGLE_LOCATION_NAME }}
@@ -419,6 +420,7 @@ jobs:
             "compatibility_date": "2024-12-01",
             "bindings": [
               {"name": "PNG_BASE_URL",   "type": "plain_text", "text": "$PNG_BASE_URL"},
+              {"name": "FB_PAGE_ID",     "type": "plain_text", "text": "61587003785491"},
               {"name": "TRIGGER_TOKEN",  "type": "secret_text", "text": $(jq -Rn --arg t "${TRIGGER_TOKEN:-}" '$t')},
               {"name": "SESSION",        "type": "kv_namespace", "namespace_id": "$SESSION_KV_ID"},
               {"name": "CRM",            "type": "d1", "id": "$CRM_D1_ID"},
@@ -427,6 +429,7 @@ jobs:
               {"name": "THREADS_USER_ID",      "type": "secret_text", "text": $(jq -Rn --arg t "${THREADS_USER_ID:-}" '$t')},
               {"name": "IG_ACCESS_TOKEN",      "type": "secret_text", "text": $(jq -Rn --arg t "${IG_ACCESS_TOKEN:-}" '$t')},
               {"name": "IG_USER_ID",           "type": "secret_text", "text": $(jq -Rn --arg t "${IG_USER_ID:-}" '$t')},
+              {"name": "FB_PAGE_ACCESS_TOKEN", "type": "secret_text", "text": $(jq -Rn --arg t "${FB_PAGE_ACCESS_TOKEN:-}" '$t')},
               {"name": "TIKTOK_ACCESS_TOKEN",  "type": "secret_text", "text": $(jq -Rn --arg t "${TIKTOK_ACCESS_TOKEN:-}" '$t')},
               {"name": "GOOGLE_SERVICE_ACCOUNT","type": "secret_text","text": $(jq -Rn --arg t "${GOOGLE_SERVICE_ACCOUNT:-}" '$t')},
               {"name": "GOOGLE_LOCATION_NAME", "type": "secret_text", "text": $(jq -Rn --arg t "${GOOGLE_LOCATION_NAME:-}" '$t')}
