@@ -1,0 +1,116 @@
+name: FB Auto Runner (self-deleting)
+
+on:
+  push:
+    branches: ['trigger/fb-token']
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    env:
+      APP_ID: '956987317313843'
+      PAGE_ID: '61587003785491'
+      SESSION_KV_ID: 20a68b10afc84764ba770b64f0f33f30
+      CRM_D1_ID: e54671b1-d15e-4552-babf-cef367267568
+      PNG_BASE_URL: https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports
+      THREADS_APP_ID: '956987317313843'
+      SOCIAL_WORKER_NAME: 3q-social-publisher
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set CF account ID
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: echo "CF_ACCOUNT_ID=$CF_ACCOUNT_ID" >> $GITHUB_ENV
+
+      - name: Read short token
+        run: echo "SHORT_TOKEN=$(cat _fb_token)" >> $GITHUB_ENV
+
+      - name: Extend to 60-day long-lived token
+        env:
+          APP_SECRET: ${{ secrets.THREADS_APP_SECRET }}
+        run: |
+          set -euo pipefail
+          resp=$(curl -sS "https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${APP_ID}&client_secret=${APP_SECRET}&fb_exchange_token=${SHORT_TOKEN}")
+          LONG=$(echo "$resp" | jq -r '.access_token // empty')
+          if [ -z "$LONG" ]; then echo "::error::$resp"; exit 1; fi
+          echo "LONG_TOKEN=$LONG" >> $GITHUB_ENV
+          echo "::notice::Long-lived token obtained"
+
+      - name: Get Page Access Token
+        run: |
+          set -euo pipefail
+          resp=$(curl -sS "https://graph.facebook.com/v21.0/me/accounts?access_token=${LONG_TOKEN}")
+          PAGE_TOKEN=$(echo "$resp" | jq -r --arg p "$PAGE_ID" '.data[]?|select(.id==$p)|.access_token // empty')
+          if [ -z "$PAGE_TOKEN" ]; then echo "::error::Page not found: $(echo $resp|jq -c .)"; exit 1; fi
+          echo "PAGE_TOKEN=$PAGE_TOKEN" >> $GITHUB_ENV
+          echo "::notice::Page Token obtained"
+
+      - name: Get IG User ID
+        run: |
+          resp=$(curl -sS "https://graph.facebook.com/v21.0/${PAGE_ID}?fields=instagram_business_account&access_token=${PAGE_TOKEN}")
+          IG=$(echo "$resp" | jq -r '.instagram_business_account.id // empty')
+          echo "IG_USER_ID=${IG:-}" >> $GITHUB_ENV
+          [ -n "$IG" ] && echo "::notice::IG User ID: $IG" || echo "::warning::No IG account linked"
+
+      - name: Store tokens in Cloudflare KV
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          declare -a PAIRS=(
+            "token:fb:page_token=${PAGE_TOKEN}"
+            "token:fb:page_id=${PAGE_ID}"
+          )
+          [ -n "${IG_USER_ID:-}" ] && PAIRS+=("token:ig:access=${PAGE_TOKEN}" "token:ig:user_id=${IG_USER_ID}")
+          for KV in "${PAIRS[@]}"; do
+            K="${KV%%=*}"; V="${KV#*=}"
+            curl -sS -X PUT \
+              "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/storage/kv/namespaces/${SESSION_KV_ID}/values/${K}" \
+              -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: text/plain" --data "$V" \
+              | jq -r '"KV " + (if .success then "✓" else "✗" end) + " " + $k' --arg k "$K"
+          done
+
+      - name: Deploy worker with FB+IG tokens
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          TRIGGER_TOKEN: ${{ secrets.TRIGGER_TOKEN }}
+          THREADS_APP_SECRET: ${{ secrets.THREADS_APP_SECRET }}
+        run: |
+          set -euo pipefail
+          cat > /tmp/meta.json <<JSON
+          {"main_module":"worker.js","compatibility_date":"2024-12-01","bindings":[
+            {"name":"PNG_BASE_URL","type":"plain_text","text":"$PNG_BASE_URL"},
+            {"name":"THREADS_APP_ID","type":"plain_text","text":"$THREADS_APP_ID"},
+            {"name":"FB_PAGE_ID","type":"plain_text","text":"$PAGE_ID"},
+            {"name":"THREADS_APP_SECRET","type":"secret_text","text":$(jq -Rn --arg t "${THREADS_APP_SECRET:-}" '$t')},
+            {"name":"FB_PAGE_ACCESS_TOKEN","type":"secret_text","text":$(jq -Rn --arg t "${PAGE_TOKEN:-}" '$t')},
+            {"name":"TRIGGER_TOKEN","type":"secret_text","text":$(jq -Rn --arg t "${TRIGGER_TOKEN:-}" '$t')},
+            {"name":"SESSION","type":"kv_namespace","namespace_id":"$SESSION_KV_ID"},
+            {"name":"CRM","type":"d1","id":"$CRM_D1_ID"},
+            {"name":"AI","type":"ai"},
+            {"name":"IG_ACCESS_TOKEN","type":"secret_text","text":$(jq -Rn --arg t "${PAGE_TOKEN:-}" '$t')},
+            {"name":"IG_USER_ID","type":"secret_text","text":$(jq -Rn --arg t "${IG_USER_ID:-}" '$t')},
+            {"name":"TIKTOK_ACCESS_TOKEN","type":"secret_text","text":""},
+            {"name":"GOOGLE_SERVICE_ACCOUNT","type":"secret_text","text":""},
+            {"name":"GOOGLE_LOCATION_NAME","type":"secret_text","text":""}
+          ]}
+          JSON
+          resp=$(curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${SOCIAL_WORKER_NAME}" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -F "metadata=@/tmp/meta.json;type=application/json" \
+            -F "worker.js=@workers/social-publisher/worker.js;type=application/javascript+module")
+          echo "$resp" | jq -e '.success == true' > /dev/null
+          echo "::notice::Worker deployed with FB+IG tokens"
+
+      - name: Summary
+        run: |
+          echo "## FB + IG 自動授權完成" >> $GITHUB_STEP_SUMMARY
+          echo "| | |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| FB Page ID | \`$PAGE_ID\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| IG User ID | \`${IG_USER_ID:-（未連結）}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Token 存儲 | Cloudflare Worker secret + KV |" >> $GITHUB_STEP_SUMMARY
+          echo "| 下一步 | 執行 Seed Content Queue 填入素材 |" >> $GITHUB_STEP_SUMMARY
