@@ -191,6 +191,10 @@ kbd{
       <button class="copy-btn" id="copyBtn" onclick="copyToken()">複製</button>
       <span style="font-size:.75rem;color:var(--muted)">複製後貼到下方 Workflow 的輸入框</span>
     </div>
+    <div id="igUserIdRow" style="display:none;margin-top:1rem">
+      <div class="label-sm" style="margin-bottom:.3rem">IG BUSINESS ACCOUNT USER ID（Workflow 自動處理）</div>
+      <div class="token-out" id="igUserIdOut" style="font-size:.75rem"></div>
+    </div>
   </div>
 
   <!-- Step: Trigger workflow -->
@@ -236,7 +240,7 @@ function setStatus(msg, green) {
 
 // Build & open Facebook OAuth consent URL (implicit flow → token lands in URL hash)
 function startOAuth() {
-  const scope = 'pages_manage_posts,pages_read_engagement,pages_show_list,publish_to_groups';
+  const scope = 'pages_manage_posts,pages_read_engagement,pages_show_list,publish_to_groups,instagram_basic,instagram_content_publish';
   const url = 'https://www.facebook.com/dialog/oauth'
     + `?client_id=${APP_ID}`
     + `&redirect_uri=${encodeURIComponent(REDIRECT)}`
@@ -275,11 +279,24 @@ async function processToken(raw) {
     }
 
     const pageToken = page.access_token;
+
+    // 3. Get Instagram Business Account ID linked to this FB Page
+    let igUserId = '';
+    try {
+      const igRes  = await fetch(`https://graph.facebook.com/v21.0/${PAGE_ID}?fields=instagram_business_account&access_token=${encodeURIComponent(pageToken)}`);
+      const igData = await igRes.json();
+      igUserId = igData.instagram_business_account?.id || '';
+    } catch(_) {}
+
     document.getElementById('pageTokenOut').textContent = pageToken;
+    if (igUserId) {
+      document.getElementById('igUserIdRow').style.display = 'block';
+      document.getElementById('igUserIdOut').textContent = igUserId;
+    }
     document.getElementById('resultPanel').classList.add('visible');
     // Auto-copy to clipboard
-    try { await navigator.clipboard.writeText(pageToken); setStatus('✓ Page Token 已自動複製到剪貼簿，請前往 Workflow 貼上並 Run', true); }
-    catch { setStatus('✓ 頁面 Token 取得成功，請手動複製後觸發 Workflow', true); }
+    try { await navigator.clipboard.writeText(pageToken); setStatus('✓ FB + IG Token 已取得，Page Token 自動複製，請前往 Workflow 貼上並 Run', true); }
+    catch { setStatus('✓ FB + IG Token 取得成功，請複製後觸發 Workflow', true); }
 
     // Scroll into view
     document.getElementById('resultPanel').scrollIntoView({behavior:'smooth', block:'start'});
