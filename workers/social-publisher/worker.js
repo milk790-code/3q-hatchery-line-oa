@@ -1,13 +1,15 @@
 // 3Q Hatchery — Social Publisher Worker v2.0
-// Auto-posts to Threads, Instagram, TikTok, Google Business Profile
+// Auto-posts to Threads, Instagram, Facebook Page, TikTok, Google Business Profile
 // Tokens stored in SESSION KV and auto-refreshed every 50 days — no manual renewal.
 //
 // Vars (wrangler.toml):
 //   THREADS_APP_ID           — Meta App ID (public, safe in vars)
+//   FB_PAGE_ID               — Facebook Page numeric ID (public)
 //
 // Secrets (wrangler secret put):
 //   THREADS_APP_SECRET       — Meta App Secret (for token refresh)
 //   TRIGGER_TOKEN            — For manual /publish and /oauth/callback endpoints
+//   FB_PAGE_ACCESS_TOKEN     — Facebook Page Access Token (long-lived, page-scoped)
 //
 // KV keys (SESSION namespace):
 //   token:threads:access     — Threads long-lived access token
@@ -20,7 +22,7 @@
 // ─────────────────────────────────────────────────────────────────────────
 // Platform daily limits (to avoid spam signals)
 // ─────────────────────────────────────────────────────────────────────────
-const DAILY_LIMITS = { threads: 3, instagram: 1, tiktok: 1, google_biz: 1 };
+const DAILY_LIMITS = { threads: 3, instagram: 1, facebook: 1, tiktok: 1, google_biz: 1 };
 
 // ─────────────────────────────────────────────────────────────────────────
 // KV-backed token storage (permanent, auto-refreshed)
@@ -148,6 +150,15 @@ async function generateCaption(seed, platform, env) {
       '- 3 句話以內，每句 15 字左右',
       '- 第一句要讓人想繼續看',
       '- 使用繁體中文',
+    ].join('\n'),
+    facebook: [
+      '你是 3Q Hatchery 的品牌孵化顧問，管理品牌 Facebook 粉絲專頁。',
+      '請根據以下主題，寫一篇 Facebook 貼文。',
+      '規則：',
+      '- 200–300 字，繁體中文',
+      '- 語氣親切、有故事感，適合在 FB 上引發留言分享',
+      '- 結尾可加 1–2 個 hashtag',
+      '- 不用「按讚」「追蹤」等動詞',
     ].join('\n'),
     google_biz: [
       '你是 3Q Hatchery 的品牌孵化顧問。',
@@ -395,12 +406,62 @@ async function publishToGoogleBiz(post, env) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
+// Facebook Page — Graph API v21.0
+// Docs: https://developers.facebook.com/docs/graph-api/reference/page/feed
+//       https://developers.facebook.com/docs/graph-api/reference/page/photos
+// Requires: FB_PAGE_ACCESS_TOKEN secret, FB_PAGE_ID var
+// ─────────────────────────────────────────────────────────────────────────
+
+async function publishToFacebook(post, env) {
+  const token  = await getToken('fb', 'FB_PAGE_ACCESS_TOKEN', env);
+  const pageId = env.FB_PAGE_ID;
+  if (!token)  return { ok: false, error: 'FB_PAGE_ACCESS_TOKEN not set' };
+  if (!pageId) return { ok: false, error: 'FB_PAGE_ID not set in vars' };
+
+  const base = `https://graph.facebook.com/v21.0/${pageId}`;
+
+  if (post.image_url) {
+    // Photo post: /photos endpoint attaches image + caption
+    const res = await fetch(`${base}/photos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url:          post.image_url,
+        caption:      post.caption || '',
+        access_token: token,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok || (!data.id && !data.post_id)) {
+      return { ok: false, error: `FB photo post failed: ${JSON.stringify(data)}` };
+    }
+    return { ok: true, platform_id: data.post_id || data.id };
+  } else {
+    // Text-only post: /feed endpoint
+    const res = await fetch(`${base}/feed`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message:      post.caption || '',
+        access_token: token,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.id) {
+      return { ok: false, error: `FB feed post failed: ${JSON.stringify(data)}` };
+    }
+    return { ok: true, platform_id: data.id };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
 // Platform dispatch
 // ─────────────────────────────────────────────────────────────────────────
 
 const PLATFORM_FNS = {
   threads:    publishToThreads,
   instagram:  publishToInstagram,
+  facebook:   publishToFacebook,
   tiktok:     publishToTikTok,
   google_biz: publishToGoogleBiz,
 };
