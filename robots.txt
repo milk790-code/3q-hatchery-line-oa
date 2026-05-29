@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://milk790-code.github.io/3q-hatchery-line-oa/sitemap.xml
