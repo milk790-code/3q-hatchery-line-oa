@@ -1,1 +1,328 @@
-IiIiCjNR6LKi5Li4IExJTkUg5a6i5pyN5qmf5Zmo5Lq6CuWPsOeBo+WcqOWcsOWTgeeJjOWtteWMluaJgAoKdjIuMSDigJQg5L+u5q2jICsg5bi45pW45oq95Y+WCiAgdjIuMDoKICAgIDEuIFRUTCDljrvph43pmLLoqJjmhrbpq5TmtKnmvI8KICAgIDIuIFdlYmhvb2sg57C95ZCN6Yyv6Kqk5o2V5o2JCiAgICAzLiDot6/nlLHlhKrlhYjntJrkv67mraMo44CM57SE6Kuu6Kmi44CN5LiN6KKr44CM6Kuu6Kmi44CN5pSU5oiqKQogICAgNC4g5paw5aKe44CM6YCB5Ye644CN6Lev55SxICsg5Y2B6aGM5Zue562U5YG15risCiAgICA1LiDnqbroqIrmga8gLyDotoXplbfoqIrmga/pmLLorbcKICAgIDYuIOWKoOWlveWPi+aUuSByZXBseSDnnIEgcHVzaCDpoY3luqYKICAgIDcuIOWFqOW9oi/ljYrlvaLlrrnpjK8KICAgIDguIOaTtOWFheOAjOWQiOS9nOOAjeOAjOahiOS+i+OAjeOAjOS9nOWTgeOAjeOAjeetieWFpeWPo+ipngogIHYyLjE6CiAgICA5LiBfbm9ybWFsaXplIOWKoCAubG93ZXIoKSDigJQg6Iux5paH5aSn5bCP5a+r5LiN5pWP5oSfCiAgIDEwLiDpl5zpjbXlrZcgKyDlm57opobmloflrZfmir3miJDpoILlsaTluLjmlbgs5Zau5LiA5L6G5rqQCiAgIDExLiDmlrDlop4gX2hhc19hbnkoKSDovJTliqnlh73lvI/muJvlsJHph43opIcKIiIiCgpmcm9tIGZhc3RhcGkgaW1wb3J0IEZhc3RBUEksIFJlcXVlc3QsIEhUVFBFeGNlcHRpb24KZnJvbSBsaW5lYm90LnYzLndlYmhvb2sgaW1wb3J0IFdlYmhvb2tIYW5kbGVyCmZyb20gbGluZWJvdC52My5leGNlcHRpb25zIGltcG9ydCBJbnZhbGlkU2lnbmF0dXJlRXJyb3IKZnJvbSBsaW5lYm90LnYzLm1lc3NhZ2luZyBpbXBvcnQgKAogICAgQ29uZmlndXJhdGlvbiwgQXBpQ2xpZW50LCBNZXNzYWdpbmdBcGksCiAgICBSZXBseU1lc3NhZ2VSZXF1ZXN0LCBUZXh0TWVzc2FnZSwKKQpmcm9tIGxpbmVib3QudjMud2ViaG9va3MgaW1wb3J0ICgKICAgIE1lc3NhZ2VFdmVudCwgVGV4dE1lc3NhZ2VDb250ZW50LCBGb2xsb3dFdmVudCwKKQpmcm9tIGRvdGVudiBpbXBvcnQgbG9hZF9kb3RlbnYKaW1wb3J0IG9zLCB0aW1lLCBsb2dnaW5nCgpsb2FkX2RvdGVudigpCgojIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAojIOWFseeUqOW4uOaVuCjmlLnkuIDomZXlhajnlJ/mlYgpCiMg4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQCgpLV19TVEFSVF9JTUFHRSA9IFsi6ZaL5aeL55Sf5ZyWIiwgIumWi+Wni+eVqyJdCktXX0NVU1RPTUVSX1NFUlZJQ0UgPSBbIuWuouacjSIsICLkurrlt6UiLCAi55yf5Lq6IiwgIuaJvuS9oCIsICLmib7kuroiXQpLV19CT09LSU5HID0gWyLntIToq67oqaIiLCAi6aCQ57SEIiwgIue0hOS4gOS4iyIsICLopovpnaIiLCAi6IGK6IGKIl0KS1dfUFJPRFVDVF8yID0gWyLooYzpirciLCAi5a6i6KO9IiwgIuaJv+irvuabuCIsICLlrbXljJYiLCAi5o6o5bujIiwgIuS7o+aTjSIsICLntpPnh58iLCAi5oqV5pS+Il0KS1dfSU5RVUlSWSA9IFsKICAgICLoq67oqaIiLCAi5LqG6KejIiwgIuWVj+WVjyIsICLmg7Pnn6XpgZMiLCAi5aCx5YO5IiwgIuaWueahiCIsICLmnI3li5kiLAogICAgIuWkmuWwkSIsICLlg7nmoLwiLCAi6LK755SoIiwgIumgheebriIsICLmpa3li5kiLCAi5YGa5LuA6bq8IiwKICAgICLlkIjkvZwiLCAi5qGI5L6LIiwgIuS9nOWTgSIsICLku4vntLkiLCAi5ZOB54mMIiwKICAgICLmgI7purzmlLYiLCAi5pS26LK7IiwgIuW5vuWhiiIsICLlg7nnm64iLApdCktXX1BST0dSRVNTID0gWyLpgLLluqYiLCAi5LiK5qyhIiwgIuWBmuWujCIsICLnrYnlpJrkuYUiLCAi5a6M5oiQ5rKSIl0KS1dfVEhBTktTID0gWyLorJ3orJ0iLCAi5oSf6KydIiwgIuiumiIsICLljrLlrrMiLCAi5qOSIiwgIuWkquWlveS6hiJdCgpSRVBMWV9SRUNFSVZFRF9GT1JNID0gKAogICAgIuaUtuWIsOS9oOeahOWNgemhjOihqCS6hiEKCiIKICAgICLmiJHlgJHmnIPlnKggMjQtNDgg5bCP5pmC5YWnCiIKICAgICLmlbTnkIblpb3pnIDmsYLkuKbplovlp4voo73kvZwKCiIKICAgICLpgY7nqIvkuK3mnInllY/poYzmnIPkuLvli5Xoga/nuavkvaAKIgogICAgIuaDs+afpemAsuW6pumaqOaZguWbnuimhuOAjOmAsuW6puOAjSIKKQoKUkVQTFlfVEVOX1FVRVNUSU9OUyA9ICgKICAgICLlpb3nmoQg6ZaL5aeL5L2g55qEIDUwMCDlhYPnlJ/lnJYKCiIKICAgICLoq4vkvp3luo/lm57nrZTljYHpoYws5YWo6YOo562U5a6M5b6M5YKz44CM6YCB5Ye644CNCiIKICAgICIyNC00OCDlsI/mmYLlhafkuqTku5g6CgoiCiAgICAiMS4g5L2g55qE5bqX5a625oiW5ZOB54mM5ZCN56ixCiIKICAgICIyLiDkuLvopoHnlKLlk4HmiJbmnI3li5kKIgogICAgIjMuIOS4u+imgeWuoue+pAoiCiAgICAiNC4g5Zac5q2h55qE6aKo5qC8KOWPr+iyvOWPg+iAg+WclikKIgogICAgIjUuIOS4u+iJsuezu+WBj+WlvQoiCiAgICAiNi4g5oOz55So5Zyo5ZOqKOaLm+eJjC/ljIXoo50vSUcv5a6Y57ayKQoiCiAgICAiNy4g5oOz5YKz6YGU55qE5qC45b+D6KiK5oGv5LiA5Y+l6KmxCiIKICAgICI4LiDkuI3llpzmraHnmoTlhYPntKAKIgogICAgIjkuIOaIqueov+aZgumWkwoiCiAgICAiMTAuIOWQq+S4gOasoeWFjeiyu+S/rizmmK/lkKbpnIDopoEKCiIKICAgICLlj6/kuIDpoYzkuIDpoYzlm54s5Lmf5Y+v5LiA5qyh6LK86b2KIgopCgojIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAojIOWfuuekjuioreWumgojIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAoKbG9nZ2luZy5iYXNpY0NvbmZpZyhsZXZlbD1sb2dnaW5nLklORk8pCmxvZ2dlciA9IGxvZ2dpbmcuZ2V0TG9nZ2VyKCIzcWJvdCIpCgphcHAgPSBGYXN0QVBJKHRpdGxlPSIzUeiyouS4uCBMSU5FIEJvdCIsIHZlcnNpb249IjIuMSIpCmNvbmZpZ3VyYXRpb24gPSBDb25maWd1cmF0aW9uKGFjY2Vzc190b2tlbj1vcy5lbnZpcm9uWyJMSU5FX0NIQU5ORUxfQUNDRVNTX1RPS0VOIl0pCmhhbmRsZXIgPSBXZWJob29rSGFuZGxlcihvcy5lbnZpcm9uWyJMSU5FX0NIQU5ORUxfU0VDUkVUIl0pCgpfc2VlbjogZGljdFtzdHIsIGZsb2F0XSA9IHt9Cl9UVEwgPSA2MDAKCgpkZWYgX2RlZHVwKGV2ZW50X2lkOiBzdHIpIC0+IGJvb2w6CiAgICBub3cgPSB0aW1lLnRpbWUoKQogICAgZXhwaXJlZCA9IFtrIGZvciBrLCB0IGluIF9zZWVuLml0ZW1zKCkgaWYgbm93IC0gdCA+IF9UVExdCiAgICBmb3IgayBpbiBleHBpcmVkOgogICAgICAgIGRlbCBfc2VlbltrXQogICAgaWYgZXZlbnRfaWQgaW4gX3NlZW46CiAgICAgICAgcmV0dXJuIFRydWUKICAgIF9zZWVuW2V2ZW50X2lkXSA9IG5vdwogICAgcmV0dXJuIEZhbHNlCgoKIyDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZAKIyDnq6/pu54KIyDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZAKCkBhcHAuZ2V0KCIvIikKZGVmIHJvb3QoKToKICAgIHJldHVybiB7InN0YXR1cyI6ICIzUeiyouS4uCBMSU5FIEJvdCBpcyBydW5uaW5nIiwgInZlcnNpb24iOiAiMi4xIn0KCgpAYXBwLnBvc3QoIi9saW5lL3dlYmhvb2siKQphc3luYyBkZWYgd2ViaG9vayhyZXF1ZXN0OiBSZXF1ZXN0KToKICAgIHNpZ25hdHVyZSA9IHJlcXVlc3QuaGVhZGVycy5nZXQoIlgtTGluZS1TaWduYXR1cmUiLCAiIikKICAgIGJvZHkgPSAoYXdhaXQgcmVxdWVzdC5ib2R5KCkpLmRlY29kZSgidXRmLTgiKQogICAgdHJ5OgogICAgICAgIGhhbmRsZXIuaGFuZGxlKGJvZHksIHNpZ25hdHVyZSkKICAgIGV4Y2VwdCBJbnZhbGlkU2lnbmF0dXJlRXJyb3I6CiAgICAgICAgbG9nZ2VyLndhcm5pbmcoIkludmFsaWQgc2lnbmF0dXJlIOKAlCDlj6/og73mmK8gQ2hhbm5lbCBTZWNyZXQg5LiN5bCNIikKICAgICAgICByYWlzZSBIVFRQRXhjZXB0aW9uKHN0YXR1c19jb2RlPTQwMCwgZGV0YWlsPSJJbnZhbGlkIHNpZ25hdHVyZSIpCiAgICBleGNlcHQgRXhjZXB0aW9uIGFzIGU6CiAgICAgICAgbG9nZ2VyLmVycm9yKGYiV2ViaG9vayBoYW5kbGVyIGVycm9yOiB7ZX0iKQogICAgICAgIHJhaXNlIEhUVFBFeGNlcHRpb24oc3RhdHVzX2NvZGU9NTAwLCBkZXRhaWw9IkludGVybmFsIGVycm9yIikKICAgIHJldHVybiAiT0siCgoKIyDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZAKIyDkuovku7bomZXnkIYKIyDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZAKCkBoYW5kbGVyLmFkZChGb2xsb3dFdmVudCkKZGVmIGhhbmRsZV9mb2xsb3coZXZlbnQpOgogICAgX3JlcGx5KGV2ZW50LCAoCiAgICAgICAgIuS9oOWlvSDmiJHmmK8gM1HosqLkuLgKIgogICAgICAgICLlj7DngaPlnKjlnLDlk4HniYzlrbXljJbmiYAKCiIKICAgICAgICAi5LiN566h5L2g55qE5bqX5aSa5aSn5aSa5bCPCiIKICAgICAgICAi5Y+q6KaB5L2g5pyJ55Si5ZOB44CB5pyJ5oqA6KGT44CB5pyJ5Y+j5ZGzCiIKICAgICAgICAi5oiR5YCR5bCx5pyJ5bmz5Y+w44CB5pyJ6Iie5Y+w44CB5pyJ5b6M5Y+wCgoiCiAgICAgICAgIuWFqeaineacjeWLmeS7u+mBuDoKIgogICAgICAgICLlm57opobjgIw1MDDjgI3ogb0gNTAwIOWFg+eUn+WcluaWueahiAoiCiAgICAgICAgIuWbnuimhuOAjOihjOmKt+OAjeiBveWuouijveWMlue2sui3r+ihjOmKtwoKIgogICAgICAgICLmiJbnm7TmjqXlm57opobjgIzoq67oqaLjgI3ogYrogYrkvaDnmoTlk4HniYwKIgogICAgICAgICLmib7nnJ/kurrlm57opobjgIzlrqLmnI3jgI0iCiAgICApKQoKCkBoYW5kbGVyLmFkZChNZXNzYWdlRXZlbnQsIG1lc3NhZ2U9VGV4dE1lc3NhZ2VDb250ZW50KQpkZWYgaGFuZGxlX3RleHRfbWVzc2FnZShldmVudCk6CiAgICBlaWQgPSBnZXRhdHRyKGV2ZW50LCAid2ViaG9va19ldmVudF9pZCIsIE5vbmUpCiAgICBpZiBlaWQgYW5kIF9kZWR1cChlaWQpOgogICAgICAgIHJldHVybgoKICAgIHRleHQgPSBfbm9ybWFsaXplKGV2ZW50Lm1lc3NhZ2UudGV4dCBvciAiIikKCiAgICBpZiBub3QgdGV4dDoKICAgICAgICBfcmVwbHkoZXZlbnQsIF9tZW51KCkpCiAgICAgICAgcmV0dXJuCgogICAgaWYgbGVuKHRleHQpID4gNTAwOgogICAgICAgIF9yZXBseShldmVudCwgIuioiuaBr+aciem7numVtyDmiJHlj6/og73nnIvkuI3lrowKCuiri+eUqOewoeefremXnOmNteWtlzoK5Zue6KaG44CM6Kuu6Kmi44CN44CMNTAw44CN44CM6KGM6Yq344CN44CM5a6i5pyN44CNIikKICAgICAgICByZXR1cm4KCiAgICBfcmVwbHkoZXZlbnQsIHJvdXRlKHRleHQpKQoKCiMg4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQCiMg5bel5YW3CiMg4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQCgpkZWYgX3JlcGx5KGV2ZW50LCB0ZXh0OiBzdHIpOgogICAgdHJ5OgogICAgICAgIHdpdGggQXBpQ2xpZW50KGNvbmZpZ3VyYXRpb24pIGFzIGFwaToKICAgICAgICAgICAgTWVzc2FnaW5nQXBpKGFwaSkucmVwbHlfbWVzc2FnZV93aXRoX2h0dHBfaW5mbygKICAgICAgICAgICAgICAgIFJlcGx5TWVzc2FnZVJlcXVlc3QoCiAgICAgICAgICAgICAgICAgICAgcmVwbHlfdG9rZW49ZXZlbnQucmVwbHlfdG9rZW4sCiAgICAgICAgICAgICAgICAgICAgbWVzc2FnZXM9W1RleHRNZXNzYWdlKHRleHQ9dGV4dCldLAogICAgICAgICAgICAgICAgKQogICAgICAgICAgICApCiAgICBleGNlcHQgRXhjZXB0aW9uIGFzIGU6CiAgICAgICAgbG9nZ2VyLmVycm9yKGYiUmVwbHkgZmFpbGVkOiB7ZX0iKQoKCmRlZiBfbm9ybWFsaXplKHRleHQ6IHN0cikgLT4gc3RyOgogICAgIiIi5YWo5b2i4oaS5Y2K5b2iICsg5Y675YmN5b6M56m655m9ICsg5bCP5a+rIiIiCiAgICBvdXQgPSBbXQogICAgZm9yIGNoIGluIHRleHQ6CiAgICAgICAgY3AgPSBvcmQoY2gpCiAgICAgICAgaWYgMHhGRjAxIDw9IGNwIDw9IDB4RkY1RToKICAgICAgICAgICAgb3V0LmFwcGVuZChjaHIoY3AgLSAweEZFRTApKQogICAgICAgIGVsaWYgY2ggPT0gJ+OAgCc6CiAgICAgICAgICAgIG91dC5hcHBlbmQoJyAnKQogICAgICAgIGVsc2U6CiAgICAgICAgICAgIG91dC5hcHBlbmQoY2gpCiAgICByZXR1cm4gIiIuam9pbihvdXQpLnN0cmlwKCkubG93ZXIoKQoKCmRlZiBfaGFzX2FueSh0ZXh0OiBzdHIsIGtleXdvcmRzOiBsaXN0W3N0cl0pIC0+IGJvb2w6CiAgICByZXR1cm4gYW55KGt3IGluIHRleHQgZm9yIGt3IGluIGtleXdvcmRzKQoKCmRlZiBfbWVudSgpIC0+IHN0cjoKICAgIHJldHVybiAoCiAgICAgICAgIuS9oOWlvSDmiJHmmK8gM1HosqLkuLgKCiIKICAgICAgICAi5LiN566h5L2g55qE5bqX5aSa5aSn5aSa5bCPCiIKICAgICAgICAi5Y+q6KaB5L2g5pyJ55Si5ZOB44CB5pyJ5oqA6KGT44CB5pyJ5Y+j5ZGzCiIKICAgICAgICAi5oiR5YCR5bCx5pyJ5bmz5Y+w44CB5pyJ6Iie5Y+w44CB5pyJ5b6M5Y+wCgoiCiAgICAgICAgIuiri+WVj+mcgOimgToKIgogICAgICAgICLlm57opobjgIzoq67oqaLjgI3ogYrogYrkvaDnmoTlk4HniYwKIgogICAgICAgICLlm57opobjgIw1MDDjgI3ogb3nlJ/lnJbmlrnmoYgKIgogICAgICAgICLlm57opobjgIzooYzpirfjgI3ogb3lrqLoo73mlrnmoYgKIgogICAgICAgICLlm57opobjgIzpgLLluqbjgI3mn6Xlt7LlkIjkvZzmoYjku7YKIgogICAgICAgICLlm57opobjgIzlrqLmnI3jgI3mib7kurrlt6XlsI/nt6giCiAgICApCgoKIyDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZAKIyDot6/nlLEo5YSq5YWI57Sa5b6e5LiK5Yiw5LiLKQojIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkAoKZGVmIHJvdXRlKHRleHQ6IHN0cikgLT4gc3RyOgoKICAgICMgMC1BLiDljYHpoYzlm57nrZTlgbXmuKwo5pyA6auY5YSq5YWIKQogICAgbGluZXMgPSBbbC5zdHJpcCgpIGZvciBsIGluIHRleHQuc3BsaXQoIgoiKSBpZiBsLnN0cmlwKCldCiAgICBudW1iZXJlZCA9IHN1bSgxIGZvciBsIGluIGxpbmVzIGlmIGxbMF0uaXNkaWdpdCgpKSBpZiBsaW5lcyBlbHNlIDAKICAgIGlmIGxlbihsaW5lcykgPj0gNSBhbmQgbnVtYmVyZWQgPj0gMzoKICAgICAgICByZXR1cm4gUkVQTFlfUkVDRUlWRURfRk9STQoKICAgICMgMC1CLiDplovlp4vnlJ/lnJYKICAgIGlmIF9oYXNfYW55KHRleHQsIEtXX1NUQVJUX0lNQUdFKToKICAgICAgICByZXR1cm4gUkVQTFlfVEVOX1FVRVNUSU9OUwoKICAgICMgMS4g6YCB5Ye6CiAgICBpZiB0ZXh0ID09ICLpgIHlh7oiOgogICAgICAgIHJldHVybiBSRVBMWV9SRUNFSVZFRF9GT1JNCgogICAgIyAyLiDlrqLmnI0KICAgIGlmIF9oYXNfYW55KHRleHQsIEtXX0NVU1RPTUVSX1NFUlZJQ0UpOgogICAgICAgIHJldHVybiAoCiAgICAgICAgICAgICLlrqLmnI3lsI/nt6jlnKjpgJkKCiIKICAgICAgICAgICAgIuiri+ebtOaOpeWRiuiotOaIkeS9oOeahOWVj+mhjAoiCiAgICAgICAgICAgICLkuIrnj63mmYLmrrUgMDk6MDAtMjE6MDAg5YWn5pyD5Zue6KaGCgoiCiAgICAgICAgICAgICLoi6Xmg7Plv6vpgJ/liIbmtYE6CiIKICAgICAgICAgICAgIuWbnuimhuOAjOirruipouOAjeiBiuaWsOWQiOS9nAoiCiAgICAgICAgICAgICLlm57opobjgIzpgLLluqbjgI3mn6Xlt7LlkIjkvZzmoYjku7YiCiAgICAgICAgKQoKICAgICMgMy4g6aCQ57SEKOWcqOOAjOirruipouOAjeS5i+WJjSkKICAgIGlmIF9oYXNfYW55KHRleHQsIEtXX0JPT0tJTkcpIG9yIHRleHQgPT0gIjMiOgogICAgICAgIHJldHVybiAoCiAgICAgICAgICAgICLlpb3nmoQg57SE5LiA5aC0IDMwIOWIhumQmOWFjeiyu+irruipogoKIgogICAgICAgICAgICAi6KuL5ZGK6Ki05oiROgoiCiAgICAgICAgICAgICIxLiDkvaDnmoTlupflgZrku4DpurznlKLlk4EKIgogICAgICAgICAgICAiMi4g55uu5YmN5pyA5aSn55qE5Y2h6bueCiIKICAgICAgICAgICAgIjMuIOaWueS+v+irruipoeeahOaZguautSjlubPml6XmmZrkuIogLyDlgYfml6UpCgoiCiAgICAgICAgICAgICLnnIvpgY7lvoznp4HoqIrntabkvaDlhbfpq5TmmYLplpMiCiAgICAgICAgKQoKICAgICMgNC4gNTAwIOeUn+WclgogICAgaWYgIjUwMCIgaW4gdGV4dCBvciAi55Sf5ZyWIiBpbiB0ZXh0IG9yIHRleHQgPT0gIjEiOgogICAgICAgIHJldHVybiAoCiAgICAgICAgICAgICI1MDAg5YWD55Sf5ZyW5pa55qGICCoiCiAgICAgICAgICAgICLmtYHnqIs6CiIKICAgICAgICAgICAgIjEuIOWhq+WNgemhjOaOouWwi+ihqCg1IOWIhumQmCkKIgogICAgICAgICAgICAiMi4g5oiR5YCR5b6M5Y+w6L2J6K2v54K66KaW6Ka66ZyA5rGCCiIKICAgICAgICAgICAgIjMuIDI0LTQ4IOWwj+aZguWFp+S6pOS7mCAxIOW8teS4u+imluimugoiCiAgICAgICAgICAgICI0LiDkuI3pmZDllYblk4HpoZ7liKUs5b6e5pSk6LuK5Yiw5a625bqt5bel5Z2K55qG5Y+vCgoiCiAgICAgICAgICAgICLpganlkIg6CiIKICAgICAgICAgICAgIi0g5oOz6Kmm5ZOB54mM6KaW6Ka655qE5bCP5bqXCiIKICAgICAgICAgICAgIi0g6aCQ566X6YKE5rKS5Yiw5a6i6KO9562J57SaCiIKICAgICAgICAgICAgIi0g5oOz55yL5oiR5YCR5omL5oSf5YaN5rG65a6a6KaB5LiN6KaB5rex5ZCI5L2cCgoiCiAgICAgICAgICAgICLmg7Pplovlp4s/5Zue6KaG44CM6ZaL5aeL55Sf5ZyW44CNIgogICAgICAgICkKCiAgICAjIDUuIOWuouijveihjOmKtwogICAgaWYgX2hhc19hbnkodGV4dCwgS1dfUFJPRFVDVF8yKSBvciB0ZXh0ID09ICIyIjoKICAgICAgICByZXR1cm4gKAogICAgICAgICAgICAi5a6i6KO95YyW57ay6Lev6KGM6Yq35pa55qGICCoiCiAgICAgICAgICAgICLmiJHlgJHlgZrnmoQ6CiIKICAgICAgICAgICAgIuWTgeeJjOWRveWQjSAvIOWMheijneioreioiAoiCiAgICAgICAgICAgICLpm7vllYbkuIrmnrYgLyDooYzpirfmipXmlL4KIgogICAgICAgICAgICAi56S+576k57aT54efIC8g5YWn5a655Luj55SiCgoiCiAgICAgICAgICAgICLmiJHlgJHnmoTkuI3lkIw6CiIKICAgICAgICAgICAgIuaVsuWumuaWueahiOaZgue1puS9oOOAjOebruaomeaJv+irvuabuOOAjQoiCiAgICAgICAgICAgICLmspLpgZTliLDmjIfmqJks5YWo6aGN6YCA5qy+CgoiCiAgICAgICAgICAgICLmiJHlgJHopoHos7rkuIDloYrpjKIKIgogICAgICAgICAgICAi5bCx5pyD5LuY5LiA5aGK6Yyi55qE6LKs5Lu7CgoiCiAgICAgICAgICAgICLkvYbmiJHlgJHmjJHlrqLmiLYs5LiN5piv5LuA6bq86YO95o6lCiIKICAgICAgICAgICAgIuaDs+S6huino+aIkeWAkeWQiOS4jeWQiOmBqSzlm57opobjgIzntIToq67oqaLjgI0iCiAgICAgICAgKQoKICAgICMgNi4g5pyN5YuZ6Kuu6KmiCiAgICBpZiBfaGFzX2FueSh0ZXh0LCBLV19JTlFVSVJZKToKICAgICAgICByZXR1cm4gKAogICAgICAgICAgICAi5oSf6Kyd5oKo5bCNIDNR6LKi5Li4IOacieiIiOi2owoKIgogICAgICAgICAgICAi5oiR5YCR5o+Q5L6b5YWp5qKd5pyN5YuZOgoKIgogICAgICAgICAgICAi5LiA44CBNTAwIOWFg+eUn+WclgoiCiAgICAgICAgICAgICLnlKjljYHpoYzmjqLlsIvooajmlLbpnIDmsYIs5b6M5Y+w6L2J6K2v5Ye65ZyW5Lqk5LuYCiIKICAgICAgICAgICAgIumBqeWQiDrpoJDnrpfmnInpmZDmg7PoqabmsLTnmoTlsI/lupflrrYKCiIKICAgICAgICAgICAgIuS6jOOAgeWuouijveWMlue2sui3r+ihjOmKtwoiCiAgICAgICAgICAgICLnm67mqJnmib/oq77mm7ggKyDkuIPmraXmoYbmnrbkuqTku5gKIgogICAgICAgICAgICAi6YGp5ZCIOuiqjeecn+aDs+WBmuWTgeeJjOeahOiAgemXhgoKIgogICAgICAgICAgICAi5oOz5LqG6Kej5ZOq5LiA5qKdPwoiCiAgICAgICAgICAgICLlm57opobjgIwx44CN6IG9IDUwMCDnlJ/lnJbntLDnr4AKIgogICAgICAgICAgICAi5Zue6KaG44CMMuOAjeiBveWuouijveihjOmKt+e0sOevgAoiCiAgICAgICAgICAgICLlm57opobjgIwz44CN55u05o6l57SE6Kuu6KmiIgogICAgICAgICkKCiAgICAjIDcuIOmAsuW6pgogICAgaWYgX2hhc19hbnkodGV4dCwgS1dfUFJPR1JFU1MpOgogICAgICAgIHJldHVybiAoCiAgICAgICAgICAgICLmg7Pmn6Xlt7LlkIjkvZzmoYjku7bpgLLluqYKIgogICAgICAgICAgICAi6KuL5o+Q5L6bOgoiCiAgICAgICAgICAgICIxLiDkvaDnmoTlp5PlkI3miJbllYbomZ8KIgogICAgICAgICAgICAiMi4g5qGI5Lu25aSn6Ie06ZaL5aeL5pel5pyfCgoiCiAgICAgICAgICAgICLnq4vliLvmib7lsIjlk6Hlm57opobkvaAiCiAgICAgICAgKQoKICAgICMgOC4g5oSf6KydCiAgICBpZiBfaGFzX2FueSh0ZXh0LCBLV19USEFOS1MpOgogICAgICAgIHJldHVybiAoCiAgICAgICAgICAgICLkuI3lrqLmsKMg5pyJ5Lu75L2V5ZWP6aGM6Zqo5pmC5ZWPCgoiCiAgICAgICAgICAgICLlm57opobjgIzoq67oqaLjgI3ogYrlk4HniYwKIgogICAgICAgICAgICAi5Zue6KaG44CM5a6i5pyN44CN5om+5Lq65bel5bCP57eoIgogICAgICAgICkKCiAgICAjIDkuIOmgkOiorQogICAgcmV0dXJuIF9tZW51KCkK
+"""
+3Q貢丸 LINE 客服機器人
+台灣在地品牌孵化所
+
+v2.1 — 修正 + 常數抽取
+  v2.0:
+    1. TTL 去重防記憶體洩漏
+    2. Webhook 簽名錯誤捕捉
+    3. 路由優先級修正(「約諮詢」不被「諮詢」攔截)
+    4. 新增「送出」路由 + 十題回答偵測
+    5. 空訊息 / 超長訊息防護
+    6. 加好友改 reply 省 push 額度
+    7. 全形/半形容錯
+    8. 擴充「合作」「案例」「作品」」等入口詞
+  v2.1:
+    9. _normalize 加 .lower() — 英文大小寫不敏感
+   10. 關鍵字 + 回覆文字抽成頂層常數,單一來源
+   11. 新增 _has_any() 輔助函式減少重複
+"""
+
+from fastapi import FastAPI, Request, HTTPException
+from linebot.v3.webhook import WebhookHandler
+from linebot.v3.exceptions import InvalidSignatureError
+from linebot.v3.messaging import (
+    Configuration, ApiClient, MessagingApi,
+    ReplyMessageRequest, TextMessage,
+)
+from linebot.v3.webhooks import (
+    MessageEvent, TextMessageContent, FollowEvent,
+)
+from dotenv import load_dotenv
+import os, time, logging
+
+load_dotenv()
+
+# ══════════════════════════════════════════════
+# 共用常數(改一處全生效)
+# ══════════════════════════════════════════════
+
+KW_START_IMAGE = ["開始生圖", "開始畫"]
+KW_CUSTOMER_SERVICE = ["客服", "人工", "真人", "找你", "找人"]
+KW_BOOKING = ["約諮詢", "預約", "約一下", "見面", "聊聊"]
+KW_PRODUCT_2 = ["行銷", "客製", "承諾書", "孵化", "推廣", "代操", "經營", "投放"]
+KW_INQUIRY = [
+    "諮詢", "了解", "問問", "想知道", "報價", "方案", "服務",
+    "多少", "價格", "費用", "項目", "業務", "做什麼",
+    "合作", "案例", "作品", "介紹", "品牌",
+    "怎麼收", "收費", "幾塊", "價目",
+]
+KW_PROGRESS = ["進度", "上次", "做完", "等多久", "完成沒"]
+KW_THANKS = ["謝謝", "感謝", "讚", "厲害", "棒", "太好了"]
+
+REPLY_RECEIVED_FORM = (
+    "收到你的十題表了!\n\n"
+    "我們會在 24-48 小時內\n"
+    "整理好需求並開始製作\n\n"
+    "過程中有問題會主動聯繫你\n"
+    "想查進度隨時回覆「進度」"
+)
+
+REPLY_TEN_QUESTIONS = (
+    "好的 開始你的 500 元生圖\n\n"
+    "請依序回答十題,全部答完後傳「送出」\n"
+    "24-48 小時內交付:\n\n"
+    "1. 你的店家或品牌名稱\n"
+    "2. 主要產品或服務\n"
+    "3. 主要客群\n"
+    "4. 喜歡的風格(可貼參考圖)\n"
+    "5. 主色系偏好\n"
+    "6. 想用在哪(招牌/包裝/IG/官網)\n"
+    "7. 想傳達的核心訊息一句話\n"
+    "8. 不喜歡的元素\n"
+    "9. 截稿時間\n"
+    "10. 含一次免費修,是否需要\n\n"
+    "可一題一題回,也可一次貼齊"
+)
+
+# ══════════════════════════════════════════════
+# 基礎設定
+# ══════════════════════════════════════════════
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("3qbot")
+
+app = FastAPI(title="3Q貢丸 LINE Bot", version="2.1")
+configuration = Configuration(access_token=os.environ["LINE_CHANNEL_ACCESS_TOKEN"])
+handler = WebhookHandler(os.environ["LINE_CHANNEL_SECRET"])
+
+_seen: dict[str, float] = {}
+_TTL = 600
+
+
+def _dedup(event_id: str) -> bool:
+    now = time.time()
+    expired = [k for k, t in _seen.items() if now - t > _TTL]
+    for k in expired:
+        del _seen[k]
+    if event_id in _seen:
+        return True
+    _seen[event_id] = now
+    return False
+
+
+# ══════════════════════════════════════════════
+# 端點
+# ══════════════════════════════════════════════
+
+@app.get("/")
+def root():
+    return {"status": "3Q貢丸 LINE Bot is running", "version": "2.1"}
+
+
+@app.post("/line/webhook")
+async def webhook(request: Request):
+    signature = request.headers.get("X-Line-Signature", "")
+    body = (await request.body()).decode("utf-8")
+    try:
+        handler.handle(body, signature)
+    except InvalidSignatureError:
+        logger.warning("Invalid signature — 可能是 Channel Secret 不對")
+        raise HTTPException(status_code=400, detail="Invalid signature")
+    except Exception as e:
+        logger.error(f"Webhook handler error: {e}")
+        raise HTTPException(status_code=500, detail="Internal error")
+    return "OK"
+
+
+# ══════════════════════════════════════════════
+# 事件處理
+# ══════════════════════════════════════════════
+
+@handler.add(FollowEvent)
+def handle_follow(event):
+    _reply(event, (
+        "你好 我是 3Q貢丸\n"
+        "台灣在地品牌孵化所\n\n"
+        "不管你的店多大多小\n"
+        "只要你有產品、有技術、有口味\n"
+        "我們就有平台、有舞台、有後台\n\n"
+        "兩條服務任選:\n"
+        "回覆「500」聽 500 元生圖方案\n"
+        "回覆「行銷」聽客製化網路行銷\n\n"
+        "或直接回覆「諮詢」聊聊你的品牌\n"
+        "找真人回覆「客服」"
+    ))
+
+
+@handler.add(MessageEvent, message=TextMessageContent)
+def handle_text_message(event):
+    eid = getattr(event, "webhook_event_id", None)
+    if eid and _dedup(eid):
+        return
+
+    text = _normalize(event.message.text or "")
+
+    if not text:
+        _reply(event, _menu())
+        return
+
+    if len(text) > 500:
+        _reply(event, "訊息有點長 我可能看不完\n\n請用簡短關鍵字:\n回覆「諮詢」「500」「行銷」「客服」")
+        return
+
+    _reply(event, route(text))
+
+
+# ══════════════════════════════════════════════
+# 工具
+# ══════════════════════════════════════════════
+
+def _reply(event, text: str):
+    try:
+        with ApiClient(configuration) as api:
+            MessagingApi(api).reply_message_with_http_info(
+                ReplyMessageRequest(
+                    reply_token=event.reply_token,
+                    messages=[TextMessage(text=text)],
+                )
+            )
+    except Exception as e:
+        logger.error(f"Reply failed: {e}")
+
+
+def _normalize(text: str) -> str:
+    """全形→半形 + 去前後空白 + 小寫"""
+    out = []
+    for ch in text:
+        cp = ord(ch)
+        if 0xFF01 <= cp <= 0xFF5E:
+            out.append(chr(cp - 0xFEE0))
+        elif ch == '　':
+            out.append(' ')
+        else:
+            out.append(ch)
+    return "".join(out).strip().lower()
+
+
+def _has_any(text: str, keywords: list[str]) -> bool:
+    return any(kw in text for kw in keywords)
+
+
+def _menu() -> str:
+    return (
+        "你好 我是 3Q貢丸\n\n"
+        "不管你的店多大多小\n"
+        "只要你有產品、有技術、有口味\n"
+        "我們就有平台、有舞台、有後台\n\n"
+        "請問需要:\n"
+        "回覆「諮詢」聊聊你的品牌\n"
+        "回覆「500」聽生圖方案\n"
+        "回覆「行銷」聽客製方案\n"
+        "回覆「進度」查已合作案件\n"
+        "回覆「客服」找人工小編"
+    )
+
+
+# ══════════════════════════════════════════════
+# 路由(優先級從上到下)
+# ══════════════════════════════════════════════
+
+def route(text: str) -> str:
+
+    # 0-A. 十題回答偵測(最高優先)
+    lines = [l.strip() for l in text.split("\n") if l.strip()]
+    numbered = sum(1 for l in lines if l[0].isdigit()) if lines else 0
+    if len(lines) >= 5 and numbered >= 3:
+        return REPLY_RECEIVED_FORM
+
+    # 0-B. 開始生圖
+    if _has_any(text, KW_START_IMAGE):
+        return REPLY_TEN_QUESTIONS
+
+    # 1. 送出
+    if text == "送出":
+        return REPLY_RECEIVED_FORM
+
+    # 2. 客服
+    if _has_any(text, KW_CUSTOMER_SERVICE):
+        return (
+            "客服小編在這\n\n"
+            "請直接告訴我你的問題\n"
+            "上班時段 09:00-21:00 內會回覆\n\n"
+            "若想快速分流:\n"
+            "回覆「諮詢」聊新合作\n"
+            "回覆「進度」查已合作案件"
+        )
+
+    # 3. 預約(在「諮詢」之前)
+    if _has_any(text, KW_BOOKING) or text == "3":
+        return (
+            "好的 約一場 30 分鐘免費諮詢\n\n"
+            "請告訴我:\n"
+            "1. 你的店做什麼產品\n"
+            "2. 目前最大的卡點\n"
+            "3. 方便諮詡的時段(平日晚上 / 假日)\n\n"
+            "看過後私訊給你具體時間"
+        )
+
+    # 4. 500 生圖
+    if "500" in text or "生圖" in text or text == "1":
+        return (
+            "500 元生圖方案*"
+            "流程:\n"
+            "1. 填十題探尋表(5 分鐘)\n"
+            "2. 我們後台轉譯為視覺需求\n"
+            "3. 24-48 小時內交付 1 張主視覺\n"
+            "4. 不限商品類別,從攤車到家庭工坊皆可\n\n"
+            "適合:\n"
+            "- 想試品牌視覺的小店\n"
+            "- 預算還沒到客製等級\n"
+            "- 想看我們手感再決定要不要深合作\n\n"
+            "想開始?回覆「開始生圖」"
+        )
+
+    # 5. 客製行銷
+    if _has_any(text, KW_PRODUCT_2) or text == "2":
+        return (
+            "客製化網路行銷方案*"
+            "我們做的:\n"
+            "品牌命名 / 包裝設計\n"
+            "電商上架 / 行銷投放\n"
+            "社群經營 / 內容代產\n\n"
+            "我們的不同:\n"
+            "敲定方案時給你「目標承諾書」\n"
+            "沒達到指標,全額退款\n\n"
+            "我們要賺一塊錢\n"
+            "就會付一塊錢的責任\n\n"
+            "但我們挑客戶,不是什麼都接\n"
+            "想了解我們合不合適,回覆「約諮詢」"
+        )
+
+    # 6. 服務諮詢
+    if _has_any(text, KW_INQUIRY):
+        return (
+            "感謝您對 3Q貢丸 有興趣\n\n"
+            "我們提供兩條服務:\n\n"
+            "一、500 元生圖\n"
+            "用十題探尋表收需求,後台轉譯出圖交付\n"
+            "適合:預算有限想試水的小店家\n\n"
+            "二、客製化網路行銷\n"
+            "目標承諾書 + 七步框架交付\n"
+            "適合:認真想做品牌的老闆\n\n"
+            "想了解哪一條?\n"
+            "回覆「1」聽 500 生圖細節\n"
+            "回覆「2」聽客製行銷細節\n"
+            "回覆「3」直接約諮詢"
+        )
+
+    # 7. 進度
+    if _has_any(text, KW_PROGRESS):
+        return (
+            "想查已合作案件進度\n"
+            "請提供:\n"
+            "1. 你的姓名或商號\n"
+            "2. 案件大致開始日期\n\n"
+            "立刻找專員回覆你"
+        )
+
+    # 8. 感謝
+    if _has_any(text, KW_THANKS):
+        return (
+            "不客氣 有任何問題隨時問\n\n"
+            "回覆「諮詢」聊品牌\n"
+            "回覆「客服」找人工小編"
+        )
+
+    # 9. 預設
+    return _menu()

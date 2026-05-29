@@ -1,1 +1,83 @@
-ewogICJzaXplIjogewogICAgIndpZHRoIjogMjUwMCwKICAgICJoZWlnaHQiOiAxNjg2CiAgfSwKICAic2VsZWN0ZWQiOiB0cnVlLAogICJuYW1lIjogIjNR6LKi5Li45Li76YG45ZauIiwKICAiY2hhdEJhclRleHQiOiAi6YG45ZauIiwKICAiYXJlYXMiOiBbCiAgICB7CiAgICAgICJib3VuZHMiOiB7CiAgICAgICAgIngiOiAwLAogICAgICAgICJ5IjogMCwKICAgICAgICAid2lkdGgiOiA4MzMsCiAgICAgICAgImhlaWdodCI6IDg0MwogICAgICB9LAogICAgICAiYWN0aW9uIjogewogICAgICAgICJ0eXBlIjogIm1lc3NhZ2UiLAogICAgICAgICJ0ZXh0IjogIuirruipoiIKICAgICAgfQogICAgfSwKICAgIHsKICAgICAgImJvdW5kcyI6IHsKICAgICAgICAieCI6IDgzMywKICAgICAgICAieSI6IDAsCiAgICAgICAgIndpZHRoIjogODMzLAogICAgICAgICJoZWlnaHQiOiA4NDMKICAgICAgfSwKICAgICAgImFjdGlvbiI6IHsKICAgICAgICAidHlwZSI6ICJtZXNzYWdlIiwKICAgICAgICAidGV4dCI6ICI1MDAiCiAgICAgIH0KICAgIH0sCiAgICB7CiAgICAgICJib3VuZHMiOiB7CiAgICAgICAgIngiOiAxNjY2LAogICAgICAgICJ5IjogMCwKICAgICAgICAid2lkdGgiOiA4MzMsCiAgICAgICAgImhlaWdodCI6IDg0MwogICAgICB9LAogICAgICAiYWN0aW9uIjogewogICAgICAgICJ0eXBlIjogIm1lc3NhZ2UiLAogICAgICAgICJ0ZXh0IjogIuihjOmKtyIKICAgICAgfQogICAgfSwKICAgIHsKICAgICAgImJvdW5kcyI6IHsKICAgICAgICAieCI6IDAsCiAgICAgICAgInkiOiA4NDMsCiAgICAgICAgIndpZHRoIjogODMzLAogICAgICAgICJoZWlnaHQiOiA4NDMKICAgICAgfSwKICAgICAgImFjdGlvbiI6IHsKICAgICAgICAidHlwZSI6ICJtZXNzYWdlIiwKICAgICAgICAidGV4dCI6ICLpgLLluqYiCiAgICAgIH0KICAgIH0sCiAgICB7CiAgICAgICJib3VuZHMiOiB7CiAgICAgICAgIngiOiA4MzMsCiAgICAgICAgInkiOiA4NDMsCiAgICAgICAgIndpZHRoIjogODMzLAogICAgICAgICJoZWlnaHQiOiA4NDMKICAgICAgfSwKICAgICAgImFjdGlvbiI6IHsKICAgICAgICAidHlwZSI6ICJtZXNzYWdlIiwKICAgICAgICAidGV4dCI6ICLlrqLmnI0iCiAgICAgIH0KICAgIH0sCiAgICB7CiAgICAgICJib3VuZHMiOiB7CiAgICAgICAgIngiOiAxNjY2LAogICAgICAgICJ5IjogODQzLAogICAgICAgICJ3aWR0aCI6IDgzMywKICAgICAgICAiaGVpZ2h0IjogODQzCiAgICAgIH0sCiAgICAgICJhY3Rpb24iOiB7CiAgICAgICAgInR5cGUiOiAibWVzc2FnZSIsCiAgICAgICAgInRleHQiOiAi57SE6Kuu6KmiIgogICAgICB9CiAgICB9CiAgXQp9
+{
+  "size": {
+    "width": 2500,
+    "height": 1686
+  },
+  "selected": true,
+  "name": "3Q貢丸主選單",
+  "chatBarText": "選單",
+  "areas": [
+    {
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 833,
+        "height": 843
+      },
+      "action": {
+        "type": "message",
+        "text": "諮詢"
+      }
+    },
+    {
+      "bounds": {
+        "x": 833,
+        "y": 0,
+        "width": 833,
+        "height": 843
+      },
+      "action": {
+        "type": "message",
+        "text": "500"
+      }
+    },
+    {
+      "bounds": {
+        "x": 1666,
+        "y": 0,
+        "width": 833,
+        "height": 843
+      },
+      "action": {
+        "type": "message",
+        "text": "行銷"
+      }
+    },
+    {
+      "bounds": {
+        "x": 0,
+        "y": 843,
+        "width": 833,
+        "height": 843
+      },
+      "action": {
+        "type": "message",
+        "text": "進度"
+      }
+    },
+    {
+      "bounds": {
+        "x": 833,
+        "y": 843,
+        "width": 833,
+        "height": 843
+      },
+      "action": {
+        "type": "message",
+        "text": "客服"
+      }
+    },
+    {
+      "bounds": {
+        "x": 1666,
+        "y": 843,
+        "width": 833,
+        "height": 843
+      },
+      "action": {
+        "type": "message",
+        "text": "約諮詢"
+      }
+    }
+  ]
+}

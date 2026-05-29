@@ -1,1 +1,4 @@
-ZmFzdGFwaT09MC4xMTUuMAp1dmljb3JuPT0wLjMyLjAKbGluZS1ib3Qtc2RrPT0zLjEyLjAKcHl0aG9uLWRvdGVudj09MS4wLjEK
+fastapi==0.115.0
+uvicorn==0.32.0
+line-bot-sdk==3.12.0
+python-dotenv==1.0.1
