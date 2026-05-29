@@ -137,7 +137,7 @@ kbd{
 <header>
   <div class="eyebrow">3Q Hatchery · 自動化工具</div>
   <h1>Facebook 頁面授權</h1>
-  <p>自動從 Graph API Explorer 取得頁面永久 Token，<br>一鍵部署到 Cloudflare Worker。</p>
+  <p>用 Graph API Explorer 取得粉專永久 Token，<br>貼回此頁自動取出 FB + IG 發布權限。</p>
 </header>
 
 <div class="container">
@@ -149,37 +149,60 @@ kbd{
     <div class="spinner active" id="autoBannerSpinner" style="margin:.75rem auto 0;display:block"></div>
   </div>
 
-  <!-- ONE-CLICK AUTH button -->
-  <div style="text-align:center;padding:2rem 0 1rem">
-    <div style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;margin-bottom:1rem">一鍵完成 Facebook 授權</div>
-    <a id="oauthBtn" class="btn" style="font-size:1rem;padding:.9rem 2.5rem;letter-spacing:.03em" onclick="startOAuth()">
-      ⚡ 一鍵授權 Facebook →
-    </a>
-    <div style="margin-top:.75rem;font-size:.75rem;color:var(--muted)">點擊後跳到 Facebook 同意畫面，確認後自動回到此頁完成設定</div>
-  </div>
-
-  <div style="display:flex;align-items:center;gap:1rem;margin:1rem 0;color:var(--muted);font-size:.75rem">
-    <div style="flex:1;height:1px;background:var(--border)"></div>
-    <div>或手動貼入 Token</div>
-    <div style="flex:1;height:1px;background:var(--border)"></div>
-  </div>
-
-  <!-- Manual token input -->
+  <!-- PRIMARY: Graph API Explorer flow (works without any app OAuth config) -->
   <div class="step">
-    <span class="step-num">手動模式</span>
-    <h2>貼入 User Access Token</h2>
-    <p>從 <a href="https://developers.facebook.com/tools/explorer/?app_id=956987317313843&version=v21.0" target="_blank">Graph API Explorer</a> 複製短效 Token，貼在下方：</p>
+    <span class="step-num">最可靠方式</span>
+    <h2>用 Graph API Explorer 取得 Token（推薦）</h2>
+    <p>這個方式不需要任何 App 設定，最不會出錯。照以下步驟：</p>
+
+    <div style="margin:1.25rem 0">
+      <a class="btn" href="https://developers.facebook.com/tools/explorer/?app_id=956987317313843&version=v21.0" target="_blank" rel="noopener">
+        ① 開啟 Graph API Explorer ↗
+      </a>
+    </div>
+
+    <p style="margin-top:1rem">② 在右側面板：</p>
+    <ul>
+      <li><strong>Meta App</strong>：選你的 App（3Q Hatchery）</li>
+      <li><strong>User or Page</strong>：選 <kbd>User Token</kbd></li>
+      <li>點 <kbd>Add a Permission</kbd>，勾選下方 5 個權限：</li>
+    </ul>
+    <div class="permission-list">
+      <span class="perm">pages_show_list</span>
+      <span class="perm">pages_read_engagement</span>
+      <span class="perm">pages_manage_posts</span>
+      <span class="perm">instagram_basic</span>
+      <span class="perm">instagram_content_publish</span>
+    </div>
+
+    <p style="margin-top:1rem">③ 點藍色 <kbd>Generate Access Token</kbd> → 跳出視窗點「允許」→ Explorer 頂部出現 Token（<kbd>EAA</kbd> 開頭）→ 全選複製</p>
+
+    <p style="margin-top:1rem">④ 把 Token 貼到下方輸入框：</p>
     <div class="token-area" style="margin-top:.75rem">
-      <label>SHORT-LIVED USER ACCESS TOKEN</label>
+      <label>USER ACCESS TOKEN（從 Explorer 複製）</label>
       <textarea id="shortToken" placeholder="EAAMURSFn..." spellcheck="false"></textarea>
     </div>
     <div class="step-actions">
       <button class="btn" onclick="processToken()">
-        取得頁面 Token →
+        取得 FB + IG Token →
       </button>
       <div class="spinner" id="spinner"></div>
     </div>
     <div class="error-panel" id="errorPanel"><p id="errorMsg"></p></div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:1rem;margin:1.5rem 0;color:var(--muted);font-size:.75rem">
+    <div style="flex:1;height:1px;background:var(--border)"></div>
+    <div>備用：一鍵授權（需 App 已設定 Web OAuth）</div>
+    <div style="flex:1;height:1px;background:var(--border)"></div>
+  </div>
+
+  <!-- FALLBACK: One-click OAuth button -->
+  <div style="text-align:center;padding:.5rem 0 1rem">
+    <a id="oauthBtn" class="btn btn-outline" style="font-size:.9rem;padding:.7rem 2rem" onclick="startOAuth()">
+      ⚡ 一鍵授權 Facebook →
+    </a>
+    <div style="margin-top:.75rem;font-size:.72rem;color:var(--muted)">若按了沒反應或出現「URL Blocked」，代表 App 未開啟 Web OAuth，請改用上方 Explorer 方式</div>
   </div>
 
   <!-- Result (shared by both paths) -->
