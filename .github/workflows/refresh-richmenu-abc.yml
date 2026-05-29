@@ -3,10 +3,9 @@ name: Refresh Rich Menu images (A/B/C)
 # Pushes updated PNG images to existing LINE schema IDs.
 # Does NOT recreate schemas — use upload-richmenu.yml when button text changes.
 #
-# Requires these GitHub repository secrets (set once after upload-richmenu.yml):
-#   RICHMENU_NEW        — richmenu-xxx (A版 · 新朋友)
-#   RICHMENU_INQUIRED   — richmenu-yyy (B版 · 詢問中)
-#   RICHMENU_CONVERTED  — richmenu-zzz (C版 · 會員)
+# Schema IDs are auto-resolved from the LINE API by matching the schema `name`
+# field (RICHMENU_NEW / RICHMENU_INQUIRED / RICHMENU_CONVERTED), so NO manual
+# GitHub secrets are needed beyond the existing LINE_CHANNEL_ACCESS_TOKEN.
 
 on:
   workflow_dispatch: {}
@@ -34,82 +33,91 @@ jobs:
             echo "  ✓ $f ($(stat -c%s "$f") bytes)"
           done
 
-      - name: Check required secrets
-        run: |
-          missing=0
-          for varname in RICHMENU_NEW RICHMENU_INQUIRED RICHMENU_CONVERTED; do
-            val=$(eval echo "\$$varname")
-            if [[ -z "$val" ]]; then
-              echo "::error::GitHub secret $varname is not set."
-              echo "Run upload-richmenu.yml first, then add the 3 IDs as repository secrets."
-              missing=1
-            fi
-          done
-          [[ $missing -eq 0 ]]
-        env:
-          RICHMENU_NEW: ${{ secrets.RICHMENU_NEW }}
-          RICHMENU_INQUIRED: ${{ secrets.RICHMENU_INQUIRED }}
-          RICHMENU_CONVERTED: ${{ secrets.RICHMENU_CONVERTED }}
-
-      - name: Push A版 image (RICHMENU_NEW)
-        env:
-          RICHMENU_ID: ${{ secrets.RICHMENU_NEW }}
+      - name: Resolve schema IDs from LINE API (by name)
         run: |
           set -euo pipefail
-          echo "▸ A版 → $RICHMENU_ID"
-          resp=$(curl -fsS -w "\n%{http_code}" -X POST \
-            "https://api-data.line.me/v2/bot/richmenu/$RICHMENU_ID/content" \
+          if [[ -z "${LINE_TOKEN:-}" ]]; then
+            echo "::error::Repo secret LINE_CHANNEL_ACCESS_TOKEN is not set."
+            exit 1
+          fi
+
+          list=$(curl -fsS -H "Authorization: Bearer $LINE_TOKEN" \
+            https://api.line.me/v2/bot/richmenu/list)
+
+          resolve() {
+            echo "$list" | jq -r --arg n "$1" \
+              '.richmenus[] | select(.name == $n) | .richMenuId' | head -1
+          }
+
+          ID_A=$(resolve "RICHMENU_NEW")
+          ID_B=$(resolve "RICHMENU_INQUIRED")
+          ID_C=$(resolve "RICHMENU_CONVERTED")
+
+          fail=0
+          for pair in "A:RICHMENU_NEW:$ID_A" "B:RICHMENU_INQUIRED:$ID_B" "C:RICHMENU_CONVERTED:$ID_C"; do
+            label="${pair%%:*}"; rest="${pair#*:}"; name="${rest%%:*}"; id="${rest#*:}"
+            if [[ -z "$id" ]]; then
+              echo "::error::Could not find schema named '$name' on LINE. Run upload-richmenu.yml first."
+              fail=1
+            else
+              echo "  ✓ $label版 ($name) → $id"
+            fi
+          done
+          [[ $fail -eq 0 ]]
+
+          {
+            echo "ID_A=$ID_A"
+            echo "ID_B=$ID_B"
+            echo "ID_C=$ID_C"
+          } >> "$GITHUB_ENV"
+
+      - name: Push A版 image (RICHMENU_NEW)
+        run: |
+          set -euo pipefail
+          echo "▸ A版 → $ID_A"
+          code=$(curl -fsS -o /dev/null -w "%{http_code}" -X POST \
+            "https://api-data.line.me/v2/bot/richmenu/$ID_A/content" \
             -H "Authorization: Bearer $LINE_TOKEN" \
             -H "Content-Type: image/png" \
             --data-binary "@assets/exports/3Q-HATCHERY_richmenu_a_2500x1686.png")
-          code=$(echo "$resp" | tail -1)
           echo "  HTTP $code"
           [[ "$code" == "200" ]] || { echo "::error::A版 upload failed (HTTP $code)"; exit 1; }
 
       - name: Push B版 image (RICHMENU_INQUIRED)
-        env:
-          RICHMENU_ID: ${{ secrets.RICHMENU_INQUIRED }}
         run: |
           set -euo pipefail
-          echo "▸ B版 → $RICHMENU_ID"
-          resp=$(curl -fsS -w "\n%{http_code}" -X POST \
-            "https://api-data.line.me/v2/bot/richmenu/$RICHMENU_ID/content" \
+          echo "▸ B版 → $ID_B"
+          code=$(curl -fsS -o /dev/null -w "%{http_code}" -X POST \
+            "https://api-data.line.me/v2/bot/richmenu/$ID_B/content" \
             -H "Authorization: Bearer $LINE_TOKEN" \
             -H "Content-Type: image/png" \
             --data-binary "@assets/exports/3Q-HATCHERY_richmenu_b_2500x1686.png")
-          code=$(echo "$resp" | tail -1)
           echo "  HTTP $code"
           [[ "$code" == "200" ]] || { echo "::error::B版 upload failed (HTTP $code)"; exit 1; }
 
       - name: Push C版 image (RICHMENU_CONVERTED)
-        env:
-          RICHMENU_ID: ${{ secrets.RICHMENU_CONVERTED }}
         run: |
           set -euo pipefail
-          echo "▸ C版 → $RICHMENU_ID"
-          resp=$(curl -fsS -w "\n%{http_code}" -X POST \
-            "https://api-data.line.me/v2/bot/richmenu/$RICHMENU_ID/content" \
+          echo "▸ C版 → $ID_C"
+          code=$(curl -fsS -o /dev/null -w "%{http_code}" -X POST \
+            "https://api-data.line.me/v2/bot/richmenu/$ID_C/content" \
             -H "Authorization: Bearer $LINE_TOKEN" \
             -H "Content-Type: image/png" \
             --data-binary "@assets/exports/3Q-HATCHERY_richmenu_c_2500x1686.png")
-          code=$(echo "$resp" | tail -1)
           echo "  HTTP $code"
           [[ "$code" == "200" ]] || { echo "::error::C版 upload failed (HTTP $code)"; exit 1; }
 
       - name: Summary
-        env:
-          RICHMENU_NEW: ${{ secrets.RICHMENU_NEW }}
-          RICHMENU_INQUIRED: ${{ secrets.RICHMENU_INQUIRED }}
-          RICHMENU_CONVERTED: ${{ secrets.RICHMENU_CONVERTED }}
         run: |
           {
             echo "## Rich Menu Image Refresh ✅"
             echo ""
             echo "| 版本 | Schema ID | 狀態 |"
             echo "|------|-----------|------|"
-            echo "| A版 (新朋友) | \`$RICHMENU_NEW\` | 圖片已更新 |"
-            echo "| B版 (詢問中) | \`$RICHMENU_INQUIRED\` | 圖片已更新 |"
-            echo "| C版 (會員)   | \`$RICHMENU_CONVERTED\` | 圖片已更新 |"
+            echo "| A版 (新朋友) | \`$ID_A\` | 圖片已更新 |"
+            echo "| B版 (詢問中) | \`$ID_B\` | 圖片已更新 |"
+            echo "| C版 (會員)   | \`$ID_C\` | 圖片已更新 |"
             echo ""
-            echo "> Schema IDs 不變，Cloudflare env vars **不需要重新填**。"
+            echo "> Schema IDs 由 LINE API 依名稱自動取得，無需手動設定。"
+            echo "> Cloudflare env vars **不需要重新填**。"
           } >> "$GITHUB_STEP_SUMMARY"
