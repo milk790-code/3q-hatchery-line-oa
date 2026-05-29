@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       fb_short_token:
-        description: '從 Graph API Explorer 複製的短效 User Access Token'
+        description:EAAOJPnviPMQBRr9Rh3260Sp5evdjRZBjQk4fGKr876ZB0EzGaVwlWooX2sQp4hvZAZBW3R1GyB2co5L1o5h47voLNnUrS6AnRNf8erfWbEkKtQfI5hSddJS9eQNQGMnPr6PriJQNW18lxxeZCJeEZCrOxoxn2oMBfQHNVNYBx3IqKlOYFNWLWgDZAuoTO5b5BcRCRJ7chcRlZCZBYERQUWFRGeY9Jm4uf4u78Yf7M33zdQKahZCRGnLWynUSVWXDqXX8grygsSNNt0oZASRezkNeLmbijGDOxduVQZDZD
         required: true
         type: string
 
