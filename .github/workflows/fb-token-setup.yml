@@ -65,14 +65,33 @@ jobs:
           echo "FB_PAGE_ACCESS_TOKEN=$PAGE_TOKEN" >> $GITHUB_ENV
           echo "::notice::Page Access Token obtained for page $FB_PAGE_ID"
 
-      - name: Store Page Token in Cloudflare KV
+      - name: Get Instagram Business Account ID
+        run: |
+          set -euo pipefail
+          resp=$(curl -sS \
+            "https://graph.facebook.com/v21.0/${FB_PAGE_ID}?fields=instagram_business_account&access_token=${FB_PAGE_ACCESS_TOKEN}")
+          IG_USER_ID=$(echo "$resp" | jq -r '.instagram_business_account.id // empty')
+          if [ -z "$IG_USER_ID" ]; then
+            echo "::warning::No Instagram Business Account linked to page $FB_PAGE_ID — IG publishing disabled"
+          else
+            echo "::notice::Instagram Business Account ID: $IG_USER_ID"
+          fi
+          echo "IG_USER_ID=${IG_USER_ID:-}" >> $GITHUB_ENV
+
+      - name: Store FB + IG Tokens in Cloudflare KV
         env:
           CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
         run: |
           set -euo pipefail
-          for KEY_VAL in \
-            "token:fb:page_token=${FB_PAGE_ACCESS_TOKEN}" \
-            "token:fb:page_id=${FB_PAGE_ID}"; do
+          declare -a PAIRS=(
+            "token:fb:page_token=${FB_PAGE_ACCESS_TOKEN}"
+            "token:fb:page_id=${FB_PAGE_ID}"
+          )
+          if [ -n "${IG_USER_ID:-}" ]; then
+            PAIRS+=("token:ig:access=${FB_PAGE_ACCESS_TOKEN}")
+            PAIRS+=("token:ig:user_id=${IG_USER_ID}")
+          fi
+          for KEY_VAL in "${PAIRS[@]}"; do
             KEY="${KEY_VAL%%=*}"
             VAL="${KEY_VAL#*=}"
             curl -sS -X PUT \
@@ -82,14 +101,15 @@ jobs:
               --data "$VAL" | jq -r '"KV " + (if .success then "✓" else "✗" end) + " " + $key' \
               --arg key "$KEY" || true
           done
-          echo "::notice::FB Page Token stored in KV (permanent)"
+          echo "::notice::FB + IG Tokens stored in KV (permanent)"
 
-      - name: Deploy 3q-social-publisher with FB_PAGE_ACCESS_TOKEN
+      - name: Deploy 3q-social-publisher with FB + IG tokens
         env:
           CF_TOKEN:             ${{ secrets.CF_API_TOKEN }}
           TRIGGER_TOKEN:        ${{ secrets.TRIGGER_TOKEN }}
           THREADS_APP_SECRET:   ${{ secrets.THREADS_APP_SECRET }}
           FB_PAGE_ACCESS_TOKEN: ${{ env.FB_PAGE_ACCESS_TOKEN }}
+          IG_USER_ID:           ${{ env.IG_USER_ID }}
         run: |
           set -euo pipefail
           cat > /tmp/meta.json <<JSON
@@ -103,8 +123,8 @@ jobs:
             {"name":"SESSION",                "type":"kv_namespace","namespace_id":"$SESSION_KV_ID"},
             {"name":"CRM",                    "type":"d1",          "id":"$CRM_D1_ID"},
             {"name":"AI",                     "type":"ai"},
-            {"name":"IG_ACCESS_TOKEN",        "type":"secret_text", "text":""},
-            {"name":"IG_USER_ID",             "type":"secret_text", "text":""},
+            {"name":"IG_ACCESS_TOKEN",        "type":"secret_text", "text":$(jq -Rn --arg t "${FB_PAGE_ACCESS_TOKEN:-}" '$t')},
+            {"name":"IG_USER_ID",             "type":"secret_text", "text":$(jq -Rn --arg t "${IG_USER_ID:-}" '$t')},
             {"name":"TIKTOK_ACCESS_TOKEN",    "type":"secret_text", "text":""},
             {"name":"GOOGLE_SERVICE_ACCOUNT", "type":"secret_text", "text":""},
             {"name":"GOOGLE_LOCATION_NAME",   "type":"secret_text", "text":""}
@@ -136,13 +156,15 @@ jobs:
 
       - name: Summary
         run: |
-          echo "## Facebook 永久授權完成" >> $GITHUB_STEP_SUMMARY
+          echo "## Facebook + Instagram 永久授權完成" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| | |" >> $GITHUB_STEP_SUMMARY
           echo "|---|---|" >> $GITHUB_STEP_SUMMARY
           echo "| Worker | \`$SOCIAL_URL\` |" >> $GITHUB_STEP_SUMMARY
           echo "| FB Page ID | \`$FB_PAGE_ID\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Token 類型 | Page Access Token（從長效 User Token 衍生，永不過期）|" >> $GITHUB_STEP_SUMMARY
+          echo "| IG User ID | \`${IG_USER_ID:-（無連結的 IG 帳號）}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| FB Token 類型 | Page Access Token（永不過期）|" >> $GITHUB_STEP_SUMMARY
+          echo "| IG Token | 同 FB Page Token（IG Business 帳號需連結到同一粉專）|" >> $GITHUB_STEP_SUMMARY
           echo "| Token 存儲 | Cloudflare Worker secret + SESSION KV |" >> $GITHUB_STEP_SUMMARY
           echo "| 發文排程 | 每天 09:00 / 12:00（週三）/ 20:30（台北時間）|" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
