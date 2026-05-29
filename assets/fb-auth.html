@@ -142,78 +142,72 @@ kbd{
 
 <div class="container">
 
-  <!-- Step 1: Open Explorer -->
-  <div class="step">
-    <span class="step-num">STEP 01</span>
-    <h2>開啟 Graph API Explorer</h2>
-    <p>點下方按鈕開啟官方工具，會在新分頁開啟。</p>
-    <div class="step-actions" style="margin-top:1rem">
-      <a class="btn" href="https://developers.facebook.com/tools/explorer/?app_id=956987317313843&version=v21.0" target="_blank" rel="noopener">
-        開啟 Graph API Explorer ↗
-      </a>
-    </div>
+  <!-- AUTO-DETECTED banner (hidden by default, shown if token in hash) -->
+  <div id="autoBanner" style="display:none;background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.4);border-radius:4px;padding:1.25rem 1.5rem;margin-bottom:1.5rem;text-align:center">
+    <div style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--green);letter-spacing:.1em;margin-bottom:.5rem">AUTO-DETECTED · TOKEN FOUND IN URL</div>
+    <div style="font-size:.9rem;color:var(--text)">Facebook 已授權回傳 Token，正在自動處理中…</div>
+    <div class="spinner active" id="autoBannerSpinner" style="margin:.75rem auto 0;display:block"></div>
   </div>
 
-  <!-- Step 2: Grant permissions -->
-  <div class="step">
-    <span class="step-num">STEP 02</span>
-    <h2>選擇 App 並授予權限</h2>
-    <p>在 Explorer 右側面板：</p>
-    <ul style="margin-top:.5rem">
-      <li>Meta App → 選 <kbd>3Q Hatchery</kbd>（App ID: 956987317313843）</li>
-      <li>點 <kbd>Generate Access Token</kbd></li>
-      <li>確認勾選以下所有權限再按確認：</li>
-    </ul>
-    <div class="permission-list">
-      <span class="perm">pages_manage_posts</span>
-      <span class="perm">pages_read_engagement</span>
-      <span class="perm">pages_show_list</span>
-      <span class="perm">publish_to_groups</span>
-    </div>
+  <!-- ONE-CLICK AUTH button -->
+  <div style="text-align:center;padding:2rem 0 1rem">
+    <div style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.1em;margin-bottom:1rem">一鍵完成 Facebook 授權</div>
+    <a id="oauthBtn" class="btn" style="font-size:1rem;padding:.9rem 2.5rem;letter-spacing:.03em" onclick="startOAuth()">
+      ⚡ 一鍵授權 Facebook →
+    </a>
+    <div style="margin-top:.75rem;font-size:.75rem;color:var(--muted)">點擊後跳到 Facebook 同意畫面，確認後自動回到此頁完成設定</div>
   </div>
 
-  <!-- Step 3: Copy token -->
+  <div style="display:flex;align-items:center;gap:1rem;margin:1rem 0;color:var(--muted);font-size:.75rem">
+    <div style="flex:1;height:1px;background:var(--border)"></div>
+    <div>或手動貼入 Token</div>
+    <div style="flex:1;height:1px;background:var(--border)"></div>
+  </div>
+
+  <!-- Manual token input -->
   <div class="step">
-    <span class="step-num">STEP 03</span>
-    <h2>複製短效 User Access Token</h2>
-    <p>授權後 Explorer 頂部會出現一段 Token，複製整段（通常以 <kbd>EAA</kbd> 開頭）貼在下方：</p>
+    <span class="step-num">手動模式</span>
+    <h2>貼入 User Access Token</h2>
+    <p>從 <a href="https://developers.facebook.com/tools/explorer/?app_id=956987317313843&version=v21.0" target="_blank">Graph API Explorer</a> 複製短效 Token，貼在下方：</p>
     <div class="token-area" style="margin-top:.75rem">
       <label>SHORT-LIVED USER ACCESS TOKEN</label>
       <textarea id="shortToken" placeholder="EAAMURSFn..." spellcheck="false"></textarea>
     </div>
     <div class="step-actions">
       <button class="btn" onclick="processToken()">
-        自動取得頁面 Token →
+        取得頁面 Token →
       </button>
       <div class="spinner" id="spinner"></div>
     </div>
     <div class="error-panel" id="errorPanel"><p id="errorMsg"></p></div>
-    <div class="result-panel" id="resultPanel">
-      <h3>✓ 頁面 Token 取得成功</h3>
-      <div class="label-sm">PAGE ACCESS TOKEN（永久有效）</div>
-      <div class="token-out" id="pageTokenOut"></div>
-      <div style="display:flex;gap:.5rem;align-items:center;margin-top:.25rem">
-        <button class="copy-btn" id="copyBtn" onclick="copyToken()">複製</button>
-        <span style="font-size:.75rem;color:var(--muted)">請複製後貼到 GitHub Workflow 的輸入框</span>
-      </div>
+  </div>
+
+  <!-- Result (shared by both paths) -->
+  <div class="result-panel" id="resultPanel" style="margin-bottom:1.5rem">
+    <h3>✓ 頁面 Token 取得成功</h3>
+    <div class="label-sm">PAGE ACCESS TOKEN（永久有效）</div>
+    <div class="token-out" id="pageTokenOut"></div>
+    <div style="display:flex;gap:.5rem;align-items:center;margin-top:.25rem;flex-wrap:wrap">
+      <button class="copy-btn" id="copyBtn" onclick="copyToken()">複製</button>
+      <span style="font-size:.75rem;color:var(--muted)">複製後貼到下方 Workflow 的輸入框</span>
     </div>
   </div>
 
-  <!-- Step 4: Trigger workflow -->
+  <!-- Step: Trigger workflow -->
   <div class="step">
-    <span class="step-num">STEP 04</span>
-    <h2>觸發 GitHub Actions 部署</h2>
-    <p>把上方 Page Token 貼到 Workflow 的 <kbd>fb_short_token</kbd> 欄位並執行：</p>
+    <span class="step-num">最後一步</span>
+    <h2>觸發 GitHub Actions 自動部署</h2>
+    <p>把上方 Page Token 貼到 Workflow 的 <kbd>fb_short_token</kbd> 欄位並按 Run：</p>
     <div class="workflow-link">
-      <p>Actions → <code>Setup Facebook Page Token</code> → Run workflow</p>
-      <p>Workflow 會自動把 Token 部署到 Cloudflare Worker，並存入 KV 永久生效。</p>
+      <p>Actions → <code>Setup Facebook Page Token</code> → Run workflow → 貼入 Token → Run</p>
+      <p>Workflow 自動延長 Token（永久）→ 部署到 Cloudflare Worker → 完成。</p>
       <a class="btn btn-outline btn-sm" href="https://github.com/milk790-code/3q-hatchery-line-oa/actions/workflows/fb-token-setup.yml" target="_blank" rel="noopener">
         開啟 Workflow ↗
       </a>
     </div>
     <div style="margin-top:1rem">
       <p style="font-size:.8rem;color:var(--muted)">
-        完成後可繼續執行 <strong style="color:var(--gold)">Seed Content Queue</strong> 把 14 天素材填入 D1，等下次 cron 自動發文。
+        Workflow 完成後，執行 <strong style="color:var(--gold)">Seed Content Queue</strong> 把 14 天素材填入 D1。
       </p>
       <div style="margin-top:.75rem">
         <a class="btn btn-green btn-sm" href="https://github.com/milk790-code/3q-hatchery-line-oa/actions/workflows/seed-content-queue.yml" target="_blank" rel="noopener">
@@ -231,16 +225,29 @@ kbd{
 </div>
 
 <script>
-const APP_ID  = '956987317313843';
-const PAGE_ID = '61587003785491';
+const APP_ID   = '956987317313843';
+const PAGE_ID  = '61587003785491';
+const REDIRECT = location.origin + location.pathname; // this page's URL
 
 function setStatus(msg, green) {
   document.getElementById('statusText').textContent = msg;
   document.getElementById('statusDot').className = 'dot' + (green ? ' green' : '');
 }
 
-async function processToken() {
-  const raw = document.getElementById('shortToken').value.trim();
+// Build & open Facebook OAuth consent URL (implicit flow → token lands in URL hash)
+function startOAuth() {
+  const scope = 'pages_manage_posts,pages_read_engagement,pages_show_list,publish_to_groups';
+  const url = 'https://www.facebook.com/dialog/oauth'
+    + `?client_id=${APP_ID}`
+    + `&redirect_uri=${encodeURIComponent(REDIRECT)}`
+    + `&scope=${encodeURIComponent(scope)}`
+    + `&response_type=token`
+    + `&auth_type=rerequest`;
+  window.location.href = url;
+}
+
+async function processToken(raw) {
+  raw = raw || document.getElementById('shortToken').value.trim();
   if (!raw) { alert('請先貼入 Token'); return; }
 
   document.getElementById('errorPanel').classList.remove('visible');
@@ -249,30 +256,33 @@ async function processToken() {
   setStatus('正在驗證 Token…');
 
   try {
-    // 1. Verify token
-    const verifyUrl = `https://graph.facebook.com/v21.0/me?access_token=${encodeURIComponent(raw)}`;
-    const verifyRes = await fetch(verifyUrl);
-    const verifyData = await verifyRes.json();
-    if (verifyData.error) throw new Error(`Token 無效：${verifyData.error.message}`);
-    setStatus(`Token 有效（用戶：${verifyData.name || verifyData.id}）`, true);
+    // 1. Verify token & get user name
+    const meRes  = await fetch(`https://graph.facebook.com/v21.0/me?access_token=${encodeURIComponent(raw)}`);
+    const meData = await meRes.json();
+    if (meData.error) throw new Error(`Token 無效：${meData.error.message}`);
+    setStatus(`Token 有效（${meData.name || meData.id}）— 正在取得頁面清單…`, true);
 
-    // 2. Get /me/accounts (page list)
-    const acctUrl = `https://graph.facebook.com/v21.0/me/accounts?access_token=${encodeURIComponent(raw)}`;
-    const acctRes = await fetch(acctUrl);
+    // 2. Get /me/accounts
+    const acctRes  = await fetch(`https://graph.facebook.com/v21.0/me/accounts?access_token=${encodeURIComponent(raw)}`);
     const acctData = await acctRes.json();
     if (acctData.error) throw new Error(`取得頁面清單失敗：${acctData.error.message}`);
 
     const pages = acctData.data || [];
-    const page = pages.find(p => p.id === PAGE_ID);
+    const page  = pages.find(p => p.id === PAGE_ID);
     if (!page) {
       const names = pages.map(p => `${p.id} (${p.name})`).join(', ');
-      throw new Error(`找不到頁面 ${PAGE_ID}。你的帳號管理的頁面：${names || '無'}`);
+      throw new Error(`找不到頁面 ${PAGE_ID}。帳號管理的頁面：${names || '無'}`);
     }
 
     const pageToken = page.access_token;
     document.getElementById('pageTokenOut').textContent = pageToken;
     document.getElementById('resultPanel').classList.add('visible');
-    setStatus('✓ 頁面 Token 取得成功，請複製後觸發 GitHub Workflow', true);
+    // Auto-copy to clipboard
+    try { await navigator.clipboard.writeText(pageToken); setStatus('✓ Page Token 已自動複製到剪貼簿，請前往 Workflow 貼上並 Run', true); }
+    catch { setStatus('✓ 頁面 Token 取得成功，請手動複製後觸發 Workflow', true); }
+
+    // Scroll into view
+    document.getElementById('resultPanel').scrollIntoView({behavior:'smooth', block:'start'});
 
   } catch(err) {
     document.getElementById('errorMsg').textContent = err.message;
@@ -280,6 +290,7 @@ async function processToken() {
     setStatus('錯誤：' + err.message);
   } finally {
     document.getElementById('spinner').classList.remove('active');
+    document.getElementById('autoBannerSpinner').style.display = 'none';
   }
 }
 
@@ -293,8 +304,21 @@ function copyToken() {
   });
 }
 
-// Allow pressing Enter in textarea
+// On page load: check URL hash for access_token (Facebook OAuth redirect)
 document.addEventListener('DOMContentLoaded', () => {
+  const hash   = window.location.hash.slice(1);
+  const params = new URLSearchParams(hash);
+  const token  = params.get('access_token');
+
+  if (token) {
+    // Clean hash from URL without reload
+    history.replaceState(null, '', window.location.pathname);
+    document.getElementById('autoBanner').style.display = 'block';
+    document.getElementById('shortToken').value = token;
+    setStatus('偵測到 OAuth Token，正在自動處理…');
+    processToken(token);
+  }
+
   document.getElementById('shortToken').addEventListener('keydown', e => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) processToken();
   });
