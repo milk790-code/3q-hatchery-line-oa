@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Skill Creator · 3Q Hatchery</title>
+<meta name="description" content="Claude Code Slash Command 設計器，填表產生 .claude/commands/*.md skill 文件。"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@200;300&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#B8924A;--gold-light:#D4AA6A;--gold-dim:rgba(184,146,74,.12);
+  --bg:#080808;--bg2:#0E0E0E;--bg3:#111;
+  --text:#F0EBE1;--muted:#8A8070;--border:rgba(184,146,74,.18);
+  --serif:'Noto Serif TC',serif;--sans:'Noto Sans TC',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-weight:300;min-height:100vh}
+
+nav{
+  position:sticky;top:0;z-index:99;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 40px;background:rgba(8,8,8,.96);border-bottom:1px solid var(--border);
+  backdrop-filter:blur(8px);
+}
+.nav-logo{font-family:var(--serif);font-weight:200;font-size:.82rem;letter-spacing:.2em;color:var(--gold);text-decoration:none}
+.nav-back{font-size:.7rem;letter-spacing:.15em;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-back:hover{color:var(--gold)}
+
+.container{max-width:1000px;margin:0 auto;padding:0 40px}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:32px;padding:48px 0 100px;align-items:start}
+
+h1{font-family:var(--serif);font-weight:200;font-size:1.8rem;letter-spacing:.1em;margin-bottom:8px}
+.subtitle{font-size:.82rem;color:var(--muted);letter-spacing:.08em;margin-bottom:36px;line-height:1.7}
+
+.field{margin-bottom:20px}
+label{display:block;font-size:.65rem;letter-spacing:.3em;color:var(--gold);text-transform:uppercase;margin-bottom:8px}
+input[type=text],textarea{
+  width:100%;background:var(--bg3);border:1px solid var(--border);
+  color:var(--text);padding:10px 14px;font-family:var(--sans);font-size:.85rem;
+  font-weight:300;letter-spacing:.05em;outline:none;resize:vertical;transition:border-color .2s;
+}
+input[type=text]:focus,textarea:focus{border-color:var(--gold)}
+textarea{min-height:80px}
+
+/* TOOL CHECKBOXES */
+.tool-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.tool-chip{
+  border:1px solid var(--border);padding:6px 14px;
+  font-size:.7rem;letter-spacing:.15em;color:var(--muted);cursor:pointer;
+  transition:all .2s;user-select:none;
+}
+.tool-chip.active{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
+
+/* STEPS LIST */
+.steps-list{margin-bottom:10px}
+.step-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.step-num{
+  flex-shrink:0;width:20px;height:20px;border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.6rem;color:var(--gold);
+}
+.step-row input{flex:1;border:1px solid var(--border);background:var(--bg3);
+  color:var(--text);padding:8px 12px;font-family:var(--sans);font-size:.82rem;
+  font-weight:300;outline:none;transition:border-color .2s}
+.step-row input:focus{border-color:var(--gold)}
+.step-del{background:none;border:none;color:var(--muted);cursor:pointer;padding:0 4px;font-size:1rem;transition:color .15s;flex-shrink:0}
+.step-del:hover{color:#e06060}
+.btn-add{
+  width:100%;padding:8px;border:1px dashed var(--border);background:transparent;
+  color:var(--muted);cursor:pointer;font-size:.72rem;letter-spacing:.2em;
+  text-transform:uppercase;transition:all .2s;font-family:var(--sans);
+}
+.btn-add:hover{border-color:var(--gold);color:var(--gold)}
+
+/* OUTPUT */
+.output-panel{position:sticky;top:80px}
+.output-header{
+  padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-bottom:none;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.output-filename{font-family:monospace;font-size:.75rem;color:var(--gold)}
+.output-box{
+  background:var(--bg3);border:1px solid var(--border);
+  padding:20px;font-family:monospace;font-size:.76rem;line-height:1.75;
+  color:#D4C8B0;max-height:500px;overflow-y:auto;
+  white-space:pre-wrap;word-break:break-word;
+}
+.md-h1{color:var(--text);font-weight:bold}
+.md-h2{color:var(--gold);opacity:.9}
+.md-code{color:#9DC0D0}
+.md-muted{color:var(--muted)}
+
+.output-actions{display:flex;gap:8px;margin-top:10px}
+.btn{
+  flex:1;padding:10px;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;
+  border:1px solid var(--border);background:transparent;color:var(--text);
+  cursor:pointer;transition:all .2s;font-family:var(--sans);
+}
+.btn:hover{border-color:var(--gold);color:var(--gold)}
+.btn-primary{background:var(--gold);color:#0A0A0A;border-color:var(--gold)}
+.btn-primary:hover{background:var(--gold-light);color:#0A0A0A}
+
+/* INSTALL HINT */
+.install-hint{
+  margin-top:12px;background:var(--bg3);border:1px solid var(--border);
+  padding:14px 16px;font-family:monospace;font-size:.72rem;line-height:1.7;color:#D4C8B0;
+}
+.install-hint .comment{color:var(--muted);opacity:.7}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:24px;right:24px;background:var(--gold);color:#0A0A0A;
+  padding:10px 20px;font-size:.72rem;letter-spacing:.15em;
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.toast.show{opacity:1}
+
+@media(max-width:768px){
+  nav,main{padding-left:20px;padding-right:20px}
+  .container{padding:0 20px}
+  .layout{grid-template-columns:1fr;gap:24px;padding:32px 0 80px}
+  .output-panel{position:static}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">3Q HATCHERY</a>
+  <a href="/" class="nav-back">← 返回</a>
+</nav>
+
+<div class="container">
+<div class="layout">
+
+  <!-- FORM -->
+  <div>
+    <h1>Skill Creator</h1>
+    <p class="subtitle">設計 Claude Code Slash Command，產生可直接放入 <code>.claude/commands/</code> 的 <code>.md</code> 文件。</p>
+
+    <div class="field">
+      <label>Skill 名稱（kebab-case）</label>
+      <input type="text" id="fName" placeholder="auto-deploy" spellcheck="false"/>
+    </div>
+
+    <div class="field">
+      <label>觸發情境</label>
+      <input type="text" id="fContext" placeholder="當需要自動部署到 Cloudflare Workers 時"/>
+    </div>
+
+    <div class="field">
+      <label>一句話描述</label>
+      <input type="text" id="fDesc" placeholder="自動執行 Cloudflare Workers 部署流程"/>
+    </div>
+
+    <div class="field">
+      <label>用法範例</label>
+      <input type="text" id="fUsage" placeholder="/auto-deploy [staging|production]"/>
+    </div>
+
+    <div class="field">
+      <label>核心步驟</label>
+      <div class="steps-list" id="stepsList"></div>
+      <button class="btn-add" id="btnAddStep">+ 新增步驟</button>
+    </div>
+
+    <div class="field">
+      <label>使用工具</label>
+      <div class="tool-grid" id="toolGrid">
+        <div class="tool-chip" data-tool="Bash">Bash</div>
+        <div class="tool-chip" data-tool="Read">Read</div>
+        <div class="tool-chip" data-tool="Edit">Edit</div>
+        <div class="tool-chip" data-tool="Write">Write</div>
+        <div class="tool-chip" data-tool="Agent">Agent</div>
+        <div class="tool-chip" data-tool="mcp">MCP 工具</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>輸出格式</label>
+      <input type="text" id="fOutput" placeholder="文字說明 + 可複製的指令碼"/>
+    </div>
+
+    <div class="field">
+      <label>注意事項（選填）</label>
+      <textarea id="fNotes" placeholder="- 只在已有 wrangler.toml 的專案中使用&#10;- 不要在無 git 的目錄執行"></textarea>
+    </div>
+  </div>
+
+  <!-- OUTPUT -->
+  <div class="output-panel">
+    <div class="output-header">
+      <span class="output-filename" id="outputFilename">.claude/commands/skill-name.md</span>
+    </div>
+    <pre class="output-box" id="outputBox"></pre>
+    <div class="output-actions">
+      <button class="btn" id="btnCopy">複製</button>
+      <button class="btn btn-primary" id="btnDown">下載 .md</button>
+    </div>
+    <div class="install-hint" id="installHint">
+      <span class="comment"># 安裝到專案</span><br/>
+      mkdir -p .claude/commands<br/>
+      <span id="hintCmd"># 下載後放入 .claude/commands/ 目錄</span>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let steps = [];
+let activeTools = new Set();
+
+const fName    = document.getElementById('fName');
+const fContext = document.getElementById('fContext');
+const fDesc    = document.getElementById('fDesc');
+const fUsage   = document.getElementById('fUsage');
+const fOutput  = document.getElementById('fOutput');
+const fNotes   = document.getElementById('fNotes');
+
+function addStep(text = '') {
+  steps.push({ id: Date.now(), text });
+  renderSteps();
+  update();
+}
+
+function renderSteps() {
+  const list = document.getElementById('stepsList');
+  list.innerHTML = steps.map((s, i) => `
+    <div class="step-row" data-id="${s.id}">
+      <div class="step-num">${i + 1}</div>
+      <input type="text" placeholder="執行 wrangler deploy..." value="${s.text}"/>
+      <button class="step-del" data-del="${s.id}">×</button>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('input').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const id = parseInt(e.target.closest('[data-id]').dataset.id);
+      const s = steps.find(x => x.id === id);
+      if (s) s.text = e.target.value;
+      update();
+    });
+  });
+  list.querySelectorAll('[data-del]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      steps = steps.filter(s => s.id !== parseInt(btn.dataset.del));
+      renderSteps();
+      update();
+    });
+  });
+}
+
+function genMarkdown() {
+  const name    = fName.value.trim() || 'my-skill';
+  const desc    = fDesc.value.trim() || '說明這個 skill 的用途。';
+  const usage   = fUsage.value.trim() || `/${name}`;
+  const output  = fOutput.value.trim();
+  const notes   = fNotes.value.trim();
+  const toolList = [...activeTools];
+
+  let md = `# ${name.charAt(0).toUpperCase() + name.slice(1).replace(/-/g,' ')}\n\n`;
+  md += `${desc}\n\n`;
+  md += `## 用法\n\n\`\`\`\n${usage}\n\`\`\`\n\n`;
+
+  if (steps.length > 0) {
+    md += `## 步驟\n\n`;
+    steps.forEach((s, i) => {
+      md += `${i + 1}. ${s.text || '...'}\n`;
+    });
+    md += '\n';
+  }
+
+  if (toolList.length > 0) {
+    md += `## 工具\n\n`;
+    toolList.forEach(t => { md += `- ${t}\n`; });
+    md += '\n';
+  }
+
+  if (output) {
+    md += `## 輸出\n\n${output}\n\n`;
+  }
+
+  if (notes) {
+    md += `## 注意事項\n\n${notes}\n`;
+  }
+
+  return md;
+}
+
+function update() {
+  const name = fName.value.trim() || 'skill-name';
+  document.getElementById('outputFilename').textContent = `.claude/commands/${name}.md`;
+  document.getElementById('outputBox').textContent = genMarkdown();
+  document.getElementById('hintCmd').textContent =
+    `cp ~/Downloads/${name}.md .claude/commands/`;
+}
+
+// Tool chips
+document.getElementById('toolGrid').addEventListener('click', e => {
+  const chip = e.target.closest('.tool-chip');
+  if (!chip) return;
+  const t = chip.dataset.tool;
+  if (activeTools.has(t)) activeTools.delete(t);
+  else activeTools.add(t);
+  chip.classList.toggle('active', activeTools.has(t));
+  update();
+});
+
+document.getElementById('btnAddStep').addEventListener('click', () => addStep());
+[fName, fContext, fDesc, fUsage, fOutput, fNotes].forEach(el => el.addEventListener('input', update));
+
+document.getElementById('btnCopy').addEventListener('click', () => {
+  navigator.clipboard.writeText(genMarkdown()).then(() => showToast('已複製到剪貼簿'));
+});
+
+document.getElementById('btnDown').addEventListener('click', () => {
+  const name = fName.value.trim() || 'my-skill';
+  const blob = new Blob([genMarkdown()], { type: 'text/markdown' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name + '.md';
+  a.click();
+});
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// Default example
+fName.value = 'auto-deploy';
+fDesc.value = '自動執行 Cloudflare Workers 完整部署流程';
+fUsage.value = '/auto-deploy [staging|production]';
+fOutput.value = '部署結果摘要 + 驗證指令';
+addStep('確認 git status 無未提交變更');
+addStep('執行 wrangler d1 migrations apply CRM --remote（若有 migration）');
+addStep('執行 wrangler deploy 部署 Worker');
+addStep('執行 curl /health 驗證部署結果');
+['Bash', 'Read'].forEach(t => {
+  activeTools.add(t);
+  document.querySelector(`[data-tool="${t}"]`)?.classList.add('active');
+});
+update();
+</script>
+</body>
+</html>

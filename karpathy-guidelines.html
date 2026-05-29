@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Karpathy 準則 · 3Q Hatchery</title>
+<meta name="description" content="Andrej Karpathy 風格 AI 輔助開發準則，為 3Q Hatchery 技術團隊整理。"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@200;300;400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#B8924A;--gold-light:#D4AA6A;--gold-dim:rgba(184,146,74,.15);
+  --bg:#080808;--bg2:#0E0E0E;--bg3:#141414;
+  --text:#F0EBE1;--muted:#8A8070;--border:rgba(184,146,74,.18);
+  --serif:'Noto Serif TC',serif;--sans:'Noto Sans TC',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-weight:300;overflow-x:hidden;min-height:100vh}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:99;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 40px;
+  background:linear-gradient(to bottom,rgba(8,8,8,.96),transparent);
+  backdrop-filter:blur(8px);
+}
+.nav-logo{font-family:var(--serif);font-weight:200;font-size:.85rem;letter-spacing:.2em;color:var(--gold);text-decoration:none}
+.nav-back{font-size:.72rem;letter-spacing:.15em;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-back:hover{color:var(--gold)}
+
+/* HERO */
+.hero{
+  padding:140px 40px 80px;text-align:center;
+  border-bottom:1px solid var(--border);
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;top:20%;left:50%;transform:translate(-50%,-50%);
+  width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(184,146,74,.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+.eyebrow{font-size:.65rem;letter-spacing:.4em;color:var(--gold);margin-bottom:24px;opacity:.8;text-transform:uppercase}
+.hero-title{font-family:var(--serif);font-weight:200;font-size:clamp(2rem,5vw,3.8rem);line-height:1.2;margin-bottom:16px}
+.hero-rule{width:48px;height:1px;background:var(--gold);margin:24px auto;opacity:.5}
+.hero-sub{font-size:.88rem;color:var(--muted);letter-spacing:.1em;line-height:1.8;max-width:540px;margin:0 auto 36px}
+.art-link{
+  display:inline-flex;align-items:center;gap:10px;
+  border:1px solid var(--border);padding:10px 24px;
+  font-size:.75rem;letter-spacing:.18em;color:var(--gold);text-decoration:none;
+  transition:all .25s;
+}
+.art-link:hover{background:var(--gold-dim);border-color:var(--gold)}
+.art-link svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.5}
+
+/* MAIN */
+main{max-width:860px;margin:0 auto;padding:72px 40px 120px}
+
+/* PROGRESS */
+.progress-bar{
+  position:fixed;top:0;left:0;height:2px;background:var(--gold);
+  transition:width .15s;z-index:100;opacity:.7;
+}
+
+/* SECTION */
+.section{margin-bottom:72px}
+.section-num{
+  font-size:.65rem;letter-spacing:.4em;color:var(--gold);
+  text-transform:uppercase;margin-bottom:16px;opacity:.7;
+}
+.section-title{
+  font-family:var(--serif);font-weight:300;font-size:1.5rem;
+  line-height:1.3;letter-spacing:.08em;margin-bottom:12px;
+}
+.section-body{font-size:.88rem;color:var(--muted);line-height:1.85;letter-spacing:.05em;margin-bottom:20px}
+
+/* CHECKLIST */
+.checklist{list-style:none;margin-top:16px}
+.checklist li{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:14px 0;border-bottom:1px solid rgba(184,146,74,.08);
+  font-size:.85rem;line-height:1.7;cursor:pointer;transition:color .2s;
+}
+.checklist li:last-child{border-bottom:none}
+.checklist li.done{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(184,146,74,.4)}
+.check-box{
+  flex-shrink:0;width:16px;height:16px;margin-top:3px;
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+.checklist li.done .check-box{background:var(--gold-dim);border-color:var(--gold)}
+.check-box svg{width:10px;height:10px;stroke:var(--gold);stroke-width:2.5;fill:none;display:none}
+.checklist li.done .check-box svg{display:block}
+
+/* 3Q ADDENDUM */
+.addendum{
+  background:var(--bg3);border:1px solid var(--border);
+  padding:32px 36px;margin-top:48px;
+}
+.addendum-title{
+  font-size:.65rem;letter-spacing:.4em;color:var(--gold);
+  text-transform:uppercase;margin-bottom:20px;
+}
+.addendum-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+.addendum-item{}
+.addendum-item h4{font-size:.82rem;font-weight:500;letter-spacing:.1em;margin-bottom:6px;color:var(--text)}
+.addendum-item p{font-size:.78rem;color:var(--muted);line-height:1.7}
+
+/* FOOTER */
+footer{
+  border-top:1px solid var(--border);padding:32px 40px;
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:.7rem;letter-spacing:.15em;color:var(--muted);
+  max-width:860px;margin:0 auto;
+}
+footer a{color:var(--gold);text-decoration:none}
+
+@media(max-width:640px){
+  nav{padding:16px 20px}
+  .hero{padding:110px 20px 60px}
+  main{padding:48px 20px 80px}
+  .addendum{padding:24px 20px}
+  footer{flex-direction:column;gap:12px;text-align:center;padding:24px 20px}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="prog"></div>
+
+<nav>
+  <a href="/" class="nav-logo">3Q HATCHERY</a>
+  <a href="/" class="nav-back">← 返回</a>
+</nav>
+
+<section class="hero">
+  <p class="eyebrow">Developer Guidelines</p>
+  <h1 class="hero-title">Karpathy 開發準則</h1>
+  <div class="hero-rule"></div>
+  <p class="hero-sub">Andrej Karpathy 風格的 AI 輔助開發哲學，為 3Q Hatchery 技術團隊整理。每次開工前勾選，讓 Claude 知道你的立場。</p>
+  <a href="algorithmic-art.html" class="art-link">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3m-3.5-7.5-2.1 2.1M7.6 16.4l-2.1 2.1m0-13.1 2.1 2.1m8.8 8.8 2.1 2.1"/></svg>
+    演算法藝術生成器 →
+  </a>
+</section>
+
+<main>
+  <div id="guidelines">
+
+    <div class="section">
+      <p class="section-num">01</p>
+      <h2 class="section-title">最小可用</h2>
+      <p class="section-body">只寫解決當前問題所需的最少程式碼。三行相似比一個過早的抽象更好。不要設計你還不需要的功能。</p>
+      <ul class="checklist" id="list-01">
+        <li data-id="01-a"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>這個功能現在真的需要嗎？</li>
+        <li data-id="01-b"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>有沒有更簡單的解法？</li>
+        <li data-id="01-c"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>抽象層次是否必要，還是只是方便？</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <p class="section-num">02</p>
+      <h2 class="section-title">程式碼即說明</h2>
+      <p class="section-body">良好命名的函式和變數本身就是文件。不寫解釋「做什麼」的注釋，只寫「為什麼」——非顯而易見的約束或 workaround。</p>
+      <ul class="checklist">
+        <li data-id="02-a"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>函式名稱能清楚說明它做什麼嗎？</li>
+        <li data-id="02-b"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>注釋是否說明了「為什麼」而非「是什麼」？</li>
+        <li data-id="02-c"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>刪掉注釋後，未來的讀者還能理解嗎？</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <p class="section-num">03</p>
+      <h2 class="section-title">不當英雄</h2>
+      <p class="section-body">遇到瓶頸時，先嘗試最簡單的解法。不要花三天做可以用 cron job 解決的問題。優雅感是結果，不是目標。</p>
+      <ul class="checklist">
+        <li data-id="03-a"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>有沒有現成的工具或 API 可以用？</li>
+        <li data-id="03-b"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>手動解決一次是否比自動化更划算？</li>
+        <li data-id="03-c"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>技術債的代價是否清楚列出？</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <p class="section-num">04</p>
+      <h2 class="section-title">資料優先</h2>
+      <p class="section-body">先理解資料流，再設計架構。Schema 和 API 契約比框架選擇更重要。壞的資料模型會讓好的程式碼變得複雜。</p>
+      <ul class="checklist">
+        <li data-id="04-a"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>資料從哪裡來，要到哪裡去？</li>
+        <li data-id="04-b"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>Schema 是否反映了真實的業務邏輯？</li>
+        <li data-id="04-c"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>API 契約是否明確，邊界條件是否處理？</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <p class="section-num">05</p>
+      <h2 class="section-title">可讀性 &gt; 聰明</h2>
+      <p class="section-body">未來的你（或 AI）要能快速理解。一個清楚的 if/else 比一個聰明的 one-liner 更有價值。程式碼讀的次數遠多於寫的次數。</p>
+      <ul class="checklist">
+        <li data-id="05-a"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>三個月後的你能看懂這段嗎？</li>
+        <li data-id="05-b"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>可以拆成更小的具名函式嗎？</li>
+        <li data-id="05-c"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>魔法數字是否都有常數名稱？</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <p class="section-num">06</p>
+      <h2 class="section-title">邊界驗證</h2>
+      <p class="section-body">只在系統邊界（用戶輸入、外部 API）做驗證。不要為內部程式碼加防禦性錯誤處理。信任你控制的程式碼。</p>
+      <ul class="checklist">
+        <li data-id="06-a"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>驗證是否在正確的層級（外部邊界）？</li>
+        <li data-id="06-b"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>有沒有多餘的 try/catch 包著內部邏輯？</li>
+        <li data-id="06-c"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>錯誤訊息對用戶有意義嗎？</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <p class="section-num">07</p>
+      <h2 class="section-title">可逆性優先</h2>
+      <p class="section-body">優先選擇容易回退的方案。資料庫 migration 要可回滾，部署要有 canary 或 rollback 指令。不要用破壞性操作解決問題。</p>
+      <ul class="checklist">
+        <li data-id="07-a"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>這個操作可以回滾嗎？</li>
+        <li data-id="07-b"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>影響範圍是否最小化？</li>
+        <li data-id="07-c"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>出事時，有沒有明確的回復步驟？</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <p class="section-num">08</p>
+      <h2 class="section-title">小步提交</h2>
+      <p class="section-body">每個 commit 只做一件事，且能描述為一句話。Git history 是最好的文件，也是最快的除錯工具。</p>
+      <ul class="checklist">
+        <li data-id="08-a"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>這個 commit message 能一句話說清楚嗎？</li>
+        <li data-id="08-b"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>有沒有混入不相關的變更？</li>
+        <li data-id="08-c"><span class="check-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>測試和程式碼是否在同一個 commit？</li>
+      </ul>
+    </div>
+
+    <div class="addendum">
+      <p class="addendum-title">3Q Hatchery 專屬補充</p>
+      <div class="addendum-grid">
+        <div class="addendum-item">
+          <h4>Cloudflare Workers</h4>
+          <p>有 1ms CPU 限制，避免同步的 heavy computation。善用 `ctx.waitUntil()` 處理非同步任務。</p>
+        </div>
+        <div class="addendum-item">
+          <h4>D1 查詢</h4>
+          <p>優先使用 prepared statements，避免 N+1 問題。每次 Worker 調用控制查詢次數 ≤ 5。</p>
+        </div>
+        <div class="addendum-item">
+          <h4>KV 存取</h4>
+          <p>Batch 讀取，避免每個 key 一次 await。用 `getWithMetadata` 同時讀取值和過期時間。</p>
+        </div>
+        <div class="addendum-item">
+          <h4>設計系統</h4>
+          <p>HTML/CSS 直接用 `colors_and_type.css` 的 token，不要硬寫顏色值。黃金比例：金色 ≤ 3%。</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <span>3Q HATCHERY · KARPATHY GUIDELINES</span>
+  <a href="algorithmic-art.html">演算法藝術 →</a>
+</footer>
+
+<script>
+const STORAGE_KEY = '3q-karpathy-checklist';
+
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+  catch { return {}; }
+}
+
+function saveState(state) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function init() {
+  const state = loadState();
+  document.querySelectorAll('.checklist li').forEach(li => {
+    const id = li.dataset.id;
+    if (!id) return;
+    if (state[id]) li.classList.add('done');
+    li.addEventListener('click', () => {
+      li.classList.toggle('done');
+      const s = loadState();
+      s[id] = li.classList.contains('done');
+      saveState(s);
+    });
+  });
+}
+
+// Reading progress bar
+window.addEventListener('scroll', () => {
+  const doc = document.documentElement;
+  const scrolled = doc.scrollTop / (doc.scrollHeight - doc.clientHeight);
+  document.getElementById('prog').style.width = (scrolled * 100) + '%';
+});
+
+init();
+</script>
+</body>
+</html>
