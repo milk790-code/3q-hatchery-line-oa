@@ -1,1 +1,84 @@
-IyBVcGxvYWQgUmljaCBNZW51IOKAlCDkvb/nlKjoqqrmmI4KCiMjIOS4gOmNtei3kQoKYGBgYmFzaApjZCBhc3NldHMvZXhwb3J0cy8KZXhwb3J0IENIQU5ORUxfVE9LRU49IuS9oOeahF9sb25nX2xpdmVkX2NoYW5uZWxfYWNjZXNzX3Rva2VuIgpjaG1vZCAreCB1cGxvYWQtcmljaG1lbnUuc2gKLi91cGxvYWQtcmljaG1lbnUuc2gKYGBgCgrot5HlrozmnIPljbDlh7rkuInlgIsgSUTvvJoKCmBgYApjb25zdCBSSUNITUVOVV9ORVcgICAgICAgPSAncmljaG1lbnUteHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHgnOwpjb25zdCBSSUNITUVOVV9JTlFVSVJFRCAgPSAncmljaG1lbnUteXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXknOwpjb25zdCBSSUNITUVOVV9DT05WRVJURUQgPSAncmljaG1lbnUtenp6enp6enp6enp6enp6enp6enp6enp6enonOwpgYGAKCuaKiumAmeS4ieihjOiyvOWIsCBgd29ya2VyLmpzYCDlj5bku6PoiIrnmoQgSUQg5bi45pW044CCCgojIyDlroPlgZrkuobku4DpurwKCjEuIFBPU1QgYC92Mi9ib3QvcmljaG1lbnVgIMOXIDMg4oaSIOW7uiAzIOWAiyBzY2hlbWHvvIh0YXAgem9uZXMg5bey57aT5a+r5aW977yJCjIuIFBPU1QgYC92Mi9ib3QvcmljaG1lbnUve2lkfS9jb250ZW50YCDDlyAzIOKGkiDkuIrlgrPlsI3mh4kgUE5HCjMuIFBPU1QgYC92Mi9ib3QvdXNlci9hbGwvcmljaG1lbnUve0lEX0F9YCDihpIgQSDniYjoqK3ngrrmlrDlpb3lj4vpoJDoqK0KCiMjIOWPluW+lyBDaGFubmVsIEFjY2VzcyBUb2tlbgoKTElORSBEZXZlbG9wZXJzIENvbnNvbGUg4oaSIFByb3ZpZGVyIOKGkiBNZXNzYWdpbmcgQVBJIOKGkiBCYXNpYyBzZXR0aW5ncyDihpIgKipDaGFubmVsIGFjY2VzcyB0b2tlbiAobG9uZy1saXZlZCkqKiDihpIgSXNzdWXjgIIKCuikh+ijveaVtOaute+8iOW+iOmVt++8ie+8jOiyvOWIsCBgZXhwb3J0IENIQU5ORUxfVE9LRU49Ii4uLiJg44CCCgojIyDliIfmj5vkuI3lkIzniYjmnKzvvIjlnKggd29ya2VyLmpzIOijoe+8iQoKYGBganMKLy8g55So5oi25b6eIE5FVyDihpIgSU5RVUlSRUQKYXdhaXQgZmV0Y2goYGh0dHBzOi8vYXBpLmxpbmUubWUvdjIvYm90L3VzZXIvJHt1c2VySWR9L3JpY2htZW51LyR7UklDSE1FTlVfSU5RVUlSRUR9YCwgewogIG1ldGhvZDogJ1BPU1QnLAogIGhlYWRlcnM6IHsgQXV0aG9yaXphdGlvbjogYEJlYXJlciAke0NIQU5ORUxfVE9LRU59YCB9Cn0pOwoKLy8g55So5oi25b6eIElOUVVJUkVEIOKGkiBDT05WRVJURUQgKOaIkOS6pCkKYXdhaXQgZmV0Y2goYGh0dHBzOi8vYXBpLmxpbmUubWUvdjIvYm90L3VzZXIvJHt1c2VySWR9L3JpY2htZW51LyR7UklDSE1FTlVfQ09OVkVSVEVEfWAsIHsKICBtZXRob2Q6ICdQT1NUJywKICBoZWFkZXJzOiB7IEF1dGhvcml6YXRpb246IGBCZWFyZXIgJHtDSEFOTkVMX1RPS0VOfWAgfQp9KTsKYGBgCgojIyDph43ot5EKCuavj+asoei3keacg+W7uuaWsOeahCBzY2hlbWHvvIjoiIrnmoTkuI3mnIPoh6rli5XliKrvvInjgILlhY3osrvluLPomZ/kuIrpmZAgMTAwMCDlgIsgcmljaG1lbnXvvIzkvYblu7rorbDlrprmnJ/muIXnkIbvvJoKCmBgYGJhc2gKIyDliJflh7rmiYDmnInnj77mnIkgcmljaG1lbnUKY3VybCAtcyAtSCAiQXV0aG9yaXphdGlvbjogQmVhcmVyICRDSEFOTkVMX1RPS0VOIiBcCiAgaHR0cHM6Ly9hcGkubGluZS5tZS92Mi9ib3QvcmljaG1lbnUvbGlzdCB8IGpxCgojIOWIqumZpOafkOWAi++8iOeUqOS4iumdouaLv+WIsOeahCByaWNoTWVudUlk77yJCmN1cmwgLVggREVMRVRFIC1IICJBdXRob3JpemF0aW9uOiBCZWFyZXIgJENIQU5ORUxfVE9LRU4iIFwKICBodHRwczovL2FwaS5saW5lLm1lL3YyL2JvdC9yaWNobWVudS97UklDSE1FTlVfSUR9CmBgYAoKIyMgVGFwIFpvbmUg5bCN5oeJ55qE6Zec6Y215a2XCgp8IFJpY2ggTWVudSB8IOaMiemIlSB8IOinuOeZvOioiuaBryB8CnwtLS18LS0tfC0tLXwKfCBBIMK3IE5FVyB8IOS4uyBoZXJvIHwg6Kqq6Kqq5oiR55qE5bqXIHwKfCBBIHwgMDIgfCDlk4HniYzlrbXljJbmmK/ku4DpurwgfAp8IEEgfCAwMyB8IOacjeWLmeS4gOimvSB8CnwgQSB8IDA0IHwg5ZCI5L2c5qGI5L6LIHwKfCBBIHwgMDUgfCDoga/ntaHmiJHlgJEgfAp8IEIgwrcgSU5RVUlSRUQgfCBoZXJvIHwg6aCQ57SE6Kuu6KmiIHwKfCBCIHwgMDIgfCDov73ouaTpgLLluqYgfAp8IEIgfCAwMyB8IOeci+eci+WgseWDuSB8CnwgQiB8IDA0IHwg5YSq5YyW5bu66K2wIHwKfCBCIHwgMDUgfCDoga/ntaHpoafllY8gfAp8IEMgwrcgQ09OVkVSVEVEIHwgaGVybyB8IOS9oOWlve+8jOS7iuWkqeaDs+WBmuS7gOm6vCB8CnwgQyB8IDAyIHwg5oiR55qE5bCI5qGI54uA5oWLIHwKfCBDIHwgMDMgfCDov73liqDmnI3li5kgfAp8IEMgfCAwNCB8IFZJUCDos4fmupDluqsgfAp8IEMgfCAwNSB8IOS7i+e0ueaWsOWuouaItiB8CgrpgJkgMTUg5YCL6Zec6Y215a2X5b+F6aCI6LefIHdvcmtlci5qcyDoo6HnmoQgYGhhbmRsZU1lc3NhZ2VgIHN3aXRjaCDlsI3liLDjgIIK
+# Upload Rich Menu — 使用說明
+
+## 一鍵跑
+
+```bash
+cd assets/exports/
+export CHANNEL_TOKEN="你的_long_lived_channel_access_token"
+chmod +x upload-richmenu.sh
+./upload-richmenu.sh
+```
+
+跑完會印出三個 ID：
+
+```
+const RICHMENU_NEW       = 'richmenu-xxxxxxxxxxxxxxxxxxxxxxxxxx';
+const RICHMENU_INQUIRED  = 'richmenu-yyyyyyyyyyyyyyyyyyyyyyyyyy';
+const RICHMENU_CONVERTED = 'richmenu-zzzzzzzzzzzzzzzzzzzzzzzzzz';
+```
+
+把這三行貼到 `worker.js` 取代舊的 ID 常整。
+
+## 它做了什麼
+
+1. POST `/v2/bot/richmenu` × 3 → 建 3 個 schema（tap zones 已經寫好）
+2. POST `/v2/bot/richmenu/{id}/content` × 3 → 上傳對應 PNG
+3. POST `/v2/bot/user/all/richmenu/{ID_A}` → A 版設為新好友預設
+
+## 取得 Channel Access Token
+
+LINE Developers Console → Provider → Messaging API → Basic settings → **Channel access token (long-lived)** → Issue。
+
+複製整段（很長），貼到 `export CHANNEL_TOKEN="..."`。
+
+## 切換不同版本（在 worker.js 裡）
+
+```js
+// 用戶從 NEW → INQUIRED
+await fetch(`https://api.line.me/v2/bot/user/${userId}/richmenu/${RICHMENU_INQUIRED}`, {
+  method: 'POST',
+  headers: { Authorization: `Bearer ${CHANNEL_TOKEN}` }
+});
+
+// 用戶從 INQUIRED → CONVERTED (成交)
+await fetch(`https://api.line.me/v2/bot/user/${userId}/richmenu/${RICHMENU_CONVERTED}`, {
+  method: 'POST',
+  headers: { Authorization: `Bearer ${CHANNEL_TOKEN}` }
+});
+```
+
+## 重跑
+
+每次跑會建新的 schema（舊的不會自動刪）。免費帳號上限 1000 個 richmenu，但建議定期清理：
+
+```bash
+# 列出所有現有 richmenu
+curl -s -H "Authorization: Bearer $CHANNEL_TOKEN" \
+  https://api.line.me/v2/bot/richmenu/list | jq
+
+# 刪除某個（用上面拿到的 richMenuId）
+curl -X DELETE -H "Authorization: Bearer $CHANNEL_TOKEN" \
+  https://api.line.me/v2/bot/richmenu/{RICHMENU_ID}
+```
+
+## Tap Zone 對應的關鍵字
+
+| Rich Menu | 按鈕 | 觸發訊息 |
+|---|---|---|
+| A · NEW | 主 hero | 說說我的店 |
+| A | 02 | 品牌孵化是什麼 |
+| A | 03 | 服務一覽 |
+| A | 04 | 合作案例 |
+| A | 05 | 聯絡我們 |
+| B · INQUIRED | hero | 預約諮詢 |
+| B | 02 | 追蹤進度 |
+| B | 03 | 看看報價 |
+| B | 04 | 優化建議 |
+| B | 05 | 聯絡顧問 |
+| C · CONVERTED | hero | 你好，今天想做什麼 |
+| C | 02 | 我的專案狀態 |
+| C | 03 | 追加服務 |
+| C | 04 | VIP 資源庫 |
+| C | 05 | 介紹新客戶 |
+
+這 15 個關鍵字必須跟 worker.js 裡的 `handleMessage` switch 對到。

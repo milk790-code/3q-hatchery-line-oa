@@ -1,1 +1,161 @@
-IiIiCjNR6LKi5Li4IFJpY2ggTWVudSDoqK3lrprohbPmnKwgdjIKCuS/ruatozoKICAxLiDjgIzoqK3ngrrpoJDoqK3jgI1QT1NUIOW4tiBkYXRhPWIiIizpgb/lhY3mn5DkupsgUHl0aG9uIOeJiOacrOiqpOWIpOeCuiBHRVQKICAyLiDmib7kuI3liLDlnJbniYfmmYIgc3lzLmV4aXQoMSkg5Lit5q2iLOmBv+WFjeS4iue3muepuueZvemBuOWWrgogIDMuIOmWi+mgreiHquWLlea4heeQhuiIiiBSaWNoIE1lbnUs6YG/5YWN5aCG56mN5YiwIDEwMDAg5LiK6ZmQCgrkvb/nlKjmlrnlvI86CiAgcHl0aG9uIHNldHVwX3JpY2htZW51LnB5CgrliY3nva7mop3ku7Y6CiAgMS4gLmVudiDlt7Lloavlpb0gTElORV9DSEFOTkVMX0FDQ0VTU19UT0tFTgogIDIuIGFzc2V0cy9yaWNoLW1lbnUtMjUwMHgxNjg2LnBuZyDlrZjlnKgKIiIiCgppbXBvcnQgb3MsIHN5cywganNvbiwgdXJsbGliLnJlcXVlc3QKZnJvbSBkb3RlbnYgaW1wb3J0IGxvYWRfZG90ZW52Cgpsb2FkX2RvdGVudigpClRPS0VOID0gb3MuZW52aXJvbi5nZXQoIkxJTkVfQ0hBTk5FTF9BQ0NFU1NfVE9LRU4iLCAiIikKaWYgbm90IFRPS0VOOgogICAgcHJpbnQoIuKdjCDmib7kuI3liLAgTElORV9DSEFOTkVMX0FDQ0VTU19UT0tFTizoq4vnorroqo0gLmVudiDlt7Lloavlpb0iKQogICAgc3lzLmV4aXQoMSkKCkJBU0UgPSAiaHR0cHM6Ly9hcGkubGluZS5tZS92Mi9ib3QiCkRBVEFfQkFTRSA9ICJodHRwczovL2FwaS1kYXRhLmxpbmUubWUvdjIvYm90IgpJTUdfUEFUSCA9IG9zLnBhdGguam9pbihvcy5wYXRoLmRpcm5hbWUoX19maWxlX18pLCAiYXNzZXRzIiwgInJpY2gtbWVudS0yNTAweDE2ODYucG5nIikKQVVUSF9IRUFERVJTID0geyJBdXRob3JpemF0aW9uIjogZiJCZWFyZXIge1RPS0VOfSJ9CgoKIyDilIDilIAg6YCa55So5bel5YW3IOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKZGVmIF9yZXF1ZXN0KHVybCwgbWV0aG9kLCBoZWFkZXJzPU5vbmUsIGRhdGE9Tm9uZSk6CiAgICAiIiLntbHkuIAgcmVxdWVzdCDomZXnkIYiIiIKICAgIGggPSBkaWN0KEFVVEhfSEVBREVSUykKICAgIGlmIGhlYWRlcnM6CiAgICAgICAgaC51cGRhdGUoaGVhZGVycykKICAgICMg56K65L+dIFBPU1Qg5LiA5b6L5bi2IGJvZHko5Y2z5L2/5piv56m655qEKQogICAgYm9keSA9IGRhdGEgaWYgZGF0YSBpcyBub3QgTm9uZSBlbHNlIChiIiIgaWYgbWV0aG9kID09ICJQT1NUIiBlbHNlIE5vbmUpCiAgICByZXEgPSB1cmxsaWIucmVxdWVzdC5SZXF1ZXN0KHVybCwgZGF0YT1ib2R5LCBoZWFkZXJzPWgsIG1ldGhvZD1tZXRob2QpCiAgICB0cnk6CiAgICAgICAgcmVzcCA9IHVybGxpYi5yZXF1ZXN0LnVybG9wZW4ocmVxKQogICAgICAgIHJhdyA9IHJlc3AucmVhZCgpCiAgICAgICAgcmV0dXJuIHJlc3Auc3RhdHVzLCAoanNvbi5sb2FkcyhyYXcpIGlmIHJhdyBlbHNlIHt9KQogICAgZXhjZXB0IHVybGxpYi5lcnJvci5IVFRQRXJyb3IgYXMgZToKICAgICAgICBlcnJfYm9keSA9IGUucmVhZCgpLmRlY29kZSgpCiAgICAgICAgcHJpbnQoZiLinYwgQVBJIHttZXRob2R9IHt1cmx9IOWkseaVlyB7ZS5jb2RlfToge2Vycl9ib2R5fSIpCiAgICAgICAgc3lzLmV4aXQoMSkKCgpkZWYgYXBpX2dldChwYXRoKToKICAgIF8sIGJvZHkgPSBfcmVxdWVzdChmIntCQVNFfXtwYXRofSIsICJHRVQiKQogICAgcmV0dXJuIGJvZHkKCgpkZWYgYXBpX3Bvc3RfanNvbihwYXRoLCBkYXRhKToKICAgIGJvZHkgPSBqc29uLmR1bXBzKGRhdGEpLmVuY29kZSgpCiAgICBfLCByZXQgPSBfcmVxdWVzdCgKICAgICAgICBmIntCQVNFfXtwYXRofSIsICJQT1NUIiwKICAgICAgICBoZWFkZXJzPXsiQ29udGVudC1UeXBlIjogImFwcGxpY2F0aW9uL2pzb24ifSwKICAgICAgICBkYXRhPWJvZHksCiAgICApCiAgICByZXR1cm4gcmV0CgoKZGVmIGFwaV9wb3N0X2VtcHR5KHBhdGgpOgogICAgIiIi6Kit5a6a6aGeIFBPU1Qo54ShIGJvZHkpLOS/ruato+eJiOW4tiBkYXRhPWInJyIiIgogICAgc3RhdHVzLCBfID0gX3JlcXVlc3QoZiJ7QkFTRX17cGF0aH0iLCAiUE9TVCIpCiAgICByZXR1cm4gc3RhdHVzCgoKZGVmIGFwaV9kZWxldGUocGF0aCk6CiAgICBzdGF0dXMsIF8gPSBfcmVxdWVzdChmIntCQVNFfXtwYXRofSIsICJERUxFVEUiKQogICAgcmV0dXJuIHN0YXR1cwoKCmRlZiBhcGlfdXBsb2FkX2ltYWdlKG1lbnVfaWQsIGltZ19kYXRhKToKICAgIHVybCA9IGYie0RBVEFfQkFTRX0vcmljaG1lbnUve21lbnVfaWR9L2NvbnRlbnQiCiAgICBzdGF0dXMsIF8gPSBfcmVxdWVzdCgKICAgICAgICB1cmwsICJQT1NUIiwKICAgICAgICBoZWFkZXJzPXsiQ29udGVudC1UeXBlIjogImltYWdlL3BuZyJ9LAogICAgICAgIGRhdGE9aW1nX2RhdGEsCiAgICApCiAgICByZXR1cm4gc3RhdHVzCgoKIyDilIDilIAg5Li75rWB56iLIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAoKZGVmIG1haW4oKToKICAgIHByaW50KCLwn5SoIDNR6LKi5Li4IFJpY2ggTWVudSDoqK3lrpogdjJcbiIpCgogICAgIyAwLiDliY3nva7mqqLmn6Ug4oCUIOWclueJh+W/hemgiOWtmOWcqAogICAgaWYgbm90IG9zLnBhdGguZXhpc3RzKElNR19QQVRIKToKICAgICAgICBwcmludChmIuKdjCDmib7kuI3liLAge0lNR19QQVRIfSIpCiAgICAgICAgcHJpbnQoIiAg6KuL5YWI56K66KqNIGFzc2V0cy9yaWNoLW1lbnUtMjUwMHgxNjg2LnBuZyDlrZjlnKjlho3ln7fooYwiKQogICAgICAgIHByaW50KCIgIOmBv+WFjeS4iue3muS4gOWAi+aykuacieWclueJh+eahOepuueZvemBuOWWriIpCiAgICAgICAgc3lzLmV4aXQoMSkKICAgIHByaW50KGYiWzAvNF0g5ZyW54mH5qqi5p+lIOKchSB7SU1HX1BBVEh9IikKCiAgICAjIDEuIOa4heeQhuiIiiBSaWNoIE1lbnUo6YG/5YWN5aCG56mN5YiwIDEwMDAg5LiK6ZmQKQogICAgcHJpbnQoIlsxLzRdIOa4heeQhuiIiiBSaWNoIE1lbnUuLi4iKQogICAgZXhpc3RpbmcgPSBhcGlfZ2V0KCIvcmljaG1lbnUvbGlzdCIpCiAgICBtZW51cyA9IGV4aXN0aW5nLmdldCgicmljaG1lbnVzIiwgW10pCiAgICBpZiBtZW51czoKICAgICAgICBmb3IgbSBpbiBtZW51czoKICAgICAgICAgICAgbWlkID0gbS5nZXQoInJpY2hNZW51SWQiKQogICAgICAgICAgICBuYW1lID0gbS5nZXQoIm5hbWUiLCAiKHVubmFtZWQpIikKICAgICAgICAgICAgYXBpX2RlbGV0ZShmIi9yaWNobWVudS97bWlkfSIpCiAgICAgICAgICAgIHByaW50KGYiICDinIUg5bey5Yiq6Zmk6IiK6YG45ZauOiB7bmFtZX0gKHttaWRbOjEyXX0uLi4pIikKICAgIGVsc2U6CiAgICAgICAgcHJpbnQoIiAgKOeEoeiIiumBuOWWrumcgOa4heeQhikiKQoKICAgICMgMi4g5bu656uLIFJpY2ggTWVudSDntZDmp4sKICAgIHByaW50KCJbMi80XSDlu7rnq4vmlrAgUmljaCBNZW51IOe1kOaniy4uLiIpCiAgICBXLCBIID0gMjUwMCwgMTY4NgogICAgY3csIGNoID0gVyAvLyAzLCBIIC8vIDIKICAgIGtleXdvcmRzID0gWyLoq67oqaIiLCAiNTAwIiwgIuihjOmKtyIsICLpgLLluqYiLCAi5a6i5pyNIiwgIue0hOirruipoiJdCgogICAgYXJlYXMgPSBbXQogICAgZm9yIGlkeCwga3cgaW4gZW51bWVyYXRlKGtleXdvcmRzKToKICAgICAgICBjb2wgPSBpZHggJSAzCiAgICAgICAgcm93ID0gaWR4IC8vIDMKICAgICAgICAjIOacgOWPs+ashOijnOmkmOaVuCzpgb/lhY0gd2lkdGgg5Yqg57i95LiN562J5pa8IFcKICAgICAgICB3aWR0aCA9IChXIC0gY29sICogY3cpIGlmIGNvbCA9PSAyIGVsc2UgY3cKICAgICAgICBhcmVhcy5hcHBlbmQoewogICAgICAgICAgICAiYm91bmRzIjogeyJ4IjogY29sICogY3csICJ5Ijogcm93ICogY2gsICJ3aWR0aCI6IHdpZHRoLCAiaGVpZ2h0IjogY2h9LAogICAgICAgICAgICAiYWN0aW9uIjogeyJ0eXBlIjogIm1lc3NhZ2UiLCAidGV4dCI6IGt3fSwKICAgICAgICB9KQoKICAgIG1lbnVfYm9keSA9IHsKICAgICAgICAic2l6ZSI6IHsid2lkdGgiOiBXLCAiaGVpZ2h0IjogSH0sCiAgICAgICAgInNlbGVjdGVkIjogVHJ1ZSwKICAgICAgICAibmFtZSI6ICIzUeiyouS4uOS4u+mBuOWWrnYyIiwKICAgICAgICAiY2hhdEJhclRleHQiOiAi8J+TiyDpgbjllq4iLAogICAgICAgICJhcmVhcyI6IGFyZWFzLAogICAgfQoKICAgIHJlc3VsdCA9IGFwaV9wb3N0X2pzb24oIi9yaWNobWVudSIsIG1lbnVfYm9keSkKICAgIG1lbnVfaWQgPSByZXN1bHQuZ2V0KCJyaWNoTWVudUlkIikKICAgIHByaW50KGYiICDinIUgUmljaCBNZW51IElEOiB7bWVudV9pZH0iKQoKICAgICMgMy4g5LiK5YKz5ZyW54mHCiAgICBwcmludCgiWzMvNF0g5LiK5YKzIFJpY2ggTWVudSDlnJbniYcuLi4iKQogICAgd2l0aCBvcGVuKElNR19QQVRILCAicmIiKSBhcyBmOgogICAgICAgIGltZ19kYXRhID0gZi5yZWFkKCkKICAgIGFwaV91cGxvYWRfaW1hZ2UobWVudV9pZCwgaW1nX2RhdGEpCiAgICBwcmludChmIiAg4pyFIOWclueJh+S4iuWCs+WujOaIkCh7bGVuKGltZ19kYXRhKS8vMTAyNH0gS0IpIikKCiAgICAjIDQuIOioreeCuumgkOiorShQT1NUIOW4tiBkYXRhPWIiIiDpgb/lhY3ooqvoqqTliKTngrogR0VUKQogICAgcHJpbnQoIls0LzRdIOioreeCuuaJgOacieS9v+eUqOiAheeahOmgkOiorSBSaWNoIE1lbnUuLi4iKQogICAgYXBpX3Bvc3RfZW1wdHkoZiIvdXNlci9hbGwvcmljaG1lbnUve21lbnVfaWR9IikKICAgIHByaW50KCIgIOKchSDlt7LoqK3ngrrpoJDoqK0gUmljaCBNZW51IikKCiAgICBwcmludChmIlxu4pyFIOWFqOmDqOWujOaIkCEiKQogICAgcHJpbnQoZiJSaWNoIE1lbnUgSUQ6IHttZW51X2lkfSIpCiAgICBwcmludChmIkxJTkUg5L2/55So6ICF5omT6ZaL5bCN6Kmx5Y2z5Y+v55yL5Yiw5bqV6YOo5YWt5qC86YG45ZauIikKCgppZiBfX25hbWVfXyA9PSAiX19tYWluX18iOgogICAgbWFpbigpCg==
+"""
+3Q貢丸 Rich Menu 設定腳本 v2
+
+修正:
+  1. 「設為預設」POST 帶 data=b"",避免某些 Python 版本誤判為 GET
+  2. 找不到圖片時 sys.exit(1) 中止,避免上線空白選單
+  3. 開頭自動清理舊 Rich Menu,避免堆積到 1000 上限
+
+使用方式:
+  python setup_richmenu.py
+
+前置條件:
+  1. .env 已填好 LINE_CHANNEL_ACCESS_TOKEN
+  2. assets/rich-menu-2500x1686.png 存在
+"""
+
+import os, sys, json, urllib.request
+from dotenv import load_dotenv
+
+load_dotenv()
+TOKEN = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN", "")
+if not TOKEN:
+    print("❌ 找不到 LINE_CHANNEL_ACCESS_TOKEN,請確認 .env 已填好")
+    sys.exit(1)
+
+BASE = "https://api.line.me/v2/bot"
+DATA_BASE = "https://api-data.line.me/v2/bot"
+IMG_PATH = os.path.join(os.path.dirname(__file__), "assets", "rich-menu-2500x1686.png")
+AUTH_HEADERS = {"Authorization": f"Bearer {TOKEN}"}
+
+
+# ── 通用工具 ──────────────────────────────────
+
+def _request(url, method, headers=None, data=None):
+    """統一 request 處理"""
+    h = dict(AUTH_HEADERS)
+    if headers:
+        h.update(headers)
+    # 確保 POST 一律帶 body(即使是空的)
+    body = data if data is not None else (b"" if method == "POST" else None)
+    req = urllib.request.Request(url, data=body, headers=h, method=method)
+    try:
+        resp = urllib.request.urlopen(req)
+        raw = resp.read()
+        return resp.status, (json.loads(raw) if raw else {})
+    except urllib.error.HTTPError as e:
+        err_body = e.read().decode()
+        print(f"❌ API {method} {url} 失敗 {e.code}: {err_body}")
+        sys.exit(1)
+
+
+def api_get(path):
+    _, body = _request(f"{BASE}{path}", "GET")
+    return body
+
+
+def api_post_json(path, data):
+    body = json.dumps(data).encode()
+    _, ret = _request(
+        f"{BASE}{path}", "POST",
+        headers={"Content-Type": "application/json"},
+        data=body,
+    )
+    return ret
+
+
+def api_post_empty(path):
+    """設定類 POST(無 body),修正版帶 data=b''"""
+    status, _ = _request(f"{BASE}{path}", "POST")
+    return status
+
+
+def api_delete(path):
+    status, _ = _request(f"{BASE}{path}", "DELETE")
+    return status
+
+
+def api_upload_image(menu_id, img_data):
+    url = f"{DATA_BASE}/richmenu/{menu_id}/content"
+    status, _ = _request(
+        url, "POST",
+        headers={"Content-Type": "image/png"},
+        data=img_data,
+    )
+    return status
+
+
+# ── 主流程 ──────────────────────────────────
+
+def main():
+    print("🔨 3Q貢丸 Rich Menu 設定 v2\n")
+
+    # 0. 前置檢查 — 圖片必須存在
+    if not os.path.exists(IMG_PATH):
+        print(f"❌ 找不到 {IMG_PATH}")
+        print("  請先確認 assets/rich-menu-2500x1686.png 存在再執行")
+        print("  避免上線一個沒有圖片的空白選單")
+        sys.exit(1)
+    print(f"[0/4] 圖片檢查 ✅ {IMG_PATH}")
+
+    # 1. 清理舊 Rich Menu(避免堆積到 1000 上限)
+    print("[1/4] 清理舊 Rich Menu...")
+    existing = api_get("/richmenu/list")
+    menus = existing.get("richmenus", [])
+    if menus:
+        for m in menus:
+            mid = m.get("richMenuId")
+            name = m.get("name", "(unnamed)")
+            api_delete(f"/richmenu/{mid}")
+            print(f"  ✅ 已刪除舊選單: {name} ({mid[:12]}...)")
+    else:
+        print("  (無舊選單需清理)")
+
+    # 2. 建立 Rich Menu 結構
+    print("[2/4] 建立新 Rich Menu 結構...")
+    W, H = 2500, 1686
+    cw, ch = W // 3, H // 2
+    keywords = ["諮詢", "500", "行銷", "進度", "客服", "約諮詢"]
+
+    areas = []
+    for idx, kw in enumerate(keywords):
+        col = idx % 3
+        row = idx // 3
+        # 最右欄補餘數,避免 width 加總不等於 W
+        width = (W - col * cw) if col == 2 else cw
+        areas.append({
+            "bounds": {"x": col * cw, "y": row * ch, "width": width, "height": ch},
+            "action": {"type": "message", "text": kw},
+        })
+
+    menu_body = {
+        "size": {"width": W, "height": H},
+        "selected": True,
+        "name": "3Q貢丸主選單v2",
+        "chatBarText": "📋 選單",
+        "areas": areas,
+    }
+
+    result = api_post_json("/richmenu", menu_body)
+    menu_id = result.get("richMenuId")
+    print(f"  ✅ Rich Menu ID: {menu_id}")
+
+    # 3. 上傳圖片
+    print("[3/4] 上傳 Rich Menu 圖片...")
+    with open(IMG_PATH, "rb") as f:
+        img_data = f.read()
+    api_upload_image(menu_id, img_data)
+    print(f"  ✅ 圖片上傳完成({len(img_data)//1024} KB)")
+
+    # 4. 設為預設(POST 帶 data=b"" 避免被誤判為 GET)
+    print("[4/4] 設為所有使用者的預設 Rich Menu...")
+    api_post_empty(f"/user/all/richmenu/{menu_id}")
+    print("  ✅ 已設為預設 Rich Menu")
+
+    print(f"\n✅ 全部完成!")
+    print(f"Rich Menu ID: {menu_id}")
+    print(f"LINE 使用者打開對話即可看到底部六格選單")
+
+
+if __name__ == "__main__":
+    main()

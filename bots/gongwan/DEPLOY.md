@@ -1,1 +1,114 @@
-IyAzUeiyouS4uCBMSU5FIEJvdCDCtyBSZW5kZXIg6Zuy56uv6YOo572yCgrkuI3nlKjmnKzmqZ8gUG93ZXJTaGVsbCzkuI3nlKggbmdyb2ss5LiN55Ko5q+P5aSp6ZaL5qmf44CCCuWFqOeoi+m7nua7kem8oCznuL3lhbHkuInmrrXlhbEgMTAg5YiG6ZCY5bem5Y+z44CCCgotLS0KCiMjIOWFqOeoi+mgkOimvQoKYGBgCuauteiQvSAxICDkuIrlgrPliLAgR2l0SHViICAgIDMg5YiG6ZCYICAg6bueIDMg5qyh5ruR6bygCuauteiQvSAyICDpgKPliLAgUmVuZGVyICAgICAgNCDliIbpkJggICDpu54gNSDmrKHmu5HpvKAgKyDosrwgMiDlgIvlgLwK5q616JC9IDMgIOaOpeWbniBMSU5FIENvbnNvbGUgMSDliIbpkJggICDosrwgMSDmrKEgVVJMCuauteiQvSA0ICDku6PnkIbmuIXnkIYgKyDmuKzoqaYgIDMg5YiG6ZCYICAg6LK8IDEg5q615oyH5LukICsg5risIDEyIOWPpQpgYGAKCi0tLQoKIyMg5q616JC9IDEgwrcg5LiK5YKz5YiwIEdpdEh1Yu+8iDMg5YiG6ZCY77yJCgojIyMgMS0xIOmWiyBHaXRIdWIg5biz6JmfCgrljrsgaHR0cHM6Ly9naXRodWIuY29tL3NpZ251cCDoqLvlhooKCiMjIyAxLTIg5paw5bu6IHJlcG8KCuWOuyBodHRwczovL2dpdGh1Yi5jb20vbmV3CgpgYGAKUmVwb3NpdG9yeSBuYW1lICAgICAgM3Fnb25nd2FuLWJvdApEZXNjcmlwdGlvbiAgICAgICAgICAzUeiyouS4uCBMSU5FIOWuouacjeapn+WZqOS6ugpQdWJsaWMgLyBQcml2YXRlICAgICDpgbggUHJpdmF0ZQpBZGQgYSBSRUFETUUgZmlsZSAgICDkuI3li74KLmdpdGlnbm9yZSAgICAgICAgICAg5LiN5Yu+CkxpY2Vuc2UgICAgICAgICAgICAgIE5vbmUKYGBgCgrpu54gKipDcmVhdGUgcmVwb3NpdG9yeSoqCgojIyMgMS0zIOS4iuWCs+aqlOahiAoK6bueICoqdXBsb2FkaW5nIGFuIGV4aXN0aW5nIGZpbGUqKgoKYGBgCjEuIOaKiuizh+aWmeWkvuWFp+aJgOacieaqlOahiOWFqOmBuO+8iOWQqyBhc3NldHMg6LOH5paZ5aS+77yJCjIuIOaLluabs+WIsCBHaXRIdWIg5LiK5YKz5Y2ACjMuIOKaoCDnorroqo0gLmVudiDmspLooqvpgbjliLDvvIjlj6ropoEgLmVudi50ZW1wbGF0Ze+8iQo0LiBDb21taXQgbWVzc2FnZSDloas6IEluaXRpYWwgY29tbWl0IHYyLjAKNS4g6bueIENvbW1pdCBjaGFuZ2VzCmBgYAoKLS0tCgojIyDmrrXokL0gMiDCtyDpgKPliLAgUmVuZGVy77yINCDliIbpkJjvvIkKCiMjIyAyLTEg6Ki75YaKIFJlbmRlcgoK5Y67IGh0dHBzOi8vZGFzaGJvYXJkLnJlbmRlci5jb20vcmVnaXN0ZXIg4oaSICoqU2lnbiB1cCB3aXRoIEdpdEh1YioqCgojIyMgMi0yIOaWsOW7uiBXZWIgU2VydmljZQoKRGFzaGJvYXJkIOKGkiAqKk5ldyArKiog4oaSICoqV2ViIFNlcnZpY2UqKiDihpIg6YCj5YiwICoqM3Fnb25nd2FuLWJvdCoqCgojIyMgMi0zIFJlbmRlciDoh6rli5XoroAgcmVuZGVyLnlhbWwKCuiHquWLleWhq+WlveaJgOacieashOS9jSzpu54gKipBcHBseSoqCgojIyMgMi00IOWhq+WFqeWAi+eSsOWig+iuiuaVuAoKKipFbnZpcm9ubWVudCoqIOKGkiAqKkFkZCBFbnZpcm9ubWVudCBWYXJpYWJsZSoqCgpgYGAKS2V5OiAgICBMSU5FX0NIQU5ORUxfU0VDUkVUClZhbHVlOiAgW+W+niBMSU5FIERldmVsb3BlcnMgQ29uc29sZSDlj5blvpddCgpLZXk6ICAgIExJTkVfQ0hBTk5FTF9BQ0NFU1NfVE9LRU4KVmFsdWU6ICBb5b6eIExJTkUgRGV2ZWxvcGVycyBDb25zb2xlIOWPluW+l10KYGBgCgrimqAg6YCZ5YWp5YCL5YC857WV5bCN5LiN6KaB6LK86YCy5bCN6Kmx44CB5LiN6KaB5oiq5ZyWCgojIyMgMi01IOaLv+WIsOWbuuWumiBVUkwKCumDqOe9suWujOaIkOW+jOikh+ijvSBgaHR0cHM6Ly8zcWdvbmd3YW4tYm90Lm9ucmVuZGVyLmNvbWAKCi0tLQoKIyMg5q616JC9IDMgwrcg5o6l5ZueIExJTkUgQ29uc29sZe+8iDEg5YiG6ZCY77yJCgpgYGAKV2ViaG9vayBVUkw6IGh0dHBzOi8vM3Fnb25nd2FuLWJvdC5vbnJlbmRlci5jb20vbGluZS93ZWJob29rCmBgYAoK6bueICoqVXBkYXRlKiog4oaSICoqVmVyaWZ5Kiog4oaSIOeci+WIsOe2oOWLvgrplovllZ8gKipVc2Ugd2ViaG9vayoqICsgKipXZWJob29rIHJlZGVsaXZlcnkqKgoKLS0tCgojIyDmrrXokL0gNCDCtyDlvozlj7DmuIXnkIYgKyDmuKzoqabvvIgzIOWIhumQmO+8iQoKMS4gYGFnZW50LWluc3RydWN0aW9ucy1BLnR4dGAg57Wm54CP6Ka95Zmo5Luj55CG6LeRCjIuIOeFpyBgdGVzdC1jaGVja2xpc3QubWRgIOi3kSAxMiDmop3muKzoqaYKCi0tLQoKIyMgUmVuZGVyIOWFjeiyu+aWueahiOaPkOmGkgoKYGBgCjEuIOmWkue9riAxNSDliIbpkJjnnaHnnKDvvIzpppbmrKHllprphpLntIQgMzAg56eSCiAgIOeUqCBodHRwczovL2Nyb24tam9iLm9yZyDmr48gMTAg5YiG6ZCYIHBpbmcg5Y+v5L+d5oyB5riF6YaSCjIuIOavj+aciCA3NTAg5bCP5pmC5YWN6LK777yM5aSg5LiA5YCL5pyN5YuZIDI0LzcKMy4gQnVpbGQg5aSx5pWX55yLIFJlbmRlciBMb2dzCjQuIOawuOS4jeedoeecoDogU3RhcnRlciBVU0QgNy/mnIgKYGBgCg==
+# 3Q貢丸 LINE Bot · Render 雲端部署
+
+不用本機 PowerShell,不用 ngrok,不璨每天開機。
+全程點滑鼠,總共三段共 10 分鐘左右。
+
+---
+
+## 全程預覽
+
+```
+段落 1  上傳到 GitHub    3 分鐘   點 3 次滑鼠
+段落 2  連到 Render      4 分鐘   點 5 次滑鼠 + 貼 2 個值
+段落 3  接回 LINE Console 1 分鐘   貼 1 次 URL
+段落 4  代理清理 + 測試  3 分鐘   貼 1 段指令 + 測 12 句
+```
+
+---
+
+## 段落 1 · 上傳到 GitHub（3 分鐘）
+
+### 1-1 開 GitHub 帳號
+
+去 https://github.com/signup 註冊
+
+### 1-2 新建 repo
+
+去 https://github.com/new
+
+```
+Repository name      3qgongwan-bot
+Description          3Q貢丸 LINE 客服機器人
+Public / Private     選 Private
+Add a README file    不勾
+.gitignore           不勾
+License              None
+```
+
+點 **Create repository**
+
+### 1-3 上傳檔案
+
+點 **uploading an existing file**
+
+```
+1. 把資料夾內所有檔案全選（含 assets 資料夾）
+2. 拖曳到 GitHub 上傳區
+3. ⚠ 確認 .env 沒被選到（只要 .env.template）
+4. Commit message 填: Initial commit v2.0
+5. 點 Commit changes
+```
+
+---
+
+## 段落 2 · 連到 Render（4 分鐘）
+
+### 2-1 註冊 Render
+
+去 https://dashboard.render.com/register → **Sign up with GitHub**
+
+### 2-2 新建 Web Service
+
+Dashboard → **New +** → **Web Service** → 連到 **3qgongwan-bot**
+
+### 2-3 Render 自動讀 render.yaml
+
+自動填好所有欄位,點 **Apply**
+
+### 2-4 填兩個環境變數
+
+**Environment** → **Add Environment Variable**
+
+```
+Key:    LINE_CHANNEL_SECRET
+Value:  [從 LINE Developers Console 取得]
+
+Key:    LINE_CHANNEL_ACCESS_TOKEN
+Value:  [從 LINE Developers Console 取得]
+```
+
+⚠ 這兩個值絕對不要貼進對話、不要截圖
+
+### 2-5 拿到固定 URL
+
+部署完成後複製 `https://3qgongwan-bot.onrender.com`
+
+---
+
+## 段落 3 · 接回 LINE Console（1 分鐘）
+
+```
+Webhook URL: https://3qgongwan-bot.onrender.com/line/webhook
+```
+
+點 **Update** → **Verify** → 看到綠勾
+開啟 **Use webhook** + **Webhook redelivery**
+
+---
+
+## 段落 4 · 後台清理 + 測試（3 分鐘）
+
+1. `agent-instructions-A.txt` 給瀏覽器代理跑
+2. 照 `test-checklist.md` 跑 12 條測試
+
+---
+
+## Render 免費方案提醒
+
+```
+1. 閒置 15 分鐘睡眠，首次喚醒約 30 秒
+   用 https://cron-job.org 每 10 分鐘 ping 可保持清醒
+2. 每月 750 小時免費，夠一個服務 24/7
+3. Build 失敗看 Render Logs
+4. 永不睡眠: Starter USD 7/月
+```
