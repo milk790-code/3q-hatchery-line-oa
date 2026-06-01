@@ -10,6 +10,7 @@ on:
         type: choice
         options:
           - 005_launch_plan_campaign.sql
+          - 006_fb_evergreen.sql
       dry_run:
         description: 'Dry run（只印出 SQL，不真正執行）'
         required: false
