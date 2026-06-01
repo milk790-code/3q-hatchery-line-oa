@@ -337,8 +337,10 @@ async function issueMemberCard(uid, env) {
     const num = cur + 1;
     await env.SESSION.put('member:next_num', String(num));
     const joinDate = new Date(Date.now() + 8 * 3600000).toISOString().slice(0, 10);
-    const card = { num, joinDate, tier: 'visitor' };
+    const code = refCodeForNum(num);
+    const card = { num, joinDate, tier: 'visitor', code, refCount: 0 };
     await env.SESSION.put(`member:${uid}`, JSON.stringify(card));
+    await env.SESSION.put(`refcode:${code}`, uid);   // reverse index for O(1) attribution
     return card;
   } catch (err) {
     console.error('issueMemberCard failed:', err.message);
@@ -358,34 +360,50 @@ async function updateMemberTier(uid, tier, env) {
   } catch {}
 }
 
-function memberCardFlex(num, joinDate, tier) {
+function memberCardFlex(num, joinDate, tier, code, refCount, env) {
   const TIER_LABELS = { visitor: '訪客', inquired: '詢問者', partner: '夥伴' };
   const TIER_COLORS = { visitor: '#8A8A8A', inquired: '#B8924A', partner: '#B8924A' };
   const padded = String(num).padStart(4, '0');
-  return FLEX(`3Q 會員卡 #${padded}`, {
-    type: 'bubble', size: 'mega',
-    body: {
-      type: 'box', layout: 'vertical', backgroundColor: '#0A0A0A',
-      paddingAll: '24px', spacing: 'sm',
-      contents: [
-        { type: 'text', text: 'MEMBER', color: '#B8924A', size: 'xxs', weight: 'bold', letterSpacing: '4px' },
-        { type: 'text', text: `# ${padded}`, color: '#F5F2EC', size: 'xxl', weight: 'bold', margin: 'sm' },
-        { type: 'separator', margin: 'sm', color: '#B8924A' },
-        { type: 'box', layout: 'horizontal', margin: 'md', contents: [
-          { type: 'text', text: '加入日期', color: '#8A8A8A', size: 'xs', flex: 1 },
-          { type: 'text', text: joinDate, color: '#F5F2EC', size: 'xs', flex: 2, align: 'end' },
-        ]},
-        { type: 'box', layout: 'horizontal', contents: [
-          { type: 'text', text: '身分', color: '#8A8A8A', size: 'xs', flex: 1 },
-          { type: 'text', text: TIER_LABELS[tier] || tier,
-            color: TIER_COLORS[tier] || '#F5F2EC', size: 'xs', flex: 2, align: 'end', weight: 'bold' },
-        ]},
-        { type: 'separator', margin: 'md', color: '#333333' },
-        { type: 'text', text: '3Q HATCHERY · 台灣在地品牌孵化所',
-          color: '#444444', size: 'xxs', margin: 'sm', align: 'center' },
-      ],
-    },
-  });
+  const body = {
+    type: 'box', layout: 'vertical', backgroundColor: '#0A0A0A',
+    paddingAll: '24px', spacing: 'sm',
+    contents: [
+      { type: 'text', text: 'MEMBER', color: '#B8924A', size: 'xxs', weight: 'bold', letterSpacing: '4px' },
+      { type: 'text', text: `# ${padded}`, color: '#F5F2EC', size: 'xxl', weight: 'bold', margin: 'sm' },
+      { type: 'separator', margin: 'sm', color: '#B8924A' },
+      { type: 'box', layout: 'horizontal', margin: 'md', contents: [
+        { type: 'text', text: '加入日期', color: '#8A8A8A', size: 'xs', flex: 1 },
+        { type: 'text', text: joinDate, color: '#F5F2EC', size: 'xs', flex: 2, align: 'end' },
+      ]},
+      { type: 'box', layout: 'horizontal', contents: [
+        { type: 'text', text: '身分', color: '#8A8A8A', size: 'xs', flex: 1 },
+        { type: 'text', text: TIER_LABELS[tier] || tier,
+          color: TIER_COLORS[tier] || '#F5F2EC', size: 'xs', flex: 2, align: 'end', weight: 'bold' },
+      ]},
+    ],
+  };
+  if (code) {
+    body.contents.push({ type: 'box', layout: 'horizontal', contents: [
+      { type: 'text', text: '引薦碼', color: '#8A8A8A', size: 'xs', flex: 1 },
+      { type: 'text', text: `${code} · 已薦 ${refCount || 0}`, color: '#B8924A', size: 'xs', flex: 2, align: 'end', weight: 'bold' },
+    ]});
+  }
+  body.contents.push(
+    { type: 'separator', margin: 'md', color: '#333333' },
+    { type: 'text', text: '3Q HATCHERY · 台灣在地品牌孵化所',
+      color: '#444444', size: 'xxs', margin: 'sm', align: 'center' },
+  );
+  const bubble = { type: 'bubble', size: 'mega', body };
+  if (code) {
+    bubble.footer = {
+      type: 'box', layout: 'vertical', backgroundColor: '#F5F2EC', paddingAll: '16px',
+      contents: [{
+        type: 'button', style: 'primary', color: '#0A0A0A', height: 'sm',
+        action: { type: 'uri', label: '引薦朋友 · 兩邊都有禮遇', uri: referralDeepLink(code, env) },
+      }],
+    };
+  }
+  return FLEX(`3Q 會員卡 #${padded}`, bubble);
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -422,6 +440,200 @@ async function getSubscribers(env) {
     const cur = await env.SESSION.get(SUBSCRIBERS_KEY);
     return cur ? JSON.parse(cur) : [];
   } catch { return []; }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// v3.7: Referral engine — code issue, attribution, qualify, reward
+//   One engine shared across OAs (code prefix H = hatchery, G = gongwan).
+//   Attribution path (no LIFF): prefilled oaMessage deep link "引薦 <CODE>".
+//   Reward = status language (label_public) wrapping a real discount code.
+//   Qualifies ONLY on inquiry/campaign (never on follow) → anti-farming.
+// ─────────────────────────────────────────────────────────────────────────
+
+const REF_PREFIX = 'H';                      // this worker = hatchery
+const REF_PENDING_TTL = 60 * 60 * 24 * 30;   // pending attribution lives 30 days
+const REF_WEEK_LIMIT = 20;                    // > this/week → owner review, not auto-reward
+
+function refCodeForNum(num) {
+  return REF_PREFIX + String(num).padStart(4, '0');
+}
+
+// Reward ladder by inviter cumulative qualified count (REFERRAL-SYSTEM.md §5).
+function inviterReward(count) {
+  if (count >= 10) return { value_type: 'discount_pct', value: 20, label: '引薦核心 · 聯名席位' };
+  if (count >= 5)  return { value_type: 'discount_pct', value: 20, label: '引薦夥伴 · 常態禮遇' };
+  if (count >= 3)  return { value_type: 'discount_pct', value: 15, label: '常引薦 · 優先排程' };
+  return { value_type: 'discount_pct', value: 10, label: '引薦人 · 留名禮遇' };
+}
+const INVITEE_REWARD = { value_type: 'discount_pct', value: 10, label: '入席禮 · 首單禮遇' };
+
+function referralDeepLink(code, env) {
+  const id = env.LINE_BASIC_ID || '@121Ikspe';
+  return `https://line.me/R/oaMessage/${encodeURIComponent(id)}/?${encodeURIComponent('引薦 ' + code)}`;
+}
+function referralSiteLink(code, env) {
+  const base = env.SITE_BASE_URL || 'https://milk790-code.github.io/3q-hatchery-line-oa/';
+  return base + (base.indexOf('?') > -1 ? '&' : '?') + 'ref=' + encodeURIComponent(code);
+}
+
+// Ensure a member card carries a code + reverse key (heals legacy cards).
+async function ensureReferralCode(uid, env) {
+  const card = await issueMemberCard(uid, env);   // idempotent
+  if (!card) return null;
+  let dirty = false;
+  if (!card.code) { card.code = refCodeForNum(card.num); dirty = true; }
+  if (card.refCount == null) { card.refCount = 0; dirty = true; }
+  if (dirty) await env.SESSION.put(`member:${uid}`, JSON.stringify(card));
+  await env.SESSION.put(`refcode:${card.code}`, uid);
+  return card;
+}
+
+async function resolveRefCode(code, env) {
+  if (!env.SESSION || !code) return null;
+  return await env.SESSION.get(`refcode:${code}`);
+}
+
+// Invitee sent the prefilled "引薦 CODE" — stash pending attribution (no reward yet).
+async function capturePendingRef(inviteeUid, code, env) {
+  if (!env.SESSION || !inviteeUid || !code) return false;
+  const inviterUid = await resolveRefCode(code, env);
+  if (!inviterUid || inviterUid === inviteeUid) return false;   // unknown code or self-referral
+  await env.SESSION.put(`pending_ref:${inviteeUid}`,
+    JSON.stringify({ code, inviterUid, ts: Date.now() }),
+    { expirationTtl: REF_PENDING_TTL });
+  return true;
+}
+
+async function grantReward(uid, role, refId, reward, env) {
+  if (!env.CRM) return null;
+  const code = `${role.slice(0, 3).toUpperCase()}-${refId}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+  try {
+    await env.CRM.prepare(
+      'INSERT INTO rewards (uid, role, ref_id, value_type, value, label_public, discount_code) VALUES (?, ?, ?, ?, ?, ?, ?)'
+    ).bind(uid, role, refId, reward.value_type, reward.value, reward.label, code).run();
+  } catch (err) { console.error('grantReward failed:', err.message); return null; }
+  return code;
+}
+
+async function pushMsg(to, messages, env) {
+  if (!to || !env.LINE_CHANNEL_ACCESS_TOKEN) return;
+  try {
+    await fetch('https://api.line.me/v2/bot/message/push', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to, messages }),
+    });
+  } catch (err) { console.error('pushMsg failed:', err.message); }
+}
+
+// Called the moment an invitee qualifies (inquiry/campaign). Idempotent + guarded.
+async function finalizeReferral(inviteeUid, inquiryId, sourceOa, env) {
+  if (!env.SESSION || !env.CRM || !inviteeUid) return;
+  try {
+    const raw = await env.SESSION.get(`pending_ref:${inviteeUid}`);
+    if (!raw) return;
+    const p = JSON.parse(raw);
+    const inviterUid = p.inviterUid || await resolveRefCode(p.code, env);
+    if (!inviterUid || inviterUid === inviteeUid) {
+      await env.SESSION.delete(`pending_ref:${inviteeUid}`);
+      return;
+    }
+    // one attribution per invitee lifetime (UNIQUE index is the hard guard)
+    const existing = await env.CRM.prepare('SELECT id FROM referrals WHERE invitee_uid = ?').bind(inviteeUid).first();
+    if (existing) { await env.SESSION.delete(`pending_ref:${inviteeUid}`); return; }
+
+    // rate-limit → flag for owner review instead of auto-rewarding
+    const wk = await env.CRM.prepare(
+      "SELECT COUNT(*) AS n FROM referrals WHERE inviter_uid = ? AND status IN ('qualified','rewarded') AND qualified_at > datetime('now','-7 days')"
+    ).bind(inviterUid).first();
+    const flagged = (wk?.n || 0) >= REF_WEEK_LIMIT;
+
+    const res = await env.CRM.prepare(
+      "INSERT INTO referrals (code, inviter_uid, invitee_uid, source_oa, status, inquiry_id, qualified_at) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))"
+    ).bind(p.code, inviterUid, inviteeUid, sourceOa || '3q-hatchery', flagged ? 'review' : 'qualified', inquiryId || null).run();
+    const refId = res?.meta?.last_row_id || null;
+    await env.SESSION.delete(`pending_ref:${inviteeUid}`);
+
+    if (flagged) {
+      if (env.OWNER_USER_ID) await pushMsg(env.OWNER_USER_ID, [{ type: 'text', text: `⚠️ 引薦待審：${p.code} 一週內已達上限，請人工確認。` }], env);
+      return;
+    }
+
+    // bump inviter cumulative count (drives the ladder)
+    let count = 1;
+    const cur = await env.SESSION.get(`member:${inviterUid}`);
+    if (cur) {
+      const card = JSON.parse(cur);
+      card.refCount = (card.refCount || 0) + 1;
+      count = card.refCount;
+      await env.SESSION.put(`member:${inviterUid}`, JSON.stringify(card));
+    }
+
+    const invR = inviterReward(count);
+    const inviterCode = await grantReward(inviterUid, 'inviter', refId, invR, env);
+    const inviteeCode = await grantReward(inviteeUid, 'invitee', refId, INVITEE_REWARD, env);
+    if (refId) await env.CRM.prepare("UPDATE referrals SET status='rewarded' WHERE id=?").bind(refId).run();
+
+    await pushMsg(inviterUid, [{ type: 'text',
+      text: `你引薦的朋友入席了。\n\n${invR.label}已為你記上 — 你的第 ${count} 位引薦。\n禮遇碼：${inviterCode}\n（諮詢時出示即可）` }], env);
+    await pushMsg(inviteeUid, [{ type: 'text',
+      text: `你的${INVITEE_REWARD.label}已備好。\n禮遇碼：${inviteeCode}\n（諮詢時出示即可）` }], env);
+    if (env.OWNER_USER_ID) await pushMsg(env.OWNER_USER_ID, [{ type: 'text', text: `🎉 引薦成立：${p.code} → 第 ${count} 位（${sourceOa || '3q-hatchery'}）` }], env);
+  } catch (err) {
+    console.error('finalizeReferral failed:', err.message);
+  }
+}
+
+function referralCardFlex(card, env) {
+  const code = card.code;
+  const count = card.refCount || 0;
+  return FLEX('你的引薦碼', {
+    type: 'bubble', size: 'mega',
+    body: {
+      type: 'box', layout: 'vertical', backgroundColor: '#0A0A0A', paddingAll: '24px', spacing: 'sm',
+      contents: [
+        { type: 'text', text: 'INTRODUCTION · 引薦', color: '#B8924A', size: 'xxs', weight: 'bold', letterSpacing: '3px' },
+        { type: 'text', text: code, color: '#F5F2EC', size: 'xxl', weight: 'bold', margin: 'sm' },
+        { type: 'separator', margin: 'md', color: '#B8924A' },
+        { type: 'text', text: '把信任的人帶進這個房間。\n他完成諮詢，兩邊都收到禮遇。', color: '#8A8A8A', size: 'sm', wrap: true, margin: 'md' },
+        { type: 'box', layout: 'horizontal', margin: 'md', contents: [
+          { type: 'text', text: '已引薦', color: '#8A8A8A', size: 'xs', flex: 1 },
+          { type: 'text', text: `${count} 位`, color: '#B8924A', size: 'xs', flex: 2, align: 'end', weight: 'bold' },
+        ]},
+      ],
+    },
+    footer: {
+      type: 'box', layout: 'vertical', backgroundColor: '#F5F2EC', paddingAll: '16px', spacing: 'sm',
+      contents: [
+        { type: 'button', style: 'primary', color: '#0A0A0A', height: 'sm',
+          action: { type: 'uri', label: '用 LINE 引薦朋友', uri: referralDeepLink(code, env) } },
+        { type: 'button', style: 'secondary', height: 'sm',
+          action: { type: 'uri', label: '分享引薦連結', uri: referralSiteLink(code, env) } },
+      ],
+    },
+  });
+}
+
+function seatWelcomeFlex(code) {
+  return FLEX('為你留了席', {
+    type: 'bubble', size: 'mega',
+    body: {
+      type: 'box', layout: 'vertical', backgroundColor: '#0A0A0A', paddingAll: '24px', spacing: 'sm',
+      contents: [
+        { type: 'text', text: '為你留了席', color: '#B8924A', size: 'xxs', weight: 'bold', letterSpacing: '3px' },
+        { type: 'text', text: '有人把你引薦進來。', color: '#F5F2EC', size: 'lg', weight: 'bold', wrap: true, margin: 'sm' },
+        { type: 'separator', margin: 'md', color: '#B8924A' },
+        { type: 'text', text: `引薦碼 ${code} 已記下。\n完成一次諮詢，你的入席禮就會送到。`, color: '#8A8A8A', size: 'sm', wrap: true, margin: 'md' },
+      ],
+    },
+    footer: {
+      type: 'box', layout: 'vertical', backgroundColor: '#F5F2EC', paddingAll: '16px',
+      contents: [{
+        type: 'button', style: 'primary', color: '#0A0A0A', height: 'sm',
+        action: { type: 'postback', label: '說說我的店', data: 'menu:my-store', displayText: '說說我的店' },
+      }],
+    },
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -1143,6 +1355,24 @@ async function handleEvent(ev, env) {
       }], env);
     }
 
+    // v3.7: Referral — capture attribution from the prefilled deep-link message
+    const refCap = text.trim().match(/^引薦\s+([A-Za-z]\d{3,6})$/);
+    if (refCap) {
+      const code = refCap[1].toUpperCase();
+      const ok = await capturePendingRef(uid, code, env);
+      return replyMsg(ev.replyToken, [ ok
+        ? seatWelcomeFlex(code)
+        : { type: 'text', text: '這個引薦碼我找不到，確認一下有沒有打對？' } ], env);
+    }
+
+    // v3.7: Referral — show my referral card (realises the v3.7 介紹新客戶 placeholder)
+    if (['引薦', '我的引薦碼', '推薦碼', '我的推薦碼', '介紹新客戶', '介紹朋友'].includes(text.trim())) {
+      const card = await ensureReferralCode(uid, env);
+      return replyMsg(ev.replyToken, [ card
+        ? referralCardFlex(card, env)
+        : { type: 'text', text: '引薦系統暫時無法使用，請稍後再試。' } ], env);
+    }
+
     const session = await getSession(uid, env);
 
     // A3: Booking time text step
@@ -1311,12 +1541,14 @@ async function handleFlow(data, uid, replyToken, env) {
   if (data === 'flow:submit') {
     const session = await getSession(uid, env);
     if (session) {
-      await saveInquiry(uid, session, env);
+      const inquiryId = await saveInquiry(uid, session, env);
       if (env.OWNER_USER_ID) await pushToOwner(session, env, uid);
       // B1: Switch rich menu to "inquired" state
       await switchRichMenu(uid, env.RICHMENU_INQUIRED, env);
       // B2: Upgrade member tier
       await updateMemberTier(uid, 'inquired', env);
+      // v3.7: qualify referral attribution (success def = inquiry)
+      await finalizeReferral(uid, inquiryId, '3q-hatchery', env);
     }
     await clearSession(uid, env);
     return replyMsg(replyToken, [
@@ -1338,6 +1570,8 @@ async function handleFlow(data, uid, replyToken, env) {
       // B1: Switch to inquired rich menu on campaign register (payment not confirmed yet)
       await switchRichMenu(uid, env.RICHMENU_INQUIRED, env);
       await updateMemberTier(uid, 'inquired', env);
+      // v3.7: qualify referral attribution (success def = campaign signup)
+      await finalizeReferral(uid, null, '3q-hatchery', env);
       if (env.OWNER_USER_ID) {
         await fetch('https://api.line.me/v2/bot/message/push', {
           method: 'POST',
@@ -1450,7 +1684,7 @@ async function sendWelcome(replyToken, env, mCard = null) {
   };
   const msgs = [welcomeFlex, carouselMsg(base), serviceCard(base)];
   // B2: Append member card if issued
-  if (mCard) msgs.push(memberCardFlex(mCard.num, mCard.joinDate, mCard.tier));
+  if (mCard) msgs.push(memberCardFlex(mCard.num, mCard.joinDate, mCard.tier, mCard.code, mCard.refCount, env));
   return replyMsg(replyToken, msgs, env);
 }
 

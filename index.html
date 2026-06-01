@@ -424,6 +424,7 @@ body.lit { opacity: 1; }
 <script>
 (function () {
   var LINE_BASE = 'https://lin.ee/UKKodJj';
+  var LINE_BASIC_ID = '@121Ikspe';   // OA basic id — must match worker LINE_BASIC_ID
   var SITE = 'https://milk790-code.github.io/3q-hatchery-line-oa/';
 
   /* ---- referral capture: ?ref=CODE (or ?r=) survives the jump into LINE ----
@@ -437,14 +438,17 @@ body.lit { opacity: 1; }
     try { ref = localStorage.getItem('3q_ref') || ''; } catch (e) {}
   }
 
-  // append ref to every LINE CTA so the OA can read it for attribution
-  function withRef(url) {
-    if (!ref) return url;
-    return url + (url.indexOf('?') > -1 ? '&' : '?') + 'ref=' + encodeURIComponent(ref);
+  // When invited (ref present), swap join CTAs to a prefilled-message deep link:
+  // it opens LINE pre-typed "引薦 CODE" — the only path the webhook can attribute.
+  // 'referJoin' (become a referrer) stays on plain LINE: that user wants their own code.
+  function joinUrl(fallbackUrl) {
+    if (!ref) return fallbackUrl;
+    return 'https://line.me/R/oaMessage/' + encodeURIComponent(LINE_BASIC_ID) +
+           '/?' + encodeURIComponent('引薦 ' + ref);
   }
-  ['navCta','heroCta','referJoin','footerCta','stickyLink'].forEach(function (id) {
+  ['navCta','heroCta','footerCta','stickyLink'].forEach(function (id) {
     var el = document.getElementById(id);
-    if (el) el.href = withRef(el.getAttribute('href'));
+    if (el) el.href = joinUrl(el.getAttribute('href'));
   });
 
   // reveal the honored-seat ribbon when someone arrives via an invite
