@@ -180,3 +180,66 @@ finalizeReferral(inviteeUid, inquiryId, sourceOa, env):
 3. **貢丸對接方式**：第八節 (a) 直連 D1 或 (b) 經 worker 端點（建議 b）。
 
 備齊後，第三輪一次落地：`006_referrals.sql` + worker 的 5 段 handler + `index.html` 深連結切換 + 會員卡/Welcome Flex + 貢丸 thin client。
+
+---
+
+## 十、成長迴圈擴充（第二輪追加）
+
+定案：**單一引擎、貢丸為分支 thin client、不分家**。引薦引擎是地基，上面再疊三個自動累積流量的迴圈。
+
+### 10.1 每日「霸王餐 / 免費做圖」抽獎（LINE 群組 + cron）
+
+```
+參加資格：當日「分享引薦連結」或打關鍵字「抽」→ KV lottery:{YYYY-MM-DD}:entries (uid set)
+每日開獎：worker cron（已有 cron 基礎）固定時段 → 隨機抽 winner
+領獎條件：winner 必須「分享」才能領（share-to-claim）→ 領獎動作本身回灌新流量
+獎品：霸王餐福利 / 免費做圖一張 → 標記 claimed → 顧問交付
+公告：群組 push(groupId) + 1:1 push(winner)
+```
+
+- **裂變閉環**：要參加得分享、要領獎得分享 → 每天自動產生新引薦入口。
+- 抽獎與引薦共用同一套 `referrals` 歸因（分享連結即帶 code）。
+- KV：`lottery:{date}:entries`、`lottery:{date}:winner`，TTL 自然過期。
+
+> **開工需要**：(1) 在 LINE App 建群、加 bot → worker 用 `join` 事件抓 `groupId` 存 KV `group:main`；(2) 開獎時段（預設每日 20:00 TW）。
+
+### 10.2 FB 公域（粉專）— 全自動，對齊 FB 算法
+
+複用 `workers/social-publisher`（已能發 FB Page）。每日自動產出並發布：
+
+- 內容：今日得主 / 免費做圖案例 / 孵化前後對比（原生圖優先）。
+- **對齊 FB 算法的底層規則**（寫進發文模組）：
+  - 原生圖片/影片優先，**外連放第一則留言**（避免外連降觸及）。
+  - 固定節奏（沿用 `DAILY_LIMITS` facebook:1，不洗版觸發 spam 訊號）。
+  - 互動鉤子：引導留言「+1 / 我要」→ 高互動拉自然觸及。
+  - UGC 回灌：得主分享的截圖 → 隔日素材，自我增強。
+- 導流：留言／私訊關鍵字 → 自動回 LINE 加入連結（公域 → 私域）。
+
+### 10.3 FB 私域（社團）— 平台限制與務實解
+
+> ⚠️ **Meta 2024 起關閉 Groups API**：app 無法用 API 自動發文/讀社團。平台硬限制。
+
+務實三選一：
+- **(a) 粉專全自動 + 社團半自動（建議）**：bot 每日把社團文案＋圖產到 KV/Drive，管理員一鍵貼。
+- **(b) 只做粉專公域 + LINE 群組私域**，暫不碰 FB 社團（全自動、零人工）。
+- **(c) 仍要社團**：僅能「一鍵貼」半自動，無法全自動。
+
+### 10.4 自動累積的底層架構（資料流）
+
+```
+公域(FB粉專/IG/Threads · social-publisher) ──導流──┐
+                                                   ▼
+私域(LINE OA + 群組) ── 引薦引擎(referrals) ── 每日抽獎(share-to-claim)
+        ▲                                           │
+        └────────── UGC/得主分享 回灌公域素材 ────────┘
+```
+每一圈都把「分享」設為解鎖條件 → 流量自我累積，不靠付費廣告。
+
+---
+
+## 十一、第三輪開工前補充需要的值
+
+4. **貢丸 OA basic ID**（`@`），並確認孵化所為 `@121Ikspe`。
+5. **LINE 群組**：建群 + 加 bot（之後自動抓 groupId）＋ 開獎時段。
+6. **FB 私域策略**：10.3 的 (a)/(b)/(c) 擇一。
+7. **FB_PAGE_ID / token** 是否已在 social-publisher 設好（決定粉專自動發文能否即刻啟用）。
