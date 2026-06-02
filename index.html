@@ -2,7 +2,8 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#0C0A08"/>
 <title>3Q貢丸 · 台灣在地品牌孵化所</title>
 <meta name="description" content="3Q貢丸 · 台灣在地品牌孵化所。只要你願意說，我們就幫你被看見。品牌孵化、官網設計、App、影音剪輯、外送美圖、後台美編。">
 <link rel="canonical" href="https://milk790-code.github.io/3q-hatchery-line-oa/">
@@ -23,18 +24,201 @@
 <meta name="twitter:image" content="https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports/3q-campaign-poster-bowl-1080x1040.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@200;300;400&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="landing-styles.css"/>
+
+<!-- ============================================================
+     HOOK LAYER — index-only visual maximisation + referral funnel
+     Kept inline so it never bleeds into Landing Page.html, which
+     shares landing-styles.css. Reuses the same brand tokens.
+     ============================================================ -->
+<style id="hook">
+/* keep page dark while fonts settle, then fade the stage in */
+body { opacity: 0; transition: opacity .9s var(--ease); }
+body.lit { opacity: 1; }
+
+/* ---- HERO: maximise the cinema, keep the restraint ---- */
+.hero { min-height: 100svh; }
+/* second, opposing glow + a faint vertical light beam behind the mark */
+.hero-glow.two {
+  top: auto; right: auto; bottom: -240px; left: -200px;
+  background: radial-gradient(circle, rgba(184,146,74,0.07), transparent 62%);
+}
+.hero-beam {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 1px; height: 46vh;
+  background: linear-gradient(to bottom, transparent, rgba(184,146,74,0.45), transparent);
+  pointer-events: none; opacity: 0; animation: beamIn 1.6s var(--ease) .2s forwards;
+}
+@keyframes beamIn { to { opacity: 1; } }
+
+/* the incubation mark breathes — a single, slow, alive pulse */
+.hero-mark { animation: breathe 6.5s ease-in-out infinite; will-change: transform, opacity; }
+@keyframes breathe {
+  0%,100% { transform: scale(1);    opacity: .82; }
+  50%     { transform: scale(1.05); opacity: 1;   }
+}
+
+/* kinetic headline — lines lift in on load */
+.kinetic { overflow: hidden; }
+.kinetic .ln {
+  display: block; opacity: 0; transform: translateY(120%);
+  animation: lnUp .95s var(--ease) forwards;
+}
+.kinetic .ln:nth-child(1) { animation-delay: .35s; }
+.kinetic .ln:nth-child(2) { animation-delay: .52s; }
+@keyframes lnUp { to { opacity: 1; transform: translateY(0); } }
+
+/* secondary, quiet "become a referrer" link under the primary CTA */
+.hero-aside {
+  margin-top: 22px; font-size: 12px; letter-spacing: .18em;
+  color: rgba(245,242,236,.42);
+}
+.hero-aside a {
+  color: var(--gold); text-decoration: none;
+  border-bottom: 1px solid rgba(184,146,74,.35); padding-bottom: 2px;
+  transition: border-color .3s var(--ease);
+}
+.hero-aside a:hover { border-color: var(--gold); }
+
+/* ---- REFERRAL "honored seat" ribbon (shown only when ?ref= present) ---- */
+.seat {
+  display: none; margin: 0 auto 30px; max-width: 460px;
+  border: 0.5px solid rgba(184,146,74,.4);
+  background: rgba(184,146,74,.05);
+  padding: 16px 26px; position: relative; backdrop-filter: blur(2px);
+}
+.seat.show { display: block; animation: seatIn 1s var(--ease) .6s both; }
+@keyframes seatIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.seat .k {
+  font-size: 10px; letter-spacing: .42em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 8px;
+}
+.seat .v {
+  font-family: var(--serif); font-weight: 300; font-size: 16px;
+  letter-spacing: .1em; color: var(--paper); line-height: 1.6;
+}
+.seat .v b { color: var(--gold); font-weight: 300; }
+
+/* ---- PROOF STRIP (count-up numerals) ---- */
+.proof {
+  background: var(--black); color: var(--paper);
+  border-top: 1px solid rgba(184,146,74,.1);
+  border-bottom: 1px solid rgba(184,146,74,.1);
+  display: flex; flex-wrap: wrap; justify-content: center;
+  padding: 8px 24px;
+}
+.proof-item { flex: 1 1 180px; max-width: 260px; text-align: center; padding: 48px 24px; position: relative; }
+.proof-item + .proof-item::before {
+  content: ""; position: absolute; left: 0; top: 28%; bottom: 28%;
+  width: 1px; background: rgba(184,146,74,.14);
+}
+.proof-num {
+  font-family: var(--serif); font-weight: 200; font-size: 52px;
+  color: var(--gold); line-height: 1; letter-spacing: .02em;
+}
+.proof-unit {
+  display: block; font-size: 10px; letter-spacing: .32em;
+  text-transform: uppercase; color: rgba(184,146,74,.7); margin-top: 8px;
+}
+.proof-label { font-size: 12px; color: rgba(245,242,236,.45); margin-top: 14px; line-height: 1.7; letter-spacing: .04em; }
+
+/* ---- REFERRAL SECTION — "把房間引薦出去" ---- */
+.refer { background: var(--black); color: var(--paper); position: relative; overflow: hidden; }
+.refer .glow {
+  position: absolute; top: -160px; right: -160px; width: 560px; height: 560px;
+  background: radial-gradient(circle, rgba(184,146,74,.06), transparent 62%); pointer-events: none;
+}
+.refer .section-inner { position: relative; z-index: 1; max-width: 760px; text-align: center; }
+.refer .section-eyebrow, .refer .section-hair { margin-left: auto; margin-right: auto; }
+.refer h2 {
+  font-family: var(--serif); font-weight: 300; font-size: 32px;
+  letter-spacing: .1em; line-height: 1.55; color: var(--paper); margin-bottom: 20px;
+}
+.refer h2 em { font-style: normal; color: var(--gold); }
+.refer .lead {
+  font-size: 14px; line-height: 1.95; letter-spacing: .05em;
+  color: rgba(245,242,236,.55); max-width: 520px; margin: 0 auto 12px;
+}
+/* three-beat "how the introduction works" */
+.refer-beats { display: flex; gap: 0; margin: 52px 0; text-align: left; }
+.refer-beat { flex: 1; padding: 0 24px; position: relative; }
+.refer-beat + .refer-beat::before {
+  content: ""; position: absolute; left: 0; top: 6px; bottom: 6px; width: 1px; background: rgba(184,146,74,.14);
+}
+.refer-beat .i { font-family: var(--serif); font-style: italic; font-size: 13px; color: rgba(184,146,74,.6); letter-spacing: .12em; margin-bottom: 12px; }
+.refer-beat h4 { font-family: var(--serif); font-weight: 300; font-size: 17px; letter-spacing: .1em; color: var(--paper); margin-bottom: 10px; }
+.refer-beat p { font-size: 12.5px; line-height: 1.85; letter-spacing: .03em; color: rgba(245,242,236,.5); }
+.refer-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+.btn-solid {
+  display: inline-flex; align-items: center; gap: 10px; padding: 15px 40px;
+  background: var(--gold); color: var(--black); border: none; cursor: pointer;
+  font-family: var(--serif); font-weight: 300; font-size: 15px; letter-spacing: .18em;
+  text-decoration: none; transition: background .4s var(--ease);
+}
+.btn-solid:hover { background: #C9A35B; }
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 10px; padding: 15px 38px;
+  background: none; color: var(--paper); border: 1px solid rgba(184,146,74,.45); cursor: pointer;
+  font-family: var(--serif); font-weight: 300; font-size: 15px; letter-spacing: .18em;
+  text-decoration: none; transition: all .4s var(--ease);
+}
+.btn-ghost:hover { background: rgba(184,146,74,.08); border-color: var(--gold); }
+.refer-note { margin-top: 22px; font-size: 11px; letter-spacing: .14em; color: rgba(245,242,236,.32); }
+
+/* ---- sticky mobile CTA (max conversion on phones) ---- */
+.sticky-cta {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
+  display: none; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 14px 22px calc(14px + env(safe-area-inset-bottom));
+  background: rgba(12,10,8,.92); backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(184,146,74,.22);
+  transform: translateY(120%); transition: transform .5s var(--ease);
+}
+.sticky-cta.show { transform: translateY(0); }
+.sticky-cta .txt { font-family: var(--serif); font-size: 14px; letter-spacing: .08em; color: var(--paper); }
+.sticky-cta .txt small { display: block; font-family: var(--sans); font-size: 10px; letter-spacing: .12em; color: rgba(245,242,236,.4); margin-top: 3px; }
+.sticky-cta a {
+  flex-shrink: 0; padding: 11px 24px; background: var(--gold); color: var(--black);
+  font-family: var(--serif); font-size: 14px; letter-spacing: .12em; text-decoration: none;
+}
+
+/* ---- toast ---- */
+.toast {
+  position: fixed; left: 50%; bottom: 32px; transform: translate(-50%, 24px);
+  z-index: 200; background: rgba(12,10,8,.95); border: 0.5px solid rgba(184,146,74,.4);
+  color: var(--paper); font-size: 12px; letter-spacing: .12em; padding: 13px 26px;
+  opacity: 0; pointer-events: none; transition: all .4s var(--ease);
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+@media (max-width: 768px) {
+  .hero h1 { font-size: 32px; }
+  .proof-num { font-size: 40px; }
+  .proof-item + .proof-item::before { display: none; }
+  .refer-beats { flex-direction: column; gap: 36px; }
+  .refer-beat { padding: 0; }
+  .refer-beat + .refer-beat::before { display: none; }
+  .sticky-cta { display: flex; }
+  body { padding-bottom: 76px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-mark, .hero-beam, .kinetic .ln { animation: none; }
+  .kinetic .ln { opacity: 1; transform: none; }
+}
+</style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav class="nav" id="nav">
   <a class="nav-logo" href="#">3Q貢丸 <span>·</span> 品牌孵化所</a>
-  <a class="nav-cta" href="https://lin.ee/UKKodJj?utm_source=official_site&utm_medium=nav&utm_campaign=hatchery" target="_blank" rel="noopener">加入 LINE</a>
+  <a class="nav-cta" id="navCta" href="https://lin.ee/UKKodJj?utm_source=official_site&utm_medium=nav&utm_campaign=hatchery" target="_blank" rel="noopener">加入 LINE</a>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
   <div class="hero-glow"></div>
+  <div class="hero-glow two"></div>
+  <div class="hero-beam"></div>
   <svg class="hero-grain" xmlns="http://www.w3.org/2000/svg"><filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.10 0"/></filter><rect width="100%" height="100%" filter="url(#grain)"/></svg>
 
   <svg class="hero-mark" viewBox="0 0 280 280" fill="none" stroke="#B8924A" stroke-width="1" stroke-linecap="round">
@@ -52,9 +236,15 @@
     <line x1="90" y1="248" x2="190" y2="248" stroke-opacity="0.35"/>
   </svg>
 
+  <!-- referral honored-seat ribbon — revealed by JS when ?ref= is present -->
+  <div class="seat" id="seat">
+    <div class="k">由引薦人為你留席</div>
+    <div class="v" id="seatText">有人記得你，<b>把你引薦進這個房間</b>。</div>
+  </div>
+
   <div class="hero-eyebrow">TAIWAN BRAND HATCHERY</div>
   <div class="hero-hairline"></div>
-  <h1>只要你願意說，<br/>我們就幫你被看見。</h1>
+  <h1 class="kinetic"><span class="ln">只要你願意說，</span><span class="ln">我們就幫你被看見。</span></h1>
 
   <div class="hero-services">
     <span class="tag">品牌孵化</span><span class="dot"></span>
@@ -65,16 +255,42 @@
     <span class="tag">後台美編</span>
   </div>
 
-  <a class="hero-cta-btn" href="https://lin.ee/UKKodJj?utm_source=official_site&utm_medium=hero&utm_campaign=hatchery" target="_blank" rel="noopener">
+  <a class="hero-cta-btn" id="heroCta" href="https://lin.ee/UKKodJj?utm_source=official_site&utm_medium=hero&utm_campaign=hatchery" target="_blank" rel="noopener">
     <span>說說你的店</span>
     <svg viewBox="0 0 80 80" fill="none" stroke="#B8924A" stroke-width="1.5" stroke-linecap="round"><line x1="20" y1="40" x2="58" y2="40"/><path d="M48 30 L58 40 L48 50"/></svg>
   </a>
+
+  <div class="hero-aside">想把朋友帶進來？<a href="#refer">成為引薦人</a></div>
 
   <div class="hero-scroll">
     <div class="line"></div>
     <span>SCROLL</span>
   </div>
 </section>
+
+<!-- PROOF -->
+<div class="proof">
+  <div class="proof-item">
+    <div class="proof-num" data-to="50" data-suffix="+">0</div>
+    <span class="proof-unit">Brands</span>
+    <div class="proof-label">協助品牌<br/>從無到有</div>
+  </div>
+  <div class="proof-item">
+    <div class="proof-num" data-to="3">0</div>
+    <span class="proof-unit">Days</span>
+    <div class="proof-label">最快 3 天<br/>產出第一版</div>
+  </div>
+  <div class="proof-item">
+    <div class="proof-num" data-to="24" data-suffix="h">0</div>
+    <span class="proof-unit">Response</span>
+    <div class="proof-label">24 小時內<br/>回覆諮詢</div>
+  </div>
+  <div class="proof-item">
+    <div class="proof-num" data-to="100" data-suffix="%">0</div>
+    <span class="proof-unit">Taiwan</span>
+    <div class="proof-label">純台灣團隊<br/>在地服務</div>
+  </div>
+</div>
 
 <!-- SERVICES -->
 <section class="section services">
@@ -145,6 +361,42 @@
   </div>
 </section>
 
+<!-- REFERRAL — 把房間引薦出去 -->
+<section class="section refer" id="refer">
+  <div class="glow"></div>
+  <div class="section-inner">
+    <div class="section-eyebrow reveal">INTRODUCTION · 引薦</div>
+    <div class="section-hair reveal reveal-d1"></div>
+    <h2 class="reveal reveal-d2">好的東西，<em>會被傳下去。</em></h2>
+    <p class="lead reveal reveal-d3">這裡不靠廣告長大，靠的是一句話的引薦。</p>
+    <p class="lead reveal reveal-d3">你把信任的人帶進這個房間，房間會記得你 —<br/>被你引薦的人，我們為他留一個席位；你，我們留一份禮遇。</p>
+
+    <div class="refer-beats reveal reveal-d4">
+      <div class="refer-beat">
+        <div class="i">i.</div>
+        <h4>留下你的名字</h4>
+        <p>加入 LINE，告訴我們你想引薦朋友。我們給你一組專屬引薦碼。</p>
+      </div>
+      <div class="refer-beat">
+        <div class="i">ii.</div>
+        <h4>把席位送出去</h4>
+        <p>把你的引薦連結傳給朋友。他一進來，就是「被你帶進來的人」。</p>
+      </div>
+      <div class="refer-beat">
+        <div class="i">iii.</div>
+        <h4>各自被記得</h4>
+        <p>朋友完成諮詢或報名，兩邊都收到我們的禮遇 — 你引薦得越多，席位越靠前。</p>
+      </div>
+    </div>
+
+    <div class="refer-actions reveal reveal-d4">
+      <a class="btn-solid" id="referJoin" href="https://lin.ee/UKKodJj?utm_source=official_site&utm_medium=refer_join&utm_campaign=referral" target="_blank" rel="noopener">成為引薦人</a>
+      <button class="btn-ghost" id="shareBtn" type="button">把這個房間引薦給朋友</button>
+    </div>
+    <p class="refer-note reveal reveal-d4">引薦不是拉客 — 是把你信任的人，帶到一個你放心的地方。</p>
+  </div>
+</section>
+
 <!-- CTA -->
 <section class="cta-section" id="cta">
   <div class="cta-glow"></div>
@@ -152,7 +404,7 @@
   <div class="section-hair reveal reveal-d1" style="margin:0 auto 32px"></div>
   <h2 class="reveal reveal-d2">來，幫你圓夢。</h2>
   <p class="sub reveal reveal-d3">不管你的店多大多小，新舊、簡單複雜 —<br/>我們都把你當客人接。</p>
-  <a class="cta-btn reveal reveal-d4" href="https://lin.ee/UKKodJj?utm_source=official_site&utm_medium=footer_cta&utm_campaign=hatchery" target="_blank" rel="noopener">加入 LINE 開始</a>
+  <a class="cta-btn reveal reveal-d4" id="footerCta" href="https://lin.ee/UKKodJj?utm_source=official_site&utm_medium=footer_cta&utm_campaign=hatchery" target="_blank" rel="noopener">加入 LINE 開始</a>
 </section>
 
 <!-- FOOTER -->
@@ -161,24 +413,125 @@
   <div class="footer-copy">© 2026 3Q Brand Hatchery</div>
 </footer>
 
-<script>
-// Scroll-based nav background
-const nav = document.getElementById('nav');
-window.addEventListener('scroll', () => {
-  nav.classList.toggle('scrolled', window.scrollY > 60);
-}, { passive: true });
+<!-- sticky mobile CTA -->
+<div class="sticky-cta" id="stickyCta">
+  <div class="txt">說說你的店<small>加入 LINE · 24 小時內回覆</small></div>
+  <a id="stickyLink" href="https://lin.ee/UKKodJj?utm_source=official_site&utm_medium=sticky&utm_campaign=hatchery" target="_blank" rel="noopener">加入 LINE</a>
+</div>
 
-// Intersection Observer for reveal animations
-const reveals = document.querySelectorAll('.reveal');
-const io = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('visible');
-      io.unobserve(e.target);
-    }
+<div class="toast" id="toast">引薦連結已複製，傳給你信任的人。</div>
+
+<script>
+(function () {
+  var LINE_BASE = 'https://lin.ee/UKKodJj';
+  var LINE_BASIC_ID = '@121Ikspe';   // OA basic id — must match worker LINE_BASIC_ID
+  var SITE = 'https://milk790-code.github.io/3q-hatchery-line-oa/';
+
+  /* ---- referral capture: ?ref=CODE (or ?r=) survives the jump into LINE ----
+     Real attribution (matching code -> inviter -> reward on inquiry/booking)
+     is wired in the backend round. Here we only carry + surface the seat. */
+  var params = new URLSearchParams(location.search);
+  var ref = (params.get('ref') || params.get('r') || '').trim().slice(0, 32);
+  if (ref) {
+    try { localStorage.setItem('3q_ref', ref); } catch (e) {}
+  } else {
+    try { ref = localStorage.getItem('3q_ref') || ''; } catch (e) {}
+  }
+
+  // When invited (ref present), swap join CTAs to a prefilled-message deep link:
+  // it opens LINE pre-typed "引薦 CODE" — the only path the webhook can attribute.
+  // 'referJoin' (become a referrer) stays on plain LINE: that user wants their own code.
+  function joinUrl(fallbackUrl) {
+    if (!ref) return fallbackUrl;
+    return 'https://line.me/R/oaMessage/' + encodeURIComponent(LINE_BASIC_ID) +
+           '/?' + encodeURIComponent('引薦 ' + ref);
+  }
+  ['navCta','heroCta','footerCta','stickyLink'].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) el.href = joinUrl(el.getAttribute('href'));
   });
-}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
-reveals.forEach(el => io.observe(el));
+
+  // reveal the honored-seat ribbon when someone arrives via an invite
+  if (params.get('ref') || params.get('r')) {
+    var seat = document.getElementById('seat');
+    if (seat) {
+      var who = (params.get('by') || '').trim().slice(0, 24);
+      if (who) {
+        document.getElementById('seatText').innerHTML =
+          '<b>' + who.replace(/[<>&"]/g, '') + '</b> 把你引薦進這個房間。';
+      }
+      seat.classList.add('show');
+    }
+  }
+
+  /* ---- share / become-referrer ---- */
+  var shareUrl = SITE + (ref ? '?ref=' + encodeURIComponent(ref) : '');
+  var shareData = {
+    title: '3Q貢丸 · 台灣在地品牌孵化所',
+    text: '只要你願意說，我們就幫你被看見。我把這個房間引薦給你。',
+    url: shareUrl
+  };
+  function toast(msg) {
+    var t = document.getElementById('toast');
+    if (msg) t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function () { t.classList.remove('show'); }, 2600);
+  }
+  var shareBtn = document.getElementById('shareBtn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', function () {
+      if (navigator.share) {
+        navigator.share(shareData).catch(function () {});
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(shareUrl).then(function () { toast(); });
+      } else {
+        toast('引薦連結：' + shareUrl);
+      }
+    });
+  }
+
+  /* ---- nav background on scroll ---- */
+  var nav = document.getElementById('nav');
+  var sticky = document.getElementById('stickyCta');
+  window.addEventListener('scroll', function () {
+    var y = window.scrollY;
+    nav.classList.toggle('scrolled', y > 60);
+    if (sticky) sticky.classList.toggle('show', y > 480);
+  }, { passive: true });
+
+  /* ---- reveal on scroll ---- */
+  var reveals = document.querySelectorAll('.reveal');
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(function (el) { io.observe(el); });
+
+  /* ---- count-up numerals ---- */
+  function countUp(el) {
+    var to = parseInt(el.getAttribute('data-to'), 10);
+    var suffix = el.getAttribute('data-suffix') || '';
+    var dur = 1400, start = null;
+    function step(ts) {
+      if (!start) start = ts;
+      var p = Math.min((ts - start) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(to * eased) + suffix;
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  var numIo = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { countUp(e.target); numIo.unobserve(e.target); }
+    });
+  }, { threshold: 0.6 });
+  document.querySelectorAll('.proof-num').forEach(function (el) { numIo.observe(el); });
+
+  /* ---- light the stage ---- */
+  requestAnimationFrame(function () { document.body.classList.add('lit'); });
+})();
 </script>
 </body>
 </html>

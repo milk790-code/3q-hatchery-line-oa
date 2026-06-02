@@ -420,6 +420,19 @@ async function publishToFacebook(post, env) {
 
   const base = `https://graph.facebook.com/v21.0/${pageId}`;
 
+  // Post a link as the FIRST COMMENT (keeps external links out of the body,
+  // which FB's algorithm penalises for reach).
+  async function firstComment(objectId) {
+    if (!post.link_url || !objectId) return;
+    try {
+      await fetch(`https://graph.facebook.com/v21.0/${objectId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: post.link_url, access_token: token }),
+      });
+    } catch (e) { console.error('[fb] first comment failed:', e.message); }
+  }
+
   if (post.image_url) {
     // Photo post: /photos endpoint attaches image + caption
     const res = await fetch(`${base}/photos`, {
@@ -435,7 +448,9 @@ async function publishToFacebook(post, env) {
     if (!res.ok || (!data.id && !data.post_id)) {
       return { ok: false, error: `FB photo post failed: ${JSON.stringify(data)}` };
     }
-    return { ok: true, platform_id: data.post_id || data.id };
+    const objectId = data.post_id || data.id;
+    await firstComment(objectId);
+    return { ok: true, platform_id: objectId };
   } else {
     // Text-only post: /feed endpoint
     const res = await fetch(`${base}/feed`, {
@@ -450,6 +465,7 @@ async function publishToFacebook(post, env) {
     if (!res.ok || !data.id) {
       return { ok: false, error: `FB feed post failed: ${JSON.stringify(data)}` };
     }
+    await firstComment(data.id);
     return { ok: true, platform_id: data.id };
   }
 }
@@ -480,6 +496,64 @@ async function publishPost(post, env) {
   }
 
   return await fn(post, env);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// v3.7: daily growth content — self-refilling FB Page queue (public domain)
+//   + FB Group paste-ready content in KV (private domain, semi-auto since
+//   Meta closed the Groups API). Both drive traffic to LINE.
+// ─────────────────────────────────────────────────────────────────────────
+
+const FB_POSTER = '3q-campaign-poster-bowl-1080x1040.png';
+
+function dailyFbCaption() {
+  return [
+    '今天的霸王餐與免費做圖，留給願意被看見的小店。',
+    '',
+    '你的店、你的產品，值得一張像樣的照片。',
+    '想參加今天的抽選，在留言處告訴我們「+1」，我們私訊你。',
+    '',
+    '— 3Q 台灣在地品牌孵化所',
+  ].join('\n');
+}
+
+function dailyGroupContent(joinUrl) {
+  return [
+    '【今日霸王餐 / 免費做圖】',
+    '',
+    '每天我們送一份霸王餐、一張免費做圖，給社團裡的小店。',
+    '想抽就在下面留「+1」，晚上 8 點開獎，得主把好東西分享出去就能領。',
+    '',
+    '想直接拿你的專屬引薦連結（朋友完成諮詢，兩邊都有禮遇）：',
+    joinUrl,
+  ].join('\n');
+}
+
+async function seedDailyContent(env) {
+  if (!env.CRM) return { ok: false, error: 'D1 not bound' };
+  const today = new Date().toISOString().slice(0, 10);
+  const joinUrl = env.LINE_JOIN_URL || 'https://lin.ee/UKKodJj';
+  const base = env.PNG_BASE_URL || '';
+
+  // 1) FB Page — ensure one post exists for today (self-accumulating queue)
+  const fbToday = await env.CRM.prepare(
+    "SELECT COUNT(*) AS n FROM content_queue WHERE platform='facebook' AND created_at >= ?"
+  ).bind(today).first();
+  let seeded = false;
+  if ((fbToday?.n || 0) === 0) {
+    await env.CRM.prepare(
+      "INSERT INTO content_queue (platform, image_url, caption, link_url, status, source_oa) VALUES ('facebook', ?, ?, ?, 'pending', '3q-hatchery')"
+    ).bind(base ? `${base}/${FB_POSTER}` : null, dailyFbCaption(), joinUrl).run();
+    seeded = true;
+  }
+
+  // 2) FB Group — store paste-ready content in KV for one-tap admin posting
+  if (env.SESSION) {
+    const content = dailyGroupContent(joinUrl);
+    await env.SESSION.put('fbgroup:today', JSON.stringify({ date: today, content }), { expirationTtl: 60 * 60 * 48 });
+  }
+
+  return { ok: true, date: today, fbPageSeeded: seeded };
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -556,7 +630,9 @@ export default {
   async scheduled(controller, env, ctx) {
     console.log(`[social-publisher] cron triggered: ${controller.cron}`);
     ctx.waitUntil(
-      runPublishLoop(env)
+      seedDailyContent(env)
+        .then(r => console.log('[social-publisher] seeded:', JSON.stringify(r)))
+        .then(() => runPublishLoop(env))
         .then(r => console.log('[social-publisher] done:', JSON.stringify(r)))
         .then(() => refreshTokensIfNeeded(env))
         .catch(err => console.error('[social-publisher] error:', err.message))
@@ -590,6 +666,22 @@ export default {
           auto_refresh: Boolean(env.THREADS_APP_SECRET),
         },
       });
+    }
+
+    // FB Group semi-auto: GET /fbgroup/today — paste-ready content for the admin
+    // (Meta closed the Groups API; this is the one-tap-copy fallback).
+    if (url.pathname === '/fbgroup/today') {
+      let payload = null;
+      if (env.SESSION) {
+        const raw = await env.SESSION.get('fbgroup:today');
+        if (!raw) { await seedDailyContent(env); }
+        const fresh = await env.SESSION.get('fbgroup:today');
+        payload = fresh ? JSON.parse(fresh) : null;
+      }
+      if (url.searchParams.get('format') === 'text') {
+        return new Response(payload?.content || '', { headers: { 'Content-Type': 'text/plain; charset=utf-8', ...CORS } });
+      }
+      return json(payload || { ok: false, error: 'no content' });
     }
 
     // OAuth callback: POST /oauth/callback (TRIGGER_TOKEN protected)

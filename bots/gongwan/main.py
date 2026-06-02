@@ -29,9 +29,17 @@ from linebot.v3.webhooks import (
     MessageEvent, TextMessageContent, FollowEvent,
 )
 from dotenv import load_dotenv
-import os, time, logging
+import os, time, logging, re
+
+# v3.7 referral — thin client to the single shared engine (Hatchery worker)
+from hatchery_api import (
+    record_inquiry, get_referral_code, capture_referral, finalize_referral,
+)
 
 load_dotenv()
+
+REF_CAP_RE = re.compile(r"^引薦\s+([A-Za-z]\d{3,6})$")
+KW_REFERRAL = ["引薦", "推薦碼", "我的推薦碼", "介紹朋友", "介紹新客戶"]
 
 # ══════════════════════════════════════════════
 # 共用常數(改一處全生效)
@@ -161,7 +169,40 @@ def handle_text_message(event):
         _reply(event, "訊息有點長 我可能看不完\n\n請用簡短關鍵字:\n回覆「諮詢」「500」「行銷」「客服」")
         return
 
-    _reply(event, route(text))
+    uid = getattr(getattr(event, "source", None), "user_id", None)
+
+    # v3.7 referral — invitee sent the prefilled "引薦 CODE"
+    m = REF_CAP_RE.match(text)
+    if m:
+        ok = capture_referral(uid, m.group(1).upper()) if uid else False
+        _reply(event, "為你留了席。\n完成一次諮詢，入席禮就送到。"
+               if ok else "這個引薦碼我找不到 確認一下有沒有打對")
+        return
+
+    # v3.7 referral — show my code (same shared engine, prefix-agnostic)
+    if text in KW_REFERRAL:
+        info = get_referral_code(uid) if uid else None
+        if info:
+            _reply(event,
+                   f"你的引薦碼 {info['code']}(已薦 {info['refCount']})\n\n"
+                   f"用 LINE 引薦朋友:\n{info['deepLink']}\n\n"
+                   f"或分享連結:\n{info['siteLink']}\n\n"
+                   "朋友完成諮詢 兩邊都有禮遇")
+        else:
+            _reply(event, "引薦系統暫時無法使用 稍後再試")
+        return
+
+    reply = route(text)
+
+    # v3.7 referral — qualify attribution when an inquiry form is received
+    if reply == REPLY_RECEIVED_FORM and uid:
+        record_inquiry(uid, free_text=text[:480], service="gongwan-form")
+        res = finalize_referral(uid)
+        if res and res.get("ok") and res.get("invitee"):
+            inv = res["invitee"]
+            reply += f"\n\n你的{inv['reward']}已備好\n禮遇碼:{inv['code']}"
+
+    _reply(event, reply)
 
 
 # ══════════════════════════════════════════════
