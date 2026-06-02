@@ -6,6 +6,8 @@ compatibility_date = "2024-12-01"
 PNG_BASE_URL   = "https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports"
 THREADS_APP_ID = "956987317313843"
 FB_PAGE_ID     = "61587003785491"
+# v3.7 growth: LINE join link used in FB first-comment + FB group paste content
+LINE_JOIN_URL  = "https://lin.ee/UKKodJj"
 
 # Secrets (set via wrangler secret put or GitHub Actions deploy):
 #
