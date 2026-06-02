@@ -527,20 +527,22 @@ async function pushMsg(to, messages, env) {
 }
 
 // Called the moment an invitee qualifies (inquiry/campaign). Idempotent + guarded.
-async function finalizeReferral(inviteeUid, inquiryId, sourceOa, env) {
-  if (!env.SESSION || !env.CRM || !inviteeUid) return;
+// opts.pushInvitee=false → don't push the invitee (cross-OA: caller delivers it
+// with its own channel token). Always returns a result object.
+async function finalizeReferral(inviteeUid, inquiryId, sourceOa, env, opts = {}) {
+  if (!env.SESSION || !env.CRM || !inviteeUid) return { ok: false, reason: 'not-configured' };
   try {
     const raw = await env.SESSION.get(`pending_ref:${inviteeUid}`);
-    if (!raw) return;
+    if (!raw) return { ok: false, reason: 'no-pending' };
     const p = JSON.parse(raw);
     const inviterUid = p.inviterUid || await resolveRefCode(p.code, env);
     if (!inviterUid || inviterUid === inviteeUid) {
       await env.SESSION.delete(`pending_ref:${inviteeUid}`);
-      return;
+      return { ok: false, reason: 'self-or-unknown' };
     }
     // one attribution per invitee lifetime (UNIQUE index is the hard guard)
     const existing = await env.CRM.prepare('SELECT id FROM referrals WHERE invitee_uid = ?').bind(inviteeUid).first();
-    if (existing) { await env.SESSION.delete(`pending_ref:${inviteeUid}`); return; }
+    if (existing) { await env.SESSION.delete(`pending_ref:${inviteeUid}`); return { ok: false, reason: 'already-attributed' }; }
 
     // rate-limit → flag for owner review instead of auto-rewarding
     const wk = await env.CRM.prepare(
@@ -556,7 +558,7 @@ async function finalizeReferral(inviteeUid, inquiryId, sourceOa, env) {
 
     if (flagged) {
       if (env.OWNER_USER_ID) await pushMsg(env.OWNER_USER_ID, [{ type: 'text', text: `⚠️ 引薦待審：${p.code} 一週內已達上限，請人工確認。` }], env);
-      return;
+      return { ok: true, status: 'review', code: p.code };
     }
 
     // bump inviter cumulative count (drives the ladder)
@@ -574,13 +576,23 @@ async function finalizeReferral(inviteeUid, inquiryId, sourceOa, env) {
     const inviteeCode = await grantReward(inviteeUid, 'invitee', refId, INVITEE_REWARD, env);
     if (refId) await env.CRM.prepare("UPDATE referrals SET status='rewarded' WHERE id=?").bind(refId).run();
 
+    // inviter always lives on this (hatchery) channel — their code was issued here
     await pushMsg(inviterUid, [{ type: 'text',
       text: `你引薦的朋友入席了。\n\n${invR.label}已為你記上 — 你的第 ${count} 位引薦。\n禮遇碼：${inviterCode}\n（諮詢時出示即可）` }], env);
-    await pushMsg(inviteeUid, [{ type: 'text',
-      text: `你的${INVITEE_REWARD.label}已備好。\n禮遇碼：${inviteeCode}\n（諮詢時出示即可）` }], env);
+    // invitee may be on another OA → caller can opt out and deliver it itself
+    if (opts.pushInvitee !== false) {
+      await pushMsg(inviteeUid, [{ type: 'text',
+        text: `你的${INVITEE_REWARD.label}已備好。\n禮遇碼：${inviteeCode}\n（諮詢時出示即可）` }], env);
+    }
     if (env.OWNER_USER_ID) await pushMsg(env.OWNER_USER_ID, [{ type: 'text', text: `🎉 引薦成立：${p.code} → 第 ${count} 位（${sourceOa || '3q-hatchery'}）` }], env);
+    return {
+      ok: true, status: 'rewarded', code: p.code, count,
+      inviter: { reward: invR.label, code: inviterCode },
+      invitee: { reward: INVITEE_REWARD.label, code: inviteeCode },
+    };
   } catch (err) {
     console.error('finalizeReferral failed:', err.message);
+    return { ok: false, reason: err.message };
   }
 }
 
@@ -1193,6 +1205,43 @@ export default {
       const a = { service: body.service, budget: body.budget, timeline: body.timeline, freeText: body.freeText };
       const rowId = await saveInquiry(uid, a, env, body.sourceOa || 'external');
       return new Response(JSON.stringify({ ok: true, id: rowId, leadScore: leadScore(body.budget) }), { status: 201, headers: { 'Content-Type': 'application/json', ...CORS } });
+    }
+
+    // v3.7: GET /api/referral/code/:uid — issue/return a member's referral code (cross-OA)
+    if (url.pathname.startsWith('/api/referral/code/') && request.method === 'GET') {
+      const auth = request.headers.get('Authorization') || '';
+      const tok = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+      if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return new Response('forbidden', { status: 403 });
+      const uid = decodeURIComponent(url.pathname.slice('/api/referral/code/'.length));
+      const card = await ensureReferralCode(uid, env);
+      if (!card) return new Response(JSON.stringify({ ok: false, error: 'cannot issue' }), { status: 500, headers: { 'Content-Type': 'application/json', ...CORS } });
+      return new Response(JSON.stringify({ ok: true, code: card.code, refCount: card.refCount || 0,
+        deepLink: referralDeepLink(card.code, env), siteLink: referralSiteLink(card.code, env) }), { headers: { 'Content-Type': 'application/json', ...CORS } });
+    }
+
+    // v3.7: POST /api/referral/capture — stash pending attribution (cross-OA invitee)
+    if (url.pathname === '/api/referral/capture' && request.method === 'POST') {
+      const auth = request.headers.get('Authorization') || '';
+      const tok = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+      if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return new Response('forbidden', { status: 403 });
+      let body; try { body = await request.json(); } catch { return new Response(JSON.stringify({ ok: false, error: 'invalid JSON' }), { status: 400, headers: { 'Content-Type': 'application/json', ...CORS } }); }
+      const uid = body.userId || body.uid;
+      if (!uid || !body.code) return new Response(JSON.stringify({ ok: false, error: 'uid and code required' }), { status: 400, headers: { 'Content-Type': 'application/json', ...CORS } });
+      const ok = await capturePendingRef(uid, String(body.code).toUpperCase(), env);
+      return new Response(JSON.stringify({ ok }), { status: ok ? 201 : 200, headers: { 'Content-Type': 'application/json', ...CORS } });
+    }
+
+    // v3.7: POST /api/referral/finalize — qualify a cross-OA invitee on their inquiry
+    if (url.pathname === '/api/referral/finalize' && request.method === 'POST') {
+      const auth = request.headers.get('Authorization') || '';
+      const tok = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+      if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return new Response('forbidden', { status: 403 });
+      let body; try { body = await request.json(); } catch { return new Response(JSON.stringify({ ok: false, error: 'invalid JSON' }), { status: 400, headers: { 'Content-Type': 'application/json', ...CORS } }); }
+      const uid = body.userId || body.uid;
+      if (!uid) return new Response(JSON.stringify({ ok: false, error: 'uid required' }), { status: 400, headers: { 'Content-Type': 'application/json', ...CORS } });
+      // pushInvitee:false → caller (e.g. gongwan) delivers invitee reward on its own channel
+      const result = await finalizeReferral(uid, body.inquiryId || null, body.sourceOa || 'external', env, { pushInvitee: false });
+      return new Response(JSON.stringify(result), { headers: { 'Content-Type': 'application/json', ...CORS } });
     }
 
     // v4: GET /api/member/list — list all member card keys (batch sync)
