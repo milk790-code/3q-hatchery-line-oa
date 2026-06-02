@@ -243,3 +243,31 @@ finalizeReferral(inviteeUid, inquiryId, sourceOa, env):
 5. **LINE 群組**：建群 + 加 bot（之後自動抓 groupId）＋ 開獎時段。
 6. **FB 私域策略**：10.3 的 (a)/(b)/(c) 擇一。
 7. **FB_PAGE_ID / token** 是否已在 social-publisher 設好（決定粉專自動發文能否即刻啟用）。
+
+---
+
+## 十二、已實作對照（v3.7，本 PR）
+
+| 規格 | 落地位置 | 狀態 |
+|---|---|---|
+| referrals + rewards 表 | `db/migrations/006_referrals.sql` | ✅ |
+| 引薦碼/反查/防弊/雙向發獎 | `webhook/worker.js`（referral 區） | ✅ |
+| 歸因深連結捕捉 | text `引薦 CODE` + index.html CTA | ✅ |
+| 結算 hook | `flow:submit`、campaign register | ✅ |
+| 會員卡顯示引薦碼 | `memberCardFlex` | ✅ |
+| 每日霸王餐抽獎 | cron `0 12 * * *`、`抽` keyword、`join` 抓 groupId、share-to-claim | ✅ |
+| 跨 OA API | `/api/referral/{code,capture,finalize}` | ✅ |
+| 貢丸 thin client | `bots/gongwan/{hatchery_api,main}.py` | ✅ |
+| FB 粉專自動 + 外連首留言 | `workers/social-publisher`（`seedDailyContent`, `publishToFacebook`） | ✅ |
+| FB 社團半自動 | KV `fbgroup:today` + `GET /fbgroup/today` | ✅ |
+| 折扣階梯數字 | `inviterReward()`（預設值，待確認可調） | ⚠️ 預設 |
+
+## 十三、上線清單（部署時）
+
+1. 套 D1 migration：`wrangler d1 migrations apply 3q-hatchery-crm --remote`（含 006、007）。
+2. 部署兩個 worker：`webhook/`（含新 cron）、`workers/social-publisher/`。
+3. 確認 `LINE_BASIC_ID`（worker + index.html）= 真實 basic id；非 `@121Ikspe` 則改兩處。
+4. 貢丸（Render）設 `HATCHERY_WORKER_URL`、`TRIGGER_TOKEN`（與 CF secret 同值）。
+5. 建 LINE 群、加 bot（自動寫 `group:main`）。
+6. social-publisher 確認 `FB_PAGE_ACCESS_TOKEN` secret 已設。
+7. 社團每日內容：管理員開 `GET /fbgroup/today?format=text` 一鍵複製貼上。
