@@ -637,6 +637,79 @@ function seatWelcomeFlex(code) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
+// v3.7: Daily lottery — 霸王餐 / 免費做圖. Enter with「抽」, draw 20:00 TW,
+//   winner must SHARE to claim (share-to-claim) → every win seeds new traffic.
+// ─────────────────────────────────────────────────────────────────────────
+
+function twDateStr() {
+  return new Date(Date.now() + 8 * 3600000).toISOString().slice(0, 10);
+}
+
+async function lotteryEnter(uid, env) {
+  if (!env.SESSION || !uid) return 'error';
+  try {
+    const key = `lottery:${twDateStr()}:entries`;
+    const cur = await env.SESSION.get(key);
+    const list = cur ? JSON.parse(cur) : [];
+    if (list.includes(uid)) return 'already';
+    list.push(uid);
+    await env.SESSION.put(key, JSON.stringify(list), { expirationTtl: 60 * 60 * 48 });
+    return 'ok';
+  } catch { return 'error'; }
+}
+
+function lotteryWinnerFlex(shareUri) {
+  return FLEX('你被抽中了', {
+    type: 'bubble', size: 'mega',
+    body: {
+      type: 'box', layout: 'vertical', backgroundColor: '#0A0A0A', paddingAll: '24px', spacing: 'sm',
+      contents: [
+        { type: 'text', text: 'TODAY · 霸王餐', color: '#B8924A', size: 'xxs', weight: 'bold', letterSpacing: '3px' },
+        { type: 'text', text: '今晚的好東西，留給你了。', color: '#F5F2EC', size: 'lg', weight: 'bold', wrap: true, margin: 'sm' },
+        { type: 'separator', margin: 'md', color: '#B8924A' },
+        { type: 'text', text: '霸王餐福利 / 免費做圖一張。\n領獎只有一個規矩：把好東西分享出去 —\n分享後按下方「我分享了」，顧問就為你備上。', color: '#8A8A8A', size: 'sm', wrap: true, margin: 'md' },
+      ],
+    },
+    footer: {
+      type: 'box', layout: 'vertical', backgroundColor: '#F5F2EC', paddingAll: '16px', spacing: 'sm',
+      contents: [
+        { type: 'button', style: 'primary', color: '#0A0A0A', height: 'sm',
+          action: { type: 'uri', label: '分享好東西', uri: shareUri } },
+        { type: 'button', style: 'secondary', height: 'sm',
+          action: { type: 'postback', label: '我分享了，領獎', data: 'lottery:claim', displayText: '我分享了，領獎' } },
+      ],
+    },
+  });
+}
+
+async function runLotteryDraw(env) {
+  if (!env.SESSION) return { skipped: 'no kv' };
+  const date = twDateStr();
+  try {
+    const cur = await env.SESSION.get(`lottery:${date}:entries`);
+    const list = cur ? JSON.parse(cur) : [];
+    if (!list.length) return { skipped: 'no entries', date };
+    const winner = list[Math.floor(Math.random() * list.length)];
+    await env.SESSION.put(`lottery:${date}:winner`,
+      JSON.stringify({ uid: winner, claimed: false }), { expirationTtl: 60 * 60 * 72 });
+    // winner: personalised share link (their own referral deep link) + claim flow
+    const card = await ensureReferralCode(winner, env);
+    const shareUri = card ? referralDeepLink(card.code, env) : (env.SITE_BASE_URL || 'https://milk790-code.github.io/3q-hatchery-line-oa/');
+    await pushMsg(winner, [lotteryWinnerFlex(shareUri)], env);
+    // group announcement (if bot has been added to a group → groupId captured on join)
+    const gid = await env.SESSION.get('group:main');
+    if (gid) await pushMsg(gid, [{ type: 'text',
+      text: '今日霸王餐 / 免費做圖 — 開獎了。\n得主已私訊通知。\n\n明天想抽？在這裡打「抽」就入場。' }], env);
+    if (env.OWNER_USER_ID) await pushMsg(env.OWNER_USER_ID, [{ type: 'text',
+      text: `🎁 今日抽獎開出：${winner}\n（${list.length} 人參加，待得主分享領獎）` }], env);
+    return { ok: true, date, entries: list.length, winner };
+  } catch (err) {
+    console.error('runLotteryDraw failed:', err.message);
+    return { error: err.message };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
 // D1 helpers
 // ─────────────────────────────────────────────────────────────────────────
 
@@ -1287,6 +1360,10 @@ export default {
     if (event.cron === '0 1 1 3,6,9,12 *') {
       ctx.waitUntil(runSeasonalPush(env).then(r => console.log('Seasonal push:', JSON.stringify(r))));
     }
+    // v3.7: daily lottery draw at 20:00 TW (12:00 UTC)
+    if (event.cron === '0 12 * * *') {
+      ctx.waitUntil(runLotteryDraw(env).then(r => console.log('Lottery draw:', JSON.stringify(r))));
+    }
   },
 };
 
@@ -1305,6 +1382,14 @@ async function handleEvent(ev, env) {
     return sendWelcome(ev.replyToken, env, mCard);
   }
 
+  // v3.7: bot added to a group/room → remember it as the lottery broadcast target
+  if (ev.type === 'join') {
+    const gid = ev.source?.groupId || ev.source?.roomId;
+    if (gid && env.SESSION) await env.SESSION.put('group:main', gid);
+    return replyMsg(ev.replyToken, [{ type: 'text',
+      text: '我進來了。\n這裡每天送霸王餐與免費做圖一張 — 想抽就打「抽」。\n晚上 8 點開獎，得主分享後即可領。' }], env);
+  }
+
   if (ev.type === 'postback') {
     const d = ev.postback?.data || '';
     if (d.startsWith('flow:')) return handleFlow(d, uid, ev.replyToken, env);
@@ -1317,6 +1402,22 @@ async function handleEvent(ev, env) {
         const labels = { contacted: '已聯繫 ✓', lost: '不感興趣', won: '成交 🎉' };
         return replyMsg(ev.replyToken, [{ type: 'text', text: `已更新：${labels[params.status] || params.status}` }], env);
       }
+    }
+
+    // v3.7: lottery winner claims after sharing (share-to-claim)
+    if (d === 'lottery:claim') {
+      const date = twDateStr();
+      const raw = env.SESSION ? await env.SESSION.get(`lottery:${date}:winner`) : null;
+      const w = raw ? JSON.parse(raw) : null;
+      if (!w || w.uid !== uid) {
+        return replyMsg(ev.replyToken, [{ type: 'text', text: '今天的獎不是這個帳號中的喔。\n想參加明天的，打「抽」就入場。' }], env);
+      }
+      if (!w.claimed) {
+        w.claimed = true;
+        await env.SESSION.put(`lottery:${date}:winner`, JSON.stringify(w), { expirationTtl: 60 * 60 * 72 });
+        if (env.OWNER_USER_ID) await pushMsg(env.OWNER_USER_ID, [{ type: 'text', text: `✅ 抽獎得主已分享領獎：${uid}\n請安排霸王餐 / 免費做圖交付。` }], env);
+      }
+      return replyMsg(ev.replyToken, [{ type: 'text', text: '收到，謝謝你把好東西傳出去。\n顧問會私訊你安排霸王餐 / 免費做圖。' }], env);
     }
 
     const MENU = {
@@ -1363,6 +1464,17 @@ async function handleEvent(ev, env) {
       return replyMsg(ev.replyToken, [ ok
         ? seatWelcomeFlex(code)
         : { type: 'text', text: '這個引薦碼我找不到，確認一下有沒有打對？' } ], env);
+    }
+
+    // v3.7: Daily lottery — enter today's draw
+    if (['抽', '抽獎', '霸王餐', '免費做圖'].includes(text.trim())) {
+      const r = await lotteryEnter(uid, env);
+      const msg = r === 'already'
+        ? '今天你已經在抽獎名單裡了。\n晚上 8 點開獎，中了我們私訊你。'
+        : r === 'ok'
+        ? '入場了。\n今晚 8 點開獎 — 霸王餐 / 免費做圖一張。\n想多一份機會？把引薦連結分享出去（打「引薦」拿你的連結）。'
+        : '抽獎暫時無法使用，稍後再試。';
+      return replyMsg(ev.replyToken, [{ type: 'text', text: msg }], env);
     }
 
     // v3.7: Referral — show my referral card (realises the v3.7 介紹新客戶 placeholder)

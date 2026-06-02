@@ -13,6 +13,14 @@ PNG_BASE_URL = "https://milk790-code.github.io/3q-hatchery-line-oa/assets/export
 LINE_BASIC_ID = "@121Ikspe"
 SITE_BASE_URL = "https://milk790-code.github.io/3q-hatchery-line-oa/"
 
+# Cron triggers (declarative — keep ALL; deploy replaces the dashboard set)
+#   5 * * * *           follow-ups (hourly)
+#   0 13 * * 1          weekly digest (Mon 21:00 TW)
+#   0 1 1 3,6,9,12 *    seasonal push (quarterly 09:00 TW)
+#   0 12 * * *          v3.7 daily lottery draw (20:00 TW)
+[triggers]
+crons = ["5 * * * *", "0 13 * * 1", "0 1 1 3,6,9,12 *", "0 12 * * *"]
+
 # KV namespace for guided-flow session state (2h TTL per user)
 [[kv_namespaces]]
 binding = "SESSION"
