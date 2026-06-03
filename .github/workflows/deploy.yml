@@ -261,6 +261,7 @@ jobs:
               {"name": "LINE_BASIC_ID",             "type": "plain_text",  "text": "@121Ikspe"},
               {"name": "SITE_BASE_URL",             "type": "plain_text",  "text": "https://milk790-code.github.io/3q-hatchery-line-oa/"},
               {"name": "TRIGGER_TOKEN",             "type": "secret_text", "text": $(jq -Rn --arg t "${TRIGGER_TOKEN:-}" '$t')},
+              {"name": "ANTHROPIC_API_KEY",          "type": "inherit"},
               {"name": "SESSION",                   "type": "kv_namespace", "namespace_id": "$SESSION_KV_ID"},
               {"name": "AI",                        "type": "ai"},
               {"name": "RICHMENU_NEW",       "type": "plain_text", "text": $(jq -Rn --arg t "${RICHMENU_A:-}" '$t')},
