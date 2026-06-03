@@ -1903,8 +1903,90 @@ async function handleIntent(userText, replyToken, env, uid) {
 // AI Fallback — Workers AI LLM (Llama-3 fast)
 // ─────────────────────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────────────────
+// Claude API 引擎(Anthropic）+ 去金融輸出防護 + 3Q 八法則客服腦
+// 金鑰只在 env.ANTHROPIC_API_KEY（server）；沒 key → 回 null，自動退回 Llama，不壞 bot。
+// ─────────────────────────────────────────────────────────────────────────
+const AI_BANNED = ['先享後付', '先用滿意再付', '先用再付', '分期', '月費', '保證', '最便宜', '穩賺'];
+const AI_SAFE_REPLY = [
+  '你好，謝謝你私訊。',
+  '掘計畫是我們免費幫你的店做一個官網，做給你看、喜歡再合作。',
+  '你是做哪一行的？也可以直接加 LINE：@121lkspe',
+].join('\n');
+
+function sanitizeAIReply(text) {
+  if (!text) return null;
+  let t = String(text).trim();
+  t = t.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{1F1E6}-\u{1F1FF}\u{FE0F}]/gu, '');
+  t = t.replace(/[!！]/g, '。').replace(/\n{3,}/g, '\n\n').trim();
+  if (AI_BANNED.some(w => t.includes(w))) return AI_SAFE_REPLY;
+  if (t.length < 5) return AI_SAFE_REPLY;
+  return t.slice(0, 300);
+}
+
+// 3Q 八法則·頂級顧問腦(餵給 Claude 的 system）
+const BRAIN_3Q = [
+  '你是「3Q 貢丸品牌孵化所」的首席顧問，也是頂級銷售。你回覆主動私訊進來的店家老闆。',
+  '',
+  '# 你的身分',
+  '不是推銷員，是接待客人的主人，也是替老闆把脈的顧問。客人願意私訊，代表他對自己的店有期待——你的工作是接住這份期待，讓他覺得「這個人真的懂我的生意」，然後給他一個清楚、無痛的下一步。',
+  '',
+  '# 頂級銷售的四步(每次對話心裡都跑一遍，但不要說出步驟名)',
+  '1. 接住：先回應他說的具體內容，讓他感到被聽見。用他的話回鏡一次。',
+  '2. 診斷：用一個好問題，讓他多說一點他的生意(行業、現在最卡的地方)。問題要具體、好回答。',
+  '3. 給對的下一步：根據他的行業與痛點，點出「被找到 / 被相信 / 被下單」這三件他最缺的哪一件，給一個明確動作。',
+  '4. 收束：每次只給一個下一步(私訊行業 / 加 LINE / 免費品牌健診)。對方猶豫就留鉤子，不逼。',
+  '',
+  '# 判斷溫度，給不同力度',
+  '- 冷(只問「這什麼」)：先講清楚掘計畫 + 收他的行業，不催。',
+  '- 溫(問價格/怎麼做)：講免費第一步 + 導顧問，不報死數字。',
+  '- 熱(說了行業/想做)：給行業專屬價值 + 明確約下一步(私訊「貢丸＋行業」或加 LINE)。',
+  '',
+  '# 說話方式',
+  '- 繁體中文，用「你」不用「您」。短句、分行，最多 5 行，手機好讀。',
+  '- 克制、誠懇。不浮誇、不用驚嘆號、不用 emoji、不堆形容詞。',
+  '- 講結果，不講空話(不用「量身打造/絕無僅有/業界第一」這類)。',
+  '- 像一個對自己做的東西很有把握、所以不需要大聲的人。',
+  '',
+  '# 絕對不做',
+  '- 不報任何最終價格數字。被問價格：只說「第一步是免費的」+「之後按你需求加購」+ 請他說行業或加 LINE 顧問報。',
+  '- 不用這些字：先享後付、先用再付、分期、月費、保證、最便宜、第一、絕對、穩賺。',
+  '- 不逼單、不催、不製造假急迫。不亂承諾成效數字、不冒充已成交案例。',
+  '',
+  '# 核心彈藥',
+  '- 掘計畫：免費幫你的店做一個官網，做給你看、喜歡再合作，每個行業只收一位。',
+  '- 信念：做得對，才敢做給你看。',
+  '- 目標導向：讓對方說出行業 → 私訊「貢丸＋你的行業」或加 LINE @121lkspe → 免費品牌健診。',
+].join('\n');
+
+async function callClaude(env, systemPrompt, messages, opts = {}) {
+  if (!env.ANTHROPIC_API_KEY) return null;
+  const model = opts.model || 'claude-sonnet-4-6';
+  const maxTokens = opts.maxTokens || 400;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: maxTokens,
+        system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
+        messages: messages.slice(-12),
+      }),
+    });
+    if (!res.ok) { console.error('anthropic', res.status, await res.text().catch(() => '')); return null; }
+    const data = await res.json();
+    const text = (data.content || []).filter(c => c.type === 'text').map(c => c.text).join('\n');
+    return sanitizeAIReply(text);
+  } catch (e) { console.error('callClaude', e?.message); return null; }
+}
+
 async function aiFallback(userText, env, uid) {
-  if (!env.AI) return null;
+  if (!env.AI && !env.ANTHROPIC_API_KEY) return null;
   if (env.SESSION && uid) {
     const key = `rl:ai:${uid}`;
     const cur = parseInt(await env.SESSION.get(key) || '0', 10);
@@ -1912,6 +1994,9 @@ async function aiFallback(userText, env, uid) {
     await env.SESSION.put(key, String(cur + 1), { expirationTtl: 60 });
   }
   try {
+    // 先試 Claude(八法則腦);沒 key 或失敗 → 退回 Llama
+    const claudeReply = await callClaude(env, BRAIN_3Q, [{ role: 'user', content: userText }], { model: 'claude-sonnet-4-6', maxTokens: 400 });
+    if (claudeReply) return claudeReply;
     const SYSTEM = '你是 3Q 貢丸·台灣在地品牌孵化所的客服助理。回應台灣繁體中文，最多 80 字。\n\n3Q 提供 3 個服務：\n1. 好物・好照 — 產品攝影 + 介紹文，500 元起\n2. 客製行銷 — 季度規劃，從現階段往前 3 個月\n3. 諮詢 — 30 分鐘免費，先聊聊再決定\n\n本月活動：好物・好照限時招募，前 10 位 100 元，名額剩 X 位。傳「+1」可看。\n\n用戶問什麼，你判斷最接近哪個服務，回答 2-3 句話，結尾建議他傳的關鍵字（例如：「回覆『+1』」「點選圖文選單『好物・好照』」）。語氣親切但不要過度熱情，跟用戶平等對話。';
     const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct-fast', {
       messages: [
@@ -1921,8 +2006,7 @@ async function aiFallback(userText, env, uid) {
       max_tokens: 200,
     });
     const text = (result?.response || '').trim();
-    if (!text || text.length < 5) return null;
-    return text.slice(0, 300);
+    return sanitizeAIReply(text);
   } catch (err) {
     console.error('AI fallback failed:', err?.message);
     return null;
