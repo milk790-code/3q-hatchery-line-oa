@@ -1364,6 +1364,32 @@ export default {
       return new Response(JSON.stringify({ ok: true, id }), { headers: { 'Content-Type': 'application/json', ...CORS } });
     }
 
+    // 官網 concierge 聊天 — POST /api/chat(跨子網域,CORS)。共用 callClaude + BRAIN_3Q。
+    if (url.pathname === '/api/chat') {
+      const CC_CORS = { ...CORS, 'Access-Control-Allow-Headers': 'content-type', 'Access-Control-Max-Age': '86400' };
+      if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CC_CORS });
+      if (request.method === 'POST') {
+        const J = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { 'Content-Type': 'application/json', ...CC_CORS } });
+        let pl; try { pl = await request.json(); } catch { return J({ error: 'bad json' }, 400); }
+        const raw = Array.isArray(pl.messages) ? pl.messages : [];
+        const msgs = raw
+          .filter(m => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+          .map(m => ({ role: m.role, content: m.content.slice(0, 1500) }))
+          .slice(-12);
+        const last = msgs[msgs.length - 1];
+        if (!last || last.role !== 'user') return J({ reply: '你做哪一行的？我幫你看你的店現在最缺哪一塊。' });
+        const ip = request.headers.get('cf-connecting-ip') || 'anon';
+        if (env.SESSION) {
+          const rlk = `rl:web:${ip}`;
+          const cur = parseInt(await env.SESSION.get(rlk) || '0', 10);
+          if (cur >= 12) return J({ reply: '稍等一下再問我好嗎，你也可以直接加 LINE @121lkspe。' });
+          await env.SESSION.put(rlk, String(cur + 1), { expirationTtl: 60 });
+        }
+        const reply = await callClaude(env, BRAIN_3Q, msgs, { model: 'claude-sonnet-4-6', maxTokens: 400 });
+        return J({ reply: reply || '想聊更快可以加我們 LINE：@121lkspe，或私訊「貢丸＋你的行業」，我幫你看怎麼開始。' });
+      }
+    }
+
     if (request.method === 'GET') {
       return new Response(JSON.stringify({
         service: '3Q Hatchery LINE OA webhook',
