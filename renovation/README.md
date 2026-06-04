@@ -71,6 +71,14 @@ renovation/
 
 > **價高 · 質好 · 客傳客** —— 高價養得起好工班 → 好品質 → 客戶信任 → 好評＋轉介 → 更多高價案。
 
+## 📱 手機閱讀版（HTML）
+
+工班端與內部機密的每份 `.md` 都有對應的 **`.html` 手機好讀版**（品牌排版、表格可橫滑、ASCII 圖可滑、機密頁有紅色標示）。導覽中心 `index.html` 已直接連到 HTML 版。
+
+- `.md` = 原始來源（編輯用）
+- `.html` = 閱讀版（手機看這個）
+- 改了 `.md` 後，重新產生 HTML：`npm i marked && node renovation/build-docs.mjs`
+
 ## 怎麼看
 
 - HTML 直接用瀏覽器開。從 `index.html` 點進去最快。

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>內部機密 ‧ 警衛地推 Playbook</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+:root{--black:#0A0A0A;--paper:#F5F2EC;--gold:#B8924A;--ink:#1A1A1A;--stone:#8A8A8A;--sand:#E8DFD0;--rule:rgba(10,10,10,.12)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:"Noto Sans TC",-apple-system,system-ui,sans-serif;line-height:1.85;-webkit-text-size-adjust:100%}
+.bar{position:sticky;top:0;z-index:10;background:rgba(10,10,10,.96);backdrop-filter:blur(6px);color:var(--paper);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;border-bottom:1px solid var(--gold)}
+.bar a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:.06em;white-space:nowrap}
+.bar .t{font-family:"Noto Serif TC",serif;font-size:15px;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar button{background:transparent;border:1px solid var(--gold);color:var(--gold);font-size:12px;padding:6px 12px;border-radius:4px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.secret{background:#a8442a;color:#fff;text-align:center;font-size:12.5px;letter-spacing:.12em;padding:8px}
+.doc{max-width:760px;margin:0 auto;padding:28px 20px 80px}
+.doc h1{font-family:"Noto Serif TC",serif;font-weight:600;font-size:clamp(26px,7vw,38px);line-height:1.35;letter-spacing:.03em;margin:8px 0 22px;padding-bottom:14px;border-bottom:2px solid var(--gold);color:var(--black)}
+.doc h2{font-family:"Noto Serif TC",serif;font-weight:600;font-size:clamp(21px,5.5vw,28px);margin:38px 0 14px;padding-left:13px;border-left:4px solid var(--gold);color:var(--black);letter-spacing:.03em}
+.doc h3{font-family:"Noto Serif TC",serif;font-weight:500;font-size:clamp(18px,4.8vw,22px);margin:28px 0 10px;color:var(--black);letter-spacing:.03em}
+.doc h4{font-size:16px;font-weight:700;margin:20px 0 8px;color:var(--ink)}
+.doc p{margin:13px 0;font-size:16.5px}
+.doc ul,.doc ol{margin:13px 0;padding-left:24px}
+.doc li{margin:7px 0;font-size:16.5px}
+.doc li::marker{color:var(--gold)}
+.doc input[type=checkbox]{width:17px;height:17px;margin-right:7px;accent-color:var(--gold);vertical-align:-2px}
+.doc strong{color:var(--black);font-weight:700}
+.doc a{color:var(--gold)}
+.doc blockquote{margin:18px 0;padding:12px 18px;background:var(--sand);border-left:4px solid var(--gold);border-radius:0 6px 6px 0}
+.doc blockquote p{margin:4px 0;font-size:16px}
+.doc code{background:var(--sand);padding:2px 7px;border-radius:4px;font-size:.92em;font-family:"SFMono-Regular",Menlo,Consolas,monospace}
+.doc pre{background:var(--black);color:var(--paper);padding:16px;border-radius:8px;overflow-x:auto;margin:18px 0;-webkit-overflow-scrolling:touch}
+.doc pre code{background:none;color:inherit;padding:0;font-size:13px;line-height:1.6;white-space:pre}
+.doc hr{border:none;border-top:1px solid var(--rule);margin:30px 0}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:18px 0;border:1px solid var(--rule);border-radius:8px}
+.doc table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:420px}
+.doc th{background:var(--black);color:var(--paper);text-align:left;padding:11px 13px;font-weight:500;letter-spacing:.04em;white-space:nowrap}
+.doc td{border-bottom:1px solid var(--rule);padding:11px 13px;vertical-align:top}
+.doc tbody tr:nth-child(even){background:#faf8f4}
+.doc table strong{color:var(--gold)}
+</style></head>
+<body>
+<div class="bar"><a href="../index.html">← 導覽中心</a><span class="t">內部機密 ‧ 警衛地推 Playbook</span><button onclick="window.print()">列印</button></div>
+<div class="secret">🔴 內部機密 · 切勿公開或外流</div>
+<main class="doc"><h1>內部機密 ‧ 警衛地推 Playbook</h1>
+<blockquote>
+<p><strong>機密等級:內部限閱(業務 / 行銷 / 經營層)</strong>
+一句話:<strong>攻下警衛,就攻下整棟樓。</strong> 這是 3Q 成本最低、信任度最高的獲客管道。
+六字訣回顧:<strong>價高 · 質好 · 客傳客</strong>。警衛地推是「客傳客」的入口,把陌生社區變成熟人地盤。</p>
+</blockquote>
+<hr>
+<h2>一、為什麼這招有效(心理學底層)</h2>
+<p>不是運氣,是三個機制疊起來的必然結果:</p>
+<table>
+<thead>
+<tr>
+<th>機制</th>
+<th>白話解釋</th>
+<th>為什麼贏過廣告 / 名片</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>日常曝光效應(單純曝光)</strong></td>
+<td>警衛每天上班 8–12 小時,手機支架、電風扇就在桌上。看的次數越多,越覺得這家「面熟、可信」。</td>
+<td>廣告牌一週看不到幾眼;桌上的日用品天天用、天天看。</td>
+</tr>
+<tr>
+<td><strong>守門人效應</strong></td>
+<td>警衛是社區的資訊節點 —— 誰要裝修、誰剛交屋、誰在抱怨工程,他全知道。攻下他=攻下整棟的情報網。</td>
+<td>業務從外面亂敲門,效率極低且惹人厭;守門人主動報情報,精準又省力。</td>
+</tr>
+<tr>
+<td><strong>人情背書(信任轉移)</strong></td>
+<td>住戶不信陌生業務,但信「天天看到、會幫忙收包裹的王大哥」。警衛開口推薦,等於把他的信任借給我們。</td>
+<td>一張名片的信任值 ≈ 0;熟識警衛一句「這家不錯」≈ 一個熱推薦。</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>核心心法:我們不是在「賄賂」警衛,是在「經營一段真實的人情關係」。</strong> 真誠混臉熟,東西只是讓他記住我們的工具。</p>
+</blockquote>
+<hr>
+<h2>二、目標社區篩選(別亂送,送對地方)</h2>
+<p>不是每個社區都值得投入。優先順序:</p>
+<table>
+<thead>
+<tr>
+<th>優先級</th>
+<th>社區型態</th>
+<th>為什麼優先</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>⭐⭐⭐⭐⭐</td>
+<td><strong>交屋潮的整片新建案</strong></td>
+<td>一次幾百戶要裝修,複製成交、攤平成本最快。警衛剛上任、關係空白,先到先贏。</td>
+</tr>
+<tr>
+<td>⭐⭐⭐⭐</td>
+<td><strong>高端社區(屋齡 3–10 年)</strong></td>
+<td>願付頂價、會二次裝修/翻新、鄰里口碑緊密。警衛多為長期駐點,關係能養很久。</td>
+</tr>
+<tr>
+<td>⭐⭐⭐</td>
+<td><strong>大型社區(300 戶以上)</strong></td>
+<td>基數大,裝修需求穩定流出,管理嚴=我們的乾淨工地是加分。</td>
+</tr>
+<tr>
+<td>⭐⭐</td>
+<td><strong>中型成熟社區</strong></td>
+<td>偶有翻新/水電/清潔需求,適合養售後回購。</td>
+</tr>
+<tr>
+<td>⭐(略過)</td>
+<td><strong>小型公寓 / 無管理員 / 透天</strong></td>
+<td>沒有守門人節點,本招失效,用其他管道。</td>
+</tr>
+</tbody></table>
+<p><strong>篩選檢核清單(進場前先打勾):</strong></p>
+<ul>
+<li><input disabled="" type="checkbox"> 有 24 小時駐點警衛 / 管理員(不是巡邏制)</li>
+<li><input disabled="" type="checkbox"> 警衛室有桌面、看得到電視或久坐(送禮才有舞台)</li>
+<li><input disabled="" type="checkbox"> 戶數夠多 / 交屋進行中(有複製空間)</li>
+<li><input disabled="" type="checkbox"> 社區單價/族群符合「願付安心溢價」</li>
+<li><input disabled="" type="checkbox"> 管理嚴格(代表我們的乾淨守規矩是優勢,不是阻力)</li>
+</ul>
+<hr>
+<h2>三、送禮品項與設計規格</h2>
+<p><strong>主打兩件套:客製手機支架 + 小電風扇。</strong> 選這兩樣的邏輯:警衛上班不是滑手機追劇,就是吹電扇消暑 —— <strong>天天上手、天天在視線正前方。</strong></p>
+<h3>3.1 資訊配置規格(最關鍵,不能馬虎)</h3>
+<table>
+<thead>
+<tr>
+<th>載體</th>
+<th>必印資訊</th>
+<th>設計要求</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>手機支架(底座正面)</strong></td>
+<td>公司名稱(大)+ 服務專線 + 「裝修‧鍍膜‧清潔‧水電」一行</td>
+<td>字要大、對比強,坐著低頭就看得清</td>
+</tr>
+<tr>
+<td><strong>手機支架(背面/側面)</strong></td>
+<td>業務本人手機 + 姓名 + LINE QR Code</td>
+<td>QR 直接加業務 LINE,降低轉介摩擦</td>
+</tr>
+<tr>
+<td><strong>小電風扇(扇身/底座)</strong></td>
+<td>公司名稱 + 電話(超大字)</td>
+<td>顏色要跳、夜班昏暗也看得到</td>
+</tr>
+<tr>
+<td><strong>兩者共通</strong></td>
+<td>一句 slogan:<strong>「全程連線看工地,有人負責到底」</strong></td>
+<td>讓資訊本身就在賣定位</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>鐵則:資訊一定要「超級清楚」。</strong> 寧可醜一點、字大一點,也不要設計感蓋過電話號碼。這是工具,不是藝術品。</p>
+</blockquote>
+<h3>3.2 品質要求(送爛貨會反效果)</h3>
+<ul>
+<li><strong>寧缺勿濫</strong>:電風扇要真的好用、安靜、風量夠;支架要穩、不晃。用得爽才會天天用。</li>
+<li><strong>不要廉價塑膠感</strong>:警衛桌上擺得出去,代表「這家公司不隨便」 —— 物品本身就是品質背書。</li>
+<li><strong>附小卡</strong>:第一次送附手寫小卡(「天氣熱,給您消暑用,有需要裝修隨時找我 —— 小陳」),溫度比印刷強。</li>
+<li><strong>預算帶</strong>:單套建議成本控制在合理區間(品質優先),詳見第八節 ROI。</li>
+</ul>
+<hr>
+<h2>四、話術腳本(逐句,可直接背)</h2>
+<h3>階段 A:初次接觸(第 1 次,目標=不尷尬地把東西送出去)</h3>
+<blockquote>
+<p><strong>業務(進門先打招呼,別急著推銷):</strong>
+「大哥您好~不好意思打擾一下。我是 3Q 裝修的小陳,我們有在這邊附近接案子。今天剛好路過,天氣這麼熱,帶了個小電扇跟手機架,想說給您放桌上用。沒別的意思,純粹覺得您們站崗辛苦。」</p>
+</blockquote>
+<blockquote>
+<p><strong>(對方客氣推辭時):</strong>
+「沒事沒事~這小東西而已,您就收著用。上面有我電話,以後社區住戶要是有裝修、水電、或是過年想大掃除的需求,麻煩您幫我提一下,我請您喝飲料。」</p>
+</blockquote>
+<p><strong>重點:第一次不談業務細節,只「送 + 留印象 + 埋一句轉介種子」。</strong></p>
+<h3>階段 B:混臉熟(第 2–4 次,目標=從「業務」變「熟人」)</h3>
+<blockquote>
+<p>「王大哥早!電扇還順嗎?風夠不夠強?」
+「今天買了兩杯涼的,一杯給您。最近社區有人在裝修齁,我看 X 棟那邊在搬東西。」
+(閒聊社區八卦、天氣、球賽 —— <strong>不主動推銷,讓對方主動問。</strong>)</p>
+</blockquote>
+<p><strong>目標訊號:警衛開始叫得出你名字、會主動跟你聊社區動態 = 關係已建立。</strong></p>
+<h3>階段 C:接住轉介(關係成熟後)</h3>
+<blockquote>
+<p><strong>警衛主動報:</strong> 「欸小陳,B 棟 12 樓那戶剛交屋,好像在找裝修的。」
+<strong>業務回應:</strong>
+「真的喔!太感謝大哥了!我等等就準備一下。對了大哥,如果這案子成,我一定不會忘記您,先謝謝您幫忙。」</p>
+</blockquote>
+<blockquote>
+<p><strong>接洽住戶開場(借警衛信任):</strong>
+「您好~我是 3Q 裝修,管理室的王大哥跟我提到您這邊剛交屋。我們在這社區有配合過,工地我們都顧得很乾淨、不會吵到鄰居,全程還能手機連線看施工。要不要我先過去幫您看看、免費估個價?」</p>
+</blockquote>
+<blockquote>
+<p><strong>(報出警衛名字+強調乾淨守規矩=瞬間拉高信任。)</strong></p>
+</blockquote>
+<hr>
+<h2>五、維繫節奏(別三分鐘熱度,也別變騷擾)</h2>
+<table>
+<thead>
+<tr>
+<th>階段</th>
+<th>頻率</th>
+<th>帶什麼</th>
+<th>停留時間</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>建立期(前 4 週)</strong></td>
+<td>約每週 1 次</td>
+<td>飲料 / 涼的 / 小點心</td>
+<td>5–10 分鐘,點到為止</td>
+</tr>
+<tr>
+<td><strong>維繫期(關係穩後)</strong></td>
+<td>約每 2–3 週 1 次</td>
+<td>飲料即可,節慶加碼</td>
+<td>路過寒暄 3–5 分鐘</td>
+</tr>
+<tr>
+<td><strong>節慶加碼</strong></td>
+<td>端午 / 中秋 / 過年</td>
+<td>一盒像樣的禮(粽子/月餅/伴手禮)</td>
+<td>親自送、講感謝</td>
+</tr>
+<tr>
+<td><strong>轉介發生後</strong></td>
+<td>隨時</td>
+<td>立刻回謝(見第六節)</td>
+<td>—</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>節奏鐵律:寧可少,不要煩。</strong> 警衛要值勤,挑他不忙的時段(交接後、人流少時),別在尖峰打擾。讓他覺得你「貼心」,不是「黏人」。</p>
+</blockquote>
+<hr>
+<h2>六、轉介發生後:接手與回饋警衛機制</h2>
+<h3>6.1 接手 SOP</h3>
+<ol>
+<li>警衛報線索 → <strong>當天</strong>回謝警衛 + <strong>48 小時內</strong>聯絡住戶。</li>
+<li>接洽時自然帶出警衛名字(借信任),但<strong>不過度張揚</strong>(保護警衛,避免他被住戶或管委會說閒話)。</li>
+<li>成交與否,<strong>都要回報警衛結果</strong>(「大哥那戶談成了!」/「那戶還在考慮,還是謝謝您」)—— 讓他知道報線索有下文,他才會繼續報。</li>
+</ol>
+<h3>6.2 回饋警衛(分寸見第七節)</h3>
+<ul>
+<li><strong>小回饋(報線索):</strong> 一杯好一點的飲料、一頓便當、節慶禮加碼。即時、輕量、表達感謝。</li>
+<li><strong>成交回饋:</strong> 真心實質的感謝禮(伴手禮 / 加碼節慶禮)。<strong>定位是「謝謝你幫忙、我們是朋友」,不是「按件計酬的傭金」。</strong></li>
+<li><strong>登記在案:</strong> 每筆回饋記錄在追蹤表,避免重複或遺漏,也方便算 ROI。</li>
+</ul>
+<blockquote>
+<p>⚠️ 回饋形式與金額分寸極重要,務必讀第七節再執行。</p>
+</blockquote>
+<hr>
+<h2>七、禁忌與分寸(踩線會出大事)</h2>
+<table>
+<thead>
+<tr>
+<th>❌ 絕對不要</th>
+<th>✅ 正確做法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>給警衛固定「每件 X 元」現金抽佣、簽抽成契約</td>
+<td>以「朋友間的感謝」形式回饋(請客 / 伴手禮),不制度化成傭金</td>
+</tr>
+<tr>
+<td>要求警衛洩漏住戶個資、名單、門禁資訊</td>
+<td>只接受警衛「自願提及」的公開動態,不索取個資</td>
+</tr>
+<tr>
+<td>天天去、值勤尖峰硬聊、死纏爛打</td>
+<td>挑空檔、低頻、點到為止,尊重他在上班</td>
+</tr>
+<tr>
+<td>在管委會 / 物業明令禁止下硬闖推銷</td>
+<td>先了解社區規矩,必要時走物業正式合作管道</td>
+</tr>
+<tr>
+<td>送禮造成警衛違反公司規定 / 收賄疑慮</td>
+<td>小額、日用、公開,讓他收得心安理得</td>
+</tr>
+<tr>
+<td>進場後工地髒亂、抽菸、擾鄰,打臉警衛的推薦</td>
+<td><strong>乾淨守規矩=保護警衛面子</strong>,他才敢一直推</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>底線:不涉違法利誘、不騷擾、不害警衛違規。</strong> 這條關係要養好幾年,任何一次越線都可能毀掉整個社區的入口。<strong>分寸感,就是這招的護城河。</strong></p>
+</blockquote>
+<hr>
+<h2>八、ROI 粗估方式(範例數字皆為假設,請依實況校正)</h2>
+<h3>8.1 單一社區投入(假設)</h3>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>假設數字</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>兩件套禮品成本(支架+電扇,客製)</td>
+<td>約 NT$300–500 / 套</td>
+</tr>
+<tr>
+<td>飲料 / 點心(建立+維繫期約 3 個月)</td>
+<td>約 NT$1,500</td>
+</tr>
+<tr>
+<td>節慶禮(年 3 次)</td>
+<td>約 NT$2,000</td>
+</tr>
+<tr>
+<td>業務時間成本(每次 30 分含交通,前 3 月約 12 趟)</td>
+<td>自行換算工時</td>
+</tr>
+<tr>
+<td><strong>單社區年度現金投入(粗估)</strong></td>
+<td><strong>約 NT$4,000–5,000</strong></td>
+</tr>
+</tbody></table>
+<h3>8.2 回收估算(假設)</h3>
+<ul>
+<li>假設一個用心經營的社區,<strong>一年帶來 2 件轉介、成交 1 件裝修統包</strong>。</li>
+<li>假設裝修統包毛利貢獻(含鍍膜整合)遠高於上述投入 → <strong>單一成交即覆蓋成本數倍以上</strong>。</li>
+<li>別忘記<strong>長尾</strong>:同社區後續水電、保養、年度清潔回購,以及該客戶再轉介鄰居(samehouse 效應)。</li>
+</ul>
+<h3>8.3 追蹤公式</h3>
+<pre><code>社區 ROI = (該社區累計成交毛利貢獻 − 累計禮品/回饋/工時成本) ÷ 累計成本
+獲客成本(CAC)= 該社區累計投入 ÷ 該社區成交件數
+</code></pre>
+<blockquote>
+<p>經營滿 6 個月仍 0 轉介、且警衛關係冷淡 → 列入「降頻或撤出」檢討,把資源轉到高潛力社區。</p>
+</blockquote>
+<hr>
+<h2>九、追蹤表格(請同步進 CRM / LINE)</h2>
+<h3>9.1 社區‧警衛主檔</h3>
+<table>
+<thead>
+<tr>
+<th>社區名稱</th>
+<th>地址/區域</th>
+<th>優先級</th>
+<th>警衛姓名</th>
+<th>班別/在崗時段</th>
+<th>戶數/交屋狀態</th>
+<th>負責業務</th>
+<th>首次送禮日</th>
+<th>關係階段(A/B/C)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>範例:○○莊園</td>
+<td>北市內湖</td>
+<td>⭐⭐⭐⭐⭐</td>
+<td>王大哥</td>
+<td>早班 7–19</td>
+<td>480戶/交屋中</td>
+<td>小陳</td>
+<td>2026/06/05</td>
+<td>B</td>
+</tr>
+</tbody></table>
+<h3>9.2 互動紀錄</h3>
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>社區</th>
+<th>警衛</th>
+<th>互動內容</th>
+<th>帶了什麼</th>
+<th>對方反應/情報</th>
+<th>下次計畫</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>範例</td>
+<td>○○莊園</td>
+<td>王大哥</td>
+<td>寒暄+報社區動態</td>
+<td>涼飲×2</td>
+<td>提到B棟交屋潮</td>
+<td>6/19再訪</td>
+</tr>
+</tbody></table>
+<h3>9.3 轉介與回饋追蹤</h3>
+<table>
+<thead>
+<tr>
+<th>轉介日</th>
+<th>社區</th>
+<th>警衛</th>
+<th>被介紹戶別</th>
+<th>是否成交</th>
+<th>成交金額</th>
+<th>回饋方式</th>
+<th>回饋日</th>
+<th>備註</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>範例</td>
+<td>○○莊園</td>
+<td>王大哥</td>
+<td>B棟12F</td>
+<td>是</td>
+<td>(略)</td>
+<td>伴手禮一盒</td>
+<td>成交後3日</td>
+<td>已回報結果</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>十、一頁速記(給新進業務)</h2>
+<ol>
+<li><strong>挑對社區</strong>:交屋潮新建案 &gt; 高端老社區 &gt; 大型社區。</li>
+<li><strong>送對東西</strong>:好用的手機支架+電扇,電話印超大、附 LINE QR。</li>
+<li><strong>第一次只送不賣</strong>,埋一句轉介種子。</li>
+<li><strong>混臉熟</strong>:低頻、帶飲料、聊天不推銷,等他主動問。</li>
+<li><strong>接住線索</strong>:當天謝警衛、48 小時內聯絡住戶、借警衛名字+強調乾淨守規矩。</li>
+<li><strong>每次都回報結果</strong>給警衛,他才會一直報。</li>
+<li><strong>回饋走「朋友感謝」</strong>,不制度化、不違法、不騷擾。</li>
+<li><strong>全程記進表格 / CRM</strong>,定期算 ROI,資源往高潛力社區集中。</li>
+</ol>
+<blockquote>
+<p><strong>記住:我們賣的是安心。警衛桌上那台電扇,吹的是信任的風。</strong></p>
+</blockquote>
+</main>
+<script>
+// 讓所有表格可在手機橫向滑動
+document.querySelectorAll('.doc table').forEach(t=>{const w=document.createElement('div');w.className='tw';t.replaceWith(w);w.appendChild(t);});
+</script>
+</body></html>

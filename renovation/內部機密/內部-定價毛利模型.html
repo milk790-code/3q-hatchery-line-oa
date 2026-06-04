@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3Q 室內裝修統包 — 內部・三級方案定價與毛利模型</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+:root{--black:#0A0A0A;--paper:#F5F2EC;--gold:#B8924A;--ink:#1A1A1A;--stone:#8A8A8A;--sand:#E8DFD0;--rule:rgba(10,10,10,.12)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:"Noto Sans TC",-apple-system,system-ui,sans-serif;line-height:1.85;-webkit-text-size-adjust:100%}
+.bar{position:sticky;top:0;z-index:10;background:rgba(10,10,10,.96);backdrop-filter:blur(6px);color:var(--paper);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;border-bottom:1px solid var(--gold)}
+.bar a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:.06em;white-space:nowrap}
+.bar .t{font-family:"Noto Serif TC",serif;font-size:15px;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar button{background:transparent;border:1px solid var(--gold);color:var(--gold);font-size:12px;padding:6px 12px;border-radius:4px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.secret{background:#a8442a;color:#fff;text-align:center;font-size:12.5px;letter-spacing:.12em;padding:8px}
+.doc{max-width:760px;margin:0 auto;padding:28px 20px 80px}
+.doc h1{font-family:"Noto Serif TC",serif;font-weight:600;font-size:clamp(26px,7vw,38px);line-height:1.35;letter-spacing:.03em;margin:8px 0 22px;padding-bottom:14px;border-bottom:2px solid var(--gold);color:var(--black)}
+.doc h2{font-family:"Noto Serif TC",serif;font-weight:600;font-size:clamp(21px,5.5vw,28px);margin:38px 0 14px;padding-left:13px;border-left:4px solid var(--gold);color:var(--black);letter-spacing:.03em}
+.doc h3{font-family:"Noto Serif TC",serif;font-weight:500;font-size:clamp(18px,4.8vw,22px);margin:28px 0 10px;color:var(--black);letter-spacing:.03em}
+.doc h4{font-size:16px;font-weight:700;margin:20px 0 8px;color:var(--ink)}
+.doc p{margin:13px 0;font-size:16.5px}
+.doc ul,.doc ol{margin:13px 0;padding-left:24px}
+.doc li{margin:7px 0;font-size:16.5px}
+.doc li::marker{color:var(--gold)}
+.doc input[type=checkbox]{width:17px;height:17px;margin-right:7px;accent-color:var(--gold);vertical-align:-2px}
+.doc strong{color:var(--black);font-weight:700}
+.doc a{color:var(--gold)}
+.doc blockquote{margin:18px 0;padding:12px 18px;background:var(--sand);border-left:4px solid var(--gold);border-radius:0 6px 6px 0}
+.doc blockquote p{margin:4px 0;font-size:16px}
+.doc code{background:var(--sand);padding:2px 7px;border-radius:4px;font-size:.92em;font-family:"SFMono-Regular",Menlo,Consolas,monospace}
+.doc pre{background:var(--black);color:var(--paper);padding:16px;border-radius:8px;overflow-x:auto;margin:18px 0;-webkit-overflow-scrolling:touch}
+.doc pre code{background:none;color:inherit;padding:0;font-size:13px;line-height:1.6;white-space:pre}
+.doc hr{border:none;border-top:1px solid var(--rule);margin:30px 0}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:18px 0;border:1px solid var(--rule);border-radius:8px}
+.doc table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:420px}
+.doc th{background:var(--black);color:var(--paper);text-align:left;padding:11px 13px;font-weight:500;letter-spacing:.04em;white-space:nowrap}
+.doc td{border-bottom:1px solid var(--rule);padding:11px 13px;vertical-align:top}
+.doc tbody tr:nth-child(even){background:#faf8f4}
+.doc table strong{color:var(--gold)}
+</style></head>
+<body>
+<div class="bar"><a href="../index.html">← 導覽中心</a><span class="t">3Q 室內裝修統包 — 內部・三級方案定價與毛利模型</span><button onclick="window.print()">列印</button></div>
+<div class="secret">🔴 內部機密 · 切勿公開或外流</div>
+<main class="doc"><h1>3Q 室內裝修統包 — 內部・三級方案定價與毛利模型</h1>
+<blockquote>
+<p>文件性質:<strong>內部財務參考</strong>,不對外。
+一句話:<strong>頂價不是貴,是篩選器與品質承諾。賣安心,不賣便宜。</strong></p>
+</blockquote>
+<blockquote>
+<p>⚠️ <strong>重要聲明</strong>:本文件所有金額、成本比例、毛利率、LTV、CAC 數字皆為 <strong>「假設值,僅供模型演練,需依實際成本、實際接案結構與在地行情調整」</strong>。請勿直接拿去報價或對外引用。</p>
+</blockquote>
+<hr>
+<h2>一、模型基本假設(假設值,需依實際成本調整)</h2>
+<p>以一間 <strong>30 坪 / 約 100 ㎡ 的中高端住宅(準新屋)</strong> 的全室統包為基準單位。</p>
+<table>
+<thead>
+<tr>
+<th>假設項目</th>
+<th>假設值</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>基準坪數</td>
+<td>30 坪</td>
+<td>模型計算單位,實際依案調整</td>
+</tr>
+<tr>
+<td>計酬制度</td>
+<td><strong>按案結算</strong>(屋主、師傅皆是)</td>
+<td>非按天,杜絕拖工(見策略全書第七節)</td>
+</tr>
+<tr>
+<td>鍍膜耐久</td>
+<td>室內 5 年幾乎不掉</td>
+<td>對外溝通用</td>
+</tr>
+<tr>
+<td>稅務</td>
+<td>模型用未稅金額;對外報價另計 5% 營業稅</td>
+<td>—</td>
+</tr>
+<tr>
+<td>幣別</td>
+<td>新台幣 (NT$)</td>
+<td>—</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>二、三級方案總覽(假設值)</h2>
+<table>
+<thead>
+<tr>
+<th>維度</th>
+<th>🥉 基礎 Basic</th>
+<th>🥈 標準 Standard</th>
+<th>🥇 頂級 Premium(含鍍膜)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>目標客群</strong></td>
+<td>預算敏感但要安心、單一空間翻修</td>
+<td>主力客群:首購新婚、準新屋全室</td>
+<td>高端社區、整片新建案、不想煩的高資產屋主</td>
+</tr>
+<tr>
+<td><strong>報價區間(30坪/未稅)</strong></td>
+<td>NT$ 80萬 – 130萬</td>
+<td>NT$ 150萬 – 250萬</td>
+<td>NT$ 280萬 – 450萬+</td>
+</tr>
+<tr>
+<td><strong>每坪概估</strong></td>
+<td>2.7萬 – 4.3萬</td>
+<td>5萬 – 8.3萬</td>
+<td>9.3萬 – 15萬+</td>
+</tr>
+<tr>
+<td><strong>透明連線施工</strong></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅(專屬頻道)</td>
+</tr>
+<tr>
+<td><strong>統一窗口負責到底</strong></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅(專案經理 1 對 1)</td>
+</tr>
+<tr>
+<td><strong>居家/浴室鍍膜</strong></td>
+<td>✖(可加購)</td>
+<td>部分(浴室+檯面)</td>
+<td>✅ 全室鍍膜整合進交付</td>
+</tr>
+<tr>
+<td><strong>保固年限</strong></td>
+<td>1 年工程</td>
+<td>2 年工程</td>
+<td>3 年工程 + 5 年鍍膜</td>
+</tr>
+<tr>
+<td><strong>首年免費清潔</strong></td>
+<td>✖</td>
+<td>1 次(交屋深層)</td>
+<td>2 次(交屋 + 過年前)</td>
+</tr>
+<tr>
+<td><strong>目標毛利率</strong></td>
+<td>25%</td>
+<td>32%</td>
+<td>40%+</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>三級的真正用途:<strong>錨定</strong>。基礎與標準的存在,是讓頂級「看起來合理」。多數高端客戶會落在標準/頂級。</p>
+</blockquote>
+<hr>
+<h2>三、各級成本拆解與毛利(假設值,需依實際成本調整)</h2>
+<p>成本五大塊:<strong>工班(人工)/ 材料 / 鍍膜 / 管理(含窗口、保固、CRM)/ 行銷獲客</strong>。</p>
+<h3>🥉 基礎 Basic(以報價 NT$ 100 萬 為例)</h3>
+<table>
+<thead>
+<tr>
+<th>成本項</th>
+<th>佔報價 %</th>
+<th>金額</th>
+<th>備註</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>工班人工(按案)</td>
+<td>40%</td>
+<td>400,000</td>
+<td>按案結算,不拖工</td>
+</tr>
+<tr>
+<td>材料</td>
+<td>28%</td>
+<td>280,000</td>
+<td>標準等級建材</td>
+</tr>
+<tr>
+<td>鍍膜</td>
+<td>0%</td>
+<td>0</td>
+<td>不含,僅可加購</td>
+</tr>
+<tr>
+<td>管理(窗口/保固/CRM)</td>
+<td>5%</td>
+<td>50,000</td>
+<td>攤提客服與系統</td>
+</tr>
+<tr>
+<td>行銷獲客</td>
+<td>2%</td>
+<td>20,000</td>
+<td>轉介為主、成本低</td>
+</tr>
+<tr>
+<td><strong>總成本</strong></td>
+<td><strong>75%</strong></td>
+<td><strong>750,000</strong></td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>毛利</strong></td>
+<td><strong>25%</strong></td>
+<td><strong>250,000</strong></td>
+<td>目標毛利率 25%</td>
+</tr>
+</tbody></table>
+<h3>🥈 標準 Standard(以報價 NT$ 200 萬 為例)</h3>
+<table>
+<thead>
+<tr>
+<th>成本項</th>
+<th>佔報價 %</th>
+<th>金額</th>
+<th>備註</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>工班人工</td>
+<td>36%</td>
+<td>720,000</td>
+<td>養得起的好工班</td>
+</tr>
+<tr>
+<td>材料</td>
+<td>24%</td>
+<td>480,000</td>
+<td>中高階建材</td>
+</tr>
+<tr>
+<td>鍍膜(浴室+檯面)</td>
+<td>3%</td>
+<td>60,000</td>
+<td>部分鍍膜整合</td>
+</tr>
+<tr>
+<td>管理</td>
+<td>3%</td>
+<td>60,000</td>
+<td>—</td>
+</tr>
+<tr>
+<td>行銷獲客</td>
+<td>2%</td>
+<td>40,000</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>總成本</strong></td>
+<td><strong>68%</strong></td>
+<td><strong>1,360,000</strong></td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>毛利</strong></td>
+<td><strong>32%</strong></td>
+<td><strong>640,000</strong></td>
+<td>目標毛利率 32%</td>
+</tr>
+</tbody></table>
+<h3>🥇 頂級 Premium 含鍍膜(以報價 NT$ 350 萬 為例)</h3>
+<table>
+<thead>
+<tr>
+<th>成本項</th>
+<th>佔報價 %</th>
+<th>金額</th>
+<th>備註</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>工班人工</td>
+<td>33%</td>
+<td>1,155,000</td>
+<td>頂規工班、嚴守社區規矩</td>
+</tr>
+<tr>
+<td>材料</td>
+<td>18%</td>
+<td>630,000</td>
+<td>高階建材</td>
+</tr>
+<tr>
+<td>鍍膜(全室整合)</td>
+<td>4%</td>
+<td>140,000</td>
+<td><strong>成本低、感知價值高</strong></td>
+</tr>
+<tr>
+<td>管理(專案經理)</td>
+<td>3.5%</td>
+<td>122,500</td>
+<td>1 對 1 服務</td>
+</tr>
+<tr>
+<td>行銷獲客</td>
+<td>1.5%</td>
+<td>52,500</td>
+<td>轉介+警衛地推,CAC 極低</td>
+</tr>
+<tr>
+<td><strong>總成本</strong></td>
+<td><strong>60%</strong></td>
+<td><strong>2,100,000</strong></td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>毛利</strong></td>
+<td><strong>40%</strong></td>
+<td><strong>1,400,000</strong></td>
+<td>目標毛利率 40%+</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>關鍵洞察</strong>:鍍膜成本只佔報價 3–4%,但它把「我比較貴」翻譯成「<strong>我更貴,但有鍍膜</strong>」,同時開啟長期保固/清潔/維修的再行銷鉤子。它是<strong>毛利槓桿</strong>,不是成本負擔。</p>
+</blockquote>
+<hr>
+<h2>四、附加銷售(Upsell / Cross-sell,假設值)</h2>
+<table>
+<thead>
+<tr>
+<th>附加項目</th>
+<th>定價(假設)</th>
+<th>毛利率(假設)</th>
+<th>觸發時機</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>鍍膜加購(基礎/標準補升)</td>
+<td>6萬 – 15萬</td>
+<td>55%</td>
+<td>簽約時、交屋前</td>
+</tr>
+<tr>
+<td>年度過年前清潔(訂閱)</td>
+<td>1.2萬 – 2.5萬 / 年</td>
+<td>50%+(有鍍膜更高)</td>
+<td>每年 11–1 月(見訂閱文件)</td>
+</tr>
+<tr>
+<td>水電維修 / 小修繕</td>
+<td>出工 2,000 起 + 料</td>
+<td>45%</td>
+<td>保固期內外、清潔回訪</td>
+</tr>
+<tr>
+<td>續保(鍍膜 5 年後)</td>
+<td>3萬 – 5萬 / 次</td>
+<td>60%</td>
+<td>保固到期前 60 天</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>附加銷售的毛利率普遍高於主工程,且 CAC 趨近於零(客戶已在手)。<strong>這是把一次性裝修做成 LTV 的引擎。</strong></p>
+</blockquote>
+<hr>
+<h2>五、頂價策略:為什麼刻意釘在業內最高</h2>
+<table>
+<thead>
+<tr>
+<th>邏輯</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>高價=篩選器</strong></td>
+<td>自動過濾掉殺價、扯皮、奧客;留下願為「安心」付費的客群。</td>
+</tr>
+<tr>
+<td><strong>高價=品質承諾</strong></td>
+<td>養得起好工班、好材料、好鍍膜 → 真的做得出頂規品質。</td>
+</tr>
+<tr>
+<td><strong>高價=信任訊號</strong></td>
+<td>在「人人怕被坑」的市場,貴反而代表「不會偷工」。</td>
+</tr>
+<tr>
+<td><strong>高價=正循環燃料</strong></td>
+<td>高價→好工班→好品質→口碑→更敢收高價(超級閉環)。</td>
+</tr>
+<tr>
+<td><strong>不打折原則</strong></td>
+<td>折價 = 自毀定位。要讓利,用「加值」(多送清潔/延長保固),不動價格。</td>
+</tr>
+</tbody></table>
+<pre><code>低價同業:         3Q 頂價策略:
+殺價 → 偷工         高價 → 養好工班
+→ 出事 → 客訴       → 好品質 → 口碑轉介
+→ 重接低價客        → 更多高價案
+(惡性循環)         (超級閉環)
+</code></pre>
+<hr>
+<h2>六、LTV 與 CAC 粗估(假設值,需依實際成本調整)</h2>
+<h3>6.1 單一頂級客戶 LTV(10 年期)</h3>
+<table>
+<thead>
+<tr>
+<th>收入來源</th>
+<th>金額(毛利)</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>主工程(頂級含鍍膜)</td>
+<td>1,400,000</td>
+<td>一次性</td>
+</tr>
+<tr>
+<td>年度清潔訂閱 × 8 年</td>
+<td>8 × 9,000 = 72,000</td>
+<td>留存假設 80%/年</td>
+</tr>
+<tr>
+<td>水電/小修繕 × 10 年</td>
+<td>10 × 5,000 = 50,000</td>
+<td>偶發</td>
+</tr>
+<tr>
+<td>鍍膜續保 × 1 次</td>
+<td>30,000</td>
+<td>第 5–6 年</td>
+</tr>
+<tr>
+<td><strong>單客 LTV(毛利)</strong></td>
+<td><strong>約 1,552,000</strong></td>
+<td>假設值</td>
+</tr>
+<tr>
+<td><strong>轉介帶來新客(係數)</strong></td>
+<td>× 1.5 案</td>
+<td>高端社區口碑外溢</td>
+</tr>
+</tbody></table>
+<h3>6.2 CAC(獲客成本)假設</h3>
+<table>
+<thead>
+<tr>
+<th>獲客管道</th>
+<th>單客 CAC(假設)</th>
+<th>佔比</th>
+<th>備註</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>警衛地推轉介</td>
+<td>NT$ 1,500</td>
+<td>高</td>
+<td>手機支架+小電扇,極低成本高信任</td>
+</tr>
+<tr>
+<td>老客戶轉介</td>
+<td>NT$ 3,000</td>
+<td>高</td>
+<td>轉介獎勵/禮</td>
+</tr>
+<tr>
+<td>數位廣告</td>
+<td>NT$ 25,000</td>
+<td>低</td>
+<td>僅補量,效率最差</td>
+</tr>
+<tr>
+<td><strong>混合平均 CAC</strong></td>
+<td><strong>約 NT$ 8,000</strong></td>
+<td>—</td>
+<td>假設值</td>
+</tr>
+</tbody></table>
+<h3>6.3 LTV / CAC 比</h3>
+<pre><code>LTV / CAC ≈ 1,552,000 / 8,000 ≈ 194 : 1   (假設值,極健康)
+</code></pre>
+<blockquote>
+<p>即使把 LTV 砍到只算主工程毛利、CAC 抓最貴的廣告管道,比值仍 &gt; 50:1。本商業模式的關鍵不是「壓 CAC」,而是<strong>守住頂價毛利 + 拉高轉介係數與訂閱留存</strong>。</p>
+</blockquote>
+<hr>
+<h2>七、行動建議(內部)</h2>
+<ol>
+<li><strong>主推標準與頂級</strong>,基礎只當錨點與接觸點。</li>
+<li>所有報價單把鍍膜做成<strong>頂級的內建價值</strong>,而非加價項目。</li>
+<li>行銷預算優先投<strong>警衛地推+轉介獎勵</strong>,廣告只補量。</li>
+<li>把每位客戶當 LTV 經營:交屋即進 CRM,啟動保固/清潔/續保提醒。</li>
+</ol>
+<blockquote>
+<p>再次提醒:以上全部為<strong>假設值,需依實際成本調整</strong>。建議每季用實際接案數據回校一次模型。</p>
+</blockquote>
+</main>
+<script>
+// 讓所有表格可在手機橫向滑動
+document.querySelectorAll('.doc table').forEach(t=>{const w=document.createElement('div');w.className='tw';t.replaceWith(w);w.appendChild(t);});
+</script>
+</body></html>
