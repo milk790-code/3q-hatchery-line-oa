@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>裝修工程報價單 · 模板</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body{ background:#5a5650; font-family:var(--font-sans); color:var(--color-black); -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .sheet { width:210mm; min-height:297mm; margin:12mm auto; background:#fff; padding:16mm; box-shadow:0 8px 40px rgba(0,0,0,.35); }
+  .top { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid var(--color-gold); padding-bottom:6mm; }
+  .top .brand { font-family:var(--font-serif); font-size:24px; letter-spacing:.05em; }
+  .top .brand b{ color:var(--color-gold); }
+  .top .brand small{ display:block; font-family:var(--font-sans); font-size:11px; color:var(--color-stone); letter-spacing:.2em; margin-top:3mm; }
+  .top .doc { text-align:right; }
+  .top .doc .t{ font-family:var(--font-serif); font-size:22px; letter-spacing:.1em; }
+  .top .doc .m{ font-size:11px; color:var(--color-stone); margin-top:3mm; line-height:1.7; }
+
+  .meta { display:grid; grid-template-columns:1fr 1fr; gap:3mm 8mm; margin:7mm 0; font-size:12px; }
+  .meta .row{ display:flex; gap:3mm; border-bottom:1px solid #ddd; padding-bottom:2mm; }
+  .meta .k{ color:var(--color-stone); min-width:18mm; letter-spacing:.08em; }
+  .meta .v{ flex:1; color:#bbb; }
+
+  table { width:100%; border-collapse:collapse; margin-top:4mm; font-size:12px; }
+  th { background:var(--color-black); color:var(--color-paper); text-align:left; padding:3.5mm 3mm; letter-spacing:.08em; font-weight:500; }
+  th.r,td.r{ text-align:right; }
+  td { border-bottom:1px solid #e2e2e2; padding:4mm 3mm; color:#999; }
+  tbody tr:nth-child(even) td{ background:#faf8f4; }
+  .sec td{ background:var(--color-sand)!important; color:var(--color-black); font-weight:500; letter-spacing:.06em; }
+
+  .totals { margin-top:6mm; margin-left:auto; width:80mm; font-size:13px; }
+  .totals .row{ display:flex; justify-content:space-between; padding:2.5mm 0; border-bottom:1px solid #e2e2e2; }
+  .totals .grand{ border-top:2px solid var(--color-gold); border-bottom:none; font-family:var(--font-serif); font-size:18px; padding-top:3mm; }
+  .totals .grand b{ color:var(--color-gold); }
+
+  .terms { margin-top:8mm; font-size:11px; color:#555; line-height:1.9; }
+  .terms h4{ font-family:var(--font-serif); font-size:14px; color:var(--color-black); margin-bottom:2mm; letter-spacing:.06em; }
+  .terms .gold{ color:var(--color-gold); }
+
+  .sign { display:flex; gap:12mm; margin-top:12mm; }
+  .sign .box{ flex:1; }
+  .sign .line{ border-bottom:1px solid #333; height:14mm; }
+  .sign .lbl{ font-size:11px; color:var(--color-stone); margin-top:2mm; letter-spacing:.1em; }
+
+  .printbar{ position:fixed; top:16px; right:16px; }
+  .printbar button{ background:var(--color-gold); color:#fff; border:none; padding:10px 18px; font-family:var(--font-sans); font-size:13px; letter-spacing:.1em; cursor:pointer; }
+  @media print { html,body{ background:#fff; } .sheet{ margin:0; box-shadow:none; } .printbar{ display:none; } @page{ size:A4 portrait; margin:0; } }
+</style>
+</head>
+<body>
+<div class="printbar"><button onclick="window.print()">列印 / 存 PDF</button></div>
+
+<div class="sheet">
+  <div class="top">
+    <div class="brand">透明裝修 · <b>一站式統包</b><small>看得見的安心 · 含鍍膜與長期保養</small></div>
+    <div class="doc"><div class="t">工程報價單</div><div class="m">報價單號：____________<br>日期：____ / ____ / ____<br>有效期限：30 日</div></div>
+  </div>
+
+  <div class="meta">
+    <div class="row"><span class="k">客戶姓名</span><span class="v">　</span></div>
+    <div class="row"><span class="k">聯絡電話</span><span class="v">　</span></div>
+    <div class="row"><span class="k">工程地址</span><span class="v">　</span></div>
+    <div class="row"><span class="k">社區／建案</span><span class="v">　</span></div>
+    <div class="row"><span class="k">坪數</span><span class="v">　</span></div>
+    <div class="row"><span class="k">方案</span><span class="v">□ 基礎　□ 標準　□ 頂級（含鍍膜）</span></div>
+  </div>
+
+  <table>
+    <thead><tr><th style="width:8mm">#</th><th>工程項目</th><th>說明</th><th class="r">數量</th><th class="r">單價</th><th class="r">小計</th></tr></thead>
+    <tbody>
+      <tr class="sec"><td colspan="6">一、拆除 / 保護</td></tr>
+      <tr><td>1</td><td>　</td><td>　</td><td class="r">　</td><td class="r">　</td><td class="r">　</td></tr>
+      <tr><td>2</td><td>　</td><td>　</td><td class="r">　</td><td class="r">　</td><td class="r">　</td></tr>
+      <tr class="sec"><td colspan="6">二、水電</td></tr>
+      <tr><td>3</td><td>　</td><td>　</td><td class="r">　</td><td class="r">　</td><td class="r">　</td></tr>
+      <tr><td>4</td><td>　</td><td>　</td><td class="r">　</td><td class="r">　</td><td class="r">　</td></tr>
+      <tr class="sec"><td colspan="6">三、泥作 / 木作 / 油漆</td></tr>
+      <tr><td>5</td><td>　</td><td>　</td><td class="r">　</td><td class="r">　</td><td class="r">　</td></tr>
+      <tr><td>6</td><td>　</td><td>　</td><td class="r">　</td><td class="r">　</td><td class="r">　</td></tr>
+      <tr><td>7</td><td>　</td><td>　</td><td class="r">　</td><td class="r">　</td><td class="r">　</td></tr>
+      <tr class="sec"><td colspan="6">四、居家 / 浴室鍍膜（頂級方案）</td></tr>
+      <tr><td>8</td><td>　</td><td>　</td><td class="r">　</td><td class="r">　</td><td class="r">　</td></tr>
+      <tr class="sec"><td colspan="6">五、清潔交屋</td></tr>
+      <tr><td>9</td><td>　</td><td>　</td><td class="r">　</td><td class="r">　</td><td class="r">　</td></tr>
+    </tbody>
+  </table>
+
+  <div class="totals">
+    <div class="row"><span>小計</span><span>　</span></div>
+    <div class="row"><span>稅金（5%）</span><span>　</span></div>
+    <div class="row grand"><span>總計</span><b>NT$ ＿＿＿＿＿＿</b></div>
+  </div>
+
+  <div class="terms">
+    <h4>付款與條款</h4>
+    <p>1. <span class="gold">按進度節點分期結算</span>，非按天計價。各期金額與節點以簽約附件為準。<br>
+    2. 報價含全程透明施工（即時連線）、單一窗口負責、乾淨工地與社區友善施工。<br>
+    3. 完工提供保固；頂級方案含鍍膜保固與保養說明、過年前年度清潔回訪。<br>
+    4. 屋況變更或追加項目，須經客戶書面同意後始得施作。<br>
+    5. 本報價有效期限 30 日。</p>
+  </div>
+
+  <div class="sign">
+    <div class="box"><div class="line"></div><div class="lbl">客戶簽章</div></div>
+    <div class="box"><div class="line"></div><div class="lbl">公司代表 / 業務</div></div>
+  </div>
+</div>
+
+</body>
+</html>
