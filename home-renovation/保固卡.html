@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>保固卡 · 透明裝修</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html,body{ background:#5a5650; font-family:var(--font-sans); -webkit-print-color-adjust:exact; print-color-adjust:exact; display:flex; flex-direction:column; align-items:center; gap:8mm; padding:14mm 0; }
+  .card { width:148mm; height:105mm; background:var(--color-black); color:var(--color-paper); padding:12mm; position:relative; box-shadow:0 8px 30px rgba(0,0,0,.4); display:flex; flex-direction:column; }
+  .card::after{ content:""; position:absolute; inset:5mm; border:1px solid var(--color-gold); pointer-events:none; }
+  .card .head{ display:flex; justify-content:space-between; align-items:baseline; }
+  .card .brand{ font-family:var(--font-serif); font-size:18px; letter-spacing:.05em; }
+  .card .brand b{ color:var(--color-gold); }
+  .card .kind{ font-size:10px; letter-spacing:.3em; color:var(--color-gold); }
+  .card h1{ font-family:var(--font-serif); font-weight:400; font-size:30px; letter-spacing:.06em; margin-top:8mm; }
+  .card h1 b{ color:var(--color-gold); }
+  .card .fields{ margin-top:6mm; font-size:11px; display:grid; grid-template-columns:1fr 1fr; gap:3mm 6mm; }
+  .card .f{ border-bottom:1px solid rgba(184,146,74,.4); padding-bottom:1.5mm; color:var(--color-stone); letter-spacing:.06em; }
+  .card .foot{ margin-top:auto; font-size:10px; color:var(--color-stone); letter-spacing:.08em; line-height:1.7; }
+  .back { background:var(--color-paper); color:var(--color-black); }
+  .back::after{ border-color:var(--color-gold); }
+  .back h2{ font-family:var(--font-serif); font-size:16px; color:var(--color-gold); letter-spacing:.08em; margin-bottom:3mm; }
+  .back ol{ font-size:10.5px; line-height:1.85; padding-left:5mm; color:#333; }
+  .back .note{ margin-top:4mm; font-size:9.5px; color:var(--color-stone); line-height:1.7; }
+  .printbar{ position:fixed; top:16px; right:16px; }
+  .printbar button{ background:var(--color-gold); color:#fff; border:none; padding:10px 18px; font-size:13px; letter-spacing:.1em; cursor:pointer; font-family:var(--font-sans); }
+  @media print{ html,body{ background:#fff; gap:0; } .card{ box-shadow:none; page-break-after:always; } .printbar{ display:none; } @page{ margin:10mm; } }
+</style>
+</head>
+<body>
+<div class="printbar"><button onclick="window.print()">列印 / 存 PDF</button></div>
+
+<!-- 正面 -->
+<div class="card">
+  <div class="head"><div class="brand">透明裝修 · <b>一站式統包</b></div><div class="kind">WARRANTY</div></div>
+  <h1>工程<b>保固卡</b></h1>
+  <div class="fields">
+    <div class="f">客戶姓名　</div>
+    <div class="f">工程地址　</div>
+    <div class="f">完工 / 交屋日　</div>
+    <div class="f">保固到期日　</div>
+    <div class="f">方案　□基礎 □標準 □頂級</div>
+    <div class="f">鍍膜保固　□ 有 □ 無</div>
+  </div>
+  <div class="foot">本卡為保固憑證，請妥善保存。售後服務 · 年度清潔預約請洽專屬窗口。<br>LINE：＿＿＿＿＿　電話：＿＿＿＿＿＿＿＿</div>
+</div>
+
+<!-- 背面 -->
+<div class="card back">
+  <h2>保固範圍</h2>
+  <ol>
+    <li>裝修工程主體：自交屋日起保固（年限依合約）。</li>
+    <li>水電管線：依合約年限保固，正常使用範圍內免費維修。</li>
+    <li>居家／浴室鍍膜：保固期內依保養須知正常使用，效果不達標可回檢處理。</li>
+    <li>頂級方案享過年前年度清潔回訪一次。</li>
+  </ol>
+  <div class="note">＊ 不可抗力、人為破壞、自行改動或未依保養須知使用者，不在保固範圍。詳細條款以簽約文件為準。</div>
+</div>
+
+</body>
+</html>

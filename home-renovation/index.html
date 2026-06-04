@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>透明裝修 · 看得見的安心 | 一站式室內裝修統包</title>
+<meta name="description" content="全程透明、即時連線看工地、有人負責到底的一站式室內裝修統包。從毛胚到入住、含居家鍍膜與長期保養，讓你的新家乾乾淨淨、不留隱患、不被坑。">
+<link rel="stylesheet" href="colors_and_type.css">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { background:var(--color-paper); color:var(--color-black); font-family:var(--font-sans); -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:1080px; margin:0 auto; padding:0 6vw; }
+  section { padding:14vh 0; border-bottom:1px solid var(--rule); }
+
+  /* nav */
+  nav { position:sticky; top:0; z-index:50; background:rgba(245,242,236,.88); backdrop-filter:blur(8px); border-bottom:1px solid var(--color-gold); }
+  nav .wrap { display:flex; align-items:center; justify-content:space-between; padding-top:18px; padding-bottom:18px; }
+  nav .logo { font-family:var(--font-serif); font-size:20px; letter-spacing:.06em; }
+  nav .logo b { color:var(--color-gold); font-weight:600; }
+  nav .links a { font-size:13px; letter-spacing:.12em; color:var(--color-ink); text-decoration:none; margin-left:26px; }
+  nav .links a:hover { color:var(--color-gold); }
+  @media(max-width:680px){ nav .links a:not(.cta){display:none;} }
+  .cta { background:var(--color-black); color:var(--color-paper)!important; padding:10px 18px; }
+  .cta:hover { background:var(--color-gold); }
+
+  /* hero */
+  .hero { background:var(--color-black); color:var(--color-paper); border:none; padding:20vh 0 16vh; }
+  .hero .kick { font-size:12px; letter-spacing:.32em; color:var(--color-gold); margin-bottom:5vh; }
+  .hero h1 { font-family:var(--font-serif); font-weight:500; font-size:clamp(38px,6.5vw,82px); line-height:1.18; letter-spacing:.03em; }
+  .hero h1 b { color:var(--color-gold); font-weight:600; }
+  .hero p { font-size:clamp(16px,1.6vw,21px); color:var(--color-stone); margin-top:5vh; max-width:640px; line-height:1.9; letter-spacing:.04em; }
+  .hero .btns { margin-top:7vh; display:flex; gap:18px; flex-wrap:wrap; }
+  .btn-gold { background:var(--color-gold); color:#fff; padding:15px 30px; text-decoration:none; font-size:14px; letter-spacing:.14em; }
+  .btn-line { border:1px solid var(--color-paper); color:var(--color-paper); padding:15px 30px; text-decoration:none; font-size:14px; letter-spacing:.14em; }
+  .btn-gold:hover{ opacity:.88; } .btn-line:hover{ background:var(--color-paper); color:var(--color-black); }
+
+  .tag { font-size:12px; letter-spacing:.3em; color:var(--color-gold); text-transform:uppercase; margin-bottom:4vh; }
+  h2 { font-family:var(--font-serif); font-weight:500; font-size:clamp(28px,3.8vw,50px); line-height:1.3; letter-spacing:.04em; margin-bottom:6vh; }
+  h2 b { color:var(--color-gold); font-weight:600; }
+
+  .cards3 { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+  @media(max-width:760px){ .cards3{ grid-template-columns:1fr; } }
+  .card { background:var(--color-white); border:1px solid var(--rule); border-top:3px solid var(--color-gold); padding:34px 28px; }
+  .card h3 { font-family:var(--font-serif); font-size:22px; font-weight:500; margin-bottom:14px; letter-spacing:.04em; }
+  .card p { font-size:15px; color:var(--color-ink); line-height:1.9; letter-spacing:.03em; }
+  .card .strike { color:var(--color-stone); text-decoration:line-through; }
+
+  .steps { display:grid; grid-template-columns:repeat(4,1fr); gap:0; }
+  @media(max-width:760px){ .steps{ grid-template-columns:1fr 1fr; gap:24px; } }
+  .step { padding:0 22px; border-left:1px solid var(--color-gold); }
+  .step .n { font-family:var(--font-serif); color:var(--color-gold); font-size:34px; }
+  .step .t { font-size:17px; font-weight:500; margin:12px 0 8px; letter-spacing:.04em; }
+  .step .d { font-size:13px; color:var(--color-stone); line-height:1.8; }
+
+  .pledge { background:var(--color-sand); }
+  .pledge ul { list-style:none; max-width:760px; }
+  .pledge li { font-size:clamp(16px,1.7vw,22px); padding:22px 0; border-bottom:1px solid rgba(10,10,10,.1); letter-spacing:.04em; }
+  .pledge li b { color:var(--color-gold); font-family:var(--font-serif); margin-right:14px; }
+
+  .coat { background:var(--color-black); color:var(--color-paper); border:none; }
+  .coat .big { font-family:var(--font-serif); font-size:clamp(30px,5vw,64px); line-height:1.3; letter-spacing:.04em; }
+  .coat .big b { color:var(--color-gold); }
+  .coat p { color:var(--color-stone); font-size:18px; line-height:1.9; margin-top:5vh; max-width:620px; letter-spacing:.04em; }
+
+  .final { text-align:center; }
+  .final h2 { margin-bottom:4vh; }
+  .final p { color:var(--color-ink); font-size:17px; line-height:1.9; margin-bottom:6vh; }
+
+  footer { background:var(--color-black); color:var(--color-stone); padding:7vh 0; font-size:13px; letter-spacing:.1em; }
+  footer .wrap { display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px; }
+  footer b { color:var(--color-paper); font-family:var(--font-serif); font-weight:500; }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <div class="logo">透明裝修 · <b>一站式統包</b></div>
+  <div class="links">
+    <a href="方案價格.html">方案與價格</a>
+    <a href="常見問題FAQ.html">常見問題</a>
+    <a href="#contact" class="cta">免費諮詢</a>
+  </div>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="kick">看得見的安心 · 從毛胚到入住一手交付</div>
+  <h1>裝修，<br>應該是<b>看得見</b>的</h1>
+  <p>全程即時連線看工地、有人負責到底、交屋還幫你鍍膜起來。讓剛入手新家的你，乾乾淨淨、不留隱患，也不再怕被坑。</p>
+  <div class="btns">
+    <a href="方案價格.html" class="btn-gold">看方案與價格</a>
+    <a href="#contact" class="btn-line">加 LINE 免費諮詢</a>
+  </div>
+</div></header>
+
+<!-- 痛點 -->
+<section><div class="wrap">
+  <div class="tag">你是不是也遇過</div>
+  <h2>願意多付錢，<br>卻<b>躲不掉被坑</b></h2>
+  <div class="cards3">
+    <div class="card"><h3>家人介紹的</h3><p><span class="strike">以為最安心</span><br>抹不開面子，結果反而坑得更慘。</p></div>
+    <div class="card"><h3>自己上網找</h3><p><span class="strike">做足功課</span><br>還是遇到工程蟑螂、被當肥羊。</p></div>
+    <div class="card"><h3>出事找不到人</h3><p><span class="strike">看不到工地</span><br>工班沒本事擔責，責任歸屬說不清。</p></div>
+  </div>
+</div></section>
+
+<!-- 承諾 -->
+<section class="pledge"><div class="wrap">
+  <div class="tag">我們的承諾</div>
+  <h2>把不安，<br>變成<b>看得見的放心</b></h2>
+  <ul>
+    <li><b>透明</b>全程即時連線，工地進度你隨時都看得到。</li>
+    <li><b>可靠</b>單一窗口、有人負責到底，出事找得到人。</li>
+    <li><b>守規</b>乾淨工地、不擾鄰、不抽菸、準時收工，社區都歡迎。</li>
+    <li><b>鍍膜</b>交屋前幫新家鍍膜起來，好保養、好清潔、耐用多年。</li>
+  </ul>
+</div></section>
+
+<!-- 流程 -->
+<section><div class="wrap">
+  <div class="tag">服務流程</div>
+  <h2>一次裝修，<b>長期照顧</b></h2>
+  <div class="steps">
+    <div class="step"><div class="n">1</div><div class="t">接案規劃</div><div class="d">到府了解、統一報價、白紙黑字。</div></div>
+    <div class="step"><div class="n">2</div><div class="t">透明施工</div><div class="d">即時連線、規範工班、乾淨工地。</div></div>
+    <div class="step"><div class="n">3</div><div class="t">交屋鍍膜</div><div class="d">居家／浴室鍍膜整合進交付。</div></div>
+    <div class="step"><div class="n">4</div><div class="t">長期維護</div><div class="d">保養、水電、過年前年度清潔。</div></div>
+  </div>
+</div></section>
+
+<!-- 鍍膜 -->
+<section class="coat"><div class="wrap">
+  <div class="tag">交屋的最後一哩</div>
+  <div class="big">更貴一點，<br><b>但你有鍍膜</b></div>
+  <p>像車漆鍍膜一樣，把你的新家保護起來。室內環境下耐用多年，日後清潔更輕鬆、表面更耐髒。我們把它直接整合進交付，並提供保固與後續保養。</p>
+</div></section>
+
+<!-- CTA -->
+<section class="final" id="contact"><div class="wrap">
+  <div class="tag">下一步</div>
+  <h2>先聊聊，<b>不用急著決定</b></h2>
+  <p>加我們的 LINE，免費諮詢、到府估價。<br>把你的疑慮、預算、想要的樣子告訴我們，剩下的交給我們把關。</p>
+  <a href="#" class="btn-gold">加 LINE 免費諮詢</a>
+</div></section>
+
+<footer><div class="wrap">
+  <div><b>透明裝修 · 一站式室內裝修統包</b></div>
+  <div>看得見的安心 · 從毛胚到入住 · 含鍍膜與長期保養</div>
+</div></footer>
+
+</body>
+</html>
