@@ -18,7 +18,7 @@ jobs:
       CRM_D1_ID: e54671b1-d15e-4552-babf-cef367267568
       PNG_BASE_URL: https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports
       FB_APP_ID: '956987317313843'
-      FB_PAGE_ID: '61587003785491'
+      FB_PAGE_ID: '1011553295383631'
       THREADS_APP_ID: '956987317313843'
 
     steps:
