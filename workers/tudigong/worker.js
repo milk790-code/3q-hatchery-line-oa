@@ -62,9 +62,13 @@ export default {
 
     if (url.pathname === '/setup') return handleSetup(request, env, url);
 
-    if (request.method !== 'POST') {
+    if (url.pathname === '/health') {
       const cfg = await loadCfg(env);
       return new Response(`tudigong bot alive | secret=${!!cfg.lineSecret} token=${!!cfg.lineToken} ai=${cfg.anthropicKey ? 'claude' : 'builtin'} owner=${!!cfg.ownerId}`, { status: 200 });
+    }
+
+    if (request.method !== 'POST') {
+      return new Response(LANDING_HTML, { headers: { 'content-type': 'text/html;charset=utf-8', 'cache-control': 'public, max-age=300' } });
     }
 
     const bodyText = await request.text();
@@ -79,6 +83,45 @@ export default {
     return new Response('ok', { status: 200 });
   },
 };
+
+
+const LANDING_HTML = `<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>呆丸土地公|台灣最接地氣的選址情報所|買房租店開攤 免費幫你看三個重點</title>
+<meta name="description" content="不賣房、不仲介,只給你中立選址情報。買房、租店面、擺攤前,私訊地址,土地公免費幫你看三個重點:嫌惡設施、人流、行情。台灣在地選址判斷服務。">
+<meta property="og:title" content="呆丸土地公|不賣房 只幫你看地點"><meta property="og:description" content="私訊地址 免費幫你看三個重點:嫌惡設施 人流 行情">
+<style>
+body{font-family:"Microsoft JhengHei","PingFang TC",sans-serif;margin:0;background:#FBF0D9;color:#2B1C14;line-height:1.9}
+.wrap{max-width:560px;margin:0 auto;padding:28px 20px}
+h1{color:#C8362B;font-size:30px;margin:8px 0;line-height:1.4}
+.sub{color:#8a6a3a;font-size:15px;letter-spacing:1px}
+.hook{background:#fff;border-left:6px solid #C8362B;padding:16px 18px;margin:22px 0;font-size:17px;border-radius:0 8px 8px 0}
+.cta{display:block;text-align:center;background:#06C755;color:#fff;font-size:19px;font-weight:700;padding:16px;border-radius:12px;text-decoration:none;margin:26px 0;box-shadow:0 4px 14px rgba(6,199,85,.35)}
+.cta small{display:block;font-weight:400;font-size:13px;opacity:.9}
+h2{color:#C8362B;font-size:20px;border-bottom:2px solid #E8B04B;padding-bottom:6px;margin-top:34px}
+.pt{background:#fff;border-radius:10px;padding:14px 16px;margin:12px 0}
+.pt b{color:#C8362B}
+.faq{font-size:15px}
+footer{margin:40px 0 20px;font-size:12px;color:#8a6a3a;text-align:center}
+.lantern{font-size:42px;text-align:center;margin-top:18px}
+</style></head><body><div class="wrap">
+<div class="lantern">🏮</div>
+<h1>呆丸土地公</h1>
+<div class="sub">台灣最接地氣的選址情報所</div>
+<div class="hook">你要租的那間店、要買的那間房<br>我勸你先別急著簽。<br><b>這條街白天熱鬧、晚上死城,你看得出來嗎?</b></div>
+<a class="cta" href="https://line.me/R/ti/p/@207cpaps">加 LINE 私訊地址 → 免費幫你看三個重點<small>嫌惡設施|人流|行情 · 24小時內回覆 · 每日限6件</small></a>
+<h2>土地公幫你看什麼</h2>
+<div class="pt"><b>① 嫌惡設施</b><br>宮廟、殯葬、加油站、變電所…半徑內有沒有你不想要的鄰居,一次盤清。</div>
+<div class="pt"><b>② 人流動線</b><br>人多不等於會停下來買。白天晚上、平日假日、紅綠燈哪一側,差很多。</div>
+<div class="pt"><b>③ 行情</b><br>用實價登錄比對周邊成交,你的開價是合理、還是被當盤子。(資料來源:內政部實價登錄,僅供參考)</div>
+<h2>為什麼敢信土地公</h2>
+<div class="pt">我<b>不賣房、不仲介、不收成交佣金</b>。<br>沒有要賺你房子的錢,所以說的話你敢信。<br>看明白了,決定權還你。</div>
+<h2>常見問題</h2>
+<div class="pt faq"><b>免費的範圍?</b><br>一個地址 × 三個重點 × 文字回覆。想要五維完整報告(加停車、未來發展、實勘與議價建議)再升級付費版。</div>
+<div class="pt faq"><b>怎麼開始?</b><br>加 LINE → 回「地址」→ 貼上你想看的地址+用途(買房/租店/開攤),24小時內回你。</div>
+<div class="pt faq"><b>會不會推銷我買房?</b><br>不會。土地公不賣房也不仲介,只負責把地點看清楚。</div>
+<a class="cta" href="https://line.me/R/ti/p/@207cpaps">現在就問 → LINE @207cpaps<small>免費快問 · 不賣房 · 不仲介</small></a>
+<footer>呆丸土地公 · 選址資訊顧問服務(非不動產經紀業務)<br>行情資訊僅供參考,實際以官方登錄與現場為準</footer>
+</div></body></html>`;
 
 async function loadCfg(env) {
   const [s, t, a, o] = await Promise.all([
