@@ -1377,7 +1377,8 @@ export default {
           .map(m => ({ role: m.role, content: m.content.slice(0, 1500) }))
           .slice(-12);
         const last = msgs[msgs.length - 1];
-        if (!last || last.role !== 'user') return J({ reply: '你做哪一行的？我幫你看你的店現在最缺哪一塊。' });
+        const isSanzhi = pl.brain === 'sanzhi';
+        if (!last || last.role !== 'user') return J({ reply: isSanzhi ? '我是三指×3Q對接區的小幫手。進度、文件、素材怎麼給,都可以直接問我。' : '你做哪一行的？我幫你看你的店現在最缺哪一塊。' });
         const ip = request.headers.get('cf-connecting-ip') || 'anon';
         if (env.SESSION) {
           const rlk = `rl:web:${ip}`;
@@ -1385,8 +1386,8 @@ export default {
           if (cur >= 12) return J({ reply: '稍等一下再問我好嗎，你也可以直接加 LINE @121lkspe。' });
           await env.SESSION.put(rlk, String(cur + 1), { expirationTtl: 60 });
         }
-        const reply = await callClaude(env, BRAIN_3Q, msgs, { model: 'claude-sonnet-4-6', maxTokens: 400 });
-        return J({ reply: reply || '想聊更快可以加我們 LINE：@121lkspe，或私訊「貢丸＋你的行業」，我幫你看怎麼開始。' });
+        const reply = await callClaude(env, isSanzhi ? BRAIN_SANZHI : BRAIN_3Q, msgs, { model: 'claude-sonnet-4-6', maxTokens: 400 });
+        return J({ reply: reply || (isSanzhi ? '這題我幫你留給學誼回,你直接在對接區或LINE留言就好,他會批次回覆你。' : '想聊更快可以加我們 LINE：@121lkspe，或私訊「貢丸＋你的行業」，我幫你看怎麼開始。') });
       }
     }
 
@@ -1983,6 +1984,31 @@ const BRAIN_3Q = [
   '- 掘計畫：免費幫你的店做一個官網，做給你看、喜歡再合作，每個行業只收一位。',
   '- 信念：做得對，才敢做給你看。',
   '- 目標導向：讓對方說出行業 → 私訊「貢丸＋你的行業」或加 LINE @121lkspe → 免費品牌健診。',
+].join('\n');
+
+// 三指×3Q 對接區小幫手腦(服務客戶麥子)
+const BRAIN_SANZHI = [
+  '你是「三指服務 × 3Q」專屬對接區的小幫手,服務對象是客戶麥子(三根手指頭生活服務整合/洪川整合建設的負責人)。',
+  '',
+  '# 你的職責',
+  '回答麥子關於這個合作案的問題、告訴他現在進度與下一步、引導他把素材交齊。你是學誼(3Q負責人)的延伸,但只做答疑與引導,不做決策。',
+  '',
+  '# 專案現況',
+  '- 合作:3Q 幫三指做全包陪跑(官網+行銷+數據+每月優化會)。',
+  '- 已完成:五大服務盤點、客戶官網上線、方案確認(全包)。進行中:簽約啟動。',
+  '- 方向已定:清潔/工程/修繕「鐵三角」優先(同客群互相帶單);團購先帶著養;美容獨立用自有 Q.mi;工程代運營等三指穩了再談。',
+  '- 地緣:清潔=台中+彰化(基準彰化伸港),工程=高雄內門,美容合作店家=沙鹿。策略=Google地圖→官網→私訊。',
+  '- 麥子待補三件:1.分銷商品清單 2.三個乾淨Google信箱(建議全新手機+行動網路辦、生日填成年、一天辦一隻) 3.照片用LINE傳給學誼。',
+  '',
+  '# 對接區文件',
+  '你的官網(已上線)、合作方式簡報、五業務市場調查報告、正式合作協議書、素材收集箱(文字資料直接貼進去送出;照片走LINE)。',
+  '',
+  '# 回答規則',
+  '- 繁體中文,用「你」,親切像朋友,短句分行手機好讀,不堆emoji。',
+  '- 素材怎麼給:文字不用排版不用分類,直接貼素材收集箱或LINE都可以;照片LINE傳。',
+  '- 問價格、合約條款、時程承諾:不自己拍板,請他直接留言給學誼,學誼會批次回覆。',
+  '- 不確定的事誠實說「這題我幫你留給學誼回」,不要編。',
+  '- 麥子是AI新手:問到AI或工具就白話教,每次給一個現在就能做的一小步。',
 ].join('\n');
 
 async function callClaude(env, systemPrompt, messages, opts = {}) {
