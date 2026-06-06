@@ -629,43 +629,127 @@ function tokensMatch(a, b) {
 export default {
   async scheduled(controller, env, ctx) {
     console.log(`[social-publisher] cron triggered: ${controller.cron}`);
-    ctx.waitUntil(
-      seedDailyContent(env)
-        .then(r => console.log('[social-publisher] seeded:', JSON.stringify(r)))
-        .then(() => runPublishLoop(env))
-        .then(r => console.log('[social-publisher] done:', JSON.stringify(r)))
-        .then(() => refreshTokensIfNeeded(env))
-        .catch(err => console.error('[social-publisher] error:', err.message))
-    );
+    // Each stage is isolated: a seed failure must NEVER block the publish loop
+    // (2026-06-06 incident: seed INSERT hit missing column → whole chain died silently).
+    ctx.waitUntil((async () => {
+      try {
+        const r = await seedDailyContent(env);
+        console.log('[social-publisher] seeded:', JSON.stringify(r));
+      } catch (err) {
+        console.error('[social-publisher] seed failed (non-fatal):', err.message);
+      }
+      try {
+        const r = await runPublishLoop(env);
+        console.log('[social-publisher] done:', JSON.stringify(r));
+      } catch (err) {
+        console.error('[social-publisher] publish loop error:', err.message);
+      }
+      await refreshTokensIfNeeded(env).catch(err => console.error('[social-publisher] refresh error:', err.message));
+    })());
   },
 
   async fetch(request, env) {
     const url = new URL(request.url);
-    const CORS = { 'Access-Control-Allow-Origin': '*' };
+    const CORS = {
+      'Access-Control-Allow-Origin':  '*',
+      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+      'Access-Control-Allow-Headers': 'Authorization,Content-Type',
+    };
     const json = (data, status = 200) =>
       new Response(JSON.stringify(data, null, 2), { status, headers: { 'Content-Type': 'application/json', ...CORS } });
 
+    // CORS preflight (browser calls from the scheduler page send Authorization header)
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { status: 204, headers: CORS });
+    }
+
+    // Shared auth check: Bearer header or ?token= query param
+    const requireToken = () => {
+      const auth = request.headers.get('Authorization') || '';
+      const tok  = auth.startsWith('Bearer ') ? auth.slice(7) : url.searchParams.get('token');
+      return tokensMatch(tok, env.TRIGGER_TOKEN);
+    };
+
     // Health check
     if (url.pathname === '/health') {
-      const [threadsToken, igToken] = await Promise.all([
+      const [threadsToken, igToken, fbToken] = await Promise.all([
         getToken('threads', 'THREADS_ACCESS_TOKEN', env),
         getToken('ig', 'IG_ACCESS_TOKEN', env),
+        getToken('fb', 'FB_PAGE_ACCESS_TOKEN', env),
       ]);
       return json({
         ok: true,
         worker: '3q-social-publisher',
-        version: '2.0',
+        version: '2.1',
         platforms: Object.keys(DAILY_LIMITS),
         configured: {
           threads:    Boolean(threadsToken),
           instagram:  Boolean(igToken),
+          facebook:   Boolean(fbToken && env.FB_PAGE_ID),
           tiktok:     Boolean(env.TIKTOK_ACCESS_TOKEN),
           google_biz: Boolean(env.GOOGLE_SERVICE_ACCOUNT && env.GOOGLE_LOCATION_NAME),
           crm_d1:     Boolean(env.CRM),
           ai:         Boolean(env.AI),
-          auto_refresh: Boolean(env.THREADS_APP_SECRET),
+          auto_refresh: Boolean(env.THREADS_APP_SECRET && env.THREADS_APP_ID),
         },
       });
+    }
+
+    // Add posts to the content queue: POST /queue/add (TRIGGER_TOKEN protected)
+    // Body: single post object, bare array, or { posts: [...] }
+    // Fields: platform (required), caption | caption_seed (one required),
+    //         image_url, topic_tag, link_url, scheduled_at, source_oa
+    if (url.pathname === '/queue/add' && request.method === 'POST') {
+      if (!requireToken()) return new Response('forbidden', { status: 403 });
+      if (!env.CRM) return json({ ok: false, error: 'D1 not bound' }, 500);
+      const body = await request.json().catch(() => null);
+      if (!body) return json({ ok: false, error: 'invalid JSON body' }, 400);
+      const items = Array.isArray(body) ? body : Array.isArray(body.posts) ? body.posts : [body];
+      const ids = [], errors = [];
+      for (let i = 0; i < items.length; i++) {
+        const p = items[i] || {};
+        if (!PLATFORM_FNS[p.platform]) { errors.push({ index: i, error: `unknown platform: ${p.platform}` }); continue; }
+        if (!p.caption && !p.caption_seed) { errors.push({ index: i, error: 'caption or caption_seed required' }); continue; }
+        try {
+          const r = await env.CRM.prepare(
+            "INSERT INTO content_queue (platform, image_url, caption_seed, caption, topic_tag, link_url, scheduled_at, status, source_oa) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?)"
+          ).bind(
+            p.platform, p.image_url || null, p.caption_seed || null, p.caption || null,
+            p.topic_tag || null, p.link_url || null, p.scheduled_at || null, p.source_oa || '3q-hatchery'
+          ).run();
+          ids.push(r.meta?.last_row_id ?? null);
+        } catch (err) {
+          errors.push({ index: i, error: err.message });
+        }
+      }
+      const status = ids.length === 0 && errors.length > 0 ? 400 : 200;
+      return json({ ok: errors.length === 0, added: ids.length, ids, errors }, status);
+    }
+
+    // Queue overview: GET /queue/list (TRIGGER_TOKEN protected)
+    // Scheduler page contract: { rows: [{id, platform, preview, scheduled_at, status, error_msg}] }
+    if ((url.pathname === '/queue/list' || url.pathname === '/queue') && request.method === 'GET') {
+      if (!requireToken()) return new Response('forbidden', { status: 403 });
+      if (!env.CRM) return json({ ok: false, error: 'D1 not bound' }, 500);
+      const [rows, counts] = await Promise.all([
+        env.CRM.prepare("SELECT id, platform, substr(COALESCE(caption, caption_seed), 1, 60) AS preview, scheduled_at, status, error_msg FROM content_queue ORDER BY id DESC LIMIT 50").all(),
+        env.CRM.prepare('SELECT platform, status, COUNT(*) AS n FROM content_queue GROUP BY platform, status ORDER BY platform').all(),
+      ]);
+      return json({ ok: true, rows: rows.results, counts: counts.results });
+    }
+
+    // Delete a queued item: POST /queue/del?id=N (TRIGGER_TOKEN protected)
+    // Only pending/failed can be deleted — published rows feed the daily-limit count.
+    if (url.pathname === '/queue/del' && request.method === 'POST') {
+      if (!requireToken()) return new Response('forbidden', { status: 403 });
+      if (!env.CRM) return json({ ok: false, error: 'D1 not bound' }, 500);
+      const id = Number(url.searchParams.get('id'));
+      if (!Number.isInteger(id) || id <= 0) return json({ ok: false, error: 'valid id required' }, 400);
+      const r = await env.CRM.prepare(
+        "DELETE FROM content_queue WHERE id = ? AND status IN ('pending','failed')"
+      ).bind(id).run();
+      const deleted = r.meta?.changes ?? 0;
+      return json({ ok: deleted > 0, deleted, ...(deleted === 0 ? { error: 'not found or already published' } : {}) });
     }
 
     // FB Group semi-auto: GET /fbgroup/today — paste-ready content for the admin
@@ -723,6 +807,6 @@ export default {
       return json({ ok: true, caption });
     }
 
-    return json({ service: '3q-social-publisher', ok: true, version: '1.0' });
+    return json({ service: '3q-social-publisher', ok: true, version: '2.1' });
   },
 };
