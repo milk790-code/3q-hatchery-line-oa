@@ -1,0 +1,27 @@
+name: Publish Now (social-publisher)
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: '指定平台(留空=全平台輪詢一次):facebook / instagram / threads'
+        required: false
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger publish loop
+        env:
+          TRIGGER_TOKEN: ${{ secrets.TRIGGER_TOKEN }}
+          PLATFORM: ${{ inputs.platform }}
+        run: |
+          set -euo pipefail
+          URL="https://3q-social-publisher.milk790.workers.dev/publish"
+          if [ -n "${PLATFORM:-}" ]; then URL="${URL}?platform=${PLATFORM}"; fi
+          resp=$(curl -sS -X POST "$URL" -H "Authorization: Bearer $TRIGGER_TOKEN")
+          echo "$resp" | jq .
+          echo "$resp" | jq -e '.ok == true' > /dev/null
+          echo "::notice::publish loop done"
+          echo "$resp" | jq -r '.results[]? | "::notice::\(.platform): \(if .published then "✅ 已發布 id=\(.id)" elif .skipped then "略過(\(.reason))" else "❌ \(.error // "失敗")" end)"'
