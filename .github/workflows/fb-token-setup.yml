@@ -31,7 +31,10 @@ jobs:
 
       - name: Extend to 60-day long-lived User Token
         env:
-          FB_APP_SECRET: ${{ secrets.THREADS_APP_SECRET }}
+          # Must be the App Secret of FB_APP_ID (956987317313843 / popmonster-distributor-v2).
+          # THREADS_APP_SECRET belongs to a different (Threads consumer) app — run #44 proved
+          # it fails "Error validating client secret" — so a dedicated FB_APP_SECRET wins here.
+          FB_APP_SECRET: ${{ secrets.FB_APP_SECRET || secrets.THREADS_APP_SECRET }}
           # Repo secret first (encrypted + log-masked); dispatch input only as fallback.
           SHORT_TOKEN: ${{ secrets.FB_SHORT_TOKEN || inputs.fb_short_token }}
         run: |
