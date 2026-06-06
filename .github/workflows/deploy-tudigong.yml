@@ -62,7 +62,8 @@ jobs:
               compatibility_flags: ["nodejs_compat"],
               bindings: ([
                 {name:"STATE", type:"kv_namespace", namespace_id:$kv},
-                {name:"DB", type:"d1", id:$d1}
+                {name:"DB", type:"d1", id:$d1},
+                {name:"AI", type:"ai"}
               ] + $secrets)
             }' > /tmp/metadata.json
 
