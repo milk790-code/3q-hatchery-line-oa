@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       fb_short_token:
-        description: 'Meta Graph API Explorer 的短效 User Token（需勾權限：pages_show_list / pages_manage_posts / pages_read_engagement / instagram_basic / instagram_content_publish）'
-        required: true
+        description: '⚠ 建議留空！請改用 repo secret FB_SHORT_TOKEN（Settings → Secrets → Actions）。此輸入框僅為備用：dispatch inputs 非加密、可能留在執行紀錄中。Token 需求權限：pages_show_list / pages_manage_posts / pages_read_engagement / instagram_basic / instagram_content_publish'
+        required: false
         type: string
 
 jobs:
@@ -32,9 +32,14 @@ jobs:
       - name: Extend to 60-day long-lived User Token
         env:
           FB_APP_SECRET: ${{ secrets.THREADS_APP_SECRET }}
-          SHORT_TOKEN: ${{ inputs.fb_short_token }}
+          # Repo secret first (encrypted + log-masked); dispatch input only as fallback.
+          SHORT_TOKEN: ${{ secrets.FB_SHORT_TOKEN || inputs.fb_short_token }}
         run: |
           set -euo pipefail
+          if [ -z "${SHORT_TOKEN:-}" ]; then
+            echo "::error::No token provided. Add repo secret FB_SHORT_TOKEN (Settings → Secrets and variables → Actions) and re-run."
+            exit 1
+          fi
           resp=$(curl -sS \
             "https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${FB_APP_ID}&client_secret=${FB_APP_SECRET}&fb_exchange_token=${SHORT_TOKEN}")
           LONG=$(echo "$resp" | jq -r '.access_token // empty')
@@ -154,9 +159,4 @@ jobs:
           echo "| IG User ID | \`${IG_USER_ID:-（無連結的 IG 帳號）}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| FB Token 類型 | Page Access Token（永不過期）|" >> $GITHUB_STEP_SUMMARY
           echo "| IG Token | 同 FB Page Token（IG Business 帳號需連結到同一粉專）|" >> $GITHUB_STEP_SUMMARY
-          echo "| Token 存儲 | Cloudflare Worker secret + SESSION KV |" >> $GITHUB_STEP_SUMMARY
-          echo "| 發文排程 | 每天 09:00 / 12:00（週三）/ 20:30（台北時間）|" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 下一步" >> $GITHUB_STEP_SUMMARY
-          echo "1. 到 Actions → **Seed Content Queue** 填入素材到 D1" >> $GITHUB_STEP_SUMMARY
-          echo "2. 等下次 cron 或手動 \`POST /publish?token=TRIGGER_TOKEN\`" >> $GITHUB_STEP_SUMMARY
+          echo "| Token 存儲 | Cloudflare Worker s
