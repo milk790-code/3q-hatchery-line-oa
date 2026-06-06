@@ -442,6 +442,7 @@ jobs:
         env:
           CF_TOKEN:        ${{ secrets.CF_API_TOKEN }}
           TRIGGER_TOKEN:   ${{ secrets.TRIGGER_TOKEN }}
+          THREADS_APP_SECRET:    ${{ secrets.THREADS_APP_SECRET }}
           THREADS_ACCESS_TOKEN:  ${{ secrets.THREADS_ACCESS_TOKEN }}
           THREADS_USER_ID:       ${{ secrets.THREADS_USER_ID }}
           IG_ACCESS_TOKEN:       ${{ secrets.IG_ACCESS_TOKEN }}
@@ -452,29 +453,56 @@ jobs:
           GOOGLE_LOCATION_NAME:   ${{ secrets.GOOGLE_LOCATION_NAME }}
         run: |
           set -euo pipefail
-          cat > /tmp/social-metadata.json <<JSON
-          {
-            "main_module": "worker.js",
-            "compatibility_date": "2024-12-01",
-            "bindings": [
-              {"name": "PNG_BASE_URL",   "type": "plain_text", "text": "$PNG_BASE_URL"},
-              {"name": "FB_PAGE_ID",     "type": "plain_text", "text": "61587003785491"},
-              {"name": "LINE_JOIN_URL",  "type": "plain_text", "text": "https://lin.ee/UKKodJj"},
-              {"name": "TRIGGER_TOKEN",  "type": "secret_text", "text": $(jq -Rn --arg t "${TRIGGER_TOKEN:-}" '$t')},
-              {"name": "SESSION",        "type": "kv_namespace", "namespace_id": "$SESSION_KV_ID"},
-              {"name": "CRM",            "type": "d1", "id": "$CRM_D1_ID"},
-              {"name": "AI",             "type": "ai"},
-              {"name": "THREADS_ACCESS_TOKEN", "type": "secret_text", "text": $(jq -Rn --arg t "${THREADS_ACCESS_TOKEN:-}" '$t')},
-              {"name": "THREADS_USER_ID",      "type": "secret_text", "text": $(jq -Rn --arg t "${THREADS_USER_ID:-}" '$t')},
-              {"name": "IG_ACCESS_TOKEN",      "type": "secret_text", "text": $(jq -Rn --arg t "${IG_ACCESS_TOKEN:-}" '$t')},
-              {"name": "IG_USER_ID",           "type": "secret_text", "text": $(jq -Rn --arg t "${IG_USER_ID:-}" '$t')},
-              {"name": "FB_PAGE_ACCESS_TOKEN", "type": "secret_text", "text": $(jq -Rn --arg t "${FB_PAGE_ACCESS_TOKEN:-}" '$t')},
-              {"name": "TIKTOK_ACCESS_TOKEN",  "type": "secret_text", "text": $(jq -Rn --arg t "${TIKTOK_ACCESS_TOKEN:-}" '$t')},
-              {"name": "GOOGLE_SERVICE_ACCOUNT","type": "secret_text","text": $(jq -Rn --arg t "${GOOGLE_SERVICE_ACCOUNT:-}" '$t')},
-              {"name": "GOOGLE_LOCATION_NAME", "type": "secret_text", "text": $(jq -Rn --arg t "${GOOGLE_LOCATION_NAME:-}" '$t')}
+
+          # ── Secret-washing protection (2026-06-06 incident) ──────────────
+          # Old behaviour wrote every secret as secret_text straight from GitHub
+          # secrets; any EMPTY GitHub secret silently overwrote the manually-bound
+          # Cloudflare value with "". New 3-tier logic per secret:
+          #   1. GitHub secret non-empty           → set it (GitHub wins)
+          #   2. empty, but exists on live worker  → {"type":"inherit"} (keep CF value)
+          #   3. empty and not on live worker      → omit entirely
+          existing=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${SOCIAL_WORKER_NAME}/settings" \
+            | jq -c '[.result.bindings[]? | select(.type=="secret_text") | .name]' || echo '[]')
+          echo "::notice::Existing secret bindings on live worker: $existing"
+
+          secrets_json=$(jq -n --argjson existing "$existing" '
+            [
+              {name: "TRIGGER_TOKEN",          val: (env.TRIGGER_TOKEN          // "")},
+              {name: "THREADS_APP_SECRET",     val: (env.THREADS_APP_SECRET     // "")},
+              {name: "THREADS_ACCESS_TOKEN",   val: (env.THREADS_ACCESS_TOKEN   // "")},
+              {name: "THREADS_USER_ID",        val: (env.THREADS_USER_ID        // "")},
+              {name: "IG_ACCESS_TOKEN",        val: (env.IG_ACCESS_TOKEN        // "")},
+              {name: "IG_USER_ID",             val: (env.IG_USER_ID             // "")},
+              {name: "FB_PAGE_ACCESS_TOKEN",   val: (env.FB_PAGE_ACCESS_TOKEN   // "")},
+              {name: "TIKTOK_ACCESS_TOKEN",    val: (env.TIKTOK_ACCESS_TOKEN    // "")},
+              {name: "GOOGLE_SERVICE_ACCOUNT", val: (env.GOOGLE_SERVICE_ACCOUNT // "")},
+              {name: "GOOGLE_LOCATION_NAME",   val: (env.GOOGLE_LOCATION_NAME   // "")}
             ]
-          }
-          JSON
+            | map(
+                if .val != "" then {name: .name, type: "secret_text", text: .val}
+                elif ([.name] | inside($existing)) then {name: .name, type: "inherit"}
+                else empty
+                end
+              )')
+
+          jq -n --argjson secrets "$secrets_json" \
+            --arg png "$PNG_BASE_URL" --arg kv "$SESSION_KV_ID" --arg d1 "$CRM_D1_ID" '
+            {
+              main_module: "worker.js",
+              compatibility_date: "2024-12-01",
+              bindings: ([
+                {name: "PNG_BASE_URL",   type: "plain_text", text: $png},
+                {name: "THREADS_APP_ID", type: "plain_text", text: "956987317313843"},
+                {name: "FB_PAGE_ID",     type: "plain_text", text: "61587003785491"},
+                {name: "LINE_JOIN_URL",  type: "plain_text", text: "https://lin.ee/UKKodJj"},
+                {name: "SESSION",        type: "kv_namespace", namespace_id: $kv},
+                {name: "CRM",            type: "d1", id: $d1},
+                {name: "AI",             type: "ai"}
+              ] + $secrets)
+            }' > /tmp/social-metadata.json
+
+          echo "::notice::Social publisher bindings: $(jq -c '.bindings | map({name, type})' /tmp/social-metadata.json)"
 
           resp=$(curl -sS -X PUT \
             "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${SOCIAL_WORKER_NAME}" \
