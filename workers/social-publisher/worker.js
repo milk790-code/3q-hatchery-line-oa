@@ -30,7 +30,14 @@ const DAILY_LIMITS = { threads: 3, instagram: 1, facebook: 1, tiktok: 1, google_
 
 async function getToken(platform, key, env) {
   if (!env.SESSION) return env[key] || null;
-  const kvVal = await env.SESSION.get(`token:${platform}:${key.toLowerCase().replace('_access_token','access').replace('_user_id','user_id')}`);
+  // Map binding name → KV suffix actually written by saveTokenToKV / fb-token-setup:
+  //   *_ACCESS_TOKEN → "access", *_USER_ID → "user_id".
+  // The old replace() built keys like "token:threads:threadsaccess", so KV reads
+  // ALWAYS missed (and auto-refresh silently never worked). Fixed 2026-06-07.
+  const suffix = key.endsWith('_ACCESS_TOKEN') ? 'access'
+               : key.endsWith('_USER_ID')      ? 'user_id'
+               : key.toLowerCase();
+  const kvVal = await env.SESSION.get(`token:${platform}:${suffix}`);
   return kvVal || env[key] || null;
 }
 
