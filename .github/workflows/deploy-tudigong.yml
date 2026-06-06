@@ -1,0 +1,127 @@
+name: Deploy Tudigong LINE Bot
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'workers/tudigong/worker.js'
+      - '.github/workflows/deploy-tudigong.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      WORKER_NAME: tudigong-line-oa
+      STATE_KV_ID: f7d10ea0569e405dbeb95435fc48863e
+      DB_D1_ID: 34972ecb-63dd-4e5d-a265-7718ceadc431
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set Cloudflare account ID
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          [ -n "$CF_ACCOUNT_ID" ] || { echo "::error::CF_ACCOUNT_ID empty"; exit 1; }
+          echo "CF_ACCOUNT_ID=$CF_ACCOUNT_ID" >> $GITHUB_ENV
+
+      - name: Deploy Worker (3-tier secret protection)
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          T_LINE_SECRET: ${{ secrets.TUDIGONG_LINE_CHANNEL_SECRET }}
+          T_LINE_TOKEN: ${{ secrets.TUDIGONG_LINE_CHANNEL_ACCESS_TOKEN }}
+          T_ANTHROPIC: ${{ secrets.TUDIGONG_ANTHROPIC_API_KEY }}
+          T_OWNER: ${{ secrets.TUDIGONG_OWNER_LINE_USER_ID }}
+        run: |
+          set -euo pipefail
+          existing=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/settings" \
+            | jq -c '[.result.bindings[]? | select(.type=="secret_text") | .name]' || echo '[]')
+          [ "$existing" = "null" ] && existing='[]'
+          echo "existing secret bindings: $existing"
+
+          secrets_json=$(jq -n --argjson existing "$existing" '
+            [
+              {name:"LINE_CHANNEL_SECRET", val:(env.T_LINE_SECRET // "")},
+              {name:"LINE_CHANNEL_ACCESS_TOKEN", val:(env.T_LINE_TOKEN // "")},
+              {name:"ANTHROPIC_API_KEY", val:(env.T_ANTHROPIC // "")},
+              {name:"OWNER_LINE_USER_ID", val:(env.T_OWNER // "")}
+            ]
+            | map(
+              if .val != "" then {name:.name, type:"secret_text", text:.val}
+              elif ([.name] | inside($existing)) then {name:.name, type:"inherit"}
+              else empty
+              end
+            )')
+
+          jq -n --argjson secrets "$secrets_json" --arg kv "$STATE_KV_ID" --arg d1 "$DB_D1_ID" '
+            {
+              main_module: "worker.js",
+              compatibility_date: "2026-06-01",
+              compatibility_flags: ["nodejs_compat"],
+              bindings: ([
+                {name:"STATE", type:"kv_namespace", namespace_id:$kv},
+                {name:"DB", type:"d1", id:$d1}
+              ] + $secrets)
+            }' > /tmp/metadata.json
+
+          jq '(.bindings[] | select(.type=="secret_text") | .text) = "***MASKED***"' /tmp/metadata.json
+
+          resp=$(curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -F "metadata=@/tmp/metadata.json;type=application/json" \
+            -F "worker.js=@workers/tudigong/worker.js;type=application/javascript+module")
+          echo "$resp" | jq -e '.success == true' > /dev/null || { echo "$resp" | jq .; exit 1; }
+          echo "::notice::tudigong worker deployed (etag=$(echo "$resp" | jq -r '.result.etag'))"
+
+      - name: Enable workers.dev + URL
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/subdomain" \
+            -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" \
+            -d '{"enabled": true}' | jq -e '.success == true' > /dev/null
+          SUB=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/subdomain" \
+            | jq -r '.result.subdomain')
+          WORKER_URL="https://${WORKER_NAME}.${SUB}.workers.dev"
+          echo "WORKER_URL=$WORKER_URL" >> $GITHUB_ENV
+          echo "::notice::Worker URL: $WORKER_URL"
+
+      - name: Smoke test
+        run: |
+          sleep 5
+          curl -sS "$WORKER_URL" || true
+
+      - name: Set LINE webhook (only if token secret present)
+        continue-on-error: true
+        env:
+          T_LINE_TOKEN: ${{ secrets.TUDIGONG_LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          if [ -z "${T_LINE_TOKEN:-}" ]; then echo "::warning::TUDIGONG_LINE_CHANNEL_ACCESS_TOKEN not set - skipping webhook setup"; exit 0; fi
+          curl -sS -f -X PUT https://api.line.me/v2/bot/channel/webhook/endpoint \
+            -H "Authorization: Bearer $T_LINE_TOKEN" -H "Content-Type: application/json" \
+            -d "{\"endpoint\":\"$WORKER_URL\"}"
+          curl -sS -X POST https://api.line.me/v2/bot/channel/webhook/test \
+            -H "Authorization: Bearer $T_LINE_TOKEN" -H "Content-Type: application/json" \
+            -d "{\"endpoint\":\"$WORKER_URL\"}" | jq .
+          echo "::notice::LINE webhook set to $WORKER_URL"
+
+      - name: Summary
+        run: |
+          echo "## 呆丸土地公 Worker deployed" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Worker URL | \`$WORKER_URL\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| KV STATE | \`$STATE_KV_ID\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| D1 DB | \`$DB_D1_ID\` |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Remaining repo secrets (Settings > Secrets > Actions), then re-run:" >> $GITHUB_STEP_SUMMARY
+          echo "- TUDIGONG_LINE_CHANNEL_SECRET" >> $GITHUB_STEP_SUMMARY
+          echo "- TUDIGONG_LINE_CHANNEL_ACCESS_TOKEN (Messaging API tab > Issue)" >> $GITHUB_STEP_SUMMARY
+          echo "- TUDIGONG_ANTHROPIC_API_KEY" >> $GITHUB_STEP_SUMMARY
+          echo "- TUDIGONG_OWNER_LINE_USER_ID (say 我是老闆 to the bot after secrets set)" >> $GITHUB_STEP_SUMMARY
