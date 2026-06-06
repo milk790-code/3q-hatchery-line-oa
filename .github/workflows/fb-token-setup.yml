@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       fb_short_token:
-        description:EAAOJPnviPMQBRr9Rh3260Sp5evdjRZBjQk4fGKr876ZB0EzGaVwlWooX2sQp4hvZAZBW3R1GyB2co5L1o5h47voLNnUrS6AnRNf8erfWbEkKtQfI5hSddJS9eQNQGMnPr6PriJQNW18lxxeZCJeEZCrOxoxn2oMBfQHNVNYBx3IqKlOYFNWLWgDZAuoTO5b5BcRCRJ7chcRlZCZBYERQUWFRGeY9Jm4uf4u78Yf7M33zdQKahZCRGnLWynUSVWXDqXX8grygsSNNt0oZASRezkNeLmbijGDOxduVQZDZD
+        description: 'Meta Graph API Explorer 的短效 User Token（需勾權限：pages_show_list / pages_manage_posts / pages_read_engagement / instagram_basic / instagram_content_publish）'
         required: true
         type: string
 
@@ -103,40 +103,29 @@ jobs:
           done
           echo "::notice::FB + IG Tokens stored in KV (permanent)"
 
-      - name: Deploy 3q-social-publisher with FB + IG tokens
+      - name: Bind FB + IG secrets on worker (surgical — touches nothing else)
         env:
-          CF_TOKEN:             ${{ secrets.CF_API_TOKEN }}
-          TRIGGER_TOKEN:        ${{ secrets.TRIGGER_TOKEN }}
-          THREADS_APP_SECRET:   ${{ secrets.THREADS_APP_SECRET }}
-          FB_PAGE_ACCESS_TOKEN: ${{ env.FB_PAGE_ACCESS_TOKEN }}
-          IG_USER_ID:           ${{ env.IG_USER_ID }}
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
         run: |
           set -euo pipefail
-          cat > /tmp/meta.json <<JSON
-          {"main_module":"worker.js","compatibility_date":"2024-12-01","bindings":[
-            {"name":"PNG_BASE_URL",           "type":"plain_text",  "text":"$PNG_BASE_URL"},
-            {"name":"THREADS_APP_ID",         "type":"plain_text",  "text":"$THREADS_APP_ID"},
-            {"name":"FB_PAGE_ID",             "type":"plain_text",  "text":"$FB_PAGE_ID"},
-            {"name":"THREADS_APP_SECRET",     "type":"secret_text", "text":$(jq -Rn --arg t "${THREADS_APP_SECRET:-}" '$t')},
-            {"name":"FB_PAGE_ACCESS_TOKEN",   "type":"secret_text", "text":$(jq -Rn --arg t "${FB_PAGE_ACCESS_TOKEN:-}" '$t')},
-            {"name":"TRIGGER_TOKEN",          "type":"secret_text", "text":$(jq -Rn --arg t "${TRIGGER_TOKEN:-}" '$t')},
-            {"name":"SESSION",                "type":"kv_namespace","namespace_id":"$SESSION_KV_ID"},
-            {"name":"CRM",                    "type":"d1",          "id":"$CRM_D1_ID"},
-            {"name":"AI",                     "type":"ai"},
-            {"name":"IG_ACCESS_TOKEN",        "type":"secret_text", "text":$(jq -Rn --arg t "${FB_PAGE_ACCESS_TOKEN:-}" '$t')},
-            {"name":"IG_USER_ID",             "type":"secret_text", "text":$(jq -Rn --arg t "${IG_USER_ID:-}" '$t')},
-            {"name":"TIKTOK_ACCESS_TOKEN",    "type":"secret_text", "text":""},
-            {"name":"GOOGLE_SERVICE_ACCOUNT", "type":"secret_text", "text":""},
-            {"name":"GOOGLE_LOCATION_NAME",   "type":"secret_text", "text":""}
-          ]}
-          JSON
-          resp=$(curl -sS -X PUT \
-            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${SOCIAL_WORKER_NAME}" \
-            -H "Authorization: Bearer $CF_TOKEN" \
-            -F "metadata=@/tmp/meta.json;type=application/json" \
-            -F "worker.js=@workers/social-publisher/worker.js;type=application/javascript+module")
-          echo "$resp" | jq -e '.success == true' > /dev/null
-          echo "::notice::Worker redeployed with FB_PAGE_ACCESS_TOKEN"
+          # Per-secret PUT via the Workers secrets API: updates ONE secret each call,
+          # never rewrites the script or other bindings. This replaces the old
+          # full-metadata redeploy that hardcoded "" for TIKTOK/GOOGLE secrets and
+          # re-washed anything not passed in (same disease as the 2026-06-06 incident).
+          put_secret() {
+            curl -sS -X PUT \
+              "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${SOCIAL_WORKER_NAME}/secrets" \
+              -H "Authorization: Bearer $CF_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "$(jq -n --arg n "$1" --arg t "$2" '{name: $n, text: $t, type: "secret_text"}')" \
+              | jq -r --arg n "$1" '"secret " + $n + ": " + (.success | tostring)'
+          }
+          put_secret FB_PAGE_ACCESS_TOKEN "$FB_PAGE_ACCESS_TOKEN"
+          put_secret IG_ACCESS_TOKEN     "$FB_PAGE_ACCESS_TOKEN"
+          if [ -n "${IG_USER_ID:-}" ]; then
+            put_secret IG_USER_ID "$IG_USER_ID"
+          fi
+          echo "::notice::FB/IG secrets bound — script and other bindings untouched"
 
       - name: Verify /health endpoint
         env:
