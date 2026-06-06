@@ -56,7 +56,7 @@ export default {
 
     if (request.method !== 'POST') {
       const cfg = await loadCfg(env);
-      return new Response(`tudigong bot alive | secret=${!!cfg.lineSecret} token=${!!cfg.lineToken} ai=${!!cfg.anthropicKey} owner=${!!cfg.ownerId}`, { status: 200 });
+      return new Response(`tudigong bot alive | secret=${!!cfg.lineSecret} token=${!!cfg.lineToken} ai=${cfg.anthropicKey ? 'claude' : 'builtin'} owner=${!!cfg.ownerId}`, { status: 200 });
     }
 
     const bodyText = await request.text();
@@ -101,13 +101,13 @@ async function handleSetup(request, env, url) {
     const secret = (form.get('line_secret') || '').trim();
     const token = (form.get('line_token') || '').trim();
     const akey = (form.get('anthropic_key') || '').trim();
-    if (!secret || !token || !akey) {
-      return new Response(resultHtml('❌ 三格都要填,回上一頁補齊。', false), { headers: { 'content-type': 'text/html;charset=utf-8' } });
+    if (!secret || !token) {
+      return new Response(resultHtml('❌ 前兩格必填,回上一頁補齊。', false), { headers: { 'content-type': 'text/html;charset=utf-8' } });
     }
 
     await env.STATE.put('cfg:line_secret', secret);
     await env.STATE.put('cfg:line_token', token);
-    await env.STATE.put('cfg:anthropic_key', akey);
+    if (akey) await env.STATE.put('cfg:anthropic_key', akey);
 
     const selfUrl = `https://${url.hostname}`;
     const steps = [];
@@ -150,7 +150,7 @@ const SETUP_HTML = `<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf
 <form method="POST">
 <label>LINE Channel secret</label><input name="line_secret" required autocomplete="off"><small>LINE Developers → Basic settings → Channel secret</small>
 <label>LINE Channel access token</label><input name="line_token" required autocomplete="off"><small>LINE Developers → Messaging API 分頁 → Issue</small>
-<label>Anthropic API key</label><input name="anthropic_key" required autocomplete="off"><small>console.anthropic.com → API keys</small>
+<label>Anthropic API key(選填)</label><input name="anthropic_key" autocomplete="off" placeholder="留空=用內建 AI,之後想升級再填"><small>留空也能跑;有 console.anthropic.com 的 key 品質更好</small>
 <button type="submit">完成設定,點火 🚀</button>
 </form></body></html>`;
 
@@ -205,7 +205,7 @@ async function onText(ev, env, cfg) {
   const state = await loadState(env, userId);
   state.history.push({ role: 'user', content: text });
 
-  const ai = await callSalesBrain(cfg, state);
+  const ai = await callSalesBrain(env, cfg, state);
   if (!ai) {
     await replyLine(ev.replyToken, ['土地公這邊訊號卡了一下\n你剛剛說的我記著 稍等回你'], cfg);
     return;
@@ -228,8 +228,8 @@ async function onText(ev, env, cfg) {
   }
 }
 
-async function callSalesBrain(cfg, state) {
-  if (!cfg.anthropicKey) return null;
+async function callSalesBrain(env, cfg, state) {
+  if (!cfg.anthropicKey) return callBuiltinBrain(env, state);
   const messages = state.history.map(m => ({ role: m.role, content: m.content }));
   const stateBlock = `［對話狀態］${JSON.stringify(state.sales || { completion: 0 })}\n(以上為後端攜帶的進度,接續推進,勿從頭開始)`;
 
@@ -244,6 +244,18 @@ async function callSalesBrain(cfg, state) {
     const textOut = (data.content && data.content[0] && data.content[0].text) || '';
     return JSON.parse(textOut.slice(textOut.indexOf('{'), textOut.lastIndexOf('}') + 1));
   } catch (e) { return null; }
+}
+
+
+async function callBuiltinBrain(env, state) {
+  if (!env.AI) return null;
+  const sys = SYSTEM_PROMPT + '\n\n［對話狀態］' + JSON.stringify(state.sales || { completion: 0 });
+  const messages = [{ role: 'system', content: sys }].concat(state.history.map(m => ({ role: m.role, content: m.content })));
+  try {
+    const r = await env.AI.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', { messages, max_tokens: 1024 });
+    const textOut = (r && (r.response || r.result || '')) + '';
+    return JSON.parse(textOut.slice(textOut.indexOf('{'), textOut.lastIndexOf('}') + 1));
+  } catch (e) { console.error('builtin brain', e.message); return null; }
 }
 
 async function loadState(env, userId) {
