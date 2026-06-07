@@ -18,7 +18,7 @@ jobs:
       CRM_D1_ID: e54671b1-d15e-4552-babf-cef367267568
       PNG_BASE_URL: https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports
       FB_APP_ID: '956987317313843'
-      FB_PAGE_ID: '1011553295383631'
+      FB_PAGE_ID: '1006044165915714'
       THREADS_APP_ID: '956987317313843'
 
     steps:
@@ -66,8 +66,13 @@ jobs:
             '.data[]? | select(.id == $pid) | .access_token // empty')
 
           if [ -z "$PAGE_TOKEN" ]; then
-            echo "::error::Page $FB_PAGE_ID not found in /me/accounts. Make sure pages_manage_posts is granted."
-            echo "Response: $(echo $resp | jq -c .)"
+            echo "::notice::Not in /me/accounts — trying direct page query (new Pages experience fallback)"
+            resp2=$(curl -sS "https://graph.facebook.com/v21.0/${FB_PAGE_ID}?fields=access_token,name&access_token=${FB_USER_TOKEN}")
+            echo "$resp2" | jq -r '"direct query page: " + (.name // "n/a")'
+            PAGE_TOKEN=$(echo "$resp2" | jq -r '.access_token // empty')
+          fi
+          if [ -z "$PAGE_TOKEN" ]; then
+            echo "::error::Page $FB_PAGE_ID unreachable by both /me/accounts and direct query — user token lacks management permission for this page. Grant the page to the app in business settings."
             exit 1
           fi
           echo "FB_PAGE_ACCESS_TOKEN=$PAGE_TOKEN" >> $GITHUB_ENV

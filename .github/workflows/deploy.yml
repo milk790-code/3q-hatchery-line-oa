@@ -494,7 +494,7 @@ jobs:
               bindings: ([
                 {name: "PNG_BASE_URL",   type: "plain_text", text: $png},
                 {name: "THREADS_APP_ID", type: "plain_text", text: "956987317313843"},
-                {name: "FB_PAGE_ID",     type: "plain_text", text: "1011553295383631"},
+                {name: "FB_PAGE_ID",     type: "plain_text", text: "1006044165915714"},
                 {name: "LINE_JOIN_URL",  type: "plain_text", text: "https://lin.ee/UKKodJj"},
                 {name: "SESSION",        type: "kv_namespace", namespace_id: $kv},
                 {name: "CRM",            type: "d1", id: $d1},
