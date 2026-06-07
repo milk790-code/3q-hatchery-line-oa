@@ -149,6 +149,30 @@ footer .copy{border-top:1px solid rgba(255,255,255,.1);padding-top:22px;font-siz
   *{animation:none!important;scroll-behavior:auto}
   .reveal{opacity:1;transform:none;transition:none}
 }
+
+/* price/story/faq additions */
+.acc{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.ac{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.ac summary{list-style:none;cursor:pointer;padding:20px 22px;display:flex;align-items:center;gap:14px;font-weight:800;font-size:17px;color:var(--ink)}
+.ac summary::-webkit-details-marker{display:none}
+.ac summary .ico{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:18px;flex-shrink:0;background:color-mix(in srgb,var(--clr) 14%,#fff)}
+.ac summary .pl{margin-left:auto;color:var(--clr);font-size:22px;transition:.3s;font-weight:400}
+.ac[open] summary .pl{transform:rotate(45deg)}
+.ac .inner{padding:0 22px 20px 72px}
+.ac .row{display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-top:1px dashed var(--line);font-size:14.5px}
+.ac .row:first-child{border-top:none}
+.ac .row .v{color:var(--clr);font-weight:700;white-space:nowrap}
+.ac .proc{font-size:14.5px;color:var(--ink2);line-height:1.8}.ac .proc b{color:var(--clr)}
+.story{background:var(--card)}
+.story-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:46px;align-items:center;max-width:1000px;margin:0 auto}
+.story-art{aspect-ratio:1;border-radius:26px;background:linear-gradient(150deg,#2A2F38,#16191F);display:grid;place-items:center;box-shadow:var(--shadow);overflow:hidden}
+.story-art svg{width:64%;animation:tilt 10s ease-in-out infinite}
+.story h2{font-family:var(--serif);font-size:clamp(26px,4.5vw,38px);font-weight:900;color:var(--ink);line-height:1.25;margin-bottom:18px;letter-spacing:-.01em}
+.story p{color:var(--ink2);font-size:15.5px;margin-bottom:14px}.story p b{color:var(--brand)}
+.story .sig{margin-top:8px;font-family:var(--serif);font-size:15px;color:var(--mid)}
+.story .pills{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.story .pills span{font-size:13px;font-weight:700;color:var(--brand);background:#FCEbe1;padding:6px 13px;border-radius:999px}
+@media(max-width:860px){.story-grid{grid-template-columns:1fr;gap:24px}.story-art{max-width:300px;margin:0 auto;order:-1}.ac .inner{padding-left:22px}}
 </style>
 </head>
 <body>
@@ -194,6 +218,39 @@ footer .copy{border-top:1px solid rgba(255,255,255,.1);padding-top:22px;font-siz
   </div>
 </section>
 
+<!-- PRICE -->
+<section class="sec" id="price" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="tag">Pricing</span><h2>透明價目，先看再決定</h2><p>價格寫清楚，不怕你比較。工程因每戶不同，採免費估價。</p></div>
+    <div class="acc reveal d1">
+      <details class="ac" style="--clr:var(--c-clean)" open><summary><span class="ico">🧹</span>居家清潔<span class="pl">+</span></summary><div class="inner">
+        <div class="row"><span>基礎居家清潔（單空間）</span><span class="v">750–1,000</span></div>
+        <div class="row"><span>深度居家清潔（單空間）</span><span class="v">2,500</span></div>
+        <div class="row"><span>裝潢後細清（單空間）</span><span class="v">2,500 起</span></div>
+        <div class="row"><span>空屋清潔</span><span class="v">3,000–10,000</span></div>
+        <div class="row"><span>年終大掃除</span><span class="v">3,500–15,000</span></div>
+      </div></details>
+      <details class="ac" style="--clr:var(--c-fix)"><summary><span class="ico">🔧</span>居家修繕<span class="pl">+</span></summary><div class="inner">
+        <div class="row"><span>到府檢測</span><span class="v">300–800</span></div>
+        <div class="row"><span>燈具更換</span><span class="v">500–1,500</span></div>
+        <div class="row"><span>水龍頭更換</span><span class="v">800–2,500</span></div>
+        <div class="row"><span>馬桶零件維修</span><span class="v">1,000–3,000</span></div>
+        <div class="row"><span>矽利康重打</span><span class="v">1,000–5,000</span></div>
+        <div class="row"><span>紗窗／家具組裝／油漆修補</span><span class="v">另估</span></div>
+      </div></details>
+      <details class="ac" style="--clr:var(--c-eng)"><summary><span class="ico">🏗</span>統包工程<span class="pl">+</span></summary><div class="inner">
+        <p class="proc"><b>免費估價 → 現場勘查 → 白紙黑字報價 → 才開工。</b><br>衛浴翻修、廚房改造、老屋翻新、整宅統包，每一戶現況不同，所以我們不在網路喊價。報價單列到一顆螺絲，簽了什麼價就是什麼價。</p>
+      </div></details>
+      <details class="ac" style="--clr:var(--c-beauty)"><summary><span class="ico">💆</span>美容保養<span class="pl">+</span></summary><div class="inner">
+        <div class="row"><span>新客體驗（60 分鐘）</span><span class="v">499</span></div>
+        <div class="row"><span>臉部基礎保養（90 分鐘）</span><span class="v">1,500</span></div>
+        <div class="row"><span>粉刺調理課程</span><span class="v">1,500–2,000</span></div>
+        <div class="row"><span>深層清潔／保濕修護課程</span><span class="v">1,500–2,500</span></div>
+      </div></details>
+    </div>
+  </div>
+</section>
+
 <!-- WHY -->
 <section class="sec why">
   <div class="wrap">
@@ -206,6 +263,35 @@ footer .copy{border-top:1px solid rgba(255,255,255,.1);padding-top:22px;font-siz
       <div class="why-c reveal d1"><div class="n">200+</div><h4>服務過的家庭</h4><p>從除塵蟎到統包工程，近兩百個家庭累積的手感，不是第一天上工。</p></div>
       <div class="why-c reveal d2"><div class="n">1</div><h4>一個窗口到底</h4><p>清潔發現的問題，修繕接手；修繕長出的工程，同一個人負責。不用你到處找。</p></div>
       <div class="why-c reveal d3"><div class="n">0</div><h4>追加預算的意外</h4><p>工程免費估價、現場勘查、白紙黑字才開工，報價單列到一顆螺絲。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- STORY -->
+<section class="sec story" id="about">
+  <div class="wrap"><div class="story-grid">
+    <div class="story-art reveal"><svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="sg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFB07A"/><stop offset="1" stop-color="#E8581E"/></linearGradient></defs><circle cx="100" cy="100" r="70" fill="none" stroke="url(#sg)" stroke-width="3" opacity=".4"/><path d="M70 96 L96 70 L130 70 L130 104 L104 130 L70 130 Z" fill="url(#sg)"/><path d="M70 96 L96 122 L96 130 L70 130 Z" fill="#C9450C"/><circle cx="100" cy="100" r="9" fill="#fff"/><g fill="#fff"><circle cx="150" cy="62" r="4"/><circle cx="56" cy="140" r="3"/><path d="M150 130 l2 5 5 2 -5 2 -2 5 -2-5 -5-2 5-2z"/></g></svg></div>
+    <div class="story-copy reveal d1">
+      <h2>我創業，是因為發現<br>生活裡的問題，其實都相連</h2>
+      <p>18 歲入行美容，因為自己走過肌膚的冤枉路，所以想用對的方式幫人，而不是賣課程。軍中七年，前四年勞務、後三年後勤行政，教會我一件事：再小的細節都會影響整體成果，真正讓事情完成的是制度與整合。</p>
+      <p>退伍後我做過美容、清潔、除塵蟎、團購、工程，服務過近 200 個家庭。我慢慢發現——需要裝修的家也需要細清，重視清潔的人在意塵蟎，過敏久了開始研究保養。看似不同的需求，其實在同一條路上。</p>
+      <p>所以客人真正需要的不是單一產品，而是<b>能解決問題的人</b>。這就是三指服務存在的原因。</p>
+      <div class="pills"><span>持證美容師</span><span>軍旅 7 年</span><span>200+ 家庭</span><span>五業整合</span></div>
+      <div class="sig">— 三指服務 創辦人</div>
+    </div>
+  </div></div>
+</section>
+
+<!-- FAQ -->
+<section class="sec" id="faq" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="tag">FAQ</span><h2>常見問題</h2></div>
+    <div class="acc reveal d1">
+      <details class="ac" style="--clr:var(--brand)" open><summary><span class="ico">📍</span>你們服務哪些地區？<span class="pl">+</span></summary><div class="inner"><p class="proc">清潔與修繕主要在<b>台中、彰化</b>；統包工程在<b>高雄、台南</b>。全都是到府服務，線上選時段即可。</p></div></details>
+      <details class="ac" style="--clr:var(--brand)"><summary><span class="ico">🛏</span>除塵蟎真的有效嗎？<span class="pl">+</span></summary><div class="inner"><p class="proc">創辦人在除塵蟎產業服務過近 200 個過敏家庭。流程是<b>高溫＋拍打＋HEPA 集塵</b>，連蟎屍跟排泄物一起帶走。做完你會看到集塵盒，眼見為憑。</p></div></details>
+      <details class="ac" style="--clr:var(--brand)"><summary><span class="ico">📐</span>工程怎麼收費？<span class="pl">+</span></summary><div class="inner"><p class="proc">不在網路喊價。<b>免費估價 → 現場勘查 → 白紙黑字報價 → 才開工</b>。報價單列到一顆螺絲，沒有做到一半追加預算這回事。</p></div></details>
+      <details class="ac" style="--clr:var(--brand)"><summary><span class="ico">🧹</span>清潔「單空間」怎麼算？<span class="pl">+</span></summary><div class="inner"><p class="proc">以房間／衛浴／廚房為單位。下訂前會先跟你確認坪數與現況，講好價格才開工，不臨時加價。</p></div></details>
+      <details class="ac" style="--clr:var(--brand)"><summary><span class="ico">💬</span>怎麼預約？<span class="pl">+</span></summary><div class="inner"><p class="proc">加我們的 LINE，說一句你需要哪個服務、什麼時段，剩下交給我們安排。</p></div></details>
     </div>
   </div>
 </section>
