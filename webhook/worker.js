@@ -1921,7 +1921,9 @@ async function handleIntent(userText, replyToken, env, uid) {
     if (match.response) msgs.push({ type: 'text', text: match.response });
     if (match.carousel && env.PNG_BASE_URL) msgs.push(carouselMsg(env.PNG_BASE_URL));
   } else {
-    msgs.push({ type: 'text', text: AWAY_TEXT });
+    // 2026-06-07 學誼指示：未匹配關鍵字改「靜默」，留給真人回覆。
+    // 罐頭 AWAY_TEXT 會插進 1:1 對話打斷客戶溝通（麥子案例），選單/關鍵字功能不受影響。
+    return new Response('OK');
   }
   return replyMsg(replyToken, msgs, env);
 }
