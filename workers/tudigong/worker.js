@@ -69,6 +69,19 @@ export default {
       if (g) return new Response(guideHtml(g), { headers: { 'content-type': 'text/html;charset=utf-8', 'cache-control': 'public, max-age=600' } });
     }
 
+    if (url.pathname === '/admin/selftest') {
+      if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
+      const cfg = await loadCfg(env);
+      const q = url.searchParams.get('q') || '\u6211\u60f3\u79df\u5e97\u9762\u958b\u98f2\u6599\u5e97,\u53f0\u4e2d\u5317\u5c6f,\u9810\u7b97\u6708\u79df3\u842c,\u6703\u4e0d\u6703\u592a\u8cb4?';
+      const state = { history: [{ role: 'user', content: q }], sales: { completion: 0 } };
+      const t0 = Date.now();
+      let brain = null, err = null;
+      try { brain = await callSalesBrain(env, cfg, state); } catch (e) { err = e.message; }
+      const ms = Date.now() - t0;
+      const ok = !!(brain && brain.reply && brain.state && typeof brain.state.completion !== 'undefined');
+      return new Response(JSON.stringify({ ok, ms, ai: cfg.anthropicKey ? 'claude' : 'builtin', contract_fields: brain ? Object.keys(brain) : null, completion: brain?.state?.completion, reply_preview: brain?.reply ? String(brain.reply).slice(0, 200) : null, error: err }, null, 2), { headers: { 'content-type': 'application/json' } });
+    }
+
     if (url.pathname === '/admin/secret') {
       if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
       const v = (url.searchParams.get('v') || '').trim();
