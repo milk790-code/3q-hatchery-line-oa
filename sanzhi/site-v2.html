@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1C2128">
+<title>三指服務 · 生活服務整合｜清潔・美容・工程・修繕・團購</title>
+<meta name="description" content="台中、彰化、高雄、台南｜居家清潔、除塵蟎、統包工程、居家修繕、美容保養、嚴選團購。你家的事，交給一個人就好。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand:#E8581E;--brand-d:#B83E0C;--ink:#16191F;--ink2:#3A3F4A;--mid:#6E7682;
+  --paper:#F7F4EF;--card:#FFFFFF;--line:#E8E6E1;
+  --c-clean:#2B7DE0;--c-beauty:#D45E94;--c-eng:#E8961E;--c-fix:#28A46A;--c-buy:#7B5CD6;
+  --sans:'Noto Sans TC',system-ui,-apple-system,sans-serif;--serif:'Noto Serif TC',serif;
+  --shadow:0 18px 50px -18px rgba(20,25,31,.45);
+  --radius:22px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);color:var(--ink2);background:var(--paper);line-height:1.7;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+section{position:relative}
+
+/* ── Nav ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;transition:.35s}
+nav .bar{display:flex;align-items:center;justify-content:space-between;max-width:1120px;margin:0 auto;padding:14px 22px}
+nav.scrolled{background:rgba(247,244,239,.82);backdrop-filter:blur(16px);box-shadow:0 1px 0 rgba(20,25,31,.07)}
+.logo{display:flex;align-items:baseline;gap:3px;font-weight:900;font-size:21px;letter-spacing:-.01em}
+.logo .s{color:var(--brand)}.logo .f{color:var(--ink)}.logo .sub{font-size:11px;color:var(--mid);font-weight:500;margin-left:6px;letter-spacing:.08em}
+.nav-cta{background:var(--brand);color:#fff;padding:9px 18px;border-radius:999px;font-size:14px;font-weight:700;box-shadow:0 8px 20px -8px var(--brand);transition:.25s}
+.nav-cta:active{transform:scale(.95)}
+
+/* ── Hero ── */
+.hero{min-height:100svh;display:flex;align-items:center;position:relative;overflow:hidden;background:var(--ink)}
+.mesh{position:absolute;inset:-30%;z-index:0;filter:blur(60px);opacity:.9}
+.mesh i{position:absolute;border-radius:50%;mix-blend-mode:screen;animation:float 18s ease-in-out infinite}
+.mesh i:nth-child(1){width:46vw;height:46vw;background:#E8581E;top:2%;left:-4%;animation-delay:0s}
+.mesh i:nth-child(2){width:40vw;height:40vw;background:#7B5CD6;bottom:-6%;right:-2%;animation-delay:-6s}
+.mesh i:nth-child(3){width:34vw;height:34vw;background:#2B7DE0;top:30%;right:18%;animation-delay:-11s}
+.mesh i:nth-child(4){width:28vw;height:28vw;background:#D45E94;bottom:10%;left:22%;animation-delay:-3s}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(6%,-5%) scale(1.12)}66%{transform:translate(-4%,4%) scale(.92)}}
+.hero-grain{position:absolute;inset:0;z-index:1;opacity:.5;background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px);background-size:4px 4px}
+.hero .wrap{position:relative;z-index:3;width:100%;padding-top:90px;padding-bottom:60px}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center}
+.kick{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#fff;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);padding:7px 15px;border-radius:999px;backdrop-filter:blur(8px);margin-bottom:22px}
+.kick .dot{width:7px;height:7px;border-radius:50%;background:#5BE5A0;box-shadow:0 0 10px #5BE5A0;animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.4}}
+.hero h1{font-family:var(--serif);font-weight:900;color:#fff;font-size:clamp(38px,7vw,64px);line-height:1.12;letter-spacing:-.02em;margin-bottom:20px}
+.hero h1 em{font-style:normal;background:linear-gradient(120deg,#FFB07A,#E8581E);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.lead{color:rgba(255,255,255,.72);font-size:clamp(15px,2.4vw,18px);max-width:30em;margin-bottom:30px}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:16px;padding:15px 26px;border-radius:14px;transition:.25s;cursor:pointer;border:none}
+.btn-pri{background:var(--brand);color:#fff;box-shadow:0 14px 34px -12px var(--brand)}
+.btn-pri:hover{transform:translateY(-3px);box-shadow:0 20px 40px -12px var(--brand)}
+.btn-ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(8px)}
+.btn-ghost:hover{background:rgba(255,255,255,.16)}
+.hero-stats{display:flex;gap:26px;margin-top:38px;flex-wrap:wrap}
+.hero-stats .st b{display:block;font-family:var(--serif);font-size:30px;font-weight:900;color:#fff;line-height:1}
+.hero-stats .st span{font-size:12.5px;color:rgba(255,255,255,.6)}
+/* hero 3D art */
+.hero-art{position:relative;perspective:1200px}
+.hero-art svg{width:100%;height:auto;filter:drop-shadow(0 30px 50px rgba(0,0,0,.4));animation:tilt 9s ease-in-out infinite}
+@keyframes tilt{0%,100%{transform:rotateY(-9deg) rotateX(5deg)}50%{transform:rotateY(9deg) rotateX(-2deg)}}
+.scroll-cue{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);z-index:3;color:rgba(255,255,255,.5);font-size:11px;letter-spacing:.2em;display:flex;flex-direction:column;align-items:center;gap:7px}
+.scroll-cue .m{width:24px;height:38px;border:2px solid rgba(255,255,255,.3);border-radius:14px;position:relative}
+.scroll-cue .m::after{content:'';position:absolute;top:7px;left:50%;width:4px;height:7px;background:#fff;border-radius:2px;transform:translateX(-50%);animation:scrolld 1.6s infinite}
+@keyframes scrolld{0%{opacity:0;transform:translate(-50%,0)}40%{opacity:1}80%{opacity:0;transform:translate(-50%,12px)}}
+
+/* ── Sections ── */
+.sec{padding:clamp(64px,10vw,110px) 0}
+.sec-head{text-align:center;max-width:40em;margin:0 auto 52px}
+.sec-head .tag{font-size:13px;font-weight:800;letter-spacing:.14em;color:var(--brand);text-transform:uppercase}
+.sec-head h2{font-family:var(--serif);font-weight:900;font-size:clamp(28px,5vw,42px);color:var(--ink);line-height:1.2;margin:10px 0 14px;letter-spacing:-.01em}
+.sec-head p{color:var(--mid);font-size:16px}
+
+/* services */
+.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.svc{background:var(--card);border-radius:var(--radius);padding:30px 26px;border:1px solid var(--line);box-shadow:0 4px 18px -10px rgba(20,25,31,.18);transition:.4s cubic-bezier(.2,.7,.2,1);position:relative;overflow:hidden;transform-style:preserve-3d}
+.svc::before{content:'';position:absolute;inset:0;background:radial-gradient(120% 80% at 50% -10%,var(--clr),transparent 60%);opacity:.08;transition:.4s}
+.svc:hover{transform:translateY(-8px);box-shadow:0 30px 60px -24px var(--clr)}
+.svc:hover::before{opacity:.16}
+.svc .ill{width:100%;height:150px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.svc .ill svg{width:130px;height:130px;filter:drop-shadow(0 14px 18px rgba(20,25,31,.16));transition:.4s}
+.svc:hover .ill svg{transform:scale(1.06) translateY(-3px)}
+.svc h3{font-size:21px;font-weight:900;color:var(--ink);margin-bottom:7px}
+.svc .one{font-size:14.5px;color:var(--ink2);min-height:3.1em;margin-bottom:12px}
+.svc .price{font-size:13px;font-weight:700;color:var(--clr);background:color-mix(in srgb,var(--clr) 12%,#fff);display:inline-block;padding:4px 12px;border-radius:999px}
+.svc .more{margin-top:16px;font-size:14px;font-weight:700;color:var(--clr);display:inline-flex;align-items:center;gap:5px}
+
+/* why */
+.why{background:var(--ink);color:#fff;border-radius:0}
+.why .sec-head h2{color:#fff}.why .sec-head p{color:rgba(255,255,255,.6)}
+.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.why-c{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:32px 26px;text-align:center}
+.why-c .n{font-family:var(--serif);font-size:46px;font-weight:900;background:linear-gradient(120deg,#FFB07A,#E8581E);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1}
+.why-c h4{font-size:18px;font-weight:800;color:#fff;margin:12px 0 8px}
+.why-c p{font-size:14px;color:rgba(255,255,255,.62)}
+
+/* buy strip */
+.buy{background:linear-gradient(120deg,#7B5CD6,#5B3FB0);color:#fff;border-radius:var(--radius);padding:clamp(34px,6vw,56px);display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;overflow:hidden;position:relative}
+.buy::after{content:'🛍';position:absolute;right:-10px;bottom:-30px;font-size:170px;opacity:.12}
+.buy h3{font-family:var(--serif);font-size:clamp(24px,4vw,34px);font-weight:900;margin-bottom:8px;position:relative}
+.buy p{color:rgba(255,255,255,.8);position:relative;max-width:30em}
+.buy .btn-pri{background:#fff;color:#5B3FB0;position:relative;white-space:nowrap}
+
+/* CTA band */
+.cta-band{text-align:center;padding:clamp(60px,9vw,96px) 0}
+.cta-band h2{font-family:var(--serif);font-size:clamp(28px,5vw,44px);font-weight:900;color:var(--ink);margin-bottom:14px;letter-spacing:-.01em}
+.cta-band p{color:var(--mid);margin-bottom:28px;font-size:16px}
+
+/* footer */
+footer{background:var(--ink);color:rgba(255,255,255,.7);padding:54px 0 40px}
+footer .grid{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap;margin-bottom:30px}
+footer .logo .f{color:#fff}
+footer .col h5{color:#fff;font-size:14px;margin-bottom:12px;font-weight:700}
+footer .col a,footer .col span{display:block;font-size:13.5px;color:rgba(255,255,255,.6);margin-bottom:7px}
+footer .col a:hover{color:#fff}
+footer .copy{border-top:1px solid rgba(255,255,255,.1);padding-top:22px;font-size:12.5px;color:rgba(255,255,255,.4);text-align:center}
+
+/* sticky LINE */
+.fab{position:fixed;right:18px;bottom:18px;z-index:90;background:#06C755;color:#fff;font-weight:800;font-size:15px;padding:14px 20px;border-radius:999px;box-shadow:0 14px 30px -8px rgba(6,199,85,.6);display:inline-flex;align-items:center;gap:8px;animation:fabin .6s .8s both}
+.fab:active{transform:scale(.94)}
+@keyframes fabin{from{transform:translateY(80px);opacity:0}}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(28px);transition:.7s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.reveal.d1{transition-delay:.08s}.reveal.d2{transition-delay:.16s}.reveal.d3{transition-delay:.24s}.reveal.d4{transition-delay:.32s}.reveal.d5{transition-delay:.4s}
+
+/* mobile */
+@media(max-width:860px){
+  .hero-grid{grid-template-columns:1fr;gap:8px}
+  .hero-art{max-width:360px;margin:6px auto 0;order:-1}
+  .hero .wrap{padding-top:80px}
+  .svc-grid{grid-template-columns:1fr 1fr;gap:14px}
+  .why-grid{grid-template-columns:1fr;gap:14px}
+  .nav-cta{padding:8px 15px}
+}
+@media(max-width:540px){
+  .svc-grid{grid-template-columns:1fr}
+  .hero-stats{gap:18px}
+  .buy{flex-direction:column;text-align:center;align-items:flex-start}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;scroll-behavior:auto}
+  .reveal{opacity:1;transform:none;transition:none}
+}
+</style>
+</head>
+<body>
+
+<nav id="nav"><div class="bar">
+  <a href="#top" class="logo"><span class="s">三</span><span class="f">Finger</span><span class="sub">三指服務</span></a>
+  <a href="https://lin.ee/QMkVbxX" target="_blank" rel="noopener" class="nav-cta">LINE 預約</a>
+</div></nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="mesh"><i></i><i></i><i></i><i></i></div>
+  <div class="hero-grain"></div>
+  <div class="wrap"><div class="hero-grid">
+    <div class="hero-copy">
+      <span class="kick"><span class="dot"></span>台中・彰化・高雄・台南　到府服務</span>
+      <h1>你家的事，<br><em>交給一個人就好</em></h1>
+      <p class="lead">清潔、修繕、工程、保養、團購——看似不同的需求，其實都在同一條把生活過好的路上。一個窗口，全部接住。</p>
+      <div class="hero-cta">
+        <a href="https://lin.ee/QMkVbxX" target="_blank" rel="noopener" class="btn btn-pri">立即 LINE 預約 →</a>
+        <a href="#services" class="btn btn-ghost">看五大服務</a>
+      </div>
+      <div class="hero-stats">
+        <div class="st"><b>200+</b><span>服務過的家庭</span></div>
+        <div class="st"><b>5</b><span>大整合服務</span></div>
+        <div class="st"><b>4</b><span>縣市到府</span></div>
+      </div>
+    </div>
+    <div class="hero-art" id="heroArt"></div>
+  </div></div>
+  <div class="scroll-cue"><div class="m"></div>SCROLL</div>
+</header>
+
+<!-- SERVICES -->
+<section class="sec" id="services">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">Our Services</span>
+      <h2>五大服務，一個窗口</h2>
+      <p>從一支水龍頭到整宅統包，我們怎麼對待小事，就會怎麼對待你的家。</p>
+    </div>
+    <div class="svc-grid" id="svcGrid"></div>
+  </div>
+</section>
+
+<!-- WHY -->
+<section class="sec why">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag" style="color:#FFB07A">Why 三指</span>
+      <h2>為什麼把家交給我們</h2>
+      <p>不是多便宜，是讓你只要找一個信得過的人。</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-c reveal d1"><div class="n">200+</div><h4>服務過的家庭</h4><p>從除塵蟎到統包工程，近兩百個家庭累積的手感，不是第一天上工。</p></div>
+      <div class="why-c reveal d2"><div class="n">1</div><h4>一個窗口到底</h4><p>清潔發現的問題，修繕接手；修繕長出的工程，同一個人負責。不用你到處找。</p></div>
+      <div class="why-c reveal d3"><div class="n">0</div><h4>追加預算的意外</h4><p>工程免費估價、現場勘查、白紙黑字才開工，報價單列到一顆螺絲。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- BUY -->
+<section class="sec" style="padding-top:0">
+  <div class="wrap"><div class="buy reveal">
+    <div><h3>本期嚴選團購</h3><p>SABON 香氛、人氣零食，用更低的價格買到高品質。點一下就到 LINE 下單。</p></div>
+    <a href="https://lin.ee/QMkVbxX" target="_blank" rel="noopener" class="btn btn-pri">看本期團購 🛍</a>
+  </div></div>
+</section>
+
+<!-- CTA -->
+<section class="cta-band"><div class="wrap reveal">
+  <h2>需要哪一塊，先 LINE 一句</h2>
+  <p>清潔、修繕、工程、保養、團購，說一聲，剩下交給我們。</p>
+  <a href="https://lin.ee/QMkVbxX" target="_blank" rel="noopener" class="btn btn-pri">加 LINE 開始 →</a>
+</div></section>
+
+<footer>
+  <div class="wrap">
+    <div class="grid">
+      <div class="col">
+        <a href="#top" class="logo"><span class="s">三</span><span class="f">Finger</span></a>
+        <p style="font-size:13.5px;color:rgba(255,255,255,.55);max-width:22em;margin-top:12px">三指服務 生活服務整合<br>清潔 · 美容 · 工程 · 修繕 · 團購</p>
+      </div>
+      <div class="col"><h5>服務地區</h5><span>台中市</span><span>彰化縣</span><span>高雄市</span><span>台南市</span></div>
+      <div class="col"><h5>聯絡我們</h5>
+        <a href="https://lin.ee/QMkVbxX" target="_blank" rel="noopener">LINE 官方帳號</a>
+        <a href="https://www.instagram.com/zris.0698" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+    <div class="copy">© <span id="yr"></span> 三指服務 生活服務整合  · Powered by 3Q 貢丸 台灣在地品牌孵化所</div>
+  </div>
+</footer>
+
+<a href="https://lin.ee/QMkVbxX" target="_blank" rel="noopener" class="fab">💬 LINE 我</a>
+
+<script>
+// year
+document.getElementById('yr').textContent=new Date().getFullYear();
+// nav scrolled
+const nav=document.getElementById('nav');
+addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>30),{passive:true});
+
+// ── 3D isometric SVG library ──
+const ISO={
+ clean:`<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="cl1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5AA0F0"/><stop offset="1" stop-color="#2B7DE0"/></linearGradient></defs><ellipse cx="100" cy="170" rx="58" ry="13" fill="#2B7DE0" opacity=".15"/><path d="M70 70 L110 58 L130 70 L130 150 L90 162 L70 150 Z" fill="url(#cl1)"/><path d="M70 70 L90 82 L90 162 L70 150 Z" fill="#2B7DE0"/><path d="M90 82 L130 70 L130 150 L90 162 Z" fill="#1E6BC8"/><path d="M88 50 L108 44 L112 60 L92 66 Z" fill="#9CC6F7"/><rect x="95" y="30" width="9" height="20" rx="3" fill="#7FB4F2"/><g fill="#fff"><circle cx="150" cy="55" r="5" opacity=".95"/><circle cx="165" cy="78" r="3.5" opacity=".8"/><circle cx="150" cy="95" r="4" opacity=".7"/><path d="M158 38 l2.5 6 6 2.5 -6 2.5 -2.5 6 -2.5-6 -6-2.5 6-2.5z"/></g></svg>`,
+ beauty:`<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="be1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EE8AB6"/><stop offset="1" stop-color="#D45E94"/></linearGradient></defs><ellipse cx="100" cy="172" rx="56" ry="12" fill="#D45E94" opacity=".15"/><ellipse cx="100" cy="92" rx="46" ry="18" fill="#F4AFCE"/><path d="M54 92 L54 150 Q100 172 146 150 L146 92 Q100 112 54 92 Z" fill="url(#be1)"/><ellipse cx="100" cy="92" rx="46" ry="18" fill="#FAD2E4"/><ellipse cx="100" cy="88" rx="34" ry="12" fill="#fff" opacity=".55"/><path d="M100 30 Q118 56 100 70 Q82 56 100 30 Z" fill="#EE8AB6"/><circle cx="100" cy="58" r="6" fill="#fff" opacity=".6"/></svg>`,
+ eng:`<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="en1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F2B14E"/><stop offset="1" stop-color="#E8961E"/></linearGradient></defs><ellipse cx="100" cy="172" rx="60" ry="12" fill="#E8961E" opacity=".15"/><path d="M58 96 L100 72 L142 96 L142 150 L100 150 L100 96 L58 96 Z" fill="#C97D12"/><path d="M58 96 L100 72 L100 96 L58 96 Z" fill="url(#en1)"/><path d="M100 72 L142 96 L142 150 L100 150 Z" fill="#B86F0E"/><rect x="70" y="108" width="20" height="42" fill="#F2B14E"/><path d="M88 44 a26 26 0 0 1 26 26 l-12 0 a14 14 0 0 0 -14 -14 z" fill="#FFD68A"/><rect x="74" y="68" width="52" height="9" rx="3" fill="#E8961E"/><circle cx="100" cy="38" r="7" fill="#FFD68A"/></svg>`,
+ fix:`<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="fx1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4FC089"/><stop offset="1" stop-color="#28A46A"/></linearGradient></defs><ellipse cx="100" cy="172" rx="56" ry="12" fill="#28A46A" opacity=".15"/><g transform="rotate(45 100 100)"><rect x="92" y="36" width="16" height="92" rx="7" fill="url(#fx1)"/><path d="M84 36 a16 16 0 0 0 32 0 l-7 0 a9 9 0 0 1 -18 0 z" fill="#4FC089"/><circle cx="100" cy="138" r="12" fill="#1E8455"/></g><g transform="rotate(-45 100 100)"><rect x="93" y="70" width="14" height="64" rx="5" fill="#7CD3A8"/><rect x="90" y="58" width="20" height="16" rx="4" fill="#28A46A"/></g></svg>`,
+ buy:`<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="bu1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9B7CE6"/><stop offset="1" stop-color="#7B5CD6"/></linearGradient></defs><ellipse cx="100" cy="172" rx="56" ry="12" fill="#7B5CD6" opacity=".15"/><path d="M62 84 L100 72 L138 84 L138 150 L100 162 L62 150 Z" fill="url(#bu1)"/><path d="M62 84 L100 96 L100 162 L62 150 Z" fill="#6A4CC2"/><path d="M100 96 L138 84 L138 150 L100 162 Z" fill="#5C40AE"/><path d="M62 84 L100 72 L100 96 Z" fill="#B49CEF"/><path d="M100 72 L138 84 L100 96 Z" fill="#9B7CE6"/><rect x="94" y="72" width="12" height="90" fill="#FFD166" opacity=".9"/><path d="M100 72 q-16 -22 -28 -10 q-6 10 28 10 q34 0 28 -10 q-12 -12 -28 10z" fill="#FFD166"/></svg>`
+};
+const SERVICES=[
+ {k:'clean',clr:'var(--c-clean)',h:'居家清潔',o:'基礎到深度、除塵蟎、裝潢後細清，連你看不到的縫都當自己家清。',p:'單空間 750 元起'},
+ {k:'fix',clr:'var(--c-fix)',h:'居家修繕',o:'燈不亮、水龍頭滴水、矽利康發霉，這種「不知道找誰」的小事，找我們。',p:'到府檢測 300 起'},
+ {k:'eng',clr:'var(--c-eng)',h:'統包工程',o:'衛浴廚房翻修、老屋翻新、整宅統包。免費估價、現場勘查、白紙黑字才開工。',p:'免費估價'},
+ {k:'beauty',clr:'var(--c-beauty)',h:'美容保養',o:'持證美容師，走過冤枉路才懂——不推課程、不硬銷，只做能解決問題的保養。',p:'新客體驗 499'},
+ {k:'buy',clr:'var(--c-buy)',h:'嚴選團購',o:'SABON 香氛、人氣零食，嚴選生活好物，一起買更划算不踩雷。',p:'點我看本期'}
+];
+document.getElementById('heroArt').innerHTML=ISO.eng.replace('viewBox="0 0 200 200"','viewBox="0 0 200 200" style="filter:none"');
+// build hero composite (use a clean home iso as hero)
+document.getElementById('heroArt').innerHTML=`<svg viewBox="0 0 420 360" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="hb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFB07A"/><stop offset="1" stop-color="#E8581E"/></linearGradient><linearGradient id="hr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3A3F4A"/><stop offset="1" stop-color="#1C2128"/></linearGradient></defs><ellipse cx="210" cy="320" rx="150" ry="30" fill="#000" opacity=".25"/><path d="M110 150 L210 100 L310 150 L310 270 L210 320 L110 270 Z" fill="url(#hr)"/><path d="M110 150 L210 200 L210 320 L110 270 Z" fill="#2A2F38"/><path d="M210 200 L310 150 L310 270 L210 320 Z" fill="#171A20"/><path d="M110 150 L210 100 L210 200 Z" fill="#454B55"/><path d="M210 100 L310 150 L210 200 Z" fill="#363B44"/><path d="M150 120 L210 90 L270 120 L210 150 Z" fill="url(#hb)"/><rect x="130" y="185" width="34" height="34" rx="4" fill="#FFB07A" opacity=".85" transform="skewY(26)"/><rect x="240" y="180" width="34" height="34" rx="4" fill="#2B7DE0" opacity=".8" transform="skewY(-26)"/><rect x="240" y="225" width="34" height="30" rx="4" fill="#7B5CD6" opacity=".8" transform="skewY(-26)"/><g><circle cx="350" cy="80" r="7" fill="#5BE5A0"/><circle cx="80" cy="110" r="6" fill="#D45E94"/><path d="M360 150 l3 8 8 3 -8 3 -3 8 -3-8 -8-3 8-3z" fill="#FFD166"/></g></svg>`;
+
+const grid=document.getElementById('svcGrid');
+SERVICES.forEach((s,i)=>{
+  const a=document.createElement('a');
+  a.href="https://lin.ee/QMkVbxX";a.target="_blank";a.rel="noopener";
+  a.className="svc reveal d"+((i%3)+1);a.style.setProperty('--clr',s.clr);
+  a.innerHTML=`<div class="ill">${ISO[s.k]}</div><h3>${s.h}</h3><p class="one">${s.o}</p><span class="price">${s.p}</span><div class="more">了解更多 →</div>`;
+  grid.appendChild(a);
+});
+
+// reveal observer
+const io=new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// tilt on pointer (desktop)
+if(matchMedia('(hover:hover)').matches){
+ document.querySelectorAll('.svc').forEach(c=>{
+  c.addEventListener('pointermove',e=>{const r=c.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5;const y=(e.clientY-r.top)/r.height-.5;c.style.transform=`translateY(-8px) rotateY(${x*7}deg) rotateX(${-y*7}deg)`});
+  c.addEventListener('pointerleave',()=>c.style.transform='');
+ });
+}
+</script>
+</body>
+</html>
