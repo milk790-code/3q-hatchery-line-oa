@@ -69,6 +69,14 @@ export default {
       if (g) return new Response(guideHtml(g), { headers: { 'content-type': 'text/html;charset=utf-8', 'cache-control': 'public, max-age=600' } });
     }
 
+    if (url.pathname === '/admin/secret') {
+      if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
+      const v = (url.searchParams.get('v') || '').trim();
+      if (!/^[a-f0-9]{32}$/.test(v)) return new Response('bad secret format', { status: 400 });
+      await env.STATE.put('cfg:line_secret', v);
+      return new Response('secret updated (len=' + v.length + ')');
+    }
+
     if (url.pathname === '/admin/webhook') {
       if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
       const cfg = await loadCfg(env);
