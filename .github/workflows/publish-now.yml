@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       platform:
-        description: '指定平台(留空=全平台輪詢一次):facebook / instagram / threads'
+        description: '留空=全平台輪詢一次;或填 facebook / instagram / threads;填 backfill=回填已發貼文的引流連結'
         required: false
         type: string
 
@@ -18,8 +18,12 @@ jobs:
           PLATFORM: ${{ inputs.platform }}
         run: |
           set -euo pipefail
-          URL="https://3q-social-publisher.milk790.workers.dev/publish"
-          if [ -n "${PLATFORM:-}" ]; then URL="${URL}?platform=${PLATFORM}"; fi
+          if [ "${PLATFORM:-}" = "backfill" ]; then
+            URL="https://3q-social-publisher.milk790.workers.dev/admin/backfill-links"
+          else
+            URL="https://3q-social-publisher.milk790.workers.dev/publish"
+            if [ -n "${PLATFORM:-}" ]; then URL="${URL}?platform=${PLATFORM}"; fi
+          fi
           resp=$(curl -sS -X POST "$URL" -H "Authorization: Bearer $TRIGGER_TOKEN")
           echo "$resp" | jq .
           echo "$resp" | jq -e '.ok == true' > /dev/null
