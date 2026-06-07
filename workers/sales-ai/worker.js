@@ -275,10 +275,38 @@ h1 em{color:#d9a441;font-style:normal}
 .cta:active{transform:scale(.98)}
 .note{color:#67748a;font-size:12px;text-align:center;margin-bottom:30px}
 h2{font-size:18px;margin:26px 0 10px;color:#d9a441}
+/* ── 3D HERO(GPU only:transform/opacity;reduced-motion 全停)── */
+.hero3d{position:relative;height:240px;perspective:1000px;margin:6px 0 18px;overflow:hidden;border-radius:16px}
+.cubewrap{position:absolute;left:50%;top:50%;transform:translate(-50%,-54%);width:150px;height:150px;perspective:900px}
+.cube{width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:spin 14s cubic-bezier(.4,0,.2,1) infinite}
+.face{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#d9a441;background:linear-gradient(160deg,#1a2230,#0e1218);border:1px solid #d9a44155;border-radius:14px;box-shadow:0 0 34px #d9a44126, inset 0 0 26px #0009;backface-visibility:hidden}
+.f1{transform:rotateY(0deg) translateZ(75px)}
+.f2{transform:rotateY(90deg) translateZ(75px)}
+.f3{transform:rotateY(180deg) translateZ(75px)}
+.f4{transform:rotateY(270deg) translateZ(75px)}
+.f5{transform:rotateX(90deg) translateZ(75px);background:#0c1016}
+.f6{transform:rotateX(-90deg) translateZ(75px);background:#0c1016}
+@keyframes spin{0%,18%{transform:rotateX(-12deg) rotateY(0)}25%,43%{transform:rotateX(-12deg) rotateY(-90deg)}50%,68%{transform:rotateX(-12deg) rotateY(-180deg)}75%,93%{transform:rotateX(-12deg) rotateY(-270deg)}100%{transform:rotateX(-12deg) rotateY(-360deg)}}
+.glowfloor{position:absolute;left:50%;bottom:8px;width:240px;height:40px;transform:translateX(-50%);background:radial-gradient(ellipse at center,#d9a44133,transparent 70%);filter:blur(4px)}
+.p3{position:absolute;bottom:-8px;width:5px;height:5px;border-radius:50%;background:#d9a441;opacity:0;animation:rise 7s linear infinite}
+.p3:nth-child(1){left:12%;animation-delay:0s}.p3:nth-child(2){left:28%;animation-delay:1.8s}.p3:nth-child(3){left:46%;animation-delay:3.1s}.p3:nth-child(4){left:64%;animation-delay:.9s}.p3:nth-child(5){left:80%;animation-delay:2.4s}.p3:nth-child(6){left:92%;animation-delay:4.2s}
+@keyframes rise{0%{transform:translateY(0) scale(1);opacity:0}12%{opacity:.85}100%{transform:translateY(-225px) scale(.25);opacity:0}}
+.in1,.in2,.in3{opacity:0;transform:translateY(16px);animation:inup .8s cubic-bezier(.2,.7,.3,1) forwards}
+.in2{animation-delay:.18s}.in3{animation-delay:.36s}
+@keyframes inup{to{opacity:1;transform:translateY(0)}}
+.card{transition:transform .35s cubic-bezier(.2,.7,.3,1),box-shadow .35s}
+.card:active,.card:hover{transform:perspective(700px) rotateX(4deg) translateY(-3px);box-shadow:0 14px 36px -14px #d9a44140}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}.in1,.in2,.in3{opacity:1;transform:none}}
+
 </style></head><body><div class="wrap">
-<div class="tag">3Q 台灣在地品牌孵化所</div>
-<h1>客人掏手機查的那 30 秒,<br><em>查得到的那家店贏了。</em></h1>
-<p class="sub">餐飲、美業、手作、寵物、汽美——你的生意卡住,通常是這三件缺一件:</p>
+<div class="tag in1">3Q 台灣在地品牌孵化所</div>
+<div class="hero3d in1"><div class="cubewrap"><div class="cube">
+<div class="face f1">被找到</div><div class="face f2">被相信</div><div class="face f3">被下單</div><div class="face f4">3Q</div><div class="face f5"></div><div class="face f6"></div>
+</div></div><div class="glowfloor"></div>
+<div class="p3"></div><div class="p3"></div><div class="p3"></div><div class="p3"></div><div class="p3"></div><div class="p3"></div>
+</div>
+<h1 class="in2">客人掏手機查的那 30 秒,<br><em>查得到的那家店贏了。</em></h1>
+<p class="sub in3">餐飲、美業、手作、寵物、汽美——你的生意卡住,通常是這三件缺一件:</p>
 <div class="card"><b>被找到</b>——客人搜尋的時候,有你嗎?</div>
 <div class="card"><b>被相信</b>——找到了,但作品、評價撐得起來嗎?</div>
 <div class="card"><b>被下單</b>——想買了,動線會不會讓他放棄?</div>
@@ -308,10 +336,15 @@ h1 span{color:#d9a441}
 .g{background:#11151c;border:1px solid #2a3242;border-radius:12px;padding:14px;font-size:14px}
 .g b{display:block;color:#d9a441;margin-bottom:4px;font-size:15px}
 .cta{display:inline-block;background:#06c755;color:#fff;font-weight:800;border-radius:10px;padding:10px 18px;text-decoration:none;font-size:15px;margin-bottom:22px}
+.g{transition:transform .35s cubic-bezier(.2,.7,.3,1),box-shadow .35s}
+.g:hover,.g:active{transform:perspective(700px) rotateX(5deg) translateY(-4px);box-shadow:0 14px 32px -14px #d9a44150}
+.in1,.in2{opacity:0;transform:translateY(14px);animation:inup .7s cubic-bezier(.2,.7,.3,1) forwards}.in2{animation-delay:.15s}
+@keyframes inup{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.in1,.in2{opacity:1;transform:none}}
 </style></head><body><div class="wrap">
-<h1>3Q 掘計畫 <span>— 免費做官網,做給你看</span></h1>
+<h1 class="in1">3Q 掘計畫 <span>— 免費做官網,做給你看</span></h1>
 <p class="sub">台灣在地品牌孵化所・幫實體店家被找到、被相信、被下單</p>
-<div class="grid">
+<div class="grid in2">
 <div class="g"><b>第一步免費</b>官網先做給你看,喜歡再合作,不用先賭一筆錢。</div>
 <div class="g"><b>每行業只收一位</b>同行就不再收,做得對才敢做給你看。</div>
 <div class="g"><b>做完有人管</b>官網+24 小時 AI 接客+看得懂的獲客路線圖。</div>
