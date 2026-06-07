@@ -303,8 +303,16 @@ export default {
       if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
       const cfg = await getCfg(env);
       if (!cfg.lineToken) return new Response('no token', { status: 503 });
+      if (url.searchParams.get('test') === '1') {   // 真預覽:只發給老闆本人的 LINE
+        if (!cfg.ownerId) return new Response(JSON.stringify({ error: '尚未綁定老闆(對 bot 說「我是老闆」)' }), { status: 503, headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+        const r = await fetch('https://api.line.me/v2/bot/message/push', {
+          method: 'POST', headers: { 'Authorization': 'Bearer ' + cfg.lineToken, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ to: cfg.ownerId, messages: BROADCAST_PRESET }),
+        });
+        return new Response(JSON.stringify({ test_sent: r.ok, status: r.status, note: '已發到你自己的 LINE(只有你收到)。看排版滿意,網址改 &go=1 正式群發。' }, null, 2), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+      }
       if (url.searchParams.get('go') !== '1') {
-        return new Response(JSON.stringify({ preview: true, note: '這是預覽。確認內容後在網址加 &go=1 正式群發(對全部好友、不可收回)', messages: BROADCAST_PRESET }, null, 2), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+        return new Response(JSON.stringify({ preview: true, note: '加 &test=1 先發給自己看真實排版;確認後加 &go=1 正式群發(全部好友、不可收回)', messages: BROADCAST_PRESET }, null, 2), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
       }
       const r = await fetch('https://api.line.me/v2/bot/message/broadcast', {
         method: 'POST', headers: { 'Authorization': 'Bearer ' + cfg.lineToken, 'Content-Type': 'application/json' },
