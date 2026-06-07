@@ -27,6 +27,9 @@ html,body{background:var(--bg);font-family:'Noto Sans TC',system-ui,sans-serif;c
 .btn:active{background:var(--brand-dark)}
 .note{background:#FEF0E8;border-left:4px solid var(--brand);border-radius:12px;padding:14px 16px;font-size:12.5px;line-height:1.8;color:var(--body);margin:18px 0}
 .foot{text-align:center;color:var(--mid);font-size:11px;line-height:1.8;padding:24px 16px}
+.spec{font-size:11.5px;color:var(--mid);font-weight:400;margin-left:2px}
+.strike{text-decoration:line-through;color:var(--mid);font-size:12px;font-weight:400}
+.inote{font-size:11.5px;color:var(--brand);margin-top:2px}
 </style>
 </head>
 <body>
@@ -51,33 +54,33 @@ const OA_ID = '%40121lkspe'; // 收單 LINE OA（三指自有 OA 開通後改這
 const DATA = {
   period: '2026-06',
   cats: [
-    {name: 'SABON 香氛保養', items: [
-      {n:'SABON 沐浴油 500ml 附壓頭（白茶／經典／玫瑰茶語／茉莉花語）', p:999},
-      {n:'SABON 限定沐浴油 500ml（綠玫瑰／盛宴橄欖／橙花漫舞）', p:1050},
-      {n:'SABON 沐浴油 300ml（香芒奇異果）', p:900},
-      {n:'SABON 泡澡油', p:1390},
-      {n:'SABON 白茶身體磨砂膏 600g', p:1599},
-      {n:'SABON 身體磨砂膏 320g（香芒奇異果）', p:1399},
-      {n:'SABON 沁心薄荷死海鹽頭皮磨砂膏 300g', p:1599},
-      {n:'SABON 茉莉花語香氛保養組', p:2199},
-      {n:'SABON 絲綢身體乳液 50ml×2 限量雙瓶組', p:460},
-      {n:'SABON 白茶春光限定組', p:1280}
-    ]},
     {name: '人氣零食', items: [
-      {n:'薯條三兄弟', p:329},
-      {n:'辛拉麵 5 入', p:155},
-      {n:'海苔脆片', p:159},
-      {n:'神戶可可塊', p:139}
+      {n:'薯條三兄弟', spec:'盒', p:329},
+      {n:'辛拉麵', spec:'一袋 5 包', p:140, note:'優惠價'},
+      {n:'海苔脆片', spec:'包', p:159},
+      {n:'神戶可可塊', spec:'盒', p:139},
+      {n:'大同國際巧克力玉米酥', spec:'40g／包', p:20, note:'任選 2 包 39｜3 包 58｜5 包 95'},
+      {n:'大同國際麥香雞全家餐', spec:'40g／包', p:20, note:'任選 2 包 39｜3 包 58｜5 包 95'},
+      {n:'大同國際玉米濃湯餅乾', spec:'40g／包', p:20, note:'任選 2 包 39｜3 包 58｜5 包 95'}
+    ]},
+    {name: 'SABON 香氛保養', items: [
+      {n:'SABON 泡澡油', spec:'200ml', p:1390, op:1580, note:'團購價'},
+      {n:'SABON 沐浴油', spec:'500ml，附壓頭', p:999},
+      {n:'SABON 限定款沐浴油', spec:'500ml', p:1050, note:'限定款'}
     ]}
   ]
 };
+
 const list = document.getElementById('list');
 DATA.cats.forEach(cat => {
   const h = document.createElement('div'); h.className='cat'; h.textContent = cat.name; list.appendChild(h);
   cat.items.forEach(it => {
     const msg = encodeURIComponent('我要+1：' + it.n);
     const card = document.createElement('div'); card.className='item';
-    card.innerHTML = '<div class="info"><div class="name">'+it.n+'</div><div class="price">NT$'+it.p.toLocaleString()+'</div></div>'+
+    var meta = it.spec ? '<span class="spec">'+it.spec+'</span>' : '';
+    var price = (it.op ? '<span class="strike">NT$'+it.op.toLocaleString()+'</span> ' : '')+'NT$'+it.p.toLocaleString();
+    var note = it.note ? '<div class="inote">'+it.note+'</div>' : '';
+    card.innerHTML = '<div class="info"><div class="name">'+it.n+' '+meta+'</div><div class="price">'+price+'</div>'+note+'</div>'+
       '<a class="btn" href="https://line.me/R/oaMessage/'+OA_ID+'/?'+msg+'" target="_blank" rel="noopener">我要 +1</a>';
     list.appendChild(card);
   });
