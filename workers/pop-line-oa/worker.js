@@ -259,7 +259,7 @@ async function handleSetup(req, env, url) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     if (url.pathname === '/setup') return handleSetup(request, env, url);
     if (url.pathname === '/admin/evolve') { const cfg = await getCfg(env); return handleEvolve(env, cfg, url); }
@@ -327,11 +327,17 @@ export default {
       const valid = await verifyLineSignature(body, request.headers.get('x-line-signature'), cfg.lineSecret);
       if (!valid) { await env.SESSION?.put('dbg:last_badsig', new Date().toISOString()).catch(() => {}); return new Response('bad signature', { status: 403 }); }
       await env.SESSION?.put('dbg:last_oksig', new Date().toISOString()).catch(() => {});  // 偵測:簽名通過
-      await ensureTables(env);
       const data = JSON.parse(body);
-      for (const ev of (data.events || [])) {
-        await handleEvent(ev, env, cfg).catch(e => console.error('[pop-line] event', e.message));
-      }
+      // ⚡ 土地公模式:先回 200 讓 LINE 安心,AI 思考放背景跑(LINE 等不到回應會掛斷並處決 worker)
+      ctx.waitUntil((async () => {
+        await ensureTables(env);
+        for (const ev of (data.events || [])) {
+          await handleEvent(ev, env, cfg).catch(async (e) => {
+            console.error('[pop-line] event', e.message);
+            await env.SESSION?.put('dbg:last_error', e.message + ' @' + new Date().toISOString()).catch(() => {});
+          });
+        }
+      })());
       return new Response('ok');
     }
     return new Response('pop-monster line bot (seed ' + SEED_VER + '). /setup?key=... to configure.', { status: 200 });
