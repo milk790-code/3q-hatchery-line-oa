@@ -284,13 +284,16 @@ export default {
       const cfg = await getCfg(env);
       let insights = 0;
       if (env.CRM) { try { const r = await env.CRM.prepare("SELECT COUNT(*) n FROM seed_insights").first(); insights = r?.n || 0; } catch (_) {} }
-      return new Response(JSON.stringify({ ok: true, worker: 'pop-line-oa', seed: SEED_VER, secret: !!cfg.lineSecret, token: !!cfg.lineToken, ai: cfg.anthropicKey ? 'claude-sonnet-4-6' : 'workers-ai-70b', owner: !!cfg.ownerId, crm: !!env.CRM, evolved_insights: insights }), { headers: { 'Content-Type': 'application/json' } });
+      const [lp, lb, lo] = await Promise.all([env.SESSION?.get('dbg:last_post'), env.SESSION?.get('dbg:last_badsig'), env.SESSION?.get('dbg:last_oksig')]);
+      return new Response(JSON.stringify({ ok: true, worker: 'pop-line-oa', seed: SEED_VER, secret: !!cfg.lineSecret, token: !!cfg.lineToken, ai: cfg.anthropicKey ? 'claude-sonnet-4-6' : 'workers-ai-70b', owner: !!cfg.ownerId, crm: !!env.CRM, evolved_insights: insights, dbg: { last_post: lp || null, last_badsig: lb || null, last_oksig: lo || null } }), { headers: { 'Content-Type': 'application/json' } });
     }
     if (url.pathname === '/webhook' && request.method === 'POST') {
+      await env.SESSION?.put('dbg:last_post', new Date().toISOString()).catch(() => {});   // 偵測:LINE 有敲門
       const cfg = await getCfg(env);
       const body = await request.text();
       const valid = await verifyLineSignature(body, request.headers.get('x-line-signature'), cfg.lineSecret);
-      if (!valid) return new Response('bad signature', { status: 403 });
+      if (!valid) { await env.SESSION?.put('dbg:last_badsig', new Date().toISOString()).catch(() => {}); return new Response('bad signature', { status: 403 }); }
+      await env.SESSION?.put('dbg:last_oksig', new Date().toISOString()).catch(() => {});  // 偵測:簽名通過
       await ensureTables(env);
       const data = JSON.parse(body);
       for (const ev of (data.events || [])) {
