@@ -368,7 +368,7 @@ add('你好,我是 3Q 的接待。想了解掘計畫、免費官網,或先做個
 
 const PAGE_DCARD = `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
-<title>Dcard 發文指令包|3Q 內部工具</title>
+<title>Dcard 公開揭露發文包|3Q 內部工具</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0c0f14;color:#e8edf5;font-family:"Noto Sans TC",system-ui,sans-serif;line-height:1.7;padding:24px 16px 60px}
@@ -383,60 +383,65 @@ h1{font-size:22px;margin-bottom:4px}h1 span{color:#d9a441}
 .copy{margin-top:8px;background:#d9a441;border:0;border-radius:8px;padding:8px 16px;font-weight:700;color:#14110a;cursor:pointer;font-size:13px}
 .copy.ok{background:#06c755;color:#fff}
 .steps{font-size:13px;color:#9aa7ba;margin-top:12px;border-top:1px dashed #2a3242;padding-top:10px}
-.warn{background:#2a1d10;border:1px solid #5a3d28;border-radius:10px;padding:12px;font-size:13px;color:#e8b88a;margin-bottom:18px}
+.rule{background:#10261a;border:1px solid #1f5a3d;border-radius:10px;padding:12px;font-size:13px;color:#8ae0b0;margin-bottom:18px}
 </style></head><body><div class="wrap">
-<h1>Dcard 發文指令包 <span>v1</span></h1>
-<p class="sub">Dcard 無發文 API+板規禁自動化 → 半自動:複製 → 開 Dcard → 貼上發布。每天最多 1 篇、隔天換板,不同板不同文。</p>
-<div class="warn">⚠ 發文鐵則:誠實視角(我在做這個服務),價值給足,文末輕 CTA。絕不偽裝無關路人、絕不放短連結(會被檢舉)。留言有人問再回 LINE ID。</div>
+<h1>Dcard 公開揭露發文包 <span>v2</span></h1>
+<p class="sub">原則:每篇開頭就表明「我是做這項服務的業者」。誠實揭露的乾貨內容,多數看板允許;隱藏意圖的假分享=違規,本工具不做。</p>
+<div class="rule">✅ 這版的鐵則:① 第一段就亮業者身分,不假裝中立路人 ② 內容真的有用,不灌水 ③ 想放 LINE 就光明正大放在文末「利益揭露」段 ④ 發文前讀一次該板板規,有「禁廣告/須標 #業配」就遵守或改發允許的板 ⑤ 同一篇別到處重貼。這不是規避偵測,是基本尊重。</div>
 
-<div class="kit"><h2>指令包 1|創業板</h2><div class="meta">建議時段:週一~四 12:00–13:00 或 21:00–22:00</div>
-<div class="field">標題(點按複製)</div><div class="box" id="t1">幫二十幾家小店做完官網後,整理出店家被客人找到的三件事</div><button class="copy" data-t="t1">複製標題</button>
-<div class="field">內文</div><div class="box" id="b1">我自己在做幫實體店家架官網跟獲客系統的服務,這兩年陸陸續續做了二十幾家(餐飲、美甲、寵物、汽美都有),發現生意卡住的店,幾乎都是這三件缺一件:
+<div class="kit"><h2>發文包 1|創業板</h2><div class="meta">先確認創業板是否允許業者分享;不確定就先站內信問板主</div>
+<div class="field">標題</div><div class="box" id="t1">[心得] 我是做店家官網的,分享幫二十幾家小店後看到的三個共通問題</div><button class="copy" data-t="t1">複製標題</button>
+<div class="field">內文</div><div class="box" id="b1">先說明:我自己是在做「幫實體店家架官網+獲客系統」的業者(文末有揭露),這篇不是中立第三方,是業者視角的觀察,大家斟酌參考。
 
-1. 被找到——客人現在找店第一個動作是掏手機查。你 Google 自己的店名+服務,如果第一頁沒有你,客人就去了查得到的那家。
+這兩年做了二十幾家(餐飲、美甲、寵物、汽美都有),發現生意卡住的店幾乎都是這三件缺一件:
 
-2. 被相信——找到了,但頁面上沒作品、沒評價、資訊過期,客人會默默關掉。不是你不好,是他沒有理由相信你。
+1. 被找到——客人找店第一個動作是掏手機查。Google 自己的店名+服務,第一頁沒有你,客人就去了查得到的那家。
+2. 被相信——找到了,但沒作品、沒評價、資訊過期,客人默默關掉。
+3. 被下單——想買了卻要私訊等半天、訂位要打電話,動線多一步流失一半。
 
-3. 被下單——想買了,結果要私訊等半天、訂位要打電話。動線多一步,流失一半。
+自己就能做的檢查:用無痕視窗把自己當客人走一次完整流程,卡在哪步先補哪步。這些不用找人也能改善,分享給需要的人。
 
-自我檢查方法很簡單:用無痕模式搜自己的店,把自己當客人走一次整個流程,卡在哪一步就先補哪裡。
+— 利益揭露 —
+我是 3Q,提供上述服務(第一步免費做官網初版給店家看)。有需要可以 LINE 找我:@121lkspe。沒需要的話,上面的方法自己用也完全 OK。</div><button class="copy" data-t="b1">複製內文</button>
+<div class="steps">步驟:讀創業板板規 → 確認允許業者分享(或站內信問板主)→ 發文 → 貼上 → 若板規要求標註就加 #業者分享 之類標籤。</div></div>
 
-我們入行的做法是第一步先免費做給店家看(做得對才敢這樣收客人),所以看過很多店的真實數據。有什麼想問的歡迎留言,我都會回。</div><button class="copy" data-t="b1">複製內文</button>
-<div class="steps">步驟:開 Dcard → 創業板 → 發文 → 貼標題+內文 → 不放連結 → 發布。留言有人問服務再回:「我們在做這個,LINE 搜 @121lkspe 或私我」。</div></div>
+<div class="kit"><h2>發文包 2|美妝板(美業向)</h2><div class="meta">美妝板對商業內容較敏感,務必先看板規;不允許就改發到適合的板或自己 IG</div>
+<div class="field">標題</div><div class="box" id="t2">[心得] 做店家官網的業者,聊聊美甲美睫師的作品集放哪裡最有效</div><button class="copy" data-t="t2">複製標題</button>
+<div class="field">內文</div><div class="box" id="b2">利益揭露在前:我是做店家官網/接單系統的業者,以下是工作中觀察到的,給美業朋友參考。
 
-<div class="kit"><h2>指令包 2|美妝板(美業向)</h2><div class="meta">建議時段:週三~五 20:00–22:00</div>
-<div class="field">標題</div><div class="box" id="t2">做美甲美睫的朋友,你的作品集還鎖在手機相簿嗎</div><button class="copy" data-t="t2">複製標題</button>
-<div class="field">內文</div><div class="box" id="b2">工作關係接觸很多美甲師美睫師(我做店家官網跟接單系統的),發現一個很可惜的共同點:作品都超強,但全部躺在手機相簿和限動裡。
+接觸很多美甲師美睫師,共同的可惜點:作品超強,但全躺在手機相簿和限動。客人決定約誰的流程是 IG 看到 → Google 搜你 → 找作品集 → 找價目 → 找預約方式,中間斷一格就流失。
 
-客人決定約誰的流程其實是:IG 看到 → Google 搜你 → 找作品集 → 找價目 → 找怎麼預約。中間斷一格,她就回去滑下一個了。
-
-幾個我看過有效的做法,自己就能弄:
-- 作品集放一個固定連結(精選 20 張就好,不用全放),IG 簡介掛上去
+自己就能做的三件:
+- 作品集放一個固定連結(精選 20 張),IG 簡介掛上去
 - 價目表做成一張圖,別讓客人用問的
-- 預約動線越短越好,最好點一下就到表單或 LINE
+- 預約動線越短越好,點一下到表單或 LINE
 
-做了這三件,空檔通常肉眼可見地變少。我們是有在幫店家做整套的(第一步免費做給你看),但上面這三件自己動手也完全可以。有問題留言聊。</div><button class="copy" data-t="b2">複製內文</button>
-<div class="steps">步驟:開 Dcard → 美妝板 → 發文 → 貼上 → 發布。同樣不放連結,留言區再導。</div></div>
+做了通常空檔肉眼可見變少。這些自己動手就行,不一定要找人。
 
-<div class="kit"><h2>指令包 3|工作板(開店/接案向)</h2><div class="meta">建議時段:週日~一 21:00–23:00</div>
-<div class="field">標題</div><div class="box" id="t3">開店的人最常後悔的不是錢花太多,是這件事做太晚</div><button class="copy" data-t="t3">複製標題</button>
-<div class="field">內文</div><div class="box" id="b3">做店家數位化服務的,分享一個重複看到的劇本:
+— 揭露 —
+我是 3Q,有在幫店家做整套(第一步免費做給你看)。需要再找我 LINE @121lkspe,不需要也希望上面對你有用。</div><button class="copy" data-t="b2">複製內文</button>
+<div class="steps">步驟:先讀美妝板板規。若禁商業內容→改發到允許的板,或發自己 IG/部落格(自家管道推廣本來就正當)。</div></div>
 
-店開了半年一年,東西好、回頭客也有,但新客就是進不來。老闆這時候才開始想「是不是該弄個官網、弄個線上預約」——然後發現競品早就把搜尋第一頁佔走了。
+<div class="kit"><h2>發文包 3|工作板(開店/接案向)</h2><div class="meta">開頭即揭露業者身分</div>
+<div class="field">標題</div><div class="box" id="t3">[心得] 業者視角:開店的人最常後悔太晚做的一件事</div><button class="copy" data-t="t3">複製標題</button>
+<div class="field">內文</div><div class="box" id="b3">先揭露:我是做店家數位化服務的業者,這篇是業者觀察,不是中立評論。
 
-網路上的位置跟店面的位置一樣,是先到先贏的。差別是店租每個月都要繳,網路上的位置佔下來之後成本趨近於零。
+重複看到的劇本:店開了半年一年,東西好、回頭客有,但新客進不來。老闆這時才想弄官網、線上預約,卻發現競品早就佔住搜尋第一頁。
 
-如果你正要開店或剛開店,我的建議順序:
+網路位置跟店面位置一樣先到先贏,差別是店租月月繳、網路位置佔下後成本趨近零。
+
+要開店/剛開店的建議順序(預算有限就照這個):
 1. Google 商家檔案先建好(免費,十分鐘)
-2. 一頁式官網,放清楚你是誰、賣什麼、怎麼買
-3. 社群帳號至少活著,一週一更也行
+2. 一頁式官網,寫清楚你是誰、賣什麼、怎麼買
+3. 社群至少活著,一週一更也行
 
-預算有限就照這個順序,效果最大。我們公司是做這塊的,第一步免費幫店家做官網初版(看完喜歡再談合作),所以這些是實戰結論不是理論。問題歡迎留言。</div><button class="copy" data-t="b3">複製內文</button>
-<div class="steps">步驟:開 Dcard → 工作板 → 發文 → 貼上 → 發布。</div></div>
+— 利益揭露 —
+我是 3Q,提供這類服務(第一步免費幫店家做官網初版)。這些是我實戰看到的,不是理論。需要 LINE 我 @121lkspe;自己照著做也完全可以。</div><button class="copy" data-t="b3">複製內文</button>
+<div class="steps">步驟:讀工作板板規 → 發文 → 貼上。</div></div>
 
-<p class="sub">節奏:每天最多 1 篇、三個板輪流、同文勿重發。發完把連結貼給 Claude,記錄成效進日報。</p>
+<p class="sub">節奏建議:有真的想分享的內容才發,不為發而發。三篇是不同主題不同板,不是同文輪貼。發完把連結貼給 Claude 記錄。</p>
 </div>
 <script>
 document.querySelectorAll('.copy').forEach(b=>{b.onclick=async()=>{const el=document.getElementById(b.dataset.t);await navigator.clipboard.writeText(el.textContent);b.textContent='已複製';b.classList.add('ok');setTimeout(()=>{b.textContent=b.dataset.t.startsWith('t')?'複製標題':'複製內文';b.classList.remove('ok')},1600);};});
-</script></body></html>`;
+</script></body></html>`
 
