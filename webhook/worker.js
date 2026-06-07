@@ -1,7 +1,8 @@
 // Cloudflare Worker — LINE OA webhook for 3Q Hatchery.
-// v3.6 — A: lead scoring, owner quick-reply Flex, booking flow
+// v3.7 — A: lead scoring, owner quick-reply Flex, booking flow
 //         B: rich menu switching, member card, subscriber list + seasonal push
 //         + 15 Rich Menu keyword routes + project status query
+//         C: referral system — 引薦碼 auto-track, milestone rewards, viral invite on won
 //
 // Env vars required:
 //   LINE_CHANNEL_ACCESS_TOKEN   LINE_CHANNEL_SECRET   PNG_BASE_URL
@@ -69,8 +70,6 @@ const AUTO_REPLIES = [
     response: '想看報價？告訴我：\n1. 你的店類型\n2. 預算範圍\n3. 期待時程\n\n我會給你客製試算。' },
   { keywords: ['VIP 資源庫', 'VIP資源庫'],
     response: 'VIP 資源庫整理中…\n預計 v3.7 推出：\n• 行銷模板庫\n• 拍攝指南\n• 顧問月報\n\n敬請期待。' },
-  { keywords: ['介紹新客戶'],
-    response: '介紹朋友來孵化？\n• 你的專屬推薦碼：（v3.7 推出）\n• 朋友成交，你獲得免費品牌健診\n\n先聯絡顧問，我們手動登記。' },
 ];
 
 const SEASONS = [
@@ -486,7 +485,13 @@ async function updateInquiryStatus(uid, status, env) {
     await env.CRM.prepare(
       'UPDATE inquiries SET status = ? WHERE id = (SELECT id FROM inquiries WHERE user_id = ? ORDER BY id DESC LIMIT 1)'
     ).bind(status, uid).run();
-    if (status === 'won')       await updateMemberTier(uid, 'partner',  env);
+    if (status === 'won') {
+      await updateMemberTier(uid, 'partner', env);
+      await Promise.allSettled([
+        checkAndGrantReferralReward(uid, env),
+        sendReferralInvite(uid, env),
+      ]);
+    }
     if (status === 'contacted') await updateMemberTier(uid, 'inquired', env);
   } catch (err) {
     console.error('updateInquiryStatus failed:', err.message);
@@ -526,6 +531,107 @@ async function saveSocialEvent(data, env) {
     console.error('saveSocialEvent failed:', err.message);
     return null;
   }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// v3.7: Referral system
+// ─────────────────────────────────────────────────────────────────────────
+
+function uidToCode(uid) {
+  // Deterministic 6-char base36 code from LINE uid (collision-safe at <1M users)
+  const hex = (uid.startsWith('U') ? uid.slice(1, 9) : uid.slice(0, 8)).replace(/[^0-9a-f]/gi, '0');
+  const n = parseInt(hex, 16) % Math.pow(36, 6);
+  return n.toString(36).toUpperCase().padStart(6, '0');
+}
+
+async function getReferralCode(uid, env) {
+  if (!env.SESSION) return null;
+  const stored = await env.SESSION.get(`referral:user:${uid}:code`);
+  if (stored) return stored;
+  const code = uidToCode(uid);
+  await Promise.all([
+    env.SESSION.put(`referral:user:${uid}:code`, code),
+    env.SESSION.put(`referral:code:${code}`, uid),
+  ]);
+  return code;
+}
+
+async function getUserByCode(code, env) {
+  if (!env.SESSION) return null;
+  return env.SESSION.get(`referral:code:${code}`);
+}
+
+async function saveReferral(referrerUid, inviteeUid, code, env) {
+  if (!env.CRM) return;
+  try {
+    await env.CRM.prepare(
+      'INSERT OR IGNORE INTO referrals (referrer_uid, invitee_uid, code) VALUES (?, ?, ?)'
+    ).bind(referrerUid, inviteeUid, code).run();
+  } catch (e) { console.error('saveReferral failed:', e.message); }
+}
+
+async function checkAndGrantReferralReward(inviteeUid, env) {
+  if (!env.CRM || !env.LINE_CHANNEL_ACCESS_TOKEN) return;
+  let row;
+  try {
+    row = await env.CRM.prepare(
+      'SELECT id, referrer_uid, reward_granted FROM referrals WHERE invitee_uid = ? AND converted = 0'
+    ).bind(inviteeUid).first();
+  } catch { return; }
+  if (!row) return;
+
+  await env.CRM.prepare('UPDATE referrals SET converted = 1 WHERE id = ?').bind(row.id).run().catch(() => {});
+  if (row.reward_granted) return;
+  await env.CRM.prepare('UPDATE referrals SET reward_granted = 1 WHERE id = ?').bind(row.id).run().catch(() => {});
+
+  let count = 1;
+  try {
+    const r = await env.CRM.prepare(
+      'SELECT COUNT(*) AS n FROM referrals WHERE referrer_uid = ? AND converted = 1'
+    ).bind(row.referrer_uid).first();
+    count = r?.n || 1;
+  } catch {}
+
+  const rewardMsg = count >= 5
+    ? `你已成功引薦 ${count} 位夥伴！\n\n恭喜成為 3Q 超級引薦人 🏆\n請聯絡顧問領取專屬禮遇。`
+    : count === 3
+    ? `你已成功引薦 3 位！\n\n里程碑禮：服務升級點數 🔥\n繼續引薦，5 位有大禮。`
+    : `你引薦的朋友成交了！\n\n首位成交禮：品牌健診加值一次 🎁\n累積 3 位 → 服務升級點數。`;
+
+  await fetch('https://api.line.me/v2/bot/message/push', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ to: row.referrer_uid, messages: [{ type: 'text', text: rewardMsg }] }),
+  }).catch(() => {});
+
+  if (env.OWNER_USER_ID) {
+    await fetch('https://api.line.me/v2/bot/message/push', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        to: env.OWNER_USER_ID,
+        messages: [{ type: 'text', text: `🔗 引薦成交\n引薦人UID：${row.referrer_uid}\n累積成交：${count} 位\n已自動推播獎勵。` }],
+      }),
+    }).catch(() => {});
+  }
+}
+
+async function sendReferralInvite(uid, env) {
+  if (!env.LINE_CHANNEL_ACCESS_TOKEN) return;
+  const code = await getReferralCode(uid, env);
+  if (!code) return;
+  const shareText = `「我在用 3Q 孵化所幫品牌做官網，第一步完全免費。台灣每個行業只收一位，先搶先贏。加入後傳引薦碼 ${code}，你能拿到更完整的免費版本。」`;
+  await fetch('https://api.line.me/v2/bot/message/push', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      to: uid,
+      messages: [{
+        type: 'text',
+        text: `歡迎正式加入 3Q 孵化所夥伴！🎉\n\n你有 3 個引薦名額。\n你的專屬引薦碼：${code}\n\n複製這段訊息給你覺得需要被看見的朋友：\n———\n${shareText}\n———\n\n朋友成交，你得品牌健診加值一次。\n累積 3 位成交 → 服務升級點數。`,
+      }],
+    }),
+  }).catch(() => {});
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -1085,11 +1191,27 @@ export default {
 async function handleEvent(ev, env) {
   const uid = ev.source?.userId;
 
+  // 加入群組/聊天室 → 記下 ID 作為每日抽獎群播目標(group:main)
+  if (ev.type === 'join') {
+    const gid = ev.source?.groupId || ev.source?.roomId;
+    if (gid && env.SESSION) await env.SESSION.put('group:main', gid);
+    return replyMsg(ev.replyToken, [{ type: 'text', text: '已連結這個群組。\n之後每日抽獎結果會自動公布在這裡。' }], env);
+  }
+  // 群內手動綁定備援:有人傳「綁定本群」就更新 group:main(萬一 join 事件漏接)
+  if (ev.type === 'message' && ev.message?.type === 'text' && (ev.source?.groupId || ev.source?.roomId) && /綁定本群|綁定群組/.test(ev.message.text || '')) {
+    const gid = ev.source.groupId || ev.source.roomId;
+    if (env.SESSION) await env.SESSION.put('group:main', gid);
+    return replyMsg(ev.replyToken, [{ type: 'text', text: '已綁定這個群組為公告群。' }], env);
+  }
+
   if (ev.type === 'follow') {
     await clearSession(uid, env);
-    const mCard = await issueMemberCard(uid, env);
-    await addSubscriber(uid, env);
-    await switchRichMenu(uid, env.RICHMENU_NEW, env);
+    const [mCard] = await Promise.all([
+      issueMemberCard(uid, env),
+      getReferralCode(uid, env),    // v3.7: pre-generate referral code on first follow
+      addSubscriber(uid, env),
+      switchRichMenu(uid, env.RICHMENU_NEW, env),
+    ]);
     return sendWelcome(ev.replyToken, env, mCard);
   }
 
@@ -1489,6 +1611,30 @@ async function handleIntent(userText, replyToken, env, uid) {
       FLEX('品牌孵化是什麼 · 三階段', bubble),
     ], env);
   }
+  // v3.7: Referral — show user's code or register an incoming code
+  if (/介紹新客戶|我的引薦碼|我的推薦碼|引薦碼|引薦計畫|推薦給朋友/.test(userText)) {
+    const code = await getReferralCode(uid, env);
+    if (!code) return replyMsg(replyToken, [{ type: 'text', text: '引薦系統準備中，請稍後再試。' }], env);
+    const shareText = `「我在用 3Q 孵化所幫品牌做官網，第一步完全免費。台灣每個行業只收一位，先搶先贏。加入後傳引薦碼 ${code}，你能拿到更完整的免費版本。」`;
+    return replyMsg(replyToken, [{
+      type: 'text',
+      text: `你的專屬引薦碼：${code}\n\n複製這段訊息發給朋友：\n———\n${shareText}\n———\n\n朋友成交 → 品牌健診加值一次\n累積 3 位 → 服務升級點數\n累積 5 位 → 超級引薦人禮遇`,
+    }], env);
+  }
+  const refMatch = userText.trim().match(/^(?:引薦碼|推薦碼)[\s：:]*([A-Z0-9]{5,8})$/i);
+  if (refMatch) {
+    const code = refMatch[1].toUpperCase();
+    const referrerUid = await getUserByCode(code, env);
+    if (!referrerUid) {
+      return replyMsg(replyToken, [{ type: 'text', text: `引薦碼 ${code} 查無紀錄。\n請確認後再試，或打「說說我的店」直接開始。` }], env);
+    }
+    if (referrerUid === uid) {
+      return replyMsg(replyToken, [{ type: 'text', text: '這是你自己的引薦碼。\n分享給朋友，讓他們輸入才能登記。' }], env);
+    }
+    await saveReferral(referrerUid, uid, code, env);
+    return replyMsg(replyToken, [{ type: 'text', text: `引薦碼 ${code} 已登記！\n\n你的朋友的好意已記錄在 3Q。\n打「說說我的店」開始免費品牌診斷。` }], env);
+  }
+
   const match = ALL_REPLIES.find(r => r.keywords.some(kw => userText.includes(kw)));
   const msgs = [];
   if (match) {
@@ -1499,7 +1645,9 @@ async function handleIntent(userText, replyToken, env, uid) {
     if (match.response) msgs.push({ type: 'text', text: match.response });
     if (match.carousel && env.PNG_BASE_URL) msgs.push(carouselMsg(env.PNG_BASE_URL));
   } else {
-    msgs.push({ type: 'text', text: AWAY_TEXT });
+    // 沒命中關鍵字 → 超級業務 AI 客服接手;AI 不可用/限流才退回 AWAY_TEXT
+    const ai = await aiFallback(userText, env, uid);
+    msgs.push({ type: 'text', text: ai || AWAY_TEXT });
   }
   return replyMsg(replyToken, msgs, env);
 }
@@ -1517,21 +1665,57 @@ async function aiFallback(userText, env, uid) {
     await env.SESSION.put(key, String(cur + 1), { expirationTtl: 60 });
   }
   try {
-    const SYSTEM = '你是 3Q 貢丸·台灣在地品牌孵化所的客服助理。回應台灣繁體中文，最多 80 字。\n\n3Q 提供 3 個服務：\n1. 好物・好照 — 產品攝影 + 介紹文，500 元起\n2. 客製行銷 — 季度規劃，從現階段往前 3 個月\n3. 諮詢 — 30 分鐘免費，先聊聊再決定\n\n本月活動：好物・好照限時招募，前 10 位 100 元，名額剩 X 位。傳「+1」可看。\n\n用戶問什麼，你判斷最接近哪個服務，回答 2-3 句話，結尾建議他傳的關鍵字（例如：「回覆『+1』」「點選圖文選單『好物・好照』」）。語氣親切但不要過度熱情，跟用戶平等對話。';
+    const SYSTEM = [
+      '你是「3Q 貢丸品牌孵化所」的線上顧問,回覆主動私訊進來的店家老闆。',
+      '你不是推銷員,是接待客人的主人。客人願意私訊,代表他對自己的店有期待,你要接住。',
+      '',
+      '說話規則:',
+      '- 繁體中文,用「你」不用「您」。',
+      '- 短句、分行,最多 4 行,適合手機讀。',
+      '- 克制誠懇。不浮誇、不用驚嘆號、不用 emoji、不堆形容詞。',
+      '- 講結果,不講空話。',
+      '',
+      '絕對不做:',
+      '- 不報任何價格數字。被問到價格,只說「第一步是免費的」加「之後按你需求加購」,請他說出行業或加 LINE 顧問。',
+      '- 不用這些字:先享後付、先用再付、分期、月費、保證、最便宜、穩賺。',
+      '- 不逼單。對方觀望就留鉤子,不催。',
+      '',
+      '掘計畫是什麼:我們免費幫你的店做一個官網,做給你看,喜歡再合作,每個行業只收一位。',
+      '你的目標:讓對方說出他的行業,再請他私訊「貢丸＋你的行業」或加 LINE @121lkspe。',
+      '每次只給一個明確的下一步。',
+    ].join('\n');
     const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct-fast', {
       messages: [
         { role: 'system', content: SYSTEM },
         { role: 'user', content: userText },
       ],
-      max_tokens: 200,
+      max_tokens: 220,
     });
-    const text = (result?.response || '').trim();
-    if (!text || text.length < 5) return null;
-    return text.slice(0, 300);
+    return sanitizeAIReply(result?.response || '');
   } catch (err) {
     console.error('AI fallback failed:', err?.message);
     return null;
   }
+}
+
+// 去金融 + 無 emoji 輸出防護網:AI 偶爾塞 emoji/驚嘆號/金融字,送出前清掉。
+// 觸到金融雷字無法乾淨清除時,改用安全罐頭,絕不送出踩雷內容。
+const AI_SAFE_REPLY = [
+  '你好,謝謝你私訊。',
+  '掘計畫是我們免費幫你的店做一個官網,做給你看、喜歡再合作。',
+  '你是做哪一行的?也可以直接加 LINE:@121lkspe',
+].join('\n');
+
+function sanitizeAIReply(text) {
+  if (!text) return null;
+  let t = text.trim();
+  t = t.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{1F1E6}-\u{1F1FF}\u{FE0F}]/gu, '');
+  t = t.replace(/[!！]/g, '。');
+  t = t.replace(/\n{3,}/g, '\n\n').trim();
+  const banned = ['先享後付', '先用滿意再付', '先用再付', '分期', '月費', '保證', '最便宜', '穩賺'];
+  if (banned.some(w => t.includes(w))) return AI_SAFE_REPLY;
+  if (t.length < 5) return AI_SAFE_REPLY;
+  return t.slice(0, 300);
 }
 
 function carouselMsg(base) {
