@@ -1,0 +1,9 @@
+{
+  "service": "3Q Hatchery LINE OA webhook",
+  "ok": true,
+  "configured": {
+    "token": true,
+    "secret": true,
+    "png_base": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports"
+  }
+}

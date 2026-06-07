@@ -1,0 +1,40 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1350" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="bg4" cx="65%" cy="25%" r="90%">
+      <stop offset="0%" stop-color="#3A3530"></stop>
+      <stop offset="100%" stop-color="#0A0908"></stop>
+    </radialGradient>
+    <linearGradient id="stalk" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#C9B080"></stop>
+      <stop offset="100%" stop-color="#6A5A3A"></stop>
+    </linearGradient>
+    <filter id="grain4">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7"></feTurbulence>
+      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.13 0"></feColorMatrix>
+    </filter>
+  </defs>
+
+  <rect width="1080" height="1350" fill="url(#bg4)"></rect>
+
+  
+  <line x1="540" y1="1200" x2="540" y2="420" stroke="url(#stalk)" stroke-width="3"></line>
+  
+  <g fill="url(#stalk)">
+    <ellipse cx="540" cy="420" rx="5" ry="14"></ellipse>
+    <ellipse cx="525" cy="440" rx="5" ry="13" transform="rotate(-15 525 440)"></ellipse>
+    <ellipse cx="555" cy="445" rx="5" ry="13" transform="rotate(15 555 445)"></ellipse>
+    <ellipse cx="520" cy="470" rx="5" ry="13" transform="rotate(-20 520 470)"></ellipse>
+    <ellipse cx="560" cy="475" rx="5" ry="13" transform="rotate(20 560 475)"></ellipse>
+    <ellipse cx="515" cy="500" rx="5" ry="13" transform="rotate(-25 515 500)"></ellipse>
+    <ellipse cx="565" cy="505" rx="5" ry="13" transform="rotate(25 565 505)"></ellipse>
+    <ellipse cx="510" cy="530" rx="5" ry="13" transform="rotate(-28 510 530)"></ellipse>
+    <ellipse cx="570" cy="535" rx="5" ry="13" transform="rotate(28 570 535)"></ellipse>
+    <ellipse cx="508" cy="560" rx="5" ry="13" transform="rotate(-30 508 560)"></ellipse>
+    <ellipse cx="572" cy="565" rx="5" ry="13" transform="rotate(30 572 565)"></ellipse>
+    <ellipse cx="508" cy="590" rx="5" ry="13" transform="rotate(-30 508 590)"></ellipse>
+    <ellipse cx="572" cy="595" rx="5" ry="13" transform="rotate(30 572 595)"></ellipse>
+  </g>
+
+  <rect width="1080" height="1350" filter="url(#grain4)" opacity="0.6"></rect>
+</svg>

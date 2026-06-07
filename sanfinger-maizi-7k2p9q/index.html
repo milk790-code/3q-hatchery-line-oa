@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>三指服務 × 3Q · 客戶專屬對接區</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{
+    --brand:#E8581E;--brand-light:#FEF0E8;--brand-dark:#B83E0C;
+    --dark:#1C2128;--body:#3A3F4A;--mid:#6E7682;--divider:#E4E6EA;
+    --bg:#F9F7F5;--card:#FFFFFF;
+    --sans:'Noto Sans TC',system-ui,sans-serif;--serif:'Noto Serif TC',Georgia,serif;
+    --cleaning:#2B7DE0;--beauty:#D45E94;--engineering:#E8961E;--repair:#28A46A;--groupbuy:#E8581E;
+  }
+  html,body{background:var(--bg);font-family:var(--sans);color:var(--body);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:440px;margin:0 auto;min-height:100vh;background:var(--bg)}
+
+  /* Header */
+  .hero{background:linear-gradient(160deg,#1C2128 0%,#2A2018 100%);padding:48px 28px 38px;position:relative;overflow:hidden}
+  .hero::after{content:'';position:absolute;right:-40px;top:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(232,88,30,.35),transparent 70%)}
+  .hero .kick{font-size:11px;letter-spacing:.2em;color:var(--brand);font-weight:600;margin-bottom:16px;text-transform:uppercase}
+  .hero h1{font-size:30px;font-weight:700;color:#fff;line-height:1.3;margin-bottom:12px;position:relative;z-index:1}
+  .hero h1 em{color:var(--brand);font-style:normal}
+  .hero p{font-size:14px;color:rgba(255,255,255,.6);line-height:1.75;position:relative;z-index:1}
+  .hero .logo{display:flex;align-items:baseline;gap:5px;margin-top:24px;position:relative;z-index:1}
+  .hero .logo .l-san{font-size:18px;font-weight:700;color:var(--brand)}
+  .hero .logo .l-fin{font-size:18px;font-weight:700;color:#fff}
+  .hero .logo .l-sub{font-size:10px;color:rgba(255,255,255,.4);letter-spacing:.12em;margin-left:4px}
+
+  .body{padding:26px 22px 60px}
+  .sec-label{font-size:12px;font-weight:700;color:var(--brand);letter-spacing:.1em;margin:6px 0 14px;display:flex;align-items:center;gap:7px}
+  .sec-label::before{content:'';width:18px;height:2px;background:var(--brand);border-radius:1px}
+
+  /* Progress */
+  .progress{background:var(--card);border-radius:18px;padding:24px 22px;box-shadow:0 4px 20px rgba(28,33,40,.06);margin-bottom:28px}
+  .step{display:flex;gap:14px;position:relative;padding-bottom:20px}
+  .step:last-child{padding-bottom:0}
+  .step:not(:last-child)::before{content:'';position:absolute;left:13px;top:28px;bottom:0;width:2px;background:var(--divider)}
+  .step.done:not(:last-child)::before{background:var(--brand)}
+  .dot{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;z-index:1}
+  .step.done .dot{background:var(--brand);color:#fff}
+  .step.now .dot{background:var(--brand-light);color:var(--brand);border:2px solid var(--brand);animation:pulse 2s infinite}
+  .step.todo .dot{background:#fff;color:var(--mid);border:2px solid var(--divider)}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(232,88,30,.35)}50%{box-shadow:0 0 0 6px rgba(232,88,30,0)}}
+  .step .stxt{padding-top:3px}
+  .step .stitle{font-size:15px;font-weight:600;color:var(--dark);margin-bottom:2px}
+  .step.todo .stitle{color:var(--mid);font-weight:500}
+  .step .sdesc{font-size:12px;color:var(--mid);line-height:1.55}
+  .step.now .stitle{color:var(--brand)}
+  .badge-now{display:inline-block;font-size:10px;font-weight:700;color:#fff;background:var(--brand);padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:middle}
+
+  /* Doc cards */
+  .docs{display:flex;flex-direction:column;gap:12px;margin-bottom:28px}
+  .doc{background:var(--card);border-radius:16px;padding:18px;display:flex;align-items:center;gap:15px;box-shadow:0 2px 12px rgba(28,33,40,.05);text-decoration:none;transition:transform .15s,box-shadow .15s;border:1px solid transparent}
+  .doc:active{transform:scale(.985)}
+  .doc:hover{box-shadow:0 6px 22px rgba(28,33,40,.1)}
+  .doc .ic{width:46px;height:46px;border-radius:13px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px}
+  .doc .meta{flex:1;min-width:0}
+  .doc .dt{font-size:15px;font-weight:600;color:var(--dark);margin-bottom:3px}
+  .doc .dd{font-size:12px;color:var(--mid);line-height:1.5}
+  .doc .arrow{color:var(--mid);font-size:18px;flex-shrink:0}
+  .doc .st{font-size:10px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap}
+  .st-live{background:#E7F9F1;color:#1B7A4E}
+  .st-soon{background:#FEF0E8;color:var(--brand)}
+
+  /* Note */
+  .note{background:var(--brand-light);border-radius:16px;padding:20px 22px;border-left:4px solid var(--brand);margin-bottom:26px}
+  .note .nt{font-size:14px;font-weight:700;color:var(--brand-dark);margin-bottom:7px}
+  .note .nd{font-size:13px;color:var(--body);line-height:1.8}
+
+  .cta{display:block;background:var(--brand);color:#fff;text-align:center;text-decoration:none;font-size:15px;font-weight:600;padding:15px;border-radius:14px;box-shadow:0 6px 18px rgba(232,88,30,.3);transition:background .15s}
+  .cta:active{background:var(--brand-dark)}
+
+  .foot{text-align:center;padding:30px 20px 10px;color:var(--mid)}
+  .foot .fl{display:inline-flex;align-items:baseline;gap:5px;margin-bottom:8px}
+  .foot .fl .l-san{font-size:15px;font-weight:700;color:var(--brand)}
+  .foot .fl .l-fin{font-size:15px;font-weight:700;color:var(--dark)}
+  .foot .fcap{font-size:11px;color:var(--mid);line-height:1.7}
+  .hidden-tag{font-size:10px;color:var(--mid);background:#EFECE7;padding:3px 10px;border-radius:999px;display:inline-block;margin-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kick">3Q × 三指服務 · 專屬對接區</div>
+    <h1>麥子，<em>歡迎回來</em></h1>
+    <p>這是你和 3Q 的專屬空間。<br>我們的合作進度、所有文件，都會整齊地收在這裡，你隨時點進來就看得到。</p>
+    <div class="logo"><span class="l-san">三</span><span class="l-fin">Finger</span><span class="l-sub">三指服務</span></div>
+  </div>
+
+  <div class="body">
+
+    <div class="sec-label">目前進度</div>
+    <div class="progress">
+      <div class="step done"><div class="dot">✓</div><div class="stxt"><div class="stitle">了解你的五大服務</div><div class="sdesc">清潔、美容、工程、修繕、團購，全部盤點完成</div></div></div>
+      <div class="step done"><div class="dot">✓</div><div class="stxt"><div class="stitle">官網上線</div><div class="sdesc">五大服務整合官網，已正式上線運作</div></div></div>
+      <div class="step done"><div class="dot">✓</div><div class="stxt"><div class="stitle">方案確認</div><div class="sdesc">你和先生決定採用全包方案 🙌</div></div></div>
+      <div class="step now"><div class="dot">4</div><div class="stxt"><div class="stitle">簽約啟動<span class="badge-now">進行中</span></div><div class="sdesc">確認協議內容、完成簽約，我們就正式開始</div></div></div>
+      <div class="step todo"><div class="dot">5</div><div class="stxt"><div class="stitle">正式陪跑</div><div class="sdesc">先架構、跑數據、再一路陪你優化</div></div></div>
+    </div>
+
+    <div class="sec-label">你的文件</div>
+    <div class="docs">
+      <a class="doc" href="https://sanfinger.pages.dev" target="_blank">
+        <div class="ic" style="background:var(--cleaning);color:#fff">🌐</div>
+        <div class="meta"><div class="dt">你的官網</div><div class="dd">五大服務整合站，已上線</div></div>
+        <span class="st st-live">已上線</span>
+      </a>
+      <a class="doc" href="./deck.html" target="_blank">
+        <div class="ic" style="background:var(--brand);color:#fff">🎬</div>
+        <div class="meta"><div class="dt">合作方式簡報</div><div class="dd">有語音講解，帶你看我們怎麼陪你跑</div></div>
+        <span class="st st-live">可看</span>
+      </a>
+      <a class="doc" href="./report.pdf" target="_blank">
+        <div class="ic" style="background:var(--engineering);color:#fff">📊</div>
+        <div class="meta"><div class="dt">五業務市場調查報告</div><div class="dd">你五個服務的線上機會分析</div></div>
+        <span class="st st-live">可看</span>
+      </a>
+      <a class="doc" href="./agreement.pdf" target="_blank">
+        <div class="ic" style="background:var(--repair);color:#fff">📝</div>
+        <div class="meta"><div class="dt">正式合作協議書</div><div class="dd">每一項服務、時程、費用都寫清楚</div></div>
+        <span class="st st-live">可看</span>
+      </a>
+    </div>
+
+    <div class="note">
+      <div class="nt">關於這個空間</div>
+      <div class="nd">這裡是只屬於你的對接區，不會出現在官網的公開選單上。之後合作的每一份文件、每一次進度更新，我們都會放在這裡，你不用翻 LINE 對話找來找去，回到這一頁就一目了然。</div>
+    </div>
+
+    <a class="cta" href="https://line.me/" onclick="return false">有任何問題，直接 LINE 我 💬</a>
+
+    <div class="foot">
+      <div class="fl"><span class="l-san">三</span><span class="l-fin">Finger</span></div>
+      <div class="fcap">三指服務 × 3Q 貢丸 · 台灣在地品牌孵化所<br>一個前端服務客人，一個後台陪你成長</div>
+      <div class="hidden-tag">🔒 專屬連結 · 請勿公開分享</div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

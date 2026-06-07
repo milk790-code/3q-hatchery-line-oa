@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <meta name="theme-color" content="#0F0D0A"/>
+  <title>3Q貢丸 · 台灣在地品牌孵化所</title>
+
+  <link rel="stylesheet" href="./colors_and_type.css"/>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      margin: 0; padding: 0;
+      background: #0F0D0A;
+      color: var(--color-paper);
+      font-family: var(--font-sans);
+      overscroll-behavior: none;
+    }
+
+    /* ===================================================
+       PART 1 · ABOVE-FOLD BRAND (max-w 520px, single-col)
+       =================================================== */
+    .brand-zone {
+      min-height: 100vh; min-height: 100dvh;
+      padding: max(28px, env(safe-area-inset-top)) 24px 36px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: stretch;
+      max-width: 520px;
+      margin: 0 auto;
+      gap: 28px;
+    }
+    .brand {
+      display: flex; flex-direction: column; align-items: center; gap: 14px;
+      padding-top: 18px;
+    }
+    .mono {
+      width: 64px; height: 64px;
+      border: 1px solid rgba(184,146,74,0.55);
+      display: grid; place-items: center;
+      font-family: var(--font-serif); font-weight: 300;
+      font-size: 26px; letter-spacing: 0.04em;
+      color: var(--color-paper); position: relative;
+    }
+    .mono::after {
+      content: ""; position: absolute; left: 18%; right: 18%; bottom: 18px;
+      height: 1px; background: rgba(184,146,74,0.6);
+    }
+    .eyebrow {
+      font-size: 9.5px; letter-spacing: 0.42em; text-transform: uppercase;
+      color: var(--color-gold);
+    }
+    .lineid {
+      font-size: 10px; letter-spacing: 0.3em; color: rgba(245,242,236,0.55);
+    }
+
+    .slogan {
+      text-align: center; display: flex; flex-direction: column;
+      gap: 24px; align-items: center;
+    }
+    .slogan h1 {
+      font-family: var(--font-serif); font-weight: 300;
+      font-size: clamp(28px, 8.5vw, 40px);
+      line-height: 1.4; letter-spacing: 0.04em;
+      margin: 0; color: var(--color-paper);
+    }
+    .slogan h1 em { font-style: italic; color: var(--color-gold); font-weight: 300; }
+    .rule { width: 36px; height: 1px; background: rgba(184,146,74,0.6); }
+    .slogan p {
+      margin: 0; font-size: 13.5px; letter-spacing: 0.06em;
+      line-height: 1.85; color: rgba(245,242,236,0.7);
+      max-width: 320px;
+    }
+
+    .ctas { display: flex; flex-direction: column; gap: 10px; }
+    .cta {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 16px 18px;
+      background: rgba(245,242,236,0.04);
+      border: 1px solid rgba(184,146,74,0.28);
+      color: var(--color-paper); text-decoration: none;
+      font-size: 14px; letter-spacing: 0.05em;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .cta:active { background: rgba(184,146,74,0.14); border-color: var(--color-gold); }
+    .cta .label { display: flex; flex-direction: column; gap: 4px; }
+    .cta .num {
+      font-family: var(--font-serif); font-style: italic;
+      font-size: 10px; letter-spacing: 0.2em; color: var(--color-gold);
+    }
+    .cta .arr {
+      width: 24px; height: 24px; display: grid; place-items: center;
+      color: var(--color-gold); font-family: var(--font-serif);
+      font-size: 20px; font-weight: 300;
+    }
+
+    /* ===================================================
+       DIVIDER · brand-zone → canvas-zone
+       =================================================== */
+    .divider {
+      display: flex; flex-direction: column; align-items: center; gap: 14px;
+      padding: 48px 24px 12px;
+      max-width: 520px; margin: 0 auto;
+    }
+    .divider .hairline { width: 1px; height: 36px; background: var(--color-gold); opacity: 0.6; }
+    .divider .label {
+      font-size: 9.5px; letter-spacing: 0.4em; text-transform: uppercase;
+      color: rgba(245,242,236,0.45);
+    }
+    .divider .arrow {
+      font-family: var(--font-serif); font-size: 18px; font-weight: 300;
+      color: var(--color-gold);
+    }
+
+    /* ===================================================
+       PART 2 · CANVAS BELOW-FOLD (max-w 1280px, grid)
+       =================================================== */
+    .canvas-zone {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px 24px 48px;
+    }
+
+    .sec { margin-bottom: 72px; }
+    .sec-head {
+      display: flex; align-items: baseline; gap: 18px;
+      padding-bottom: 18px; margin-bottom: 28px;
+      border-bottom: 1px solid rgba(184,146,74,0.18);
+    }
+    .sec-num {
+      font-family: var(--font-serif); font-style: italic;
+      font-size: 22px; font-weight: 300; color: var(--color-gold);
+      letter-spacing: 0.05em;
+    }
+    .sec-title {
+      font-family: var(--font-serif); font-weight: 300;
+      font-size: clamp(18px, 3vw, 26px); margin: 0; color: var(--color-paper);
+      letter-spacing: 0.04em;
+    }
+    .sec-meta {
+      margin-left: auto; font-size: 10px; letter-spacing: 0.25em;
+      color: rgba(245,242,236,0.4); text-transform: uppercase;
+    }
+
+    .card { display: flex; flex-direction: column; gap: 10px; }
+    .card a.img {
+      display: block; background: rgba(245,242,236,0.03);
+      border: 1px solid rgba(184,146,74,0.22);
+      overflow: hidden; transition: border-color 0.2s;
+    }
+    .card a.img:hover { border-color: var(--color-gold); }
+    .card a.img img { display: block; width: 100%; height: auto; }
+    .card .cap {
+      font-size: 10px; letter-spacing: 0.12em;
+      color: rgba(245,242,236,0.55); line-height: 1.5;
+    }
+    .card .cap b {
+      display: block; color: var(--color-paper); font-weight: 400;
+      font-size: 11px; letter-spacing: 0.05em; margin-bottom: 2px;
+    }
+
+    .row-2 { display: grid; grid-template-columns: 200px 1fr; gap: 24px; align-items: start; }
+    .row-2 .card.avatar a.img { border-radius: 50%; aspect-ratio: 1; }
+    .row-2 .card.avatar a.img img { border-radius: 50%; }
+
+    .row-side { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+    .copybox {
+      padding: 22px 24px; background: rgba(245,242,236,0.03);
+      border-left: 1px solid var(--color-gold);
+      font-size: 13px; line-height: 1.95; color: rgba(245,242,236,0.78);
+      letter-spacing: 0.02em; white-space: pre-wrap;
+    }
+    .copybox h4 {
+      font-family: var(--font-sans); font-weight: 400;
+      font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--color-gold); margin: 0 0 14px;
+    }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+    .grid-rx { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+    .grid-rx .card .cap { font-size: 9.5px; text-align: center; }
+    .grid-rx .card .cap b { text-align: center; }
+
+    /* ===================================================
+       FOOTER
+       =================================================== */
+    .foot {
+      max-width: 1280px; margin: 32px auto 0;
+      padding: 28px 24px max(28px, env(safe-area-inset-bottom));
+      border-top: 1px solid rgba(184,146,74,0.18);
+      display: flex; justify-content: space-between; gap: 16px;
+      font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+      color: rgba(245,242,236,0.4);
+      flex-wrap: wrap;
+    }
+    .foot a { color: var(--color-gold); text-decoration: none; }
+
+    /* ===================================================
+       RESPONSIVE
+       =================================================== */
+    @media (max-width: 980px) {
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .grid-5 { grid-template-columns: repeat(3, 1fr); }
+      .grid-rx { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .canvas-zone { padding-left: 16px; padding-right: 16px; }
+      .row-2 { grid-template-columns: 90px 1fr; gap: 14px; }
+      .row-side { grid-template-columns: 1fr; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .grid-5 { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .grid-rx { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+      .sec { margin-bottom: 52px; }
+      .sec-meta { display: none; }
+    }
+    @media (min-width: 768px) {
+      .brand-zone { max-width: 460px; padding-top: 64px; padding-bottom: 28px; }
+      .mono { width: 78px; height: 78px; font-size: 30px; }
+      .slogan h1 { font-size: 38px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================
+       PART 1 · BRAND ZONE (above-fold)
+       ============================================ -->
+  <main class="brand-zone">
+
+    <header class="brand">
+      <div class="mono" aria-label="3Q monogram">3Q</div>
+      <div class="eyebrow">Taiwan Brand Hatchery</div>
+      <div class="lineid">LINE · @121LKSPE</div>
+    </header>
+
+    <section class="slogan">
+      <h1>你的產品，<br/><em>值得被看見</em>。</h1>
+      <div class="rule"></div>
+      <p>不管你的店多大多小、新舊、簡單複雜，<br/>我們都有適合的平台、舞台、後台。</p>
+    </section>
+
+    <nav class="ctas" aria-label="next steps">
+      <a class="cta" href="https://line.me/R/oaMessage/%40121LKSPE/?%E6%88%91%E6%83%B3%E8%AA%AA%E8%AA%AA%E6%88%91%E7%9A%84%E5%BA%97">
+        <div class="label">
+          <span class="num">NO. 01</span>
+          <span>說說你的店</span>
+        </div>
+        <span class="arr">→</span>
+      </a>
+      <a class="cta" href="https://line.me/R/oaMessage/%40121LKSPE/?%E6%88%91%E6%83%B3%E4%BA%86%E8%A7%A3%E5%A5%BD%E7%89%A9%C2%B7%E5%A5%BD%E7%85%A7">
+        <div class="label">
+          <span class="num">NO. 02</span>
+          <span>好物 · 好照 — FROM 500 元</span>
+        </div>
+        <span class="arr">→</span>
+      </a>
+      <a class="cta" href="https://line.me/R/oaMessage/%40121LKSPE/?%E6%88%91%E6%83%B3%E8%A6%81%E5%AE%A2%E8%A3%BD%E8%A1%8C%E9%8A%B7">
+        <div class="label">
+          <span class="num">NO. 03</span>
+          <span>陪你被看見 · 客製行銷</span>
+        </div>
+        <span class="arr">→</span>
+      </a>
+    </nav>
+
+  </main>
+
+  <!-- ============================================
+       DIVIDER
+       ============================================ -->
+  <div class="divider">
+    <div class="hairline"></div>
+    <div class="label">Design System</div>
+    <div class="arrow">↓</div>
+  </div>
+
+  <!-- ============================================
+       PART 2 · CANVAS ZONE (below-fold)
+       ============================================ -->
+  <div class="canvas-zone">
+
+    <!-- 01 PROFILE -->
+    <section class="sec">
+      <div class="sec-head">
+        <span class="sec-num">01</span>
+        <h2 class="sec-title">帳號身份</h2>
+        <span class="sec-meta">Profile · Avatar + Cover</span>
+      </div>
+      <div class="row-2">
+        <div class="card avatar">
+          <a class="img" href="./assets/exports/3q-avatar-640.png" target="_blank">
+            <img src="./assets/exports/3q-avatar-640.png" alt="Avatar"/>
+          </a>
+          <div class="cap"><b>Avatar</b>640 × 640 · 圓形</div>
+        </div>
+        <div class="card">
+          <a class="img" href="./assets/exports/3q-cover-bowl-1080x878.png" target="_blank">
+            <img src="./assets/exports/3q-cover-bowl-1080x878.png" alt="Cover"/>
+          </a>
+          <div class="cap"><b>Cover</b>1080 × 878 · 上 150px 留給頭像</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 RICH MENU -->
+    <section class="sec">
+      <div class="sec-head">
+        <span class="sec-num">02</span>
+        <h2 class="sec-title">圖文選單</h2>
+        <span class="sec-meta">Rich Menu · 5 tap zones</span>
+      </div>
+      <div class="card">
+        <a class="img" href="./assets/exports/3q-richmenu-2500x1686.png" target="_blank">
+          <img src="./assets/exports/3q-richmenu-2500x1686.png" alt="Rich Menu"/>
+        </a>
+        <div class="cap">
+          <b>Rich Menu · 2500 × 1686</b>
+          HERO（uri → hero.html）　│　B 說說你的店　│　C 好物·好照　│　D 陪你被看見　│　E 走到哪了
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 WELCOME -->
+    <section class="sec">
+      <div class="sec-head">
+        <span class="sec-num">03</span>
+        <h2 class="sec-title">開始訊息</h2>
+        <span class="sec-meta">Welcome card · 1040 × 1040</span>
+      </div>
+      <div class="row-side">
+        <div class="card">
+          <a class="img" href="./assets/exports/3q-welcome-card-1040.png" target="_blank">
+            <img src="./assets/exports/3q-welcome-card-1040.png" alt="Welcome"/>
+          </a>
+          <div class="cap"><b>Welcome Card</b>1040 × 1040 · 加好友後第一則</div>
+        </div>
+        <div class="copybox">
+<h4>Greeting Copy</h4>你好，這裡是 3Q貢丸 · 台灣在地品牌孵化所。
+
+只要你願意說，我們就幫你被看見。
+不管你的店多大多小、新舊、簡單複雜，
+我們都有適合的平台、舞台、後台。
+
+點下方圖文選單 「說說你的店」
+我們會幫你找出下一步該被拍下、被講出、被看見的，是哪一件事。
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 CAROUSEL -->
+    <section class="sec">
+      <div class="sec-head">
+        <span class="sec-num">04</span>
+        <h2 class="sec-title">案例輪播</h2>
+        <span class="sec-meta">Carousel · 4 cards · 1040 × 1040</span>
+      </div>
+      <div class="grid-4">
+        <div class="card">
+          <a class="img" href="./assets/exports/3q-carousel-01-1040.png" target="_blank">
+            <img src="./assets/exports/3q-carousel-01-1040.png" alt="阿婆ㄟ切仔麵店"/>
+          </a>
+          <div class="cap"><b>01 · 阿婆ㄟ切仔麵店</b>說說你的店</div>
+        </div>
+        <div class="card">
+          <a class="img" href="./assets/exports/3q-carousel-02-1040.png" target="_blank">
+            <img src="./assets/exports/3q-carousel-02-1040.png" alt="好物值得好照"/>
+          </a>
+          <div class="cap"><b>02 · 好物值得好照</b>好物・好照</div>
+        </div>
+        <div class="card">
+          <a class="img" href="./assets/exports/3q-carousel-03-1040.png" target="_blank">
+            <img src="./assets/exports/3q-carousel-03-1040.png" alt="一束稻一個故事"/>
+          </a>
+          <div class="cap"><b>03 · 一束稻一個故事</b>陪你被看見</div>
+        </div>
+        <div class="card">
+          <a class="img" href="./assets/exports/3q-carousel-04-1040.png" target="_blank">
+            <img src="./assets/exports/3q-carousel-04-1040.png" alt="原麻布沒被命名的好"/>
+          </a>
+          <div class="cap"><b>04 · 原麻布沒被命名的好</b>走到哪了</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 SEASONAL -->
+    <section class="sec">
+      <div class="sec-head">
+        <span class="sec-num">05</span>
+        <h2 class="sec-title">節氣 Hero</h2>
+        <span class="sec-meta">Seasonal · 4 covers · 1080 × 878</span>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <a class="img" href="./assets/exports/3q-seasonal-spring-1080x878.png" target="_blank">
+            <img src="./assets/exports/3q-seasonal-spring-1080x878.png" alt="春"/>
+          </a>
+          <div class="cap"><b>春 · Spring</b>桂花 · 清明 · 茶</div>
+        </div>
+        <div class="card">
+          <a class="img" href="./assets/exports/3q-seasonal-summer-1080x878.png" target="_blank">
+            <img src="./assets/exports/3q-seasonal-summer-1080x878.png" alt="夏"/>
+          </a>
+          <div class="cap"><b>夏 · Summer</b>綠豆 · 仙草 · 消暑</div>
+        </div>
+        <div class="card">
+          <a class="img" href="./assets/exports/3q-seasonal-autumn-1080x878.png" target="_blank">
+            <img src="./assets/exports/3q-seasonal-autumn-1080x878.png" alt="秋"/>
+          </a>
+          <div class="cap"><b>秋 · Autumn</b>桂圓 · 紅棗 · 中秋</div>
+        </div>
+        <div class="card">
+          <a class="img" href="./assets/exports/3q-seasonal-winter-1080x878.png" target="_blank">
+            <img src="./assets/exports/3q-seasonal-winter-1080x878.png" alt="冬"/>
+          </a>
+          <div class="cap"><b>冬 · Winter</b>紅豆 · 薑湯 · 冬至</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 CAMPAIGN -->
+    <section class="sec">
+      <div class="sec-head">
+        <span class="sec-num">06</span>
+        <h2 class="sec-title">活動海報</h2>
+        <span class="sec-meta">Campaign · 4 photo variants · 1080 × 1040</span>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <a class="img" href="./assets/exports/3q-campaign-poster-bowl-1080x1040.png" target="_blank">
+            <img src="./assets/exports/3q-campaign-poster-bowl-1080x1040.png" alt="bowl"/>
+          </a>
+          <div class="cap"><b>bowl · 麵碗</b>業界 2,000 / 這次 500</div>
+        </div>
+        <div class="card">
+          <a class="img" href="./assets/exports/3q-campaign-poster-ink-1080x1040.png" target="_blank">
+            <img src="./assets/exports/3q-campaign-poster-ink-1080x1040.png" alt="ink"/>
+          </a>
+          <div class="cap"><b>ink · 產品近拍</b>★ default poster</div>
+        </div>
+        <div class="card">
+          <a class="img" href="./assets/exports/3q-campaign-poster-linen-1080x1040.png" target="_blank">
+            <img src="./assets/exports/3q-campaign-poster-linen-1080x1040.png" alt="linen"/>
+          </a>
+          <div class="cap"><b>linen · 麻布</b>質地系</div>
+        </div>
+        <div class="card">
+          <a class="img" href="./assets/exports/3q-campaign-poster-stalk-1080x1040.png" target="_blank">
+            <img src="./assets/exports/3q-campaign-poster-stalk-1080x1040.png" alt="stalk"/>
+          </a>
+          <div class="cap"><b>stalk · 稻穗</b>質地系</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 LUCKY BAG -->
+    <section class="sec">
+      <div class="sec-head">
+        <span class="sec-num">07</span>
+        <h2 class="sec-title">福袋 · 時段推播</h2>
+        <span class="sec-meta">Lucky Bag · 5 time slots · 1040 × 1040</span>
+      </div>
+      <div class="grid-5">
+        <div class="card">
+          <a class="img" href="./assets/exports/3q-lucky-bag-main-1040.png" target="_blank">
+            <img src="./assets/exports/3q-lucky-bag-main-1040.png" alt="main"/>
+          </a>
+          <div class="cap"><b>main</b>主圖</div>
+        </div>
+        <div class="card">
+          <a class="img" href="./assets/exports/3q-lucky-bag-morning-1040.png" target="_blank">
+            <img src="./assets/exports/3q-lucky-bag-morning-1040.png" alt="morning"/>
+          </a>
+          <div class="cap"><b>morning</b>07:30</div>
+        </div>
+        <div class="card">
+          <a class="img" href="./assets/exports/3q-lucky-bag-noon-1040.png" target="_blank">
+            <img src="./assets/exports/3q-lucky-bag-noon-1040.png" alt="noon"/>
+          </a>
+          <div class="cap"><b>noon</b>12:30</div>
+        </div>
+        <div class="card">
+          <a class="img" href="./assets/exports/3q-lucky-bag-evening-1040.png" target="_blank">
+            <img src="./assets/exports/3q-lucky-bag-evening-1040.png" alt="evening"/>
+          </a>
+          <div class="cap"><b>evening</b>18:30</div>
+        </div>
+        <div class="card">
+          <a class="img" href="./assets/exports/3q-lucky-bag-night-1040.png" target="_blank">
+            <img src="./assets/exports/3q-lucky-bag-night-1040.png" alt="night"/>
+          </a>
+          <div class="cap"><b>night</b>22:00</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08 REACTIONS -->
+    <section class="sec">
+      <div class="sec-head">
+        <span class="sec-num">08</span>
+        <h2 class="sec-title">表情圖卡</h2>
+        <span class="sec-meta">Reactions · 20 stickers · 480 × 480</span>
+      </div>
+      <div class="grid-rx">
+        <div class="card"><a class="img" href="./assets/exports/3q-reaction-hot-480.png" target="_blank"><img src="./assets/exports/3q-reaction-hot-480.png" alt="hot"/></a><div class="cap"><b>好燙</b>hot</div></div>
+        <div class="card"><a class="img" href="./assets/exports/3q-reaction-recommend-480.png" target="_blank"><img src="./assets/exports/3q-reaction-recommend-480.png" alt="recommend"/></a><div class="cap"><b>推薦</b>recommend</div></div>
+        <div class="card"><a class="img" href="./assets/exports/3q-reaction-thanks-480.png" target="_blank"><img src="./assets/exports/3q-reaction-thanks-480.png" alt="thanks"/></a><div class="cap"><b>謝謝</b>thanks</div></div>
+        <div class="card"><a class="img" href="./assets/exports/3q-reaction-wait-480.png" target="_blank"><img src="./assets/exports/3q-reaction-wait-480.png" alt="wait"/></a><div class="cap"><b>稍等</b>wait</div></div>
+        <div class="card"><a class="img" href="./assets/exports/3q-reaction-got-it-480.png" target="_blank"><img src="./assets/exports/3q-reaction-got-it-480.png" alt="got-it"/></a><div class="cap"><b>收到</b>got-it</div></div>
+        <div class="card"><a class="img" href="./assets/exports/3q-reaction-i-see-480.png" target="_blank"><img src="./assets/exports/3q-reaction-i-see-480.png" alt="i-see"/></a><div class="cap"><b>我懂</b>i-see</div></div>
+        <div class="card"><a class="img" href="./assets/exports/3q-reaction-cheer-480.png" target="_blank"><img src="./assets/exports/3q-reaction-cheer-480.png" alt="cheer"/></a><div class="cap"><b>加油</b>cheer</div></div>
+        <div class="card"><a class="img" href="./assets/exports/3q-reaction-excellent-480.png" target="_blank"><img src="./assets/exports/3q-reaction-excellent-480.png" alt="excellent"/></a><div class="cap"><b>太棒了</b>excellent</div></div>
+        <div class="card"><a class="img" href="./assets/exports/3q-reaction-later-480.png" target="_blank"><img src="./assets/exports/3q-reaction-later-480.png" alt="later"/></a><div class="cap"><b>等等回</b>later</div></div>
+        <div class="card"><a class="img" href="./assets/exports/3q-reaction-goodnight-480.png" target="_blank"><img src="./assets/exports/3q-reaction-goodnight-480.png" alt="goodnight"/></a><div class="cap"><b>晚安</b>goodnight</div></div>
+        <div class="card"><a class="img" href="./assets/exports/3q-reaction-order-480.png" target="_blank"><img src="./assets/exports/3q-reaction-order-480.png" alt="order"/></a><div class="cap"><b>下單</b>order</div></div>
+        <div class="card"><a class="img" href="./assets/exports/3q-reaction-seeyou-480.png" target="_blank"><img src="./assets/exports/3q-reaction-seeyou-480.png" alt="seeyou"/></a><div class="cap"><b>再見</b>seeyou</div></div>
+        <div class="card"><a class="img" href="./assets/exports/3q-reaction-musthave-480.png" target="_blank"><img src="./assets/exports/3q-reaction-musthave-480.png" alt="musthave"/></a><div class="cap"><b>必收</b>musthave</div></div>
+        <div class="card"><a class="img" href="./assets/exports/3q-reaction-queue-480.png" target="_blank"><img src="./assets/exports/3q-reaction-queue-480.png" alt="queue"/></a><div class="cap"><b>排隊</b>queue</div></div>
+        <div class="card"><a class="img" href="./assets/exports/3q-reaction-hungry-480.png" target="_blank"><img src="./assets/exports/3q-reaction-hungry-480.png" alt="hungry"/></a><div class="cap"><b>餓了</b>hungry</div></div>
+        <div class="card"><a class="img" href="./assets/exports/3q-reaction-empty-480.png" target="_blank"><img src="./assets/exports/3q-reaction-empty-480.png" alt="empty"/></a><div class="cap"><b>空空</b>empty</div></div>
+        <div class="card"><a class="img" href="./assets/exports/3q-reaction-bold-480.png" target="_blank"><img src="./assets/exports/3q-reaction-bold-480.png" alt="bold"/></a><div class="cap"><b>大膽</b>bold</div></div>
+        <div class="card"><a class="img" href="./assets/exports/3q-reaction-stellar-480.png" target="_blank"><img src="./assets/exports/3q-reaction-stellar-480.png" alt="stellar"/></a><div class="cap"><b>滿天星</b>stellar</div></div>
+        <div class="card"><a class="img" href="./assets/exports/3q-reaction-hyper-480.png" target="_blank"><img src="./assets/exports/3q-reaction-hyper-480.png" alt="hyper"/></a><div class="cap"><b>嗨</b>hyper</div></div>
+        <div class="card"><a class="img" href="./assets/exports/3q-reaction-done-480.png" target="_blank"><img src="./assets/exports/3q-reaction-done-480.png" alt="done"/></a><div class="cap"><b>完成</b>done</div></div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ============================================
+       FOOTER
+       ============================================ -->
+  <footer class="foot">
+    <span>Taipei · 2026 · Hatchery</span>
+    <span>3Q貢丸 · <a href="https://line.me/R/ti/p/%40121LKSPE">@121LKSPE</a></span>
+  </footer>
+
+</body>
+</html>

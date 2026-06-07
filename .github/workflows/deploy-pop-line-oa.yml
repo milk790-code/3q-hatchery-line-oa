@@ -1,0 +1,55 @@
+name: Deploy POP LINE OA bot
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'workers/pop-line-oa/worker.js'
+      - '.github/workflows/deploy-pop-line-oa.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      WORKER_NAME: pop-line-oa
+      SESSION_KV_ID: 20a68b10afc84764ba770b64f0f33f30
+      CRM_D1_ID: e54671b1-d15e-4552-babf-cef367267568
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set CF account ID
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: echo "CF_ACCOUNT_ID=$CF_ACCOUNT_ID" >> $GITHUB_ENV
+      - name: Deploy (3-tier inherit-safe secrets)
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          POP_LINE_SECRET: ${{ secrets.POP_LINE_SECRET }}
+          POP_LINE_TOKEN: ${{ secrets.POP_LINE_TOKEN }}
+        run: |
+          set -euo pipefail
+          existing=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/settings" \
+            | jq -c '[.result.bindings[]? | select(.type=="secret_text") | .name]' || echo '[]')
+          secrets_json=$(jq -n --argjson existing "$existing" '
+            [ {name:"ANTHROPIC_API_KEY",val:(env.ANTHROPIC_API_KEY//"")},
+              {name:"POP_LINE_SECRET",val:(env.POP_LINE_SECRET//"")},
+              {name:"POP_LINE_TOKEN",val:(env.POP_LINE_TOKEN//"")} ]
+            | map( if .val!="" then {name:.name,type:"secret_text",text:.val}
+                   elif ([.name]|inside($existing)) then {name:.name,type:"inherit"}
+                   else empty end )')
+          jq -n --argjson secrets "$secrets_json" --arg kv "$SESSION_KV_ID" --arg d1 "$CRM_D1_ID" '
+            { main_module:"worker.js", compatibility_date:"2024-12-01",
+              bindings: ([ {name:"SESSION",type:"kv_namespace",namespace_id:$kv},
+                           {name:"CRM",type:"d1",id:$d1},
+                           {name:"AI",type:"ai"} ] + $secrets) }' > /tmp/meta.json
+          resp=$(curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -F "metadata=@/tmp/meta.json;type=application/json" \
+            -F "worker.js=@workers/pop-line-oa/worker.js;type=application/javascript+module")
+          echo "$resp" | jq -e '.success==true' >/dev/null || { echo "$resp" | jq -c '.errors'; exit 1; }
+          curl -sS -X POST "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/subdomain" \
+            -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" -d '{"enabled":true}' | jq -e '.success==true' >/dev/null
+          echo "::notice::pop-line-oa deployed"

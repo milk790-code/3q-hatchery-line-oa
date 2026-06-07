@@ -1,0 +1,171 @@
+name: Deploy Fukubukuro Push Worker
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'workers/fukubukuro/worker.js'
+      - '.github/workflows/deploy-fukubukuro.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      WORKER_NAME: 3q-fukubukuro-push
+      PNG_BASE_URL: https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify Cloudflare token
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          resp=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            https://api.cloudflare.com/client/v4/user/tokens/verify)
+          echo "$resp" | jq -e '.success == true' > /dev/null
+          echo "::notice::CF token OK"
+
+      - name: Set Cloudflare account ID
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          if [ -z "$CF_ACCOUNT_ID" ]; then
+            echo "::error::CF_ACCOUNT_ID secret is empty"
+            exit 1
+          fi
+          echo "CF_ACCOUNT_ID=$CF_ACCOUNT_ID" >> $GITHUB_ENV
+
+      - name: Deploy Worker
+        env:
+          CF_TOKEN:          ${{ secrets.CF_API_TOKEN }}
+          LINE_TOKEN:        ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          OWNER_LINE_UID:    ${{ secrets.OWNER_USER_ID }}
+          TRIGGER_TOKEN_VAL: ${{ secrets.TRIGGER_TOKEN }}
+        run: |
+          set -uo pipefail
+          mkdir -p _debug
+          cat > /tmp/metadata.json <<JSON
+          {
+            "main_module": "worker.js",
+            "compatibility_date": "2024-12-01",
+            "bindings": [
+              {"name": "LINE_CHANNEL_ACCESS_TOKEN", "type": "secret_text", "text": $(jq -Rn --arg t "$LINE_TOKEN"        '$t')},
+              {"name": "OWNER_LINE_USER_ID",        "type": "secret_text", "text": $(jq -Rn --arg t "$OWNER_LINE_UID"    '$t')},
+              {"name": "TRIGGER_TOKEN",             "type": "secret_text", "text": $(jq -Rn --arg t "$TRIGGER_TOKEN_VAL" '$t')},
+              {"name": "PNG_BASE_URL",              "type": "plain_text",  "text": $(jq -Rn --arg t "$PNG_BASE_URL"      '$t')}
+            ]
+          }
+          JSON
+
+          jq '(.bindings[] | select(.type=="secret_text") | .text) = "***MASKED***"' /tmp/metadata.json > _debug/metadata-sanitized.json
+
+          set +e
+          http_code=$(curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -F "metadata=@/tmp/metadata.json;type=application/json" \
+            -F "worker.js=@workers/fukubukuro/worker.js;type=application/javascript+module" \
+            -o _debug/cf-deploy-response.json -w "%{http_code}")
+          curl_exit=$?
+          set -e
+
+          ok=$(jq -r '.success // false' _debug/cf-deploy-response.json 2>/dev/null || echo "parse-error")
+          if [ "$ok" != "true" ]; then
+            echo "DEPLOY FAILED — http=$http_code curl_exit=$curl_exit"
+            cat _debug/cf-deploy-response.json
+            exit 1
+          fi
+          echo "::notice::Worker uploaded (http=$http_code)"
+
+      - name: Set Cron Schedules
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          resp=$(curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/schedules" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '[
+              {"cron": "30 23 * * *"},
+              {"cron": "30 4 * * *"},
+              {"cron": "30 10 * * *"},
+              {"cron": "0 14 * * *"}
+            ]')
+          echo "$resp" | jq -e '.success == true' > /dev/null
+          echo "::notice::Cron schedules set: 07:30 / 12:30 / 18:30 / 22:00 Taipei"
+
+      - name: Enable workers.dev subdomain
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/subdomain" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"enabled": true}' \
+            | jq -e '.success == true' > /dev/null
+
+          SUB=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/subdomain" \
+            | jq -r '.result.subdomain')
+          echo "WORKER_URL=https://${WORKER_NAME}.${SUB}.workers.dev" >> $GITHUB_ENV
+          echo "::notice::Worker URL: https://${WORKER_NAME}.${SUB}.workers.dev"
+
+      - name: Smoke-test /health
+        run: |
+          set -euo pipefail
+          sleep 5
+          resp=$(curl -sS "$WORKER_URL/health")
+          echo "$resp" | jq .
+          echo "$resp" | jq -e '.ok == true' > /dev/null
+          echo "::notice::fukubukuro worker alive"
+
+      - name: CF diagnostics (summary only)
+        if: always()
+        run: |
+          echo "## Fukubukuro Deploy Diagnostics" >> $GITHUB_STEP_SUMMARY
+          if [ -d _debug ]; then
+            for f in _debug/*; do [ -f "$f" ] || continue
+              echo "### \`$f\`" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              head -c 3000 "$f" >> $GITHUB_STEP_SUMMARY
+              echo >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+            done
+            rm -rf _debug
+          fi
+
+      - name: Deploy summary
+        run: |
+          echo "## Fukubukuro Deploy Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Worker | \`$WORKER_NAME\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Health | \`$WORKER_URL/health\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Manual push | \`$WORKER_URL/push?slot=0730&token=TRIGGER_TOKEN\` |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Cron slots (Taipei)" >> $GITHUB_STEP_SUMMARY
+          echo "| UTC | Taipei | Label |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| \`30 23 * * *\` | 07:30 | 晨光福袋 |" >> $GITHUB_STEP_SUMMARY
+          echo "| \`30 4 * * *\`  | 12:30 | 午陽福袋 |" >> $GITHUB_STEP_SUMMARY
+          echo "| \`30 10 * * *\` | 18:30 | 暮色福袋 |" >> $GITHUB_STEP_SUMMARY
+          echo "| \`0 14 * * *\`  | 22:00 | 月光福袋 |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### GitHub Secrets status" >> $GITHUB_STEP_SUMMARY
+          echo "| Secret | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| CF_API_TOKEN | existing |" >> $GITHUB_STEP_SUMMARY
+          echo "| CF_ACCOUNT_ID | existing |" >> $GITHUB_STEP_SUMMARY
+          echo "| LINE_CHANNEL_ACCESS_TOKEN | existing |" >> $GITHUB_STEP_SUMMARY
+          echo "| OWNER_USER_ID | set for LINE push alerts |" >> $GITHUB_STEP_SUMMARY
+          echo "| TRIGGER_TOKEN | add for /push manual trigger |" >> $GITHUB_STEP_SUMMARY

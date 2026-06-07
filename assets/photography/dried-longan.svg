@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 878" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="bg" cx="35%" cy="25%" r="100%"><stop offset="0%" stop-color="#E8DFD0"/><stop offset="100%" stop-color="#3A2C20"/></radialGradient>
+    <radialGradient id="longan" cx="40%" cy="35%" r="70%"><stop offset="0%" stop-color="#A07248"/><stop offset="60%" stop-color="#5A3818"/><stop offset="100%" stop-color="#2A1A0A"/></radialGradient>
+    <filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="17"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.12 0"/></filter>
+  </defs>
+  <rect width="1080" height="878" fill="url(#bg)"/>
+  <g fill="url(#longan)">
+    <circle cx="340" cy="540" r="42"/><circle cx="410" cy="520" r="44"/><circle cx="480" cy="540" r="42"/>
+    <circle cx="370" cy="595" r="44"/><circle cx="440" cy="600" r="42"/><circle cx="510" cy="585" r="40"/>
+    <circle cx="320" cy="470" r="40"/><circle cx="395" cy="450" r="38"/><circle cx="465" cy="460" r="40"/>
+    <circle cx="395" cy="650" r="42"/><circle cx="465" cy="645" r="40"/>
+  </g>
+  <g fill="#1A0E04" opacity="0.7">
+    <circle cx="340" cy="540" r="6"/><circle cx="410" cy="520" r="6"/><circle cx="480" cy="540" r="6"/>
+    <circle cx="370" cy="595" r="6"/><circle cx="440" cy="600" r="6"/><circle cx="510" cy="585" r="6"/>
+  </g>
+  <rect width="1080" height="878" filter="url(#g)" opacity="0.55"/>
+</svg>

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 878" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="bg" cx="68%" cy="22%" r="115%">
+      <stop offset="0%" stop-color="#EFEAE0"/><stop offset="50%" stop-color="#9A8A70"/><stop offset="100%" stop-color="#1A1814"/>
+    </radialGradient>
+    <radialGradient id="bowl" cx="50%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#3A2C20"/><stop offset="100%" stop-color="#0A0908"/>
+    </radialGradient>
+    <radialGradient id="beans" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#8A2F1C"/><stop offset="100%" stop-color="#3A1208"/>
+    </radialGradient>
+    <radialGradient id="steam" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F5F2EC" stop-opacity="0.45"/><stop offset="100%" stop-color="#F5F2EC" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="13"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.10 0"/></filter>
+  </defs>
+  <rect width="1080" height="878" fill="url(#bg)"/>
+  <ellipse cx="380" cy="700" rx="270" ry="32" fill="#0A0908" opacity="0.4"/>
+  <ellipse cx="380" cy="540" rx="230" ry="60" fill="url(#bowl)"/>
+  <ellipse cx="380" cy="535" rx="195" ry="46" fill="url(#beans)"/>
+  <g fill="#5A1808" opacity="0.85">
+    <ellipse cx="320" cy="525" rx="5" ry="4"/><ellipse cx="345" cy="520" rx="5" ry="4"/><ellipse cx="372" cy="517" rx="5" ry="4"/>
+    <ellipse cx="400" cy="520" rx="5" ry="4"/><ellipse cx="430" cy="523" rx="5" ry="4"/><ellipse cx="300" cy="535" rx="5" ry="4"/>
+    <ellipse cx="450" cy="540" rx="5" ry="4"/><ellipse cx="358" cy="510" rx="5" ry="4"/><ellipse cx="386" cy="508" rx="5" ry="4"/>
+    <ellipse cx="415" cy="513" rx="5" ry="4"/><ellipse cx="338" cy="540" rx="5" ry="4"/><ellipse cx="395" cy="543" rx="5" ry="4"/>
+  </g>
+  <ellipse cx="380" cy="380" rx="90" ry="120" fill="url(#steam)"/>
+  <ellipse cx="365" cy="280" rx="50" ry="80" fill="url(#steam)" opacity="0.7"/>
+  <rect width="1080" height="878" filter="url(#g)" opacity="0.6"/>
+</svg>

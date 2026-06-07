@@ -1,0 +1,19 @@
+name = "3q-fukubukuro-push"
+main = "worker.js"
+compatibility_date = "2024-12-01"
+
+[vars]
+PNG_BASE_URL = "https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports"
+
+# Secrets (set via wrangler secret put):
+#   LINE_CHANNEL_ACCESS_TOKEN
+#   OWNER_LINE_USER_ID
+#   TRIGGER_TOKEN   (for manual /push?token=... HTTP trigger)
+
+[[triggers.crons]]
+crons = [
+  "30 23 * * *",
+  "30 4 * * *",
+  "30 10 * * *",
+  "0 14 * * *"
+]

@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>演算法藝術 · 3Q Hatchery</title>
+<meta name="description" content="Karpathy 風格 Canvas 演算法藝術生成器，3Q Hatchery 金色系。"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400&family=Noto+Serif+TC:wght@200;300&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#B8924A;--gold-light:#D4AA6A;--gold-dim:rgba(184,146,74,.15);
+  --bg:#080808;--bg2:#0E0E0E;--bg3:#111;
+  --text:#F0EBE1;--muted:#8A8070;--border:rgba(184,146,74,.18);
+  --serif:'Noto Serif TC',serif;--sans:'Noto Sans TC',sans-serif;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);font-weight:300;overflow:hidden}
+
+/* LAYOUT */
+.layout{display:flex;height:100vh}
+
+/* CANVAS AREA */
+.canvas-wrap{flex:1;position:relative;overflow:hidden}
+canvas{display:block;width:100%;height:100%}
+.canvas-label{
+  position:absolute;bottom:20px;left:50%;transform:translateX(-50%);
+  font-size:.6rem;letter-spacing:.3em;color:rgba(184,146,74,.4);
+  text-transform:uppercase;pointer-events:none;
+}
+
+/* PANEL */
+.panel{
+  width:260px;flex-shrink:0;background:var(--bg2);
+  border-left:1px solid var(--border);overflow-y:auto;
+  display:flex;flex-direction:column;
+}
+.panel-header{
+  padding:20px;border-bottom:1px solid var(--border);
+}
+.panel-logo{font-family:var(--serif);font-weight:200;font-size:.8rem;letter-spacing:.2em;color:var(--gold);text-decoration:none;display:block;margin-bottom:4px}
+.panel-title{font-size:.65rem;letter-spacing:.3em;color:var(--muted);text-transform:uppercase}
+.panel-body{padding:20px;flex:1}
+
+/* CONTROLS */
+.ctrl-group{margin-bottom:24px}
+.ctrl-label{font-size:.65rem;letter-spacing:.25em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;display:block}
+.ctrl-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.ctrl-name{font-size:.72rem;color:var(--muted);flex:1}
+.ctrl-val{font-size:.72rem;color:var(--text);min-width:32px;text-align:right}
+input[type=range]{
+  flex:2;-webkit-appearance:none;background:rgba(184,146,74,.15);height:2px;outline:none;border-radius:1px;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:12px;height:12px;border-radius:50%;
+  background:var(--gold);cursor:pointer;
+}
+
+/* COLOR SWATCHES */
+.swatch-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.swatch{
+  width:28px;height:28px;border:1px solid transparent;cursor:pointer;
+  transition:border-color .2s;flex-shrink:0;
+}
+.swatch.active{border-color:var(--text)}
+
+/* MODE BUTTONS */
+.mode-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.mode-btn{
+  padding:6px 12px;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;
+  border:1px solid var(--border);background:transparent;color:var(--muted);
+  cursor:pointer;transition:all .2s;
+}
+.mode-btn:hover,.mode-btn.active{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
+
+/* ACTIONS */
+.panel-actions{padding:20px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+.btn{
+  width:100%;padding:10px;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;
+  border:1px solid var(--border);background:transparent;color:var(--text);
+  cursor:pointer;transition:all .2s;font-family:var(--sans);
+}
+.btn:hover{border-color:var(--gold);color:var(--gold)}
+.btn-primary{background:var(--gold);color:#0A0A0A;border-color:var(--gold)}
+.btn-primary:hover{background:var(--gold-light);color:#0A0A0A}
+
+/* BACK NAV */
+.back{
+  position:absolute;top:16px;left:16px;z-index:10;
+  font-size:.65rem;letter-spacing:.2em;color:var(--muted);text-decoration:none;
+  border:1px solid var(--border);padding:6px 14px;transition:all .2s;
+}
+.back:hover{color:var(--gold);border-color:var(--gold)}
+
+@media(max-width:640px){
+  .layout{flex-direction:column}
+  .panel{width:100%;height:auto;max-height:45vh;border-left:none;border-top:1px solid var(--border)}
+  .canvas-wrap{flex:none;height:55vw;min-height:200px}
+  .back{top:8px;left:8px}
+}
+</style>
+</head>
+<body>
+<a href="karpathy-guidelines.html" class="back">← 準則</a>
+
+<div class="layout">
+  <div class="canvas-wrap">
+    <canvas id="c"></canvas>
+    <span class="canvas-label">3Q HATCHERY · ALGORITHMIC ART</span>
+  </div>
+
+  <aside class="panel">
+    <div class="panel-header">
+      <a href="/" class="panel-logo">3Q HATCHERY</a>
+      <span class="panel-title">演算法藝術生成器</span>
+    </div>
+
+    <div class="panel-body">
+      <div class="ctrl-group">
+        <span class="ctrl-label">模式</span>
+        <div class="mode-row" id="modeRow">
+          <button class="mode-btn active" data-mode="particles">粒子</button>
+          <button class="mode-btn" data-mode="flow">流場</button>
+          <button class="mode-btn" data-mode="waves">波紋</button>
+          <button class="mode-btn" data-mode="lattice">晶格</button>
+        </div>
+      </div>
+
+      <div class="ctrl-group">
+        <span class="ctrl-label">參數</span>
+        <div class="ctrl-row">
+          <span class="ctrl-name">數量</span>
+          <input type="range" id="rCount" min="20" max="400" value="120"/>
+          <span class="ctrl-val" id="vCount">120</span>
+        </div>
+        <div class="ctrl-row">
+          <span class="ctrl-name">速度</span>
+          <input type="range" id="rSpeed" min="1" max="100" value="30"/>
+          <span class="ctrl-val" id="vSpeed">30</span>
+        </div>
+        <div class="ctrl-row">
+          <span class="ctrl-name">尺寸</span>
+          <input type="range" id="rSize" min="1" max="20" value="4"/>
+          <span class="ctrl-val" id="vSize">4</span>
+        </div>
+        <div class="ctrl-row">
+          <span class="ctrl-name">尾跡</span>
+          <input type="range" id="rTrail" min="1" max="98" value="15"/>
+          <span class="ctrl-val" id="vTrail">15</span>
+        </div>
+        <div class="ctrl-row">
+          <span class="ctrl-name">連線</span>
+          <input type="range" id="rLink" min="0" max="200" value="80"/>
+          <span class="ctrl-val" id="vLink">80</span>
+        </div>
+      </div>
+
+      <div class="ctrl-group">
+        <span class="ctrl-label">配色</span>
+        <div class="swatch-row" id="swatches">
+          <div class="swatch active" data-palette="gold" style="background:linear-gradient(135deg,#B8924A,#D4AA6A,#8A6830)"></div>
+          <div class="swatch" data-palette="cold" style="background:linear-gradient(135deg,#4A7AB8,#6A9AD4,#304870)"></div>
+          <div class="swatch" data-palette="rose" style="background:linear-gradient(135deg,#B84A6A,#D46A8A,#803050)"></div>
+          <div class="swatch" data-palette="mono" style="background:linear-gradient(135deg,#F0EBE1,#8A8070,#2A2820)"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-actions">
+      <button class="btn" id="btnShuffle">隨機重置</button>
+      <button class="btn btn-primary" id="btnDown">下載 PNG</button>
+    </div>
+  </aside>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const DPR = window.devicePixelRatio || 1;
+
+const PALETTES = {
+  gold:  ['#B8924A','#D4AA6A','#E8C880','#8A6830','#F0DEB0'],
+  cold:  ['#4A7AB8','#6A9AD4','#8ABAE8','#304870','#B0D0F0'],
+  rose:  ['#B84A6A','#D46A8A','#E890A8','#803050','#F0B0C8'],
+  mono:  ['#F0EBE1','#C8C0B0','#8A8070','#504840','#F8F4EE'],
+};
+
+let W, H, particles = [], mode = 'particles', pal = PALETTES.gold;
+let cfg = { count:120, speed:0.3, size:4, trail:15, link:80 };
+let raf = null, t = 0;
+
+function resize() {
+  const wrap = canvas.parentElement;
+  W = wrap.clientWidth; H = wrap.clientHeight;
+  canvas.width = W * DPR; canvas.height = H * DPR;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  ctx.scale(DPR, DPR);
+  build();
+}
+
+class Particle {
+  constructor() { this.reset(true); }
+  reset(init) {
+    this.x = Math.random() * W;
+    this.y = init ? Math.random() * H : (Math.random() < .5 ? -10 : H + 10);
+    const a = Math.random() * Math.PI * 2;
+    this.vx = Math.cos(a) * cfg.speed;
+    this.vy = Math.sin(a) * cfg.speed;
+    this.r = cfg.size * (.5 + Math.random() * .5);
+    this.c = pal[Math.floor(Math.random() * pal.length)];
+    this.life = 1;
+    this.decay = .001 + Math.random() * .002;
+  }
+  step() {
+    if (mode === 'particles') {
+      this.x += this.vx; this.y += this.vy;
+    } else if (mode === 'flow') {
+      const nx = this.x / W * 3, ny = this.y / H * 3;
+      const angle = (Math.sin(nx + t) + Math.cos(ny + t)) * Math.PI;
+      this.vx = Math.cos(angle) * cfg.speed;
+      this.vy = Math.sin(angle) * cfg.speed;
+      this.x += this.vx; this.y += this.vy;
+    } else if (mode === 'waves') {
+      this.x += this.vx;
+      this.y = (this.y + H) % H;
+      this.vy = Math.sin(this.x / 60 + t * 2 + this.r) * cfg.speed;
+      this.y += this.vy;
+    } else if (mode === 'lattice') {
+      const gx = Math.round(this.x / 40) * 40;
+      const gy = Math.round(this.y / 40) * 40;
+      this.x += (gx - this.x) * .05 + (Math.random() - .5) * cfg.speed * 2;
+      this.y += (gy - this.y) * .05 + (Math.random() - .5) * cfg.speed * 2;
+    }
+    this.life -= this.decay;
+    if (this.x < -20 || this.x > W + 20 || this.y < -20 || this.y > H + 20 || this.life <= 0) this.reset(false);
+  }
+  draw() {
+    ctx.globalAlpha = this.life * .85;
+    ctx.fillStyle = this.c;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function build() {
+  particles = Array.from({ length: cfg.count }, () => new Particle());
+}
+
+function drawLinks() {
+  if (cfg.link === 0) return;
+  const maxDist = cfg.link;
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d < maxDist) {
+        ctx.globalAlpha = (1 - d / maxDist) * .3;
+        ctx.strokeStyle = particles[i].c;
+        ctx.lineWidth = .5;
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+function frame() {
+  t += 0.008;
+  const alpha = cfg.trail / 100;
+  ctx.fillStyle = `rgba(8,8,8,${1 - alpha * 0.85})`;
+  ctx.fillRect(0, 0, W, H);
+  drawLinks();
+  particles.forEach(p => { p.step(); p.draw(); });
+  ctx.globalAlpha = 1;
+  raf = requestAnimationFrame(frame);
+}
+
+function start() {
+  if (raf) cancelAnimationFrame(raf);
+  frame();
+}
+
+// Controls
+function bind(id, valId, key, transform) {
+  const el = document.getElementById(id);
+  const vEl = document.getElementById(valId);
+  el.addEventListener('input', () => {
+    const v = parseFloat(el.value);
+    cfg[key] = transform ? transform(v) : v;
+    vEl.textContent = el.value;
+    if (key === 'count') { build(); } // rebuild on count change
+  });
+}
+
+bind('rCount', 'vCount', 'count');
+bind('rSpeed', 'vSpeed', 'speed', v => v / 100);
+bind('rSize',  'vSize',  'size');
+bind('rTrail', 'vTrail', 'trail');
+bind('rLink',  'vLink',  'link');
+
+document.getElementById('modeRow').addEventListener('click', e => {
+  const btn = e.target.closest('.mode-btn');
+  if (!btn) return;
+  mode = btn.dataset.mode;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b === btn));
+  build();
+});
+
+document.getElementById('swatches').addEventListener('click', e => {
+  const sw = e.target.closest('.swatch');
+  if (!sw) return;
+  pal = PALETTES[sw.dataset.palette];
+  document.querySelectorAll('.swatch').forEach(s => s.classList.toggle('active', s === sw));
+  build();
+});
+
+document.getElementById('btnShuffle').addEventListener('click', () => {
+  cfg.count = 60 + Math.floor(Math.random() * 200);
+  cfg.speed = (0.1 + Math.random() * 0.8);
+  cfg.size  = 1 + Math.floor(Math.random() * 8);
+  cfg.trail = 5 + Math.floor(Math.random() * 60);
+  cfg.link  = Math.floor(Math.random() * 150);
+  document.getElementById('rCount').value = cfg.count;
+  document.getElementById('vCount').textContent = cfg.count;
+  document.getElementById('rSpeed').value = Math.round(cfg.speed * 100);
+  document.getElementById('vSpeed').textContent = Math.round(cfg.speed * 100);
+  document.getElementById('rSize').value = cfg.size;
+  document.getElementById('vSize').textContent = cfg.size;
+  document.getElementById('rTrail').value = cfg.trail;
+  document.getElementById('vTrail').textContent = cfg.trail;
+  document.getElementById('rLink').value = cfg.link;
+  document.getElementById('vLink').textContent = cfg.link;
+  build();
+});
+
+document.getElementById('btnDown').addEventListener('click', () => {
+  const link = document.createElement('a');
+  link.download = '3q-art-' + Date.now() + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});
+
+window.addEventListener('resize', resize);
+resize();
+start();
+</script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+name: Render PNG assets
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'ui_kits/line_oa/_*.html'
+      - 'ui_kits/line_oa/*.jsx'
+      - 'ui_kits/line_oa/LineSpecs.js'
+      - 'ui_kits/social/_*.html'
+      - 'ui_kits/social/*.jsx'
+      - 'ui_kits/social/SocialSpecs.js'
+      - 'scripts/render-pngs.mjs'
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Cache Playwright browser
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-v1
+
+      - name: Install Playwright + http-server
+        run: |
+          npm install --no-save playwright http-server
+          npx playwright install --with-deps chromium
+
+      - name: Start local HTTP server
+        run: |
+          npx http-server -p 8080 -s . &
+          for i in 1 2 3 4 5; do
+            if curl -fsS http://localhost:8080/ > /dev/null 2>&1; then
+              echo "server up"; break
+            fi
+            sleep 1
+          done
+
+      - name: Render PNGs
+        run: node scripts/render-pngs.mjs
+
+      - name: Compress richmenu PNG → JPEG (≤ 1 MB for LINE)
+        run: |
+          pip install --quiet pillow
+          python3 -c "
+          from PIL import Image
+          import os
+          src = 'assets/exports/3q-richmenu-2500x1686.png'
+          dst = 'assets/exports/3q-richmenu-2500x1686.jpg'
+          Image.open(src).convert('RGB').save(dst, quality=88, optimize=True)
+          size = os.path.getsize(dst)
+          print(f'JPEG: {size} bytes ({size/1024/1024:.3f} MB)')
+          assert size < 1024*1024, f'JPEG over 1MB: {size}'
+          "
+
+      - name: Diff summary
+        run: |
+          echo "## Rendered PNGs" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          ls -la assets/exports/ >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Manifest" >> $GITHUB_STEP_SUMMARY
+          echo '```json' >> $GITHUB_STEP_SUMMARY
+          cat assets/exports/_render-manifest.json >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Commit refreshed PNGs (if changed)
+        run: |
+          set -euo pipefail
+          git config user.email "actions@github.com"
+          git config user.name "github-actions[bot]"
+          git add assets/exports/
+          if git diff --cached --quiet; then
+            echo "::notice::No PNG changes to commit"
+          else
+            git commit -m "render: refresh PNGs from run ${{ github.run_id }}"
+            git push origin HEAD:main
+            echo "::notice::Pushed PNG updates — deploy.yml will auto-trigger"
+          fi

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 878" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="bg" cx="60%" cy="30%" r="100%"><stop offset="0%" stop-color="#F5F2EC"/><stop offset="100%" stop-color="#C8C0AE"/></radialGradient>
+    <radialGradient id="stone" cx="40%" cy="30%" r="60%"><stop offset="0%" stop-color="#3A2C20"/><stop offset="100%" stop-color="#1A1408"/></radialGradient>
+    <filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="31"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.10 0"/></filter>
+  </defs>
+  <rect width="1080" height="878" fill="url(#bg)"/>
+  <rect x="180" y="500" width="180" height="180" fill="#A02818" opacity="0.95"/>
+  <g fill="#F5F2EC" opacity="0.85">
+    <rect x="208" y="528" width="34" height="6"/><rect x="220" y="540" width="10" height="40"/>
+    <rect x="208" y="585" width="34" height="6"/><rect x="220" y="595" width="10" height="40"/>
+    <rect x="270" y="528" width="34" height="6"/><rect x="282" y="540" width="10" height="40"/>
+    <rect x="270" y="585" width="34" height="6"/><rect x="282" y="595" width="10" height="40"/>
+    <rect x="208" y="624" width="34" height="6"/><rect x="220" y="630" width="10" height="40"/>
+    <rect x="270" y="624" width="34" height="6"/><rect x="282" y="630" width="10" height="40"/>
+  </g>
+  <rect x="180" y="500" width="180" height="180" fill="none" stroke="#F5F2EC" stroke-width="2" opacity="0.4"/>
+  <rect x="420" y="240" width="160" height="240" rx="6" fill="url(#stone)"/>
+  <rect x="420" y="240" width="160" height="40" rx="6" fill="#B8924A" opacity="0.6"/>
+  <ellipse cx="500" cy="500" rx="100" ry="14" fill="#0A0908" opacity="0.35"/>
+  <rect width="1080" height="878" filter="url(#g)" opacity="0.55"/>
+</svg>

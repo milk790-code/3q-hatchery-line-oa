@@ -1,0 +1,29 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <pattern id="weave" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse">
+      <rect width="6" height="6" fill="#D8CDB5"></rect>
+      <line x1="0" y1="3" x2="6" y2="3" stroke="#B8AB8A" stroke-width="0.7"></line>
+      <line x1="3" y1="0" x2="3" y2="6" stroke="#C2B696" stroke-width="0.6"></line>
+    </pattern>
+    <radialGradient id="bg6" cx="30%" cy="20%" r="100%">
+      <stop offset="0%" stop-color="#EFEAE0"></stop>
+      <stop offset="100%" stop-color="#9A917D"></stop>
+    </radialGradient>
+    <filter id="grain6">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="6"></feTurbulence>
+      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.10 0"></feColorMatrix>
+    </filter>
+  </defs>
+
+  <rect width="1080" height="1080" fill="url(#bg6)"></rect>
+  
+  <rect x="160" y="320" width="760" height="500" fill="#0A0908" opacity="0.25" transform="skewX(-3)"></rect>
+  
+  <rect x="160" y="240" width="760" height="500" fill="url(#weave)"></rect>
+  
+  <rect x="160" y="240" width="760" height="3" fill="#A89A78"></rect>
+  <rect x="160" y="737" width="760" height="3" fill="#A89A78"></rect>
+
+  <rect width="1080" height="1080" filter="url(#grain6)" opacity="0.55"></rect>
+</svg>

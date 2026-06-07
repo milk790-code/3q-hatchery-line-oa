@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<title>3Q · iOS App 原型</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@200;300;400&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="ios-frame.jsx"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#F0EDE8;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Noto Sans TC",sans-serif;-webkit-font-smoothing:antialiased}
+#root{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:20px}
+.scene-label{font-size:11px;color:#8A8A8A;letter-spacing:.12em;text-align:center}
+.tabs-outer{display:flex;gap:8px;background:rgba(0,0,0,0.06);border-radius:12px;padding:4px}
+.tabs-outer button{border:none;background:none;padding:6px 14px;border-radius:8px;font-size:11px;cursor:pointer;letter-spacing:.05em;color:#666;transition:all .2s;font-family:inherit}
+.tabs-outer button.active{background:white;color:#0C0A08;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useRef } = React;
+const GO = '#B8924A', BK = '#0C0A08', PA = '#F5F2EC';
+const serif = '"Noto Serif TC", serif';
+const sys = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Noto Sans TC", sans-serif';
+
+/* ─── Shared micro-components ─── */
+const GoldBar = ({ pct }) => (
+  <div style={{ height:4, background:'#E8DFD0', borderRadius:2, overflow:'hidden' }}>
+    <div style={{ height:'100%', width:`${pct}%`, background:GO, borderRadius:2, transition:'width .4s' }}/>
+  </div>
+);
+const Chip = ({ label, color='#E8DFD0', text=BK }) => (
+  <span style={{ display:'inline-block', background:color, color:text, fontSize:11, padding:'3px 9px', borderRadius:20, letterSpacing:'.04em' }}>{label}</span>
+);
+const Avatar = ({ name, size=36, bg='#0C0A08', color='#B8924A' }) => (
+  <div style={{ width:size, height:size, borderRadius:'50%', background:bg, display:'flex', alignItems:'center', justifyContent:'center', fontSize:size*0.38, color, fontFamily:serif, fontWeight:300, letterSpacing:'.05em', flexShrink:0 }}>
+    {name[0]}
+  </div>
+);
+
+/* ─── Tab bar ─── */
+const tabs = [
+  { id:'home',     label:'主頁',   icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 12L12 3L21 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M5 10V20H9V15H15V20H19V10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> },
+  { id:'projects', label:'專案',   icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="1.5"/><path d="M8 8h8M8 12h5M8 16h3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg> },
+  { id:'chat',     label:'顧問',   icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 6h18a1 1 0 011 1v9a1 1 0 01-1 1H8l-5 4V7a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> },
+  { id:'services', label:'服務',   icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.5"/></svg> },
+  { id:'book',     label:'預約',   icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M8 3v4M16 3v4M3 10h18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg> },
+];
+
+function TabBar({ current, onSelect }) {
+  return (
+    <div style={{ display:'flex', borderTop:'0.5px solid rgba(0,0,0,0.1)', background:'rgba(249,247,244,0.92)', backdropFilter:'blur(16px)', padding:'8px 0 4px' }}>
+      {tabs.map(t => (
+        <button key={t.id} onClick={() => onSelect(t.id)} style={{ flex:1, border:'none', background:'none', cursor:'pointer', display:'flex', flexDirection:'column', alignItems:'center', gap:3, padding:'4px 0 6px', color: current===t.id ? GO : '#8A8A8A', transition:'color .2s' }}>
+          {t.icon}
+          <span style={{ fontSize:10, letterSpacing:'.04em' }}>{t.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/* ─── Screen 1: Home ─── */
+function HomeScreen() {
+  return (
+    <div style={{ flex:1, overflowY:'auto', background:'#F5F3F0' }}>
+      {/* Header */}
+      <div style={{ background:BK, padding:'12px 20px 24px' }}>
+        <div style={{ fontFamily:serif, fontWeight:300, fontSize:11, letterSpacing:'.3em', color:'rgba(184,146,74,0.6)', textTransform:'uppercase', marginBottom:6 }}>3Q · BRAND HATCHERY</div>
+        <div style={{ fontFamily:serif, fontWeight:300, fontSize:22, color:PA, letterSpacing:'.06em', marginBottom:4 }}>你好，阿婆ㄟ切仔麵</div>
+        <div style={{ fontSize:12, color:'rgba(245,242,236,0.45)', letterSpacing:'.04em' }}>品牌孵化 · 第 3 週進行中</div>
+      </div>
+      {/* Active project card */}
+      <div style={{ margin:'12px 16px 0', background:'white', borderRadius:16, padding:16, boxShadow:'0 1px 4px rgba(0,0,0,0.06)' }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:12 }}>
+          <div>
+            <div style={{ fontSize:13, fontWeight:500, color:BK, letterSpacing:'.04em', marginBottom:3 }}>品牌孵化專案</div>
+            <div style={{ fontSize:11, color:'#8A8A8A', letterSpacing:'.03em' }}>阿婆ㄟ切仔麵店 · 雲林</div>
+          </div>
+          <Chip label="進行中" color="rgba(184,146,74,0.12)" text={GO}/>
+        </div>
+        <div style={{ marginBottom:8 }}><GoldBar pct={65}/></div>
+        <div style={{ display:'flex', justifyContent:'space-between', fontSize:11, color:'#8A8A8A' }}>
+          <span>5/8 任務完成</span><span>65%</span>
+        </div>
+      </div>
+      {/* Quick actions */}
+      <div style={{ margin:'12px 16px 0', display:'flex', gap:8 }}>
+        {[['查看進度','projects'],['傳訊息','chat'],['預約諮詢','book']].map(([l, t]) => (
+          <button key={l} style={{ flex:1, background:'white', border:'none', borderRadius:12, padding:'10px 4px', fontSize:11, color:BK, letterSpacing:'.04em', cursor:'pointer', boxShadow:'0 1px 3px rgba(0,0,0,0.06)' }}>{l}</button>
+        ))}
+      </div>
+      {/* Next meeting */}
+      <div style={{ margin:'12px 16px 0', background:`rgba(184,146,74,0.08)`, borderRadius:14, padding:'12px 14px', display:'flex', alignItems:'center', gap:12, border:`1px solid rgba(184,146,74,0.2)` }}>
+        <div style={{ width:36, height:36, borderRadius:10, background:GO, display:'flex', alignItems:'center', justifyContent:'center' }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        </div>
+        <div>
+          <div style={{ fontSize:12, fontWeight:500, color:BK, marginBottom:2 }}>下次更新</div>
+          <div style={{ fontSize:11, color:'#8A8A8A' }}>週五 下午 3:00 · 與顧問 Mei 通話</div>
+        </div>
+      </div>
+      {/* Recent updates */}
+      <div style={{ margin:'16px 16px 0', paddingBottom:16 }}>
+        <div style={{ fontSize:12, fontWeight:500, color:'#8A8A8A', letterSpacing:'.06em', textTransform:'uppercase', marginBottom:10 }}>最近更新</div>
+        {[
+          { t:'LOGO 初稿已完成', sub:'設計團隊 · 2小時前', done:true },
+          { t:'品牌色票確認中', sub:'等待你回覆 · 昨天', done:false },
+          { t:'競品分析報告', sub:'顧問 Mei · 3天前', done:true },
+        ].map((u, i) => (
+          <div key={i} style={{ display:'flex', gap:10, alignItems:'flex-start', paddingBottom:12, borderBottom: i<2 ? '0.5px solid rgba(0,0,0,0.06)':'none', marginBottom:12 }}>
+            <div style={{ width:7, height:7, borderRadius:'50%', background:u.done?GO:'#E0D8CC', marginTop:5, flexShrink:0 }}/>
+            <div>
+              <div style={{ fontSize:13, color:BK, letterSpacing:'.03em', marginBottom:2 }}>{u.t}</div>
+              <div style={{ fontSize:11, color:'#8A8A8A' }}>{u.sub}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Screen 2: Projects ─── */
+function ProjectsScreen() {
+  const [sel, setSel] = useState(null);
+  const steps = ['諮詢完成','策略規劃','設計製作','上線部署','驗收完成'];
+  const done = 2;
+  if (sel !== null) return (
+    <div style={{ flex:1, overflowY:'auto', background:'#F5F3F0' }}>
+      <div style={{ background:BK, padding:'12px 20px 20px' }}>
+        <button onClick={()=>setSel(null)} style={{ background:'none', border:'none', color:GO, fontSize:13, cursor:'pointer', letterSpacing:'.05em', marginBottom:8 }}>← 返回</button>
+        <div style={{ fontFamily:serif, fontWeight:300, fontSize:20, color:PA, letterSpacing:'.06em' }}>品牌孵化專案</div>
+        <div style={{ fontSize:11, color:'rgba(245,242,236,0.45)', marginTop:3 }}>阿婆ㄟ切仔麵店</div>
+      </div>
+      <div style={{ padding:'16px' }}>
+        <div style={{ background:'white', borderRadius:16, padding:16, marginBottom:12 }}>
+          <GoldBar pct={65}/>
+          <div style={{ fontSize:11, color:'#8A8A8A', marginTop:6, textAlign:'right' }}>65% · 第 3/5 階段</div>
+        </div>
+        <div style={{ background:'white', borderRadius:16, padding:'14px 16px' }}>
+          {steps.map((s, i) => (
+            <div key={i} style={{ display:'flex', gap:12, alignItems:'flex-start', paddingBottom: i<steps.length-1?14:0, marginBottom: i<steps.length-1?14:0, borderBottom: i<steps.length-1?'0.5px solid rgba(0,0,0,0.06)':'' }}>
+              <div style={{ width:22, height:22, borderRadius:'50%', background: i<done?GO:i===done?'rgba(184,146,74,0.15)':'#EEE', border: i===done?`1.5px solid ${GO}`:'none', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                {i<done && <svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4.5L4 7.5L10 1.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                {i===done && <div style={{ width:6, height:6, borderRadius:'50%', background:GO }}/>}
+              </div>
+              <div>
+                <div style={{ fontSize:13, fontWeight: i===done?500:400, color: i>done?'#8A8A8A':BK, letterSpacing:'.03em' }}>{s}</div>
+                {i===done && <div style={{ fontSize:11, color:GO, marginTop:2 }}>進行中 · LOGO 初稿審核中</div>}
+                {i<done && <div style={{ fontSize:11, color:'#8A8A8A', marginTop:2 }}>已完成</div>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+  return (
+    <div style={{ flex:1, overflowY:'auto', background:'#F5F3F0' }}>
+      <div style={{ background:BK, padding:'12px 20px 20px' }}>
+        <div style={{ fontFamily:serif, fontWeight:300, fontSize:22, color:PA, letterSpacing:'.06em' }}>我的專案</div>
+      </div>
+      <div style={{ padding:16, display:'flex', flexDirection:'column', gap:10 }}>
+        {[
+          { name:'阿婆ㄟ切仔麵店', type:'品牌孵化', pct:65, status:'進行中' },
+          { name:'三代米舖', type:'官網設計', pct:100, status:'已完成' },
+        ].map((p,i) => (
+          <div key={i} onClick={()=>setSel(i)} style={{ background:'white', borderRadius:16, padding:16, cursor:'pointer', boxShadow:'0 1px 4px rgba(0,0,0,0.06)' }}>
+            <div style={{ display:'flex', justifyContent:'space-between', marginBottom:10 }}>
+              <div>
+                <div style={{ fontSize:14, fontWeight:500, color:BK, marginBottom:3 }}>{p.name}</div>
+                <div style={{ fontSize:11, color:'#8A8A8A' }}>{p.type}</div>
+              </div>
+              <Chip label={p.status} color={p.pct===100?'#E8F5E9':'rgba(184,146,74,0.12)'} text={p.pct===100?'#2E7D32':GO}/>
+            </div>
+            <GoldBar pct={p.pct}/>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Screen 3: Chat ─── */
+function ChatScreen() {
+  const msgs = [
+    { from:'advisor', text:'你好！LOGO 初稿已完成，請查看附件，有什麼意見隨時說。', time:'10:24' },
+    { from:'user',    text:'看到了！整體風格很喜歡，想問一下字體可以再細一點嗎？', time:'10:31' },
+    { from:'advisor', text:'沒問題，字重可以調到 Light 300。我今天下午更新第二版給你。', time:'10:33' },
+    { from:'user',    text:'太好了，謝謝！', time:'10:35' },
+    { from:'advisor', text:'第二版已上傳，請確認。這版字重已調整，品牌金色的比例也微調了一下。', time:'15:02' },
+  ];
+  return (
+    <div style={{ flex:1, display:'flex', flexDirection:'column', background:'#F5F3F0' }}>
+      <div style={{ background:BK, padding:'10px 16px 14px', display:'flex', alignItems:'center', gap:10 }}>
+        <Avatar name="M" bg="rgba(184,146,74,0.15)" color={GO} size={36}/>
+        <div>
+          <div style={{ fontSize:14, fontWeight:500, color:PA, letterSpacing:'.03em' }}>Mei · 你的顧問</div>
+          <div style={{ fontSize:10, color:'rgba(245,242,236,0.4)' }}>● 線上中</div>
+        </div>
+      </div>
+      <div style={{ flex:1, overflowY:'auto', padding:'12px 16px', display:'flex', flexDirection:'column', gap:8 }}>
+        {msgs.map((m, i) => (
+          <div key={i} style={{ display:'flex', justifyContent: m.from==='user'?'flex-end':'flex-start', gap:8, alignItems:'flex-end' }}>
+            {m.from==='advisor' && <Avatar name="M" size={28} bg="rgba(184,146,74,0.12)" color={GO}/>}
+            <div style={{ maxWidth:'72%' }}>
+              <div style={{ background: m.from==='user'?GO:'white', color: m.from==='user'?'white':BK, borderRadius: m.from==='user'?'16px 16px 4px 16px':'16px 16px 16px 4px', padding:'9px 12px', fontSize:13, lineHeight:1.5, letterSpacing:'.03em', boxShadow:'0 1px 3px rgba(0,0,0,0.08)' }}>{m.text}</div>
+              <div style={{ fontSize:10, color:'#8A8A8A', marginTop:3, textAlign: m.from==='user'?'right':'left' }}>{m.time}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ background:'rgba(249,247,244,0.95)', backdropFilter:'blur(12px)', borderTop:'0.5px solid rgba(0,0,0,0.1)', padding:'8px 12px', display:'flex', gap:8, alignItems:'center' }}>
+        <div style={{ flex:1, background:'white', borderRadius:20, padding:'8px 14px', fontSize:13, color:'#8A8A8A', border:'0.5px solid rgba(0,0,0,0.08)' }}>傳訊息給 Mei…</div>
+        <div style={{ width:34, height:34, borderRadius:'50%', background:GO, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M22 2L11 13M22 2L15 22 11 13 2 9 22 2Z"/></svg>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Screen 4: Services ─── */
+function ServicesScreen() {
+  const svcs = [
+    { icon:'🌱', name:'品牌孵化',  price:'$6,000 起', desc:'從零到一的品牌建立' },
+    { icon:'🌐', name:'官網設計',  price:'$15,000 起', desc:'展現品牌質感的網站' },
+    { icon:'📱', name:'App 設計', price:'$30,000 起', desc:'手機端體驗設計' },
+    { icon:'🎬', name:'影音剪輯',  price:'$2,000 起', desc:'產品影片、品牌短片' },
+    { icon:'📸', name:'外送美圖',  price:'$500 起',   desc:'外送平台產品照優化' },
+    { icon:'✏️', name:'後台美編',  price:'$800/月',   desc:'社群貼文、海報、EDM' },
+  ];
+  return (
+    <div style={{ flex:1, overflowY:'auto', background:'#F5F3F0' }}>
+      <div style={{ background:BK, padding:'12px 20px 20px' }}>
+        <div style={{ fontFamily:serif, fontWeight:300, fontSize:22, color:PA, letterSpacing:'.06em' }}>服務一覽</div>
+        <div style={{ fontSize:11, color:'rgba(245,242,236,0.4)', marginTop:3 }}>6 種方式，幫你被看見</div>
+      </div>
+      <div style={{ padding:12, display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+        {svcs.map((s, i) => (
+          <div key={i} style={{ background:'white', borderRadius:16, padding:14, boxShadow:'0 1px 3px rgba(0,0,0,0.06)', cursor:'pointer' }}>
+            <div style={{ fontSize:24, marginBottom:8 }}>{s.icon}</div>
+            <div style={{ fontSize:13, fontWeight:500, color:BK, marginBottom:3, letterSpacing:'.03em' }}>{s.name}</div>
+            <div style={{ fontSize:11, color:'#8A8A8A', marginBottom:8, lineHeight:1.4 }}>{s.desc}</div>
+            <div style={{ fontSize:12, color:GO, fontWeight:500, letterSpacing:'.04em' }}>{s.price}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ margin:'4px 12px 16px', background:BK, borderRadius:14, padding:14, textAlign:'center', cursor:'pointer' }}>
+        <div style={{ fontSize:13, color:PA, letterSpacing:'.06em' }}>預約免費諮詢</div>
+        <div style={{ fontSize:11, color:GO, marginTop:3 }}>30 分鐘 · 不強迫</div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Screen 5: Booking ─── */
+function BookScreen() {
+  const [step, setStep] = useState(0);
+  const times = ['9:00', '10:00', '11:00', '14:00', '15:00', '16:00'];
+  const [selTime, setSelTime] = useState(null);
+  const [selDate, setSelDate] = useState(4);
+  const dates = [
+    { d:'今', w:'二', full:'6/3' },
+    { d:'4', w:'三', full:'6/4' },
+    { d:'5', w:'四', full:'6/5' },
+    { d:'6', w:'五', full:'6/6' },
+    { d:'7', w:'六', full:'6/7' },
+  ];
+  if (step===2) return (
+    <div style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', background:'#F5F3F0', padding:24, textAlign:'center' }}>
+      <div style={{ width:64, height:64, borderRadius:'50%', background:`rgba(184,146,74,0.12)`, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:20 }}>
+        <svg width="32" height="26" viewBox="0 0 32 26" fill="none"><path d="M2 13L11 22L30 3" stroke={GO} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+      </div>
+      <div style={{ fontFamily:serif, fontWeight:300, fontSize:22, color:BK, letterSpacing:'.06em', marginBottom:8 }}>預約完成</div>
+      <div style={{ fontSize:13, color:'#8A8A8A', lineHeight:1.7, marginBottom:24 }}>
+        6/6 (五) {selTime || '15:00'}<br/>與顧問 Mei 30 分鐘諮詢<br/>你會收到 LINE 提醒
+      </div>
+      <button onClick={()=>setStep(0)} style={{ border:`1px solid ${GO}`, background:'none', color:GO, borderRadius:12, padding:'10px 24px', fontSize:13, cursor:'pointer', letterSpacing:'.06em' }}>返回主頁</button>
+    </div>
+  );
+  return (
+    <div style={{ flex:1, overflowY:'auto', background:'#F5F3F0' }}>
+      <div style={{ background:BK, padding:'12px 20px 20px' }}>
+        <div style={{ fontFamily:serif, fontWeight:300, fontSize:22, color:PA, letterSpacing:'.06em' }}>預約諮詢</div>
+        <div style={{ display:'flex', gap:4, marginTop:10 }}>
+          {['選時段','確認'].map((l,i) => (
+            <div key={i} style={{ height:3, flex:1, borderRadius:2, background: i<=step?GO:'rgba(184,146,74,0.2)' }}/>
+          ))}
+        </div>
+      </div>
+      {step===0 && (
+        <div style={{ padding:16 }}>
+          <div style={{ fontSize:12, color:'#8A8A8A', letterSpacing:'.08em', marginBottom:10 }}>選擇日期</div>
+          <div style={{ display:'flex', gap:6, marginBottom:16 }}>
+            {dates.map((d,i) => (
+              <div key={i} onClick={()=>setSelDate(i)} style={{ flex:1, textAlign:'center', padding:'8px 4px', borderRadius:12, background: selDate===i?GO:'white', cursor:'pointer', transition:'all .2s', boxShadow:'0 1px 3px rgba(0,0,0,0.06)' }}>
+                <div style={{ fontSize:10, color: selDate===i?'rgba(255,255,255,0.7)':'#8A8A8A', marginBottom:2 }}>{d.w}</div>
+                <div style={{ fontSize:15, fontWeight:500, color: selDate===i?'white':BK }}>{d.d}</div>
+                <div style={{ fontSize:9, color: selDate===i?'rgba(255,255,255,0.6)':'#8A8A8A', marginTop:1 }}>{d.full}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ fontSize:12, color:'#8A8A8A', letterSpacing:'.08em', marginBottom:10 }}>選擇時段（30 分鐘）</div>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:8 }}>
+            {times.map(t => (
+              <div key={t} onClick={()=>setSelTime(t)} style={{ textAlign:'center', padding:'10px 4px', borderRadius:10, background: selTime===t?GO:'white', cursor:'pointer', fontSize:13, color: selTime===t?'white':BK, transition:'all .2s', boxShadow:'0 1px 3px rgba(0,0,0,0.06)' }}>{t}</div>
+            ))}
+          </div>
+          <button onClick={()=>selTime && setStep(1)} style={{ width:'100%', marginTop:16, background: selTime?GO:'#E0D8CC', color: selTime?'white':'#8A8A8A', border:'none', borderRadius:14, padding:14, fontSize:14, cursor: selTime?'pointer':'default', transition:'all .2s', letterSpacing:'.06em' }}>下一步</button>
+        </div>
+      )}
+      {step===1 && (
+        <div style={{ padding:16 }}>
+          <div style={{ background:'white', borderRadius:16, padding:16, marginBottom:12, boxShadow:'0 1px 4px rgba(0,0,0,0.06)' }}>
+            <div style={{ fontSize:12, color:'#8A8A8A', marginBottom:12 }}>確認諮詢資訊</div>
+            {[['日期','6/6 (五)'],['時間',selTime || '15:00'],['時長','30 分鐘'],['顧問','Mei'],['方式','LINE 視訊']].map(([l,v]) => (
+              <div key={l} style={{ display:'flex', justifyContent:'space-between', paddingBottom:10, borderBottom:'0.5px solid rgba(0,0,0,0.06)', marginBottom:10 }}>
+                <span style={{ fontSize:13, color:'#8A8A8A' }}>{l}</span>
+                <span style={{ fontSize:13, color:BK, fontWeight:500 }}>{v}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{ background:'rgba(184,146,74,0.08)', borderRadius:12, padding:'10px 14px', fontSize:12, color:'#8A8A8A', marginBottom:12 }}>免費諮詢，不強迫推銷。確認後將收到 LINE 提醒。</div>
+          <button onClick={()=>setStep(2)} style={{ width:'100%', background:GO, color:'white', border:'none', borderRadius:14, padding:14, fontSize:14, cursor:'pointer', letterSpacing:'.06em' }}>確認預約</button>
+          <button onClick={()=>setStep(0)} style={{ width:'100%', background:'none', color:'#8A8A8A', border:'none', padding:'10px 0', fontSize:13, cursor:'pointer', marginTop:6 }}>返回修改</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── Main App ─── */
+const screenLabels = { home:'01 主頁', projects:'02 專案追蹤', chat:'03 顧問聊天', services:'04 服務一覽', book:'05 預約諮詢' };
+
+function App() {
+  const [tab, setTab] = useState('home');
+  return (
+    <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:14 }}>
+      <div className="scene-label">{screenLabels[tab]}</div>
+      <div className="tabs-outer">
+        {Object.entries(screenLabels).map(([k,l]) => (
+          <button key={k} className={tab===k?'active':''} onClick={()=>setTab(k)}>{l}</button>
+        ))}
+      </div>
+      <IOSDevice style={{ maxHeight:'82vh' }}>
+        <IOSStatusBar dark={true} time="9:41"/>
+        {tab==='home'     && <HomeScreen/>}
+        {tab==='projects' && <ProjectsScreen/>}
+        {tab==='chat'     && <ChatScreen/>}
+        {tab==='services' && <ServicesScreen/>}
+        {tab==='book'     && <BookScreen/>}
+        <TabBar current={tab} onSelect={setTab}/>
+      </IOSDevice>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

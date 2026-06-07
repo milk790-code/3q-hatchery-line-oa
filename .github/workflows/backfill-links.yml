@@ -1,0 +1,19 @@
+name: Backfill FB Links
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repair links on published FB posts
+        env:
+          TRIGGER_TOKEN: ${{ secrets.TRIGGER_TOKEN }}
+        run: |
+          set -euo pipefail
+          resp=$(curl -sS -X POST "https://3q-social-publisher.milk790.workers.dev/admin/backfill-links" \
+            -H "Authorization: Bearer $TRIGGER_TOKEN")
+          echo "$resp" | jq .
+          echo "$resp" | jq -e '.ok == true' > /dev/null
+          echo "$resp" | jq -r '.results[]? | "::notice::queue#\(.id): \(if .ok then (if .already then "已有連結" else "補上(\(.via))" end) else (.skipped // .failed // "?") end)"'

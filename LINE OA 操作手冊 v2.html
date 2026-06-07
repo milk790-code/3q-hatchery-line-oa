@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>3Q · LINE OA 上線操作手冊 v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400&family=Noto+Serif+TC:wght@200;300;400&display=swap" rel="stylesheet"/>
+<style>
+:root{--black:#0C0A08;--paper:#F5F2EC;--gold:#B8924A;--stone:#8A8A8A;--serif:"Noto Serif TC",serif;--sans:"Noto Sans TC",sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);font-family:var(--sans);font-weight:300;color:var(--black);-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:60px 40px}
+
+/* header */
+.hd{border-bottom:1px solid rgba(184,146,74,0.2);padding-bottom:32px;margin-bottom:48px}
+.hd-eye{font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.hd h1{font-family:var(--serif);font-weight:300;font-size:28px;letter-spacing:.1em;margin-bottom:8px}
+.hd .sub{font-size:12px;color:var(--stone);letter-spacing:.05em;line-height:1.6}
+
+/* phase block */
+.phase{margin-bottom:48px}
+.phase-label{font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.phase-label::after{content:"";flex:1;height:1px;background:rgba(184,146,74,0.2)}
+.phase h2{font-family:var(--serif);font-weight:300;font-size:20px;letter-spacing:.1em;margin-bottom:20px}
+
+/* steps */
+.steps{display:flex;flex-direction:column;gap:0}
+.step{display:flex;gap:20px;padding:18px 0;border-bottom:1px solid rgba(0,0,0,0.06)}
+.step:last-child{border-bottom:none}
+.step-num{width:28px;height:28px;border-radius:50%;border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:10px;font-family:var(--serif);font-style:italic;color:var(--gold);flex-shrink:0;margin-top:2px}
+.step-body{flex:1}
+.step-title{font-size:14px;letter-spacing:.06em;color:var(--black);margin-bottom:4px}
+.step-desc{font-size:12px;line-height:1.7;color:var(--stone);letter-spacing:.03em}
+.step-path{display:inline-block;margin-top:6px;font-size:11px;background:#F0EDE7;padding:3px 8px;border-radius:3px;color:var(--black);letter-spacing:.05em;font-family:"SFMono-Regular",Menlo,monospace}
+.step-note{display:inline-block;margin-top:6px;font-size:10px;color:var(--gold);letter-spacing:.05em}
+
+/* info box */
+.infobox{background:white;border-left:2px solid var(--gold);padding:14px 18px;margin:16px 0;border-radius:0 6px 6px 0}
+.infobox p{font-size:12px;line-height:1.7;color:var(--stone)}
+.infobox strong{color:var(--black);font-weight:400}
+
+/* tag badges */
+.tag{display:inline-block;font-size:9px;letter-spacing:.15em;text-transform:uppercase;padding:2px 7px;border:0.5px solid var(--gold);color:var(--gold);margin-right:4px;margin-bottom:4px}
+.tag.done{border-color:#3A8A4A;color:#3A8A4A}
+.tag.todo{border-color:var(--stone);color:var(--stone)}
+
+/* checklist */
+.checklist{display:flex;flex-direction:column;gap:0;margin-top:12px}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.05)}
+.check-item:last-child{border-bottom:none}
+.check-box{width:16px;height:16px;border:1px solid var(--gold);border-radius:2px;flex-shrink:0;margin-top:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.check-box.checked{background:var(--gold)}
+.check-box.checked::after{content:"✓";font-size:10px;color:white}
+.check-text{font-size:12px;line-height:1.6;color:var(--black);letter-spacing:.03em}
+.check-text.checked-text{text-decoration:line-through;color:var(--stone)}
+
+/* copy button */
+.copy-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.copy-btn{background:none;border:0.5px solid rgba(184,146,74,0.4);color:var(--gold);font-size:10px;letter-spacing:.15em;padding:4px 12px;cursor:pointer;border-radius:3px;font-family:inherit;transition:all .2s}
+.copy-btn:hover{background:rgba(184,146,74,0.08)}
+code{font-size:11px;background:#F0EDE7;padding:2px 6px;border-radius:3px;font-family:"SFMono-Regular",Menlo,monospace;letter-spacing:.03em}
+
+/* footer */
+.ft{border-top:1px solid rgba(184,146,74,0.15);padding-top:24px;margin-top:48px;font-size:10px;color:var(--stone);letter-spacing:.1em;display:flex;justify-content:space-between}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hd">
+    <div class="hd-eye">LINE OA SETUP GUIDE · v2</div>
+    <h1>3Q貢丸 · LINE 官方帳號上線手冊</h1>
+    <p class="sub">依序完成以下步驟，約 30–60 分鐘可全部上線。已完成的項目打勾追蹤進度。</p>
+  </div>
+
+  <!-- P0 -->
+  <div class="phase">
+    <div class="phase-label">P0 · 上線前必備</div>
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">上傳 PNG 到 GitHub Pages</div>
+          <div class="step-desc">將以下 5 張圖片放到你的 GitHub repo 的 <code>assets/exports/</code> 目錄，push 後自動部署。</div>
+          <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">
+            <span class="tag done">✓ 已有</span> <code>3Q-HATCHERY_richmenu_a_v2_2500x1686.png</code><br/>
+            <span class="tag done">✓ 已有</span> <code>3Q-HATCHERY_richmenu_b_v2_2500x1686.png</code><br/>
+            <span class="tag done">✓ 已有</span> <code>3Q-HATCHERY_richmenu_c_v2_2500x1686.png</code><br/>
+            <span class="tag done">✓ 已有</span> <code>3Q-HATCHERY_welcome-card_1040x1040.png</code><br/>
+            <span class="tag done">✓ 已有</span> <code>3Q-HATCHERY_member-card-bg_1040x585.png</code>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">跑 Rich Menu 上傳腳本</div>
+          <div class="step-desc">在終端機執行，自動建立三版 Rich Menu 並回傳 3 個 ID。</div>
+          <div class="step-path">export CHANNEL_TOKEN="你的Token" && chmod +x export/upload-richmenu.sh && ./export/upload-richmenu.sh</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">填入 worker.js 的 Rich Menu ID</div>
+          <div class="step-desc">腳本跑完後把三個 ID 填進 worker.js 對應的常數。</div>
+          <div class="step-path">const RICHMENU_NEW = "richmenu-xxx";<br/>const RICHMENU_INQUIRED = "richmenu-yyy";<br/>const RICHMENU_CONVERTED = "richmenu-zzz";</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">設定歡迎訊息 + Carousel</div>
+          <div class="step-desc">在 LINE Official Account Manager 設定歡迎訊息。</div>
+          <div class="infobox">
+            <p><strong>路徑：</strong>LINE Official Account Manager → 主頁 → 訊息設定 → 歡迎訊息 → 編輯</p>
+            <p style="margin-top:8px"><strong>步驟：</strong></p>
+            <p>① 點「新增」→ 選「Flex Message」</p>
+            <p>② 點右上角「JSON」切換編輯模式</p>
+            <p>③ 貼上 <a href="Welcome Carousel.html" style="color:var(--gold)">Welcome Carousel.html</a> 頁底的 JSON</p>
+            <p>④ 點「預覽」確認，再按「儲存」</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title">設定 6 組關鍵字自動回覆</div>
+          <div class="step-desc">路徑：自動回應訊息 → 建立 → 依下表貼入</div>
+          <div class="infobox">
+            <p><strong>我想說說我的店</strong> / 我的店 / 我想說 → 好。先告訴我們三件事：1. 你的店在哪裡 2. 你做的東西是什麼 3. 你現在最頭痛的一件事</p>
+            <p style="margin-top:8px"><strong>好物 / 好照 / 拍照 / 500</strong> → 「好物・好照」從一個產品開始，500 元起。回「實例」看三個。</p>
+            <p style="margin-top:8px"><strong>客製 / 行銷 / 陪跑</strong> → 客製行銷是季度規劃。先約 30 分鐘免費諮詢。回「諮詢」開時段。</p>
+            <p style="margin-top:8px"><strong>進度 / 走到哪</strong> → 請告訴我們你的店名 / 報名編號，會回你目前進度。</p>
+            <p style="margin-top:8px"><strong>實例 / 案例 / 看作品</strong> → 本月入駐：01 阿婆ㄟ切仔麵店 02 三代米舖 03 鹿港織坊。回 01/02/03 看。</p>
+            <p style="margin-top:8px"><strong>諮詢 / 預約</strong> → 好。告訴我們：店名 / 角色 / 想聊什麼。24h 內寄時段。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <div class="step-title">QA 測試</div>
+          <div class="step-desc">加入帳號後逐項點過一次，確認所有按鈕和自動回覆正常。</div>
+          <div class="step-note">LINE ID: <code>https://lin.ee/UKKodJj</code></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- P1 -->
+  <div class="phase">
+    <div class="phase-label">P1 · 功能完整</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-body">
+          <div class="step-title">Rich Menu 階段切換</div>
+          <div class="step-desc">在 worker.js 的 <code>switchRichMenu()</code> 接上正確邏輯：用戶送出「說說我的店」→ 切到 INQUIRED；完成交易後 → 切到 CONVERTED。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">8</div>
+        <div class="step-body">
+          <div class="step-title">会員卡背景</div>
+          <div class="step-desc">在 worker.js 的 <code>memberCardFlex()</code> 引用 <code>memberBg</code> URL，自動生成個人化會員卡。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P2 -->
+  <div class="phase">
+    <div class="phase-label">P2 · 長期</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">9</div>
+        <div class="step-body">
+          <div class="step-title">30 天內容排程</div>
+          <div class="step-desc">參考 <code>ui_kits/line_oa/calendar.html</code> 的貼文計劃表，在 LINE 後台排程發送。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">10</div>
+        <div class="step-body">
+          <div class="step-title">IG / Threads / TikTok 同步上線</div>
+          <div class="step-desc">使用 <code>ui_kits/social/launch.html</code> 的素材，配合 Landing Page 和品牌動畫影片一起發。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 進度追蹤 -->
+  <div class="phase">
+    <div class="phase-label">進度追蹤</div>
+    <div class="checklist" id="checklist">
+      <div class="check-item"><div class="check-box" onclick="toggle(this)"></div><div class="check-text">Rich Menu v2 PNG 已匯出 (Rich Menu v2.html)</div></div>
+      <div class="check-item"><div class="check-box" onclick="toggle(this)"></div><div class="check-text">PNG 已上傳 GitHub Pages</div></div>
+      <div class="check-item"><div class="check-box" onclick="toggle(this)"></div><div class="check-text">upload-richmenu.sh 執行完成，3 個 ID 取得</div></div>
+      <div class="check-item"><div class="check-box" onclick="toggle(this)"></div><div class="check-text">worker.js 填入 3 個 RICHMENU_ID</div></div>
+      <div class="check-item"><div class="check-box" onclick="toggle(this)"></div><div class="check-text">歡迎 Carousel JSON 貼到 LINE 後台</div></div>
+      <div class="check-item"><div class="check-box" onclick="toggle(this)"></div><div class="check-text">6 組關鍵字自動回覆設定完成</div></div>
+      <div class="check-item"><div class="check-box" onclick="toggle(this)"></div><div class="check-text">加入帳號 QA 測試完成</div></div>
+      <div class="check-item"><div class="check-box" onclick="toggle(this)"></div><div class="check-text">Landing Page 上線</div></div>
+      <div class="check-item"><div class="check-box" onclick="toggle(this)"></div><div class="check-text">社群媒體同步上線</div></div>
+    </div>
+  </div>
+
+  <div class="ft">
+    <span>3Q貢丸 · 台灣在地品牌孵化所</span>
+    <span>LINE: https://lin.ee/UKKodJj</span>
+  </div>
+</div>
+
+<script>
+function toggle(el) {
+  el.classList.toggle('checked');
+  const txt = el.nextElementSibling;
+  txt.classList.toggle('checked-text');
+  // persist
+  const items = [...document.querySelectorAll('.check-box')];
+  localStorage.setItem('3q-checklist', JSON.stringify(items.map(b => b.classList.contains('checked'))));
+}
+// restore
+const saved = JSON.parse(localStorage.getItem('3q-checklist') || '[]');
+document.querySelectorAll('.check-box').forEach((b, i) => {
+  if (saved[i]) { b.classList.add('checked'); b.nextElementSibling.classList.add('checked-text'); }
+});
+</script>
+</body>
+</html>

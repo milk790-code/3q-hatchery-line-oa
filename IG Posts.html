@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<title>3Q · IG 貼文系列 10 張</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400&family=Noto+Serif+TC:wght@200;300;400&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0A0A0A;font-family:"Noto Sans TC",sans-serif;padding:36px}
+.pg-head{margin-bottom:28px;display:flex;align-items:baseline;justify-content:space-between;gap:16px}
+.pg-head h1{color:#F5F2EC;font-size:15px;font-weight:300;letter-spacing:.15em}
+.pg-head p{font-size:11px;color:#555;letter-spacing:.05em}
+.export-all-btn{background:none;border:0.5px solid rgba(184,146,74,0.5);color:#B8924A;font-size:10px;letter-spacing:.15em;padding:5px 14px;cursor:pointer;font-family:inherit;transition:all .25s;white-space:nowrap}
+.export-all-btn:hover{background:rgba(184,146,74,0.1)}
+.grid{display:grid;grid-template-columns:repeat(3,auto);gap:20px 16px}
+.pw{display:flex;flex-direction:column;gap:7px}
+.pl{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pn{font-size:9.5px;color:#B8924A;letter-spacing:.15em;white-space:nowrap}
+.dl{background:none;border:0.5px solid rgba(184,146,74,0.3);color:#B8924A;font-size:9px;letter-spacing:.1em;padding:2px 8px;cursor:pointer;border-radius:2px;font-family:inherit;transition:all .2s;flex-shrink:0}
+.dl:hover{background:rgba(184,146,74,0.1)}
+.dl:disabled{opacity:.3;cursor:wait}
+.status{font-size:9px;color:#555;letter-spacing:.05em;height:14px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const NW = 1080, NH = 1350, SC = 0.27;
+const W = NW * SC, H = NH * SC;
+const sq = n => n * SC;
+const RF = '"Noto Serif TC", serif';
+const RS = '"Noto Sans TC", sans-serif';
+const BK = '#0C0A08', PA = '#F5F2EC', GO = '#B8924A';
+
+const Glow = ({top='-20%',right='-10%',left,bottom,w='70%',h='60%',op=0.09}) => (
+  <div style={{position:'absolute',top,right,left,bottom,width:w,height:h,background:`radial-gradient(circle,rgba(184,146,74,${op}),transparent)`,pointerEvents:'none'}}/>
+);
+const Brand = ({light}) => (
+  <div style={{position:'absolute',bottom:sq(36),right:sq(40),fontFamily:RS,fontWeight:300,fontSize:sq(16),letterSpacing:'.30em',color:light?'rgba(184,146,74,0.35)':'rgba(184,146,74,0.28)',textTransform:'uppercase'}}>3Q · BRAND HATCHERY</div>
+);
+const Hair = ({w=36,my=40}) => <div style={{width:sq(w),height:.5,background:GO,margin:`${sq(my)}px auto`}}/>;
+
+/* ─ Icons ─ */
+const Ico = ({children,sz=90}) => <svg width={sq(sz)} height={sq(sz)} viewBox="0 0 80 80" fill="none" stroke={GO} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">{children}</svg>;
+const IcoEgg    = () => <Ico><path d="M20 60 C20 35 30 18 40 18 C50 18 60 35 60 60Z"/><line x1="26" y1="50" x2="34" y2="50"/><line x1="46" y1="50" x2="54" y2="50"/></Ico>;
+const IcoBrow   = () => <Ico><rect x="10" y="14" width="60" height="52" rx="3"/><line x1="10" y1="26" x2="70" y2="26"/><circle cx="18" cy="20" r="2"/><circle cx="24" cy="20" r="2"/></Ico>;
+const IcoPhone  = () => <Ico><rect x="22" y="8" width="36" height="64" rx="5"/><line x1="22" y1="20" x2="58" y2="20"/><line x1="22" y1="60" x2="58" y2="60"/><circle cx="40" cy="66" r="2"/></Ico>;
+const IcoPlay   = () => <Ico><circle cx="40" cy="40" r="26"/><polygon points="35,28 55,40 35,52"/></Ico>;
+const IcoCamera = () => <Ico><rect x="12" y="22" width="56" height="40" rx="3"/><circle cx="40" cy="42" r="10"/><path d="M30 22 L35 14 H45 L50 22"/><circle cx="58" cy="30" r="2" fill={GO} stroke="none"/></Ico>;
+const IcoGrid   = () => <Ico><rect x="10" y="10" width="25" height="25"/><rect x="45" y="10" width="25" height="25"/><rect x="10" y="45" width="25" height="25"/><rect x="45" y="45" width="25" height="25"/></Ico>;
+const IcoTree   = () => (
+  <svg width={sq(130)} height={sq(130)} viewBox="0 0 280 280" fill="none" stroke={GO} strokeWidth="1.2" strokeLinecap="round">
+    <line x1="140" y1="60" x2="140" y2="240"/>
+    <path d="M140 80 Q120 90 110 110 Q120 105 140 100"/><path d="M140 80 Q160 90 170 110 Q160 105 140 100"/>
+    <path d="M140 110 Q110 120 95 145 Q115 138 140 130"/><path d="M140 110 Q170 120 185 145 Q165 138 140 130"/>
+    <path d="M140 140 Q100 152 80 180 Q110 170 140 162"/><path d="M140 140 Q180 152 200 180 Q170 170 140 162"/>
+    <circle cx="140" cy="48" r="3" fill={GO} stroke="none"/>
+    <circle cx="140" cy="48" r="12" strokeOpacity="0.3"/>
+  </svg>
+);
+
+/* ─ Post Types ─ */
+function DarkPost({eyebrow, headline, sub, cta, accent}) {
+  return (
+    <div style={{width:W,height:H,background:BK,position:'relative',overflow:'hidden',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',padding:`${sq(80)}px ${sq(72)}px`}}>
+      <Glow/>
+      {accent && <Glow top="60%" left="-10%" right="auto" bottom="auto" w="60%" h="50%" op={0.04}/>}
+      <div style={{fontFamily:RS,fontSize:sq(18),fontWeight:300,letterSpacing:'.35em',textTransform:'uppercase',color:GO,marginBottom:sq(44)}}>{eyebrow}</div>
+      <IcoTree/>
+      <Hair/>
+      <div style={{fontFamily:RF,fontWeight:300,fontSize:sq(76),letterSpacing:'.10em',color:PA,lineHeight:1.35,marginBottom:sq(24),whiteSpace:'pre-line'}}>{headline}</div>
+      <div style={{fontFamily:RF,fontWeight:300,fontStyle:'italic',fontSize:sq(26),letterSpacing:'.08em',color:'rgba(245,242,236,0.55)',lineHeight:1.75,maxWidth:sq(820)}}>{sub}</div>
+      {cta && <div style={{marginTop:sq(52),fontFamily:RS,fontSize:sq(18),letterSpacing:'.25em',color:GO}}>{cta}</div>}
+      <Brand/>
+    </div>
+  );
+}
+
+function ServicePost({num, Icon, title, desc}) {
+  const splitH = 0.58 * H;
+  return (
+    <div style={{width:W,height:H,background:BK,position:'relative',overflow:'hidden',display:'flex',flexDirection:'column'}}>
+      <div style={{height:splitH,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',position:'relative'}}>
+        <Glow/>
+        <div style={{position:'absolute',top:sq(28),left:sq(40),fontFamily:RF,fontStyle:'italic',fontSize:sq(18),color:'rgba(184,146,74,0.38)',letterSpacing:'.1em'}}>SERVICE {num}</div>
+        <Icon/>
+      </div>
+      <div style={{height:.5,background:'rgba(184,146,74,0.12)',margin:`0 ${sq(60)}px`}}/>
+      <div style={{flex:1,padding:`${sq(50)}px ${sq(60)}px`,display:'flex',flexDirection:'column',justifyContent:'space-between'}}>
+        <div>
+          <div style={{fontFamily:RF,fontWeight:300,fontSize:sq(58),letterSpacing:'.12em',color:PA,lineHeight:1.2,marginBottom:sq(18)}}>{title}</div>
+          <div style={{fontFamily:RS,fontWeight:300,fontSize:sq(22),letterSpacing:'.05em',color:'rgba(245,242,236,0.48)',lineHeight:1.75}}>{desc}</div>
+        </div>
+        <div style={{fontFamily:RS,fontWeight:300,fontSize:sq(16),letterSpacing:'.28em',color:'rgba(184,146,74,0.28)',textTransform:'uppercase'}}>3Q · BRAND HATCHERY</div>
+      </div>
+    </div>
+  );
+}
+
+function CasePost() {
+  return (
+    <div style={{width:W,height:H,background:'#0E0C0A',position:'relative',overflow:'hidden',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',padding:`${sq(80)}px`}}>
+      <Glow top="-10%" left="-15%" right="auto" w="65%" h="55%" op={0.06}/>
+      <div style={{fontFamily:RS,fontSize:sq(16),fontWeight:300,letterSpacing:'.4em',textTransform:'uppercase',color:GO,marginBottom:sq(40)}}>COMING SOON</div>
+      <div style={{width:sq(36),height:.5,background:GO,marginBottom:sq(44)}}/>
+      <div style={{fontFamily:RF,fontWeight:300,fontSize:sq(64),letterSpacing:'.10em',color:PA,lineHeight:1.45,marginBottom:sq(28)}}>他們的故事，<br/>即將登場。</div>
+      <div style={{fontFamily:RF,fontWeight:300,fontStyle:'italic',fontSize:sq(24),color:'rgba(245,242,236,0.45)',letterSpacing:'.08em'}}>入駐品牌 × 3Q貢丸</div>
+      <div style={{marginTop:sq(60),width:sq(14),height:sq(14),border:`0.5px solid ${GO}`,transform:'rotate(45deg)',opacity:.4}}/>
+      <Brand/>
+    </div>
+  );
+}
+
+function QuotePost({quote, who}) {
+  return (
+    <div style={{width:W,height:H,background:PA,position:'relative',overflow:'hidden',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:`${sq(100)}px ${sq(80)}px`,textAlign:'center'}}>
+      <div style={{position:'absolute',top:sq(28),left:sq(36),fontFamily:RF,fontSize:sq(200),color:'rgba(184,146,74,0.07)',lineHeight:1,userSelect:'none',pointerEvents:'none'}}>「</div>
+      <div style={{fontFamily:RF,fontWeight:300,fontSize:sq(42),letterSpacing:'.10em',color:BK,lineHeight:1.75,position:'relative',marginBottom:sq(56)}}>「{quote}」</div>
+      <div style={{width:sq(36),height:.5,background:GO,marginBottom:sq(28)}}/>
+      <div style={{fontFamily:RS,fontWeight:300,fontSize:sq(20),letterSpacing:'.1em',color:'#8A8A8A'}}>{who}</div>
+      <Brand light/>
+    </div>
+  );
+}
+
+/* ─ Post data ─ */
+const posts = [
+  {id:'p01',label:'01 開帳號公告',   el:<DarkPost eyebrow="LAUNCH · 開帳了" headline={"我們來了。"} sub="只要你願意說，我們就幫你被看見。" cta="LINE: lin.ee/UKKodJj" accent/>},
+  {id:'p02',label:'02 品牌介紹',     el:<DarkPost eyebrow="ABOUT US · 關於我們" headline={"陪小店家，\n被看見。"} sub="從 10 元茶葉蛋到上市企業，我們都接得住。"/>},
+  {id:'p03',label:'03 品牌孵化',     el:<ServicePost num="01" Icon={IcoEgg}    title="品牌孵化" desc="從名字到包裝，從零開始打造你的品牌"/>},
+  {id:'p04',label:'04 官網設計',     el:<ServicePost num="02" Icon={IcoBrow}   title="官網設計" desc="一個讓人記住的網站，展現你的質感"/>},
+  {id:'p05',label:'05 App 設計',     el:<ServicePost num="03" Icon={IcoPhone}  title="App 設計" desc="手機上的體驗，讓客人更方便找到你"/>},
+  {id:'p06',label:'06 影音剪輯',     el:<ServicePost num="04" Icon={IcoPlay}   title="影音剪輯" desc="產品影片、品牌短片，用畫面好好說一次"/>},
+  {id:'p07',label:'07 外送美圖',     el:<ServicePost num="05" Icon={IcoCamera} title="外送美圖" desc="外送平台的產品照，讓人滑到就想點"/>},
+  {id:'p08',label:'08 後台美編',     el:<ServicePost num="06" Icon={IcoGrid}   title="後台美編" desc="社群貼文、海報、EDM，日常視覺交給我們"/>},
+  {id:'p09',label:'09 合作案例預告', el:<CasePost/>},
+  {id:'p10',label:'10 客戶見證',     el:<QuotePost quote="只說了店的狀況，他們就給了方向。" who="— 3Q 入駐品牌"/>},
+];
+
+async function dlPost(id, label, setStatus) {
+  if (!window.htmlToImage) { setStatus('需要在瀏覽器中開啟'); return; }
+  setStatus('匯出中...');
+  try {
+    await document.fonts.ready;
+    const el = document.getElementById(id);
+    const url = await htmlToImage.toPng(el, { pixelRatio: 4, backgroundColor: '#0C0A08' });
+    const a = document.createElement('a'); a.download = `3Q-IG-${label}.png`; a.href = url; a.click();
+    setStatus('✓ 已下載');
+    setTimeout(() => setStatus(''), 2500);
+  } catch(e) { setStatus('失敗: ' + e.message); }
+}
+
+function App() {
+  const [statuses, setStatuses] = React.useState({});
+  const [allBusy, setAllBusy] = React.useState(false);
+  const setS = (id, v) => setStatuses(s => ({...s, [id]: v}));
+
+  async function exportAll() {
+    setAllBusy(true);
+    for (const {id, label} of posts) {
+      await dlPost(id, label, v => setS(id, v));
+      await new Promise(r => setTimeout(r, 600));
+    }
+    setAllBusy(false);
+  }
+
+  return (
+    <div>
+      <div className="pg-head">
+        <div>
+          <h1>3Q貢丸 · IG 貼文系列</h1>
+          <p>10 張 · 1080×1350 · 點各張右下角「↓ PNG」下載</p>
+        </div>
+        <button className="export-all-btn" onClick={exportAll} disabled={allBusy}>
+          {allBusy ? '匯出中...' : '匯出全部 PNG'}
+        </button>
+      </div>
+
+      <div className="grid">
+        {posts.map(({id, label, el}) => (
+          <div key={id} className="pw">
+            <div id={id}>{el}</div>
+            <div className="pl">
+              <span className="pn">{label}</span>
+              <button className="dl" onClick={() => dlPost(id, label, v => setS(id, v))}>↓ PNG</button>
+            </div>
+            <div className="status">{statuses[id] || ''}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

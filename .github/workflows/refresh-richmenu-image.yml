@@ -1,0 +1,91 @@
+name: Force refresh Rich Menu image on LINE
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    env:
+      RM_NAME: '3Q Hatchery · MENU (postback v4)'
+      HERO_URI: 'https://milk790-code.github.io/3q-hatchery-line-oa/hero.html'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Delete ALL existing menus (v3 + v4 + any others)
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          all_ids=$(curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
+            https://api.line.me/v2/bot/richmenu/list \
+            | jq -r '.richmenus[].richMenuId')
+          for id in $all_ids; do
+            echo "Deleting menu: $id"
+            curl -sS -X DELETE -H "Authorization: Bearer $LINE_TOKEN" \
+              "https://api.line.me/v2/bot/richmenu/$id"
+          done
+
+      - name: Create v4 fresh
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          jq -nc --arg uri "$HERO_URI" --arg name "$RM_NAME" '{
+            size: {width: 2500, height: 1686}, selected: false, name: $name, chatBarText: "MENU",
+            areas: [
+              {bounds: {x:0,y:0,width:2500,height:800},   action: {type:"uri", uri:$uri}},
+              {bounds: {x:0,y:800,width:625,height:886},  action: {type:"postback", data:"menu:my-store"}},
+              {bounds: {x:625,y:800,width:625,height:886},action: {type:"postback", data:"menu:imagery"}},
+              {bounds: {x:1250,y:800,width:625,height:886},action: {type:"postback", data:"menu:marketing"}},
+              {bounds: {x:1875,y:800,width:625,height:886},action: {type:"postback", data:"menu:progress"}}
+            ]
+          }' > /tmp/def.json
+
+          resp=$(curl -sS -X POST https://api.line.me/v2/bot/richmenu \
+            -H "Authorization: Bearer $LINE_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data @/tmp/def.json)
+          RM_ID=$(echo "$resp" | jq -r '.richMenuId')
+          echo "RICH_MENU_ID=$RM_ID" >> $GITHUB_ENV
+          echo "::notice::Created: $RM_ID"
+
+      - name: Upload fresh binary
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -f -X POST \
+            "https://api-data.line.me/v2/bot/richmenu/$RICH_MENU_ID/content" \
+            -H "Authorization: Bearer $LINE_TOKEN" \
+            -H "Content-Type: image/jpeg" \
+            --data-binary @assets/exports/3q-richmenu-2500x1686.jpg
+          echo "::notice::Binary uploaded"
+
+      - name: Set as default
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          pip install --quiet requests
+          python3 -c "
+          import os, requests
+          rm_id = os.environ['RICH_MENU_ID']
+          token = os.environ['LINE_TOKEN']
+          r = requests.post(
+            f'https://api.line.me/v2/bot/user/all/richmenu/{rm_id}',
+            headers={'Authorization': f'Bearer {token}'}, timeout=15,
+          )
+          print(f'HTTP {r.status_code}: {r.text}')
+          r.raise_for_status()
+          "
+          echo "::notice::Set as default"
+
+      - name: Verify
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          echo "## Final state ##"
+          curl -sS -H "Authorization: Bearer $LINE_TOKEN" https://api.line.me/v2/bot/richmenu/list | jq '.richmenus[] | {id: .richMenuId, name, hero: .areas[0].action}'
+          echo "Default: $(curl -sS -H "Authorization: Bearer $LINE_TOKEN" https://api.line.me/v2/bot/user/all/richmenu | jq -r .richMenuId)"

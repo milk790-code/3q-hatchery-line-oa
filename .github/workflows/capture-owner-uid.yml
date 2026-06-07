@@ -1,0 +1,46 @@
+name: Capture OWNER_USER_ID from KV
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      KV_NAMESPACE_ID: 20a68b10afc84764ba770b64f0f33f30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read uid from KV
+        env:
+          CF_TOKEN:      ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          UID_VAL=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/storage/kv/namespaces/$KV_NAMESPACE_ID/values/__last_user_uid")
+          echo "Raw KV value: $UID_VAL"
+          if [ -z "$UID_VAL" ] || [ "$UID_VAL" = "null" ] || [[ "$UID_VAL" == *"error"* ]]; then
+            echo "::error::No userId captured in KV. Send any message to the LINE OA first."
+            exit 1
+          fi
+          # LINE userIds look like U followed by 32 hex chars (33 chars total)
+          if [[ ! "$UID_VAL" =~ ^U[0-9a-f]{32}$ ]]; then
+            echo "::error::KV value doesn't look like a LINE userId: $UID_VAL"
+            exit 1
+          fi
+          echo "CAPTURED_UID=$UID_VAL" >> $GITHUB_ENV
+          echo "::notice::Captured uid: ${UID_VAL:0:6}…${UID_VAL: -4}"
+
+      - name: Commit captured uid to temp file for off-platform secret update
+        run: |
+          set -euo pipefail
+          mkdir -p _debug/uid
+          echo "$CAPTURED_UID" > _debug/uid/captured.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add _debug/uid/captured.txt
+          git diff --cached --quiet || git commit -m "uid: captured ${CAPTURED_UID:0:6}…${CAPTURED_UID: -4} (will be cleaned up)"
+          git push || true

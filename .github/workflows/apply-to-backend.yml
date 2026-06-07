@@ -1,0 +1,193 @@
+name: Apply to LINE OA Backend
+
+on:
+  workflow_dispatch:
+    inputs:
+      broadcast:
+        description: 'Send broadcast to all friends (costs LINE quota)?'
+        type: choice
+        default: 'test_to_owner'
+        options:
+          - 'test_to_owner'
+          - 'broadcast_to_all'
+          - 'skip'
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      PNG_BASE: https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports
+      MANAGER:  https://manager.line.biz/account/@121lkspe
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Audit current LINE OA state
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p _debug/backend
+
+          echo "## LINE OA Backend Audit (run ${{ github.run_id }})" > _debug/backend/AUDIT.md
+          echo "" >> _debug/backend/AUDIT.md
+          echo "**Manager URL:** $MANAGER" >> _debug/backend/AUDIT.md
+          echo "" >> _debug/backend/AUDIT.md
+
+          # 1. Bot info
+          echo "### 1. Bot info" >> _debug/backend/AUDIT.md
+          curl -sS -H "Authorization: Bearer $LINE_TOKEN" https://api.line.me/v2/bot/info > _debug/backend/bot-info.json
+          BOT=$(cat _debug/backend/bot-info.json)
+          echo "- Display name: $(echo $BOT | jq -r '.displayName')" >> _debug/backend/AUDIT.md
+          echo "- Basic ID: $(echo $BOT | jq -r '.basicId')" >> _debug/backend/AUDIT.md
+          echo "- Picture URL: $(echo $BOT | jq -r '.pictureUrl')" >> _debug/backend/AUDIT.md
+          echo "- Chat mode: $(echo $BOT | jq -r '.chatMode')" >> _debug/backend/AUDIT.md
+          echo "- Mark-as-read: $(echo $BOT | jq -r '.markAsReadMode')" >> _debug/backend/AUDIT.md
+          echo "" >> _debug/backend/AUDIT.md
+
+          # 2. Webhook
+          echo "### 2. Webhook" >> _debug/backend/AUDIT.md
+          WH=$(curl -sS -H "Authorization: Bearer $LINE_TOKEN" https://api.line.me/v2/bot/channel/webhook/endpoint)
+          echo "- Endpoint: $(echo $WH | jq -r '.endpoint')" >> _debug/backend/AUDIT.md
+          echo "- Active: $(echo $WH | jq -r '.active')" >> _debug/backend/AUDIT.md
+          echo "" >> _debug/backend/AUDIT.md
+
+          # 3. Rich menus
+          echo "### 3. Rich menus" >> _debug/backend/AUDIT.md
+          RM=$(curl -sS -H "Authorization: Bearer $LINE_TOKEN" https://api.line.me/v2/bot/richmenu/list)
+          echo "$RM" | jq '.richmenus[] | "- " + .name + " (id: " + .richMenuId + ", " + (.areas|length|tostring) + " areas)"' -r >> _debug/backend/AUDIT.md
+          DEF=$(curl -sS -H "Authorization: Bearer $LINE_TOKEN" https://api.line.me/v2/bot/user/all/richmenu)
+          echo "- Default: $(echo $DEF | jq -r '.richMenuId')" >> _debug/backend/AUDIT.md
+          echo "" >> _debug/backend/AUDIT.md
+
+          # 4. Friend count (Insight API)
+          echo "### 4. Followers" >> _debug/backend/AUDIT.md
+          YESTERDAY=$(date -u -d "yesterday" +%Y%m%d)
+          FOLLOWERS=$(curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
+            "https://api.line.me/v2/bot/insight/followers?date=$YESTERDAY")
+          echo "- Followers (yesterday): $(echo $FOLLOWERS | jq -r '.followers // "n/a"')" >> _debug/backend/AUDIT.md
+          echo "- Targeted reaches: $(echo $FOLLOWERS | jq -r '.targetedReaches // "n/a"')" >> _debug/backend/AUDIT.md
+          echo "- Blocks: $(echo $FOLLOWERS | jq -r '.blocks // "n/a"')" >> _debug/backend/AUDIT.md
+          echo "" >> _debug/backend/AUDIT.md
+
+          # 5. Message quota
+          echo "### 5. Message quota" >> _debug/backend/AUDIT.md
+          QUOTA=$(curl -sS -H "Authorization: Bearer $LINE_TOKEN" https://api.line.me/v2/bot/message/quota)
+          CONSUMED=$(curl -sS -H "Authorization: Bearer $LINE_TOKEN" https://api.line.me/v2/bot/message/quota/consumption)
+          echo "- Plan type: $(echo $QUOTA | jq -r '.type')" >> _debug/backend/AUDIT.md
+          echo "- Monthly limit: $(echo $QUOTA | jq -r '.value // "unlimited"')" >> _debug/backend/AUDIT.md
+          echo "- Used this month: $(echo $CONSUMED | jq -r '.totalUsage')" >> _debug/backend/AUDIT.md
+          echo "" >> _debug/backend/AUDIT.md
+
+      - name: Send push (test or broadcast)
+        if: ${{ inputs.broadcast != 'skip' }}
+        env:
+          LINE_TOKEN:    ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          OWNER_USER_ID: ${{ secrets.OWNER_USER_ID }}
+          MODE: ${{ inputs.broadcast }}
+        run: |
+          set -euo pipefail
+
+          # Build message payload
+          cat > /tmp/messages.json <<JSON
+          [
+            {
+              "type": "text",
+              "text": "📣 全新功能上線！\n\n業界 2,000 起跳的攝影棚美食圖\n我們這次 500，前 10 位只要 100\n\n額滿就停 · 不延期、不加場"
+            },
+            {
+              "type": "image",
+              "originalContentUrl": "$PNG_BASE/3q-campaign-poster-1080x1040.png",
+              "previewImageUrl":    "$PNG_BASE/3q-campaign-poster-1080x1040.png"
+            },
+            {
+              "type": "template",
+              "altText": "8 張產品樣品圖 — 選你喜歡的",
+              "template": {
+                "type": "image_carousel",
+                "columns": [
+                  {"imageUrl": "$PNG_BASE/3q-campaign-sample-s01-1080x1040.png", "action": {"type": "message", "text": "我喜歡 s01"}},
+                  {"imageUrl": "$PNG_BASE/3q-campaign-sample-s02-1080x1040.png", "action": {"type": "message", "text": "我喜歡 s02"}},
+                  {"imageUrl": "$PNG_BASE/3q-campaign-sample-s03-1080x1040.png", "action": {"type": "message", "text": "我喜歡 s03"}},
+                  {"imageUrl": "$PNG_BASE/3q-campaign-sample-s04-1080x1040.png", "action": {"type": "message", "text": "我喜歡 s04"}},
+                  {"imageUrl": "$PNG_BASE/3q-campaign-sample-s05-1080x1040.png", "action": {"type": "message", "text": "我喜歡 s05"}},
+                  {"imageUrl": "$PNG_BASE/3q-campaign-sample-s06-1080x1040.png", "action": {"type": "message", "text": "我喜歡 s06"}}
+                ]
+              }
+            },
+            {
+              "type": "text",
+              "text": "傳「+1」立即報名，傳「福袋」看每日抽獎，傳「實例」看作品。\n\n額滿就停 · 不延期"
+            }
+          ]
+          JSON
+
+          if [ "$MODE" = "test_to_owner" ]; then
+            curl -sS -X POST https://api.line.me/v2/bot/message/push \
+              -H "Authorization: Bearer $LINE_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "$(jq -nc --argjson m "$(cat /tmp/messages.json)" --arg t "$OWNER_USER_ID" '{to: $t, messages: $m}')" \
+              | tee _debug/backend/push-result.json | jq .
+            echo "::notice::Test push sent to OWNER_USER_ID"
+          elif [ "$MODE" = "broadcast_to_all" ]; then
+            curl -sS -X POST https://api.line.me/v2/bot/message/broadcast \
+              -H "Authorization: Bearer $LINE_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "$(jq -nc --argjson m "$(cat /tmp/messages.json)" '{messages: $m}')" \
+              | tee _debug/backend/broadcast-result.json | jq .
+            echo "::notice::Broadcast sent to all friends"
+          fi
+
+      - name: Generate manual upload checklist
+        run: |
+          cat >> _debug/backend/AUDIT.md <<MD
+
+          ---
+
+          ## 手動上傳清單（LINE Manager 上做）
+
+          開啟 [LINE Manager]($MANAGER) →
+
+          ### 1. 大頭貼 (Avatar)
+          - 設定 → 帳號設定 → 大頭貼
+          - 上傳：[$PNG_BASE/3q-avatar-640.png]($PNG_BASE/3q-avatar-640.png)
+
+          ### 2. 封面圖 (Cover)
+          - 設定 → 帳號設定 → 封面照片
+          - 上傳：[$PNG_BASE/3q-cover-bowl-1080x878.png]($PNG_BASE/3q-cover-bowl-1080x878.png)
+
+          ### 3. 帳號狀態消息（可選）
+          - 設定 → 帳號設定 → 狀態消息
+          - 文字：「只要你願意說，我們就幫你被看見。」
+
+          ### 4. 自動回應功能（要關掉）
+          - 設定 → 回應功能 → **關閉「自動回應訊息」**（讓 Webhook 接管）
+          - 確認「Webhook」勾選 ON
+
+          ### 5. 加入好友的歡迎訊息（可選 — Webhook 已處理）
+          - 已由 Worker 接管，無需設定
+
+          ---
+
+          ## API 已完成項目 ✓
+
+          - Webhook URL：set
+          - Rich Menu：設定 + 預設
+          - Auto-reply keywords：30+ 個透過 Worker
+          - Campaign flow：Flex Message + KV
+          - Lucky bag：每日 4 次 cron 推播
+          - D1 CRM：諮詢資料永久保存
+          - OWNER_USER_ID：報名推播到你
+          MD
+          echo "Audit report written"
+
+      - name: Commit audit
+        if: always()
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add _debug/backend/
+          git diff --cached --quiet || git commit -m "backend: apply-to-backend audit + ${{ inputs.broadcast }} (run ${{ github.run_id }})"
+          git push || true

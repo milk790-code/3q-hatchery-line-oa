@@ -1,0 +1,49 @@
+name: Upload LINE Rich Menus
+
+on:
+  workflow_dispatch:
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify PNGs exist
+        working-directory: assets/exports
+        run: |
+          for f in 3Q-HATCHERY_richmenu_a_2500x1686.png \
+                   3Q-HATCHERY_richmenu_b_2500x1686.png \
+                   3Q-HATCHERY_richmenu_c_2500x1686.png ; do
+            if [[ ! -f "$f" ]]; then
+              echo "::error::Missing $f in assets/exports/"
+              exit 1
+            fi
+            echo "  ✓ $f ($(stat -c%s "$f") bytes)"
+          done
+
+      - name: Make script executable
+        run: chmod +x scripts/upload-richmenu.sh
+
+      - name: Run upload (with --prune)
+        env:
+          CHANNEL_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        working-directory: assets/exports
+        run: |
+          if [[ -z "$CHANNEL_TOKEN" ]]; then
+            echo "::error::Repo secret LINE_CHANNEL_ACCESS_TOKEN is not set."
+            echo "Go to Settings → Secrets and variables → Actions → New repository secret"
+            exit 1
+          fi
+          bash ../../scripts/upload-richmenu.sh --prune 2>&1 | tee /tmp/upload.log
+          {
+            echo "## Rich Menu Upload Result"
+            echo ""
+            echo '```'
+            cat /tmp/upload.log
+            echo '```'
+            echo ""
+            echo "### Next step"
+            echo "Copy the three \`const RICHMENU_*\` lines above and paste into Cloudflare Worker env vars."
+          } >> "$GITHUB_STEP_SUMMARY"

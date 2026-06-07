@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 878" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="bg" cx="68%" cy="25%" r="100%"><stop offset="0%" stop-color="#E8DFD0"/><stop offset="100%" stop-color="#2A2018"/></radialGradient>
+    <radialGradient id="pot" cx="35%" cy="35%" r="70%"><stop offset="0%" stop-color="#5A4838"/><stop offset="60%" stop-color="#2A1A12"/><stop offset="100%" stop-color="#0A0508"/></radialGradient>
+    <radialGradient id="rim" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#B8924A" stop-opacity="0.6"/><stop offset="100%" stop-color="#B8924A" stop-opacity="0"/></radialGradient>
+    <filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="43"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.10 0"/></filter>
+  </defs>
+  <rect width="1080" height="878" fill="url(#bg)"/>
+  <ellipse cx="380" cy="780" rx="250" ry="26" fill="#0A0908" opacity="0.5"/>
+  <path d="M 220 760 Q 220 500, 280 420 Q 340 380, 380 380 Q 420 380, 480 420 Q 540 500, 540 760 Z" fill="url(#pot)"/>
+  <ellipse cx="380" cy="400" rx="100" ry="20" fill="#0A0508"/>
+  <ellipse cx="380" cy="400" rx="90" ry="14" fill="#1A1408"/>
+  <ellipse cx="380" cy="400" rx="90" ry="14" fill="url(#rim)"/>
+  <path d="M 240 480 Q 280 440, 320 420" stroke="#B89668" stroke-width="1.2" fill="none" opacity="0.5"/>
+  <path d="M 245 540 Q 285 520, 325 510" stroke="#B89668" stroke-width="1" fill="none" opacity="0.3"/>
+  <rect width="1080" height="878" filter="url(#g)" opacity="0.6"/>
+</svg>

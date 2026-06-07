@@ -1,0 +1,18 @@
+# Render 自動部署設定檔 — 3Q貢丸 Python 客服機器人
+# rootDir 指向 monorepo 子目錄
+
+services:
+  - type: web
+    name: 3qgongwan-bot
+    runtime: python
+    rootDir: bots/gongwan
+    plan: free
+    region: singapore
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: LINE_CHANNEL_SECRET
+        sync: false
+      - key: LINE_CHANNEL_ACCESS_TOKEN
+        sync: false
+    healthCheckPath: /

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>素材收集箱 · 三指服務 × 3Q</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{--brand:#E8581E;--brand-light:#FEF0E8;--brand-dark:#B83E0C;--dark:#1C2128;--body:#3A3F4A;--mid:#6E7682;--divider:#E4E6EA;--bg:#F9F7F5;--card:#FFFFFF}
+  html,body{background:var(--bg);font-family:'Noto Sans TC',system-ui,sans-serif;color:var(--body);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:440px;margin:0 auto;min-height:100vh}
+  .hero{background:linear-gradient(160deg,#1C2128 0%,#2A2018 100%);padding:44px 26px 34px;position:relative;overflow:hidden}
+  .hero::after{content:'';position:absolute;right:-40px;top:-30px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(232,88,30,.35),transparent 70%)}
+  .hero .kick{font-size:11px;letter-spacing:.2em;color:var(--brand);font-weight:600;margin-bottom:14px}
+  .hero h1{font-size:27px;font-weight:700;color:#fff;line-height:1.35;margin-bottom:12px;position:relative;z-index:1}
+  .hero p{font-size:13.5px;color:rgba(255,255,255,.62);line-height:1.8;position:relative;z-index:1}
+  .body{padding:24px 20px 50px}
+  .tip{background:var(--brand-light);border-radius:14px;padding:16px 18px;border-left:4px solid var(--brand);margin-bottom:24px}
+  .tip p{font-size:13px;color:var(--brand-dark);line-height:1.75}
+  .tip b{font-weight:700}
+  .field{margin-bottom:22px}
+  .field label{display:block;font-size:15px;font-weight:600;color:var(--dark);margin-bottom:5px}
+  .field .hint{font-size:12px;color:var(--mid);margin-bottom:9px;line-height:1.5}
+  .field textarea{width:100%;border:1.5px solid var(--divider);border-radius:12px;padding:13px;font-family:inherit;font-size:14px;color:var(--body);resize:vertical;min-height:88px;background:var(--card);transition:border-color .15s}
+  .field textarea:focus{outline:none;border-color:var(--brand)}
+  .num{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--brand);color:#fff;font-size:12px;font-weight:700;align-items:center;justify-content:center;margin-right:7px;vertical-align:middle}
+  .photo-note{background:var(--card);border:1.5px dashed var(--brand);border-radius:14px;padding:18px;text-align:center;margin-bottom:24px}
+  .photo-note .pi{font-size:26px;margin-bottom:6px}
+  .photo-note .pt{font-size:14px;font-weight:600;color:var(--brand-dark);margin-bottom:4px}
+  .photo-note .pd{font-size:12px;color:var(--mid);line-height:1.6}
+  .btn{display:block;width:100%;background:var(--brand);color:#fff;text-align:center;border:none;font-family:inherit;font-size:16px;font-weight:600;padding:16px;border-radius:14px;box-shadow:0 6px 18px rgba(232,88,30,.3);cursor:pointer;transition:background .15s}
+  .btn:active{background:var(--brand-dark)}
+  .done{display:none;background:#E7F9F1;border-radius:14px;padding:18px;margin-top:18px;text-align:center}
+  .done.show{display:block}
+  .done .dt{font-size:15px;font-weight:700;color:#1B7A4E;margin-bottom:6px}
+  .done .dd{font-size:13px;color:#2A6048;line-height:1.7}
+  .foot{text-align:center;padding:26px 20px;color:var(--mid);font-size:11px;line-height:1.7}
+  .foot b{color:var(--brand);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="kick">3Q × 三指服務 · 素材收集箱</div>
+    <h1>把手上的東西，<br>通通丟進來就好</h1>
+    <p>不用整理、不用想格式、不用寫得漂亮。<br>你想到什麼就寫什麼，剩下的提煉，交給我們。</p>
+  </div>
+  <div class="body">
+    <div class="tip"><p><b>怎麼填？</b>像跟朋友聊天一樣，把你知道的隨手打進去就好。空著的也沒關係，想到多少寫多少。我們會幫你把這些整理成行銷可以用的內容。</p></div>
+
+    <div class="field">
+      <label><span class="num">1</span>你提供哪些服務？大概多少錢？</label>
+      <div class="hint">清潔、美容、工程、修繕、團購，想到哪個寫哪個，價格大概抓個範圍就行。</div>
+      <textarea id="f1" placeholder="例如：居家清潔一次大概 2000 起，看坪數…"></textarea>
+    </div>
+
+    <div class="field">
+      <label><span class="num">2</span>客人曾經稱讚過你什麼？</label>
+      <div class="hint">他們說過的好話、感謝的話、回頭找你的原因，記得多少寫多少。</div>
+      <textarea id="f2" placeholder="例如：客人說我們很細心、會幫忙注意小地方…"></textarea>
+    </div>
+
+    <div class="field">
+      <label><span class="num">3</span>你最想讓新客人知道的一件事？</label>
+      <div class="hint">如果只能讓客人記住一件事，你希望是什麼？</div>
+      <textarea id="f3" placeholder="例如：我們是夫妻一起做，每一件都當自己家在弄…"></textarea>
+    </div>
+
+    <div class="field">
+      <label><span class="num">4</span>你為什麼做這行？有什麼故事嗎？</label>
+      <div class="hint">不用偉大，真實就好。客人喜歡有溫度的故事。</div>
+      <textarea id="f4" placeholder="例如：以前做…後來想自己出來…"></textarea>
+    </div>
+
+    <div class="field">
+      <label><span class="num">5</span>還有什麼想說的？</label>
+      <div class="hint">任何想到的、覺得可能有用的，都丟進來。</div>
+      <textarea id="f5" placeholder="想到什麼都可以寫…"></textarea>
+    </div>
+
+    <div class="photo-note">
+      <div class="pi">📷</div>
+      <div class="pt">照片、影片這樣給最快</div>
+      <div class="pd">你的作品照、施工前後、環境、成果，<br>直接用 LINE 傳給我們就好，不用上傳這裡。</div>
+    </div>
+
+    <button class="btn" onclick="collect()">整理好，我要傳給三指服務 →</button>
+
+    <div class="done" id="done">
+      <div class="dt">✓ 已經幫你整理好、複製起來了</div>
+      <div class="dd">現在打開 LINE，貼上傳給三指服務就完成了。<br>照片記得也一起傳喔 🙌</div>
+    </div>
+  </div>
+  <div class="foot">三指服務 × <b>3Q 貢丸</b> · 台灣在地品牌孵化所<br>你的素材只會用於協助你的行銷</div>
+</div>
+<script>
+function collect(){
+  const labels=['服務與價格','客人的稱讚','最想讓客人知道的','做這行的故事','其他想說的'];
+  let out='【三指服務 · 素材收集】\n\n';
+  let has=false;
+  for(let i=1;i<=5;i++){
+    const v=document.getElementById('f'+i).value.trim();
+    if(v){ out+='▍'+labels[i-1]+'\n'+v+'\n\n'; has=true; }
+  }
+  if(!has){ alert('至少寫一項再傳給我們唷 🙂'); return; }
+  out+='（照片另外用 LINE 傳）';
+  const ta=document.createElement('textarea');
+  ta.value=out; document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta);
+  if(navigator.clipboard){ navigator.clipboard.writeText(out).catch(()=>{}); }
+  document.getElementById('done').classList.add('show');
+  document.getElementById('done').scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>

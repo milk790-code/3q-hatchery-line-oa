@@ -140,6 +140,44 @@ window.LINE_SPECS = {
     ],
   },
 
+  seasonalHero: {
+    spec: '1080 × 878 px · PNG · 季節 campaign banner',
+    note: '加入 LINE OA chat tab / push message 用。對話框內傳「春/夏/秋/冬」觸發。',
+    seasons: [
+      { season: 'spring', char: '春', label: '春季入駐 · 新品牌登場',     keywords: ['春', '春茶', '春天', '清明'] },
+      { season: 'summer', char: '夏', label: '夏日專案 · 在地夏味',       keywords: ['夏', '夏天', '夏日', '夏味'] },
+      { season: 'autumn', char: '秋', label: '秋季特輯 · 桂花滿地',       keywords: ['秋', '秋天', '中秋', '桂花'] },
+      { season: 'winter', char: '冬', label: '冬至圍爐 · 年終孵化',       keywords: ['冬', '冬天', '冬至', '紅豆湯'] },
+    ],
+  },
+
+  reactions: {
+    spec: '480 × 480 px · PNG · sticker 風小圖（非 LINE Sticker Shop）',
+    note: 'Bot 自動回覆當作 image message 送，看起來像貼圖。20 組情境。',
+    items: [
+      { name: 'hot',       label: '好燙',   sub: 'TOO HOT',         keywords: ['好燙', '燙'] },
+      { name: 'recommend', label: '推薦',   sub: 'RECOMMEND',       keywords: ['推薦', '讚', '好棒'] },
+      { name: 'thanks',    label: '謝謝',   sub: 'THANK YOU',       keywords: ['謝謝', '感謝', '謝啦'] },
+      { name: 'wait',      label: '稍等',   sub: 'ONE MOMENT',      keywords: ['稍等', '等等', '等一下'] },
+      { name: 'got-it',    label: '收到',   sub: 'GOT IT',          keywords: ['收到', '了解', '知道'] },
+      { name: 'i-see',     label: '我懂',   sub: 'I SEE',           keywords: ['我懂', '懂', '明白'] },
+      { name: 'cheer',     label: '加油',   sub: 'CHEER ON',        keywords: ['加油'] },
+      { name: 'excellent', label: '太棒了', sub: 'EXCELLENT',       keywords: ['太棒', '太好', '太強'] },
+      { name: 'later',     label: '等等回', sub: 'REPLY LATER',     keywords: ['等等回', '晚點回', '晚點'] },
+      { name: 'goodnight', label: '晚安',   sub: 'GOODNIGHT',       keywords: ['晚安', '掰掰', 'bye'] },
+      { name: 'order',     label: '老闆我要', sub: 'ORDER UP',      keywords: ['老闆我要', '老闆', '我要', '要這個'] },
+      { name: 'seeyou',    label: '下次見', sub: 'SEE YOU NEXT',    keywords: ['下次見', '掰', '下回', '再見'] },
+      { name: 'musthave',  label: '檔不住', sub: 'CAN\'T RESIST',   keywords: ['檔不住', '擋不住', '實在', '真的'] },
+      { name: 'queue',     label: '排隊中', sub: 'QUEUING',         keywords: ['排隊', '排隊中', '排隊ing'] },
+      { name: 'hungry',    label: '想吃',   sub: 'HUNGRY',          keywords: ['想吃', '肚子餓', '餓了'] },
+      { name: 'empty',     label: '賣完了', sub: 'SOLD OUT',        keywords: ['賣完了', '沒有了', '斷貨'] },
+      { name: 'bold',      label: '敢賭',   sub: 'I DARE',          keywords: ['敢賭', '敢說', '敢肯定'] },
+      { name: 'stellar',   label: '絕了',   sub: 'STELLAR',         keywords: ['絕了', '絕', '真絕', '超絕'] },
+      { name: 'hyper',     label: '狂推',   sub: 'HIGHLY RECOMMEND',keywords: ['狂推', '超推', '大推', '爆推'] },
+      { name: 'done',      label: '搞定',   sub: 'SORTED',          keywords: ['搞定', '搞好', '準備好', '弄好'] },
+    ],
+  },
+
   checklist: [
     { id: 'cover',   label: '上傳封面圖 Cover',                detail: '1080 × 878 px',      done: true },
     { id: 'avatar',  label: '上傳大頭照 Avatar',                detail: '640 × 640 px',       done: true },
@@ -150,6 +188,6 @@ window.LINE_SPECS = {
     { id: 'reply',   label: '設定關鍵字自動回覆',                detail: '6 組 keyword → reply', done: true },
     { id: 'away',    label: '設定非營業時間訊息',                detail: '24h 回覆承諾',         done: true },
     { id: 'push',    label: '準備首推輪播訊息',                  detail: '4 張卡 + tap actions', done: true },
-    { id: 'qa',      label: '上線前 QA — 每個按鈕都點過',         detail: '12 個 tap surface',    done: false },
+    { id: 'qa',      label: '上線前 QA — 每個按鈕都點過',         detail: '12 個 tap surface',    done: true },
   ],
 };

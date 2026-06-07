@@ -1,0 +1,559 @@
+name: Deploy 3Q Hatchery LINE OA
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'webhook/worker.js'
+      - 'workers/social-publisher/worker.js'
+      - 'assets/exports/3q-richmenu-2500x1686.jpg'
+      - '.github/workflows/deploy.yml'
+  workflow_run:
+    workflows: ['Render PNG assets']
+    types: [completed]
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    permissions:
+      contents: write
+      issues: write
+    env:
+      PNG_BASE_URL: https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports
+      WORKER_NAME: 3q-hatchery-webhook
+      SESSION_KV_ID: 20a68b10afc84764ba770b64f0f33f30
+      CRM_D1_ID: e54671b1-d15e-4552-babf-cef367267568
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify Cloudflare token
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          resp=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            https://api.cloudflare.com/client/v4/user/tokens/verify)
+          echo "$resp" | jq -e '.success == true' > /dev/null
+          echo "::notice::CF token OK ($(echo "$resp" | jq -r '.result.status'))"
+
+      - name: Verify LINE token
+        continue-on-error: true
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          resp=$(curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
+            https://api.line.me/v2/bot/info)
+          name=$(echo "$resp" | jq -r '.displayName // empty')
+          if [ -z "$name" ]; then
+            echo "::warning::LINE token check failed: $resp"
+            echo "::warning::Worker will still deploy. Refresh LINE_CHANNEL_ACCESS_TOKEN if webhook stops responding."
+          else
+            echo "::notice::LINE bot: $name ($(echo "$resp" | jq -r '.basicId'))"
+          fi
+      - name: Set Cloudflare account ID
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          if [ -z "$CF_ACCOUNT_ID" ]; then
+            echo "::error::CF_ACCOUNT_ID secret is empty"
+            exit 1
+          fi
+          echo "CF_ACCOUNT_ID=$CF_ACCOUNT_ID" >> $GITHUB_ENV
+          echo "::notice::Using CF account ID (hidden)"
+
+      - name: Run D1 migrations (idempotent)
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          # Create campaigns table
+          curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"sql":"CREATE TABLE IF NOT EXISTS campaigns (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT NOT NULL, tier TEXT NOT NULL, price INTEGER NOT NULL, sample_pick TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)"}' \
+            | jq -r '"campaigns table: " + (.success | tostring)'
+
+          # Add follow-up columns to inquiries (ignore duplicate column errors)
+          for col in followed_up_24h followed_up_72h followed_up_168h; do
+            result=$(curl -sS -X POST \
+              "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+              -H "Authorization: Bearer $CF_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"sql\":\"ALTER TABLE inquiries ADD COLUMN ${col} INTEGER DEFAULT 0\"}")
+            echo "$result" | jq -r '"inquiries.'"$col"': " + (.success | tostring) + " " + (.errors[0].message // "")'
+          done
+
+          # v3.5: Add lead scoring, status tracking, booking columns (ignore if already exist)
+          for col_def in \
+            "lead_score TEXT DEFAULT 'cold'" \
+            "status TEXT DEFAULT 'new'" \
+            "booking_requested INTEGER DEFAULT 0" \
+            "booking_note TEXT"; do
+            col_name=$(echo "$col_def" | awk '{print $1}')
+            result=$(curl -sS -X POST \
+              "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+              -H "Authorization: Bearer $CF_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"sql\":\"ALTER TABLE inquiries ADD COLUMN ${col_def}\"}")
+            echo "$result" | jq -r '"inquiries.'"$col_name"': " + (.success | tostring) + " " + (.errors[0].message // "")'
+          done
+
+          # v4: Add source_oa to inquiries and campaigns (ignore if already exists)
+          for tbl_col in "inquiries source_oa TEXT DEFAULT '3q-hatchery'" "campaigns source_oa TEXT DEFAULT '3q-hatchery'"; do
+            tbl=$(echo "$tbl_col" | awk '{print $1}')
+            col=$(echo "$tbl_col" | awk '{print $2}')
+            result=$(curl -sS -X POST \
+              "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+              -H "Authorization: Bearer $CF_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"sql\":\"ALTER TABLE ${tbl} ADD COLUMN ${col} TEXT DEFAULT '3q-hatchery'\"}")
+            echo "$result" | jq -r '"'"${tbl}.${col}"': " + (.success | tostring) + " " + (.errors[0].message // "")'
+          done
+
+          # v4: Create social_events table and indexes
+          curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"sql":"CREATE TABLE IF NOT EXISTS social_events (id INTEGER PRIMARY KEY AUTOINCREMENT, utm_source TEXT, utm_medium TEXT, utm_campaign TEXT, utm_content TEXT, event_type TEXT DEFAULT '\''click'\'', user_id TEXT, ip_hash TEXT, referrer TEXT, created_at TEXT NOT NULL DEFAULT (datetime('\''now'\'')))"}' \
+            | jq -r '"social_events table: " + (.success | tostring)'
+
+          for idx_def in \
+            "idx_social_events_campaign ON social_events(utm_campaign)" \
+            "idx_social_events_source ON social_events(utm_source)" \
+            "idx_social_events_created ON social_events(created_at)" \
+            "idx_inquiries_source_oa ON inquiries(source_oa)" \
+            "idx_campaigns_source_oa ON campaigns(source_oa)"; do
+            curl -sS -X POST \
+              "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+              -H "Authorization: Bearer $CF_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"sql\":\"CREATE INDEX IF NOT EXISTS ${idx_def}\"}" \
+              | jq -r '"index '"${idx_def%%ON*}"': " + (.success | tostring)' || true
+          done
+
+          # v3.7: referrals + rewards (migration 006)
+          curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"sql":"CREATE TABLE IF NOT EXISTS referrals (id INTEGER PRIMARY KEY AUTOINCREMENT, code TEXT NOT NULL, inviter_uid TEXT NOT NULL, invitee_uid TEXT NOT NULL, source_oa TEXT DEFAULT '\''3q-hatchery'\'', status TEXT NOT NULL DEFAULT '\''pending'\'', inquiry_id INTEGER, created_at TEXT NOT NULL DEFAULT (datetime('\''now'\'')), qualified_at TEXT)"}' \
+            | jq -r '"referrals table: " + (.success | tostring)'
+          curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"sql":"CREATE TABLE IF NOT EXISTS rewards (id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT NOT NULL, role TEXT NOT NULL, ref_id INTEGER, value_type TEXT NOT NULL, value REAL, label_public TEXT, discount_code TEXT, status TEXT NOT NULL DEFAULT '\''granted'\'', expires_at TEXT, created_at TEXT NOT NULL DEFAULT (datetime('\''now'\'')))"}' \
+            | jq -r '"rewards table: " + (.success | tostring)'
+          for idx_def in \
+            "idx_referrals_invitee ON referrals(invitee_uid)" \
+            "idx_referrals_inviter ON referrals(inviter_uid)" \
+            "idx_referrals_code ON referrals(code)" \
+            "idx_rewards_uid ON rewards(uid)"; do
+            uniq=""; case "$idx_def" in idx_referrals_invitee*) uniq="UNIQUE";; esac
+            curl -sS -X POST \
+              "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+              -H "Authorization: Bearer $CF_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"sql\":\"CREATE ${uniq} INDEX IF NOT EXISTS ${idx_def}\"}" \
+              | jq -r '"index '"${idx_def%%ON*}"': " + (.success | tostring)' || true
+          done
+
+          echo "::notice::D1 migrations complete"
+
+      - name: Build & upload 3 Rich Menus (A/B/C)
+        continue-on-error: true
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -uo pipefail
+          if [ -z "${LINE_TOKEN:-}" ]; then
+            echo "::warning::LINE_CHANNEL_ACCESS_TOKEN not set — skipping Rich Menu upload"
+            exit 0
+          fi
+          cd assets/exports
+          CHANNEL_TOKEN="$LINE_TOKEN" bash "$GITHUB_WORKSPACE/scripts/upload-richmenu.sh" --prune \
+            2>&1 | tee /tmp/rm-ids.txt || true
+          RM_A=$(grep "RICHMENU_NEW"       /tmp/rm-ids.txt | grep -oE "richmenu-[a-z0-9]+" | head -1)
+          RM_B=$(grep "RICHMENU_INQUIRED"  /tmp/rm-ids.txt | grep -oE "richmenu-[a-z0-9]+" | head -1)
+          RM_C=$(grep "RICHMENU_CONVERTED" /tmp/rm-ids.txt | grep -oE "richmenu-[a-z0-9]+" | head -1)
+          echo "RICHMENU_A=${RM_A:-}" >> $GITHUB_ENV
+          echo "RICHMENU_B=${RM_B:-}" >> $GITHUB_ENV
+          echo "RICHMENU_C=${RM_C:-}" >> $GITHUB_ENV
+          if [ -n "$RM_A" ] && [ -n "$RM_B" ] && [ -n "$RM_C" ]; then
+            echo "::notice::Rich Menus A=$RM_A B=$RM_B C=$RM_C"
+          else
+            echo "::warning::One or more Rich Menu IDs not captured — menu switching may be inactive"
+          fi
+
+      - name: Migration 004 — content_queue table
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"sql":"CREATE TABLE IF NOT EXISTS content_queue (id INTEGER PRIMARY KEY AUTOINCREMENT, platform TEXT NOT NULL, image_url TEXT, caption_seed TEXT, caption TEXT, topic_tag TEXT, scheduled_at TEXT, published_at TEXT, status TEXT NOT NULL DEFAULT '\''pending'\'', error_msg TEXT, source_oa TEXT NOT NULL DEFAULT '\''3q-hatchery'\'', created_at TEXT NOT NULL DEFAULT (datetime('\''now'\'')))"}' \
+            | jq -r '"content_queue table: " + (.success | tostring)'
+
+          for idx_def in \
+            "idx_content_queue_platform_status ON content_queue(platform, status)" \
+            "idx_content_queue_scheduled ON content_queue(scheduled_at)" \
+            "idx_content_queue_created ON content_queue(created_at)"; do
+            curl -sS -X POST \
+              "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+              -H "Authorization: Bearer $CF_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"sql\":\"CREATE INDEX IF NOT EXISTS ${idx_def}\"}" \
+              | jq -r '"index '"${idx_def%%ON*}"': " + (.success | tostring)' || true
+          done
+
+          # v3.7: external link goes in first comment (migration 007) — ignore if exists
+          curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"sql":"ALTER TABLE content_queue ADD COLUMN link_url TEXT"}' \
+            | jq -r '"content_queue.link_url: " + (.success | tostring) + " " + (.errors[0].message // "")'
+          echo "::notice::content_queue table ready"
+
+      - name: Deploy Worker
+        env:
+          CF_TOKEN:      ${{ secrets.CF_API_TOKEN }}
+          LINE_TOKEN:    ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_SECRET:   ${{ secrets.LINE_CHANNEL_SECRET }}
+          OWNER_USER_ID: ${{ secrets.OWNER_USER_ID }}
+          TRIGGER_TOKEN: ${{ secrets.TRIGGER_TOKEN }}
+        run: |
+          set -uo pipefail
+          mkdir -p _debug
+
+          # Probe D1 binding — if not accessible, deploy without CRM (becomes no-op)
+          d1_check=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}" \
+            | jq -r '.success // false')
+          if [ "$d1_check" = "true" ]; then
+            CRM_BINDING=",{\"name\": \"CRM\", \"type\": \"d1\", \"id\": \"$CRM_D1_ID\"}"
+            echo "::notice::D1 binding OK"
+          else
+            CRM_BINDING=""
+            echo "::warning::D1 database not accessible — deploying without CRM binding"
+          fi
+
+          cat > /tmp/metadata.json <<JSON
+          {
+            "main_module": "worker.js",
+            "compatibility_date": "2024-12-01",
+            "bindings": [
+              {"name": "LINE_CHANNEL_ACCESS_TOKEN", "type": "secret_text", "text": $(jq -Rn --arg t "$LINE_TOKEN" '$t')},
+              {"name": "LINE_CHANNEL_SECRET",       "type": "secret_text", "text": $(jq -Rn --arg t "$LINE_SECRET" '$t')},
+              {"name": "OWNER_USER_ID",             "type": "secret_text", "text": $(jq -Rn --arg t "${OWNER_USER_ID:-}" '$t')},
+              {"name": "PNG_BASE_URL",              "type": "plain_text",  "text": $(jq -Rn --arg t "$PNG_BASE_URL" '$t')},
+              {"name": "LINE_BASIC_ID",             "type": "plain_text",  "text": "@121Ikspe"},
+              {"name": "SITE_BASE_URL",             "type": "plain_text",  "text": "https://milk790-code.github.io/3q-hatchery-line-oa/"},
+              {"name": "TRIGGER_TOKEN",             "type": "secret_text", "text": $(jq -Rn --arg t "${TRIGGER_TOKEN:-}" '$t')},
+              {"name": "ANTHROPIC_API_KEY",          "type": "inherit"},
+              {"name": "SESSION",                   "type": "kv_namespace", "namespace_id": "$SESSION_KV_ID"},
+              {"name": "AI",                        "type": "ai"},
+              {"name": "RICHMENU_NEW",       "type": "plain_text", "text": $(jq -Rn --arg t "${RICHMENU_A:-}" '$t')},
+              {"name": "RICHMENU_INQUIRED",  "type": "plain_text", "text": $(jq -Rn --arg t "${RICHMENU_B:-}" '$t')},
+              {"name": "RICHMENU_CONVERTED", "type": "plain_text", "text": $(jq -Rn --arg t "${RICHMENU_C:-}" '$t')}
+              $CRM_BINDING
+            ]
+          }
+          JSON
+
+          jq '(.bindings[] | select(.type=="secret_text") | .text) = "***MASKED***"' /tmp/metadata.json > _debug/metadata-sanitized.json
+
+          set +e
+          http_code=$(curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -F "metadata=@/tmp/metadata.json;type=application/json" \
+            -F "worker.js=@webhook/worker.js;type=application/javascript+module" \
+            -o _debug/cf-deploy-response.json -w "%{http_code}")
+          curl_exit=$?
+          set -e
+
+          echo "$http_code" > _debug/cf-deploy-http-code.txt
+          echo "$curl_exit" > _debug/cf-deploy-curl-exit.txt
+
+          ok=$(jq -r '.success // false' _debug/cf-deploy-response.json 2>/dev/null || echo "parse-error")
+          if [ "$ok" != "true" ]; then
+            echo "DEPLOY FAILED — http=$http_code curl_exit=$curl_exit ok=$ok"
+            cat _debug/cf-deploy-response.json
+            exit 1
+          fi
+          echo "Worker uploaded (etag=$(jq -r '.result.etag' _debug/cf-deploy-response.json))"
+
+      - name: Set cron triggers
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/schedules" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '[{"cron": "5 * * * *"}, {"cron": "0 13 * * 1"}, {"cron": "0 1 1 3,6,9,12 *"}, {"cron": "0 12 * * *"}]' \
+            | jq -e '.success == true' > /dev/null
+          echo "::notice::Cron set: follow-ups (hourly :05) + weekly digest (Mon 21:00 TW) + seasonal push (Mar/Jun/Sep/Dec 1st 09:00 TW) + daily lottery (20:00 TW)"
+
+      - name: CF deploy diagnostics (summary + commit on failure)
+        if: always()
+        run: |
+          echo "## CF Deploy Diagnostics" >> $GITHUB_STEP_SUMMARY
+          if [ -d _debug ]; then
+            for f in _debug/*; do [ -f "$f" ] || continue;
+              echo "### \`$f\`" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              head -c 3000 "$f" >> $GITHUB_STEP_SUMMARY
+              echo >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+            done
+          fi
+
+      - name: Commit deploy debug files (on failure only)
+        if: failure()
+        run: |
+          if [ -d _debug ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            mkdir -p _debug/deploy
+            mv _debug/* _debug/deploy/ 2>/dev/null || true
+            git add _debug/deploy/
+            git diff --cached --quiet || git commit -m "deploy: debug artifacts from failed run"
+            git push || true
+          fi
+
+      - name: Enable workers.dev subdomain
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/subdomain" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"enabled": true}' \
+            | jq -e '.success == true' > /dev/null
+
+          SUB=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/subdomain" \
+            | jq -r '.result.subdomain')
+          WORKER_URL="https://${WORKER_NAME}.${SUB}.workers.dev"
+          echo "WORKER_URL=$WORKER_URL" >> $GITHUB_ENV
+          echo "::notice::Worker URL: $WORKER_URL"
+
+      - name: Smoke-test Worker URL
+        run: |
+          set -euo pipefail
+          sleep 5
+          resp=$(curl -sS "$WORKER_URL")
+          echo "$resp" | jq .
+          echo "$resp" | jq -e '.ok == true and .configured.token == true and .configured.secret == true and .configured.session_kv == true' > /dev/null
+          echo "::notice::Worker alive — token, secret, KV configured"
+
+      - name: Set LINE webhook URL
+        continue-on-error: true
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -f -X PUT \
+            https://api.line.me/v2/bot/channel/webhook/endpoint \
+            -H "Authorization: Bearer $LINE_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"endpoint\":\"$WORKER_URL\"}"
+          echo "::notice::Webhook URL set to $WORKER_URL"
+
+      - name: Test webhook from LINE side
+        continue-on-error: true
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          resp=$(curl -sS -X POST \
+            https://api.line.me/v2/bot/channel/webhook/test \
+            -H "Authorization: Bearer $LINE_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"endpoint\":\"$WORKER_URL\"}")
+          echo "$resp" | jq .
+          if echo "$resp" | jq -e '.success == true' > /dev/null; then
+            echo "::notice::Webhook verification: SUCCESS"
+          else
+            echo "::warning::Webhook test returned non-success — may still work for real events. $resp"
+          fi
+
+      - name: Deploy summary
+        run: |
+          echo "## Deploy complete — v3.5" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Worker URL | \`$WORKER_URL\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Rich Menu ID | \`$RICH_MENU_ID\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| KV namespace (SESSION) | \`$SESSION_KV_ID\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| D1 database (CRM) | \`$CRM_D1_ID\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Cron | follow-ups + weekly digest + seasonal push |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## New in v3.5" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **A1** Lead scoring: 🔥hot/⚡warm/🌱cold per budget in D1 + weekly digest" >> $GITHUB_STEP_SUMMARY
+          echo "- **A2** Owner quick-reply Flex: 已聯繫 / 不感興趣 / 成交 buttons on every new inquiry" >> $GITHUB_STEP_SUMMARY
+          echo "- **A3** Booking flow: tap 預約諮詢 after submit → bot asks preferred time → saves to D1 + pushes owner" >> $GITHUB_STEP_SUMMARY
+          echo "- **B1** Rich menu switching: new→RICHMENU_NEW, inquired→RICHMENU_INQUIRED, won→RICHMENU_CONVERTED (set secrets to enable)" >> $GITHUB_STEP_SUMMARY
+          echo "- **B2** Member card: each follower gets #XXXX card with join date + tier" >> $GITHUB_STEP_SUMMARY
+          echo "- **B3** Subscriber list: text 訂閱/取消訂閱; seasonal push auto-runs Mar/Jun/Sep/Dec 1st" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Manual steps" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "1. Optional: set RICHMENU_NEW / RICHMENU_INQUIRED / RICHMENU_CONVERTED secrets for personalized menus" >> $GITHUB_STEP_SUMMARY
+          echo "2. Self-test: add bot → step through flow → confirm submit → verify owner receives Flex with action buttons" >> $GITHUB_STEP_SUMMARY
+
+  deploy-social-publisher:
+    name: Deploy Social Publisher
+    runs-on: ubuntu-latest
+    needs: deploy
+    env:
+      SOCIAL_WORKER_NAME: 3q-social-publisher
+      SESSION_KV_ID: 20a68b10afc84764ba770b64f0f33f30
+      CRM_D1_ID: e54671b1-d15e-4552-babf-cef367267568
+      PNG_BASE_URL: https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set Cloudflare account ID
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          echo "CF_ACCOUNT_ID=$CF_ACCOUNT_ID" >> $GITHUB_ENV
+
+      - name: Deploy Social Publisher Worker
+        env:
+          CF_TOKEN:        ${{ secrets.CF_API_TOKEN }}
+          TRIGGER_TOKEN:   ${{ secrets.TRIGGER_TOKEN }}
+          THREADS_APP_SECRET:    ${{ secrets.THREADS_APP_SECRET }}
+          THREADS_ACCESS_TOKEN:  ${{ secrets.THREADS_ACCESS_TOKEN }}
+          THREADS_USER_ID:       ${{ secrets.THREADS_USER_ID }}
+          IG_ACCESS_TOKEN:       ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID:            ${{ secrets.IG_USER_ID }}
+          FB_PAGE_ACCESS_TOKEN:  ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+          TIKTOK_ACCESS_TOKEN:   ${{ secrets.TIKTOK_ACCESS_TOKEN }}
+          GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
+          GOOGLE_LOCATION_NAME:   ${{ secrets.GOOGLE_LOCATION_NAME }}
+        run: |
+          set -euo pipefail
+
+          # ── Secret-washing protection (2026-06-06 incident) ──────────────
+          # Old behaviour wrote every secret as secret_text straight from GitHub
+          # secrets; any EMPTY GitHub secret silently overwrote the manually-bound
+          # Cloudflare value with "". New 3-tier logic per secret:
+          #   1. GitHub secret non-empty           → set it (GitHub wins)
+          #   2. empty, but exists on live worker  → {"type":"inherit"} (keep CF value)
+          #   3. empty and not on live worker      → omit entirely
+          existing=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${SOCIAL_WORKER_NAME}/settings" \
+            | jq -c '[.result.bindings[]? | select(.type=="secret_text") | .name]' || echo '[]')
+          echo "::notice::Existing secret bindings on live worker: $existing"
+
+          secrets_json=$(jq -n --argjson existing "$existing" '
+            [
+              {name: "TRIGGER_TOKEN",          val: (env.TRIGGER_TOKEN          // "")},
+              {name: "THREADS_APP_SECRET",     val: (env.THREADS_APP_SECRET     // "")},
+              {name: "THREADS_ACCESS_TOKEN",   val: (env.THREADS_ACCESS_TOKEN   // "")},
+              {name: "THREADS_USER_ID",        val: (env.THREADS_USER_ID        // "")},
+              {name: "IG_ACCESS_TOKEN",        val: (env.IG_ACCESS_TOKEN        // "")},
+              {name: "IG_USER_ID",             val: (env.IG_USER_ID             // "")},
+              {name: "FB_PAGE_ACCESS_TOKEN",   val: (env.FB_PAGE_ACCESS_TOKEN   // "")},
+              {name: "TIKTOK_ACCESS_TOKEN",    val: (env.TIKTOK_ACCESS_TOKEN    // "")},
+              {name: "GOOGLE_SERVICE_ACCOUNT", val: (env.GOOGLE_SERVICE_ACCOUNT // "")},
+              {name: "GOOGLE_LOCATION_NAME",   val: (env.GOOGLE_LOCATION_NAME   // "")}
+            ]
+            | map(
+                if .val != "" then {name: .name, type: "secret_text", text: .val}
+                elif ([.name] | inside($existing)) then {name: .name, type: "inherit"}
+                else empty
+                end
+              )')
+
+          jq -n --argjson secrets "$secrets_json" \
+            --arg png "$PNG_BASE_URL" --arg kv "$SESSION_KV_ID" --arg d1 "$CRM_D1_ID" '
+            {
+              main_module: "worker.js",
+              compatibility_date: "2024-12-01",
+              bindings: ([
+                {name: "PNG_BASE_URL",   type: "plain_text", text: $png},
+                {name: "THREADS_APP_ID", type: "plain_text", text: "956987317313843"},
+                {name: "FB_PAGE_ID",     type: "plain_text", text: "1006044165915714"},
+                {name: "LINE_JOIN_URL",  type: "plain_text", text: "https://lin.ee/UKKodJj"},
+                {name: "SESSION",        type: "kv_namespace", namespace_id: $kv},
+                {name: "CRM",            type: "d1", id: $d1},
+                {name: "AI",             type: "ai"}
+              ] + $secrets)
+            }' > /tmp/social-metadata.json
+
+          echo "::notice::Social publisher bindings: $(jq -c '.bindings | map({name, type})' /tmp/social-metadata.json)"
+
+          resp=$(curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${SOCIAL_WORKER_NAME}" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -F "metadata=@/tmp/social-metadata.json;type=application/json" \
+            -F "worker.js=@workers/social-publisher/worker.js;type=application/javascript+module")
+          echo "$resp" | jq -e '.success == true' > /dev/null
+          echo "::notice::3q-social-publisher deployed (etag=$(echo "$resp" | jq -r '.result.etag'))"
+
+      - name: Set Social Publisher cron triggers
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${SOCIAL_WORKER_NAME}/schedules" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '[{"cron":"0 1 * * 2-4"},{"cron":"0 4 * * 3"},{"cron":"30 12 * * *"}]' \
+            | jq -e '.success == true' > /dev/null
+          echo "::notice::Social publisher crons set: 09:00 TW (Tue-Thu) + 12:00 TW (Wed) + 20:30 TW (daily)"
+
+      - name: Enable social-publisher workers.dev subdomain
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${SOCIAL_WORKER_NAME}/subdomain" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"enabled": true}' \
+            | jq -e '.success == true' > /dev/null
+
+          SUB=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/subdomain" \
+            | jq -r '.result.subdomain')
+          SOCIAL_URL="https://${SOCIAL_WORKER_NAME}.${SUB}.workers.dev"
+          echo "SOCIAL_URL=$SOCIAL_URL" >> $GITHUB_ENV
+          echo "::notice::Social publisher URL: $SOCIAL_URL"
+
+      - name: Social publisher summary
+        run: |
+          echo "## Social Publisher deployed" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Worker | \`$SOCIAL_URL\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Crons | 09:00 TW Tue-Thu · 12:00 TW Wed · 20:30 TW daily |" >> $GITHUB_STEP_SUMMARY
+          echo "| Platforms | Threads ✓ · IG ✓ · TikTok ✓ (tokens optional) |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Add GitHub secrets: THREADS_ACCESS_TOKEN + THREADS_USER_ID → re-deploy" >> $GITHUB_STEP_SUMMARY
+          echo "2. POST to \`/api/content\` (Bearer TRIGGER_TOKEN) to queue posts" >> $GITHUB_STEP_SUMMARY
+          echo "3. GET \`/health\` to verify which platforms are connected" >> $GITHUB_STEP_SUMMARY

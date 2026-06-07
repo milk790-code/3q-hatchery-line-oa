@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<title>Rich Menu A · RICHMENU_NEW</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #0A0A0A; font-family: "Noto Sans TC","Helvetica Neue",Arial,sans-serif; color: #F5F2EC; width: 625px; height: 422px; }
+
+  .rm { width: 625px; height: 422px; background: #0A0A0A; position: relative;
+        display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 1fr; }
+
+  .cell { position: relative; padding: 18px 16px;
+    border-right: 0.5px solid rgba(184,146,74,0.18);
+    border-bottom: 0.5px solid rgba(184,146,74,0.18);
+    display: flex; flex-direction: column; }
+  .cell:nth-child(3) { border-right: 0; }
+  .cell:nth-child(4), .cell:nth-child(5) { border-bottom: 0; }
+
+  .a-hero {
+    grid-column: 1 / 3; grid-row: 1 / 2;
+    padding: 24px 22px;
+    justify-content: space-between;
+    border-bottom: 0.5px solid rgba(184,146,74,0.18);
+  }
+
+  .eyebrow { font-size: 5px; letter-spacing: 0.35em; text-transform: uppercase; color: #B8924A; font-weight: 300; }
+  .hair-lg { width: 40px; height: 0.5px; background: #B8924A; margin: 12px 0 14px; }
+
+  .a-hero h1 { font-family: "Noto Serif TC","Cormorant Garamond","Georgia",serif;
+    font-weight: 300; font-size: 24px; line-height: 1.3; letter-spacing: 0.1em; color: #F5F2EC; }
+  .a-hero .sub { font-size: 6px; line-height: 1.85; letter-spacing: 0.04em; color: rgba(245,242,236,0.6); margin-top: 10px; max-width: 320px; }
+
+  .a-cta { display: flex; align-items: center; gap: 8px; margin-top: auto; }
+  .a-cta .label { font-family: "Noto Serif TC",serif; font-weight: 300; font-size: 7px; letter-spacing: 0.3em; color: #F5F2EC; }
+  .a-cta .arrow { width: 28px; height: 0.5px; background: #B8924A; position: relative; }
+  .a-cta .arrow::after {
+    content: ""; position: absolute; right: 0; top: -2.5px;
+    width: 5px; height: 5px;
+    border-right: 0.5px solid #B8924A; border-top: 0.5px solid #B8924A;
+    transform: rotate(45deg);
+  }
+
+  .cell .ic { width: 20px; height: 20px; margin-bottom: auto; }
+  .cell .title { font-family: "Noto Serif TC",serif; font-weight: 300; font-size: 9px; letter-spacing: 0.18em; color: #F5F2EC; line-height: 1.4; margin-top: 8px; }
+  .cell .en { font-size: 4.5px; letter-spacing: 0.3em; text-transform: uppercase; color: #B8924A; margin-top: 3px; }
+  .cell .num { position: absolute; top: 12px; right: 12px; font-family: "Noto Serif TC",serif; font-style: italic; font-size: 6px; color: rgba(184,146,74,0.5); letter-spacing: 0.1em; }
+
+  .corner { position: absolute; width: 12px; height: 12px; border: 0.5px solid #B8924A; opacity: 0.5; pointer-events: none; }
+  .corner.tl { top: 6px; left: 6px; border-right: 0; border-bottom: 0; }
+  .corner.br { bottom: 6px; right: 6px; border-left: 0; border-top: 0; }
+
+  .brand { position: absolute; bottom: 14px; right: 14px; font-family: "Noto Serif TC",serif; font-weight: 300; font-size: 6.5px; letter-spacing: 0.25em; color: rgba(245,242,236,0.3); z-index: 5; }
+</style>
+</head>
+<body>
+<div class="rm">
+  <div class="corner tl"></div>
+
+  <div class="cell a-hero">
+    <div>
+      <div class="eyebrow">START HERE · 從這裡開始</div>
+      <div class="hair-lg"></div>
+      <h1>說說你的店，<br/>從這裡開始。</h1>
+      <p class="sub">不管你的店多大多小，新舊、簡單複雜 —<br/>我們都把你當客人接。</p>
+    </div>
+    <div class="a-cta"><span class="label">開始</span><span class="arrow"></span></div>
+  </div>
+
+  <div class="cell">
+    <div class="num">02</div>
+    <svg class="ic" viewBox="0 0 80 80" fill="none" stroke="#B8924A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 60 C 20 35, 30 18, 40 18 C 50 18, 60 35, 60 60 Z"/>
+      <line x1="26" y1="50" x2="34" y2="50"/>
+      <line x1="46" y1="50" x2="54" y2="50"/>
+    </svg>
+    <div class="title">品牌孵化<br/>是什麼</div>
+    <div class="en">WHAT WE DO</div>
+  </div>
+
+  <div class="cell">
+    <div class="num">03</div>
+    <svg class="ic" viewBox="0 0 80 80" fill="none" stroke="#B8924A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="18" y="18" width="20" height="20"/>
+      <rect x="42" y="18" width="20" height="20"/>
+      <rect x="18" y="42" width="20" height="20"/>
+      <rect x="42" y="42" width="20" height="20"/>
+    </svg>
+    <div class="title">服務一覽</div>
+    <div class="en">SERVICES</div>
+  </div>
+
+  <div class="cell">
+    <div class="num">04</div>
+    <svg class="ic" viewBox="0 0 80 80" fill="none" stroke="#B8924A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M40 18 L 49 36 L 68 38 L 54 51 L 58 70 L 40 60 L 22 70 L 26 51 L 12 38 L 31 36 Z"/>
+    </svg>
+    <div class="title">合作案例</div>
+    <div class="en">PORTFOLIO</div>
+  </div>
+
+  <div class="cell">
+    <div class="num">05</div>
+    <svg class="ic" viewBox="0 0 80 80" fill="none" stroke="#B8924A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 22 h44 a4 4 0 0 1 4 4 v22 a4 4 0 0 1 -4 4 h-26 l-12 10 v-10 h-6 a4 4 0 0 1 -4 -4 v-22 a4 4 0 0 1 4 -4 z"/>
+      <line x1="24" y1="34" x2="56" y2="34"/>
+      <line x1="24" y1="42" x2="48" y2="42"/>
+    </svg>
+    <div class="title">聯絡我們</div>
+    <div class="en">CONTACT</div>
+  </div>
+
+  <div class="brand">3Q · BRAND HATCHERY</div>
+  <div class="corner br"></div>
+</div>
+</body>
+</html>

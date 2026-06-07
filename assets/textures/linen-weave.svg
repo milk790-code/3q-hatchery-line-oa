@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <defs>
+    <pattern id="w" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
+      <rect width="8" height="8" fill="#D8CDB5"/>
+      <line x1="0" y1="4" x2="8" y2="4" stroke="#B8AB8A" stroke-width="0.8"/>
+      <line x1="4" y1="0" x2="4" y2="8" stroke="#C2B696" stroke-width="0.7"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="800" fill="url(#w)"/>
+</svg>

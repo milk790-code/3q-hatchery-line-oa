@@ -1,0 +1,133 @@
+name: Cleanup rich menus + force set default
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      RICH_MENU_NAME: '3Q Hatchery · MENU (postback v3)'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cleanup rich menus
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p _debug/cleanup
+
+          echo "=== 1. List all current rich menus ==="
+          curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
+            https://api.line.me/v2/bot/richmenu/list \
+            > _debug/cleanup/before.json
+          jq '.richmenus[] | {id: .richMenuId, name, selected}' _debug/cleanup/before.json
+
+          echo
+          echo "=== 2. Identify keeper (last matching $RICH_MENU_NAME) ==="
+          mapfile -t OURS < <(jq -r --arg n "$RICH_MENU_NAME" \
+            '.richmenus[] | select(.name == $n) | .richMenuId' _debug/cleanup/before.json)
+          if [ ${#OURS[@]} -eq 0 ]; then
+            echo "::error::No rich menu with name '$RICH_MENU_NAME' found. Re-run deploy.yml first."
+            exit 1
+          fi
+          KEEP="${OURS[-1]}"
+          echo "KEEP=$KEEP"
+          echo "$KEEP" > _debug/cleanup/keep-id.txt
+
+          echo
+          echo "=== 3. Verify keeper has binary uploaded ==="
+          set +e
+          http=$(curl -sS -X GET \
+            "https://api-data.line.me/v2/bot/richmenu/${KEEP}/content" \
+            -H "Authorization: Bearer $LINE_TOKEN" \
+            -o /tmp/probe-binary -w "%{http_code}")
+          set -e
+          echo "GET binary HTTP $http"
+          if [ "$http" = "200" ]; then
+            ls -la /tmp/probe-binary
+            echo "binary exists ($(wc -c < /tmp/probe-binary) bytes)"
+          else
+            echo "::warning::keeper $KEEP has no binary (http=$http). Uploading..."
+            set +e
+            up_http=$(curl -sS -X POST \
+              "https://api-data.line.me/v2/bot/richmenu/${KEEP}/content" \
+              -H "Authorization: Bearer $LINE_TOKEN" \
+              -H "Content-Type: image/jpeg" \
+              --data-binary @assets/exports/3q-richmenu-2500x1686.jpg \
+              -o _debug/cleanup/binary-upload.json -w "%{http_code}")
+            set -e
+            echo "upload HTTP $up_http"
+            cat _debug/cleanup/binary-upload.json 2>/dev/null
+            if [ "$up_http" != "200" ]; then
+              echo "::error::Failed to upload binary to $KEEP"
+              exit 1
+            fi
+          fi
+
+          echo
+          echo "=== 4. Delete all OTHER rich menus ==="
+          mapfile -t ALL_IDS < <(jq -r '.richmenus[].richMenuId' _debug/cleanup/before.json)
+          : > _debug/cleanup/deletes.log
+          for id in "${ALL_IDS[@]}"; do
+            if [ "$id" = "$KEEP" ]; then
+              echo "(keeping $id)"
+              continue
+            fi
+            echo "Deleting $id"
+            set +e
+            http=$(curl -sS -X DELETE \
+              "https://api.line.me/v2/bot/richmenu/$id" \
+              -H "Authorization: Bearer $LINE_TOKEN" \
+              -o "_debug/cleanup/delete-${id}.json" -w "%{http_code}")
+            set -e
+            echo "  HTTP $http"
+            echo "$http $id" >> _debug/cleanup/deletes.log
+          done
+
+          echo
+          echo "=== 5. Set keeper as default — try multiple body shapes ==="
+          pip install --quiet requests
+          KEEP="$KEEP" python3 set-default.py > _debug/cleanup/setdefault-attempts.json
+          echo "--- attempts ---"
+          cat _debug/cleanup/setdefault-attempts.json
+          echo
+          http=$(jq -r 'if .winner then .[.winner].http else [.[].http // empty] | last end' _debug/cleanup/setdefault-attempts.json)
+          echo "$http" > _debug/cleanup/setdefault-http.txt
+          cp _debug/cleanup/setdefault-attempts.json _debug/cleanup/setdefault.json
+          echo "Final HTTP: $http"
+          echo "HTTP $http"
+          echo "$http" > _debug/cleanup/setdefault-http.txt
+          cat _debug/cleanup/setdefault.json
+          echo
+
+          echo
+          echo "=== 6. Verify final list ==="
+          curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
+            https://api.line.me/v2/bot/richmenu/list \
+            > _debug/cleanup/after.json
+          jq '.richmenus[] | {id: .richMenuId, name, selected}' _debug/cleanup/after.json
+
+          echo
+          echo "=== 7. Verify default endpoint ==="
+          curl -sS -H "Authorization: Bearer $LINE_TOKEN" \
+            https://api.line.me/v2/bot/user/all/richmenu \
+            > _debug/cleanup/current-default.json
+          cat _debug/cleanup/current-default.json
+
+      - name: Commit cleanup results
+        if: always()
+        run: |
+          set -euo pipefail
+          git config user.email "actions@github.com"
+          git config user.name "github-actions[bot]"
+          git add _debug/
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+          else
+            git commit -m "cleanup: rich menu state after run ${{ github.run_id }}"
+            git push origin HEAD:main
+          fi

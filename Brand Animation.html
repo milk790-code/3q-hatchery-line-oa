@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<title>3Q貢丸 · 品牌動畫</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400&family=Noto+Serif+TC:wght@200;300;400&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="animations.jsx"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #000; overflow: hidden; }
+#root { width: 100vw; height: 100vh; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useEffect, useRef } = React;
+const c01 = v => Math.max(0, Math.min(1, v));
+const go = ({ from = 0, to = 1, start = 0, end = 1, ease = Easing.easeInOutCubic }) =>
+  (t) => t <= start ? from : t >= end ? to : from + (to - from) * ease(c01((t - start) / (end - start)));
+
+const FilmGrainLayer = () => (
+  <svg style={{ position:'absolute',inset:0,width:'100%',height:'100%',opacity:0.32,mixBlendMode:'overlay',pointerEvents:'none',zIndex:20 }} xmlns="http://www.w3.org/2000/svg">
+    <filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="2" seed="13"/>
+    <feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.13 0"/></filter>
+    <rect width="100%" height="100%" filter="url(#g)"/>
+  </svg>
+);
+
+function CharLine({ text, startT, stagger=0.14, dur=0.8, fadeAt, fadeDur=0.9, wrapStyle={} }) {
+  const t = useTime();
+  return (
+    <div style={{ display:'flex', justifyContent:'center', ...wrapStyle }}>
+      {[...text].map((ch, i) => {
+        const p  = c01((t - startT - i * stagger) / dur);
+        let   op = Easing.easeOutCubic(p);
+        const ty = (1 - Easing.easeOutCubic(p)) * 20;
+        if (fadeAt !== undefined) {
+          const fp = c01((t - fadeAt - i * stagger * 0.3) / fadeDur);
+          op *= (1 - Easing.easeInCubic(fp));
+        }
+        return (
+          <span key={i} style={{ display:'inline-block', opacity:op, transform:`translateY(${ty}px)`, willChange:'transform,opacity' }}>
+            {ch === ' ' ? '\u00A0' : ch}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
+const TreeMark = ({ style }) => (
+  <div style={style}>
+    <svg viewBox="0 0 280 280" fill="none" stroke="#B8924A" strokeWidth="1.1" strokeLinecap="round">
+      <line x1="140" y1="60" x2="140" y2="240"/>
+      <path d="M140 80 Q120 90 110 110 Q120 105 140 100"/><path d="M140 80 Q160 90 170 110 Q160 105 140 100"/>
+      <path d="M140 110 Q110 120 95 145 Q115 138 140 130"/><path d="M140 110 Q170 120 185 145 Q165 138 140 130"/>
+      <path d="M140 140 Q100 152 80 180 Q110 170 140 162"/><path d="M140 140 Q180 152 200 180 Q170 170 140 162"/>
+      <path d="M140 170 Q95 182 75 215 Q110 202 140 195"/><path d="M140 170 Q185 182 205 215 Q170 202 140 195"/>
+      <circle cx="140" cy="48" r="3" fill="#B8924A" stroke="none"/>
+      <circle cx="140" cy="48" r="12" strokeOpacity="0.3"/>
+      <circle cx="140" cy="48" r="22" strokeOpacity="0.15"/>
+      <line x1="90" y1="248" x2="190" y2="248" strokeOpacity="0.35"/>
+    </svg>
+  </div>
+);
+
+function BrandAnimation() {
+  const t = useTime();
+  const rootRef = useRef(null);
+
+  useEffect(() => {
+    if (rootRef.current) rootRef.current.setAttribute('data-screen-label', `t=${Math.floor(t)}s`);
+  });
+
+  const glowOp    = go({ from:0, to:1, start:0.3, end:3.5, ease:Easing.easeOutCubic })(t);
+  const treeOp    = go({ from:0, to:1, start:2,   end:5,   ease:Easing.easeOutCubic })(t)
+                  * (1 - go({ from:0, to:1, start:15.5, end:17.5, ease:Easing.easeInCubic })(t));
+  const treeScale = go({ from:0.88, to:1, start:2, end:5.5, ease:Easing.easeOutCubic })(t);
+
+  const eyebrowOp = go({ from:0, to:1, start:6, end:7.5, ease:Easing.easeOutCubic })(t)
+                  * (1 - go({ from:0, to:1, start:15.5, end:17, ease:Easing.easeInCubic })(t));
+
+  const svcOp = go({ from:0, to:1, start:17, end:18.5, ease:Easing.easeOutCubic })(t)
+              * (1 - go({ from:0, to:1, start:23.5, end:25.5, ease:Easing.easeInCubic })(t));
+
+  const ctaOp     = go({ from:0, to:1, start:24.5, end:27, ease:Easing.easeOutCubic })(t);
+  const screenOp  = 1 - go({ from:0, to:1, start:29, end:30.2, ease:Easing.easeInCubic })(t);
+
+  const services = ['品牌孵化','官網設計','App','影音剪輯','外送美圖','後台美編'];
+  const serif = '"Noto Serif TC", serif';
+  const sans  = '"Noto Sans TC", sans-serif';
+
+  return (
+    <div ref={rootRef} data-screen-label="t=0s"
+      style={{ position:'absolute', inset:0, background:'#0C0A08', overflow:'hidden', opacity:screenOp }}>
+
+      <div style={{ position:'absolute', top:'-25%', right:'-15%', width:'70%', height:'70%', background:'radial-gradient(circle,rgba(184,146,74,0.10),transparent)', opacity:glowOp, pointerEvents:'none' }}/>
+      <div style={{ position:'absolute', bottom:'-25%', left:'-10%', width:'55%', height:'55%', background:'radial-gradient(circle,rgba(184,146,74,0.04),transparent)', opacity:glowOp, pointerEvents:'none' }}/>
+
+      <TreeMark style={{ position:'absolute', left:'50%', top:'36%', transform:`translate(-50%,-50%) scale(${treeScale})`, opacity:treeOp, width:160, height:160 }}/>
+
+      <div style={{ position:'absolute', left:'50%', top:'60%', transform:'translateX(-50%)', textAlign:'center', opacity:eyebrowOp, pointerEvents:'none' }}>
+        <div style={{ fontSize:11, fontFamily:sans, fontWeight:300, letterSpacing:'0.4em', textTransform:'uppercase', color:'#B8924A', marginBottom:14 }}>TAIWAN BRAND HATCHERY</div>
+        <div style={{ width:36, height:1, background:'#B8924A', margin:'0 auto 28px' }}/>
+      </div>
+
+      <div style={{ position:'absolute', left:'50%', top:'67%', transform:'translateX(-50%)', width:'100%', textAlign:'center', fontFamily:serif, fontWeight:300, fontSize:52, letterSpacing:'0.1em', lineHeight:1.5, pointerEvents:'none' }}>
+        <CharLine text="只要你願意說，" startT={6.8} stagger={0.13} dur={0.85} fadeAt={15.5} fadeDur={0.8} wrapStyle={{ marginBottom:6 }}/>
+        <CharLine text="我們就幫你被看見。" startT={10.0} stagger={0.12} dur={0.85} fadeAt={15.8} fadeDur={0.8}/>
+      </div>
+
+      <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', opacity:svcOp, pointerEvents:'none' }}>
+        <div style={{ fontSize:11, fontFamily:sans, fontWeight:300, letterSpacing:'0.4em', textTransform:'uppercase', color:'#B8924A', marginBottom:16 }}>SERVICES · 服務一覽</div>
+        <div style={{ width:36, height:1, background:'#B8924A', marginBottom:48 }}/>
+        <div style={{ display:'flex', alignItems:'center', gap:20, justifyContent:'center', maxWidth:1400 }}>
+          {services.map((s, i) => {
+            const p = Easing.easeOutCubic(c01((t - 17.8 - i * 0.45) / 0.85));
+            const dotP = Easing.easeOutCubic(c01((t - 18.4 - i * 0.45) / 0.6));
+            return (
+              <React.Fragment key={s}>
+                <span style={{ fontFamily:serif, fontWeight:300, fontSize:30, letterSpacing:'0.12em', color:'#F5F2EC', opacity:p, transform:`translateY(${(1-p)*16}px)`, display:'inline-block', whiteSpace:'nowrap' }}>{s}</span>
+                {i < services.length - 1 && (
+                  <span style={{ width:5, height:5, borderRadius:'50%', background:'rgba(184,146,74,0.35)', display:'inline-block', opacity:dotP, flexShrink:0 }}/>
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
+      </div>
+
+      <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', opacity:ctaOp, pointerEvents:'none' }}>
+        <div style={{ fontSize:11, fontFamily:sans, fontWeight:300, letterSpacing:'0.4em', textTransform:'uppercase', color:'#B8924A', marginBottom:14 }}>3Q BRAND HATCHERY</div>
+        <div style={{ width:48, height:1, background:'#B8924A', marginBottom:44 }}/>
+        <div style={{ fontFamily:serif, fontWeight:300, fontSize:76, letterSpacing:'0.08em', color:'#F5F2EC', lineHeight:1.35, marginBottom:32 }}>來，幫你圓夢。</div>
+        <div style={{ fontFamily:serif, fontWeight:300, fontStyle:'italic', fontSize:22, letterSpacing:'0.18em', color:'rgba(245,242,236,0.5)' }}>說說你的店，從這裡開始。</div>
+      </div>
+
+      <div style={{ position:'absolute', bottom:36, right:44, fontFamily:sans, fontWeight:300, fontSize:11, letterSpacing:'0.32em', textTransform:'uppercase', color:`rgba(184,146,74,${(glowOp*0.4).toFixed(2)})`, pointerEvents:'none' }}>
+        3Q · BRAND HATCHERY
+      </div>
+
+      <FilmGrainLayer/>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <Stage width={1920} height={1080} duration={30} background="#0C0A08">
+    <BrandAnimation/>
+  </Stage>
+);
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>三指服務 · 本期團購</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--brand:#E8581E;--brand-dark:#B83E0C;--dark:#1C2128;--body:#3A3F4A;--mid:#6E7682;--bg:#F9F7F5;--card:#fff;--divider:#E4E6EA}
+html,body{background:var(--bg);font-family:'Noto Sans TC',system-ui,sans-serif;color:var(--body)}
+.wrap{max-width:440px;margin:0 auto;min-height:100vh;padding-bottom:60px}
+.hero{background:linear-gradient(160deg,#1C2128,#2A2018);padding:34px 24px 26px}
+.hero .kick{font-size:11px;letter-spacing:.18em;color:var(--brand);font-weight:700;margin-bottom:10px}
+.hero h1{color:#fff;font-size:26px;font-weight:700;margin-bottom:6px}
+.hero p{color:rgba(255,255,255,.6);font-size:13px;line-height:1.7}
+.period{display:inline-block;margin-top:12px;font-size:11px;font-weight:700;color:#fff;background:var(--brand);padding:4px 12px;border-radius:999px}
+.body{padding:20px 16px}
+.cat{font-size:12px;font-weight:700;color:var(--brand);letter-spacing:.1em;margin:18px 4px 10px;display:flex;align-items:center;gap:7px}
+.cat::before{content:'';width:16px;height:2px;background:var(--brand)}
+.item{background:var(--card);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 10px rgba(28,33,40,.05);margin-bottom:10px}
+.item .info{flex:1;min-width:0}
+.item .name{font-size:14px;font-weight:600;color:var(--dark);line-height:1.45;margin-bottom:3px}
+.item .price{font-size:15px;font-weight:700;color:var(--brand)}
+.item .price small{font-size:11px;color:var(--mid);font-weight:400;margin-left:4px}
+.btn{flex-shrink:0;background:var(--brand);color:#fff;border:none;font-size:13px;font-weight:700;padding:9px 14px;border-radius:10px;text-decoration:none;white-space:nowrap}
+.btn:active{background:var(--brand-dark)}
+.note{background:#FEF0E8;border-left:4px solid var(--brand);border-radius:12px;padding:14px 16px;font-size:12.5px;line-height:1.8;color:var(--body);margin:18px 0}
+.foot{text-align:center;color:var(--mid);font-size:11px;line-height:1.8;padding:24px 16px}
+.spec{font-size:11.5px;color:var(--mid);font-weight:400;margin-left:2px}
+.strike{text-decoration:line-through;color:var(--mid);font-size:12px;font-weight:400}
+.inote{font-size:11.5px;color:var(--brand);margin-top:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="kick">三指服務 · 團購</div>
+    <h1>本期團購</h1>
+    <p>用更低的價格，買到高品質的商品。<br>點「我要 +1」會直接開 LINE，送出就完成登記。</p>
+    <span class="period">2026 年 6 月檔期</span>
+  </div>
+  <div class="body">
+    <div id="list"></div>
+    <div class="note">
+      下單方式：點品項的「我要 +1」→ LINE 會自動帶好訊息 → 按送出就登記成功，我們會跟你確認數量與取貨方式。<br>
+      價格以下單當下與 LINE 確認為準。
+    </div>
+  </div>
+  <div class="foot">三指服務 生活服務整合<br>清潔 · 美容 · 工程 · 修繕 · 團購</div>
+</div>
+<script>
+const OA_ID = '%40121lkspe'; // 收單 LINE OA（三指自有 OA 開通後改這裡）
+const DATA = {
+  period: '2026-06',
+  cats: [
+    {name: '人氣零食', items: [
+      {n:'薯條三兄弟', spec:'盒', p:329},
+      {n:'辛拉麵', spec:'一袋 5 包', p:140, note:'優惠價'},
+      {n:'海苔脆片', spec:'包', p:159},
+      {n:'神戶可可塊', spec:'盒', p:139},
+      {n:'大同國際巧克力玉米酥', spec:'40g／包', p:20, note:'任選 2 包 39｜3 包 58｜5 包 95'},
+      {n:'大同國際麥香雞全家餐', spec:'40g／包', p:20, note:'任選 2 包 39｜3 包 58｜5 包 95'},
+      {n:'大同國際玉米濃湯餅乾', spec:'40g／包', p:20, note:'任選 2 包 39｜3 包 58｜5 包 95'}
+    ]},
+    {name: 'SABON 香氛保養', items: [
+      {n:'SABON 泡澡油', spec:'200ml', p:1390, op:1580, note:'團購價'},
+      {n:'SABON 沐浴油', spec:'500ml，附壓頭', p:999},
+      {n:'SABON 限定款沐浴油', spec:'500ml', p:1050, note:'限定款'}
+    ]}
+  ]
+};
+
+const list = document.getElementById('list');
+DATA.cats.forEach(cat => {
+  const h = document.createElement('div'); h.className='cat'; h.textContent = cat.name; list.appendChild(h);
+  cat.items.forEach(it => {
+    const msg = encodeURIComponent('我要+1：' + it.n);
+    const card = document.createElement('div'); card.className='item';
+    var meta = it.spec ? '<span class="spec">'+it.spec+'</span>' : '';
+    var price = (it.op ? '<span class="strike">NT$'+it.op.toLocaleString()+'</span> ' : '')+'NT$'+it.p.toLocaleString();
+    var note = it.note ? '<div class="inote">'+it.note+'</div>' : '';
+    card.innerHTML = '<div class="info"><div class="name">'+it.n+' '+meta+'</div><div class="price">'+price+'</div>'+note+'</div>'+
+      '<a class="btn" href="https://line.me/R/oaMessage/'+OA_ID+'/?'+msg+'" target="_blank" rel="noopener">我要 +1</a>';
+    list.appendChild(card);
+  });
+});
+</script>
+</body>
+</html>

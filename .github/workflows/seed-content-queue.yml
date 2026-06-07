@@ -1,0 +1,66 @@
+name: Seed Content Queue
+
+on:
+  workflow_dispatch:
+    inputs:
+      migration:
+        description: '要執行的 migration 檔案（db/migrations/ 下的檔名）'
+        required: true
+        default: '005_launch_plan_campaign.sql'
+        type: choice
+        options:
+          - 005_launch_plan_campaign.sql
+          - 008_3q_acquisition_fb.sql
+      dry_run:
+        description: 'Dry run（只印出 SQL，不真正執行）'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+      CF_API_TOKEN:  ${{ secrets.CF_API_TOKEN }}
+      D1_DATABASE_ID: e54671b1-d15e-4552-babf-cef367267568
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify token
+        run: |
+          resp=$(curl -sS -H "Authorization: Bearer $CF_API_TOKEN" \
+            https://api.cloudflare.com/client/v4/user/tokens/verify)
+          echo "$resp" | grep -q '"success":true' || { echo "CF token invalid"; exit 1; }
+
+      - name: Install Wrangler
+        run: npm install -g wrangler@latest
+
+      - name: Preview SQL (always)
+        run: |
+          echo "=== SQL Preview: ${{ inputs.migration }} ==="
+          cat db/migrations/${{ inputs.migration }}
+
+      - name: Execute migration on D1
+        if: ${{ inputs.dry_run == false }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          wrangler d1 execute 3q-hatchery-crm \
+            --remote \
+            --file=db/migrations/${{ inputs.migration }}
+
+      - name: Verify row count (after insert)
+        if: ${{ inputs.dry_run == false }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          wrangler d1 execute 3q-hatchery-crm \
+            --remote \
+            --command="SELECT platform, COUNT(*) AS n FROM content_queue WHERE status='pending' GROUP BY platform ORDER BY platform"

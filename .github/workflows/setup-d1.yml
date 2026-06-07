@@ -1,0 +1,107 @@
+name: Setup D1 CRM database
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      DB_NAME: 3q-hatchery-crm
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create or find D1 database
+        env:
+          CF_TOKEN:      ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          mkdir -p _debug/d1
+
+          # Check if already exists
+          existing=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/d1/database?name=$DB_NAME" \
+            | tee _debug/d1/list.json \
+            | jq -r --arg n "$DB_NAME" '.result[] | select(.name == $n) | .uuid' | head -1)
+
+          if [ -n "$existing" ]; then
+            echo "::notice::D1 already exists: $existing"
+            echo "D1_ID=$existing" >> $GITHUB_ENV
+          else
+            echo "Creating new D1 database: $DB_NAME"
+            create=$(curl -sS -X POST -H "Authorization: Bearer $CF_TOKEN" \
+              -H "Content-Type: application/json" \
+              "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/d1/database" \
+              -d "{\"name\":\"$DB_NAME\"}")
+            echo "$create" > _debug/d1/create.json
+            new_id=$(echo "$create" | jq -r '.result.uuid // empty')
+            if [ -z "$new_id" ]; then
+              echo "::error::D1 create failed: $create"
+              exit 1
+            fi
+            echo "::notice::Created D1: $new_id"
+            echo "D1_ID=$new_id" >> $GITHUB_ENV
+          fi
+
+      - name: Run schema.sql against D1
+        env:
+          CF_TOKEN:      ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          SCHEMA=$(cat db/schema.sql | jq -Rs '.')
+          resp=$(curl -sS -X POST -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/d1/database/$D1_ID/query" \
+            -d "{\"sql\": $SCHEMA}")
+          echo "$resp" > _debug/d1/schema.json
+          ok=$(echo "$resp" | jq -r '.success // false')
+          if [ "$ok" != "true" ]; then
+            echo "::error::Schema apply failed: $resp"
+            exit 1
+          fi
+          echo "::notice::Schema applied successfully"
+
+      - name: Update deploy.yml CRM_D1_ID if changed
+        run: |
+          set -euo pipefail
+          current=$(grep "CRM_D1_ID:" .github/workflows/deploy.yml | grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' | head -1)
+          if [ "$current" != "$D1_ID" ]; then
+            sed -i "s/CRM_D1_ID: $current/CRM_D1_ID: $D1_ID/" .github/workflows/deploy.yml
+            echo "::notice::Updated deploy.yml: $current → $D1_ID"
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add .github/workflows/deploy.yml _debug/d1/
+            git commit -m "d1: update CRM_D1_ID to $D1_ID"
+            git push
+          else
+            echo "::notice::D1 ID unchanged"
+          fi
+
+      - name: Verify schema with SELECT
+        env:
+          CF_TOKEN:      ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          resp=$(curl -sS -X POST -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/d1/database/$D1_ID/query" \
+            -d '{"sql": "SELECT name FROM sqlite_master WHERE type=\"table\""}')
+          echo "$resp" | jq .
+          tables=$(echo "$resp" | jq -r '.result[0].results[].name' 2>/dev/null || echo "none")
+          echo "::notice::Tables: $tables"
+
+      - name: Trigger main deploy to bind D1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          curl -sS -X POST -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$REPO/actions/workflows/deploy.yml/dispatches" \
+            -d '{"ref":"main"}'
+          echo "::notice::Re-deploy triggered (will pick up D1 binding)"

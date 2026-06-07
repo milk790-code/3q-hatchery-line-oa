@@ -1,0 +1,22 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 0; background: #F5F2EC; font-family: var(--font-sans); }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .cell { aspect-ratio: 1.1 / 1; background-size: cover; background-position: center; position: relative; }
+  .cell::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, rgba(10,10,10,0.55)); }
+  .cell .cap { position: absolute; bottom: 14px; left: 16px; right: 16px; color: #F5F2EC; font-family: "Noto Serif TC", serif; font-weight: 300; font-size: 16px; letter-spacing: 0.15em; line-height: 1.4; z-index: 1; }
+  .cell .en { position: absolute; top: 14px; left: 16px; font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: #F5F2EC; opacity: 0.7; z-index: 1; }
+</style>
+</head><body>
+<div class="row">
+  <div class="cell" style="background-image:url(../assets/photography/still-bowl-rice.svg)">
+    <div class="en">Still Life · 01</div>
+    <div class="cap">白瓷碗・米粒</div>
+  </div>
+  <div class="cell" style="background-image:url(../assets/photography/cupped-palm-light.svg)">
+    <div class="en">Still Life · 02</div>
+    <div class="cap">手・光點</div>
+  </div>
+</div>
+</body></html>

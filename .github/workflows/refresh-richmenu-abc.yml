@@ -1,0 +1,123 @@
+name: Refresh Rich Menu images (A/B/C)
+
+# Pushes updated PNG images to existing LINE schema IDs.
+# Does NOT recreate schemas — use upload-richmenu.yml when button text changes.
+#
+# Schema IDs are auto-resolved from the LINE API by matching the schema `name`
+# field (RICHMENU_NEW / RICHMENU_INQUIRED / RICHMENU_CONVERTED), so NO manual
+# GitHub secrets are needed beyond the existing LINE_CHANNEL_ACCESS_TOKEN.
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'assets/exports/3Q-HATCHERY_richmenu_a_2500x1686.png'
+      - 'assets/exports/3Q-HATCHERY_richmenu_b_2500x1686.png'
+      - 'assets/exports/3Q-HATCHERY_richmenu_c_2500x1686.png'
+
+jobs:
+  refresh-images:
+    runs-on: ubuntu-latest
+    env:
+      LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify PNG files exist
+        working-directory: assets/exports
+        run: |
+          for f in 3Q-HATCHERY_richmenu_a_2500x1686.png \
+                   3Q-HATCHERY_richmenu_b_2500x1686.png \
+                   3Q-HATCHERY_richmenu_c_2500x1686.png; do
+            echo "  ✓ $f ($(stat -c%s "$f") bytes)"
+          done
+
+      - name: Resolve schema IDs from LINE API (by name)
+        run: |
+          set -euo pipefail
+          if [[ -z "${LINE_TOKEN:-}" ]]; then
+            echo "::error::Repo secret LINE_CHANNEL_ACCESS_TOKEN is not set."
+            exit 1
+          fi
+
+          list=$(curl -fsS -H "Authorization: Bearer $LINE_TOKEN" \
+            https://api.line.me/v2/bot/richmenu/list)
+
+          resolve() {
+            echo "$list" | jq -r --arg n "$1" \
+              '.richmenus[] | select(.name == $n) | .richMenuId' | head -1
+          }
+
+          ID_A=$(resolve "RICHMENU_NEW")
+          ID_B=$(resolve "RICHMENU_INQUIRED")
+          ID_C=$(resolve "RICHMENU_CONVERTED")
+
+          fail=0
+          for pair in "A:RICHMENU_NEW:$ID_A" "B:RICHMENU_INQUIRED:$ID_B" "C:RICHMENU_CONVERTED:$ID_C"; do
+            label="${pair%%:*}"; rest="${pair#*:}"; name="${rest%%:*}"; id="${rest#*:}"
+            if [[ -z "$id" ]]; then
+              echo "::error::Could not find schema named '$name' on LINE. Run upload-richmenu.yml first."
+              fail=1
+            else
+              echo "  ✓ $label版 ($name) → $id"
+            fi
+          done
+          [[ $fail -eq 0 ]]
+
+          {
+            echo "ID_A=$ID_A"
+            echo "ID_B=$ID_B"
+            echo "ID_C=$ID_C"
+          } >> "$GITHUB_ENV"
+
+      - name: Push A版 image (RICHMENU_NEW)
+        run: |
+          set -euo pipefail
+          echo "▸ A版 → $ID_A"
+          code=$(curl -fsS -o /dev/null -w "%{http_code}" -X POST \
+            "https://api-data.line.me/v2/bot/richmenu/$ID_A/content" \
+            -H "Authorization: Bearer $LINE_TOKEN" \
+            -H "Content-Type: image/png" \
+            --data-binary "@assets/exports/3Q-HATCHERY_richmenu_a_2500x1686.png")
+          echo "  HTTP $code"
+          [[ "$code" == "200" ]] || { echo "::error::A版 upload failed (HTTP $code)"; exit 1; }
+
+      - name: Push B版 image (RICHMENU_INQUIRED)
+        run: |
+          set -euo pipefail
+          echo "▸ B版 → $ID_B"
+          code=$(curl -fsS -o /dev/null -w "%{http_code}" -X POST \
+            "https://api-data.line.me/v2/bot/richmenu/$ID_B/content" \
+            -H "Authorization: Bearer $LINE_TOKEN" \
+            -H "Content-Type: image/png" \
+            --data-binary "@assets/exports/3Q-HATCHERY_richmenu_b_2500x1686.png")
+          echo "  HTTP $code"
+          [[ "$code" == "200" ]] || { echo "::error::B版 upload failed (HTTP $code)"; exit 1; }
+
+      - name: Push C版 image (RICHMENU_CONVERTED)
+        run: |
+          set -euo pipefail
+          echo "▸ C版 → $ID_C"
+          code=$(curl -fsS -o /dev/null -w "%{http_code}" -X POST \
+            "https://api-data.line.me/v2/bot/richmenu/$ID_C/content" \
+            -H "Authorization: Bearer $LINE_TOKEN" \
+            -H "Content-Type: image/png" \
+            --data-binary "@assets/exports/3Q-HATCHERY_richmenu_c_2500x1686.png")
+          echo "  HTTP $code"
+          [[ "$code" == "200" ]] || { echo "::error::C版 upload failed (HTTP $code)"; exit 1; }
+
+      - name: Summary
+        run: |
+          {
+            echo "## Rich Menu Image Refresh ✅"
+            echo ""
+            echo "| 版本 | Schema ID | 狀態 |"
+            echo "|------|-----------|------|"
+            echo "| A版 (新朋友) | \`$ID_A\` | 圖片已更新 |"
+            echo "| B版 (詢問中) | \`$ID_B\` | 圖片已更新 |"
+            echo "| C版 (會員)   | \`$ID_C\` | 圖片已更新 |"
+            echo ""
+            echo "> Schema IDs 由 LINE API 依名稱自動取得，無需手動設定。"
+            echo "> Cloudflare env vars **不需要重新填**。"
+          } >> "$GITHUB_STEP_SUMMARY"

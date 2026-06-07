@@ -1,0 +1,45 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="bg2" cx="35%" cy="40%" r="80%">
+      <stop offset="0%" stop-color="#EFEAE0"></stop>
+      <stop offset="45%" stop-color="#3A3530"></stop>
+      <stop offset="100%" stop-color="#0A0908"></stop>
+    </radialGradient>
+    <radialGradient id="palm" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#E5D5BD"></stop>
+      <stop offset="60%" stop-color="#A0876A"></stop>
+      <stop offset="100%" stop-color="#2A2018"></stop>
+    </radialGradient>
+    <radialGradient id="particle" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFF5DC" stop-opacity="1"></stop>
+      <stop offset="40%" stop-color="#F0D88A" stop-opacity="0.7"></stop>
+      <stop offset="100%" stop-color="#B8924A" stop-opacity="0"></stop>
+    </radialGradient>
+    <filter id="grain2">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="9"></feTurbulence>
+      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.12 0"></feColorMatrix>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg2)"></rect>
+
+  
+  <ellipse cx="650" cy="650" rx="480" ry="80" fill="#0A0908" opacity="0.7"></ellipse>
+
+  
+  <path d="M 380 580&#xA;           Q 380 480, 500 460&#xA;           Q 620 440, 740 460&#xA;           Q 860 480, 920 540&#xA;           Q 940 600, 880 640&#xA;           Q 720 700, 540 700&#xA;           Q 420 690, 380 580 Z" fill="url(#palm)"></path>
+
+  
+  <path d="M 460 480 Q 480 450, 520 458" stroke="#D4BFA0" stroke-width="2" fill="none" opacity="0.5"></path>
+  <path d="M 580 462 Q 600 432, 640 442" stroke="#D4BFA0" stroke-width="2" fill="none" opacity="0.5"></path>
+  <path d="M 700 462 Q 720 438, 760 452" stroke="#D4BFA0" stroke-width="2" fill="none" opacity="0.4"></path>
+
+  
+  <circle cx="650" cy="340" r="180" fill="url(#particle)"></circle>
+  <circle cx="650" cy="340" r="60" fill="url(#particle)"></circle>
+  <circle cx="650" cy="340" r="8" fill="#FFF5DC"></circle>
+
+  
+  <rect width="1600" height="900" filter="url(#grain2)" opacity="0.55"></rect>
+</svg>

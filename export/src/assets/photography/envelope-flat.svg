@@ -1,0 +1,33 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 1040" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="bg3" cx="30%" cy="20%" r="100%">
+      <stop offset="0%" stop-color="#F5F2EC"></stop>
+      <stop offset="100%" stop-color="#CAC3B2"></stop>
+    </radialGradient>
+    <linearGradient id="env" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F2EBD8"></stop>
+      <stop offset="100%" stop-color="#D8CEB2"></stop>
+    </linearGradient>
+    <filter id="grain3">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="2"></feTurbulence>
+      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.10 0"></feColorMatrix>
+    </filter>
+  </defs>
+
+  <rect width="1040" height="1040" fill="url(#bg3)"></rect>
+
+  
+  <rect x="220" y="430" width="600" height="380" fill="#0A0A0A" opacity="0.18" transform="skewX(-2)"></rect>
+
+  
+  <rect x="220" y="380" width="600" height="380" fill="url(#env)"></rect>
+  
+  <path d="M 220 380 L 520 540 L 820 380 Z" fill="#EBE3CB" stroke="#C8BFA3" stroke-width="0.5"></path>
+  
+  <line x1="490" y1="540" x2="550" y2="540" stroke="#B8924A" stroke-width="1.2"></line>
+  <circle cx="520" cy="540" r="3" fill="#B8924A" opacity="0.6"></circle>
+
+  
+  <rect width="1040" height="1040" filter="url(#grain3)" opacity="0.55"></rect>
+</svg>

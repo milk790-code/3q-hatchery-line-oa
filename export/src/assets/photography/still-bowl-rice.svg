@@ -1,0 +1,55 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 878" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="bg" cx="70%" cy="20%" r="120%">
+      <stop offset="0%" stop-color="#EFEAE0"></stop>
+      <stop offset="55%" stop-color="#D8D2C5"></stop>
+      <stop offset="100%" stop-color="#1A1814"></stop>
+    </radialGradient>
+    <radialGradient id="bowl-rim" cx="50%" cy="35%" r="55%">
+      <stop offset="0%" stop-color="#FFFFFF"></stop>
+      <stop offset="70%" stop-color="#E8E2D5"></stop>
+      <stop offset="100%" stop-color="#8E8676"></stop>
+    </radialGradient>
+    <radialGradient id="bowl-interior" cx="60%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#F4EFE4"></stop>
+      <stop offset="100%" stop-color="#2A2620"></stop>
+    </radialGradient>
+    <radialGradient id="rice" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#F8F3E6"></stop>
+      <stop offset="100%" stop-color="#C9BFA5"></stop>
+    </radialGradient>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="5"></feTurbulence>
+      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.10 0"></feColorMatrix>
+    </filter>
+  </defs>
+
+  <rect width="1080" height="878" fill="url(#bg)"></rect>
+
+  
+  <ellipse cx="340" cy="640" rx="260" ry="34" fill="#0A0A0A" opacity="0.32"></ellipse>
+  <ellipse cx="340" cy="640" rx="200" ry="22" fill="#0A0A0A" opacity="0.5"></ellipse>
+
+  
+  <ellipse cx="340" cy="510" rx="220" ry="56" fill="url(#bowl-rim)"></ellipse>
+  
+  <ellipse cx="340" cy="505" rx="190" ry="44" fill="url(#bowl-interior)"></ellipse>
+  
+  <ellipse cx="340" cy="495" rx="170" ry="32" fill="url(#rice)"></ellipse>
+  
+  <g fill="#F4EBD6" opacity="0.85">
+    <ellipse cx="300" cy="490" rx="3" ry="1.2"></ellipse>
+    <ellipse cx="320" cy="486" rx="3" ry="1.2"></ellipse>
+    <ellipse cx="345" cy="483" rx="3" ry="1.2"></ellipse>
+    <ellipse cx="370" cy="487" rx="3" ry="1.2"></ellipse>
+    <ellipse cx="395" cy="491" rx="3" ry="1.2"></ellipse>
+    <ellipse cx="280" cy="498" rx="3" ry="1.2"></ellipse>
+    <ellipse cx="410" cy="500" rx="3" ry="1.2"></ellipse>
+    <ellipse cx="330" cy="478" rx="3" ry="1.2"></ellipse>
+    <ellipse cx="358" cy="476" rx="3" ry="1.2"></ellipse>
+  </g>
+
+  
+  <rect width="1080" height="878" filter="url(#grain)" opacity="0.6"></rect>
+</svg>

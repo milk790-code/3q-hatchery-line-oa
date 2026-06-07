@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=1080, initial-scale=1"/>
+  <title>3Q 孵化所 · 聊天背景 匯出 (1080×2340)</title>
+
+  <meta name="ext-resource-dependency" content="../../assets/photography/still-bowl-rice.svg" data-resource-id="ph_bowl"/>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Noto+Sans+TC:wght@300;400&family=Noto+Serif+TC:wght@300;400&display=swap"/>
+  <link rel="stylesheet" href="../../colors_and_type.css"/>
+
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: #1A1612; font-family: var(--font-sans); color: var(--color-paper); }
+    .stage { min-height: 100vh; display: grid; place-items: center; padding: 48px; }
+
+    /* TARGET CANVAS: 1080×2340 = 9:19.5 — Android long-screen / iPhone Pro tall fit */
+    #card {
+      width: 1080px;
+      height: 2340px;
+      position: relative;
+      overflow: hidden;
+      background: #1A1612;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+    }
+
+    /* Bowl photo at top — full bleed, then darkened heavily */
+    .photo {
+      position: absolute;
+      inset: 0 0 auto 0;       /* anchor top */
+      width: 100%;
+      height: 1170px;          /* top half */
+      background-image: url('../../assets/photography/still-bowl-rice.svg');
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.45) contrast(0.92) saturate(0.7);
+    }
+
+    /* Gradient fade from photo into solid dark below */
+    .fade-down {
+      position: absolute;
+      left: 0; right: 0;
+      top: 900px; height: 540px;
+      background: linear-gradient(
+        to bottom,
+        rgba(26, 22, 18, 0.0) 0%,
+        rgba(26, 22, 18, 0.7) 40%,
+        rgba(26, 22, 18, 1.0) 100%
+      );
+    }
+
+    /* Vignette overlay across whole canvas */
+    .vignette {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at center top, transparent 0%, rgba(26,22,18,0.35) 70%),
+        radial-gradient(ellipse at center bottom, transparent 0%, rgba(26,22,18,0.55) 80%);
+      pointer-events: none;
+    }
+
+    /* Subtle paper-grain texture (faint, for warmth) */
+    .grain {
+      position: absolute;
+      inset: 0;
+      opacity: 0.08;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23n)' opacity='0.6'/></svg>");
+    }
+
+    /* Brand mark — bottom-center, faded enough to not distract from messages */
+    .brand {
+      position: absolute;
+      left: 50%;
+      bottom: 180px;
+      transform: translateX(-50%);
+      text-align: center;
+      color: rgba(232, 224, 207, 0.32);     /* dim paper */
+      letter-spacing: 0.32em;
+      pointer-events: none;
+    }
+    .brand .mark {
+      font-family: var(--font-display, 'Cormorant Garamond', serif);
+      font-weight: 300;
+      font-size: 84px;
+      line-height: 1;
+      letter-spacing: 0.1em;
+      margin-bottom: 28px;
+    }
+    .brand .ja {
+      font-family: var(--font-serif-tc, 'Noto Serif TC', serif);
+      font-weight: 300;
+      font-size: 22px;
+      letter-spacing: 0.6em;
+      text-transform: uppercase;
+    }
+    .brand .zh {
+      margin-top: 14px;
+      font-family: var(--font-tc, 'Noto Sans TC', sans-serif);
+      font-weight: 300;
+      font-size: 24px;
+      letter-spacing: 0.4em;
+    }
+
+    /* Decorative rule between mark + zh — pencil-thin gold */
+    .brand .rule {
+      width: 60px;
+      height: 1px;
+      background: rgba(184, 146, 74, 0.45);
+      margin: 18px auto 0;
+    }
+
+    .toolbar { position: fixed; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 9999; font-size: 12px; letter-spacing: 0.15em; flex-wrap: wrap; max-width: calc(100vw - 40px); justify-content: flex-end; }
+    .toolbar button, .toolbar a {
+      background: var(--color-paper); color: var(--color-black);
+      border: 1px solid var(--color-gold); padding: 10px 18px;
+      font-family: var(--font-sans); font-weight: 400; letter-spacing: 0.15em;
+      text-transform: uppercase; cursor: pointer; text-decoration: none;
+    }
+    .toolbar .status { padding: 10px 14px; color: var(--color-gold); border: 1px dashed rgba(184,146,74,0.4); }
+    .toolbar.hidden { display: none; }
+    body.bare .toolbar { display: none; }
+    body.bare { background: transparent; }
+    body.bare .stage { padding: 0; min-height: 2340px; }
+    body.bare #card { box-shadow: none; }
+  </style>
+</head>
+<body>
+  <div class="toolbar" id="toolbar">
+    <span class="status" id="status">準備好</span>
+    <button id="downloadBtn">⬇ 下載 PNG (1080×2340)</button>
+    <a href="_exports-index.html">← 回索引</a>
+  </div>
+
+  <div class="stage">
+    <div id="card">
+      <div class="photo"></div>
+      <div class="fade-down"></div>
+      <div class="vignette"></div>
+      <div class="grain"></div>
+
+      <div class="brand">
+        <div class="mark">3Q</div>
+        <div class="ja">TAIWAN BRAND HATCHERY</div>
+        <div class="rule"></div>
+        <div class="zh">台灣在地品牌孵化所</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const auto = params.get('download') === '1';
+    const statusEl = document.getElementById('status');
+    const btn = document.getElementById('downloadBtn');
+
+    async function exportPng() {
+      statusEl.textContent = '渲染中…';
+      btn.disabled = true;
+      document.body.classList.add('bare');
+      const canvas = await html2canvas(document.getElementById('card'), {
+        width: 1080, height: 2340,
+        scale: 1,
+        backgroundColor: '#1A1612',
+        useCORS: true,
+        allowTaint: true,
+      });
+      document.body.classList.remove('bare');
+      // JPEG q88: ~250-400 KB, fits LINE OA chat-bg limit easily, no transparency needed.
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = '3q-chat-bg-1080x2340.jpg';
+      a.click();
+      statusEl.textContent = '完成 ✓';
+      btn.disabled = false;
+    }
+
+    btn.addEventListener('click', exportPng);
+    if (auto) {
+      window.addEventListener('load', () => setTimeout(exportPng, 1200));
+    }
+  </script>
+</body>
+</html>

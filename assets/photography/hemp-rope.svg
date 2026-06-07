@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 878" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="bg" cx="65%" cy="25%" r="100%"><stop offset="0%" stop-color="#EFEAE0"/><stop offset="100%" stop-color="#5A4830"/></radialGradient>
+    <linearGradient id="rope" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#D8B888"/><stop offset="100%" stop-color="#7A5A38"/></linearGradient>
+    <filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="47"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.11 0"/></filter>
+  </defs>
+  <rect width="1080" height="878" fill="url(#bg)"/>
+  <ellipse cx="380" cy="700" rx="240" ry="20" fill="#0A0908" opacity="0.45"/>
+  <ellipse cx="380" cy="540" rx="200" ry="120" fill="url(#rope)"/>
+  <ellipse cx="380" cy="540" rx="120" ry="70" fill="#1A1812"/>
+  <g stroke="#5A3818" stroke-width="0.9" fill="none" opacity="0.7">
+    <ellipse cx="380" cy="500" rx="190" ry="20"/>
+    <ellipse cx="380" cy="525" rx="195" ry="22"/>
+    <ellipse cx="380" cy="555" rx="198" ry="22"/>
+    <ellipse cx="380" cy="585" rx="195" ry="20"/>
+    <ellipse cx="380" cy="610" rx="190" ry="18"/>
+    <ellipse cx="380" cy="475" rx="180" ry="18"/>
+    <ellipse cx="380" cy="635" rx="180" ry="16"/>
+  </g>
+  <g stroke="#3A2818" stroke-width="0.6" fill="none" opacity="0.4">
+    <line x1="220" y1="500" x2="232" y2="510"/><line x1="240" y1="498" x2="252" y2="510"/><line x1="260" y1="498" x2="272" y2="510"/>
+    <line x1="280" y1="498" x2="292" y2="510"/><line x1="300" y1="498" x2="312" y2="510"/><line x1="320" y1="498" x2="332" y2="510"/>
+    <line x1="340" y1="498" x2="352" y2="510"/><line x1="360" y1="498" x2="372" y2="510"/><line x1="380" y1="498" x2="392" y2="510"/>
+  </g>
+  <rect width="1080" height="878" filter="url(#g)" opacity="0.55"/>
+</svg>

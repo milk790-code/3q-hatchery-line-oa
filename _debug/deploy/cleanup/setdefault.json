@@ -1,0 +1,7 @@
+{
+  "requests-no-data": {
+    "http": 200,
+    "body": "{}"
+  },
+  "winner": "requests-no-data"
+}

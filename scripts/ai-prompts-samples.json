@@ -1,0 +1,50 @@
+[
+  {
+    "file": "3q-sample-01-tea-cake.png",
+    "target_size": "1040x1040",
+    "gen_size": "1024x1024",
+    "prompt": "A single round Taiwanese tea cake in dark green paper wrapping, hand-tied with natural twine, resting on a worn wooden tea table. Soft window light from the upper left. Steam from a tea cup just out of frame. Shot on Hasselblad 500CM, Portra 400, candid quiet morning. The wrapping has slight wear, the twine is asymmetric. Real product, not stylized. No text, no logo, ultra natural."
+  },
+  {
+    "file": "3q-sample-02-sauce-bottle.png",
+    "target_size": "1040x1040",
+    "gen_size": "1024x1024",
+    "prompt": "A glass bottle of dark Taiwanese soy sauce on a slate counter, with a hand-written kraft paper label tied with twine. A drop of sauce on the bottle's neck catches highlight. Backlight through the bottle reveals deep amber color. Documentary product photo, shot on Mamiya 7, Portra 800, real kitchen counter not styled. Slight grain. No fancy props."
+  },
+  {
+    "file": "3q-sample-03-noodles.png",
+    "target_size": "1040x1040",
+    "gen_size": "1024x1024",
+    "prompt": "A bundle of dried Taiwanese hand-pulled noodles tied with hemp string, on a wooden cutting board with flour dust around. Warm afternoon side light. The noodles show texture and uneven hand-craft. Shot on Pentax 67, Kodak Portra 400. Like a noodle maker's workbench, real, no styling, slight imperfection."
+  },
+  {
+    "file": "3q-sample-04-bread.png",
+    "target_size": "1040x1040",
+    "gen_size": "1024x1024",
+    "prompt": "A rustic Taiwanese sweet potato bread loaf with slightly burnt crust on a linen cloth-covered wooden board. Crumbs scattered. Soft morning light from window, the bread casts long shadow. Documentary photography, shot on Leica M6, Cinestill 800T, real bakery counter feel. The bread is imperfectly shaped. No props, no styling."
+  },
+  {
+    "file": "3q-sample-05-rice.png",
+    "target_size": "1040x1040",
+    "gen_size": "1024x1024",
+    "prompt": "A small kraft paper bag of premium Taiwanese rice with a paper tag tied with red string, on a dark wooden surface. A few rice grains spilled. Soft overhead light. Shot on Hasselblad XPan, Portra 800. Family rice mill aesthetic, real, slight wear on the paper, hand-stamped seal visible. No commercial gloss."
+  },
+  {
+    "file": "3q-sample-06-pickles.png",
+    "target_size": "1040x1040",
+    "gen_size": "1024x1024",
+    "prompt": "A clear glass jar of homemade Taiwanese pickled mustard greens (酸菜), closed with paper cap and twine, on a vintage kitchen shelf. Late afternoon golden light from the side. Slight condensation on the glass. Shot on Yashica T4, Velvia 50. Like grandmother's pantry shelf, candid, lived-in, real."
+  },
+  {
+    "file": "3q-sample-07-tea.png",
+    "target_size": "1040x1040",
+    "gen_size": "1024x1024",
+    "prompt": "A handmade ceramic teapot pouring amber tea into a small unglazed cup on a wooden tea tray. Steam visible in side light. Shot on Fuji GFX, Cinestill 50D, real moment from a tea ceremony, candid not posed. The teapot has slight hand-thrown irregularity. Quiet, contemplative, unstyled."
+  },
+  {
+    "file": "3q-sample-08-gift-box.png",
+    "target_size": "1040x1040",
+    "gen_size": "1024x1024",
+    "prompt": "A handmade Taiwanese gift box wrapped in dark cream paper, tied with natural twine, with a small handwritten card attached. Resting on a worn wooden table near a window. Soft morning light. Shot on Mamiya 7, Portra 400. Like a gift just delivered, real, not posed, the paper has slight wrinkles, the twine asymmetric."
+  }
+]
