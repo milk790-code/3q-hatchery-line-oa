@@ -15,24 +15,13 @@ npx http-server -p 8000 -c-1
 
 ## PowerShell (no Python/Node)
 ```powershell
-Add-Type -AssemblyName System.Web
-$L = [System.Net.HttpListener]::new()
-$L.Prefixes.Add('http://localhost:8000/')
-$L.Start()
-$mime = @{'.html'='text/html';'.css'='text/css';'.js'='application/javascript';'.jsx'='application/javascript';'.svg'='image/svg+xml';'.png'='image/png'}
-while ($L.IsListening) {
-  $c = $L.GetContext()
-  $p = [System.Web.HttpUtility]::UrlDecode($c.Request.Url.LocalPath.TrimStart('/'))
-  if (!$p) { $p = 'ui_kits/line_oa/launch.html' }
-  $f = Join-Path $PWD $p
-  if (Test-Path $f -PathType Leaf) {
-    $b = [System.IO.File]::ReadAllBytes($f)
-    $c.Response.ContentType = $mime[[IO.Path]::GetExtension($f).ToLower()] ?? 'application/octet-stream'
-    $c.Response.OutputStream.Write($b, 0, $b.Length)
-  } else { $c.Response.StatusCode = 404 }
-  $c.Response.Close()
-}
+.\serve.ps1
 ```
+Or with custom port:
+```powershell
+.\serve.ps1 -Port 3000
+```
+Serves from this directory on `http://localhost:8000` (or custom port). Built-in MIME types for html, css, js, jsx, svg, png, jpg, gif, json, woff, woff2, etc.
 
 Then open: **http://localhost:8000/ui_kits/line_oa/launch.html**
 
