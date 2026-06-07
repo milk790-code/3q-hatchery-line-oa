@@ -32,26 +32,35 @@ jobs:
       - name: Extend to 60-day long-lived User Token
         env:
           # Must be the App Secret of FB_APP_ID (956987317313843 / popmonster-distributor-v2).
-          # THREADS_APP_SECRET belongs to a different (Threads consumer) app — run #44 proved
-          # it fails "Error validating client secret" — so a dedicated FB_APP_SECRET wins here.
           FB_APP_SECRET: ${{ secrets.FB_APP_SECRET || secrets.THREADS_APP_SECRET }}
-          # Repo secret first (encrypted + log-masked); dispatch input only as fallback.
           SHORT_TOKEN: ${{ secrets.FB_SHORT_TOKEN || inputs.fb_short_token }}
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
         run: |
           set -euo pipefail
-          if [ -z "${SHORT_TOKEN:-}" ]; then
-            echo "::error::No token provided. Add repo secret FB_SHORT_TOKEN (Settings → Secrets and variables → Actions) and re-run."
-            exit 1
+          KV_URL="https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/storage/kv/namespaces/${SESSION_KV_ID}/values/token:fb:user_token"
+          LONG=""
+          if [ -n "${SHORT_TOKEN:-}" ]; then
+            resp=$(curl -sS \
+              "https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${FB_APP_ID}&client_secret=${FB_APP_SECRET}&fb_exchange_token=${SHORT_TOKEN}")
+            LONG=$(echo "$resp" | jq -r '.access_token // empty')
+            [ -z "$LONG" ] && echo "::warning::extend failed (short token likely expired): $(echo $resp | jq -c '.error.message // .')"
           fi
-          resp=$(curl -sS \
-            "https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${FB_APP_ID}&client_secret=${FB_APP_SECRET}&fb_exchange_token=${SHORT_TOKEN}")
-          LONG=$(echo "$resp" | jq -r '.access_token // empty')
           if [ -z "$LONG" ]; then
-            echo "::error::Token extension failed: $(echo $resp | jq -c .)"
+            echo "::notice::Trying KV-cached long-lived user token (60-day, cached by previous successful run)"
+            CACHED=$(curl -sS "$KV_URL" -H "Authorization: Bearer $CF_TOKEN" || true)
+            case "$CACHED" in
+              EAA*) LONG="$CACHED"; echo "::notice::using cached long-lived token" ;;
+              *) echo "::warning::no usable cached token" ;;
+            esac
+          fi
+          if [ -z "$LONG" ]; then
+            echo "::error::No usable token. Refresh repo secret FB_SHORT_TOKEN (Graph Explorer → Generate → copy) and re-run."
             exit 1
           fi
           echo "FB_USER_TOKEN=$LONG" >> $GITHUB_ENV
-          echo "::notice::Long-lived user token obtained"
+          # cache for future runs (50 days)
+          curl -sS -X PUT "$KV_URL?expiration_ttl=4320000" -H "Authorization: Bearer $CF_TOKEN" --data "$LONG" > /dev/null || true
+          echo "::notice::Long-lived user token ready (and cached)"
 
       - name: Get Page Access Token (never expires)
         run: |
