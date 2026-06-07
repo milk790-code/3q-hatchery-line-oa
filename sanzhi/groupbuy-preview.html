@@ -30,6 +30,7 @@ html,body{background:var(--bg);font-family:'Noto Sans TC',system-ui,sans-serif;c
 .spec{font-size:11.5px;color:var(--mid);font-weight:400;margin-left:2px}
 .strike{text-decoration:line-through;color:var(--mid);font-size:12px;font-weight:400}
 .inote{font-size:11.5px;color:var(--brand);margin-top:2px}
+.ask{color:var(--mid);font-size:13px;font-weight:700}
 </style>
 </head>
 <body>
@@ -63,6 +64,19 @@ const DATA = {
       {n:'大同國際麥香雞全家餐', spec:'40g／包', p:20, note:'任選 2 包 39｜3 包 58｜5 包 95'},
       {n:'大同國際玉米濃湯餅乾', spec:'40g／包', p:20, note:'任選 2 包 39｜3 包 58｜5 包 95'}
     ]},
+    {name: '生活日用 · 艾多美嚴選', inquiry: true, items: [
+      {n:'凝萃煥髮洗髮乳', spec:'500ml'},
+      {n:'柔護寶貝洗髮沐浴露', spec:'350ml'},
+      {n:'男士全效洗髮沐浴露', spec:'500ml'},
+      {n:'精油舒緩霜', spec:'100ml×3 入／250ml 單入'},
+      {n:'精油貼布', spec:'一盒 60 片'},
+      {n:'電動牙刷', spec:'含主機＋充電座＋2 替換刷頭＋旅行盒'},
+      {n:'牙刷', spec:'8 入組（兒童／大刷頭／小刷頭）'},
+      {n:'蜂膠牙膏', spec:'50g×4 條／200g×5 條'},
+      {n:'銀離子柔濕巾', spec:'80 抽×12 包／箱'},
+      {n:'環保衛生紙', spec:'110 抽×72 包／箱（可單串）'},
+      {n:'衛生棉', spec:'18cm／24cm／28cm'}
+    ]},
     {name: 'SABON 香氛保養', items: [
       {n:'SABON 泡澡油', spec:'200ml', p:1390, op:1580, note:'團購價'},
       {n:'SABON 沐浴油', spec:'500ml，附壓頭', p:999},
@@ -75,13 +89,14 @@ const list = document.getElementById('list');
 DATA.cats.forEach(cat => {
   const h = document.createElement('div'); h.className='cat'; h.textContent = cat.name; list.appendChild(h);
   cat.items.forEach(it => {
-    const msg = encodeURIComponent('我要+1：' + it.n);
+    const inq = cat.inquiry || it.inquiry;
+    const msg = encodeURIComponent((inq ? '想詢價：' : '我要+1：') + it.n);
     const card = document.createElement('div'); card.className='item';
     var meta = it.spec ? '<span class="spec">'+it.spec+'</span>' : '';
-    var price = (it.op ? '<span class="strike">NT$'+it.op.toLocaleString()+'</span> ' : '')+'NT$'+it.p.toLocaleString();
+    var price = inq ? '<span class="ask">私訊詢價</span>' : (it.op ? '<span class="strike">NT$'+it.op.toLocaleString()+'</span> ' : '')+'NT$'+(it.p||0).toLocaleString();
     var note = it.note ? '<div class="inote">'+it.note+'</div>' : '';
     card.innerHTML = '<div class="info"><div class="name">'+it.n+' '+meta+'</div><div class="price">'+price+'</div>'+note+'</div>'+
-      '<a class="btn" href="https://line.me/R/oaMessage/'+OA_ID+'/?'+msg+'" target="_blank" rel="noopener">我要 +1</a>';
+      '<a class="btn" href="https://line.me/R/oaMessage/'+OA_ID+'/?'+msg+'" target="_blank" rel="noopener">'+(inq?'詢問價格':'我要 +1')+'</a>';
     list.appendChild(card);
   });
 });
