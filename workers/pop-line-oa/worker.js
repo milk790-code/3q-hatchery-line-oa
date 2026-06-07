@@ -14,7 +14,8 @@ const SEED_VER = 'v4.1';
 // ═══ 群發預設稿(要發新一波:改這裡重部署,或丟文案給 Claude 更新)═══
 const TDG_IMG = 'https://raw.githubusercontent.com/milk790-code/3q-hatchery-line-oa/main/assets/tudigong/richmenu-3x1.png';
 const BROADCAST_PRESET = [
-  { type: 'text', text: '跟你報告:泡泡怪獸的老闆開了新事業——\n🔨 3Q 品牌孵化所,專幫開店的人把生意搬上網。\n\n你的店,中了幾個?\n▢ Google 地圖搜不到你,評論沒人管\n▢ 客人問「有菜單嗎」,只能拍照傳給他\n▢ 想做官網,被報價嚇退\n▢ LINE 訊息回不完,常漏單\n\n3Q 一次幫你搞定:\n・Google 商家檔案(地圖搜得到、星等有人顧)\n・品牌官網+線上菜單/服務項目頁\n・LINE 官方帳號+AI 24小時自動接客\n・FB/IG 自動發文,不用自己想梗\n\n第一步免費做給你看——\n⚡ 每個城市限定一名(需店面形象佳),先詢先審,額滿就收:\n泡泡怪獸自己就是這樣長大的(蝦皮小店→IG 13.6萬→亞太500+門市),現在把這套拿來幫你:\nhttps://3q-sales-ai.milk790.workers.dev/?utm_source=line&utm_medium=broadcast&utm_campaign=newbiz\n\n🏮 另外,要租店、展店的——簽約前讓土地公免費幫你看三重點(嫌惡設施/人流/行情),不賣房不仲介:\nhttps://tudigong-line-oa.milk790.workers.dev/?utm_source=line&utm_medium=broadcast&utm_campaign=newbiz' },
+  { type: 'image', originalContentUrl: 'https://3q-art-portfolio.milk790.workers.dev/assets/og.png', previewImageUrl: 'https://3q-art-portfolio.milk790.workers.dev/assets/og.png' },
+  { type: 'text', text: '跟你報告:泡泡怪獸的老闆開了新事業——\n🔨 3Q 掘計畫:你的官網,我來建。先用,滿意再付。\n\n你的店,中了幾個?\n▢ Google 地圖搜不到你,星等沒人顧\n▢ 客人問「有官網嗎」,沒有就被默默篩掉\n▢ 做過官網,做完沒人維護、改字就要錢\n▢ LINE 訊息回不完,常漏單\n\n3Q 一次幫你搞定:\n・品牌官網+線上菜單/服務項目頁(免費建置,只收月費,越久越便宜)\n・Google 商家檔案(地圖搜得到)\n・LINE 官方帳號+AI 24小時自動接客\n・FB/IG 自動發文,不用自己想梗\n\n通常要 NT$2-4 萬的官網,我們建好、維護好,部署完滿意才開始計費。\n⚡ 限定 5 席、每個行業只收 1 名,本期只剩 2 席:\nhttps://3q-art-portfolio.milk790.workers.dev/launch-plan?utm_source=line&utm_medium=broadcast\n\n🏮 另外,要租店、展店的——簽約前讓土地公免費幫你看三重點(嫌惡設施/人流/行情),不賣房不仲介:\nhttps://tudigong-line-oa.milk790.workers.dev/?utm_source=line&utm_medium=broadcast' },
   { type: 'text', text: '車的事,一樣找我。\n鍍膜、洗車、拋光耗材\n官網看品項、快速下單:\nhttps://popmonster.vip\n\n🎁 新攤位開張互惠(出示加好友截圖即可):\n・加「土地公」或「3Q」任一好友 → 官網下單滿千打 9 折\n・兩個都加+滿千 → 直接送 NT$599 天使塗層 30ml\n下單後把截圖傳到這裡,我們直接處理。\n\n有問題直接問——AI 業務 24 小時在線,產品、用法、怎麼選,問就對了。' },
 ];
 
