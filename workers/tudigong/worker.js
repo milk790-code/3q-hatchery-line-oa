@@ -69,6 +69,29 @@ export default {
       if (g) return new Response(guideHtml(g), { headers: { 'content-type': 'text/html;charset=utf-8', 'cache-control': 'public, max-age=600' } });
     }
 
+    if (url.pathname === '/admin/webhook') {
+      if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
+      const cfg = await loadCfg(env);
+      if (!cfg.lineToken) return new Response('no line token', { status: 503 });
+      const H = { authorization: 'Bearer ' + cfg.lineToken };
+      const HJ = { ...H, 'content-type': 'application/json' };
+      const out = {};
+      try {
+        if (url.searchParams.get('set') === '1') {
+          const target = url.origin + '/';
+          const putRes = await fetch('https://api.line.me/v2/bot/channel/webhook/endpoint', { method: 'PUT', headers: HJ, body: JSON.stringify({ endpoint: target }) });
+          out.put = { status: putRes.status, body: await putRes.text() };
+        }
+        const getRes = await fetch('https://api.line.me/v2/bot/channel/webhook/endpoint', { headers: H });
+        out.endpoint = await getRes.json();
+        const testRes = await fetch('https://api.line.me/v2/bot/channel/webhook/test', { method: 'POST', headers: HJ, body: JSON.stringify({}) });
+        out.test = await testRes.json();
+        const infoRes = await fetch('https://api.line.me/v2/bot/info', { headers: H });
+        out.bot = await infoRes.json();
+      } catch (e) { out.error = e.message; }
+      return new Response(JSON.stringify(out, null, 2), { headers: { 'content-type': 'application/json' } });
+    }
+
     if (url.pathname === '/admin/richmenu') {
       if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
       const cfg = await loadCfg(env);
