@@ -90,6 +90,12 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
+
+    // 浮動 AI 導購 widget(一行 script 嵌任何官網)
+    if (url.pathname === '/widget.js') {
+      return new Response(WIDGET_JS, { headers: { 'Content-Type': 'application/javascript; charset=utf-8', 'Cache-Control': 'public, max-age=300', ...CORS } });
+    }
+
     if (url.pathname === '/health') return json({ ok: true, worker: 'pop-sales-ai', version: '1.0', brain: env.ANTHROPIC_API_KEY ? 'claude-sonnet-4-6' : (env.AI ? 'workers-ai-llama' : 'none'), kv: Boolean(env.SESSION), d1: Boolean(env.CRM) });
     if (url.pathname === '/go') { await logEvent(env, request, url, 'click'); return Response.redirect(LINE_URL, 302); }
     if (url.pathname === '/shop') { await logEvent(env, request, url, 'shop_click'); return Response.redirect(SHOPEE_URL, 302); }
@@ -245,3 +251,43 @@ h1 span{color:#caa64a}
 <script>${CHAT_JS}
 add('你好,我是泡泡怪獸的接待。產品、施作、進貨都可以問。您是店家還是自己用?',false);
 </script></body></html>`;
+
+const WIDGET_JS = `
+(function(){
+  if(window.__sqW)return; window.__sqW=1;
+  var s=document.currentScript||(function(){var a=document.getElementsByTagName("script");return a[a.length-1]})();
+  var base=(s&&s.src||"").replace(/\/widget\.js.*$/,"");
+  var ACC="#caa64a", BRAND="泡泡怪獸", GREET="嗨,我是泡泡怪獸的 AI 導購。你是店家要進貨,還是自己的車要用?";
+  var rm=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var sid=localStorage.getItem("sq_sid"); if(!sid){sid=(Date.now().toString(36)+Math.random().toString(36).slice(2,10)); localStorage.setItem("sq_sid",sid);}
+  var css="#sqw,#sqw *{box-sizing:border-box;font-family:system-ui,-apple-system,\"Noto Sans TC\",sans-serif}"
+   +"#sqw-b{position:fixed;right:18px;bottom:18px;width:60px;height:60px;border-radius:50%;background:"+ACC+";color:#14110a;border:0;cursor:pointer;box-shadow:0 8px 24px -6px rgba(0,0,0,.5);z-index:2147483000;font-size:26px;display:flex;align-items:center;justify-content:center;transition:transform .2s}"
+   +"#sqw-b:hover{transform:scale(1.06)}"
+   +"#sqw-p{position:fixed;right:18px;bottom:88px;width:340px;max-width:92vw;height:460px;max-height:72vh;background:#0f1319;border:1px solid #2a3242;border-radius:16px;box-shadow:0 18px 50px -12px rgba(0,0,0,.6);z-index:2147483000;display:none;flex-direction:column;overflow:hidden}"
+   +"#sqw-p.on{display:flex}"
+   +"#sqw-h{background:"+ACC+";color:#14110a;padding:12px 14px;font-weight:800;font-size:15px;display:flex;justify-content:space-between;align-items:center}"
+   +"#sqw-x{cursor:pointer;font-size:20px;line-height:1;background:none;border:0;color:#14110a}"
+   +"#sqw-m{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:#0c0f14}"
+   +".sqm{max-width:85%;padding:9px 12px;border-radius:12px;font-size:14px;line-height:1.5;white-space:pre-wrap;word-break:break-word}"
+   +".sqm.ai{background:#1c2430;color:#e8edf5;align-self:flex-start}"
+   +".sqm.me{background:"+ACC+";color:#14110a;align-self:flex-end}"
+   +"#sqw-f{display:flex;gap:6px;padding:10px;border-top:1px solid #2a3242;background:#0f1319}"
+   +"#sqw-i{flex:1;background:#0c0f14;border:1px solid #2a3242;border-radius:9px;padding:9px 11px;color:#e8edf5;font-size:14px;outline:none}"
+   +"#sqw-s{background:"+ACC+";border:0;border-radius:9px;padding:0 15px;font-weight:700;color:#14110a;cursor:pointer;font-size:14px}";
+  var st=document.createElement("style"); st.textContent=css; document.head.appendChild(st);
+  var root=document.createElement("div"); root.id="sqw";
+  root.innerHTML='<button id="sqw-b" aria-label="AI 導購">&#128172;</button>'
+   +'<div id="sqw-p"><div id="sqw-h"><span>'+BRAND+' · AI 導購</span><button id="sqw-x" aria-label="關閉">&times;</button></div>'
+   +'<div id="sqw-m"></div><div id="sqw-f"><input id="sqw-i" placeholder="輸入你的問題..." autocomplete="off"><button id="sqw-s">送出</button></div></div>';
+  document.body.appendChild(root);
+  var P=root.querySelector("#sqw-p"),M=root.querySelector("#sqw-m"),I=root.querySelector("#sqw-i"),S=root.querySelector("#sqw-s");
+  function add(t,me){var d=document.createElement("div");d.className="sqm "+(me?"me":"ai");d.textContent=t;M.appendChild(d);M.scrollTop=M.scrollHeight;return d;}
+  var greeted=false;
+  root.querySelector("#sqw-b").onclick=function(){P.classList.toggle("on");if(P.classList.contains("on")){if(!greeted){greeted=true;add(GREET,false);}I.focus();}};
+  root.querySelector("#sqw-x").onclick=function(){P.classList.remove("on");};
+  function send(){var t=I.value.trim();if(!t)return;I.value="";add(t,true);S.disabled=true;var w=add("...",false);
+    fetch(base+"/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sid:sid,message:t})})
+    .then(function(r){return r.json()}).then(function(d){w.textContent=d.reply||"稍等一下,我馬上回你。";}).catch(function(){w.textContent="連線不太穩,直接加我們 LINE 更快。";}).then(function(){S.disabled=false;M.scrollTop=M.scrollHeight;});}
+  S.onclick=send; I.addEventListener("keydown",function(e){if(e.key==="Enter")send();});
+})();
+`;
