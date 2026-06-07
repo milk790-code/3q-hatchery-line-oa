@@ -430,15 +430,33 @@ async function publishToFacebook(post, env) {
 
   // Post a link as the FIRST COMMENT (keeps external links out of the body,
   // which FB's algorithm penalises for reach).
+  // 2026-06-07 fix: comment API needs pages_manage_engagement (token may lack it)
+  // → on failure, FALL BACK to editing the post and appending the link to the
+  //   caption (uses pages_manage_posts, which we definitely have). A slightly
+  //   penalised reach with a link beats full reach with no funnel.
   async function firstComment(objectId) {
     if (!post.link_url || !objectId) return;
     try {
-      await fetch(`https://graph.facebook.com/v21.0/${objectId}/comments`, {
+      const r = await fetch(`https://graph.facebook.com/v21.0/${objectId}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: post.link_url, access_token: token }),
+        body: JSON.stringify({ message: `免費診斷+AI 接待:${post.link_url}`, access_token: token }),
       });
+      const d = await r.json().catch(() => ({}));
+      if (r.ok && d.id) return; // comment landed
+      console.error('[fb] first comment rejected:', JSON.stringify(d.error || d));
     } catch (e) { console.error('[fb] first comment failed:', e.message); }
+    // Fallback: append link to the post body via edit
+    try {
+      const newMsg = `${post.caption || ''}\n\n— 免費診斷+AI 接待 —\n${post.link_url}`;
+      const r2 = await fetch(`https://graph.facebook.com/v21.0/${objectId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: newMsg, access_token: token }),
+      });
+      const d2 = await r2.json().catch(() => ({}));
+      console.log('[fb] link appended via edit:', r2.ok, JSON.stringify(d2).slice(0, 120));
+    } catch (e) { console.error('[fb] edit fallback failed:', e.message); }
   }
 
   if (post.image_url) {
@@ -605,8 +623,8 @@ async function runPublishLoop(env, targetPlatform = null) {
 
     if (outcome.ok) {
       await env.CRM.prepare(
-        "UPDATE content_queue SET status = 'published', published_at = ?, error_msg = NULL WHERE id = ?"
-      ).bind(nowIso, post.id).run();
+        "UPDATE content_queue SET status = 'published', published_at = ?, platform_post_id = ?, error_msg = NULL WHERE id = ?"
+      ).bind(nowIso, outcome.platform_id || null, post.id).run();
       results.push({ platform, published: true, id: post.id, platform_id: outcome.platform_id });
     } else {
       await env.CRM.prepare(
@@ -774,6 +792,60 @@ export default {
         return new Response(payload?.content || '', { headers: { 'Content-Type': 'text/plain; charset=utf-8', ...CORS } });
       }
       return json(payload || { ok: false, error: 'no content' });
+    }
+
+    // One-shot repair: POST /admin/backfill-links (TRIGGER_TOKEN protected)
+    // Finds recent FB posts that match published queue rows whose link never
+    // landed (comment was silently rejected), and appends the link via edit.
+    if (url.pathname === '/admin/backfill-links' && request.method === 'POST') {
+      if (!requireToken()) return new Response('forbidden', { status: 403 });
+      if (!env.CRM) return json({ ok: false, error: 'D1 not bound' }, 500);
+      const token = await getToken('fb', 'FB_PAGE_ACCESS_TOKEN', env);
+      const pageId = env.FB_PAGE_ID;
+      if (!token || !pageId) return json({ ok: false, error: 'FB token/page not configured' }, 500);
+
+      const postsResp = await fetch(`https://graph.facebook.com/v21.0/${pageId}/posts?fields=id,message&limit=15&access_token=${token}`);
+      const postsData = await postsResp.json().catch(() => ({}));
+      if (!postsResp.ok) return json({ ok: false, error: postsData.error?.message || 'posts fetch failed' }, 502);
+      const fbPosts = postsData.data || [];
+
+      const rows = await env.CRM.prepare(
+        "SELECT id, caption, link_url, platform_post_id FROM content_queue WHERE platform='facebook' AND status='published' AND link_url IS NOT NULL ORDER BY id DESC LIMIT 15"
+      ).all();
+
+      const results = [];
+      for (const row of rows.results || []) {
+        const head = (row.caption || '').slice(0, 18);
+        if (!head) { results.push({ id: row.id, skipped: 'no caption' }); continue; }
+        const match = fbPosts.find(p => (p.message || '').startsWith(head));
+        if (!match) { results.push({ id: row.id, skipped: 'no matching fb post' }); continue; }
+        if ((match.message || '').includes(row.link_url)) {
+          results.push({ id: row.id, ok: true, already: true });
+          continue;
+        }
+        // try comment first
+        let done = false;
+        try {
+          const c = await fetch(`https://graph.facebook.com/v21.0/${match.id}/comments`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: `免費診斷+AI 接待:${row.link_url}`, access_token: token }),
+          });
+          const cd = await c.json().catch(() => ({}));
+          if (c.ok && cd.id) done = 'comment';
+        } catch (_) {}
+        if (!done) {
+          const e = await fetch(`https://graph.facebook.com/v21.0/${match.id}`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: `${row.caption}\n\n— 免費診斷+AI 接待 —\n${row.link_url}`, access_token: token }),
+          });
+          const ed = await e.json().catch(() => ({}));
+          done = (e.ok && (ed.success === true || ed.id)) ? 'edit' : false;
+          if (!done) { results.push({ id: row.id, failed: ed.error?.message || 'edit failed' }); continue; }
+        }
+        await env.CRM.prepare('UPDATE content_queue SET platform_post_id = ? WHERE id = ?').bind(match.id, row.id).run();
+        results.push({ id: row.id, ok: true, via: done, fb: match.id });
+      }
+      return json({ ok: true, results });
     }
 
     // OAuth callback: POST /oauth/callback (TRIGGER_TOKEN protected)
