@@ -114,7 +114,7 @@ async function callBrain(history, env) {
     console.error('[sales-ai] anthropic error', resp.status);
   }
   if (env.AI) {
-    const r = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+    const r = await env.AI.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', {
       messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...history],
       max_tokens: 600,
     });
@@ -180,7 +180,7 @@ export default {
 
     if (url.pathname === '/health') {
       return json({ ok: true, worker: '3q-sales-ai', version: '1.0',
-        brain: env.ANTHROPIC_API_KEY ? 'claude-sonnet-4-6' : (env.AI ? 'workers-ai-llama' : 'none'),
+        brain: env.ANTHROPIC_API_KEY ? 'claude-sonnet-4-6' : (env.AI ? 'workers-ai-llama-3.3-70b' : 'none'),
         kv: Boolean(env.SESSION), d1: Boolean(env.CRM) });
     }
 
