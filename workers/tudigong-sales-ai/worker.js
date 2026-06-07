@@ -167,10 +167,38 @@ h1 em{color:#e8632c;font-style:normal}
 .cta{display:block;text-align:center;background:#06c755;color:#fff;font-size:18px;font-weight:800;border-radius:12px;padding:16px;margin:22px 0 10px;text-decoration:none}
 .note{color:#8a7458;font-size:12px;text-align:center;margin-bottom:30px}
 h2{font-size:18px;margin:26px 0 10px;color:#e8632c}
+/* ── 3D HERO:選址羅盤(GPU only)── */
+.hero3d{position:relative;height:240px;margin:6px 0 18px;overflow:hidden;border-radius:16px;perspective:800px;background:radial-gradient(ellipse at 50% 130%,#3a1f0e,transparent 65%)}
+.dialwrap{position:absolute;left:50%;top:54%;width:190px;height:190px;margin:-95px 0 0 -95px;transform-style:preserve-3d;transform:rotateX(58deg)}
+.dial{position:absolute;inset:0;border-radius:50%;border:2px solid #e8632c66;background:radial-gradient(circle at 50% 50%,#2c1a10 30%,#241510 60%,#1a100a 100%);box-shadow:0 0 0 8px #24151088, 0 24px 60px -16px #e8632c33, inset 0 0 30px #000a;animation:dialspin 26s linear infinite}
+.dial::before{content:"";position:absolute;inset:14px;border-radius:50%;border:1px dashed #e8632c44}
+.dial::after{content:"";position:absolute;inset:42px;border-radius:50%;border:1px solid #e8632c33}
+.dir{position:absolute;left:50%;top:50%;font-size:14px;font-weight:900;color:#e8632c;transform-origin:0 0}
+.dN{transform:translate(-7px,-86px)}.dS{transform:translate(-7px,62px)}.dE{transform:translate(64px,-9px)}.dW{transform:translate(-80px,-9px)}
+@keyframes dialspin{0%{transform:rotateZ(0)}100%{transform:rotateZ(360deg)}}
+.needle{position:absolute;left:50%;top:50%;width:8px;height:120px;margin:-60px 0 0 -4px;animation:needlespin 26s linear infinite reverse}
+.needle::before{content:"";position:absolute;left:0;top:0;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-bottom:60px solid #e8632c;filter:drop-shadow(0 0 8px #e8632c88)}
+.needle::after{content:"";position:absolute;left:0;bottom:0;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:60px solid #f7ead8aa}
+@keyframes needlespin{0%{transform:rotateZ(0)}100%{transform:rotateZ(-360deg)}}
+.hub{position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffd9a8,#e8632c 60%,#7a2f12);box-shadow:0 0 14px #e8632c99}
+.fire{position:absolute;bottom:-6px;width:5px;height:5px;border-radius:50%;background:#ffb35c;opacity:0;animation:rise 8s linear infinite}
+.fire:nth-child(1){left:10%;animation-delay:.3s}.fire:nth-child(2){left:24%;animation-delay:2.2s}.fire:nth-child(3){left:50%;animation-delay:4s}.fire:nth-child(4){left:72%;animation-delay:1.2s}.fire:nth-child(5){left:88%;animation-delay:3.2s}
+@keyframes rise{0%{transform:translateY(0) scale(1);opacity:0}12%{opacity:.8}100%{transform:translateY(-230px) scale(.2);opacity:0}}
+.in1,.in2,.in3{opacity:0;transform:translateY(16px);animation:inup .8s cubic-bezier(.2,.7,.3,1) forwards}
+.in2{animation-delay:.18s}.in3{animation-delay:.36s}
+@keyframes inup{to{opacity:1;transform:translateY(0)}}
+.card{transition:transform .35s cubic-bezier(.2,.7,.3,1),box-shadow .35s}
+.card:active,.card:hover{transform:perspective(700px) rotateX(4deg) translateY(-3px);box-shadow:0 14px 36px -14px #e8632c40}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}.in1,.in2,.in3{opacity:1;transform:none}}
+
 </style></head><body><div class="wrap">
-<div class="tag">呆丸土地公・台灣最接地氣的選址情報所</div>
-<h1>簽下去之前,<br><em>先讓土地公幫你看一眼。</em></h1>
-<p class="sub">買房、租屋、開店——賣你房子的人,不會告訴你這三件事:</p>
+<div class="tag in1">呆丸土地公・台灣最接地氣的選址情報所</div>
+<div class="hero3d in1">
+<div class="dialwrap"><div class="dial"><span class="dir dN">北</span><span class="dir dS">南</span><span class="dir dE">東</span><span class="dir dW">西</span></div><div class="needle"></div><div class="hub"></div></div>
+<div class="fire"></div><div class="fire"></div><div class="fire"></div><div class="fire"></div><div class="fire"></div>
+</div>
+<h1 class="in2">簽下去之前,<br><em>先讓土地公幫你看一眼。</em></h1>
+<p class="sub in3">買房、租屋、開店——賣你房子的人,不會告訴你這三件事:</p>
 <div class="card"><b>嫌惡設施</b>——宮廟、殯葬、高壓電塔、垃圾場,離你多近?</div>
 <div class="card"><b>人流</b>——這個時段的人流,跟你要做的事合不合?</div>
 <div class="card"><b>行情</b>——同路段的價,你拿到的合不合理?</div>
@@ -199,10 +227,15 @@ h1 span{color:#e8632c}
 .g{background:#241710;border:1px solid #5a3d28;border-radius:12px;padding:14px;font-size:14px}
 .g b{display:block;color:#e8632c;margin-bottom:4px;font-size:15px}
 .cta{display:inline-block;background:#06c755;color:#fff;font-weight:800;border-radius:10px;padding:10px 18px;text-decoration:none;font-size:15px;margin-bottom:22px}
+.g{transition:transform .35s cubic-bezier(.2,.7,.3,1),box-shadow .35s}
+.g:hover,.g:active{transform:perspective(700px) rotateX(5deg) translateY(-4px);box-shadow:0 14px 32px -14px #e8632c50}
+.in1,.in2{opacity:0;transform:translateY(14px);animation:inup .7s cubic-bezier(.2,.7,.3,1) forwards}.in2{animation-delay:.15s}
+@keyframes inup{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.in1,.in2{opacity:1;transform:none}}
 </style></head><body><div class="wrap">
-<h1>呆丸土地公 <span>— 買房租店看地點,先問土地公</span></h1>
+<h1 class="in1">呆丸土地公 <span>— 買房租店看地點,先問土地公</span></h1>
 <p class="sub">台灣最接地氣的選址情報所・不賣房不仲介,所以敢說真話</p>
-<div class="grid">
+<div class="grid in2">
 <div class="g"><b>免費三重點</b>傳一個地址,回你嫌惡設施、人流、行情三件事。</div>
 <div class="g"><b>中立立場</b>不賣房、不帶看、不收房仲業配,情報只對你負責。</div>
 <div class="g"><b>深度報告</b>要更完整的商圈與行情判讀,談付費選址報告。</div>
