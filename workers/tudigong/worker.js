@@ -67,6 +67,11 @@ export default {
       return new Response(`tudigong bot alive | secret=${!!cfg.lineSecret} token=${!!cfg.lineToken} ai=${cfg.anthropicKey ? 'claude' : 'builtin'} owner=${!!cfg.ownerId}`, { status: 200 });
     }
 
+    if (url.pathname.startsWith('/guide/')) {
+      const g = GUIDES[url.pathname.slice(7)];
+      if (g) return new Response(guideHtml(g), { headers: { 'content-type': 'text/html;charset=utf-8', 'cache-control': 'public, max-age=600' } });
+    }
+
     if (request.method !== 'POST') {
       return new Response(LANDING_HTML, { headers: { 'content-type': 'text/html;charset=utf-8', 'cache-control': 'public, max-age=300' } });
     }
@@ -121,6 +126,10 @@ footer{margin:40px 0 20px;font-size:12px;color:#8a6a3a;text-align:center}
 <div class="pt"><b>完整報告 NT$2,800(主力)</b><br>基礎全部+現場實勘照、白天晚上對照、議價建議。<b>早鳥:首 50 份 NT$990</b>。</div>
 <div class="pt"><b>陪跑方案 NT$3,800</b><br>完整全部+一次電話諮詢+簽約前複查一次。</div>
 <div class="pt"><b>到價監看 NT$299/月</b>(或 2,990/年)<br>長期盯一塊地,最長 5 年,有動靜通知你。</div>
+<h2>選址知識</h2>
+<div class="pt">📖 <a href="/guide/xiane" style="color:#C8362B">嫌惡設施怎麼看:你以為的 vs 真正該怕的</a></div>
+<div class="pt">📖 <a href="/guide/dianmian" style="color:#C8362B">店面選址三個眉角:人流不等於錢流</a></div>
+<div class="pt">📖 <a href="/guide/shijia" style="color:#C8362B">實價登錄怎麼看,才不會被「特殊交易」騙</a></div>
 <h2>常見問題</h2>
 <div class="pt faq"><b>免費的範圍?</b><br>一個地址 × 三個重點 × 文字回覆。想要五維完整報告再依上方價目升級,早鳥首 50 份只要 990。</div>
 <div class="pt faq"><b>怎麼開始?</b><br>加 LINE → 回「地址」→ 貼上你想看的地址+用途(買房/租店/開攤),24小時內回你。</div>
@@ -128,6 +137,46 @@ footer{margin:40px 0 20px;font-size:12px;color:#8a6a3a;text-align:center}
 <a class="cta" href="https://line.me/R/ti/p/@207cpaps">現在就問 → LINE @207cpaps<small>免費快問 · 不賣房 · 不仲介</small></a>
 <footer>呆丸土地公 · 選址資訊顧問服務(非不動產經紀業務)<br>行情資訊僅供參考,實際以官方登錄與現場為準</footer>
 </div></body></html>`;
+
+
+const GUIDES = {
+  xiane: { title: '嫌惡設施怎麼看:你以為的 vs 真正該怕的', desc: '宮廟、加油站、變電所、殯葬設施…買房租店前,嫌惡設施該怎麼盤?呆丸土地公教你用半徑思維一次看清。', body: `
+<p>看房看店,多數人只看「正對面有什麼」。但嫌惡設施的影響是<b>半徑</b>,不是視線。</p>
+<h3>你以為的嫌惡設施</h3>
+<p>宮廟、夜市、加油站——這些最常被點名,但影響其實分等級:宮廟平日安靜,初一十五與廟會才有香火與人潮;夜市影響的是「收攤後的垃圾與氣味」;加油站真正的議題是進出車流動線。</p>
+<h3>真正該怕、卻常被漏看的</h3>
+<p>變電所與基地台(影響轉手)、殯葬相關(影響貸款成數與心理)、特種行業聚集(影響夜間治安觀感)、垃圾車集點與資源回收場(每天固定時段的氣味與噪音)。這些在白天帶看時,幾乎都看不到。</p>
+<h3>土地公的盤法</h3>
+<p>以物件為圓心,150 公尺與 500 公尺各拉一圈:150 公尺內看「每天會遇到的」,500 公尺內看「影響行情的」。再配一次晚上實地走訪,九成的雷都會現形。</p>`},
+  dianmian: { title: '店面選址三個眉角:人流不等於錢流', desc: '租店面開店前必看:同一條街為什麼有人賺有人賠?人流、動線、停留率,呆丸土地公拆給你看。', body: `
+<p>「這條街人很多」是開店最常見、也最貴的一句誤判。</p>
+<h3>眉角一:人流要分「經過」與「停留」</h3>
+<p>通勤人流走得快,視線不落店;逛街人流才會停。同樣一萬人次,停留率差十倍,營業額就差十倍。</p>
+<h3>眉角二:紅綠燈這側與對面,是兩個世界</h3>
+<p>行人動線被路口、斑馬線、騎樓高低差切開。對面生意好,不代表這側活得了——轉角第一間與第三間,命運常常完全不同。</p>
+<h3>眉角三:換手率是最誠實的紅燈</h3>
+<p>同一個店面三年換五個老闆,問題通常不在產品,在地點本身:租金結構、停車可及性、晚間人流斷崖。簽約前查一下這個位置前幾任做多久,比任何話術都準。</p>`},
+  shijia: { title: '實價登錄怎麼看,才不會被「特殊交易」騙', desc: '實價登錄人人會查,但特殊交易、車位拆算、樓層價差沒排除,看到的行情就是假的。', body: `
+<p>實價登錄是免費的官方資料(lvr.land.moi.gov.tw),但「會查」跟「會看」是兩回事。</p>
+<h3>第一關:排除特殊交易</h3>
+<p>親友間買賣、急售、債務處分、附租約——這些都會拉偏均價。看到特別便宜或特別貴的單筆,先點開備註欄。</p>
+<h3>第二關:車位要拆算</h3>
+<p>含車位的總價直接除以建坪,單價會失真。先把車位價(平面約 150-250 萬、機械約 80-150 萬,依區域)拆出來,再算每坪單價。</p>
+<h3>第三關:同棟不同樓層,價差是合理的</h3>
+<p>四樓與頂樓、邊間與中間戶、面馬路與面中庭,行情天生就有級距。拿低樓層成交價去殺高樓層的價,只會被當外行。</p>
+<p>查得到資料是基本功,判讀才是價值——這也是土地公免費快問會幫你做的事。</p>`},
+};
+
+function guideHtml(g) {
+  return `<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${g.title}|呆丸土地公</title><meta name="description" content="${g.desc}">
+<style>body{font-family:"Microsoft JhengHei","PingFang TC",sans-serif;margin:0;background:#FBF0D9;color:#2B1C14;line-height:2}.wrap{max-width:560px;margin:0 auto;padding:28px 20px}h1{color:#C8362B;font-size:24px;line-height:1.5}h3{color:#C8362B;border-left:4px solid #E8B04B;padding-left:10px}a.back{color:#8a6a3a;font-size:14px;text-decoration:none}.cta{display:block;text-align:center;background:#06C755;color:#fff;font-size:18px;font-weight:700;padding:15px;border-radius:12px;text-decoration:none;margin:28px 0}p{background:#fff;padding:12px 14px;border-radius:8px}footer{margin:30px 0 16px;font-size:12px;color:#8a6a3a;text-align:center}</style></head>
+<body><div class="wrap"><a class="back" href="/">🏮 呆丸土地公|回首頁</a>
+<h1>${g.title}</h1>${g.body}
+<a class="cta" href="https://line.me/R/ti/p/@207cpaps">這塊地好不好 讓土地公免費幫你看 →<br><small style="font-weight:400;font-size:13px">私訊地址,看三個重點:嫌惡設施|人流|行情</small></a>
+<footer>呆丸土地公 · 選址資訊顧問服務(非不動產經紀業務)· 內容為一般選址知識分享,非投資建議</footer>
+</div></body></html>`;
+}
 
 async function loadCfg(env) {
   const [s, t, a, o] = await Promise.all([
