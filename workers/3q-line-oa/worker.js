@@ -234,6 +234,28 @@ export default {
     const url = new URL(request.url);
     if (url.pathname === '/setup') return handleSetup(request, env, url);
     if (url.pathname === '/admin/evolve') { const cfg = await getCfg(env); return handleEvolve(env, cfg, url); }
+    // 診斷端點:webhook 指向/官方實測/bot 身分/token 活性,一次看清(&set=1 順便把 endpoint 指回本 worker)
+    if (url.pathname === '/admin/webhook') {
+      if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
+      const cfg = await getCfg(env);
+      if (!cfg.lineToken) return new Response(JSON.stringify({ error: 'no token in KV' }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+      const H = { 'Authorization': 'Bearer ' + cfg.lineToken };
+      const HJ = { ...H, 'Content-Type': 'application/json' };
+      const out = { tokenLen: cfg.lineToken.length, secretLen: cfg.lineSecret.length };
+      try {
+        if (url.searchParams.get('set') === '1') {
+          const p = await fetch('https://api.line.me/v2/bot/channel/webhook/endpoint', { method: 'PUT', headers: HJ, body: JSON.stringify({ endpoint: url.origin + '/webhook' }) });
+          out.put = { status: p.status, body: await p.text() };
+        }
+        const g = await fetch('https://api.line.me/v2/bot/channel/webhook/endpoint', { headers: H });
+        out.endpoint = await g.json().catch(() => ({ httpStatus: g.status }));
+        const t = await fetch('https://api.line.me/v2/bot/channel/webhook/test', { method: 'POST', headers: HJ, body: '{}' });
+        out.test = await t.json().catch(() => ({ httpStatus: t.status }));
+        const b = await fetch('https://api.line.me/v2/bot/info', { headers: H });
+        out.bot = b.ok ? await b.json() : { httpStatus: b.status, note: b.status === 401 ? 'token 失效(可能被 reissue 過)' : 'api error' };
+      } catch (e) { out.error = e.message; }
+      return new Response(JSON.stringify(out, null, 2), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+    }
     if (url.pathname === '/health') {
       const cfg = await getCfg(env);
       let insights = 0;
