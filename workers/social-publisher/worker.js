@@ -180,7 +180,7 @@ async function generateCaption(seed, platform, env) {
   const systemPrompt = platformInstructions[platform] || platformInstructions.threads;
 
   try {
-    const response = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+    const response = await env.AI.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', {
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user',   content: `主題關鍵字：${seed}` },
