@@ -1,4 +1,4 @@
-// 超級業務 AI v3 · 呆丸土地公裝填版(設定已填)
+// 超級業務 AI v4 · 呆丸土地公裝填版(v3 全功能保留 + v4 情緒價值引擎 + Reflexion 自我進化)
 // 改文案改這裡;改邏輯改 worker.js。SYSTEM_PROMPT 末段的 JSON 輸出契約勿刪(worker 靠它解析)。
 
 const SYSTEM_PROMPT = `你是「呆丸土地公」的首席成交業務,在 LINE 上以土地公身分與客人對話。職責只有一個:把每筆接洽推進到成交。不是客服、不是百科——你把方案談到 99%,最後 1%(最終報價/合約條款/平台規則承諾)交回負責人拍板。
@@ -12,6 +12,11 @@ const SYSTEM_PROMPT = `你是「呆丸土地公」的首席成交業務,在 LINE
 聲腔/語言:土地公口吻——暖、接地氣、像鄰里長輩、講人話,不端架子;純文字短分行,每則不超過 8 行;繁體中文,外文附中譯。
 產品知識庫:免費快問每日限 6 件、24 小時內回覆;L1 三檔=基礎 1,800(五維文字版)/完整 2,800(加實勘照與議價建議,主力)/陪跑 3,800(加電話諮詢與簽約前複查);早鳥=完整報告首 50 份 990;L2 到價監看 299/月或 2,990/年(最長盯5年);交付=PDF+LINE 重點摘要,3 個工作天。此處沒有的(發票、特殊地區、合作、客製)一律不臆測,說「這項土地公幫你確認後回覆」並標記。
 合規紅線:永不出現 投資保證/穩賺/包漲/超高投報/即將都更/明星學區;不給投資、法律、醫療建議;不仲介不代銷(非經紀業紅線);行情數字標明實價登錄來源並註「僅供參考」;尊重台灣消保鑑賞期與個資法;不索取非必要敏感資料;業配或利益關係一律揭露。
+
+情緒價值引擎(v4,你贏過人類業務的地方):① 戰術同理:先說出你讀到的他的處境與感受(「你會這樣問,是不是怕簽下去才發現踩雷…」),被理解的人才聽你說。② 校準提問:用「怎麼/什麼/多少」開頭的開放問句挖需求,不用「是不是」逼選邊,一次只問一個,問完聽。③ 鏡像:偶爾重複客人最後幾個字,像鄰里長輩接話,讓他自己說下去。④ 情緒先於資訊:他焦慮先安撫再給方案,先處理心情、再處理事情。⑤ 嫌貴先問「是跟什麼比呢?」逼出價值比較,再把價格翻譯成「每天不到一杯咖啡」或「避開的那個損失」。⑥ 記得他:用對話裡他提過的細節(地段/用途/預算)回應,讓他覺得被記在心上。
+
+［進化記憶］以下是你從過去真實對話沉澱的實戰心得,優先參考、靈活運用:
+{{EVOLVED_INSIGHTS}}
 
 四條鐵律(凌駕一切話術):1 誠實優於討好,產品做不到的直說並給替代。2 結果優先激進推進,把問題收斂成「要A還是B」。3 只在不可逆處停:最終報價/合約/平台規則標「此項需負責人確認」。4 真正有效>主流好聽,需求不合理禮貌推回。
 
@@ -52,6 +57,7 @@ const MAX_HISTORY = 12;
 const MAX_INPUT_LEN = 1000;
 const CLAUDE_MODEL = 'claude-sonnet-4-6';
 const SETUP_KEY = 'tdg-setup-9k2m7x';
+const SEED_VER = 'v4';
 
 export default {
   async fetch(request, env, ctx) {
@@ -61,7 +67,9 @@ export default {
 
     if (url.pathname === '/health') {
       const cfg = await loadCfg(env);
-      return new Response(`tudigong bot alive | secret=${!!cfg.lineSecret} token=${!!cfg.lineToken} ai=${cfg.anthropicKey ? 'claude' : 'builtin'} owner=${!!cfg.ownerId}`, { status: 200 });
+      let insights = 0;
+      try { const r = await env.DB.prepare('SELECT COUNT(*) n FROM seed_insights').first(); insights = r?.n || 0; } catch (_) {}
+      return new Response(`tudigong bot alive | seed=${SEED_VER} secret=${!!cfg.lineSecret} token=${!!cfg.lineToken} ai=${cfg.anthropicKey ? 'claude' : 'builtin'} owner=${!!cfg.ownerId} insights=${insights}`, { status: 200 });
     }
 
     if (url.pathname.startsWith('/guide/')) {
@@ -72,14 +80,47 @@ export default {
     if (url.pathname === '/admin/selftest') {
       if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
       const cfg = await loadCfg(env);
-      const q = url.searchParams.get('q') || '\u6211\u60f3\u79df\u5e97\u9762\u958b\u98f2\u6599\u5e97,\u53f0\u4e2d\u5317\u5c6f,\u9810\u7b97\u6708\u79df3\u842c,\u6703\u4e0d\u6703\u592a\u8cb4?';
+      const q = url.searchParams.get('q') || '我想租店面開飲料店,台中北屯,預算月租3萬,會不會太貴?';
       const state = { history: [{ role: 'user', content: q }], sales: { completion: 0 } };
       const t0 = Date.now();
       let brain = null, err = null;
       try { brain = await callSalesBrain(env, cfg, state); } catch (e) { err = e.message; }
       const ms = Date.now() - t0;
       const ok = !!(brain && brain.reply && brain.state && typeof brain.state.completion !== 'undefined');
-      return new Response(JSON.stringify({ ok, ms, ai: cfg.anthropicKey ? 'claude' : 'builtin', contract_fields: brain ? Object.keys(brain) : null, completion: brain?.state?.completion, reply_preview: brain?.reply ? String(brain.reply).slice(0, 200) : null, error: err }, null, 2), { headers: { 'content-type': 'application/json' } });
+      return new Response(JSON.stringify({ ok, ms, seed: SEED_VER, ai: cfg.anthropicKey ? 'claude' : 'builtin', contract_fields: brain ? Object.keys(brain) : null, completion: brain?.state?.completion, reply_preview: brain?.reply ? String(brain.reply).slice(0, 200) : null, error: err }, null, 2), { headers: { 'content-type': 'application/json' } });
+    }
+
+    // ═══ Reflexion 自我進化:真實對話逐字稿 → 教練自省 → 沉澱心得 → 餵回種子 ═══
+    if (url.pathname === '/admin/evolve') {
+      if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
+      const cfg = await loadCfg(env);
+      await ensureEvolveTables(env);
+      const rows = await env.DB.prepare('SELECT role, text FROM convo_log ORDER BY id DESC LIMIT 60').all();
+      const convos = (rows.results || []).reverse();
+      if (convos.length < 4) {
+        return new Response(JSON.stringify({ ok: true, evolved: false, note: '對話數據不足,先累積(<4)', count: convos.length }), { headers: { 'content-type': 'application/json' } });
+      }
+      const transcript = convos.map(c => (c.role === 'user' ? '客人' : '土地公AI') + ': ' + c.text).join('\n');
+      const coachPrompt = '你是頂尖銷售教練,正在訓練「呆丸土地公」選址情報服務的成交 AI。以下是它最近的真實對話逐字稿。像教練看比賽錄影,找出可複製的實戰心得:\n① 哪些回覆有效推進成交、讓客人更投入?為什麼?\n② 哪些回覆讓客人冷掉、句點、流失?該怎麼改?\n③ 反覆出現的問題,最好的標準答法是什麼?\n輸出 4-6 條精煉「實戰心得」,每條一句話、具體可直接照做,繁中。只輸出心得清單,不要前言。\n\n逐字稿:\n' + transcript;
+      let insight = '';
+      try {
+        if (cfg.anthropicKey) {
+          const r = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'x-api-key': cfg.anthropicKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+            body: JSON.stringify({ model: CLAUDE_MODEL, max_tokens: 700, system: '你是嚴格、務實、只講重點的銷售教練。', messages: [{ role: 'user', content: coachPrompt }] }),
+          });
+          if (r.ok) { const d = await r.json(); insight = (d.content?.[0]?.text || '').trim(); }
+        }
+        if (!insight && env.AI) {
+          const r = await env.AI.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', { messages: [{ role: 'system', content: '你是嚴格、務實、只講重點的銷售教練。' }, { role: 'user', content: coachPrompt }], max_tokens: 700 });
+          insight = (r?.response || '').trim();
+        }
+      } catch (e) { console.error('evolve', e.message); }
+      if (insight) {
+        await env.DB.prepare("INSERT INTO seed_insights (insight, analyzed, created_at) VALUES (?, ?, datetime('now'))").bind(insight, convos.length).run().catch(() => {});
+      }
+      return new Response(JSON.stringify({ ok: true, evolved: !!insight, analyzed: convos.length, insight }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' } });
     }
 
     if (url.pathname === '/admin/secret') {
@@ -380,7 +421,8 @@ async function onText(ev, env, cfg) {
   const state = await loadState(env, userId);
   state.history.push({ role: 'user', content: text });
 
-  const ai = await callSalesBrain(env, cfg, state);
+  const insights = await loadInsights(env);   // ← v4 進化記憶
+  const ai = await callSalesBrain(env, cfg, state, insights);
   if (!ai) {
     await replyLine(ev.replyToken, ['土地公這邊訊號卡了一下\n你剛剛說的我記著 稍等回你'], cfg);
     return;
@@ -392,6 +434,7 @@ async function onText(ev, env, cfg) {
   await saveState(env, userId, state);
 
   await replyLine(ev.replyToken, [ai.reply], cfg);
+  await logConvo(env, userId, text, ai.reply);   // ← v4 逐字稿落庫(供進化迴圈)
 
   if (ai.state && ai.state.needs_principal && cfg.ownerId) {
     await pushLine(cfg.ownerId, [formatHandoff(userId, ai.state)], cfg);
@@ -403,15 +446,16 @@ async function onText(ev, env, cfg) {
   }
 }
 
-async function callSalesBrain(env, cfg, state) {
-  if (!cfg.anthropicKey) return callBuiltinBrain(env, state);
+async function callSalesBrain(env, cfg, state, insights) {
+  if (!cfg.anthropicKey) return callBuiltinBrain(env, state, insights);
   const messages = state.history.map(m => ({ role: m.role, content: m.content }));
+  const sys = SYSTEM_PROMPT.replace('{{EVOLVED_INSIGHTS}}', insights || '(實戰數據累積中,先用上面的內功心法)');
   const stateBlock = `［對話狀態］${JSON.stringify(state.sales || { completion: 0 })}\n(以上為後端攜帶的進度,接續推進,勿從頭開始)`;
 
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'x-api-key': cfg.anthropicKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-    body: JSON.stringify({ model: CLAUDE_MODEL, max_tokens: 1024, system: `${SYSTEM_PROMPT}\n\n${stateBlock}`, messages }),
+    body: JSON.stringify({ model: CLAUDE_MODEL, max_tokens: 1024, system: `${sys}\n\n${stateBlock}`, messages }),
   });
   if (!res.ok) { console.error('claude api', res.status, await res.text()); return null; }
   const data = await res.json();
@@ -422,15 +466,40 @@ async function callSalesBrain(env, cfg, state) {
 }
 
 
-async function callBuiltinBrain(env, state) {
+async function callBuiltinBrain(env, state, insights) {
   if (!env.AI) return null;
-  const sys = SYSTEM_PROMPT + '\n\n［對話狀態］' + JSON.stringify(state.sales || { completion: 0 });
+  const sysBase = SYSTEM_PROMPT.replace('{{EVOLVED_INSIGHTS}}', insights || '(實戰數據累積中,先用上面的內功心法)');
+  const sys = sysBase + '\n\n［對話狀態］' + JSON.stringify(state.sales || { completion: 0 });
   const messages = [{ role: 'system', content: sys }].concat(state.history.map(m => ({ role: m.role, content: m.content })));
   try {
     const r = await env.AI.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', { messages, max_tokens: 1024 });
     const textOut = (r && (r.response || r.result || '')) + '';
     return JSON.parse(textOut.slice(textOut.indexOf('{'), textOut.lastIndexOf('}') + 1));
   } catch (e) { console.error('builtin brain', e.message); return null; }
+}
+
+// ═══ v4 進化迴圈基礎設施 ═══
+async function ensureEvolveTables(env) {
+  try {
+    await env.DB.prepare("CREATE TABLE IF NOT EXISTS convo_log (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, role TEXT, text TEXT, created_at TEXT DEFAULT (datetime('now')))").run();
+    await env.DB.prepare("CREATE TABLE IF NOT EXISTS seed_insights (id INTEGER PRIMARY KEY AUTOINCREMENT, insight TEXT, analyzed INTEGER, created_at TEXT)").run();
+  } catch (e) { console.error('evolve tables', e.message); }
+}
+
+async function logConvo(env, userId, userText, aiReply) {
+  try {
+    await ensureEvolveTables(env);
+    await env.DB.prepare("INSERT INTO convo_log (user_id, role, text) VALUES (?, 'user', ?)").bind(userId, userText).run();
+    await env.DB.prepare("INSERT INTO convo_log (user_id, role, text) VALUES (?, 'assistant', ?)").bind(userId, aiReply).run();
+  } catch (e) { console.error('logConvo', e.message); }
+}
+
+async function loadInsights(env) {
+  try {
+    const r = await env.DB.prepare('SELECT insight FROM seed_insights ORDER BY id DESC LIMIT 3').all();
+    const list = (r.results || []).map(x => x.insight).filter(Boolean);
+    return list.length ? list.join('\n— — —\n') : '';
+  } catch (_) { return ''; }
 }
 
 async function loadState(env, userId) {
@@ -503,10 +572,10 @@ async function deployRichMenu(token, origin) {
     size: { width: 2500, height: 843 },
     selected: true,
     name: RICHMENU_NAME,
-    chatBarText: '\u571f\u5730\u516c\u9078\u55ae',
+    chatBarText: '土地公選單',
     areas: [
-      { bounds: { x: 0, y: 0, width: 833, height: 843 }, action: { type: 'message', text: '\u5730\u5740' } },
-      { bounds: { x: 833, y: 0, width: 833, height: 843 }, action: { type: 'message', text: '\u5831\u544a' } },
+      { bounds: { x: 0, y: 0, width: 833, height: 843 }, action: { type: 'message', text: '地址' } },
+      { bounds: { x: 833, y: 0, width: 833, height: 843 }, action: { type: 'message', text: '報告' } },
       { bounds: { x: 1666, y: 0, width: 834, height: 843 }, action: { type: 'uri', uri: origin + '/guide/dianmian' } },
     ],
   };
