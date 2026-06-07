@@ -69,6 +69,18 @@ export default {
       if (g) return new Response(guideHtml(g), { headers: { 'content-type': 'text/html;charset=utf-8', 'cache-control': 'public, max-age=600' } });
     }
 
+    if (url.pathname === '/admin/richmenu') {
+      if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
+      const cfg = await loadCfg(env);
+      if (!cfg.lineToken) return new Response('no line token', { status: 503 });
+      try {
+        const result = await deployRichMenu(cfg.lineToken, url.origin);
+        return new Response(JSON.stringify(result, null, 2), { headers: { 'content-type': 'application/json' } });
+      } catch (e) {
+        return new Response('richmenu error: ' + e.message, { status: 500 });
+      }
+    }
+
     if (url.pathname === '/google46e191dec00a8446.html') {
       return new Response('google-site-verification: google46e191dec00a8446.html', { headers: { 'content-type': 'text/html;charset=utf-8' } });
     }
@@ -424,4 +436,53 @@ function sanitize(text) {
 
 function formatHandoff(userId, s) {
   return `🏮 轉人工交接包\n客人:${userId}\n完成度:${s.completion || '?'}%\n輪廓:${s.profile || '-'}\n痛點:${s.pain || '-'}\n卡點/原因:${s.handoff_reason || '-'}\n\n建議:開 LINE OA 後台聊天接手這位客人`;
+}
+
+const RICHMENU_NAME = 'tudigong-main-v1';
+const RICHMENU_IMG = 'https://raw.githubusercontent.com/milk790-code/3q-hatchery-line-oa/main/assets/tudigong/richmenu-3x1.png';
+
+async function deployRichMenu(token, origin) {
+  const H = { authorization: 'Bearer ' + token };
+  const HJ = { ...H, 'content-type': 'application/json' };
+  const log = [];
+
+  const listRes = await fetch('https://api.line.me/v2/bot/richmenu/list', { headers: H });
+  const list = await listRes.json();
+  for (const m of (list.richmenus || [])) {
+    if (m.name === RICHMENU_NAME) {
+      await fetch('https://api.line.me/v2/bot/richmenu/' + m.richMenuId, { method: 'DELETE', headers: H });
+      log.push('deleted old ' + m.richMenuId);
+    }
+  }
+
+  const body = {
+    size: { width: 2500, height: 843 },
+    selected: true,
+    name: RICHMENU_NAME,
+    chatBarText: '\u571f\u5730\u516c\u9078\u55ae',
+    areas: [
+      { bounds: { x: 0, y: 0, width: 833, height: 843 }, action: { type: 'message', text: '\u5730\u5740' } },
+      { bounds: { x: 833, y: 0, width: 833, height: 843 }, action: { type: 'message', text: '\u5831\u544a' } },
+      { bounds: { x: 1666, y: 0, width: 834, height: 843 }, action: { type: 'uri', uri: origin + '/guide/dianmian' } },
+    ],
+  };
+  const createRes = await fetch('https://api.line.me/v2/bot/richmenu', { method: 'POST', headers: HJ, body: JSON.stringify(body) });
+  const created = await createRes.json();
+  if (!created.richMenuId) throw new Error('create failed: ' + JSON.stringify(created));
+  log.push('created ' + created.richMenuId);
+
+  const imgRes = await fetch(RICHMENU_IMG);
+  if (!imgRes.ok) throw new Error('image fetch ' + imgRes.status);
+  const imgBuf = await imgRes.arrayBuffer();
+  const upRes = await fetch('https://api-data.line.me/v2/bot/richmenu/' + created.richMenuId + '/content', {
+    method: 'POST', headers: { ...H, 'content-type': 'image/png' }, body: imgBuf,
+  });
+  if (!upRes.ok) throw new Error('image upload ' + upRes.status + ' ' + (await upRes.text()));
+  log.push('image uploaded (' + imgBuf.byteLength + ' bytes)');
+
+  const defRes = await fetch('https://api.line.me/v2/bot/user/all/richmenu/' + created.richMenuId, { method: 'POST', headers: H });
+  if (!defRes.ok) throw new Error('set default ' + defRes.status);
+  log.push('set as default for all users');
+
+  return { ok: true, richMenuId: created.richMenuId, log };
 }
