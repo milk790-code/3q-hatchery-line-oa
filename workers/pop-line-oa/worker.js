@@ -65,11 +65,13 @@ async function getCfg(env) {
     env.SESSION?.get('cfg:pop_line_secret'), env.SESSION?.get('cfg:pop_line_token'),
     env.SESSION?.get('cfg:pop_anthropic'), env.SESSION?.get('cfg:pop_owner'),
   ]);
+  // 運行時清洗:鑰匙值不含空白;貼上時夾帶的空格/換行在這裡自動修復(含 KV 已存的壞值)
+  const cl = (v) => (v || '').replace(/\s+/g, '');
   return {
-    lineSecret: s || env.POP_LINE_SECRET || '',
-    lineToken:  t || env.POP_LINE_TOKEN || '',
-    anthropicKey: a || env.ANTHROPIC_API_KEY || '',
-    ownerId: o || '',
+    lineSecret: cl(s || env.POP_LINE_SECRET),
+    lineToken:  cl(t || env.POP_LINE_TOKEN),
+    anthropicKey: cl(a || env.ANTHROPIC_API_KEY),
+    ownerId: (o || '').trim(),
   };
 }
 
@@ -86,14 +88,16 @@ async function verifyLineSignature(body, sig, secret) {
 async function callBrain(history, env, cfg, systemPrompt, maxTokens) {
   const sys = systemPrompt || buildSystemPrompt('');
   if (cfg.anthropicKey) {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'x-api-key': cfg.anthropicKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-      body: JSON.stringify({ model: CLAUDE_MODEL, max_tokens: maxTokens || 600,
-        system: [{ type: 'text', text: sys, cache_control: { type: 'ephemeral' } }], messages: history }),
-    });
-    if (r.ok) { const d = await r.json(); return d.content?.[0]?.text || ''; }
-    console.error('[pop-line] anthropic', r.status);
+    try {
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'x-api-key': cfg.anthropicKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+        body: JSON.stringify({ model: CLAUDE_MODEL, max_tokens: maxTokens || 600,
+          system: [{ type: 'text', text: sys, cache_control: { type: 'ephemeral' } }], messages: history }),
+      });
+      if (r.ok) { const d = await r.json(); return d.content?.[0]?.text || ''; }
+      console.error('[pop-line] anthropic', r.status);
+    } catch (e) { console.error('[pop-line] anthropic ex', e.message); }
   }
   if (env.AI) {
     const r = await env.AI.run(AI_MODEL, { messages: [{ role: 'system', content: sys }, ...history], max_tokens: maxTokens || 500 });
@@ -210,7 +214,9 @@ async function handleSetup(req, env, url) {
   if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
   if (req.method === 'POST') {
     const f = await req.formData();
-    const sec = (f.get('line_secret') || '').trim(), tok = (f.get('line_token') || '').trim(), ak = (f.get('anthropic') || '').trim();
+    // 防呆:鑰匙類值一律不含空白,自動清除貼上時夾帶的空格/換行(斷行貼上也能自動修復)
+    const strip = (v) => (v || '').replace(/\s+/g, '');
+    const sec = strip(f.get('line_secret')), tok = strip(f.get('line_token')), ak = strip(f.get('anthropic'));
     if (sec) await env.SESSION.put('cfg:pop_line_secret', sec);
     if (tok) await env.SESSION.put('cfg:pop_line_token', tok);
     if (ak) await env.SESSION.put('cfg:pop_anthropic', ak);
