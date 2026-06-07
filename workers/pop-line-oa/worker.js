@@ -11,6 +11,14 @@ const LINE_ID = '@150tiznd';
 const SHOPEE = 'https://shopee.tw/milk790';
 const SEED_VER = 'v4.1';
 
+// ═══ 群發預設稿(要發新一波:改這裡重部署,或丟文案給 Claude 更新)═══
+const TDG_IMG = 'https://raw.githubusercontent.com/milk790-code/3q-hatchery-line-oa/main/assets/tudigong/richmenu-3x1.png';
+const BROADCAST_PRESET = [
+  { type: 'image', originalContentUrl: TDG_IMG, previewImageUrl: TDG_IMG },
+  { type: 'text', text: '跟你報告一件事:\n泡泡怪獸的老闆,開了兩個新攤位。\n\n🏮 呆丸土地公\n要租店、買房、擺攤的先看這個——\n簽約前傳個地址,免費幫你看三重點:\n嫌惡設施、人流、行情。\n不賣房不仲介,只幫你把地點看清楚。\n加 LINE:https://line.me/R/ti/p/@207cpaps\n\n🔨 3Q 品牌孵化所\n店開了,客人卻查不到你?\n我們幫實體店家做官網+24小時AI接客,\n第一步免費做給你看,每個行業只收一位。\n加 LINE:https://line.me/R/ti/p/@121lkspe\n\n為什麼敢做這兩個?\n泡泡怪獸自己就是這樣長大的——\n蝦皮小店做到 IG 13.6萬、亞太500+門市。\n現在把這套,拿來幫你。' },
+  { type: 'text', text: '車的事,一樣找我。\n\n鍍膜、洗車、拋光耗材\n官網看品項、連蝦皮快速下單:\nhttps://popmonster.vip\n\n有問題直接在這裡問——\n我們的 AI 業務 24 小時在線,\n產品、用法、怎麼選,問就對了。' },
+];
+
 // ═══════════ 超級業務AI種子 · 基因組 v4(三線通用,只換 BRAND 與彈藥庫) ═══════════
 const SEED_GENOME = `你是「{{BRAND}}」的首席成交顧問,不是客服、不是推銷員——你是來訪者的軍師。
 你的存在只有一個目的:讓每個跟你說話的人,離開時要嘛成交、要嘛變成下次會回來的朋友,而且都覺得「這個人真的懂我」。
@@ -289,6 +297,21 @@ export default {
       const [da, d7, de] = await Promise.all([env.SESSION?.get('dbg:anthropic'), env.SESSION?.get('dbg:ai70b'), env.SESSION?.get('dbg:last_error')]);
       out.dbg = { anthropic: da || null, ai70b: d7 || null, last_error: de || null };
       return new Response(JSON.stringify(out, null, 2), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+    }
+    // 一鍵群發:不帶 go=安全預覽;&go=1 正式對全部好友發送(不可收回)
+    if (url.pathname === '/admin/broadcast') {
+      if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
+      const cfg = await getCfg(env);
+      if (!cfg.lineToken) return new Response('no token', { status: 503 });
+      if (url.searchParams.get('go') !== '1') {
+        return new Response(JSON.stringify({ preview: true, note: '這是預覽。確認內容後在網址加 &go=1 正式群發(對全部好友、不可收回)', messages: BROADCAST_PRESET }, null, 2), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+      }
+      const r = await fetch('https://api.line.me/v2/bot/message/broadcast', {
+        method: 'POST', headers: { 'Authorization': 'Bearer ' + cfg.lineToken, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: BROADCAST_PRESET }),
+      });
+      const detail = (await r.text()).slice(0, 300);
+      return new Response(JSON.stringify({ sent: r.ok, status: r.status, detail }, null, 2), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
     }
     // 診斷端點:webhook 指向/官方實測/bot 身分/token 活性,一次看清(&set=1 順便把 endpoint 指回本 worker)
     if (url.pathname === '/admin/webhook') {
