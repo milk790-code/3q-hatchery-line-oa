@@ -69,6 +69,10 @@ export default {
       if (g) return new Response(guideHtml(g), { headers: { 'content-type': 'text/html;charset=utf-8', 'cache-control': 'public, max-age=600' } });
     }
 
+    if (url.pathname === '/google46e191dec00a8446.html') {
+      return new Response('google-site-verification: google46e191dec00a8446.html', { headers: { 'content-type': 'text/html;charset=utf-8' } });
+    }
+
     if (url.pathname === '/robots.txt') {
       return new Response('User-agent: *\nAllow: /\nSitemap: ' + url.origin + '/sitemap.xml\n', { headers: { 'content-type': 'text/plain;charset=utf-8', 'cache-control': 'public, max-age=86400' } });
     }
@@ -97,6 +101,7 @@ export default {
 
 
 const LANDING_HTML = `<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="google-site-verification" content="kX7q0pPM9Z7ViBdT0JYPYwh8R2LdjChbA5c-siplIhQ">
 <title>呆丸土地公|台灣最接地氣的選址情報所|買房租店開攤 免費幫你看三個重點</title>
 <meta name="description" content="不賣房、不仲介,只給你中立選址情報。買房、租店面、擺攤前,私訊地址,土地公免費幫你看三個重點:嫌惡設施、人流、行情。台灣在地選址判斷服務。">
 <meta property="og:title" content="呆丸土地公|不賣房 只幫你看地點"><meta property="og:description" content="私訊地址 免費幫你看三個重點:嫌惡設施 人流 行情">
