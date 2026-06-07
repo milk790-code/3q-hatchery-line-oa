@@ -22,7 +22,8 @@
 // ─────────────────────────────────────────────────────────────────────────
 // Platform daily limits (to avoid spam signals)
 // ─────────────────────────────────────────────────────────────────────────
-const DAILY_LIMITS = { threads: 3, instagram: 1, facebook: 1, tiktok: 1, google_biz: 1 };
+// 2026-06-07 衝刺模式:FB 1→3、IG 1→2(短期獲客衝刺,基線出來後可調回)
+const DAILY_LIMITS = { threads: 3, instagram: 2, facebook: 3, tiktok: 1, google_biz: 1 };
 
 // ─────────────────────────────────────────────────────────────────────────
 // KV-backed token storage (permanent, auto-refreshed)
