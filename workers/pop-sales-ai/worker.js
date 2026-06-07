@@ -168,10 +168,32 @@ h1 em{color:#caa64a;font-style:normal}
 .cta2{display:block;text-align:center;background:transparent;border:1px solid #caa64a;color:#caa64a;font-size:15px;font-weight:700;border-radius:12px;padding:13px;margin-bottom:10px;text-decoration:none}
 .note{color:#6e6650;font-size:12px;text-align:center;margin-bottom:30px}
 h2{font-size:18px;margin:26px 0 10px;color:#caa64a}
+/* ── 3D HERO:鍍膜光澤泡泡(GPU only)── */
+.hero3d{position:relative;height:230px;margin:6px 0 18px;overflow:hidden;border-radius:16px;background:radial-gradient(ellipse at 50% 120%,#1a1407,transparent 70%)}
+.orb{position:absolute;border-radius:50%;background:radial-gradient(circle at 32% 28%,#fff9 0%,#f5dd9d 12%,#caa64a 38%,#6e5418 70%,#171204 96%);box-shadow:0 16px 44px -10px #caa64a40, inset -6px -10px 26px #0008, inset 4px 6px 14px #fff3;animation:bob 9s ease-in-out infinite;transform:translateZ(0)}
+.o1{width:120px;height:120px;left:50%;top:38px;margin-left:-60px}
+.o2{width:58px;height:58px;left:16%;top:96px;animation-delay:1.4s;opacity:.9}
+.o3{width:42px;height:42px;right:15%;top:60px;animation-delay:2.6s;opacity:.85}
+.o4{width:26px;height:26px;right:30%;top:150px;animation-delay:.7s;opacity:.7}
+@keyframes bob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-16px) scale(1.025)}}
+.orb::after{content:"";position:absolute;inset:0;border-radius:50%;background:linear-gradient(115deg,transparent 38%,#ffffff30 47%,#ffffff66 50%,#ffffff30 53%,transparent 62%);transform:translateX(-130%);animation:sweep 5.2s ease-in-out infinite}
+@keyframes sweep{0%,55%{transform:translateX(-130%)}80%,100%{transform:translateX(130%)}}
+.heroword{position:absolute;left:0;right:0;bottom:14px;text-align:center;font-size:13px;letter-spacing:6px;color:#caa64a;opacity:.9}
+.in1,.in2,.in3{opacity:0;transform:translateY(16px);animation:inup .8s cubic-bezier(.2,.7,.3,1) forwards}
+.in2{animation-delay:.18s}.in3{animation-delay:.36s}
+@keyframes inup{to{opacity:1;transform:translateY(0)}}
+.card{transition:transform .35s cubic-bezier(.2,.7,.3,1),box-shadow .35s}
+.card:active,.card:hover{transform:perspective(700px) rotateX(4deg) translateY(-3px);box-shadow:0 14px 36px -14px #caa64a40}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}.in1,.in2,.in3{opacity:1;transform:none}}
+
 </style></head><body><div class="wrap">
-<div class="tag">POP MONSTER・叁無 × 重新定義汽美</div>
-<h1>自己的車自己弄亮,<br><em>送店的錢留在口袋。</em></h1>
-<p class="sub">亞太 500+ 汽美門市在用的供應鏈,車主也買得到。洗車、拋光、鍍膜、塗層——做汽美的人自己在用的東西。</p>
+<div class="tag in1">POP MONSTER</div>
+<div class="hero3d in1">
+<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div><div class="orb o4"></div>
+<div class="heroword">叁無 × 重新定義汽美</div>
+</div>
+<h1 class="in2">自己的車自己弄亮,<br><em>送店的錢留在口袋。</em></h1>
+<p class="sub in3">亞太 500+ 汽美門市在用的供應鏈,車主也買得到。洗車、拋光、鍍膜、塗層——做汽美的人自己在用的東西。</p>
 <div class="card"><b>店家進貨</b>——母料與耗材供應,500+ 門市的同一條供應鏈。</div>
 <div class="card"><b>車主自用</b>——蝦皮下單,跟著 TikTok 實作影片自己做,效果看得見。</div>
 <a class="cta" href="/shop">蝦皮選購:泡泡怪獸專業母料店</a>
@@ -201,10 +223,15 @@ h1 span{color:#caa64a}
 .g b{display:block;color:#caa64a;margin-bottom:4px;font-size:15px}
 .cta{display:inline-block;background:#caa64a;color:#141005;font-weight:800;border-radius:10px;padding:10px 18px;text-decoration:none;font-size:15px;margin:0 8px 22px 0}
 .cta.o{background:transparent;border:1px solid #caa64a;color:#caa64a}
+.g{transition:transform .35s cubic-bezier(.2,.7,.3,1),box-shadow .35s}
+.g:hover,.g:active{transform:perspective(700px) rotateX(5deg) translateY(-4px);box-shadow:0 14px 32px -14px #caa64a50}
+.in1,.in2{opacity:0;transform:translateY(14px);animation:inup .7s cubic-bezier(.2,.7,.3,1) forwards}.in2{animation-delay:.15s}
+@keyframes inup{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.in1,.in2{opacity:1;transform:none}}
 </style></head><body><div class="wrap">
-<h1>泡泡怪獸 <span>POP MONSTER — 叁無 × 重新定義汽美</span></h1>
+<h1 class="in1">泡泡怪獸 <span>POP MONSTER — 叁無 × 重新定義汽美</span></h1>
 <p class="sub">汽美耗材與母料供應・亞太 500+ 門市經銷網絡</p>
-<div class="grid">
+<div class="grid in2">
 <div class="g"><b>500+ 門市供應鏈</b>做汽美的人自己在用的東西,店家與車主同一條品質線。</div>
 <div class="g"><b>實作影片可查</b>IG 13.6 萬、TikTok 527 萬瀏覽,效果用影片講話。</div>
 <div class="g"><b>雙線服務</b>車主蝦皮直購;店家母料進貨 LINE 直談。</div>
