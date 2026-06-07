@@ -15,7 +15,7 @@ const SEED_VER = 'v4.1';
 const TDG_IMG = 'https://raw.githubusercontent.com/milk790-code/3q-hatchery-line-oa/main/assets/tudigong/richmenu-3x1.png';
 const BROADCAST_PRESET = [
   { type: 'image', originalContentUrl: TDG_IMG, previewImageUrl: TDG_IMG },
-  { type: 'text', text: '跟你報告一件事:\n泡泡怪獸的老闆,開了兩個新攤位。\n\n🏮 呆丸土地公\n要租店、買房、擺攤的先看這個——\n簽約前傳個地址,免費幫你看三重點:\n嫌惡設施、人流、行情。\n不賣房不仲介,只幫你把地點看清楚。\n加 LINE:https://line.me/R/ti/p/@207cpaps\n\n🔨 3Q 品牌孵化所\n店開了,客人卻查不到你?\n我們幫實體店家做官網+24小時AI接客,\n第一步免費做給你看,每個行業只收一位。\n加 LINE:https://line.me/R/ti/p/@121lkspe\n\n為什麼敢做這兩個?\n泡泡怪獸自己就是這樣長大的——\n蝦皮小店做到 IG 13.6萬、亞太500+門市。\n現在把這套,拿來幫你。' },
+  { type: 'text', text: '跟你報告:泡泡怪獸的老闆,開了兩個新攤位。\n\n🏮 要租店、買房、擺攤的——\n你看上的那個點,白天熱鬧、晚上是不是死城?\n簽約前,讓土地公免費幫你看三重點(嫌惡設施/人流/行情)。\n不賣房、不仲介,看明白再決定:\nhttps://tudigong-line-oa.milk790.workers.dev/?utm_source=line&utm_medium=broadcast&utm_campaign=newbiz\n\n🔨 開店做生意的——\n東西做得好,客人卻在 Google 查不到你?\n官網第一步免費做給你看,每個行業只收一位:\nhttps://3q-sales-ai.milk790.workers.dev/?utm_source=line&utm_medium=broadcast&utm_campaign=newbiz\n\n泡泡怪獸自己就是這樣長大的(蝦皮小店→IG 13.6萬→亞太500+門市),現在把這套拿來幫你。點進去看,有沒有用你自己判斷。' },
   { type: 'text', text: '車的事,一樣找我。\n\n鍍膜、洗車、拋光耗材\n官網看品項、連蝦皮快速下單:\nhttps://popmonster.vip\n\n有問題直接在這裡問——\n我們的 AI 業務 24 小時在線,\n產品、用法、怎麼選,問就對了。' },
 ];
 
