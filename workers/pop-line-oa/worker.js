@@ -114,12 +114,20 @@ function clean(t) {
   return s.trim().slice(0, 900);
 }
 
-async function lineReply(token, replyToken, text) {
-  await fetch('https://api.line.me/v2/bot/message/reply', {
-    method: 'POST',
-    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ replyToken, messages: [{ type: 'text', text }] }),
-  });
+async function lineReply(token, replyToken, text, env) {
+  try {
+    const r = await fetch('https://api.line.me/v2/bot/message/reply', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ replyToken, messages: [{ type: 'text', text }] }),
+    });
+    if (!r.ok && env?.SESSION) {
+      const detail = (await r.text()).slice(0, 200);
+      await env.SESSION.put('diag:last_line_error', r.status + ' ' + detail + ' @' + new Date().toISOString(), { expirationTtl: 86400 });
+    }
+  } catch (e) {
+    if (env?.SESSION) await env.SESSION.put('diag:last_line_error', 'EX ' + e.message + ' @' + new Date().toISOString(), { expirationTtl: 86400 });
+  }
 }
 
 async function ensureTables(env) {
@@ -148,7 +156,7 @@ async function handleEvent(ev, env, cfg) {
 
   if (/^我是老闆$/.test(userMsg.trim()) && !cfg.ownerId) {
     await env.SESSION?.put('cfg:pop_owner', uid);
-    await lineReply(cfg.lineToken, ev.replyToken, '已綁定老闆身分。以後客人成交意向我會推給你。');
+    await lineReply(cfg.lineToken, ev.replyToken, '已綁定老闆身分。以後客人成交意向我會推給你。', env);
     return;
   }
 
@@ -237,6 +245,41 @@ export default {
     const url = new URL(request.url);
     if (url.pathname === '/setup') return handleSetup(request, env, url);
     if (url.pathname === '/admin/evolve') { const cfg = await getCfg(env); return handleEvolve(env, cfg, url); }
+    // 診斷端點:webhook 指向/官方實測/bot 身分/token 活性,一次看清(&set=1 順便把 endpoint 指回本 worker)
+    if (url.pathname === '/admin/webhook') {
+      if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
+      const cfg = await getCfg(env);
+      if (!cfg.lineToken) return new Response(JSON.stringify({ error: 'no token in KV' }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+      const H = { 'Authorization': 'Bearer ' + cfg.lineToken };
+      const HJ = { ...H, 'Content-Type': 'application/json' };
+      const out = { tokenLen: cfg.lineToken.length, secretLen: cfg.lineSecret.length };
+      try {
+        if (url.searchParams.get('set') === '1') {
+          const p = await fetch('https://api.line.me/v2/bot/channel/webhook/endpoint', { method: 'PUT', headers: HJ, body: JSON.stringify({ endpoint: url.origin + '/webhook' }) });
+          out.put = { status: p.status, body: await p.text() };
+        }
+        const g = await fetch('https://api.line.me/v2/bot/channel/webhook/endpoint', { headers: H });
+        out.endpoint = await g.json().catch(() => ({ httpStatus: g.status }));
+        const t = await fetch('https://api.line.me/v2/bot/channel/webhook/test', { method: 'POST', headers: HJ, body: '{}' });
+        out.test = await t.json().catch(() => ({ httpStatus: t.status }));
+        const b = await fetch('https://api.line.me/v2/bot/info', { headers: H });
+        out.bot = b.ok ? await b.json() : { httpStatus: b.status, note: b.status === 401 ? 'token 失效(可能被 reissue 過)' : 'api error' };
+      } catch (e) { out.error = e.message; }
+      return new Response(JSON.stringify(out, null, 2), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+    }
+    // 診斷端點:不經 LINE,直接測 AI 腦鏈路(loadInsights→prompt→callBrain→clean)
+    if (url.pathname === '/admin/chat') {
+      if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
+      const cfg = await getCfg(env);
+      const q = url.searchParams.get('q') || '鍍膜劑哪罐好用';
+      const t0 = Date.now();
+      let reply = '', err = null;
+      try {
+        const insights = await loadInsights(env);
+        reply = clean(await callBrain([{ role: 'user', content: q }], env, cfg, buildSystemPrompt(insights)));
+      } catch (e) { err = e.message; }
+      return new Response(JSON.stringify({ ok: !!reply, ms: Date.now() - t0, brain: cfg.anthropicKey ? 'claude(keyLen=' + cfg.anthropicKey.length + ')' : 'workers-ai-70b', reply, err }, null, 2), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+    }
     if (url.pathname === '/health') {
       const cfg = await getCfg(env);
       let insights = 0;
