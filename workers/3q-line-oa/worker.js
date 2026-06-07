@@ -230,7 +230,7 @@ async function handleSetup(req, env, url) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     if (url.pathname === '/setup') return handleSetup(request, env, url);
     if (url.pathname === '/admin/evolve') { const cfg = await getCfg(env); return handleEvolve(env, cfg, url); }
@@ -267,11 +267,14 @@ export default {
       const body = await request.text();
       const valid = await verifyLineSignature(body, request.headers.get('x-line-signature'), cfg.lineSecret);
       if (!valid) return new Response('bad signature', { status: 403 });
-      await ensureTables(env);
       const data = JSON.parse(body);
-      for (const ev of (data.events || [])) {
-        await handleEvent(ev, env, cfg).catch(e => console.error('[3q-line] event', e.message));
-      }
+      // ⚡ 土地公模式:先回 200 讓 LINE 安心,AI 思考放背景跑(LINE 等不到回應會掛斷並處決 worker)
+      ctx.waitUntil((async () => {
+        await ensureTables(env);
+        for (const ev of (data.events || [])) {
+          await handleEvent(ev, env, cfg).catch(e => console.error('[3q-line] event', e.message));
+        }
+      })());
       return new Response('ok');
     }
     return new Response('3q hatchery line bot (seed ' + SEED_VER + '). /setup?key=... to configure.', { status: 200 });
