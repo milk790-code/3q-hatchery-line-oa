@@ -96,12 +96,22 @@ async function callBrain(history, env, cfg, systemPrompt, maxTokens) {
           system: [{ type: 'text', text: sys, cache_control: { type: 'ephemeral' } }], messages: history }),
       });
       if (r.ok) { const d = await r.json(); return d.content?.[0]?.text || ''; }
-      console.error('[pop-line] anthropic', r.status);
-    } catch (e) { console.error('[pop-line] anthropic ex', e.message); }
+      const errBody = (await r.text().catch(() => '')).slice(0, 200);
+      console.error('[pop-line] anthropic', r.status, errBody);
+      await env.SESSION?.put('dbg:anthropic', r.status + ' ' + errBody + ' @' + new Date().toISOString()).catch(() => {});
+    } catch (e) {
+      console.error('[pop-line] anthropic ex', e.message);
+      await env.SESSION?.put('dbg:anthropic', 'EX ' + e.message + ' @' + new Date().toISOString()).catch(() => {});
+    }
   }
   if (env.AI) {
-    const r = await env.AI.run(AI_MODEL, { messages: [{ role: 'system', content: sys }, ...history], max_tokens: maxTokens || 500 });
-    return r?.response || '';
+    try {
+      const r = await env.AI.run(AI_MODEL, { messages: [{ role: 'system', content: sys }, ...history], max_tokens: maxTokens || 500 });
+      return r?.response || '';
+    } catch (e) {
+      console.error('[pop-line] 70b ex', e.message);
+      await env.SESSION?.put('dbg:ai70b', 'EX ' + e.message + ' @' + new Date().toISOString()).catch(() => {});
+    }
   }
   return '';
 }
@@ -162,23 +172,31 @@ async function handleEvent(ev, env, cfg) {
 
   const kvKey = 'popline:' + uid;
   let hist = [];
-  if (env.SESSION) { const raw = await env.SESSION.get(kvKey); if (raw) { try { hist = JSON.parse(raw); } catch (_) {} } }
-  hist.push({ role: 'user', content: userMsg });
-
-  const insights = await loadInsights(env);          // ← 種子讀取自己沉澱的進化記憶
-  const sys = buildSystemPrompt(insights);
-  const reply = clean(await callBrain(hist.slice(-12), env, cfg, sys)) || ('這題我幫您確認後回覆,或直接看蝦皮:' + SHOPEE);
-  hist.push({ role: 'assistant', content: reply });
-  if (env.SESSION) await env.SESSION.put(kvKey, JSON.stringify(hist.slice(-20)), { expirationTtl: 7 * 24 * 3600 });
-
-  if (env.CRM) {
-    const now = new Date().toISOString();
-    await env.CRM.prepare("INSERT INTO pop_line_customers (user_id, first_seen, last_seen, msg_count) VALUES (?,?,?,1) ON CONFLICT(user_id) DO UPDATE SET last_seen=?, msg_count=msg_count+1").bind(uid, now, now, now).run().catch(() => {});
-    await env.CRM.prepare("INSERT INTO pop_line_convos (user_id, role, text) VALUES (?, 'user', ?)").bind(uid, userMsg).run().catch(() => {});
-    await env.CRM.prepare("INSERT INTO pop_line_convos (user_id, role, text) VALUES (?, 'assistant', ?)").bind(uid, reply).run().catch(() => {});
+  let reply = '';
+  try {
+    if (env.SESSION) { const raw = await env.SESSION.get(kvKey); if (raw) { try { hist = JSON.parse(raw); } catch (_) {} } }
+    hist.push({ role: 'user', content: userMsg });
+    const insights = await loadInsights(env);          // ← 種子讀取自己沉澱的進化記憶
+    const sys = buildSystemPrompt(insights);
+    reply = clean(await callBrain(hist.slice(-12), env, cfg, sys));
+  } catch (e) {
+    console.error('[pop-line] brain pipeline', e.message);
+    await env.SESSION?.put('dbg:last_error', e.message + ' @' + new Date().toISOString()).catch(() => {});
   }
+  if (!reply) reply = '這題我幫您確認後回覆,或直接看蝦皮:' + SHOPEE;
 
-  await lineReply(cfg.lineToken, ev.replyToken, reply);
+  await lineReply(cfg.lineToken, ev.replyToken, reply);   // ← 回覆最優先,記錄其次
+
+  try {
+    hist.push({ role: 'assistant', content: reply });
+    if (env.SESSION) await env.SESSION.put(kvKey, JSON.stringify(hist.slice(-20)), { expirationTtl: 7 * 24 * 3600 });
+    if (env.CRM) {
+      const now = new Date().toISOString();
+      await env.CRM.prepare("INSERT INTO pop_line_customers (user_id, first_seen, last_seen, msg_count) VALUES (?,?,?,1) ON CONFLICT(user_id) DO UPDATE SET last_seen=?, msg_count=msg_count+1").bind(uid, now, now, now).run().catch(() => {});
+      await env.CRM.prepare("INSERT INTO pop_line_convos (user_id, role, text) VALUES (?, 'user', ?)").bind(uid, userMsg).run().catch(() => {});
+      await env.CRM.prepare("INSERT INTO pop_line_convos (user_id, role, text) VALUES (?, 'assistant', ?)").bind(uid, reply).run().catch(() => {});
+    }
+  } catch (e) { console.error('[pop-line] post-reply log', e.message); }
 }
 
 // ═══ Reflexion 自我進化:看真實對話逐字稿 → 自省 → 沉澱實戰心得 → 餵回種子 ═══
@@ -245,6 +263,21 @@ export default {
     const url = new URL(request.url);
     if (url.pathname === '/setup') return handleSetup(request, env, url);
     if (url.pathname === '/admin/evolve') { const cfg = await getCfg(env); return handleEvolve(env, cfg, url); }
+    // 大腦直測:不經 LINE,直接呼叫 callBrain 看回什麼/炸哪層
+    if (url.pathname === '/admin/selftest') {
+      if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
+      const cfg = await getCfg(env);
+      const q = url.searchParams.get('q') || '鍍膜劑哪罐好用';
+      const t0 = Date.now();
+      const out = { ai: cfg.anthropicKey ? 'claude-sonnet-4-6' : 'workers-ai-70b' };
+      try {
+        const r = await callBrain([{ role: 'user', content: q }], env, cfg, buildSystemPrompt(''), 400);
+        out.ok = !!r; out.ms = Date.now() - t0; out.reply_preview = (r || '(空)').slice(0, 300);
+      } catch (e) { out.ok = false; out.ms = Date.now() - t0; out.error = e.message; }
+      const [da, d7, de] = await Promise.all([env.SESSION?.get('dbg:anthropic'), env.SESSION?.get('dbg:ai70b'), env.SESSION?.get('dbg:last_error')]);
+      out.dbg = { anthropic: da || null, ai70b: d7 || null, last_error: de || null };
+      return new Response(JSON.stringify(out, null, 2), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+    }
     // 診斷端點:webhook 指向/官方實測/bot 身分/token 活性,一次看清(&set=1 順便把 endpoint 指回本 worker)
     if (url.pathname === '/admin/webhook') {
       if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
