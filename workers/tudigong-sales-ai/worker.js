@@ -55,7 +55,7 @@ async function callBrain(history, env) {
     console.error('[tudigong-sales-ai] anthropic error', resp.status);
   }
   if (env.AI) {
-    const r = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', { messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...history], max_tokens: 600 });
+    const r = await env.AI.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', { messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...history], max_tokens: 600 });
     return r?.response || '';
   }
   return '';
@@ -97,7 +97,7 @@ export default {
       return new Response(WIDGET_JS, { headers: { 'Content-Type': 'application/javascript; charset=utf-8', 'Cache-Control': 'public, max-age=300', ...CORS } });
     }
 
-    if (url.pathname === '/health') return json({ ok: true, worker: 'tudigong-sales-ai', version: '1.0', brain: env.ANTHROPIC_API_KEY ? 'claude-sonnet-4-6' : (env.AI ? 'workers-ai-llama' : 'none'), kv: Boolean(env.SESSION), d1: Boolean(env.CRM) });
+    if (url.pathname === '/health') return json({ ok: true, worker: 'tudigong-sales-ai', version: '1.0', brain: env.ANTHROPIC_API_KEY ? 'claude-sonnet-4-6' : (env.AI ? 'workers-ai-llama-3.3-70b' : 'none'), kv: Boolean(env.SESSION), d1: Boolean(env.CRM) });
     if (url.pathname === '/go') { await logEvent(env, request, url, 'click'); return Response.redirect(LINE_URL, 302); }
 
     if (url.pathname === '/chat' && request.method === 'POST') {
