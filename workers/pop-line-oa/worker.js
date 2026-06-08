@@ -178,7 +178,13 @@ async function loadInsights(env) {
   } catch (_) { return ''; }
 }
 
+const WELCOME_MSG = '歡迎來到泡泡怪獸\n\n我是 AI 業務,24 小時在線——\n產品怎麼選、怎麼用、店家進貨,直接問我就好。\n\n先跟我說:您是店家要進貨,還是自己的車要用?\n\n(官網看品項:https://popmonster.vip)';
+
 async function handleEvent(ev, env, cfg) {
+  if (ev.type === 'follow') {   // 新好友第一印象:立刻接住
+    await lineReply(cfg.lineToken, ev.replyToken, WELCOME_MSG, env);
+    return;
+  }
   if (ev.type !== 'message' || ev.message?.type !== 'text') return;
   const uid = ev.source?.userId || 'unknown';
   const userMsg = ev.message.text.slice(0, 1000);
