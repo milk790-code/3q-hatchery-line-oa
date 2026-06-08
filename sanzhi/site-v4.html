@@ -154,6 +154,10 @@ nav.scrolled{background:rgba(250,246,239,.85);backdrop-filter:blur(16px);box-sha
 .story-steps .s.on .dot{background:var(--lavd);box-shadow:0 0 0 5px rgba(110,91,140,.15)}
 .story-acts{display:flex;flex-direction:column;gap:clamp(30px,6vw,64px)}
 .act{background:var(--paper);border:1px solid var(--line);border-radius:24px;padding:clamp(28px,4vw,44px);box-shadow:var(--shadow-sm)}
+.act-tmp{}
+.act{display:grid;grid-template-columns:96px 1fr;gap:22px;align-items:start}
+.act-ill{width:96px;height:96px;flex:none;filter:drop-shadow(0 8px 18px rgba(110,91,140,.18))}
+@media(max-width:600px){.act{grid-template-columns:64px 1fr;gap:14px}.act-ill{width:64px;height:64px}}
 .act .n{font-family:var(--corm);font-style:italic;font-size:40px;color:var(--clays)}
 .act h3{font-family:var(--serif);font-weight:700;font-size:22px;margin:4px 0 12px}
 .act p{color:var(--ink2);font-size:15.5px;line-height:1.95}
@@ -243,10 +247,18 @@ footer .cp{margin-top:34px;padding-top:22px;border-top:1px solid rgba(255,255,25
  </div>
 </div>
 <div class="story-acts">
- <div class="act reveal" data-i="0"><div class="n">01</div><h3>從學生時期就在規劃未來</h3><p>創辦人自學生時期便習慣規劃未來，持續累積各類證照、技能與實務經驗。18 歲後，因為自身的肌膚問題與幾次不理想的美容體驗，他開始深入研究保養知識、取得美容證照——希望用更專業、誠實的方式幫助別人。</p></div>
- <div class="act reveal" data-i="1"><div class="n">02</div><h3>軍中七年，練出紀律與整合</h3><p>軍中服役七年，從基層勞務到後勤行政，他練出紀律、責任感與流程管理的能力，也真正體會到：資源整合，是解決問題的關鍵。</p></div>
- <div class="act reveal" data-i="2"><div class="n">03</div><h3>退伍後，橫跨五個領域</h3><p>退伍後不到一年，他陸續投入美容、清潔、除塵蟎、團購與工程，服務近 200 個家庭。過程中他發現——清潔、健康、居住環境與生活品質，其實息息相關；客戶真正需要的，往往不是單一服務，而是一個能整合資源、解決問題的人。</p></div>
- <div class="act reveal" data-i="3"><div class="n">04</div><h3>於是，三根手指頭誕生</h3><p>他成立洪川整合建設有限公司，打造「三根手指頭 生活服務整合」：用專業分工與資源整合，讓生活中的大小需求，都找得到更省時、更安心的解決方案。</p></div>
+ <div class="act reveal" data-i="0"><svg class="act-ill" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="47" fill="#F3EFF7" stroke="#C7B8DE" stroke-width="1.4"/><path d="M26 58 Q50 50 50 50 Q50 50 74 58 L74 40 Q50 33 50 33 Q50 33 26 40 Z" fill="#9B86BD"/>
+<path d="M50 50 V33" stroke="#6E5B8C" stroke-width="1.6"/><path d="M26 40 V58 M74 40 V58" stroke="#6E5B8C" stroke-width="1.4"/>
+<path d="M58 30 l10 -10" stroke="#C2956A" stroke-width="3" stroke-linecap="round"/><path d="M66 22 l4 -4 3 3 -4 4 z" fill="#C2956A"/>
+<g fill="#C2956A"><circle cx="30" cy="28" r="1.6"/><circle cx="40" cy="24" r="1.2"/></g></svg><div class="n">01</div><h3>從學生時期就在規劃未來</h3><p>創辦人自學生時期便習慣規劃未來，持續累積各類證照、技能與實務經驗。18 歲後，因為自身的肌膚問題與幾次不理想的美容體驗，他開始深入研究保養知識、取得美容證照——希望用更專業、誠實的方式幫助別人。</p></div>
+ <div class="act reveal" data-i="1"><svg class="act-ill" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="47" fill="#F3EFF7" stroke="#C7B8DE" stroke-width="1.4"/><path d="M50 26 L68 32 V50 C68 62 60 70 50 74 C40 70 32 62 32 50 V32 Z" fill="#6E5B8C"/>
+<path d="M40 44 H60 M40 51 H60 M40 58 H56" stroke="#F3EFF7" stroke-width="2" stroke-linecap="round"/>
+<path d="M50 18 l2.4 5 5.4 .5 -4 3.6 1.2 5.3 -5 -2.8 -5 2.8 1.2 -5.3 -4 -3.6 5.4 -.5 z" fill="#C2956A"/></svg><div class="n">02</div><h3>軍中七年，練出紀律與整合</h3><p>軍中服役七年，從基層勞務到後勤行政，他練出紀律、責任感與流程管理的能力，也真正體會到：資源整合，是解決問題的關鍵。</p></div>
+ <div class="act reveal" data-i="2"><svg class="act-ill" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="47" fill="#F3EFF7" stroke="#C7B8DE" stroke-width="1.4"/><line x1="50" y1="50" x2="50.0" y2="26.0" stroke="#C7B8DE" stroke-width="1.2"/><circle cx="50.0" cy="26.0" r="6.5" fill="#6E5B8C"/><line x1="50" y1="50" x2="72.8" y2="42.6" stroke="#C7B8DE" stroke-width="1.2"/><circle cx="72.8" cy="42.6" r="6.5" fill="#9B86BD"/><line x1="50" y1="50" x2="64.1" y2="69.4" stroke="#C7B8DE" stroke-width="1.2"/><circle cx="64.1" cy="69.4" r="6.5" fill="#C2956A"/><line x1="50" y1="50" x2="35.9" y2="69.4" stroke="#C7B8DE" stroke-width="1.2"/><circle cx="35.9" cy="69.4" r="6.5" fill="#7A5C72"/><line x1="50" y1="50" x2="27.2" y2="42.6" stroke="#C7B8DE" stroke-width="1.2"/><circle cx="27.2" cy="42.6" r="6.5" fill="#C7B8DE"/><circle cx="50" cy="50" r="9" fill="#FFFCF7" stroke="#6E5B8C" stroke-width="1.8"/></svg><div class="n">03</div><h3>退伍後，橫跨五個領域</h3><p>退伍後不到一年，他陸續投入美容、清潔、除塵蟎、團購與工程，服務近 200 個家庭。過程中他發現——清潔、健康、居住環境與生活品質，其實息息相關；客戶真正需要的，往往不是單一服務，而是一個能整合資源、解決問題的人。</p></div>
+ <div class="act reveal" data-i="3"><svg class="act-ill" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="47" fill="#F3EFF7" stroke="#C7B8DE" stroke-width="1.4"/><line x1="80.0" y1="50.0" x2="87.0" y2="50.0" stroke="#E4CBA9" stroke-width="1.6" stroke-linecap="round"/><line x1="76.0" y1="65.0" x2="82.0" y2="68.5" stroke="#E4CBA9" stroke-width="1.6" stroke-linecap="round"/><line x1="65.0" y1="76.0" x2="68.5" y2="82.0" stroke="#E4CBA9" stroke-width="1.6" stroke-linecap="round"/><line x1="50.0" y1="80.0" x2="50.0" y2="87.0" stroke="#E4CBA9" stroke-width="1.6" stroke-linecap="round"/><line x1="35.0" y1="76.0" x2="31.5" y2="82.0" stroke="#E4CBA9" stroke-width="1.6" stroke-linecap="round"/><line x1="24.0" y1="65.0" x2="18.0" y2="68.5" stroke="#E4CBA9" stroke-width="1.6" stroke-linecap="round"/><line x1="20.0" y1="50.0" x2="13.0" y2="50.0" stroke="#E4CBA9" stroke-width="1.6" stroke-linecap="round"/><line x1="24.0" y1="35.0" x2="18.0" y2="31.5" stroke="#E4CBA9" stroke-width="1.6" stroke-linecap="round"/><line x1="35.0" y1="24.0" x2="31.5" y2="18.0" stroke="#E4CBA9" stroke-width="1.6" stroke-linecap="round"/><line x1="50.0" y1="20.0" x2="50.0" y2="13.0" stroke="#E4CBA9" stroke-width="1.6" stroke-linecap="round"/><line x1="65.0" y1="24.0" x2="68.5" y2="18.0" stroke="#E4CBA9" stroke-width="1.6" stroke-linecap="round"/><line x1="76.0" y1="35.0" x2="82.0" y2="31.5" stroke="#E4CBA9" stroke-width="1.6" stroke-linecap="round"/><rect x="40" y="36" width="5.4" height="22" rx="2.7" fill="#6E5B8C"/>
+<rect x="47.3" y="32" width="5.4" height="26" rx="2.7" fill="#9B86BD"/>
+<rect x="54.6" y="38" width="5.4" height="20" rx="2.7" fill="#C2956A"/>
+<path d="M40 54 h20 v2.5 c0 5.5-4 8.5-10 8.5 s-10-3-10-8.5 z" fill="#6E5B8C"/></svg><div class="n">04</div><h3>於是，三根手指頭誕生</h3><p>他成立洪川整合建設有限公司，打造「三根手指頭 生活服務整合」：用專業分工與資源整合，讓生活中的大小需求，都找得到更省時、更安心的解決方案。</p></div>
  <div class="story-punch">你家的事，<span>交給我們就好。</span></div>
 </div>
 </div></div></section><section class="area" id="area"><div class="wrap">
