@@ -150,7 +150,13 @@ async function loadInsights(env) {
   } catch (_) { return ''; }
 }
 
+const WELCOME_MSG = '歡迎來到 3Q 品牌孵化所\n\n你是看到「免費建官網」進來的嗎?\n是真的——我們先建好給你看,滿意才開始月費,每個行業只收一位。\n\n直接跟我說「你的行業+目前最卡的點」,\n我馬上幫你看你的行業席位還在不在。';
+
 async function handleEvent(ev, env, cfg) {
+  if (ev.type === 'follow') {   // 新好友第一印象:立刻接住(廣告流量的命門)
+    await lineReply(cfg.lineToken, ev.replyToken, WELCOME_MSG);
+    return;
+  }
   if (ev.type !== 'message' || ev.message?.type !== 'text') return;
   const uid = ev.source?.userId || 'unknown';
   const userMsg = ev.message.text.slice(0, 1000);
