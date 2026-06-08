@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>三根手指頭 ｜ 生活服務整合</title>
+<meta name="description" content="三根手指頭 生活服務整合 — 居家清潔、美容保養、工程統包、居家修繕、嚴選團購。服務高雄、台南、台中、彰化。幫你把生活打理好。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="三根手指頭 · 生活服務整合">
+<meta property="og:description" content="幫你把生活打理好 — 清潔、美容、工程、修繕、團購，一個窗口全部搞定。">
+<meta property="og:image" content="https://sanzhi-3q.pages.dev/og-sanzhi.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:url" content="https://sanzhi-3q.pages.dev/site-v4.html">
+<meta property="og:site_name" content="三根手指頭 生活服務整合">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://sanzhi-3q.pages.dev/og-sanzhi.png">
+<meta name="theme-color" content="#6E5B8C">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700;900&family=Cormorant+Garamond:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --lav:#9B86BD;--lavd:#6E5B8C;--lavs:#C7B8DE;--clay:#C2956A;--clays:#E4CBA9;
+  --cream:#FAF6EF;--paper:#FFFCF7;--blush:#F5CEC9;--ink:#3A3230;--ink2:#6B6058;--line:#E5DBCB;--dark:#2E2838;
+  --serif:"Noto Serif TC",serif;--sans:"Noto Sans TC",system-ui,sans-serif;--corm:"Cormorant Garamond",serif;
+  --ease:cubic-bezier(.2,.7,.2,1);--shadow:0 22px 60px -26px rgba(80,60,70,.4);--shadow-sm:0 10px 30px -16px rgba(80,60,70,.32);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);color:var(--ink);background:var(--cream);line-height:1.85;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.serif{font-family:var(--serif)}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.9;background:
+ radial-gradient(circle at 16% 10%,rgba(155,134,189,.16),transparent 44%),
+ radial-gradient(circle at 86% 22%,rgba(245,206,201,.16),transparent 46%),
+ radial-gradient(circle at 80% 86%,rgba(194,149,106,.14),transparent 48%)}
+.wrap{max-width:1200px;margin:0 auto;padding:0 clamp(20px,6vw,80px)}
+section{position:relative;z-index:1;padding:clamp(80px,11vw,150px) 0}
+/* 圖位佔位 */
+.imgph{position:relative;background:linear-gradient(135deg,#F2EADD,#E7DBCB);border:1.5px dashed var(--lavs);border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;color:var(--lavd)}
+.imgph::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 70% 20%,rgba(199,184,222,.25),transparent 60%)}
+.imgph svg{width:40px;height:40px;opacity:.55;margin-bottom:10px;position:relative}
+.imgph .lbl{font-size:13.5px;color:var(--ink2);letter-spacing:1px;text-align:center;padding:0 16px;position:relative;font-weight:500}
+.imgph .dim{font-size:11px;color:#A99FB0;margin-top:5px;position:relative;letter-spacing:.5px}
+/* reveal */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .85s var(--ease),transform .85s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.rd1{transition-delay:.1s}.rd2{transition-delay:.2s}.rd3{transition-delay:.3s}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}*{animation:none!important}}
+/* nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;transition:.4s var(--ease)}
+nav .bar{display:flex;align-items:center;justify-content:space-between;max-width:1280px;margin:0 auto;padding:15px clamp(20px,5vw,56px)}
+nav.scrolled{background:rgba(250,246,239,.85);backdrop-filter:blur(16px);box-shadow:0 1px 0 var(--line)}
+.brand{display:flex;align-items:center;gap:11px;cursor:pointer}
+.brand .mk{width:40px;height:40px;flex:none}
+.brand b{font-family:var(--serif);font-weight:700;font-size:19px;letter-spacing:1px;display:block;line-height:1.1}
+.brand span{font-size:10px;letter-spacing:3px;color:var(--ink2)}
+.nav-links{display:flex;align-items:center;gap:4px}
+.nav-links a{font-size:14.5px;padding:8px 13px;border-radius:30px;color:var(--ink2);transition:.25s;font-weight:500}
+.nav-links a:hover{color:var(--lavd)}
+.nav-cta{display:inline-flex;align-items:center;gap:7px;background:var(--lavd);color:#fff!important;padding:9px 18px;border-radius:30px;font-size:14px;font-weight:500;box-shadow:0 10px 22px -10px rgba(110,91,140,.7);transition:.25s var(--ease)}
+.nav-cta:hover{transform:translateY(-2px)}
+.burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px}
+.burger span{width:24px;height:2px;background:var(--ink);border-radius:2px;transition:.3s}
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:9px;font-weight:500;font-size:16px;padding:15px 30px;border-radius:40px;transition:.3s var(--ease);cursor:pointer;border:none;position:relative;overflow:hidden}
+.btn-p{background:var(--lavd);color:#fff;box-shadow:0 16px 34px -14px rgba(110,91,140,.8)}
+.btn-p::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 32%,rgba(255,255,255,.34),transparent 68%);transform:translateX(-130%);transition:transform .65s}
+.btn-p:hover{transform:translateY(-3px)}.btn-p:hover::after{transform:translateX(130%)}
+.btn-g{background:transparent;border:1.5px solid var(--lav);color:var(--lavd)}
+.btn-g:hover{background:var(--lav);color:#fff}
+/* hero */
+.hero{min-height:100svh;display:flex;align-items:center;padding-top:120px;overflow:hidden;background:linear-gradient(165deg,#FBF8F2,#F1E8DA)}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(30px,5vw,64px);align-items:center;width:100%}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:13px;letter-spacing:3px;color:var(--lavd);font-weight:500;margin-bottom:24px}
+.eyebrow::before{content:"";width:30px;height:1px;background:var(--lav)}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:clamp(44px,7vw,84px);line-height:1.12;letter-spacing:2px;margin-bottom:10px}
+.hero h1 em{font-style:normal;position:relative;color:var(--lavd)}
+.hero h1 em::after{content:"";position:absolute;left:-2px;right:-2px;bottom:8px;height:16px;background:linear-gradient(90deg,rgba(199,184,222,.65),rgba(228,203,169,.55));z-index:-1;border-radius:9px}
+.hero .en{font-family:var(--corm);font-style:italic;font-size:clamp(20px,3vw,30px);color:var(--clay);margin-bottom:26px;letter-spacing:1px}
+.hero .lead{font-size:clamp(16px,2vw,18px);color:var(--ink2);max-width:30em;margin-bottom:34px}
+.hero .lead b{color:var(--ink);font-weight:700}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap}
+.hero-art{position:relative}
+.hero-art .imgph{aspect-ratio:4/5;box-shadow:var(--shadow)}
+.hero-badge{position:absolute;left:-22px;bottom:34px;background:var(--paper);border-radius:18px;padding:14px 20px;box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:12px}
+.hero-badge .st{font-family:var(--corm);font-style:italic;font-size:34px;color:var(--lavd);line-height:1}
+.hero-badge small{font-size:12px;color:var(--ink2)}
+.hero-fingers{position:absolute;right:-3%;bottom:-8%;width:min(42vw,520px);opacity:.06;z-index:0;color:var(--lavd);animation:floatF 15s var(--ease) infinite;pointer-events:none}
+@keyframes floatF{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-22px) rotate(2.5deg)}}
+/* sec head */
+.sec-head{text-align:center;max-width:42em;margin:0 auto clamp(48px,7vw,72px)}
+.sec-head .tag{font-size:13px;letter-spacing:4px;color:var(--clay);font-weight:500}
+.sec-head h2{font-family:var(--serif);font-weight:700;font-size:clamp(30px,4.5vw,48px);margin-top:12px;letter-spacing:1px;line-height:1.2}
+.sec-head h2::after{content:"";display:block;width:50px;height:3px;margin:18px auto 0;background:linear-gradient(90deg,var(--lav),var(--clay));border-radius:3px}
+.sec-head p{color:var(--ink2);margin-top:14px;font-size:16px}
+</style>
+</head>
+<body>
+<style>
+/* signature */
+.sig-track{height:320vh;position:relative}
+.sig-sticky{position:sticky;top:0;height:100svh;overflow:hidden;display:flex;align-items:flex-end;justify-content:center}
+.sig-stage{position:absolute;inset:0}
+.sig-stage .ph{position:absolute;inset:0;opacity:0;transition:opacity .7s var(--ease)}
+.sig-stage .ph .imgph{width:100%;height:100%;border-radius:0;border:none}
+.sig-stage .ph.on{opacity:1}
+.sig-veil{position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(46,40,56,.55))}
+.sig-cap{position:relative;z-index:3;text-align:center;color:#fff;padding-bottom:clamp(60px,12vh,130px);max-width:24em}
+.sig-cap .t{font-family:var(--serif);font-weight:700;font-size:clamp(24px,4vw,40px);opacity:0;transform:translateY(16px);transition:.6s var(--ease)}
+.sig-cap .t.on{opacity:1;transform:none}
+.sig-final{margin-top:18px;opacity:0;transition:.6s var(--ease)}
+.sig-final.on{opacity:1}
+.sig-prog{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);display:flex;gap:8px;z-index:4}
+.sig-prog i{width:28px;height:3px;border-radius:3px;background:rgba(255,255,255,.35);transition:.4s}
+.sig-prog i.on{background:#fff}
+/* services editorial */
+.svc-row{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,72px);align-items:center;margin-bottom:clamp(56px,8vw,108px)}
+.svc-row:last-child{margin-bottom:0}
+.svc-row .imgph{aspect-ratio:3/2}
+.svc-row:nth-child(even) .svc-pic{order:2}
+.svc-no{font-family:var(--corm);font-style:italic;font-size:clamp(48px,6vw,72px);color:var(--clays);line-height:1;margin-bottom:6px}
+.svc-txt h3{font-family:var(--serif);font-weight:700;font-size:clamp(24px,3vw,34px);margin-bottom:12px;letter-spacing:.5px}
+.svc-txt p{color:var(--ink2);font-size:16px;max-width:30em}
+.svc-txt .more{margin-top:18px;display:inline-flex;gap:7px;color:var(--lavd);font-weight:500;font-size:15px;transition:.25s}
+.svc-row:hover .more{gap:12px}
+/* trust dark */
+.trust-wrap{background:var(--dark);color:#fff;border-radius:clamp(24px,4vw,46px);margin:clamp(40px,8vw,90px) clamp(8px,3vw,40px);padding:clamp(56px,8vw,100px) clamp(24px,5vw,72px);position:relative;overflow:hidden}
+.trust-wrap::after{content:"";position:absolute;top:-30%;right:-8%;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(155,134,189,.35),transparent 70%)}
+.trust-wrap .sec-head h2{color:#fff}.trust-wrap .sec-head h2::after{margin-left:auto;margin-right:auto}
+.nums{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center;position:relative;z-index:2}
+.num b{font-family:var(--serif);font-weight:700;font-size:clamp(36px,6vw,68px);color:var(--lavs);display:block;line-height:1}
+.num span{font-size:13.5px;color:#D8CFD0;margin-top:8px;display:block}
+.ba{margin-top:clamp(40px,6vw,64px);position:relative;border-radius:20px;overflow:hidden;aspect-ratio:16/9;user-select:none;z-index:2}
+.ba .layer{position:absolute;inset:0}
+.ba .after{clip-path:inset(0 0 0 50%)}
+.ba .imgph{width:100%;height:100%;border-radius:0;border:none}
+.ba .handle{position:absolute;top:0;bottom:0;left:50%;width:2px;background:#fff;cursor:ew-resize;z-index:5}
+.ba .handle::after{content:"⇄";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;background:#fff;color:var(--lavd);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.ba .tag{position:absolute;bottom:12px;padding:4px 12px;border-radius:20px;font-size:12px;background:rgba(46,40,56,.7);color:#fff;z-index:4}
+.ba .tag.b{left:12px}.ba .tag.a{right:12px}
+/* story film */
+.story-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(30px,6vw,80px);align-items:start}
+.story-rail{position:sticky;top:18vh}
+.story-rail .kick{font-size:13px;letter-spacing:4px;color:var(--clay)}
+.story-rail h2{font-family:var(--serif);font-weight:700;font-size:clamp(28px,4vw,44px);margin:12px 0 24px;line-height:1.25}
+.story-steps{display:flex;flex-direction:column;gap:14px}
+.story-steps .s{display:flex;align-items:center;gap:12px;color:var(--ink2);font-size:15px;transition:.4s}
+.story-steps .s .dot{width:11px;height:11px;border-radius:50%;background:var(--lavs);flex:none;transition:.4s}
+.story-steps .s.on{color:var(--ink);font-weight:700}
+.story-steps .s.on .dot{background:var(--lavd);box-shadow:0 0 0 5px rgba(110,91,140,.15)}
+.story-acts{display:flex;flex-direction:column;gap:clamp(30px,6vw,64px)}
+.act{background:var(--paper);border:1px solid var(--line);border-radius:24px;padding:clamp(28px,4vw,44px);box-shadow:var(--shadow-sm)}
+.act .n{font-family:var(--corm);font-style:italic;font-size:40px;color:var(--clays)}
+.act h3{font-family:var(--serif);font-weight:700;font-size:22px;margin:4px 0 12px}
+.act p{color:var(--ink2);font-size:15.5px;line-height:1.95}
+.story-punch{margin-top:clamp(40px,6vw,70px);text-align:center;font-family:var(--serif);font-weight:700;font-size:clamp(22px,3.5vw,34px);color:var(--ink)}
+.story-punch span{color:var(--lavd)}
+/* area + cta + footer */
+.area{background:linear-gradient(120deg,#F3ECE0,#EBE0CF)}
+.area-pills{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;margin-top:30px}
+.area-pills span{font-family:var(--serif);font-size:clamp(18px,3vw,26px);font-weight:600;background:var(--paper);padding:14px 32px;border-radius:50px;box-shadow:var(--shadow-sm);transition:.32s var(--ease)}
+.area-pills span:hover{transform:translateY(-5px);box-shadow:0 20px 38px -16px rgba(110,91,140,.45)}
+.area-note{text-align:center;margin-top:22px;color:var(--ink2);font-size:14px}
+.cta{text-align:center}
+.cta h2{font-family:var(--serif);font-weight:700;font-size:clamp(28px,5vw,52px);line-height:1.2;margin-bottom:18px}
+.cta p{color:var(--ink2);margin-bottom:30px}
+.cta .row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;align-items:center}
+.cta .tel{font-family:var(--corm);font-style:italic;font-size:26px;color:var(--lavd)}
+footer{background:var(--dark);color:#C9C1CE;padding:clamp(50px,7vw,80px) 0 40px;position:relative;z-index:1}
+footer .cols{display:flex;justify-content:space-between;flex-wrap:wrap;gap:30px}
+footer a{color:#C9C1CE;font-size:14px;transition:.2s}footer a:hover{color:#fff}
+footer .ft-b{font-family:var(--serif);color:#fff;font-size:18px;margin-bottom:10px}
+footer .cp{margin-top:34px;padding-top:22px;border-top:1px solid rgba(255,255,255,.12);font-size:12.5px;color:#9990A0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+/* RWD */
+@media(max-width:860px){
+ .nav-links{display:none}.burger{display:flex}
+ .hero{padding-top:96px}.hero-grid{grid-template-columns:1fr;gap:36px}
+ .hero-art{order:-1}.hero-fingers{width:70vw;opacity:.05}
+ .svc-row{grid-template-columns:1fr;gap:20px}.svc-row:nth-child(even) .svc-pic{order:0}
+ .nums{grid-template-columns:repeat(2,1fr);gap:30px}
+ .story-grid{grid-template-columns:1fr;gap:30px}.story-rail{position:static}
+ .story-steps{flex-direction:row;flex-wrap:wrap}
+}
+@media(max-width:600px){.imgph{border-radius:16px}.trust-wrap{border-radius:22px}}
+</style>
+<nav id="nav"><div class="bar">
+<a class="brand" href="#top"><svg class="mk" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="23" stroke="#6E5B8C" stroke-width="1.4"/><rect x="15.2" y="14" width="3.8" height="17" rx="1.9" fill="#6E5B8C"/><rect x="21.2" y="10.5" width="3.8" height="20.5" rx="1.9" fill="#9B86BD"/><rect x="27.2" y="15" width="3.8" height="16" rx="1.9" fill="#C2956A"/><path d="M15 28.5h16v2.2c0 5-3.5 8-8 8s-8-3-8-8z" fill="#6E5B8C"/></svg><div><b>三根手指頭</b><span>生活服務整合</span></div></a>
+<div class="nav-links">
+<a href="#services">服務</a><a href="#trust">實績</a><a href="#story">故事</a><a href="#area">地區</a>
+<a class="nav-cta" href="https://lin.ee/QMkVbxX" target="_blank">● LINE 諮詢</a></div>
+<div class="burger" onclick="document.querySelector('.nav-links').style.display='flex';this.style.display='none'"><span></span><span></span><span></span></div>
+</div></nav><section class="hero" id="top">
+<div class="wrap"><div class="hero-grid">
+<div>
+<span class="eyebrow">HOME LIFE · ALL IN ONE</span>
+<h1>幫你把<br>生活<em>打理好</em></h1>
+<div class="en">Three Fingers · Life Service</div>
+<p class="lead">清潔、美容、工程、修繕、團購——<b>不用花時間比價，不用一間一間問。</b>我們幫你整合，你只要享受就好。</p>
+<div class="hero-btns"><a class="btn btn-p" href="https://lin.ee/QMkVbxX" target="_blank">● LINE 諮詢</a><a class="btn btn-g" href="#services">看五大服務 ↓</a></div>
+</div>
+<div class="hero-art">
+<div class="imgph" style="aspect-ratio:4/5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7H7L8.2 5h7.6L17 7h2.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/><circle cx="12" cy="13" r="3.2"/></svg><div class="lbl">Hero · 居家情境照</div><div class="dim">1200×1500 · 柔光實拍 / 生成</div></div>
+<div class="hero-badge"><span class="st">4.9</span><small>近 200 個家庭<br>信任推薦</small></div>
+</div>
+</div></div>
+<svg class="hero-fingers" viewBox="0 0 120 150" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M44 84V38a6.2 6.2 0 0 1 12.4 0V80"/><path d="M56.4 80V28a6.2 6.2 0 0 1 12.4 0V78"/><path d="M68.8 80V40a6.2 6.2 0 0 1 12.4 0V86"/><path d="M44 76V66a6.2 6.2 0 0 0-12.2 1.6l1.4 7c1.3 18 9 30 27 31 18 1 28-11 30.8-26l1.2-13a6.2 6.2 0 0 0-12-2.2"/></svg>
+</section><section class="sig" id="sig"><div class="sig-track" id="sigTrack">
+<div class="sig-sticky">
+<div class="sig-stage">
+ <div class="ph on" data-i="0"><div class="imgph" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7H7L8.2 5h7.6L17 7h2.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/><circle cx="12" cy="13" r="3.2"/></svg><div class="lbl">Signature S1 · 凌亂前照</div><div class="dim">1920×1080 · 清潔線真實照</div></div></div>
+ <div class="ph" data-i="1"><div class="imgph" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7H7L8.2 5h7.6L17 7h2.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/><circle cx="12" cy="13" r="3.2"/></svg><div class="lbl">Signature S2 · 清潔中</div><div class="dim">1920×1080 · 同機位</div></div></div>
+ <div class="ph" data-i="2"><div class="imgph" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7H7L8.2 5h7.6L17 7h2.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/><circle cx="12" cy="13" r="3.2"/></svg><div class="lbl">Signature S3 · 整潔後照</div><div class="dim">1920×1080 · 同機位</div></div></div>
+</div>
+<div class="sig-veil"></div>
+<div class="sig-cap">
+ <div class="t on" data-i="0">忙了一整天，家還在等你。</div>
+ <div class="t" data-i="1">比價、找人、追進度——交給我們。</div>
+ <div class="t" data-i="2">回到家，一切剛剛好。</div>
+ <div class="sig-final"><a class="btn btn-p" href="https://lin.ee/QMkVbxX" target="_blank" style="background:#fff;color:#6E5B8C">幫你把生活打理好 →</a></div>
+</div>
+<div class="sig-prog"><i class="on"></i><i></i><i></i></div>
+</div>
+</div></section><section id="services"><div class="wrap">
+<div class="sec-head"><div class="tag">OUR SERVICES</div><h2>五大服務，一手包辦</h2><p>居家大小事，從清潔、保養到工程修繕，再到日常團購好物，一次幫你打理到好。</p></div>
+<div class="svc-row reveal"><div class="svc-pic"><div class="imgph" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7H7L8.2 5h7.6L17 7h2.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/><circle cx="12" cy="13" r="3.2"/></svg><div class="lbl">清潔 · 裝潢細清</div><div class="dim">1200×800 · 真實照</div></div></div>
+<div class="svc-txt"><div class="svc-no">01</div><h3>居家清潔</h3><p>每一個清潔案件，都把你家當自己的家在清理。床墊裡的塵蟎、櫃頂的積塵、裝潢後的粉屑，連看不到的地方都處理。台中、彰化到府，線上選時段。</p><a class="more" href="https://lin.ee/QMkVbxX" target="_blank">LINE 預約・諮詢 →</a></div></div><div class="svc-row reveal"><div class="svc-pic"><div class="imgph" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7H7L8.2 5h7.6L17 7h2.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/><circle cx="12" cy="13" r="3.2"/></svg><div class="lbl">美容保養</div><div class="dim">1200×800 · 情境圖</div></div></div>
+<div class="svc-txt"><div class="svc-no">02</div><h3>美容保養</h3><p>18 歲接觸美容、持證美容師。因為自己走過冤枉路，不推課程、不硬銷，只做能解決問題的保養。</p><a class="more" href="https://lin.ee/QMkVbxX" target="_blank">LINE 預約・諮詢 →</a></div></div><div class="svc-row reveal"><div class="svc-pic"><div class="imgph" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7H7L8.2 5h7.6L17 7h2.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/><circle cx="12" cy="13" r="3.2"/></svg><div class="lbl">工程 · 衛浴翻修</div><div class="dim">1200×800 · 真實照</div></div></div>
+<div class="svc-txt"><div class="svc-no">03</div><h3>工程統包</h3><p>免費估價、現場勘查、白紙黑字才開工。報價單列到一顆螺絲，簽了什麼價就是什麼價。高雄、台南。</p><a class="more" href="https://lin.ee/QMkVbxX" target="_blank">LINE 預約・諮詢 →</a></div></div><div class="svc-row reveal"><div class="svc-pic"><div class="imgph" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7H7L8.2 5h7.6L17 7h2.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/><circle cx="12" cy="13" r="3.2"/></svg><div class="lbl">修繕 · 到府檢測</div><div class="dim">1200×800 · 真實照</div></div></div>
+<div class="svc-txt"><div class="svc-no">04</div><h3>居家修繕</h3><p>燈不亮、水龍頭滴水、矽利康發霉——這種「不知道找誰」的小事，正是我們最常被叫去處理的。</p><a class="more" href="https://lin.ee/QMkVbxX" target="_blank">LINE 預約・諮詢 →</a></div></div><div class="svc-row reveal"><div class="svc-pic"><div class="imgph" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7H7L8.2 5h7.6L17 7h2.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/><circle cx="12" cy="13" r="3.2"/></svg><div class="lbl">團購 · 嚴選好物</div><div class="dim">1200×800 · 情境圖</div></div></div>
+<div class="svc-txt"><div class="svc-no">05</div><h3>嚴選團購</h3><p>只開自己會用、會吃、會推薦給家人的東西。跟廠商談條件、追出貨、追售後，是我們的事。</p><a class="more" href="https://lin.ee/QMkVbxX" target="_blank">LINE 預約・諮詢 →</a></div></div>
+</div></section><section id="trust"><div class="trust-wrap">
+<div class="sec-head"><div class="tag" style="color:var(--clays)">WHY US · 真實實績</div><h2>數字，是我們最誠實的招牌</h2></div>
+<div class="nums">
+<div class="num reveal"><b data-to="200">0</b><span>個服務家庭</span></div>
+<div class="num reveal rd1"><b data-to="7">0</b><span>年軍旅紀律</span></div>
+<div class="num reveal rd2"><b data-to="4">0</b><span>座城市服務</span></div>
+<div class="num reveal rd3"><b data-to="5">0</b><span>大服務整合</span></div>
+</div>
+<div class="ba" id="ba">
+ <div class="layer before"><div class="imgph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7H7L8.2 5h7.6L17 7h2.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/><circle cx="12" cy="13" r="3.2"/></svg><div class="lbl">前後對比 · 施作前</div><div class="dim">1200×800 · 真實照</div></div></div>
+ <div class="layer after" id="baAfter"><div class="imgph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7H7L8.2 5h7.6L17 7h2.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/><circle cx="12" cy="13" r="3.2"/></svg><div class="lbl">施作後</div><div class="dim">1200×800 · 真實照</div></div></div>
+ <div class="tag b">施作前</div><div class="tag a">施作後</div>
+ <div class="handle" id="baHandle"></div>
+</div>
+</div></section><section id="story"><div class="wrap"><div class="story-grid">
+<div class="story-rail">
+ <div class="kick">OUR STORY · 我們的故事</div>
+ <h2>把細節做好，<br>生活就會變好。</h2>
+ <div class="story-steps">
+  <div class="s on" data-i="0"><span class="dot"></span>學生時期 · 規劃與證照</div>
+  <div class="s" data-i="1"><span class="dot"></span>軍中七年 · 紀律與整合</div>
+  <div class="s" data-i="2"><span class="dot"></span>退伍 · 橫跨五領域</div>
+  <div class="s" data-i="3"><span class="dot"></span>創立 · 三根手指頭</div>
+ </div>
+</div>
+<div class="story-acts">
+ <div class="act reveal" data-i="0"><div class="n">01</div><h3>從學生時期就在規劃未來</h3><p>創辦人自學生時期便習慣規劃未來，持續累積各類證照、技能與實務經驗。18 歲後，因為自身的肌膚問題與幾次不理想的美容體驗，他開始深入研究保養知識、取得美容證照——希望用更專業、誠實的方式幫助別人。</p></div>
+ <div class="act reveal" data-i="1"><div class="n">02</div><h3>軍中七年，練出紀律與整合</h3><p>軍中服役七年，從基層勞務到後勤行政，他練出紀律、責任感與流程管理的能力，也真正體會到：資源整合，是解決問題的關鍵。</p></div>
+ <div class="act reveal" data-i="2"><div class="n">03</div><h3>退伍後，橫跨五個領域</h3><p>退伍後不到一年，他陸續投入美容、清潔、除塵蟎、團購與工程，服務近 200 個家庭。過程中他發現——清潔、健康、居住環境與生活品質，其實息息相關；客戶真正需要的，往往不是單一服務，而是一個能整合資源、解決問題的人。</p></div>
+ <div class="act reveal" data-i="3"><div class="n">04</div><h3>於是，三根手指頭誕生</h3><p>他成立洪川整合建設有限公司，打造「三根手指頭 生活服務整合」：用專業分工與資源整合，讓生活中的大小需求，都找得到更省時、更安心的解決方案。</p></div>
+ <div class="story-punch">你家的事，<span>交給我們就好。</span></div>
+</div>
+</div></div></section><section class="area" id="area"><div class="wrap">
+<div class="sec-head"><div class="tag">SERVICE AREA</div><h2>我們服務的地方</h2></div>
+<div class="area-pills"><span class="reveal">高雄</span><span class="reveal rd1">台南</span><span class="reveal rd2">台中</span><span class="reveal rd3">彰化</span></div>
+<div class="area-note">營運基地：高雄市內門區 ｜ 跨區服務，歡迎先 LINE 詢問可服務時段</div>
+</div></section><section class="cta"><div class="wrap">
+<h2>把生活的麻煩，<br>交給三根手指頭</h2>
+<p>一則訊息，就能開始。我們很樂意先了解你的需求。</p>
+<div class="row"><a class="btn btn-p" href="https://lin.ee/QMkVbxX" target="_blank">● LINE 諮詢</a><span class="tel">0907-098-779</span></div>
+</div></section><footer><div class="wrap"><div class="cols">
+<div><div class="ft-b">三根手指頭 · 生活服務整合</div><div style="font-size:13px;max-width:22em">幫你把生活打理好。清潔・美容・工程・修繕・團購，一個窗口全部搞定。</div></div>
+<div><div class="ft-b" style="font-size:14px">服務</div><a href="#services">五大服務</a><br><a href="#trust">實績</a><br><a href="#story">我們的故事</a></div>
+<div><div class="ft-b" style="font-size:14px">聯絡</div><a href="https://lin.ee/QMkVbxX" target="_blank">LINE 諮詢</a><br><a href="tel:0907098779">0907-098-779</a><br><span style="font-size:13px">高雄・台南・台中・彰化</span></div>
+</div>
+<div class="cp"><span>© 2026 洪川整合建設有限公司 · 統編 62086050</span><span>三根手指頭 ♡ 生活服務整合</span></div>
+</div></footer><script>
+// nav scroll
+addEventListener('scroll',function(){document.getElementById('nav').classList.toggle('scrolled',scrollY>40)},{passive:true});
+// reveal
+if('IntersectionObserver' in window){
+ var ro=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');ro.unobserve(e.target)}})},{threshold:.14,rootMargin:'0px 0px -7% 0px'});
+ document.querySelectorAll('.reveal').forEach(function(el){ro.observe(el)});
+}
+// count-up
+function countup(){
+ document.querySelectorAll('.num b').forEach(function(b){
+  if(b.dataset.done)return; var r=b.getBoundingClientRect(); if(r.top>innerHeight*0.9)return;
+  b.dataset.done=1; var to=+b.dataset.to,st=performance.now();
+  (function tick(now){var p=Math.min(1,(now-st)/900);b.textContent=Math.round(to*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(tick);})(st);
+ });
+}
+addEventListener('scroll',countup,{passive:true});countup();
+// signature scroll
+var track=document.getElementById('sigTrack');
+function sig(){ if(!track)return;
+ var r=track.getBoundingClientRect(), total=track.offsetHeight-innerHeight;
+ var p=Math.min(1,Math.max(0,-r.top/total)), idx=p<0.34?0:(p<0.67?1:2);
+ document.querySelectorAll('.sig-stage .ph').forEach(function(e){e.classList.toggle('on',+e.dataset.i===idx)});
+ document.querySelectorAll('.sig-cap .t').forEach(function(e){e.classList.toggle('on',+e.dataset.i===idx)});
+ document.querySelectorAll('.sig-prog i').forEach(function(e,i){e.classList.toggle('on',i<=idx)});
+ var f=document.querySelector('.sig-final');if(f)f.classList.toggle('on',idx===2);
+}
+addEventListener('scroll',sig,{passive:true});sig();
+// story steps
+var acts=document.querySelectorAll('.act[data-i]');
+if('IntersectionObserver' in window){
+ var so=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var i=e.target.dataset.i;
+  document.querySelectorAll('.story-steps .s').forEach(function(s){s.classList.toggle('on',s.dataset.i===i)});}})},{threshold:.5});
+ acts.forEach(function(a){so.observe(a)});
+}
+// before/after slider
+(function(){var ba=document.getElementById('ba');if(!ba)return;
+ var after=document.getElementById('baAfter'),h=document.getElementById('baHandle'),drag=false;
+ function set(x){var r=ba.getBoundingClientRect();var pct=Math.min(100,Math.max(0,(x-r.left)/r.width*100));
+  after.style.clipPath='inset(0 0 0 '+pct+'%)';h.style.left=pct+'%';}
+ ba.addEventListener('pointerdown',function(e){drag=true;set(e.clientX)});
+ addEventListener('pointermove',function(e){if(drag)set(e.clientX)});
+ addEventListener('pointerup',function(){drag=false});
+})();
+</script>
+</body></html>
