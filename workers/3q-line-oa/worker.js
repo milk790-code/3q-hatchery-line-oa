@@ -132,6 +132,60 @@ async function lineReply(token, replyToken, text) {
   });
 }
 
+// 發任意 messages 陣列(text/flex/quickReply 混用)
+async function lineReplyRaw(token, replyToken, messages) {
+  await fetch('https://api.line.me/v2/bot/message/reply', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ replyToken, messages }),
+  });
+}
+
+// 三層大禮包引導:① 開場文字(建信任)② Flex 大禮包卡(視覺重擊)③ 行業氣泡(讓他點)
+function GIFT_FLOW() {
+  return [
+    { type: 'text', text: '你來得正好 👀\n\n每個行業我們只留 1 個名額。\n我們自己的品牌都是先在自己身上做出成績,才拿來幫客戶——\n所以這套東西,是真的能用、不是話術。\n先看你能拿什麼 👇' },
+    {
+      type: 'flex',
+      altText: '行業第一席・萬元大禮包直接送(限1名)',
+      contents: {
+        type: 'bubble', size: 'mega',
+        body: {
+          type: 'box', layout: 'vertical', backgroundColor: '#0E0E10', paddingAll: '20px', spacing: 'md',
+          contents: [
+            { type: 'text', text: '行業第一席・限量 1 名', color: '#E6B450', size: 'xs', weight: 'bold', letterSpacing: '2px' },
+            { type: 'text', text: '萬元大禮包・直接送', color: '#FFFFFF', size: 'xxl', weight: 'bold' },
+            { type: 'separator', color: '#2A2A2E', margin: 'md' },
+            { type: 'box', layout: 'vertical', spacing: 'sm', margin: 'md', contents: [
+              { type: 'box', layout: 'baseline', contents: [ { type: 'text', text: '🔑', flex: 0, size: 'sm' }, { type: 'text', text: '萬元直接送・行業唯一特惠', color: '#EAEAEA', size: 'sm', wrap: true, margin: 'sm' } ] },
+              { type: 'box', layout: 'baseline', contents: [ { type: 'text', text: '🎁', flex: 0, size: 'sm' }, { type: 'text', text: '三大禮包:官網＋LINE 官方帳號＋粉絲團,全幫你建好', color: '#EAEAEA', size: 'sm', wrap: true, margin: 'sm' } ] },
+              { type: 'box', layout: 'baseline', contents: [ { type: 'text', text: '📊', flex: 0, size: 'sm' }, { type: 'text', text: '五份超級研究報告:行業、對手、客戶全拆給你看', color: '#EAEAEA', size: 'sm', wrap: true, margin: 'sm' } ] },
+              { type: 'box', layout: 'baseline', contents: [ { type: 'text', text: '⚙️', flex: 0, size: 'sm' }, { type: 'text', text: '16 個專屬小設定,細節做滿不漏單', color: '#EAEAEA', size: 'sm', wrap: true, margin: 'sm' } ] }
+            ]},
+            { type: 'text', text: '你只顧好產品跟店,網路的事我們全包。', color: '#9A9A9E', size: 'xs', wrap: true, margin: 'md' }
+          ]
+        },
+        footer: {
+          type: 'box', layout: 'vertical', backgroundColor: '#0E0E10', paddingAll: '16px',
+          contents: [
+            { type: 'button', style: 'primary', color: '#E6B450', height: 'md',
+              action: { type: 'message', label: '我要搶這個名額', text: '我要搶這個名額！' } }
+          ]
+        }
+      },
+      quickReply: {
+        items: [
+          { type: 'action', action: { type: 'message', label: '汽車美容', text: '我做汽車美容' } },
+          { type: 'action', action: { type: 'message', label: '餐飲小吃', text: '我做餐飲' } },
+          { type: 'action', action: { type: 'message', label: '美業/美容', text: '我做美業' } },
+          { type: 'action', action: { type: 'message', label: '零售門市', text: '我做零售' } },
+          { type: 'action', action: { type: 'message', label: '其他行業', text: '我是其他行業' } }
+        ]
+      }
+    }
+  ];
+}
+
 async function ensureTables(env) {
   if (!env.CRM) return;
   try {
@@ -164,6 +218,13 @@ async function handleEvent(ev, env, cfg) {
   if (/^我是老闆$/.test(userMsg.trim()) && !cfg.ownerId) {
     await env.SESSION?.put('cfg:3q_owner', uid);
     await lineReply(cfg.lineToken, ev.replyToken, '已綁定老闆身分。以後客人成交意向我會推給你。');
+    return;
+  }
+
+  // 三層大禮包引導(Rich Menu「我要搶行業第一」或觸發詞)→ 不進 AI,直接丟三層
+  if (/搶|行業第一|大禮包|名額/.test(userMsg)) {
+    await lineReplyRaw(cfg.lineToken, ev.replyToken, GIFT_FLOW());
+    // 點完氣泡(我做汽車美容…)或大按鈕的後續訊息,會落回下方 AI 七幕商談,自然接手
     return;
   }
 
