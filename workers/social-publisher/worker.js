@@ -610,16 +610,24 @@ async function runPublishLoop(env, targetPlatform = null) {
     }
 
     // Get next pending post (scheduled_at <= now OR null)
+    // 2026-06-11 fix: SQLite ASC 排序 NULL 排最前,每日 seed 的 NULL 列永遠插隊,
+    // 餓死所有帶 scheduled_at 的排程貼文(6/3 起全部卡 pending)。
+    // 改用 COALESCE 把 NULL 視為「現在」:過期排程貼文(越早越優先)先發。
     const post = await env.CRM.prepare(
-      "SELECT * FROM content_queue WHERE platform = ? AND status = 'pending' AND (scheduled_at IS NULL OR scheduled_at <= ?) ORDER BY scheduled_at ASC, id ASC LIMIT 1"
-    ).bind(platform, nowIso).first();
+      "SELECT * FROM content_queue WHERE platform = ? AND status = 'pending' AND (scheduled_at IS NULL OR scheduled_at <= ?) ORDER BY COALESCE(scheduled_at, ?) ASC, id ASC LIMIT 1"
+    ).bind(platform, nowIso, nowIso).first();
 
     if (!post) {
       results.push({ platform, skipped: true, reason: 'no pending posts' });
       continue;
     }
 
-    const outcome = await publishPost(post, env);
+    let outcome;
+    try {
+      outcome = await publishPost(post, env);
+    } catch (err) {
+      outcome = { ok: false, error: `exception: ${err.message}` }; // 2026-06-11: 單篇例外不殺整輪
+    }
 
     if (outcome.ok) {
       await env.CRM.prepare(
@@ -706,7 +714,7 @@ export default {
       return json({
         ok: true,
         worker: '3q-social-publisher',
-        version: '2.1',
+        version: '2.2',
         platforms: Object.keys(DAILY_LIMITS),
         configured: {
           threads:    Boolean(threadsToken),
@@ -887,6 +895,6 @@ export default {
       return json({ ok: true, caption });
     }
 
-    return json({ service: '3q-social-publisher', ok: true, version: '2.1' });
+    return json({ service: '3q-social-publisher', ok: true, version: '2.2' });
   },
 };
