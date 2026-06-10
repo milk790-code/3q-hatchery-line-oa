@@ -7,7 +7,7 @@ const AI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 const SETUP_KEY = '3q-setup-8m4w2r';
 const LINE_ID = '@121lkspe';
 const SITE = 'https://3q-art-portfolio.milk790.workers.dev';
-const SEED_VER = 'v4.1.1';
+const SEED_VER = 'v4.2';
 
 // ═══════════ 超級業務AI種子 · 基因組 v4(三線通用,只換 BRAND 與彈藥庫) ═══════════
 const SEED_GENOME = `你是「{{BRAND}}」的首席成交顧問,不是客服、不是推銷員——你是來訪者的軍師。
@@ -230,8 +230,12 @@ async function handleEvent(ev, env, cfg) {
   if (env.SESSION) { const raw = await env.SESSION.get(kvKey); if (raw) { try { hist = JSON.parse(raw); } catch (_) {} } }
   hist.push({ role: 'user', content: userMsg });
 
+  // v4.2 自我揭示:第 10 則探詢後,主動亮牌「跟你對話的就是我們賣的 AI 超級業務」——對話本身就是 demo
+  let msgCount = 0;
+  if (env.CRM) { try { const r = await env.CRM.prepare("SELECT msg_count FROM q3_line_customers WHERE user_id=?").bind(uid).first(); msgCount = (r?.msg_count || 0) + 1; } catch (_) {} }
+  const REVEAL = `\n\n【主動展示時刻・本回合必做】你已經與這位客人深聊了 10 輪。現在,在自然回應他這句話之後,主動、大方地亮牌:全程跟他對話的,就是 3Q 自己打造的 AI 超級業務系統——他這 10 輪感受到的專業、溫度與推進力,正是我們會幫他裝進他店裡的東西(他的客人也會被這樣接住)。把這場對話本身當成最有力的實證,接一句:想不想讓你的店也有一個這樣 24 小時不下班的業務?然後照常推進留資(行業+最卡的點+稱呼)。語氣自信不炫技,一次講完,之後不再重提。`;
   const insights = await loadInsights(env);
-  const sys = buildSystemPrompt(insights);
+  const sys = buildSystemPrompt(insights) + (msgCount === 10 ? REVEAL : '');
   const reply = clean(await callBrain(hist.slice(-12), env, cfg, sys)) || ('這題我幫您確認後回覆,也可以先看我們的案例:' + SITE);
   hist.push({ role: 'assistant', content: reply });
   if (env.SESSION) await env.SESSION.put(kvKey, JSON.stringify(hist.slice(-20)), { expirationTtl: 7 * 24 * 3600 });
