@@ -7,7 +7,7 @@ const AI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 const SETUP_KEY = '3q-setup-8m4w2r';
 const LINE_ID = '@121lkspe';
 const SITE = 'https://3q-art-portfolio.milk790.workers.dev';
-const SEED_VER = 'v4.1';
+const SEED_VER = 'v4.1.1';
 
 // ═══════════ 超級業務AI種子 · 基因組 v4(三線通用,只換 BRAND 與彈藥庫) ═══════════
 const SEED_GENOME = `你是「{{BRAND}}」的首席成交顧問,不是客服、不是推銷員——你是來訪者的軍師。
@@ -204,13 +204,9 @@ async function loadInsights(env) {
   } catch (_) { return ''; }
 }
 
-const WELCOME_MSG = '歡迎來到 3Q 品牌孵化所\n\n你是看到「免費建官網」進來的嗎?\n是真的——我們先建好給你看,滿意才開始月費,每個行業只收一位。\n\n直接跟我說「你的行業+目前最卡的點」,\n我馬上幫你看你的行業席位還在不在。';
-
 async function handleEvent(ev, env, cfg) {
-  if (ev.type === 'follow') {   // 新好友第一印象:立刻接住(廣告流量的命門)
-    await lineReply(cfg.lineToken, ev.replyToken, WELCOME_MSG);
-    return;
-  }
+  // follow 不在 webhook 發歡迎:LINE 後台已設「加入好友的歡迎訊息+圖文按鈕」,webhook 再發會雙重歡迎
+  if (ev.type === 'follow') return;
   if (ev.type !== 'message' || ev.message?.type !== 'text') return;
   const uid = ev.source?.userId || 'unknown';
   const userMsg = ev.message.text.slice(0, 1000);
@@ -222,7 +218,8 @@ async function handleEvent(ev, env, cfg) {
   }
 
   // 三層大禮包引導(Rich Menu「我要搶行業第一」或觸發詞)→ 不進 AI,直接丟三層
-  if (/搶|行業第一|大禮包|名額/.test(userMsg)) {
+  // ⚠ 觸發詞刻意收窄:大按鈕「我要搶這個名額!」必須落入下方 AI 接手,不能再觸發三層(否則死循環)
+  if (/行業第一|大禮包/.test(userMsg)) {
     await lineReplyRaw(cfg.lineToken, ev.replyToken, GIFT_FLOW());
     // 點完氣泡(我做汽車美容…)或大按鈕的後續訊息,會落回下方 AI 七幕商談,自然接手
     return;
