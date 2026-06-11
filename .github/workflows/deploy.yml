@@ -304,9 +304,9 @@ jobs:
             "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/schedules" \
             -H "Authorization: Bearer $CF_TOKEN" \
             -H "Content-Type: application/json" \
-            -d '[{"cron": "5 * * * *"}, {"cron": "0 13 * * 1"}, {"cron": "0 1 1 3,6,9,12 *"}, {"cron": "0 12 * * *"}]' \
+            -d '[{"cron": "5 * * * *"}, {"cron": "0 13 * * MON"}, {"cron": "0 1 1 3,6,9,12 *"}, {"cron": "0 12 * * *"}]' \
             | jq -e '.success == true' > /dev/null
-          echo "::notice::Cron set: follow-ups (hourly :05) + weekly digest (Mon 21:00 TW) + seasonal push (Mar/Jun/Sep/Dec 1st 09:00 TW) + daily lottery (20:00 TW)"
+          echo "::notice::Cron set: follow-ups (hourly :05) + weekly digest (MON 21:00 TW, named day — Quartz 1=SUN) + seasonal push (Mar/Jun/Sep/Dec 1st 09:00 TW) + daily lottery (20:00 TW)"
 
       - name: CF deploy diagnostics (summary + commit on failure)
         if: always()
