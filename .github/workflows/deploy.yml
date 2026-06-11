@@ -521,9 +521,9 @@ jobs:
             "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${SOCIAL_WORKER_NAME}/schedules" \
             -H "Authorization: Bearer $CF_TOKEN" \
             -H "Content-Type: application/json" \
-            -d '[{"cron":"0 1 * * 2-4"},{"cron":"0 4 * * 3"},{"cron":"30 12 * * *"}]' \
+            -d '[{"cron":"0 1 * * TUE-THU"},{"cron":"0 4 * * WED"},{"cron":"30 12 * * *"}]' \
             | jq -e '.success == true' > /dev/null
-          echo "::notice::Social publisher crons set: 09:00 TW (Tue-Thu) + 12:00 TW (Wed) + 20:30 TW (daily)"
+          echo "::notice::Social publisher crons set: 09:00 TW (TUE-THU) + 12:00 TW (WED) + 20:30 TW (daily) — named days; CF cron parser is Quartz-style (1=SUN), numeric 2-4 was Mon-Wed"
 
       - name: Enable social-publisher workers.dev subdomain
         env:
