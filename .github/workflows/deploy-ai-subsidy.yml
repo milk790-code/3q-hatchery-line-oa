@@ -1,0 +1,37 @@
+name: Deploy AI Subsidy Landing
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'workers/ai-subsidy/worker.js'
+      - '.github/workflows/deploy-ai-subsidy.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      WORKER_NAME: 3q-ai-subsidy
+      CRM_D1_ID: e54671b1-d15e-4552-babf-cef367267568
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          jq -n --arg d1 "$CRM_D1_ID" '{ main_module:"worker.js", compatibility_date:"2024-12-01",
+            bindings:[ {name:"CRM",type:"d1",id:$d1} ] }' > /tmp/meta.json
+          resp=$(curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -F "metadata=@/tmp/meta.json;type=application/json" \
+            -F "worker.js=@workers/ai-subsidy/worker.js;type=application/javascript+module")
+          echo "$resp" | jq -e '.success==true' >/dev/null || { echo "$resp" | jq -c '.errors'; exit 1; }
+          curl -sS -X POST "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/subdomain" \
+            -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" -d '{"enabled":true}' | jq -e '.success==true' >/dev/null
+          sleep 5
+          curl -sS "https://${WORKER_NAME}.milk790.workers.dev/health" | jq -e '.ok==true' >/dev/null
+          echo "::notice::3q-ai-subsidy deployed + health OK"
