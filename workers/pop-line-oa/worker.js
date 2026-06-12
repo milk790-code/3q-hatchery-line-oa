@@ -27,7 +27,7 @@ const AI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 const SETUP_KEY = 'pop-setup-7h3k9q';
 const LINE_ID = '@150tiznd';
 const SHOPEE = 'https://shopee.tw/milk790';
-const SEED_VER = 'v4.3.0';
+const SEED_VER = 'v4.4.0';
 
 // ═══ AI 員工檔案(B 版揭露)═══
 // 正本在 brands/popmonster.json — 改 config 先改正本,再同步這份內嵌副本(單檔部署,無 bundler)
@@ -158,12 +158,17 @@ async function callBrain(history, env, cfg, systemPrompt, maxTokens, turnDirecti
     try {
       const sysBlocks = [{ type: 'text', text: sys, cache_control: { type: 'ephemeral' } }];
       if (turnDirective) sysBlocks.push({ type: 'text', text: turnDirective });
-      const r = await fetch('https://api.anthropic.com/v1/messages', {
+      const HDRS = { 'x-api-key': cfg.anthropicKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' };
+      let r = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'x-api-key': cfg.anthropicKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+        headers: HDRS,
         body: JSON.stringify({ model: pickModel(history), max_tokens: maxTokens || 600,
           system: sysBlocks, messages: history }),
       });
+      if (!r.ok && [400, 403, 404, 429].includes(r.status)) {
+      console.error('anthropic', r.status, '-> fallback opus-4-8');
+      r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: HDRS, body: JSON.stringify({ model: 'claude-opus-4-8', max_tokens: maxTokens || 600, system: sysBlocks, messages: history }) });
+      }
       if (r.ok) { const d = await r.json(); return d.content?.[0]?.text || ''; }
       const errBody = (await r.text().catch(() => '')).slice(0, 200);
       console.error('[pop-line] anthropic', r.status, errBody);
