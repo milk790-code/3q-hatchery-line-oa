@@ -1,4 +1,19 @@
 // 呆丸土地公 Sales AI — 超級業務AI 三形態 worker v1.0(選址情報所)
+// ═══ 模型三層路由 v1：成交時刻 Fable、純事實短問 Haiku、其餘 Sonnet（錯升不錯降）═══
+const MODELS = {
+  lite: 'claude-haiku-4-5-20251001',
+  chat: 'claude-sonnet-4-6',
+  escalate: 'claude-fable-5',
+};
+const ESCALATE_RX = /(健檢|報價|價格|多少錢|幾錢|預算|太貴|好貴|便宜一點|別家|考慮一下|合作|加盟|代理|經銷|夥伴|分潤|簽約|下訂|成交|怎麼付|申請|補助多少)/;
+const LITE_RX = /^(營業時間|地址|在哪|在哪裡|怎麼去|電話|運費|出貨|幾天到)[?？嗎]?$/;
+function pickModel(history) {
+  const lastUser = [...(history || [])].reverse().find(m => m && m.role === 'user');
+  const t = (lastUser && typeof lastUser.content === 'string') ? lastUser.content.trim() : '';
+  if (ESCALATE_RX.test(t)) return MODELS.escalate;
+  if (t.length <= 12 && LITE_RX.test(t)) return MODELS.lite;
+  return MODELS.chat;
+}
 // ① GET / 引流著陸頁  ② GET /intro 官網接待  ③ POST /chat 轉化回覆 API
 // /go=LINE轉跳  /health
 // 大腦:ANTHROPIC_API_KEY → claude-sonnet-4-6;無 → Workers AI llama
@@ -49,7 +64,7 @@ async function callBrain(history, env) {
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 700,
+      body: JSON.stringify({ model: pickModel(history), max_tokens: 700,
         system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }], messages: history }),
     });
     if (resp.ok) { const d = await resp.json(); return d.content?.[0]?.text || ''; }
