@@ -536,6 +536,30 @@ jobs:
           echo "SOCIAL_URL=$SOCIAL_URL" >> $GITHUB_ENV
           echo "::notice::Social publisher URL: $SOCIAL_URL"
 
+      - name: Verify live worker (health version + queue dedup E2E)
+        env:
+          TRIGGER_TOKEN: ${{ secrets.TRIGGER_TOKEN }}
+        run: |
+          set -euo pipefail
+          sleep 5
+          health=$(curl -fsS --max-time 15 "$SOCIAL_URL/health")
+          echo "$health" | jq .
+          ver=$(echo "$health" | jq -r '.version')
+          want=$(grep -oE "version: '[0-9.]+'" workers/social-publisher/worker.js | head -1 | grep -oE "[0-9.]+")
+          [ "$ver" = "$want" ] || { echo "::error::Live version $ver != repo version $want"; exit 1; }
+
+          # E2E dedup: add → identical add must be skipped → cleanup.
+          # Far-future scheduled_at keeps the cron loop away from the probe row.
+          body='{"platform":"facebook","caption":"[deploy-smoke] run '"$GITHUB_RUN_ID"'","scheduled_at":"2030-01-01T00:00:00Z"}'
+          r1=$(curl -fsS -X POST "$SOCIAL_URL/queue/add" -H "Authorization: Bearer $TRIGGER_TOKEN" -H "Content-Type: application/json" -d "$body")
+          id=$(echo "$r1" | jq -r '.ids[0]')
+          { [ "$id" != "null" ] && [ -n "$id" ]; } || { echo "::error::queue/add failed: $r1"; exit 1; }
+          r2=$(curl -fsS -X POST "$SOCIAL_URL/queue/add" -H "Authorization: Bearer $TRIGGER_TOKEN" -H "Content-Type: application/json" -d "$body")
+          echo "$r2" | jq -e --argjson id "$id" '.skipped[0].duplicate_of == $id' > /dev/null \
+            || { echo "::error::dedup did not trigger: $r2"; exit 1; }
+          curl -fsS -X POST "$SOCIAL_URL/queue/del?id=$id" -H "Authorization: Bearer $TRIGGER_TOKEN" | jq -e '.ok == true' > /dev/null
+          echo "::notice::v$ver live — health ok, dedup E2E passed (probe row $id added → skipped → deleted)"
+
       - name: Social publisher summary
         run: |
           echo "## Social Publisher deployed" >> $GITHUB_STEP_SUMMARY

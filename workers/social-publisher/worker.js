@@ -1,6 +1,15 @@
-// 3Q Hatchery — Social Publisher Worker v2.0
+// 3Q Hatchery — Social Publisher Worker v2.3
 // Auto-posts to Threads, Instagram, Facebook Page, TikTok, Google Business Profile
 // Tokens stored in SESSION KV and auto-refreshed every 50 days — no manual renewal.
+//
+// v2.3 (2026-06-12):
+//   - /queue/add 去重:platform+caption+seed+image 與 pending 列完全相同 → skip
+//     (6/1 雙跑 seed 造成 q40-46 / q48-54 同文重發風險)
+//   - 每日 FB seed 防堆積:已有相同 caption 的 pending 列就不再 seed
+//     (積壓期間 NULL 排程被餓死,舊邏輯每天疊一份,id 87-89 事故)
+//   - getToken 接受 fb-token-setup 寫入的 token:fb:page_token 鍵名
+//   - IG token 續期改用 fb_exchange_token grant;KV 缺 expires 鍵時立即補刷
+//     (舊邏輯 th_refresh_token 打 graph.facebook.com 必 400,IG 從未真正續期)
 //
 // Vars (wrangler.toml):
 //   THREADS_APP_ID           — Meta App ID (public, safe in vars)
@@ -35,11 +44,17 @@ async function getToken(platform, key, env) {
   //   *_ACCESS_TOKEN → "access", *_USER_ID → "user_id".
   // The old replace() built keys like "token:threads:threadsaccess", so KV reads
   // ALWAYS missed (and auto-refresh silently never worked). Fixed 2026-06-07.
-  const suffix = key.endsWith('_ACCESS_TOKEN') ? 'access'
-               : key.endsWith('_USER_ID')      ? 'user_id'
-               : key.toLowerCase();
-  const kvVal = await env.SESSION.get(`token:${platform}:${suffix}`);
-  return kvVal || env[key] || null;
+  // fb-token-setup.yml writes "token:fb:page_token" (not "access") — accept both,
+  // otherwise FB silently depends on the env secret alone. Added in v2.3.
+  const suffixes = key.endsWith('_ACCESS_TOKEN') ? ['access']
+                 : key.endsWith('_USER_ID')      ? ['user_id']
+                 : [key.toLowerCase()];
+  if (platform === 'fb' && key === 'FB_PAGE_ACCESS_TOKEN') suffixes.push('page_token');
+  for (const suffix of suffixes) {
+    const kvVal = await env.SESSION.get(`token:${platform}:${suffix}`);
+    if (kvVal) return kvVal;
+  }
+  return env[key] || null;
 }
 
 async function saveTokenToKV(platform, access, userId, expiresInSecs, env) {
@@ -60,10 +75,13 @@ async function refreshMetaToken(platform, env) {
   const currentToken = await getToken(platform, platform === 'threads' ? 'THREADS_ACCESS_TOKEN' : 'IG_ACCESS_TOKEN', env);
   if (!currentToken) return null;
 
-  const host = platform === 'threads' ? 'graph.threads.net' : 'graph.facebook.com';
-  const resp = await fetch(
-    `https://${host}/refresh_access_token?grant_type=th_refresh_token&access_token=${currentToken}&client_id=${appId}&client_secret=${appSecret}`
-  );
+  // Threads refreshes with th_refresh_token on graph.threads.net; FB/IG long-lived
+  // tokens use the fb_exchange_token grant on graph.facebook.com — th_refresh_token
+  // there always 400'd, so IG auto-refresh never actually worked before v2.3.
+  const url = platform === 'threads'
+    ? `https://graph.threads.net/refresh_access_token?grant_type=th_refresh_token&access_token=${currentToken}`
+    : `https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${currentToken}`;
+  const resp = await fetch(url);
   if (!resp.ok) return null;
   const data = await resp.json();
   if (!data.access_token) return null;
@@ -77,12 +95,15 @@ async function refreshTokensIfNeeded(env) {
   if (!env.SESSION || !env.THREADS_APP_SECRET) return;
   const tenDays = 10 * 24 * 60 * 60 * 1000;
   for (const platform of ['threads', 'ig']) {
+    const access = await env.SESSION.get(`token:${platform}:access`);
+    if (!access) continue; // platform not connected yet
     const expires = await env.SESSION.get(`token:${platform}:expires`);
-    if (!expires) continue;
-    if (new Date(expires).getTime() - Date.now() < tenDays) {
-      console.log(`[social-publisher] refreshing ${platform} token`);
-      await refreshMetaToken(platform, env).catch(e => console.error(`refresh ${platform} failed:`, e.message));
-    }
+    // No expires key = token imported outside the OAuth flow (e.g. fb-token-setup
+    // wrote access without expires) — refresh now so a real expiry lands in KV,
+    // instead of skipping forever and letting the token die at day 60.
+    if (expires && new Date(expires).getTime() - Date.now() >= tenDays) continue;
+    console.log(`[social-publisher] refreshing ${platform} token`);
+    await refreshMetaToken(platform, env).catch(e => console.error(`refresh ${platform} failed:`, e.message));
   }
 }
 
@@ -562,11 +583,17 @@ async function seedDailyContent(env) {
   const base = env.PNG_BASE_URL || '';
 
   // 1) FB Page — ensure one post exists for today (self-accumulating queue)
+  // v2.3: also skip while an identical daily post is still pending — during a
+  // backlog the COALESCE ordering starves NULL-scheduled rows, and the old
+  // created_at-only check stacked one duplicate per day (id 87-89 incident).
+  const fbPendingDaily = await env.CRM.prepare(
+    "SELECT COUNT(*) AS n FROM content_queue WHERE platform='facebook' AND status='pending' AND caption = ?"
+  ).bind(dailyFbCaption()).first();
   const fbToday = await env.CRM.prepare(
     "SELECT COUNT(*) AS n FROM content_queue WHERE platform='facebook' AND created_at >= ?"
   ).bind(today).first();
   let seeded = false;
-  if ((fbToday?.n || 0) === 0) {
+  if ((fbPendingDaily?.n || 0) === 0 && (fbToday?.n || 0) === 0) {
     await env.CRM.prepare(
       "INSERT INTO content_queue (platform, image_url, caption, link_url, status, source_oa) VALUES ('facebook', ?, ?, ?, 'pending', '3q-hatchery')"
     ).bind(base ? `${base}/${FB_POSTER}` : null, dailyFbCaption(), joinUrl).run();
@@ -714,7 +741,7 @@ export default {
       return json({
         ok: true,
         worker: '3q-social-publisher',
-        version: '2.2',
+        version: '2.3',
         platforms: Object.keys(DAILY_LIMITS),
         configured: {
           threads:    Boolean(threadsToken),
@@ -739,12 +766,18 @@ export default {
       const body = await request.json().catch(() => null);
       if (!body) return json({ ok: false, error: 'invalid JSON body' }, 400);
       const items = Array.isArray(body) ? body : Array.isArray(body.posts) ? body.posts : [body];
-      const ids = [], errors = [];
+      const ids = [], errors = [], skipped = [];
       for (let i = 0; i < items.length; i++) {
         const p = items[i] || {};
         if (!PLATFORM_FNS[p.platform]) { errors.push({ index: i, error: `unknown platform: ${p.platform}` }); continue; }
         if (!p.caption && !p.caption_seed) { errors.push({ index: i, error: 'caption or caption_seed required' }); continue; }
         try {
+          // v2.3 dedup: an identical pending row (platform+caption+seed+image) means a
+          // double-seeded batch — the same post would publish twice (q40-46 vs q48-54).
+          const dup = await env.CRM.prepare(
+            "SELECT id FROM content_queue WHERE status='pending' AND platform=? AND COALESCE(caption,'')=COALESCE(?,'') AND COALESCE(caption_seed,'')=COALESCE(?,'') AND COALESCE(image_url,'')=COALESCE(?,'') LIMIT 1"
+          ).bind(p.platform, p.caption || null, p.caption_seed || null, p.image_url || null).first();
+          if (dup) { skipped.push({ index: i, duplicate_of: dup.id }); continue; }
           const r = await env.CRM.prepare(
             "INSERT INTO content_queue (platform, image_url, caption_seed, caption, topic_tag, link_url, scheduled_at, status, source_oa) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?)"
           ).bind(
@@ -757,7 +790,7 @@ export default {
         }
       }
       const status = ids.length === 0 && errors.length > 0 ? 400 : 200;
-      return json({ ok: errors.length === 0, added: ids.length, ids, errors }, status);
+      return json({ ok: errors.length === 0, added: ids.length, ids, skipped, errors }, status);
     }
 
     // Queue overview: GET /queue/list (TRIGGER_TOKEN protected)
@@ -895,6 +928,6 @@ export default {
       return json({ ok: true, caption });
     }
 
-    return json({ service: '3q-social-publisher', ok: true, version: '2.2' });
+    return json({ service: '3q-social-publisher', ok: true, version: '2.3' });
   },
 };

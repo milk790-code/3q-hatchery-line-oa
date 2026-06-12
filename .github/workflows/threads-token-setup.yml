@@ -89,59 +89,24 @@ jobs:
           done
           echo "::notice::Tokens stored in KV — auto-refresh enabled"
 
-      - name: Deploy 3q-social-publisher with APP_SECRET binding
-        env:
-          CF_TOKEN:            ${{ secrets.CF_API_TOKEN }}
-          TRIGGER_TOKEN:       ${{ secrets.TRIGGER_TOKEN }}
-          THREADS_APP_SECRET:  ${{ secrets.THREADS_APP_SECRET }}
-        run: |
-          set -euo pipefail
-          cat > /tmp/meta.json <<JSON
-          {"main_module":"worker.js","compatibility_date":"2024-12-01","bindings":[
-            {"name":"PNG_BASE_URL",         "type":"plain_text",  "text":"$PNG_BASE_URL"},
-            {"name":"THREADS_APP_ID",       "type":"plain_text",  "text":"$THREADS_APP_ID"},
-            {"name":"THREADS_APP_SECRET",   "type":"secret_text", "text":$(jq -Rn --arg t "${THREADS_APP_SECRET:-}" '$t')},
-            {"name":"TRIGGER_TOKEN",        "type":"secret_text", "text":$(jq -Rn --arg t "${TRIGGER_TOKEN:-}" '$t')},
-            {"name":"SESSION",              "type":"kv_namespace","namespace_id":"$SESSION_KV_ID"},
-            {"name":"CRM",                  "type":"d1",          "id":"$CRM_D1_ID"},
-            {"name":"AI",                   "type":"ai"},
-            {"name":"IG_ACCESS_TOKEN",      "type":"secret_text", "text":""},
-            {"name":"IG_USER_ID",           "type":"secret_text", "text":""},
-            {"name":"TIKTOK_ACCESS_TOKEN",  "type":"secret_text", "text":""},
-            {"name":"GOOGLE_SERVICE_ACCOUNT","type":"secret_text","text":""},
-            {"name":"GOOGLE_LOCATION_NAME", "type":"secret_text", "text":""}
-          ]}
-          JSON
-          resp=$(curl -sS -X PUT \
-            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${SOCIAL_WORKER_NAME}" \
-            -H "Authorization: Bearer $CF_TOKEN" \
-            -F "metadata=@/tmp/meta.json;type=application/json" \
-            -F "worker.js=@workers/social-publisher/worker.js;type=application/javascript+module")
-          echo "$resp" | jq -e '.success == true' > /dev/null
-          echo "::notice::Worker deployed with APP_SECRET (auto-refresh enabled)"
+      # 2026-06-12: 不再從這裡重部署 worker。舊的內嵌 metadata 只列出部分 bindings,
+      # 跑一次就會把線上 worker 的 FB_PAGE_ID / FB_PAGE_ACCESS_TOKEN / LINE_JOIN_URL
+      # 全部抹掉(FB 發文直接斷)。Token 進 KV 後 worker 隨取隨用,不需要重部署;
+      # worker 程式與 bindings 一律由 deploy.yml 的 deploy-social-publisher job 管理。
 
-      - name: Set crons + enable subdomain
-        env:
-          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
-        run: |
-          curl -sS -X PUT \
-            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${SOCIAL_WORKER_NAME}/schedules" \
-            -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" \
-            -d '[{"cron":"0 1 * * 2-4"},{"cron":"0 4 * * 3"},{"cron":"30 12 * * *"}]' | jq -e '.success == true' > /dev/null
-          curl -sS -X POST \
-            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${SOCIAL_WORKER_NAME}/subdomain" \
-            -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" \
-            -d '{"enabled": true}' | jq -e '.success == true' > /dev/null
-          SUB=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
-            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/subdomain" | jq -r '.result.subdomain')
-          echo "SOCIAL_URL=https://${SOCIAL_WORKER_NAME}.${SUB}.workers.dev" >> $GITHUB_ENV
+      # crons / subdomain 同樣歸 deploy.yml 管(舊步驟會把具名日 cron 打回數字日,
+      # 數字 2-4 在 CF 的 Quartz 式解析下是週一~週三,重現週四 09:00 不發的 bug)。
 
       - name: Verify /health
         run: |
           sleep 5
+          SOCIAL_URL="https://${SOCIAL_WORKER_NAME}.milk790.workers.dev"
+          echo "SOCIAL_URL=$SOCIAL_URL" >> $GITHUB_ENV
           resp=$(curl -sS "${SOCIAL_URL}/health" || echo '{}')
           echo "$resp" | jq . || true
-          echo "$resp" | jq -e '.configured.threads == true' > /dev/null && echo "::notice::Threads OK" || echo "::warning::Threads not ready yet"
+          echo "$resp" | jq -e '.configured.threads == true' > /dev/null \
+            && echo "::notice::Threads OK — queued threads posts will flow at the next cron" \
+            || { echo "::error::Threads still not configured after token setup"; exit 1; }
 
       - name: Summary
         run: |
