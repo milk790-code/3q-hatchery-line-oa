@@ -1,13 +1,16 @@
 name: Sync prospects to D1
 
-# 陌開名單自動同步包(雙管之一):PROSPECTS.md(或解析腳本)進 main → 解析 → upsert 進線上 D1
-# prospects 表(3q-line-oa 老闆 LINE 指令 CRM,#34)。
+# 陌開名單自動同步包(雙管之一):PROSPECTS.md(或解析腳本)進 main → 解析 → upsert 進
+# D1 prospects 表(3q-line-oa 老闆 LINE 指令 CRM,#34)。
 # 姊妹件 import-prospects.yml 同觸發,把同一份正本灌 3q-outreach 引擎(#39);
 # 其 src=池#編號 ↔ 本表 (pool,list_no),兩套 CRM 互查。
+# 路徑:3q-line-oa /admin/prospects/import(worker 內建 D1 binding)。
+# 首跑教訓(run 27444977048):CI 的 CF token 無 D1 scope,REST 直灌回 7403 →
+# 與姊妹件同走 worker 端點,CI 不需要任何 CF secret。
 # - upsert 只更新名單欄位(name/district/online_status/why/confidence/batch),
-#   絕不覆蓋老闆在 LINE 改過的 status/note/contacted_at(與 worker /admin/prospects/import 同語義)。
-# - 名單是 append-only:從 PROSPECTS.md 刪列不會刪 D1 資料(要除名請在 LINE 標「沒興趣」)。
-# - 可 workflow_dispatch 手動重跑,重跑安全(冪等)。
+#   絕不覆蓋老闆在 LINE 改過的 status/note/contacted_at。
+# - 名單 append-only:從 PROSPECTS.md 刪列不會刪 D1 資料(要除名請在 LINE 標「沒興趣」)。
+# - workflow_dispatch 可手動重跑,冪等安全。
 
 on:
   workflow_dispatch: {}
@@ -22,58 +25,39 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     env:
-      CRM_D1_ID: e54671b1-d15e-4552-babf-cef367267568
+      LINE_OA_URL: https://3q-line-oa.milk790.workers.dev
     steps:
       - uses: actions/checkout@v4
 
-      - name: Parse PROSPECTS.md → seed.sql
+      - name: Parse PROSPECTS.md(0 筆即 fail)
         run: |
           set -euo pipefail
-          node scripts/prospects-import.mjs --sql > /tmp/seed.sql
-          # 防呆:解析出 0 筆(格式被改壞)就直接失敗,不拿空 SQL 打 D1
-          grep -q "INSERT INTO prospects" /tmp/seed.sql
-          echo "::notice::seed.sql $(wc -c < /tmp/seed.sql) bytes"
+          n=$(node scripts/prospects-import.mjs 2>/dev/null | jq 'length')
+          [ "$n" -gt 0 ] || { echo '::error::解析 0 筆,PROSPECTS.md 格式疑似被改壞'; exit 1; }
+          echo "LOCAL_N=$n" >> "$GITHUB_ENV"
+          echo "::notice::PROSPECTS.md 解析 $n 筆"
 
-      - name: Apply to D1 (idempotent upsert)
-        env:
-          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
-          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+      - name: Wait for worker with 陌開 CRM(/health 有 prospects 欄)
         run: |
-          set -euo pipefail
-          # DDL 與 worker ensureTables 同一份,先確保表存在(全新環境也能跑)
-          cat > /tmp/ddl.sql <<'SQL'
-          CREATE TABLE IF NOT EXISTS prospects (id INTEGER PRIMARY KEY AUTOINCREMENT, pool TEXT NOT NULL, list_no INTEGER NOT NULL, name TEXT NOT NULL, district TEXT, online_status TEXT, why TEXT, confidence INTEGER DEFAULT 1, batch INTEGER, status TEXT NOT NULL DEFAULT 'new', note TEXT, contacted_at TEXT, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')), UNIQUE(pool, list_no));
-          CREATE INDEX IF NOT EXISTS idx_prospects_status ON prospects(status, confidence);
-          SQL
-          for f in /tmp/ddl.sql /tmp/seed.sql; do
-            resp=$(jq -Rs '{sql: .}' "$f" | curl -sS -X POST \
-              "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
-              -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" \
-              --data-binary @-)
-            echo "$resp" | jq -e '.success == true' > /dev/null || { echo "$f FAILED:"; echo "$resp" | jq -c '.errors'; exit 1; }
-            echo "::notice::$f applied"
+          for i in $(seq 1 24); do
+            p=$(curl -sm10 "$LINE_OA_URL/health" | jq -r '.prospects // empty' || true)
+            echo "try$i prospects=$p"
+            [ -n "$p" ] && exit 0
+            sleep 5
           done
+          echo '::error::worker /health 無 prospects 欄位(陌開 CRM 版未部署),不匯入'; exit 1
+
+      - name: Import(upsert by (pool,list_no),不動 status/note)
+        run: node scripts/prospects-import.mjs --post "$LINE_OA_URL" --key 3q-setup-8m4w2r
 
       - name: Verify counts
-        env:
-          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
-          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
         run: |
           set -euo pipefail
-          resp=$(curl -sS -X POST \
-            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
-            -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" \
-            -d '{"sql":"SELECT pool, COUNT(*) n FROM prospects GROUP BY pool ORDER BY pool"}')
-          echo "$resp" | jq -e '.success == true' > /dev/null
-          counts=$(echo "$resp" | jq -c '.result[0].results')
-          # 本地解析筆數 vs D1 各池筆數,寫進 run summary 一眼看出有沒有同步成功
-          local_n=$(node scripts/prospects-import.mjs 2>/dev/null | jq 'length')
-          d1_n=$(echo "$counts" | jq '[.[].n] | add')
-          echo "## Prospects sync" >> $GITHUB_STEP_SUMMARY
-          echo "- PROSPECTS.md 解析:${local_n} 筆" >> $GITHUB_STEP_SUMMARY
-          echo "- D1 現有:${d1_n} 筆 — ${counts}" >> $GITHUB_STEP_SUMMARY
-          if [ "$d1_n" -lt "$local_n" ]; then
-            echo "::error::D1 筆數 ($d1_n) 少於名單筆數 ($local_n),同步不完整"
-            exit 1
-          fi
-          echo "::notice::D1 prospects synced: $counts"
+          total=$(curl -sm10 "$LINE_OA_URL/admin/prospects?key=3q-setup-8m4w2r&limit=1" | jq -r '.total')
+          {
+            echo "## Prospects sync"
+            echo "- PROSPECTS.md 解析:${LOCAL_N} 筆"
+            echo "- D1 prospects 現有:${total} 筆"
+          } >> "$GITHUB_STEP_SUMMARY"
+          [ "$total" -ge "$LOCAL_N" ] || { echo "::error::D1 筆數 ($total) 少於名單 ($LOCAL_N),同步不完整"; exit 1; }
+          echo "::notice::synced — D1=$total / 名單=$LOCAL_N"
