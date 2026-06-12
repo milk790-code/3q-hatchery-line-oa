@@ -2,6 +2,8 @@ name: Import prospects to outreach
 
 # PROSPECTS.md(名單正本)→ 3q-outreach 名單池。
 # worker 端以 src(池#編號)upsert:重跑只更新名單欄位,不動 status/sent_at → 任意次觸發安全。
+# 姊妹件 sync-prospects.yml 同觸發,把同一份正本灌 D1 prospects 表(3q-line-oa 老闆 LINE 指令 CRM);
+# 其 (pool,list_no) ↔ 本管 src=池#編號,兩套 CRM 互查。
 on:
   workflow_dispatch: {}
   push:
@@ -9,6 +11,7 @@ on:
     paths:
       - 'PROSPECTS.md'
       - 'scripts/prospects-to-outreach.mjs'
+      - '.github/workflows/import-prospects.yml'
 
 jobs:
   import:
