@@ -59,12 +59,17 @@ const SYSTEM_PROMPT = `你是「${BRAND}」的首席成交業務(口號:叁無 �
 
 async function callBrain(history, env) {
   if (env.ANTHROPIC_API_KEY) {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const HDRS = { 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' };
+    let resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+      headers: HDRS,
       body: JSON.stringify({ model: pickModel(history), max_tokens: 700,
         system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }], messages: history }),
     });
+    if (!resp.ok && [400, 403, 404, 429].includes(resp.status)) {
+      console.error('anthropic', resp.status, '-> fallback opus-4-8');
+      resp = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: HDRS, body: JSON.stringify({ model: 'claude-opus-4-8', max_tokens: 700, system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }], messages: history }) });
+      }
     if (resp.ok) { const d = await resp.json(); return d.content?.[0]?.text || ''; }
     console.error('[pop-sales-ai] anthropic error', resp.status);
   }
