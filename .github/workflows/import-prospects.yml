@@ -1,0 +1,31 @@
+name: Import prospects to outreach
+
+# PROSPECTS.md(名單正本)→ 3q-outreach 名單池。
+# worker 端以 src(池#編號)upsert:重跑只更新名單欄位,不動 status/sent_at → 任意次觸發安全。
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'PROSPECTS.md'
+      - 'scripts/prospects-to-outreach.mjs'
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    env:
+      OUTREACH_URL: https://3q-outreach.milk790.workers.dev
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify bridge mapping (17 checks against PROSPECTS.md)
+        run: node scripts/test-prospects-to-outreach.mjs
+      - name: Wait for worker >= v1.1 (upsert import live)
+        run: |
+          for i in $(seq 1 24); do
+            ver=$(curl -sm10 "$OUTREACH_URL/health" | jq -r '.ver // empty' || true)
+            echo "try$i ver=$ver"
+            case "$ver" in v1.0|'') sleep 5 ;; *) exit 0 ;; esac
+          done
+          echo '::error::worker 還在 v1.0(無 upsert),不匯入以免重複'; exit 1
+      - name: Import 107 leads (upsert by src)
+        run: node scripts/prospects-to-outreach.mjs --post "$OUTREACH_URL"

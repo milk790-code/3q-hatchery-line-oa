@@ -15,21 +15,31 @@
      → 每週一 09:00 週報:各池/變體 發送→回覆→健檢→成交,標該砍該放大
 ```
 
-## 名單匯入格式
+## 名單匯入
+
+**正路(107 家正本)**:`PROSPECTS.md`(A池72/B池20/C池15)→ 橋接腳本自動轉格式:
+
+```bash
+node scripts/test-prospects-to-outreach.mjs    # 先驗 17 項映射
+node scripts/prospects-to-outreach.mjs --post https://3q-outreach.milk790.workers.dev
+```
+
+push 到 main 動到 `PROSPECTS.md` 或橋接腳本時,`import-prospects.yml` 會自動跑同一件事。
+橋接會帶 `src`(如 `A#27`,同 #34 prospects 表的 (pool,list_no) 鍵)→ worker 端 **upsert**:重匯只更新名單欄位,**不動 status/sent_at/replied_at**,任意次重跑安全。
+
+手動補單筆(不帶 src = 純 INSERT,重發會疊加,自己注意):
 
 ```bash
 curl -X POST 'https://3q-outreach.milk790.workers.dev/admin/import?key=<ADMIN_KEY>' \
   -H 'Content-Type: application/json' -d '{
   "leads": [
-    { "name": "XX汽車美容", "pool": "A", "batch": 1, "ig": "xx_carcare",
-      "store_type": "汽車美容", "area": "台中", "founded_year": 2021, "note": "IG 常發施工影片" },
-    { "name": "YY甜點工作室", "pool": "B", "batch": 3, "store_type": "餐飲",
-      "biz": "food", "founded_year": 2026, "area": "台北" }
+    { "src": "A#73", "name": "XX汽車美容", "pool": "A", "batch": 4, "ig": "xx_carcare",
+      "store_type": "汽車美容", "area": "台中", "founded_year": 2021, "note": "IG 常發施工影片" }
   ]}'
 ```
 
-- `pool`:A=汽美同業(米速身分開場)/ B=新設立公司(時機切角開場)
-- `biz` 不填時:A 池預設 `car`、B 池預設 `other`;`stage` 由 `founded_year` 推(<2 年=new,否則 mid;B 池無年份預設 new)
+- `pool`:A=汽美同業(米速身分開場)/ B=新設立公司(時機切角)/ **C=市集攤主/微型品牌(免費官網切角;登記狀態未知 → 開場與 D7 不引補助金額,D3 只用「如果有商業登記」條件式講法)**
+- `biz` 不填時:A 池預設 `car`、B/C 池預設 `other`;`stage` 由 `founded_year` 推(<2 年=new,否則 mid;B/C 池無年份預設 new)
 - 匯入當下就算好 top3 補助、加總金額、開場話術——卡片即發,不再等任何 AI
 
 ## 每日節奏(你只做三件事)

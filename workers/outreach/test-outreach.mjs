@@ -1,7 +1,7 @@
 // 陌開引擎 — 數字誠實層驗證(零依賴,部署前跑一次)
 // 用法:cd workers/outreach && node test-outreach.mjs
 // 重點:每個寫進話術的金額都要能回溯到目錄;A池非台中店加總必須=83(實戰包 v3 期望值「80幾萬」的出處)
-import { CATALOG, matchSubsidies, buildOpener, composeDailyCard, enrichLead, d3Copy, d7Copy, referralCopy } from './worker.js';
+import worker, { CATALOG, matchSubsidies, buildOpener, composeDailyCard, enrichLead, d3Copy, d7Copy, referralCopy } from './worker.js';
 
 let passed = 0, failed = 0;
 function ok(cond, name, extra) { if (cond) { passed++; console.log('  ✅', name); } else { failed++; console.error('  ❌', name, extra ?? ''); } }
@@ -52,6 +52,31 @@ ok(msgs.every((m) => m.length < 4900), '⑧ 每則 < LINE 5000 字上限');
 
 // ⑨ 目錄健全:每筆補助都有 store_cap_wan 與 hook(話術數字源頭)
 ok(CATALOG.every((s) => s.store_cap_wan > 0 && s.hook && s.type), '⑨ 目錄欄位完整(' + CATALOG.length + ' 筆)');
+
+// ⑩ C 池(市集攤主,PROSPECTS.md 批次2/3):登記狀態未知 → 開場/序列禁引補助金額;切角=免費官網
+const c1 = enrichLead({ name: '魚刺人雞蛋糕', pool: 'C', area: '台中', biz: 'food', src: 'C#1' });
+ok(c1.pool === 'C' && c1.variant === 'C1' && c1.stage === 'new', '⑩ C 池 enrich 不再被塞成 A 池', `${c1.pool}/${c1.variant}/${c1.stage}`);
+ok(!c1.opener.includes('米速') && !c1.opener.includes('汽美'), '⑩ C 池開場無米速/汽美身分', c1.opener.slice(0, 30));
+ok(c1.opener.includes('官網') && !/\d+ 萬/.test(c1.opener), '⑩ C 池開場=官網切角,不引金額', c1.opener);
+ok(c1.total_wan > 0, '⑩ C 池 total_wan 照算(老闆卡片參考用)', c1.total_wan);
+const cRow = { ...c1, id: 9, total_wan: c1.total_wan };
+ok(d3Copy(cRow).includes('商業登記') && d3Copy(cRow).includes('10 萬') && !d3Copy(cRow).includes(String(c1.total_wan)), '⑩ C 池 D3 條件式講法,只引單筆目錄 hook 不引加總');
+ok(!/\d+ 萬/.test(d7Copy(cRow)) && d7Copy(cRow).includes('不再打擾'), '⑩ C 池 D7 走人式無金額', d7Copy(cRow));
+const cNoIg = enrichLead({ name: '你猜猜?', pool: 'C', area: '台中' });
+ok(cNoIg.opener.includes('市集') && !cNoIg.opener.includes('從 IG'), '⑩ 無 IG 的 C 池不謊稱「從 IG 看到」', cNoIg.opener.slice(0, 20));
+
+// ⑪ /admin/import 帶 src → upsert SQL(重匯不疊加、不動 status);不帶 src → 純 INSERT(舊行為)
+const sqls = [];
+const stub = { prepare(sql) { sqls.push(sql); const o = { bind: () => o, run: async () => ({}), all: async () => ({ results: [] }), first: async () => null }; return o; } };
+const env11 = { CRM: stub, SESSION: null };
+const req = (leads) => new Request('https://x/admin/import?key=outr-9k3v7p-2026', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ leads }) });
+const r11 = await worker.fetch(req([{ name: '測試店', pool: 'A', area: '台中', src: 'A#1' }, { name: '無src店', pool: 'B', area: '台中' }]), env11, { waitUntil() {} });
+const j11 = await r11.json();
+ok(j11.ok && j11.imported === 2, '⑪ import 回 200 且 2 筆', JSON.stringify(j11).slice(0, 80));
+const upserts = sqls.filter((s) => s.includes('ON CONFLICT(src)'));
+ok(upserts.length === 1, '⑪ 帶 src 走 upsert、不帶走純 INSERT(各 1 筆)', upserts.length);
+ok(upserts[0] && !/DO UPDATE SET[\s\S]*status/.test(upserts[0]) && !upserts[0].includes('sent_at=excluded'), '⑪ upsert 不覆寫 status/sent_at(重匯安全)');
+ok(sqls.some((s) => s.includes('ADD COLUMN src')) && sqls.some((s) => s.includes('idx_outreach_src')), '⑪ 既部署表自動補 src 欄+唯一索引');
 
 console.log(`\n${failed === 0 ? '🟢' : '🔴'} ${passed} passed, ${failed} failed`);
 process.exit(failed === 0 ? 0 : 1);
