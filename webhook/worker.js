@@ -2,6 +2,8 @@
 // v3.6 — A: lead scoring, owner quick-reply Flex, booking flow
 //         B: rich menu switching, member card, subscriber list + seasonal push
 //         + 15 Rich Menu keyword routes + project status query
+// v3.8 — outreach 補助健檢:觸發詞「補助健檢 [#陌開編號]」→ 四題 → 補助清單 → 預約 15 分健檢
+//         (獨立 sub_* session 步驟,自帶 try/catch,既有路徑零更動;目錄正本 data/subsidies.json)
 //
 // Env vars required:
 //   LINE_CHANNEL_ACCESS_TOKEN   LINE_CHANNEL_SECRET   PNG_BASE_URL
@@ -802,6 +804,149 @@ async function saveBookingRequest(uid, note, env) {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────
+// 陌開健檢流程(outreach v3)— 觸發詞「補助健檢 [#陌開編號]」→ 四題 → 補助清單 → 預約 15 分健檢
+// 目錄正本 data/subsidies.json(改正本→同步這份與 workers/outreach 的 CATALOG)
+// 整段獨立:任何錯誤只影響本流程,不碰既有路徑
+// ─────────────────────────────────────────────────────────────────────────
+const SUB_CATALOG = [
+  { id: 'digital10', name: '30 人以下數位轉型培力補助', type: '補助', cap: 10, ease: 1, hook: '最高 10 萬直接補、不用還,最快核准', elig: { stages: ['new', 'mid'], biz: 'any' } },
+  { id: 'cloudmkt', name: '雲市集數位點數', type: '補助', cap: 3, ease: 1, hook: '每年 3 萬點數,折抵 AI 軟體與系統費', elig: { stages: ['new', 'mid'], biz: 'any' } },
+  { id: 'siir', name: 'SIIR 服務業創新研發計畫', type: '補助', cap: 70, ease: 2, hook: '服務業門市適用,服務創新與系統導入都能報', elig: { stages: ['new', 'mid'], biz: ['food', 'retail', 'car'] } },
+  { id: 'local_sbir', name: '台中地方型 SBIR', type: '補助', cap: 100, ease: 2, hook: '台中企業限定加碼', elig: { stages: ['new', 'mid'], biz: 'any', area: '台中' } },
+  { id: 'sbir', name: 'SBIR 小型企業創新研發計畫', type: '補助', cap: 100, ease: 3, hook: '研發型補助,隨到隨審', elig: { stages: ['new', 'mid'], biz: ['tech', 'car', 'other'] } },
+  { id: 'youth', name: '青年創業及啟動金貸款', type: '貸款', cap: 1200, ease: 2, hook: '18-45 歲、設立未滿 5 年,前幾年利息幾乎政府付', elig: { stages: ['pre', 'new', 'mid'], biz: 'any' } },
+  { id: 'phoenix', name: '微型創業鳳凰貸款', type: '貸款', cap: 200, ease: 2, hook: '前 2 年免息(限女性或 45 歲以上)', elig: { stages: ['pre', 'new', 'mid'], biz: 'any' } },
+  { id: 'gpu', name: '政府免費 GPU 算力', type: '資源', cap: 65, ease: 2, hook: '等值 65 萬算力,AI 開發完全免費', elig: { stages: ['idea', 'pre', 'new', 'mid'], biz: ['tech'] } },
+];
+const SUB_Q = {
+  sub_q1: { text: '好,15 秒搞定。第 1 題:你現在的狀況?', opts: [['有想法還沒開始', 'idea'], ['還沒成立公司', 'pre'], ['公司設立 2 年內', 'new'], ['經營 2 年以上', 'mid']], key: 'stage', next: 'sub_q2' },
+  sub_q2: { text: '第 2 題:你的業務屬於?', opts: [['餐飲 / 食品', 'food'], ['零售 / 服務', 'retail'], ['汽車美容', 'car'], ['科技 / 軟體', 'tech'], ['其他', 'other']], key: 'biz', next: 'sub_q3' },
+  sub_q3: { text: '第 3 題:最想用補助解決什麼?', opts: [['AI 工具 / 軟體費用', 'ai-tools'], ['開店 / 創業資金', 'startup'], ['產品或服務研發', 'rd'], ['員工培訓', 'training'], ['擴店計畫', 'expand']], key: 'needs', next: 'sub_q4' },
+  sub_q4: { text: '最後一題:你的店在哪?', opts: [['台中', '台中'], ['中部其他', '中部'], ['北部', '北部'], ['南部', '南部'], ['東部 / 離島', '東部']], key: 'area', next: 'done' },
+};
+function subQCard(step) {
+  const q = SUB_Q[step];
+  return {
+    type: 'text', text: q.text,
+    quickReply: { items: q.opts.map(([label]) => ({ type: 'action', action: { type: 'message', label: label.slice(0, 20), text: label } })) },
+  };
+}
+function subMatch(ans) {
+  const ok = SUB_CATALOG.filter((s) => {
+    if (!s.elig.stages.includes(ans.stage)) return false;
+    if (s.elig.biz !== 'any' && !s.elig.biz.includes(ans.biz)) return false;
+    if (s.elig.area && (ans.area || '').indexOf(s.elig.area) === -1) return false;
+    return true;
+  });
+  const grants = ok.filter((s) => s.type === '補助').sort((a, b) => a.ease - b.ease || b.cap - a.cap).slice(0, 3);
+  return { grants, total: grants.reduce((n, s) => n + s.cap, 0), loans: ok.filter((s) => s.type === '貸款'), resources: ok.filter((s) => s.type === '資源') };
+}
+function subListText(m) {
+  const circ = ['①', '②', '③'];
+  let t = '你的補助清單(依好申請程度排):\n';
+  if (m.grants.length) {
+    t += m.grants.map((s, i) => `${circ[i]} ${s.name}|最高 ${s.cap} 萬|${s.hook}`).join('\n');
+    t += `\n\n補助加總最高可達 ${m.total} 萬(實際以主管機關核定為準)`;
+  } else {
+    t += '你目前的階段以政策貸款與免費資源為主,補助要等公司設立後開。';
+  }
+  if (m.loans.length) t += '\n──\n政策貸款:' + m.loans.map((s) => `${s.name}(最高 ${s.cap} 萬,${s.hook})`).join(';');
+  if (m.resources.length) t += '\n免費資源:' + m.resources.map((s) => `${s.name}(${s.hook})`).join(';');
+  t += '\n\n想把申請順序排好,約 15 分鐘免費補助健檢,真人幫你看。健檢免費,之後就算代辦,沒過件不收費。';
+  return t;
+}
+async function subEnsureLeadTable(env) {
+  if (!env.CRM) return;
+  await env.CRM.prepare("CREATE TABLE IF NOT EXISTS ai_subsidy_leads (id INTEGER PRIMARY KEY AUTOINCREMENT, contact TEXT NOT NULL, stage TEXT, biz TEXT, needs TEXT, ip_hash TEXT, ua TEXT, created_at TEXT DEFAULT (datetime('now')))").run().catch(() => {});
+}
+function subPartnerScore(ans) {
+  let s = 0;
+  if (ans.biz === 'car') s += 3;                  // A池垂直:一行業一夥伴候選
+  if (ans.needs === 'ai-tools') s += 2;
+  if (ans.stage === 'mid') s += 1;
+  if ((ans.area || '').indexOf('台中') >= 0) s += 1;
+  return s;
+}
+async function subLinkOutreach(env, leadNo, uid, ans, statusTo) {
+  if (!env.CRM || !leadNo) return;
+  try {
+    await env.CRM.prepare("UPDATE outreach_leads SET status=?, line_uid=?, partner_score=?, updated_at=datetime('now') WHERE id=?")
+      .bind(statusTo, uid, subPartnerScore(ans), parseInt(leadNo, 10)).run();
+    await env.CRM.prepare('INSERT INTO outreach_events (lead_id, type, detail) VALUES (?,?,?)')
+      .bind(parseInt(leadNo, 10), 'mark_' + statusTo, 'via line 補助健檢').run();
+  } catch (e) { console.error('subLinkOutreach:', e.message); }   // outreach 表未建時靜默,不影響客人流程
+}
+export { handleSubsidyStep, subQCard, subMatch, subListText };   // 測試用(CF runtime 忽略額外 named export)
+async function handleSubsidyStep(session, text, ev, uid, env) {
+  try {
+    const step = session.step;
+    if (step === 'sub_book') {
+      await subEnsureLeadTable(env);
+      const ans = session.subAns || {};
+      if (env.CRM) await env.CRM.prepare('INSERT INTO ai_subsidy_leads (contact, stage, biz, needs, ua) VALUES (?,?,?,?,?)')
+        .bind('line:' + uid, ans.stage || '', ans.biz || '', ans.needs || '', 'line-checkup').run().catch(() => {});
+      await subLinkOutreach(env, session.subLead, uid, ans, 'checkup');
+      await clearSession(uid, env);
+      if (env.OWNER_USER_ID) {
+        try {
+          await fetch('https://api.line.me/v2/bot/message/push', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ to: env.OWNER_USER_ID, messages: [{ type: 'text', text: `🩺 補助健檢預約\nUID:${uid}\n${session.subLead ? '陌開 #' + session.subLead + '\n' : ''}條件:${ans.stage}/${ans.biz}/${ans.needs}/${ans.area}\n夥伴潛力:${subPartnerScore(ans)} 分\n希望時段:${text}` }] }),
+          });
+        } catch {}
+      }
+      return replyMsg(ev.replyToken, [{ type: 'text', text: '收到。我們會在 24 小時內跟你確認時段。\n\n健檢前不用準備什麼,人來就好——清單我們會先擺在桌上。' }], env);
+    }
+    if (step === 'sub_offer') {
+      if (text === '約 15 分鐘健檢') {
+        await saveSession(uid, { ...session, step: 'sub_book' }, env);
+        return replyMsg(ev.replyToken, [{ type: 'text', text: '好,你方便的時段?(例:平日晚上 / 週六下午,直接打字)' }], env);
+      }
+      if (text === '先看清單就好') {
+        await subEnsureLeadTable(env);
+        const ans = session.subAns || {};
+        if (env.CRM) await env.CRM.prepare('INSERT INTO ai_subsidy_leads (contact, stage, biz, needs, ua) VALUES (?,?,?,?,?)')
+          .bind('line:' + uid, ans.stage || '', ans.biz || '', ans.needs || '', 'line-list-only').run().catch(() => {});
+        await subLinkOutreach(env, session.subLead, uid, ans, 'replied');
+        await clearSession(uid, env);
+        return replyMsg(ev.replyToken, [{ type: 'text', text: '清單就在上面,先收著。\n申請窗口都有期限,想動的時候傳「補助健檢」找我,或直接約 15 分鐘真人幫你排順序。' }], env);
+      }
+      return replyMsg(ev.replyToken, [{
+        type: 'text', text: '要約 15 分鐘免費健檢嗎?',
+        quickReply: { items: [
+          { type: 'action', action: { type: 'message', label: '約 15 分鐘健檢', text: '約 15 分鐘健檢' } },
+          { type: 'action', action: { type: 'message', label: '先看清單就好', text: '先看清單就好' } },
+        ] },
+      }], env);
+    }
+    const q = SUB_Q[step];
+    if (!q) { await clearSession(uid, env); return replyMsg(ev.replyToken, [{ type: 'text', text: '流程重新開始:傳「補助健檢」。' }], env); }
+    const hit = q.opts.find(([label]) => text === label);
+    if (!hit) return replyMsg(ev.replyToken, [subQCard(step)], env);   // 答非選項→重問本題
+    const ans = { ...(session.subAns || {}), [q.key]: hit[1] };
+    if (q.next !== 'done') {
+      await saveSession(uid, { ...session, step: q.next, subAns: ans }, env);
+      return replyMsg(ev.replyToken, [subQCard(q.next)], env);
+    }
+    // 四題答完 → 清單 + 約健檢
+    const m = subMatch(ans);
+    await saveSession(uid, { ...session, step: 'sub_offer', subAns: ans }, env);
+    return replyMsg(ev.replyToken, [{
+      type: 'text', text: subListText(m),
+      quickReply: { items: [
+        { type: 'action', action: { type: 'message', label: '約 15 分鐘健檢', text: '約 15 分鐘健檢' } },
+        { type: 'action', action: { type: 'message', label: '先看清單就好', text: '先看清單就好' } },
+      ] },
+    }], env);
+  } catch (e) {
+    console.error('handleSubsidyStep:', e.message);
+    await clearSession(uid, env).catch(() => {});
+    return replyMsg(ev.replyToken, [{ type: 'text', text: '剛剛訊號不穩,流程幫你重置了——再傳一次「補助健檢」就好。' }], env);
+  }
+}
+
 // v4: Social event tracking (Phase 4)
 async function saveSocialEvent(data, env) {
   if (!env.CRM) return null;
@@ -1562,6 +1707,16 @@ async function handleEvent(ev, env) {
     }
 
     const session = await getSession(uid, env);
+
+    // 陌開健檢(outreach v3):觸發詞「補助健檢 [#陌開編號]」→ 四題 → 清單 → 預約
+    const subStart = text.trim().match(/^補助健檢\s*#?(\d+)?$/);
+    if (subStart) {
+      await saveSession(uid, { step: 'sub_q1', subLead: subStart[1] || '', subAns: {} }, env);
+      return replyMsg(ev.replyToken, [subQCard('sub_q1')], env);
+    }
+    if (session?.step && String(session.step).startsWith('sub_')) {
+      return handleSubsidyStep(session, text.trim(), ev, uid, env);
+    }
 
     // A3: Booking time text step
     if (session?.step === 'booking') {
