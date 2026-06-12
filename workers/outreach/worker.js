@@ -4,10 +4,11 @@
 //      ⑤ 成交追蹤表(/admin/board 手機板,發送→回覆→健檢→報價→成交)⑥ 週報(該砍該放大)
 // 健檢四題流在正式 3Q bot(webhook/worker.js,觸發詞「補助健檢 #編號」),本 worker 不接 LINE webhook。
 // 補助目錄正本:data/subsidies.json(改正本→同步本檔 CATALOG 與 webhook 內嵌版)
+// 名單正本:PROSPECTS.md(A池汽美/B池新開店/C池市集攤主)→ scripts/prospects-to-outreach.mjs 轉格式匯入(src=池#編號,可重跑 upsert)
 // 綁定:SESSION(KV)、CRM(D1);Secrets:LINE_CHANNEL_ACCESS_TOKEN、OWNER_USER_ID(3Q OA 同一組)
 // 部署:.github/workflows/deploy-outreach.yml(API PUT + cron schedules)
 
-const VER = 'v1.0';
+const VER = 'v1.1';
 const ADMIN_KEY = 'outr-9k3v7p-2026';
 const LINE_ADD_URL = 'https://lin.ee/UKKodJj';   // 3Q OA 加好友
 const DAILY_QUOTA = 15;
@@ -16,7 +17,7 @@ const DAILY_QUOTA = 15;
 const CATALOG = [
   { id: 'digital10', name: '30 人以下數位轉型培力補助', type: '補助', max_wan: 10, store_cap_wan: 10, ease: 1, hook: '最高 10 萬直接補、不用還,最快核准', deadline_note: '2026-06-30 本期收件', elig: { stages: ['new', 'mid'], biz: 'any', employees_max: 30 } },
   { id: 'cloudmkt', name: '雲市集數位點數', type: '補助', max_wan: 3, store_cap_wan: 3, ease: 1, hook: '每年 3 萬點數,直接折抵 AI 軟體與系統費', elig: { stages: ['new', 'mid'], biz: 'any' } },
-  { id: 'siir', name: 'SIIR 服務業創新研發計畫', type: '補助', max_wan: 1000, store_cap_wan: 70, ease: 2, hook: '服務業門市適用,服務創新與系統導入都能報', elig: { stages: ['new', 'mid'], biz: ['food', 'retail', 'car'] } },
+  { id: 'siir', name: 'SIIR 服務業創新研發計畫', type: '補助', max_wan: 150, store_cap_wan: 70, ease: 2, hook: '服務業門市適用,服務創新與系統導入都能報', elig: { stages: ['new', 'mid'], biz: ['food', 'retail', 'car'] } },
   { id: 'local_sbir', name: '台中地方型 SBIR', type: '補助', max_wan: 100, store_cap_wan: 100, ease: 2, hook: '台中企業限定加碼', elig: { stages: ['new', 'mid'], biz: 'any', area: '台中' } },
   { id: 'sbir', name: 'SBIR 小型企業創新研發計畫', type: '補助', max_wan: 1200, store_cap_wan: 100, ease: 3, hook: '研發型補助,隨到隨審', elig: { stages: ['new', 'mid'], biz: ['tech', 'car', 'other'] } },
   { id: 'youth', name: '青年創業及啟動金貸款', type: '貸款', max_wan: 1200, store_cap_wan: 1200, ease: 2, hook: '18-45 歲、設立未滿 5 年,前幾年利息幾乎政府付', elig: { stages: ['pre', 'new', 'mid'], biz: 'any', within_years: 5 } },
@@ -52,9 +53,18 @@ function buildOpener(lead, m) {
   if (lead.pool === 'A') {
     return '老闆你好,我自己做汽美耗材的(米速)\n最近我們合作的店家在申請一個補助\n30 人以下的店最高 10 萬,直接補不用還\n我幫汽美店整理了一份能用的清單\n' + totalLine + '要的話傳給你';
   }
+  if (lead.pool === 'C') {
+    // 市集攤主/微型品牌:商業登記狀態未知 → 開場不得引用補助金額,切角=免費官網/接單頁
+    const seen = lead.ig ? '從 IG 看到你們的品牌' : '看到你們在市集出攤的介紹';
+    return seen + '\n我們在幫台中的市集品牌/小工作室做免費官網+線上接單頁(3Q 孵化場)\nIG 私訊接單容易漏單,這個能接住\n要的話我傳一個範例給你看?';
+  }
   return '恭喜開店\n跟你說一個多數新店不知道的事:\n公司設立前兩年有幾個專屬補助,過期就不能申請\n像青創貸款,前幾年的利息幾乎政府付\n' + (m.total > 0 ? `初步看你們條件,補助加起來最高可達 ${m.total} 萬\n` : '') + '我做這塊的,免費幫你看符合哪些?';
 }
 function d3Copy(lead) {
+  if (lead.pool === 'C') {
+    // C 池不確定有無商業登記 → 補助只能講「條件式」,且金額只引目錄單筆 hook,不引加總
+    return '補個資訊給你\n如果你們有做商業登記,其實有政府補助能用(30 人以下數位轉型最高 10 萬,直接補不用還)\n免費官網的範例我也可以直接傳給你\n不用回沒關係,純粹資訊';
+  }
   const top3 = JSON.parse(lead.top3 || '[]');
   const top1 = top3[0];
   const cat = top1 ? CATALOG.find((s) => s.id === top1.id) : null;
@@ -62,6 +72,9 @@ function d3Copy(lead) {
   return `補個資訊給你\n${top1 ? '「' + top1.name + '」' : '你們符合的計畫'}${dl}\n你們的條件應該符合,錯過等明年\n不用回沒關係,純粹資訊`;
 }
 function d7Copy(lead) {
+  if (lead.pool === 'C') {
+    return '這是最後一則,不再打擾\n免費官網+接單頁的事,之後想弄再找我就好\n祝出攤順利';
+  }
   const n = lead.total_wan || 0;
   return '幫你們這型的店算過\n' + (n > 0 ? `符合的補助加起來最高可達 ${n} 萬\n` : '') + '這是最後一則,不再打擾\n之後想弄再找我';
 }
@@ -94,11 +107,14 @@ async function ensureTables(env) {
     name TEXT NOT NULL, pool TEXT NOT NULL DEFAULT 'A', batch INTEGER DEFAULT 1,
     ig TEXT, store_type TEXT, founded_year INTEGER, area TEXT, note TEXT,
     stage TEXT, biz TEXT, top3 TEXT, total_wan INTEGER DEFAULT 0, opener TEXT,
-    status TEXT NOT NULL DEFAULT 'new', variant TEXT,
+    status TEXT NOT NULL DEFAULT 'new', variant TEXT, src TEXT,
     sent_at TEXT, replied_at TEXT, f3 INTEGER DEFAULT 0, f7 INTEGER DEFAULT 0, nudged INTEGER DEFAULT 0,
     partner_score INTEGER DEFAULT 0, line_uid TEXT,
     created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
   )`).run().catch(() => {});
+  // 既部署的表補 src 欄(PROSPECTS.md 來源編號,如 A#27):重匯 upsert 鍵,失敗=已存在
+  await env.CRM.prepare('ALTER TABLE outreach_leads ADD COLUMN src TEXT').run().catch(() => {});
+  await env.CRM.prepare('CREATE UNIQUE INDEX IF NOT EXISTS idx_outreach_src ON outreach_leads(src)').run().catch(() => {});
   await env.CRM.prepare(`CREATE TABLE IF NOT EXISTS outreach_events (
     id INTEGER PRIMARY KEY AUTOINCREMENT, lead_id INTEGER, type TEXT, detail TEXT,
     created_at TEXT DEFAULT (datetime('now'))
@@ -130,10 +146,11 @@ async function pushOwner(env, texts) {
 
 // ═══ 名單情報化(import 時就算好,卡片直接用)═══
 function enrichLead(l) {
-  const pool = (l.pool || 'A').toUpperCase() === 'B' ? 'B' : 'A';
+  const p = String(l.pool || 'A').toUpperCase();
+  const pool = p === 'B' ? 'B' : p === 'C' ? 'C' : 'A';
   const biz = l.biz || (pool === 'A' ? 'car' : 'other');
   const yr = parseInt(l.founded_year, 10) || null;
-  const stage = l.stage || (yr ? ((new Date().getFullYear() - yr) < 2 ? 'new' : 'mid') : (pool === 'B' ? 'new' : 'mid'));
+  const stage = l.stage || (yr ? ((new Date().getFullYear() - yr) < 2 ? 'new' : 'mid') : (pool === 'A' ? 'mid' : 'new'));
   const lead = { ...l, pool, biz, stage, founded_year: yr };
   const m = matchSubsidies(lead);
   return { ...lead, top3: JSON.stringify(m.top3), total_wan: m.total, opener: buildOpener(lead, m), variant: pool + '1' };
@@ -315,9 +332,21 @@ export default {
       for (const raw of list.slice(0, 300)) {
         if (!raw.name) continue;
         const l = enrichLead(raw);
-        await env.CRM.prepare(`INSERT INTO outreach_leads (name,pool,batch,ig,store_type,founded_year,area,note,stage,biz,top3,total_wan,opener,variant)
-          VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
-          .bind(l.name.slice(0, 80), l.pool, parseInt(l.batch, 10) || 1, l.ig || null, l.store_type || null, l.founded_year, l.area || null, (l.note || '').slice(0, 200), l.stage, l.biz, l.top3, l.total_wan, l.opener, l.variant).run();
+        const vals = [l.name.slice(0, 80), l.pool, parseInt(l.batch, 10) || 1, l.ig || null, l.store_type || null, l.founded_year, l.area || null, (l.note || '').slice(0, 200), l.stage, l.biz, l.top3, l.total_wan, l.opener, l.variant];
+        if (raw.src) {
+          // 帶 src(如 PROSPECTS.md 的 A#27)= upsert:重匯只更新名單欄位,不動 status/sent_at/replied_at(對齊 prospects 表哲學)
+          await env.CRM.prepare(`INSERT INTO outreach_leads (src,name,pool,batch,ig,store_type,founded_year,area,note,stage,biz,top3,total_wan,opener,variant)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            ON CONFLICT(src) DO UPDATE SET name=excluded.name, pool=excluded.pool, batch=excluded.batch, ig=excluded.ig,
+              store_type=excluded.store_type, founded_year=excluded.founded_year, area=excluded.area, note=excluded.note,
+              stage=excluded.stage, biz=excluded.biz, top3=excluded.top3, total_wan=excluded.total_wan, opener=excluded.opener,
+              variant=excluded.variant, updated_at=datetime('now')`)
+            .bind(String(raw.src).slice(0, 20), ...vals).run();
+        } else {
+          await env.CRM.prepare(`INSERT INTO outreach_leads (name,pool,batch,ig,store_type,founded_year,area,note,stage,biz,top3,total_wan,opener,variant)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+            .bind(...vals).run();
+        }
         imported++;
         if (preview.length < 3) preview.push({ name: l.name, total_wan: l.total_wan, top3: JSON.parse(l.top3).map((s) => s.name) });
       }

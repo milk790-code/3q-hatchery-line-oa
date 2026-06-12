@@ -27,7 +27,7 @@
       "id": "siir",
       "name": "SIIR 服務業創新研發計畫",
       "type": "補助",
-      "max_wan": 1000,
+      "max_wan": 150,
       "store_cap_wan": 70,
       "ease": 2,
       "hook": "服務業門市適用,服務創新與系統導入都能報",
