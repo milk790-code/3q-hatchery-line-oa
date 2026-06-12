@@ -1,15 +1,16 @@
 name: Sync prospects to D1
 
-# 陌開名單自動同步包(雙管之一):PROSPECTS.md 進 main → 解析 → upsert 進線上 D1
-# prospects 表(3q-line-oa 老闆 LINE 指令 CRM,#34)。
+# 陌開名單自動同步包(雙管之一):PROSPECTS.md(或解析腳本)進 main → 解析 → upsert 進
+# D1 prospects 表(3q-line-oa 老闆 LINE 指令 CRM,#34)。
 # 姊妹件 import-prospects.yml 同觸發,把同一份正本灌 3q-outreach 引擎(#39);
 # 其 src=池#編號 ↔ 本表 (pool,list_no),兩套 CRM 互查。
-# - 走 3q-line-oa worker 的 /admin/prospects/import(worker 自帶 D1 binding 與建表;
-#   首版直打 D1 REST API 因 CF_API_TOKEN 無 D1 權限 7403 陣亡,故改道)。
+# 路徑:3q-line-oa /admin/prospects/import(worker 內建 D1 binding)。
+# 首跑教訓(run 27444977048):CI 的 CF token 無 D1 scope,REST 直灌回 7403 →
+# 與姊妹件同走 worker 端點,CI 不需要任何 CF secret。
 # - upsert 只更新名單欄位(name/district/online_status/why/confidence/batch),
 #   絕不覆蓋老闆在 LINE 改過的 status/note/contacted_at。
-# - 名單是 append-only:從 PROSPECTS.md 刪列不會刪 D1 資料(要除名請在 LINE 標「沒興趣」)。
-# - 可 workflow_dispatch 手動重跑,重跑安全(冪等)。
+# - 名單 append-only:從 PROSPECTS.md 刪列不會刪 D1 資料(要除名請在 LINE 標「沒興趣」)。
+# - workflow_dispatch 可手動重跑,冪等安全。
 
 on:
   workflow_dispatch: {}
@@ -28,24 +29,35 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Parse PROSPECTS.md(防呆:0 筆=格式壞,直接失敗)
+      - name: Parse PROSPECTS.md(0 筆即 fail)
         run: |
           set -euo pipefail
           n=$(node scripts/prospects-import.mjs 2>/dev/null | jq 'length')
-          [ "$n" -ge 1 ] || { echo '::error::解析出 0 筆,PROSPECTS.md 格式可能被改壞'; exit 1; }
-          echo "LOCAL_N=$n" >> $GITHUB_ENV
-          echo "::notice::解析 $n 筆"
+          [ "$n" -gt 0 ] || { echo '::error::解析 0 筆,PROSPECTS.md 格式疑似被改壞'; exit 1; }
+          echo "LOCAL_N=$n" >> "$GITHUB_ENV"
+          echo "::notice::PROSPECTS.md 解析 $n 筆"
 
-      - name: Upsert via worker /admin/prospects/import + verify counts
+      - name: Wait for worker with 陌開 CRM(/health 有 prospects 欄)
+        run: |
+          for i in $(seq 1 24); do
+            p=$(curl -sm10 "$LINE_OA_URL/health" | jq -r '.prospects // empty' || true)
+            echo "try$i prospects=$p"
+            [ -n "$p" ] && exit 0
+            sleep 5
+          done
+          echo '::error::worker /health 無 prospects 欄位(陌開 CRM 版未部署),不匯入'; exit 1
+
+      - name: Import(upsert by (pool,list_no),不動 status/note)
+        run: node scripts/prospects-import.mjs --post "$LINE_OA_URL" --key 3q-setup-8m4w2r
+
+      - name: Verify counts
         run: |
           set -euo pipefail
-          resp=$(node scripts/prospects-import.mjs --post "$LINE_OA_URL" --key 3q-setup-8m4w2r)
-          echo "worker: $resp"
-          echo "$resp" | jq -e '.ok == true' > /dev/null
-          d1_n=$(echo "$resp" | jq -r '.total')
-          echo "## Prospects sync" >> $GITHUB_STEP_SUMMARY
-          echo "- PROSPECTS.md 解析:${LOCAL_N} 筆 / worker upsert 後 D1 共:${d1_n} 筆" >> $GITHUB_STEP_SUMMARY
-          if [ "$d1_n" -lt "$LOCAL_N" ]; then
-            echo "::error::D1 筆數 ($d1_n) 少於名單筆數 ($LOCAL_N),同步不完整"; exit 1
-          fi
-          echo "::notice::D1 prospects synced: $d1_n rows"
+          total=$(curl -sm10 "$LINE_OA_URL/admin/prospects?key=3q-setup-8m4w2r&limit=1" | jq -r '.total')
+          {
+            echo "## Prospects sync"
+            echo "- PROSPECTS.md 解析:${LOCAL_N} 筆"
+            echo "- D1 prospects 現有:${total} 筆"
+          } >> "$GITHUB_STEP_SUMMARY"
+          [ "$total" -ge "$LOCAL_N" ] || { echo "::error::D1 筆數 ($total) 少於名單 ($LOCAL_N),同步不完整"; exit 1; }
+          echo "::notice::synced — D1=$total / 名單=$LOCAL_N"

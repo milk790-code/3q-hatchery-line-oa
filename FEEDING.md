@@ -7,7 +7,7 @@
 
 | 正本(只改這裡) | push 到 main 後自動 | 下游 |
 |---|---|---|
-| `PROSPECTS.md`(陌開名單) | 成對雙管同觸發:`import-prospects.yml`(驗 17 項映射→灌引擎)+ `sync-prospects.yml`(D1 直灌,DDL 防呆)— 皆 upsert,重跑安全 | ① 3q-outreach(每日卡片/D+3/D+7/SLA/週報)② 3q-line-oa prospects 表(老闆 LINE 指令:陌開/詳情/狀態);src=池#編號 ↔ (pool,list_no) 互查 |
+| `PROSPECTS.md`(陌開名單) | 成對雙管同觸發:`import-prospects.yml`(驗 17 項映射→灌引擎)+ `sync-prospects.yml`(經 3q-line-oa `/admin/prospects/import` 灌 prospects 表;CI 不碰 CF token)— 皆 upsert,重跑安全 | ① 3q-outreach(每日卡片/D+3/D+7/SLA/週報)② 3q-line-oa prospects 表(老闆 LINE 指令:陌開/詳情/狀態);src=池#編號 ↔ (pool,list_no) 互查 |
 | `data/subsidies.json`(補助目錄) | 部署閘門驗同步;若先跑 `--fix` 會連動 worker 改動 → `deploy.yml` + `deploy-outreach.yml` 重新部署 | 陌開開場/D3/D7 金額、3Q bot 補助健檢清單(同一套數字,測試鎖死 83/113 萬口徑) |
 | `brands/popmonster.json`(小泡人設) | 部署閘門驗同步;`--fix` 後 `deploy-pop-line-oa.yml` 部署 | 揭露話術/交接門檻/紅線/降級話術 |
 | `brands/misu.json`、`danruo.json` | (待命名)上線時照 `brands/README.md` canary 順序接同一套閘門 | 米速/丹若 AI 員工 |
