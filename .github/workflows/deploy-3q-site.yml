@@ -1,0 +1,35 @@
+name: Deploy 3Q Site
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'workers/3q-site/worker.js'
+      - '.github/workflows/deploy-3q-site.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      WORKER_NAME: 3q-site
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          jq -n '{ main_module:"worker.js", compatibility_date:"2024-12-01", bindings:[] }' > /tmp/meta.json
+          resp=$(curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -F "metadata=@/tmp/meta.json;type=application/json" \
+            -F "worker.js=@workers/3q-site/worker.js;type=application/javascript+module")
+          echo "$resp" | jq -e '.success==true' >/dev/null || { echo "$resp" | jq -c '.errors'; exit 1; }
+          curl -sS -X POST "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/subdomain" \
+            -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" -d '{"enabled":true}' | jq -e '.success==true' >/dev/null
+          sleep 5
+          curl -sS "https://${WORKER_NAME}.milk790.workers.dev/health" | jq -e '.ok==true' >/dev/null
+          echo "::notice::3q-site deployed + health OK"
