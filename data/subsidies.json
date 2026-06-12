@@ -1,0 +1,87 @@
+{
+  "_comment": "補助目錄正本。消費端:workers/outreach/worker.js 與 webhook/worker.js 的內嵌 CATALOG(改這裡→同步那兩份)。store_cap_wan=小型店常見可達上限(加總用,避免引用計畫最高額吹牛);deadline_note 每月人工校一次。",
+  "_updated": "2026-06-12",
+  "subsidies": [
+    {
+      "id": "digital10",
+      "name": "30 人以下數位轉型培力補助",
+      "type": "補助",
+      "max_wan": 10,
+      "store_cap_wan": 10,
+      "ease": 1,
+      "hook": "最高 10 萬直接補、不用還,最快核准",
+      "deadline_note": "2026-06-30 本期收件",
+      "elig": { "stages": ["new", "mid"], "biz": "any", "employees_max": 30 }
+    },
+    {
+      "id": "cloudmkt",
+      "name": "雲市集數位點數",
+      "type": "補助",
+      "max_wan": 3,
+      "store_cap_wan": 3,
+      "ease": 1,
+      "hook": "每年 3 萬點數,直接折抵 AI 軟體與系統費",
+      "elig": { "stages": ["new", "mid"], "biz": "any" }
+    },
+    {
+      "id": "siir",
+      "name": "SIIR 服務業創新研發計畫",
+      "type": "補助",
+      "max_wan": 1000,
+      "store_cap_wan": 70,
+      "ease": 2,
+      "hook": "服務業門市適用,服務創新與系統導入都能報",
+      "elig": { "stages": ["new", "mid"], "biz": ["food", "retail", "car"] }
+    },
+    {
+      "id": "local_sbir",
+      "name": "台中地方型 SBIR",
+      "type": "補助",
+      "max_wan": 100,
+      "store_cap_wan": 100,
+      "ease": 2,
+      "hook": "台中企業限定加碼",
+      "elig": { "stages": ["new", "mid"], "biz": "any", "area": "台中" }
+    },
+    {
+      "id": "sbir",
+      "name": "SBIR 小型企業創新研發計畫",
+      "type": "補助",
+      "max_wan": 1200,
+      "store_cap_wan": 100,
+      "ease": 3,
+      "hook": "研發型補助,隨到隨審",
+      "elig": { "stages": ["new", "mid"], "biz": ["tech", "car", "other"] }
+    },
+    {
+      "id": "youth",
+      "name": "青年創業及啟動金貸款",
+      "type": "貸款",
+      "max_wan": 1200,
+      "store_cap_wan": 1200,
+      "ease": 2,
+      "hook": "18-45 歲、設立未滿 5 年,前幾年利息幾乎政府付",
+      "elig": { "stages": ["pre", "new", "mid"], "biz": "any", "within_years": 5 }
+    },
+    {
+      "id": "phoenix",
+      "name": "微型創業鳳凰貸款",
+      "type": "貸款",
+      "max_wan": 200,
+      "store_cap_wan": 200,
+      "ease": 2,
+      "hook": "前 2 年免息(限女性或 45 歲以上)",
+      "elig": { "stages": ["pre", "new", "mid"], "biz": "any" }
+    },
+    {
+      "id": "gpu",
+      "name": "政府免費 GPU 算力",
+      "type": "資源",
+      "max_wan": 65,
+      "store_cap_wan": 65,
+      "ease": 2,
+      "hook": "等值 65 萬算力,AI 開發完全免費",
+      "elig": { "stages": ["idea", "pre", "new", "mid"], "biz": ["tech"] }
+    }
+  ]
+}
