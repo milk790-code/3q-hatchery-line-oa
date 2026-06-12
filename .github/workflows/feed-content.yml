@@ -1,0 +1,91 @@
+name: Feed content queue (投餵)
+
+# content/feed/*.json(內容批次)→ 3q-social-publisher /queue/add。
+# worker v2.3 對 pending 同文去重 → 同檔重跑安全;只投本次 push 變更的檔案。
+# 格式與用法見 content/feed/README.md。
+on:
+  workflow_dispatch:
+    inputs:
+      file:
+        description: 'content/feed/ 下的檔名(手動補投用,例:wave6.json)'
+        required: true
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - 'content/feed/*.json'
+
+permissions:
+  contents: read
+
+jobs:
+  feed:
+    runs-on: ubuntu-latest
+    env:
+      SOCIAL_URL: https://3q-social-publisher.milk790.workers.dev
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Pick feed files (changed in this push, or dispatch input)
+        id: pick
+        env:
+          INPUT_FILE: ${{ inputs.file }}
+        run: |
+          set -euo pipefail
+          if [ -n "${INPUT_FILE:-}" ]; then
+            files="content/feed/${INPUT_FILE}"
+            [ -f "$files" ] || { echo "::error::$files 不存在"; exit 1; }
+          else
+            files=$(git diff --name-only HEAD^ HEAD -- 'content/feed/*.json' || true)
+          fi
+          if [ -z "$files" ]; then echo "::notice::沒有變更的投餵檔,結束"; fi
+          { echo "files<<EOF"; echo "$files"; echo "EOF"; } >> "$GITHUB_OUTPUT"
+
+      - name: Validate (validator self-test + 逐檔檢查)
+        if: steps.pick.outputs.files != ''
+        run: |
+          set -euo pipefail
+          node scripts/validate-feed.mjs --self-test
+          while IFS= read -r f; do
+            [ -n "$f" ] || continue
+            node scripts/validate-feed.mjs "$f"
+          done <<< "${{ steps.pick.outputs.files }}"
+
+      - name: Wait for worker >= 2.3 (dedup live)
+        if: steps.pick.outputs.files != ''
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 12); do
+            ver=$(curl -sm10 "$SOCIAL_URL/health" | jq -r '.version // empty' || true)
+            echo "try$i version=$ver"
+            if [ -n "$ver" ] && [ "$(printf '%s\n2.3\n' "$ver" | sort -V | head -1)" = "2.3" ]; then exit 0; fi
+            sleep 5
+          done
+          echo '::error::worker 版本 <2.3(無去重),不投餵以免重複'; exit 1
+
+      - name: Feed to /queue/add (worker 端去重)
+        if: steps.pick.outputs.files != ''
+        env:
+          TRIGGER_TOKEN: ${{ secrets.TRIGGER_TOKEN }}
+        run: |
+          set -euo pipefail
+          {
+            echo "## 投餵結果 $(date -u +'%F %T UTC')"
+            echo ""
+            echo "| 檔案 | added | skipped(pending 重複) | new ids |"
+            echo "|---|---|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+          while IFS= read -r f; do
+            [ -n "$f" ] || continue
+            resp=$(curl -fsS -X POST "$SOCIAL_URL/queue/add" \
+              -H "Authorization: Bearer $TRIGGER_TOKEN" \
+              -H "Content-Type: application/json" \
+              --data-binary @"$f")
+            echo "$resp" | jq .
+            echo "$resp" | jq -e '.errors | length == 0' > /dev/null \
+              || { echo "::error::$f 被 worker 退件: $(echo "$resp" | jq -c '.errors')"; exit 1; }
+            echo "| \`$f\` | $(echo "$resp" | jq '.added') | $(echo "$resp" | jq '.skipped | length') | \`$(echo "$resp" | jq -c '.ids')\` |" >> "$GITHUB_STEP_SUMMARY"
+          done <<< "${{ steps.pick.outputs.files }}"
+          echo "::notice::投餵完成 — 明細見 run summary"

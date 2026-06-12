@@ -1,0 +1,15 @@
+[
+  {
+    "platform": "facebook",
+    "caption": "範例貼文:把這個檔案改名成 wave6.json 之類、換成真文案,push 之後 CI 會自動投進佇列。\n\n結尾照慣例導留言連結。連結在留言。",
+    "link_url": "https://3q-ai-subsidy.milk790.workers.dev/?utm_source=fb&utm_medium=organic&utm_campaign=ai-subsidy&utm_content=w6v1",
+    "scheduled_at": "2026-06-21T12:00:00Z",
+    "source_oa": "3q-hatchery"
+  },
+  {
+    "platform": "instagram",
+    "caption": "IG 範例:必須有 image_url,連結放個人檔案/留言(IG 說明欄連結不可點)。\n\n#範例 #投餵",
+    "image_url": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports/og-ai-subsidy-sq.png",
+    "scheduled_at": "2026-06-22T02:00:00Z"
+  }
+]
