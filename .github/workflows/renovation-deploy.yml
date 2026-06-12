@@ -1,0 +1,93 @@
+name: 裝修官網 · 安全驗證 + 線上確認
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'home-renovation/**'
+  workflow_dispatch: {}
+
+jobs:
+  # ── ① 安全門：確認無機密外洩 ────────────────────────────────────────────────
+  security-gate:
+    name: 安全門
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 確認 home-renovation/ 只含允許的公開檔案
+        run: |
+          set -euo pipefail
+          ALLOWED="index.html 方案價格.html 常見問題FAQ.html 報價單模板.html 保固卡.html 透明施工承諾書.html colors_and_type.css"
+          FAIL=0
+          for f in home-renovation/*; do
+            name=$(basename "$f")
+            if ! echo "$ALLOWED" | tr ' ' '\n' | grep -qxF "$name"; then
+              echo "::error::非預期檔案 home-renovation/$name — 請確認是否誤入機密資料！"
+              FAIL=1
+            fi
+          done
+          if [ "$FAIL" = "1" ]; then exit 1; fi
+
+          COUNT=$(ls home-renovation/ | wc -l)
+          echo "::notice::安全門通過：home-renovation/ 共 $COUNT 個公開檔案，無機密外洩。"
+          echo "## 安全門 ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "共 $COUNT 個公開檔案，無機密外洩。" >> "$GITHUB_STEP_SUMMARY"
+
+  # ── ② 線上驗證：等 Pages 部署後 smoke-test ─────────────────────────────────
+  verify-live:
+    name: 線上驗證
+    runs-on: ubuntu-latest
+    needs: security-gate
+    steps:
+      - name: 等待 GitHub Pages 部署，最多 3 分鐘
+        run: |
+          set -euo pipefail
+          URL="https://milk790-code.github.io/3q-hatchery-line-oa/home-renovation/"
+          PAGES=(
+            ""
+            "方案價格.html"
+            "常見問題FAQ.html"
+          )
+          for attempt in $(seq 1 18); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$URL")
+            if [ "$STATUS" = "200" ]; then
+              echo "::notice::第 $attempt 次嘗試成功（HTTP 200）"
+              break
+            fi
+            echo "⏳ 第 $attempt / 18：HTTP $STATUS — 等待 10s..."
+            if [ "$attempt" = "18" ]; then
+              echo "::error::逾時（3 分鐘）仍未取得 200，請手動確認 Pages 設定。"
+              exit 1
+            fi
+            sleep 10
+          done
+
+          FAIL=0
+          for page in "${PAGES[@]}"; do
+            TARGET="${URL}${page}"
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$TARGET")
+            if [ "$CODE" = "200" ]; then
+              echo "✅ $TARGET"
+            else
+              echo "::error::❌ $TARGET → HTTP $CODE"
+              FAIL=1
+            fi
+          done
+          [ "$FAIL" = "0" ] || exit 1
+
+      - name: 摘要
+        run: |
+          URL="https://milk790-code.github.io/3q-hatchery-line-oa/home-renovation/"
+          echo "## 線上驗證 ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| 頁面 | 狀態 |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          for page in "" "方案價格.html" "常見問題FAQ.html" "報價單模板.html" "保固卡.html" "透明施工承諾書.html"; do
+            TARGET="${URL}${page}"
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$TARGET")
+            LABEL="${page:-index.html（著陸頁）}"
+            echo "| [\`$LABEL\`]($TARGET) | HTTP $CODE |" >> "$GITHUB_STEP_SUMMARY"
+          done
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "官網：$URL" >> "$GITHUB_STEP_SUMMARY"
