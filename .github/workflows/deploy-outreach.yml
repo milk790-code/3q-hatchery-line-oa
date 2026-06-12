@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - 'workers/outreach/worker.js'
+      - 'data/subsidies.json'
       - '.github/workflows/deploy-outreach.yml'
 
 jobs:
@@ -17,6 +18,8 @@ jobs:
       CRM_D1_ID: e54671b1-d15e-4552-babf-cef367267568
     steps:
       - uses: actions/checkout@v4
+      - name: Sync gate(data/subsidies.json ↔ CATALOG 漂移即擋)
+        run: node scripts/check-sync.mjs
       - name: Set CF account ID
         env:
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}

@@ -1,7 +1,9 @@
 name: Import prospects to outreach
 
-# PROSPECTS.md(名單正本)→ 3q-outreach 名單池。
-# worker 端以 src(池#編號)upsert:重跑只更新名單欄位,不動 status/sent_at → 任意次觸發安全。
+# PROSPECTS.md(名單正本)→ 兩套 CRM 同步投餵:
+#   ① 3q-outreach 名單池(每日卡片/序列/SLA 引擎)— src upsert
+#   ② 3q-line-oa prospects 表(老闆 LINE 指令:陌開/詳情/狀態)— (pool,list_no) upsert
+# 兩端都是 upsert:重跑只更新名單欄位,不動 status/備註 → 任意次觸發安全。
 on:
   workflow_dispatch: {}
   push:
@@ -9,6 +11,8 @@ on:
     paths:
       - 'PROSPECTS.md'
       - 'scripts/prospects-to-outreach.mjs'
+      - 'scripts/prospects-import.mjs'
+      - '.github/workflows/import-prospects.yml'
 
 jobs:
   import:
@@ -27,5 +31,7 @@ jobs:
             case "$ver" in v1.0|'') sleep 5 ;; *) exit 0 ;; esac
           done
           echo '::error::worker 還在 v1.0(無 upsert),不匯入以免重複'; exit 1
-      - name: Import 107 leads (upsert by src)
+      - name: Feed outreach engine (upsert by src)
         run: node scripts/prospects-to-outreach.mjs --post "$OUTREACH_URL"
+      - name: Feed 3q-line-oa prospects CRM (upsert by pool,list_no)
+        run: node scripts/prospects-import.mjs --post https://3q-line-oa.milk790.workers.dev --key 3q-setup-8m4w2r

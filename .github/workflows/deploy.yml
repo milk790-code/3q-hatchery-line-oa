@@ -7,6 +7,7 @@ on:
     paths:
       - 'webhook/worker.js'
       - 'workers/social-publisher/worker.js'
+      - 'data/subsidies.json'
       - 'assets/exports/3q-richmenu-2500x1686.jpg'
       - '.github/workflows/deploy.yml'
   workflow_run:
@@ -30,6 +31,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sync gate(正本↔內嵌漂移即擋下部署)
+        run: node scripts/check-sync.mjs
 
       - name: Verify Cloudflare token
         env:
