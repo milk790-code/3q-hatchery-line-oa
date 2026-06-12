@@ -365,18 +365,8 @@ jobs:
           echo "$resp" | jq -e '.ok == true and .configured.token == true and .configured.secret == true and .configured.session_kv == true' > /dev/null
           echo "::notice::Worker alive — token, secret, KV configured"
 
-      - name: Set LINE webhook URL
-        continue-on-error: true
-        env:
-          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
-        run: |
-          set -euo pipefail
-          curl -sS -f -X PUT \
-            https://api.line.me/v2/bot/channel/webhook/endpoint \
-            -H "Authorization: Bearer $LINE_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d "{\"endpoint\":\"$WORKER_URL\"}"
-          echo "::notice::Webhook URL set to $WORKER_URL"
+      # ⚠ 2026-06-12 移除「Set LINE webhook URL」步驟:它每次部署都把 webhook 劫回本(舊)worker,
+      # 蓋掉現役 3q-line-oa v4.x 成交 AI(6/11-6/12 兩次事故根因)。webhook 指向由 3q-line-oa /admin/webhook?set=1 管理。
 
       - name: Test webhook from LINE side
         continue-on-error: true
