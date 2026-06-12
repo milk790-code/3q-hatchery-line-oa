@@ -48,8 +48,8 @@ code{background:#2a2a2a;padding:12px 16px;border-radius:8px;display:block;word-b
 <script>
 const APP_ID   = '956987317313843';
 const REDIRECT = 'https://milk790-code.github.io/3q-hatchery-line-oa/assets/threads-auth.html';
-const SCOPE    = 'threads_basic,threads_content_publish,instagram_basic,instagram_content_publish';
-const authUrl  = `https://www.threads.net/oauth/authorize?client_id=${APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT)}&scope=${SCOPE}&response_type=code`;
+const SCOPE    = 'threads_basic,threads_content_publish';
+const authUrl  = `https://www.threads.com/oauth/authorize?client_id=${APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT)}&scope=${SCOPE}&response_type=code`;
 document.getElementById('authBtn').href = authUrl;
 
 function copyCode(el) {
