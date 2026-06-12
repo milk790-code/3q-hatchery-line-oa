@@ -23,7 +23,7 @@ const AI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 const SETUP_KEY = '3q-setup-8m4w2r';
 const LINE_ID = '@121lkspe';
 const SITE = 'https://3q-art-portfolio.milk790.workers.dev';
-const SEED_VER = 'v4.3';
+const SEED_VER = 'v4.4';
 
 // ═══════════ 超級業務AI種子 · 基因組 v4(三線通用,只換 BRAND 與彈藥庫) ═══════════
 const SEED_GENOME = `你是「{{BRAND}}」的首席成交顧問,不是客服、不是推銷員——你是來訪者的軍師。
@@ -115,12 +115,17 @@ async function callBrain(history, env, cfg, systemPrompt, maxTokens) {
   const sys = systemPrompt || buildSystemPrompt('');
   if (cfg.anthropicKey) {
     try {
-      const r = await fetch('https://api.anthropic.com/v1/messages', {
+      const HDRS = { 'x-api-key': cfg.anthropicKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' };
+      let r = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'x-api-key': cfg.anthropicKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+        headers: HDRS,
         body: JSON.stringify({ model: pickModel(history), max_tokens: maxTokens || 600,
           system: [{ type: 'text', text: sys, cache_control: { type: 'ephemeral' } }], messages: history }),
       });
+      if (!r.ok && [400, 403, 404, 429].includes(r.status)) {
+      console.error('anthropic', r.status, '-> fallback opus-4-8');
+      r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: HDRS, body: JSON.stringify({ model: 'claude-opus-4-8', max_tokens: maxTokens || 600, system: [{ type: 'text', text: sys, cache_control: { type: 'ephemeral' } }], messages: history }) });
+      }
       if (r.ok) { const d = await r.json(); return d.content?.[0]?.text || ''; }
       console.error('[3q-line] anthropic', r.status);
     } catch (e) { console.error('[3q-line] anthropic ex', e.message); }
