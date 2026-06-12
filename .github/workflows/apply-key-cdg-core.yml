@@ -1,0 +1,24 @@
+name: Apply ANTHROPIC_API_KEY to cdg-core
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Put secret onto cdg-core (key flows GitHub -> Cloudflare, no human handling)
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$ANTHROPIC_API_KEY" || { echo "::error::ANTHROPIC_API_KEY secret is empty"; exit 1; }
+          resp=$(jq -n --arg t "$ANTHROPIC_API_KEY" '{name:"ANTHROPIC_API_KEY", text:$t, type:"secret_text"}' | \
+            curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/cdg-core/secrets" \
+            -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" \
+            --data-binary @-)
+          echo "$resp" | jq -e '.success==true' >/dev/null || { echo "$resp" | jq -c '.errors'; exit 1; }
+          echo "::notice::cdg-core ANTHROPIC_API_KEY applied (new version auto-published, code unchanged)"
