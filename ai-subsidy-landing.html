@@ -1,0 +1,672 @@
+<!-- Static export of workers/ai-subsidy/worker.js PAGE (v1.1).
+     Form posts to relative /api/lead — serve behind a host that exposes it
+     (3q-ai-subsidy worker, or 3q-art-portfolio proxy which forwards it). -->
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>整整三年，不用花你一塊錢｜AI 創業陪跑｜3Q孵化所</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="整整三年，不用花你一塊錢｜AI 創業陪跑">
+<meta property="og:description" content="4 個問題，找出你符合資格的全部政府補助——金額、難度、申請順序，整理好用 LINE 傳給你。完全免費。">
+<meta property="og:url" content="https://3q-ai-subsidy.milk790.workers.dev/">
+<meta property="og:image" content="https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports/og-ai-subsidy.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0C0C0C;
+      --card:#161616;
+      --alt:#111111;
+      --gold:#C9A040;
+      --gold-lt:#E8BC58;
+      --gold-dim:rgba(201,160,64,0.12);
+      --cream:#F0E8D8;
+      --dim:#8A7E70;
+      --green:#52C97C;
+      --red:#FF6B6B;
+      --border:rgba(201,160,64,0.18);
+      --r:12px;
+      --rs:8px;
+    }
+    html{scroll-behavior:smooth}
+    body{
+      background:var(--bg);color:var(--cream);
+      font-family:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+      line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased;
+    }
+
+    /* NAV */
+    nav{
+      position:sticky;top:0;z-index:100;
+      display:flex;justify-content:space-between;align-items:center;
+      padding:13px 20px;
+      background:rgba(12,12,12,.95);backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--border);
+    }
+    .nav-logo{font-size:14px;font-weight:800;color:var(--gold);letter-spacing:.03em}
+    .nav-btn{
+      background:var(--gold);color:#0C0C0C;border:none;
+      padding:8px 18px;border-radius:6px;font-size:13px;font-weight:800;
+      text-decoration:none;font-family:inherit;cursor:pointer;
+    }
+
+    /* HERO */
+    .hero{
+      min-height:100svh;display:flex;flex-direction:column;
+      justify-content:center;padding:64px 20px 48px;
+      position:relative;overflow:hidden;
+    }
+    .hero::before{
+      content:'';position:absolute;top:-120px;right:-100px;
+      width:360px;height:360px;
+      background:radial-gradient(circle,rgba(201,160,64,.13) 0%,transparent 68%);
+      pointer-events:none;
+    }
+    .hero::after{
+      content:'';position:absolute;bottom:-80px;left:-80px;
+      width:280px;height:280px;
+      background:radial-gradient(circle,rgba(201,160,64,.07) 0%,transparent 70%);
+      pointer-events:none;
+    }
+    .badge{
+      display:inline-flex;align-items:center;gap:7px;
+      background:var(--gold-dim);border:1px solid var(--border);
+      border-radius:100px;padding:5px 13px;
+      font-size:11px;color:var(--gold-lt);font-weight:700;
+      letter-spacing:.06em;margin-bottom:24px;width:fit-content;
+    }
+    .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
+
+    /* THE BIG HEADLINE */
+    .hero-h1{
+      font-size:clamp(42px,11vw,72px);font-weight:900;
+      line-height:1.1;letter-spacing:-.035em;margin-bottom:6px;
+    }
+    .hero-h1 .gold{color:var(--gold)}
+    .hero-h1 .sub-line{
+      font-size:clamp(18px,5vw,28px);font-weight:500;
+      color:var(--cream);letter-spacing:-.01em;
+      display:block;margin-top:8px;
+    }
+
+    .hero-desc{
+      font-size:clamp(14px,3.8vw,17px);color:var(--cream);
+      line-height:1.75;margin:20px 0 28px;max-width:420px;
+    }
+    .hero-desc strong{color:var(--gold-lt)}
+
+    /* ticker */
+    .ticker{
+      display:flex;align-items:center;gap:10px;
+      background:var(--gold-dim);border:1px solid var(--border);
+      border-radius:var(--rs);padding:9px 13px;margin-bottom:28px;overflow:hidden;
+    }
+    .t-tag{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--gold);font-weight:800;white-space:nowrap}
+    .t-wrap{flex:1;overflow:hidden;position:relative;height:20px}
+    .t-item{
+      position:absolute;inset:0;display:flex;align-items:center;
+      font-size:12px;color:var(--cream);opacity:0;
+      transition:opacity .4s,transform .4s;transform:translateY(8px);
+    }
+    .t-item.on{opacity:1;transform:translateY(0)}
+
+    .cta-wrap{display:flex;flex-direction:column;gap:10px}
+    .btn-main{
+      display:block;background:var(--gold);color:#0C0C0C;
+      padding:17px 24px;border-radius:var(--rs);
+      font-size:16px;font-weight:800;text-align:center;
+      text-decoration:none;cursor:pointer;border:none;font-family:inherit;
+      letter-spacing:.01em;transition:background .15s;
+    }
+    .btn-main:hover{background:var(--gold-lt)}
+    .trust{font-size:11px;color:var(--dim);text-align:center}
+
+    /* STATS */
+    .stats{
+      display:grid;grid-template-columns:repeat(3,1fr);
+      gap:1px;background:var(--border);
+      border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+    }
+    .stat{background:var(--card);padding:18px 12px;text-align:center}
+    .sn{display:block;font-size:22px;font-weight:900;color:var(--gold);letter-spacing:-.02em}
+    .sl{font-size:10px;color:var(--dim);margin-top:3px;line-height:1.4}
+
+    /* SECTIONS */
+    .sec{padding:56px 20px}
+    .sec-alt{background:var(--alt)}
+    .eye{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:800;margin-bottom:10px}
+    .sec-h{font-size:clamp(24px,6.5vw,38px);font-weight:900;line-height:1.2;letter-spacing:-.02em;margin-bottom:8px}
+    .sec-p{font-size:14px;color:var(--dim);margin-bottom:28px;line-height:1.75}
+
+    /* WHO IS THIS FOR — persona cards */
+    .persona-grid{display:flex;flex-direction:column;gap:10px}
+    .p-card{
+      background:var(--card);border:1px solid var(--border);
+      border-radius:var(--r);padding:18px 16px;
+      display:flex;gap:14px;align-items:flex-start;
+    }
+    .p-icon{font-size:28px;flex-shrink:0;margin-top:2px}
+    .p-who{font-size:12px;color:var(--gold);font-weight:700;letter-spacing:.04em;margin-bottom:4px}
+    .p-title{font-size:15px;font-weight:800;margin-bottom:4px;color:var(--cream)}
+    .p-desc{font-size:12px;color:var(--dim);line-height:1.65}
+
+    /* TIMELINE JOURNEY */
+    .timeline{display:flex;flex-direction:column;gap:0;margin-top:28px}
+    .tl-item{display:flex;gap:16px;padding-bottom:28px;position:relative}
+    .tl-item:not(:last-child)::after{
+      content:'';position:absolute;left:17px;top:36px;bottom:0;
+      width:1px;background:var(--border);
+    }
+    .tl-dot{
+      width:34px;height:34px;border-radius:50%;
+      background:var(--gold);color:#0C0C0C;
+      font-size:11px;font-weight:900;
+      display:flex;align-items:center;justify-content:center;
+      flex-shrink:0;position:relative;z-index:1;letter-spacing:0;
+      text-align:center;line-height:1.2;
+    }
+    .tl-body{flex:1;padding-top:5px}
+    .tl-time{font-size:11px;color:var(--gold);font-weight:700;letter-spacing:.05em;margin-bottom:3px}
+    .tl-title{font-size:15px;font-weight:800;margin-bottom:4px;color:var(--cream)}
+    .tl-desc{font-size:13px;color:var(--dim);line-height:1.65}
+    .tl-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+    .tag{
+      background:var(--gold-dim);border:1px solid var(--border);
+      border-radius:4px;padding:3px 8px;font-size:11px;color:var(--gold-lt);font-weight:600;
+    }
+
+    /* SUBSIDIES SCROLL */
+    .scroll{
+      display:flex;gap:10px;overflow-x:auto;
+      padding:2px 0 12px;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+    }
+    .scroll::-webkit-scrollbar{display:none}
+    .sc{
+      background:var(--card);border:1px solid var(--border);
+      border-radius:var(--r);padding:16px;min-width:186px;flex-shrink:0;
+    }
+    .sc-type{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:6px}
+    .sc-name{font-size:13px;font-weight:700;margin-bottom:8px;line-height:1.4;color:var(--cream)}
+    .sc-amt{font-size:24px;font-weight:900;color:var(--gold-lt);letter-spacing:-.02em;line-height:1}
+    .sc-unit{font-size:10px;color:var(--dim);margin-top:2px}
+    .sc-tag{
+      display:inline-flex;align-items:center;gap:3px;
+      margin-top:10px;background:rgba(82,201,124,.1);
+      border-radius:4px;padding:3px 7px;font-size:10px;color:var(--green);font-weight:700;
+    }
+
+    /* THE BIG PROMISE BLOCK */
+    .promise-block{
+      background:linear-gradient(135deg,rgba(201,160,64,.1) 0%,rgba(201,160,64,.04) 100%);
+      border:1px solid var(--border);border-radius:16px;padding:28px 20px;
+      text-align:center;
+    }
+    .promise-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);font-weight:800;margin-bottom:12px}
+    .promise-big{font-size:clamp(28px,8vw,48px);font-weight:900;line-height:1.15;letter-spacing:-.03em;margin-bottom:12px}
+    .promise-big span{color:var(--gold)}
+    .promise-list{display:flex;flex-direction:column;gap:8px;text-align:left;margin-top:16px}
+    .pl-item{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--cream)}
+    .pl-check{color:var(--green);font-size:15px;flex-shrink:0;margin-top:1px}
+
+    /* FORM */
+    .form-sec{padding:56px 20px 80px}
+    .form-box{
+      background:var(--card);border:1px solid var(--border);
+      border-radius:16px;padding:28px 20px;max-width:460px;margin:0 auto;
+    }
+    .fh{font-size:22px;font-weight:900;margin-bottom:6px;letter-spacing:-.02em}
+    .fs{font-size:13px;color:var(--dim);margin-bottom:24px;line-height:1.75}
+
+    .fg{margin-bottom:20px}
+    .fl{font-size:13px;font-weight:700;display:block;margin-bottom:10px}
+
+    .rg{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+    .ro{position:relative}
+    .ro input{position:absolute;opacity:0;width:0;height:0}
+    .ro label{
+      display:block;padding:10px 11px;
+      background:var(--bg);border:1px solid rgba(255,255,255,.08);
+      border-radius:var(--rs);font-size:13px;color:var(--dim);
+      cursor:pointer;transition:all .15s;line-height:1.4;
+    }
+    .ro input:checked+label{background:var(--gold-dim);border-color:var(--gold);color:var(--cream)}
+
+    .cl{display:flex;flex-direction:column;gap:7px}
+    .co{position:relative}
+    .co input{position:absolute;opacity:0;width:0;height:0}
+    .co label{
+      display:flex;align-items:center;gap:10px;padding:11px 13px;
+      background:var(--bg);border:1px solid rgba(255,255,255,.08);
+      border-radius:var(--rs);font-size:13px;color:var(--dim);
+      cursor:pointer;transition:all .15s;
+    }
+    .co label::before{
+      content:'';width:17px;height:17px;
+      border:1.5px solid rgba(255,255,255,.18);border-radius:4px;
+      flex-shrink:0;transition:all .15s;
+    }
+    .co input:checked+label{background:var(--gold-dim);border-color:var(--gold);color:var(--cream)}
+    .co input:checked+label::before{background:var(--gold);border-color:var(--gold)}
+
+    .ti{
+      width:100%;background:var(--bg);
+      border:1px solid rgba(255,255,255,.08);border-radius:var(--rs);
+      padding:13px 14px;font-size:15px;color:var(--cream);
+      font-family:inherit;outline:none;transition:border-color .15s;
+    }
+    .ti:focus{border-color:var(--gold)}
+    .ti::placeholder{color:var(--dim)}
+    .ti.err{border-color:var(--red)}
+    .hint{font-size:11px;color:var(--dim);margin-top:6px}
+
+    .sbtn{
+      width:100%;padding:16px;margin-top:8px;
+      background:var(--gold);color:#0C0C0C;border:none;
+      border-radius:var(--rs);font-size:16px;font-weight:800;
+      font-family:inherit;cursor:pointer;transition:background .15s;letter-spacing:.01em;
+    }
+    .sbtn:hover{background:var(--gold-lt)}
+    .fn{font-size:11px;color:var(--dim);text-align:center;margin-top:12px;line-height:1.6}
+
+    /* FOOTER */
+    footer{border-top:1px solid var(--border);padding:24px 20px;text-align:center}
+    .ft-logo{font-size:14px;font-weight:800;color:var(--gold);margin-bottom:6px}
+    .ft-note{font-size:11px;color:var(--dim);line-height:1.7}
+    .ft-disclaimer{font-size:10px;color:rgba(138,126,112,.5);margin-top:12px;line-height:1.6}
+
+    /* MODAL */
+    .mb{
+      position:fixed;inset:0;background:rgba(0,0,0,.88);
+      z-index:500;display:none;align-items:center;justify-content:center;padding:20px;
+    }
+    .mb.open{display:flex}
+    .mbox{
+      background:var(--card);border:1px solid var(--border);
+      border-radius:16px;padding:36px 24px;text-align:center;max-width:340px;width:100%;
+    }
+    .mi{font-size:48px;margin-bottom:14px}
+    .mt{font-size:22px;font-weight:900;color:var(--gold);margin-bottom:10px}
+    .md{font-size:13px;color:var(--dim);line-height:1.75;margin-bottom:24px}
+    .mc{
+      background:var(--gold);color:#0C0C0C;border:none;
+      padding:12px 28px;border-radius:var(--rs);
+      font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">3Q孵化所</div>
+  <a href="#form" class="nav-btn">免費了解</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="badge"><span class="dot"></span>台灣 AI 創業陪跑計畫</div>
+
+  <h1 class="hero-h1">
+    整整三年<br>
+    <span class="gold">不用花你</span><br>
+    <span class="gold">一塊錢</span>
+    <span class="sub-line">從你的第一個想法，到開始盈利</span>
+  </h1>
+
+  <p class="hero-desc">
+    不管你是<strong>路邊小吃攤</strong>、<strong>餐飲店老闆</strong>、<strong>有想法還沒開始</strong>、還是<strong>一直在觀察 AI 但還沒接觸</strong>的你——<br>
+    我們陪你從零規劃，幫你申請政府補助，讓所有開銷都有政府買單，甚至多間分店，三年不用花你一塊錢。
+  </p>
+
+  <div class="ticker">
+    <span class="t-tag">補助中</span>
+    <div class="t-wrap">
+      <div class="t-item on">SBIR 研發補助｜最高 1,200 萬，隨到隨審</div>
+      <div class="t-item">服務業創新補助 SIIR｜小吃攤、餐廳通通能申請</div>
+      <div class="t-item">30 人以下數位轉型培力｜最高 10 萬，最快核准</div>
+      <div class="t-item">政府免費 GPU 算力｜等值 65 萬，AI 開發完全免費</div>
+      <div class="t-item">青年創業貸款｜最高 1,200 萬，5 年近乎零利率</div>
+      <div class="t-item">台中地方型 SBIR｜台中企業加碼 100 萬</div>
+      <div class="t-item">AI 投資稅務優惠｜買 AI 工具可以抵稅</div>
+      <div class="t-item">創業課程補助｜政府幫你付學費</div>
+    </div>
+  </div>
+
+  <div class="cta-wrap">
+    <a href="#form" class="btn-main">我想了解我能拿什麼 →</a>
+    <div class="trust">✓ 完全免費　✓ 3 分鐘填完　✓ 不管你有沒有公司都可以</div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <span class="sn">30+</span>
+    <span class="sl">政府補助<br>計畫</span>
+  </div>
+  <div class="stat">
+    <span class="sn">3 年</span>
+    <span class="sl">陪你從零到<br>開始盈利</span>
+  </div>
+  <div class="stat">
+    <span class="sn">$0</span>
+    <span class="sl">你自己需要<br>花的錢</span>
+  </div>
+</div>
+
+<!-- WHO IS THIS FOR -->
+<section class="sec">
+  <div class="eye">這是給你的</div>
+  <h2 class="sec-h">不管你現在<br>在哪個階段</h2>
+  <p class="sec-p">只要你有一點想法、想用 AI 讓生活更好，我們都能幫你找到資源。</p>
+
+  <div class="persona-grid">
+    <div class="p-card">
+      <div class="p-icon">🍜</div>
+      <div>
+        <div class="p-who">餐飲 / 小吃 / 攤販</div>
+        <div class="p-title">開了店，想用 AI 省人力、接外送、管庫存</div>
+        <div class="p-desc">有店面的服務業通通符合資格，可以申請服務業創新補助，幫你導入訂位系統、AI 點餐、智慧排班，費用全部政府出。</div>
+      </div>
+    </div>
+    <div class="p-card">
+      <div class="p-icon">💡</div>
+      <div>
+        <div class="p-who">有想法 / 還沒開始的你</div>
+        <div class="p-title">腦子裡有計畫，就差資金跟有人帶</div>
+        <div class="p-desc">連公司還沒設也沒關係。我們先幫你規劃，找到最適合的補助路線，設公司、申請補助一起陪你走。</div>
+      </div>
+    </div>
+    <div class="p-card">
+      <div class="p-icon">👀</div>
+      <div>
+        <div class="p-who">一直在觀察 AI 的你</div>
+        <div class="p-title">看了很多 AI 新聞，還沒真正接觸</div>
+        <div class="p-desc">等的就是一個時機。政府現在有補助可以幫你出 AI 工具的費用，現在進場比等另一年便宜太多了。</div>
+      </div>
+    </div>
+    <div class="p-card">
+      <div class="p-icon">🏪</div>
+      <div>
+        <div class="p-who">已在經營的中小企業</div>
+        <div class="p-title">想把 AI 導入但怕投資沒回報</div>
+        <div class="p-desc">政府出 50% 研發費用，你出 50%，最高補助 1,200 萬。投資風險直接砍半，回報卻是你全拿。</div>
+      </div>
+    </div>
+    <div class="p-card">
+      <div class="p-icon">🙋</div>
+      <div>
+        <div class="p-who">個人創業者 / 副業想轉正</div>
+        <div class="p-title">一個人做，但想要政府當你的靠山</div>
+        <div class="p-desc">微型創業鳳凰貸款、青年創業貸款、30 人以下培力補助——一個人也能全部申請，前兩年近乎不用付利息。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section class="sec sec-alt">
+  <div class="eye">陪跑路線</div>
+  <h2 class="sec-h">從想法到多間分店<br>每一步我們都在</h2>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot">第1<br>月</div>
+      <div class="tl-body">
+        <div class="tl-time">第 1–3 個月</div>
+        <div class="tl-title">想法梳理 + 公司設立 + 第一筆補助申請</div>
+        <div class="tl-desc">確定你的方向，設立公司（最低 NT$1 元），立刻申請第一批補助——通常 3 個月內就能核准第一筆資金進帳。</div>
+        <div class="tl-tags">
+          <span class="tag">公司設立</span>
+          <span class="tag">SBIR Phase 1</span>
+          <span class="tag">免費算力申請</span>
+        </div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot">第1<br>年</div>
+      <div class="tl-body">
+        <div class="tl-time">第 4–12 個月</div>
+        <div class="tl-title">AI 工具導入 + 第二批補助疊加</div>
+        <div class="tl-desc">補助覆蓋軟體、設備、員工培訓費用。你專心做生意，我們幫你把錢一批一批申請回來。</div>
+        <div class="tl-tags">
+          <span class="tag">SBIR Phase 2</span>
+          <span class="tag">數位轉型 10 萬</span>
+          <span class="tag">雲市集點數</span>
+          <span class="tag">員工訓練補助</span>
+        </div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot">第2<br>年</div>
+      <div class="tl-body">
+        <div class="tl-time">第二年</div>
+        <div class="tl-title">開始盈利 + 繼續申請年度補助</div>
+        <div class="tl-desc">多數補助都是年度制，每年都能繼續申請。你已經有收入，同時政府還在幫你出費用。</div>
+        <div class="tl-tags">
+          <span class="tag">服務業 SIIR</span>
+          <span class="tag">地方型 SBIR</span>
+          <span class="tag">稅務抵減開始</span>
+        </div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot">第3<br>年</div>
+      <div class="tl-body">
+        <div class="tl-time">第三年</div>
+        <div class="tl-title">多間分店規劃 + 更多補助疊加</div>
+        <div class="tl-desc">準備擴張的時候，還有更大規模的補助計畫可以申請。整整三年，你自己的錢幾乎可以不動。</div>
+        <div class="tl-tags">
+          <span class="tag">聯合申請 700 萬</span>
+          <span class="tag">AI 投資抵稅</span>
+          <span class="tag">天使輪融資</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SUBSIDIES -->
+<section class="sec">
+  <div class="eye">部分可申請補助</div>
+  <h2 class="sec-h">這些錢<br>正在等你領</h2>
+  <p class="sec-p">以下只是部分，完整清單填完表單後揭曉。← 左右滑</p>
+
+  <div class="scroll">
+    <div class="sc">
+      <div class="sc-type">研發補助</div>
+      <div class="sc-name">SBIR 小型企業<br>創新研發計畫</div>
+      <div class="sc-amt">1,200萬</div>
+      <div class="sc-unit">最高補助 / 兩年</div>
+      <div class="sc-tag">✓ 隨到隨審</div>
+    </div>
+    <div class="sc">
+      <div class="sc-type">服務業 / 餐飲</div>
+      <div class="sc-name">SIIR 服務業<br>創新研發計畫</div>
+      <div class="sc-amt">1,000萬</div>
+      <div class="sc-unit">最高補助 / 年</div>
+      <div class="sc-tag">✓ 餐飲店適用</div>
+    </div>
+    <div class="sc">
+      <div class="sc-type">微型 / 個人</div>
+      <div class="sc-name">微型創業鳳凰<br>貸款</div>
+      <div class="sc-amt">200萬</div>
+      <div class="sc-unit">前 2 年免息</div>
+      <div class="sc-tag">✓ 一個人也行</div>
+    </div>
+    <div class="sc">
+      <div class="sc-type">創業資金</div>
+      <div class="sc-name">青年創業<br>及啟動金貸款</div>
+      <div class="sc-amt">1,200萬</div>
+      <div class="sc-unit">5 年近乎零利率</div>
+      <div class="sc-tag">✓ 18–45 歲</div>
+    </div>
+    <div class="sc">
+      <div class="sc-type">最快申請</div>
+      <div class="sc-name">30 人以下<br>數位轉型培力</div>
+      <div class="sc-amt">10萬</div>
+      <div class="sc-unit">直接補助不用還</div>
+      <div class="sc-tag">✓ 最易申請</div>
+    </div>
+    <div class="sc">
+      <div class="sc-type">AI 算力</div>
+      <div class="sc-name">政府免費<br>GPU 算力</div>
+      <div class="sc-amt">65萬</div>
+      <div class="sc-unit">等值算力 · 完全免費</div>
+      <div class="sc-tag">✓ 完全不花錢</div>
+    </div>
+    <div class="sc">
+      <div class="sc-type">軟體費用</div>
+      <div class="sc-name">雲市集<br>數位點數補助</div>
+      <div class="sc-amt">3萬</div>
+      <div class="sc-unit">每年 / 折抵 AI 軟體</div>
+      <div class="sc-tag">✓ 立即可用</div>
+    </div>
+    <div class="sc">
+      <div class="sc-type">台中加碼</div>
+      <div class="sc-name">台中地方型<br>SBIR</div>
+      <div class="sc-amt">100萬</div>
+      <div class="sc-unit">台中企業限定</div>
+      <div class="sc-tag">✓ 台中人專屬</div>
+    </div>
+  </div>
+</section>
+
+<!-- PROMISE BLOCK -->
+<section class="sec sec-alt">
+  <div class="promise-block">
+    <div class="promise-label">我們的承諾</div>
+    <div class="promise-big">
+      從你的<span>第一個想法</span><br>
+      到開始盈利<br>
+      甚至<span>多間分店</span>
+    </div>
+    <p style="font-size:15px;color:var(--cream);line-height:1.75">
+      整整三年，讓補助和政策性資金覆蓋所有的開銷，你自己的錢幾乎可以不動。
+    </p>
+    <div class="promise-list">
+      <div class="pl-item"><span class="pl-check">✓</span>從零開始也沒問題，沒有公司我們幫你設</div>
+      <div class="pl-item"><span class="pl-check">✓</span>幫你找出所有能申請的補助，疊加最大化</div>
+      <div class="pl-item"><span class="pl-check">✓</span>全程陪跑，從申請到核銷到下一批</div>
+      <div class="pl-item"><span class="pl-check">✓</span>AI 工具導入 + 商業規劃 + 行銷一起做</div>
+      <div class="pl-item"><span class="pl-check">✓</span>不只是補助顧問，是你的共同創辦人</div>
+    </div>
+  </div>
+</section>
+
+<!-- FORM -->
+<section class="form-sec" id="form">
+  <div class="form-box">
+    <div class="fh">填完就知道<br>你能拿多少</div>
+    <div class="fs">
+      不管你有沒有公司、在哪個階段——4 個問題，我們幫你找出所有符合資格的補助，讓台灣的市場，搶先世界一步。
+    </div>
+
+    <form id="mainForm" novalidate>
+
+      <div class="fg">
+        <label class="fl">你現在的狀況？</label>
+        <div class="rg">
+          <div class="ro"><input type="radio" name="stage" id="s1" value="idea"><label for="s1">有想法還沒開始</label></div>
+          <div class="ro"><input type="radio" name="stage" id="s2" value="pre"><label for="s2">還沒成立公司</label></div>
+          <div class="ro"><input type="radio" name="stage" id="s3" value="new"><label for="s3">公司設立 1 年內</label></div>
+          <div class="ro"><input type="radio" name="stage" id="s4" value="mid"><label for="s4">經營中 1 年以上</label></div>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label class="fl">你的業務屬於？</label>
+        <div class="rg">
+          <div class="ro"><input type="radio" name="biz" id="b1" value="food"><label for="b1">餐飲 / 食品</label></div>
+          <div class="ro"><input type="radio" name="biz" id="b2" value="retail"><label for="b2">零售 / 服務</label></div>
+          <div class="ro"><input type="radio" name="biz" id="b3" value="tech"><label for="b3">科技 / 軟體</label></div>
+          <div class="ro"><input type="radio" name="biz" id="b4" value="other"><label for="b4">其他 / 還沒決定</label></div>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label class="fl">你最想用補助解決什麼？（可多選）</label>
+        <div class="cl">
+          <div class="co"><input type="checkbox" id="n1" value="ai-tools"><label for="n1">AI 工具 / 軟體費用</label></div>
+          <div class="co"><input type="checkbox" id="n2" value="startup"><label for="n2">創業 / 開店資金</label></div>
+          <div class="co"><input type="checkbox" id="n3" value="rd"><label for="n3">產品研發費用</label></div>
+          <div class="co"><input type="checkbox" id="n4" value="training"><label for="n4">自己或員工的 AI 培訓</label></div>
+          <div class="co"><input type="checkbox" id="n5" value="expand"><label for="n5">擴店 / 擴張計畫</label></div>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label class="fl">你的 LINE ID 或手機號碼</label>
+        <input type="text" class="ti" id="contact" placeholder="LINE ID 或 09XXXXXXXX" autocomplete="off">
+        <div class="hint">只用來傳你的補助清單，完全保密，不會騷擾你。</div>
+      </div>
+
+      <button type="submit" class="sbtn">送出 → 立即生成我的補助清單</button>
+      <div class="fn">🔒 完全免費　✓ 不管你有沒有公司都可以填　✓ 沒有銷售電話</div>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-logo">3Q孵化所 × AI 補助媒合</div>
+  <div class="ft-note">
+    台灣 AI 品牌孵化與創業陪跑<br>
+    讓台灣的市場，搶先世界一步
+  </div>
+  <div class="ft-disclaimer">
+    ＊補助申請結果以各主管機關審核為準，補助金額視申請計畫、公司條件及當年度預算而定。本服務協助媒合與規劃，不保證所有補助均可申請成功。
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div class="mb" id="modal">
+  <div class="mbox">
+    <div class="mi">🎯</div>
+    <div class="mt">收到了！</div>
+    <div class="md">
+      我們正在根據你的條件比對補助清單。<br><br>
+      <strong style="color:var(--cream)">最快今天內</strong>，你的個人化補助清單會透過 LINE 傳給你——包含每個符合資格的計畫、金額、申請難度，全部整理好。
+    </div>
+    <a class="mc" href="https://line.me/R/ti/p/%40121lkspe" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;text-align:center">加 LINE 領取補助清單 → @121lkspe</a>
+<div style="margin-top:10px;font-size:12px;opacity:.7">清單透過 LINE 傳送，加好友才收得到（10 秒完成）</div>
+  </div>
+</div>
+
+<script>
+  // Ticker
+  const ti = document.querySelectorAll('.t-item');
+  let tc = 0;
+  setInterval(() => {
+    ti[tc].classList.remove('on');
+    tc = (tc + 1) % ti.length;
+    ti[tc].classList.add('on');
+  }, 2800);
+
+  // Form submit
+  document.getElementById('mainForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const c = document.getElementById('contact');
+    if (!c.value.trim()) {
+      c.classList.add('err');
+      c.focus();
+      setTimeout(() => c.classList.remove('err'), 2000);
+      return;
+    }
+    const payload = {
+      contact: c.value.trim().slice(0,120),
+      stage: (document.querySelector('input[name="stage"]:checked')||{}).value || '',
+      biz: (document.querySelector('input[name="biz"]:checked')||{}).value || '',
+      needs: Array.from(document.querySelectorAll('.cl input[type="checkbox"]:checked')).map(x=>x.value)
+    };
+    fetch('/api/lead', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)}).catch(function(){});
+    document.getElementById('modal').classList.add('open');
+  });
+</script>
+</body>
+</html>
+
