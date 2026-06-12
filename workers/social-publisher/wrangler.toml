@@ -5,7 +5,8 @@ compatibility_date = "2024-12-01"
 [vars]
 PNG_BASE_URL   = "https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports"
 THREADS_APP_ID = "956987317313843"
-FB_PAGE_ID     = "61587003785491"
+# 與 .github/workflows/deploy.yml(正準部署管道)對齊;舊值 61587003785491 與生產不符
+FB_PAGE_ID     = "1006044165915714"
 # v3.7 growth: LINE join link used in FB first-comment + FB group paste content
 LINE_JOIN_URL  = "https://lin.ee/UKKodJj"
 
@@ -35,12 +36,13 @@ database_id = "e54671b1-d15e-4552-babf-cef367267568"
 binding = "AI"
 
 # Cron schedule (Taipei time):
-#   01:00 UTC = 09:00 TW  (weekday morning, best engagement)
+#   01:00 UTC = 09:00 TW  (Tue-Thu morning, best engagement)
 #   04:00 UTC = 12:00 TW  (Wednesday lunch peak)
 #   12:30 UTC = 20:30 TW  (evening light content)
+# 具名日與 deploy.yml 對齊:CF cron 為 Quartz 式(1=SUN),數字 2-4 實為週一~週三
 [[triggers.crons]]
 crons = [
-  "0 1 * * 2-4",
-  "0 4 * * 3",
+  "0 1 * * TUE-THU",
+  "0 4 * * WED",
   "30 12 * * *"
 ]
