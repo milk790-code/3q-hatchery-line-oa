@@ -192,6 +192,9 @@ async function ensureTables(env) {
     await env.CRM.prepare("CREATE TABLE IF NOT EXISTS q3_line_customers (user_id TEXT PRIMARY KEY, first_seen TEXT, last_seen TEXT, msg_count INTEGER DEFAULT 0)").run();
     await env.CRM.prepare("CREATE TABLE IF NOT EXISTS q3_line_convos (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, role TEXT, text TEXT, created_at TEXT DEFAULT (datetime('now')))").run();
     await env.CRM.prepare("CREATE TABLE IF NOT EXISTS q3_seed_insights (id INTEGER PRIMARY KEY AUTOINCREMENT, insight TEXT, analyzed INTEGER, created_at TEXT)").run();
+    // 陌開 CRM:PROSPECTS.md 名單入庫(pool=A 汽美耗材/B 新店官網/C 市集攤主;list_no=清單編號)
+    await env.CRM.prepare("CREATE TABLE IF NOT EXISTS prospects (id INTEGER PRIMARY KEY AUTOINCREMENT, pool TEXT NOT NULL, list_no INTEGER NOT NULL, name TEXT NOT NULL, district TEXT, online_status TEXT, why TEXT, confidence INTEGER DEFAULT 1, batch INTEGER, status TEXT NOT NULL DEFAULT 'new', note TEXT, contacted_at TEXT, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')), UNIQUE(pool, list_no))").run();
+    await env.CRM.prepare("CREATE INDEX IF NOT EXISTS idx_prospects_status ON prospects(status, confidence)").run();
   } catch (e) { console.error('[3q-line] tables', e.message); }
 }
 
@@ -204,6 +207,47 @@ async function loadInsights(env) {
   } catch (_) { return ''; }
 }
 
+// ═══ 陌開 CRM:老闆 LINE 指令(名單來源 PROSPECTS.md,資料在 D1 prospects 表) ═══
+const PROSPECT_STATUS_WORDS = { '已聯繫': 'contacted', '有興趣': 'interested', '成交': 'won', '沒興趣': 'lost', '不感興趣': 'lost' };
+const PROSPECT_STATUS_ZH = { new: '待開發', contacted: '已聯繫', interested: '有興趣', won: '成交', lost: '沒興趣' };
+
+async function handleProspectCmd(msg, env) {
+  if (!env.CRM) return '陌開 CRM 需要 D1,目前未綁定。';
+  const m = msg.match(/^陌開\s*([ABCabc])\s*(\d+)\s*(.*)$/);
+  if (m) {
+    const pool = m[1].toUpperCase(), no = parseInt(m[2], 10), rest = (m[3] || '').trim();
+    const row = await env.CRM.prepare('SELECT * FROM prospects WHERE pool=? AND list_no=?').bind(pool, no).first();
+    if (!row) return '找不到 ' + pool + no + '。編號範圍:A1-72/B1-20/C1-15(對照 PROSPECTS.md)。';
+    if (!rest) {
+      return [pool + no + ' ' + row.name,
+        '區域:' + (row.district || '—'),
+        '門面:' + (row.online_status || '—'),
+        '切角:' + (row.why || '—'),
+        '信心:' + '★'.repeat(row.confidence || 1) + '|批次' + (row.batch || '—'),
+        '狀態:' + (PROSPECT_STATUS_ZH[row.status] || row.status) + (row.note ? '|備註:' + row.note : '')].join('\n');
+    }
+    const noteM = rest.match(/^備註\s*(.+)$/);
+    if (noteM) {
+      await env.CRM.prepare("UPDATE prospects SET note=?, updated_at=datetime('now') WHERE pool=? AND list_no=?").bind(noteM[1].slice(0, 200), pool, no).run();
+      return pool + no + ' ' + row.name + ' 備註已記。';
+    }
+    const st = PROSPECT_STATUS_WORDS[rest];
+    if (!st) return '看不懂「' + rest + '」。可用:已聯繫/有興趣/成交/沒興趣,或「備註 xxx」。';
+    await env.CRM.prepare("UPDATE prospects SET status=?, updated_at=datetime('now'), contacted_at=COALESCE(contacted_at, datetime('now')) WHERE pool=? AND list_no=?").bind(st, pool, no).run();
+    return pool + no + ' ' + row.name + ' → ' + PROSPECT_STATUS_ZH[st];
+  }
+  // 「陌開」/「陌開清單」→ 戰況總覽 + 下一波建議(信心高者優先)
+  const stats = await env.CRM.prepare('SELECT status, COUNT(*) n FROM prospects GROUP BY status').all();
+  const by = {}; let total = 0;
+  for (const r of (stats.results || [])) { by[r.status] = r.n; total += r.n; }
+  if (!total) return '名單還沒匯入。POST /admin/prospects/import 或跑 scripts/prospects-import.mjs。';
+  const next = await env.CRM.prepare("SELECT pool, list_no, name, district, confidence FROM prospects WHERE status='new' ORDER BY confidence DESC, batch ASC, pool ASC, list_no ASC LIMIT 5").all();
+  const lines = (next.results || []).map(r => r.pool + r.list_no + ' ' + r.name + '|' + (r.district || '').replace('台中市', '') + ' ' + '★'.repeat(r.confidence || 1));
+  return ['陌開戰況:全 ' + total + '|待開發 ' + (by.new || 0) + '|已聯繫 ' + (by.contacted || 0) + '|有興趣 ' + (by.interested || 0) + '|成交 ' + (by.won || 0) + '|沒興趣 ' + (by.lost || 0),
+    '下一波(信心優先):', ...lines, '——',
+    '指令:陌開 A57(詳情)|陌開 A57 已聯繫/有興趣/成交/沒興趣|陌開 A57 備註 xxx'].join('\n');
+}
+
 async function handleEvent(ev, env, cfg) {
   // follow 不在 webhook 發歡迎:LINE 後台已設「加入好友的歡迎訊息+圖文按鈕」,webhook 再發會雙重歡迎
   if (ev.type === 'follow') return;
@@ -214,6 +258,13 @@ async function handleEvent(ev, env, cfg) {
   if (/^我是老闆$/.test(userMsg.trim()) && !cfg.ownerId) {
     await env.SESSION?.put('cfg:3q_owner', uid);
     await lineReply(cfg.lineToken, ev.replyToken, '已綁定老闆身分。以後客人成交意向我會推給你。');
+    return;
+  }
+
+  // 陌開指令只認老闆;其他人打「陌開」一律當一般訊息落入 AI(不洩漏功能存在)
+  if (cfg.ownerId && uid === cfg.ownerId && /^陌開/.test(userMsg.trim())) {
+    const out = await handleProspectCmd(userMsg.trim(), env).catch(e => '陌開指令出錯:' + e.message);
+    await lineReply(cfg.lineToken, ev.replyToken, out);
     return;
   }
 
@@ -336,11 +387,53 @@ export default {
       } catch (e) { out.error = e.message; }
       return new Response(JSON.stringify(out, null, 2), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
     }
+    // 陌開 CRM 後台:GET 查名單/戰況,POST /import 匯入(upsert,保留 status/note 不被覆蓋)
+    if (url.pathname === '/admin/prospects') {
+      if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
+      if (!env.CRM) return new Response(JSON.stringify({ ok: false, note: '無 D1' }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+      await ensureTables(env);
+      const status = url.searchParams.get('status'), pool = url.searchParams.get('pool');
+      const limit = Math.min(parseInt(url.searchParams.get('limit') || '50', 10) || 50, 200);
+      let sql = 'SELECT pool, list_no, name, district, online_status, confidence, batch, status, note, contacted_at FROM prospects';
+      const where = [], binds = [];
+      if (status) { where.push('status=?'); binds.push(status); }
+      if (pool) { where.push('pool=?'); binds.push(pool.toUpperCase()); }
+      if (where.length) sql += ' WHERE ' + where.join(' AND ');
+      sql += ' ORDER BY confidence DESC, batch ASC, pool ASC, list_no ASC LIMIT ' + limit;
+      const rows = await env.CRM.prepare(sql).bind(...binds).all();
+      const stats = await env.CRM.prepare('SELECT status, COUNT(*) n FROM prospects GROUP BY status').all();
+      const by_status = {}; let total = 0;
+      for (const r of (stats.results || [])) { by_status[r.status] = r.n; total += r.n; }
+      return new Response(JSON.stringify({ ok: true, total, by_status, rows: rows.results || [] }, null, 2), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+    }
+    if (url.pathname === '/admin/prospects/import' && request.method === 'POST') {
+      if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
+      if (!env.CRM) return new Response(JSON.stringify({ ok: false, note: '無 D1' }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+      await ensureTables(env);
+      let items;
+      try { items = await request.json(); } catch (_) { return new Response(JSON.stringify({ ok: false, note: 'body 要是 JSON 陣列' }), { status: 400, headers: { 'Content-Type': 'application/json' } }); }
+      if (!Array.isArray(items)) return new Response(JSON.stringify({ ok: false, note: 'body 要是 JSON 陣列' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+      const stmt = env.CRM.prepare("INSERT INTO prospects (pool, list_no, name, district, online_status, why, confidence, batch) VALUES (?,?,?,?,?,?,?,?) ON CONFLICT(pool, list_no) DO UPDATE SET name=excluded.name, district=excluded.district, online_status=excluded.online_status, why=excluded.why, confidence=excluded.confidence, batch=excluded.batch, updated_at=datetime('now')");
+      let imported = 0, skipped = 0;
+      for (let i = 0; i < items.length; i += 40) {
+        const chunk = items.slice(i, i + 40).filter(p => p && p.pool && p.list_no && p.name);
+        skipped += items.slice(i, i + 40).length - chunk.length;
+        if (chunk.length) {
+          await env.CRM.batch(chunk.map(p => stmt.bind(String(p.pool).toUpperCase(), p.list_no, p.name, p.district || null, p.online_status || null, p.why || null, p.confidence || 1, p.batch || null)));
+          imported += chunk.length;
+        }
+      }
+      const c = await env.CRM.prepare('SELECT COUNT(*) n FROM prospects').first();
+      return new Response(JSON.stringify({ ok: true, imported, skipped, total: c?.n || 0 }), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+    }
     if (url.pathname === '/health') {
       const cfg = await getCfg(env);
-      let insights = 0;
-      if (env.CRM) { try { const r = await env.CRM.prepare("SELECT COUNT(*) n FROM q3_seed_insights").first(); insights = r?.n || 0; } catch (_) {} }
-      return new Response(JSON.stringify({ ok: true, worker: '3q-line-oa', seed: SEED_VER, secret: !!cfg.lineSecret, token: !!cfg.lineToken, ai: cfg.anthropicKey ? 'claude-sonnet-4-6' : 'workers-ai-70b', owner: !!cfg.ownerId, crm: !!env.CRM, evolved_insights: insights }), { headers: { 'Content-Type': 'application/json' } });
+      let insights = 0, prospects = 0;
+      if (env.CRM) {
+        try { const r = await env.CRM.prepare("SELECT COUNT(*) n FROM q3_seed_insights").first(); insights = r?.n || 0; } catch (_) {}
+        try { const r = await env.CRM.prepare("SELECT COUNT(*) n FROM prospects").first(); prospects = r?.n || 0; } catch (_) {}
+      }
+      return new Response(JSON.stringify({ ok: true, worker: '3q-line-oa', seed: SEED_VER, secret: !!cfg.lineSecret, token: !!cfg.lineToken, ai: cfg.anthropicKey ? 'claude-sonnet-4-6' : 'workers-ai-70b', owner: !!cfg.ownerId, crm: !!env.CRM, evolved_insights: insights, prospects }), { headers: { 'Content-Type': 'application/json' } });
     }
     if (url.pathname === '/webhook' && request.method === 'POST') {
       const cfg = await getCfg(env);
