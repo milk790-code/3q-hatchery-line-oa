@@ -20,10 +20,14 @@ jobs:
         env:
           CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          LINE_TOKEN: ${{ secrets.Q3_LINE_TOKEN }}
+          ADMIN_UID: ${{ secrets.OWNER_USER_ID }}
         run: |
           set -euo pipefail
-          jq -n --arg d1 "$CRM_D1_ID" '{ main_module:"worker.js", compatibility_date:"2024-12-01",
-            bindings:[ {name:"CRM",type:"d1",id:$d1} ] }' > /tmp/meta.json
+          jq -n --arg d1 "$CRM_D1_ID" --arg lt "$LINE_TOKEN" --arg au "$ADMIN_UID" '{ main_module:"worker.js", compatibility_date:"2024-12-01",
+            bindings:[ {name:"CRM",type:"d1",id:$d1},
+                       {name:"LINE_CHANNEL_ACCESS_TOKEN",type:"secret_text",text:$lt},
+                       {name:"ADMIN_LINE_USER_ID",type:"secret_text",text:$au} ] }' > /tmp/meta.json
           resp=$(curl -sS -X PUT \
             "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}" \
             -H "Authorization: Bearer $CF_TOKEN" \

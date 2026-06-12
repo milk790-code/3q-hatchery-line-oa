@@ -1,6 +1,112 @@
 // 3q-ai-subsidy — AI 補助落地頁 worker(獨立,不碰 3q-art-portfolio / LINE 三層)
 // GET / → 落地頁(含 OG);POST /api/lead → D1 ai_subsidy_leads;GET /health。
-const VER = 'v1.1';
+const VER = 'v2.0';
+
+// ── 補助媒合規則表(資料查證 2026-06-12)──────────────────────
+// stage: idea/pre/new/mid ; biz: food/retail/tech/other
+// needs: ai-tools/startup/rd/training/expand
+// status_2026: open(開放中)/seasonal(等梯次)/closed(今年已截止,備明年)
+const RULES = [
+  { id:"sbir-central", name:"中央型SBIR 小型企業創新研發計畫", max_amount:12000000, type:"grant",
+    eligibility:{ stage:["new","mid"], biz_bonus:["tech","food","other"], needs:["rd","ai-tools"] },
+    difficulty:4, timing:"rolling", status_2026:"open",
+    tip:"全台最強研發補助，隨到隨審無梯次壓力。先以Phase1（150萬、簡報格式、6個月）試水，過了再攻Phase2。需公司登記、補助款不得超過總經費50%。" },
+  { id:"sbir-taichung", name:"台中市地方型SBIR（地方產業創新研發）", max_amount:1000000, type:"grant",
+    eligibility:{ stage:["new","mid"], biz_bonus:["tech","other","food"], needs:["rd","ai-tools"] },
+    difficulty:3, timing:"annual", status_2026:"open",
+    tip:"台中在地企業專屬，門檻比中央SBIR低。115年度紙本收件至6/26中午12時。執行場所須在台中、同公司同年度限1案。" },
+  { id:"siir", name:"SIIR 服務業創新研發計畫", max_amount:1500000, type:"grant",
+    eligibility:{ stage:["new","mid"], biz_bonus:["retail","food","tech"], needs:["rd","ai-tools","expand"] },
+    difficulty:4, timing:"annual", status_2026:"seasonal",
+    tip:"服務業數位/低碳轉型補助。115年第一梯已截止，第二梯約5-6月，否則備2027年第一梯（12月開）。需工商憑證、淨值為正。" },
+  { id:"youth-loan", name:"青年創業及啟動金貸款", max_amount:12000000, type:"loan",
+    eligibility:{ stage:["pre","new","mid"], biz_bonus:["food","retail","tech","other"], needs:["startup","expand"] },
+    difficulty:3, timing:"rolling", status_2026:"open",
+    tip:"18-45歲、公司設立未滿8年、負責人持股20%以上、3年內修滿20小時創業課程。週轉600萬/資本支出1200萬，100萬以下免計畫書、免保人。" },
+  { id:"digital-30", name:"30人以下中小微企業數位轉型培力補助", max_amount:100000, type:"grant",
+    eligibility:{ stage:["new","mid"], biz_bonus:["food","retail","tech","other"], needs:["ai-tools","training"] },
+    difficulty:1, timing:"rolling", status_2026:"open",
+    tip:"最好上手的補助：員工30人以下、培訓數位技能可搭配軟體。每家最高10萬，受理至115/12/31，可分次報核。" },
+  { id:"tcloud", name:"臺灣雲市集 TCloud 數位點數", max_amount:30000, type:"grant",
+    eligibility:{ stage:["new","mid"], biz_bonus:["food","retail","other","tech"], needs:["ai-tools"] },
+    difficulty:1, timing:"rolling", status_2026:"open",
+    tip:"需工商憑證、一公司限一次，最高3萬點買雲端工具（POS/CRM/電商）。自付額與補助1:4，須簽約當月啟用、3個月內用完否則收回。" },
+  { id:"phoenix", name:"微型創業鳳凰貸款", max_amount:2000000, type:"loan",
+    eligibility:{ stage:["pre","new"], biz_bonus:["food","retail","other"], needs:["startup"] },
+    difficulty:2, timing:"rolling", status_2026:"open",
+    tip:"限女性(18-45)、中高齡(45-65)或離島居民。前2年免息（特定身分前3年）、免擔保免保人。需修18小時課程、事業設立未滿5年、員工未滿5人。" },
+  { id:"citd", name:"CITD 協助傳統產業技術開發計畫", max_amount:2000000, type:"grant",
+    eligibility:{ stage:["mid"], biz_bonus:["other","food"], needs:["rd"] },
+    difficulty:4, timing:"annual", status_2026:"closed",
+    tip:"製造業須工廠登記、技術服務業限特定類別。產品開發上限200萬、補助≤總經費50%。115年主要梯次已截止，多在Q1/Q3開案，備明年。" },
+  { id:"imdp", name:"國貿署 補助企業布建海外通路（開發國際市場）", max_amount:5000000, type:"grant",
+    eligibility:{ stage:["mid"], biz_bonus:["food","retail","other","tech"], needs:["expand"] },
+    difficulty:4, timing:"rolling", status_2026:"open",
+    tip:"須為登記出進口廠商、有出進口實績（新創可放寬）。補助海外據點/代理商，排除參展。單家上限500萬、聯合2000萬、補助50%。受理至2027/11/30。" },
+  { id:"hire-subsidy", name:"僱用獎助（雇主僱用失業勞工獎助）", max_amount:156000, type:"grant",
+    eligibility:{ stage:["new","mid"], biz_bonus:["food","retail","tech","other"], needs:["expand"] },
+    difficulty:2, timing:"rolling", status_2026:"open",
+    tip:"須僱用就服站開立『僱用獎助推介卡』的失業勞工。每人每月0.9萬-1.3萬，最長12個月。先向公立就服機構求才登記。" },
+  { id:"ndf-angel", name:"國發基金 創業天使投資方案", max_amount:30000000, type:"invest",
+    eligibility:{ stage:["new","mid"], biz_bonus:["tech"], needs:["rd","expand"] },
+    difficulty:5, timing:"rolling", status_2026:"open",
+    tip:"股權投資非補助。設立未滿8年、實收資本額1億以下、未公開發行。原則需搭配天使投資人共同投資。原則投資2000萬、初次最高3000萬。" },
+  { id:"angel-tax-23-2", name:"產創條例§23-2 天使投資人租稅優惠", max_amount:5000000, type:"tax",
+    eligibility:{ stage:["new"], biz_bonus:["tech"], needs:["rd"] },
+    difficulty:3, timing:"rolling", status_2026:"open",
+    tip:"給投資你的天使的租稅優惠：個人投資滿50萬、持股3年，可抵減投資額50%、每年最高500萬（一般產業300萬）。可當募資籌碼。" },
+  { id:"startup-award", name:"新創事業獎", max_amount:500000, type:"award",
+    eligibility:{ stage:["new","mid"], biz_bonus:["tech","food","retail","other"], needs:["rd"] },
+    difficulty:3, timing:"annual", status_2026:"seasonal",
+    tip:"得獎是SBIR等計畫的審查加分項。重點在背書與曝光，適合已有產品實績者。" },
+  { id:"small-giant-award", name:"小巨人獎", max_amount:300000, type:"award",
+    eligibility:{ stage:["mid"], biz_bonus:["tech","other","food"], needs:["rd","expand"] },
+    difficulty:4, timing:"annual", status_2026:"seasonal",
+    tip:"頒給有外銷/創新實績的成熟中小企業，屬榮譽型、SBIR加分項。經營1年以上、有出口或創新成績者再考慮。" },
+  { id:"tc-star", name:"台中摘星青年、築夢臺中（創業基地進駐）", max_amount:50000, type:"grant",
+    eligibility:{ stage:["idea","pre","new"], biz_bonus:["food","retail","other"], needs:["startup","training"] },
+    difficulty:2, timing:"annual", status_2026:"seasonal",
+    tip:"適合早期/還沒成立的台中青年：進駐審計新村/光復新村創業基地，享空間+輔導+補助。需設籍台中、進駐期間不得受僱他處。" },
+];
+
+// 分層：high=階段命中且開放中；mid=階段命中但等梯次/缺需求對應；future=階段未到或已截止
+function matchSubsidies({ stage, biz, needs }) {
+  const high = [], mid = [], future = [];
+  for (const r of RULES) {
+    const stageHit = r.eligibility.stage.includes(stage);
+    const needsHit = needs.some(n => r.eligibility.needs.includes(n));
+    const item = { id:r.id, name:r.name, max_amount:r.max_amount, type:r.type,
+      difficulty:r.difficulty, timing:r.timing, tip:r.tip,
+      biz_bonus:r.eligibility.biz_bonus.includes(biz), needs_hit:needsHit };
+    if (stageHit && r.status_2026 === 'open') high.push(item);
+    else if (stageHit && (r.status_2026 === 'seasonal' || !needsHit)) mid.push(item);
+    else future.push(item);
+  }
+  const sortKey = (a,b) => (b.max_amount*(6-b.difficulty)) - (a.max_amount*(6-a.difficulty));
+  high.sort(sortKey); mid.sort(sortKey); future.sort(sortKey);
+  return { matches:{high,mid,future}, total_amount: high.reduce((s,x)=>s+x.max_amount,0) };
+}
+
+function fmtNT(n){ return 'NT$' + Number(n||0).toLocaleString('en-US'); }
+
+// LINE push 通知陳學誼本人(失敗不影響主流程;每月免費 200 則,僅高適配>0 時發送以省額度)
+async function notifyAdmin(env, d) {
+  const token = env.LINE_CHANNEL_ACCESS_TOKEN, to = env.ADMIN_LINE_USER_ID;
+  if (!token || !to) return;
+  const map = { idea:'有想法還沒開始', pre:'還沒成立公司', new:'設立1年內', mid:'經營1年以上',
+    food:'餐飲食品', retail:'零售服務', tech:'科技軟體', other:'其他' };
+  const needMap = { 'ai-tools':'AI工具', startup:'創業資金', rd:'產品研發', training:'AI培訓', expand:'擴店擴張' };
+  const top3 = d.matches.high.slice(0,3).map((m,i)=>`${i+1}. ${m.name}（最高 ${fmtNT(m.max_amount)}）`).join('\n')
+    || '（暫無高適配，見中適配清單）';
+  const text = `🔔 新補助諮詢來了！\n階段：${map[d.stage]||d.stage}\n產業：${map[d.biz]||d.biz}\n` +
+    `需求：${(d.needs||[]).map(n=>needMap[n]||n).join('、')}\n聯絡：${d.contact}\n─────\n` +
+    `預估可爭取總額：${fmtNT(d.total_amount)}\n高適配 TOP3：\n${top3}`;
+  await fetch('https://api.line.me/v2/bot/message/push', {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${token}` },
+    body: JSON.stringify({ to, messages:[{ type:'text', text }] })
+  }).catch(()=>{});
+}
 const PAGE = `<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -605,6 +711,8 @@ const PAGE = `<!DOCTYPE html>
         <div class="hint">只用來傳你的補助清單，完全保密，不會騷擾你。</div>
       </div>
 
+      <input type="text" id="hp" name="hp" style="position:absolute;left:-9999px" tabindex="-1" autocomplete="off" aria-hidden="true">
+
       <button type="submit" class="sbtn">送出 → 立即生成我的補助清單</button>
       <div class="fn">🔒 完全免費　✓ 不管你有沒有公司都可以填　✓ 沒有銷售電話</div>
     </form>
@@ -647,7 +755,31 @@ const PAGE = `<!DOCTYPE html>
     ti[tc].classList.add('on');
   }, 2800);
 
-  // Form submit
+  // Form submit → 即時媒合結果(後端失敗時退回原本「收到了」modal,不漏單)
+  const fallbackHTML = document.querySelector('#modal .mbox').innerHTML;
+  function fmtNT(n){ return 'NT$' + Number(n||0).toLocaleString('en-US'); }
+  function showFallback(){
+    document.querySelector('#modal .mbox').innerHTML = fallbackHTML;
+    document.getElementById('modal').classList.add('open');
+  }
+  function showResult(data){
+    const high = (data.matches && data.matches.high) || [];
+    let list = high.slice(0,5).map(function(m){
+      return '<div style="border-left:3px solid var(--gold);padding:8px 12px;margin:8px 0;background:var(--alt);text-align:left">' +
+        '<div style="color:var(--gold);font-weight:800;font-size:14px">' + m.name + '</div>' +
+        '<div style="font-size:13px">最高可爭取 ' + fmtNT(m.max_amount) + '</div>' +
+        '<div style="color:var(--dim);font-size:12px;margin-top:4px">' + m.tip + '</div></div>';
+    }).join('');
+    if (!list) list = '<div style="font-size:14px">目前以「未來可期」項目為主，我們會親自為你規劃路徑。</div>';
+    document.querySelector('#modal .mbox').innerHTML =
+      '<div class="mi">🎯</div><div class="mt">你的專屬補助清單</div>' +
+      '<div style="margin:10px 0 4px;font-size:14px">預估可爭取總額</div>' +
+      '<div style="color:var(--gold);font-size:30px;font-weight:800;margin-bottom:8px">' + fmtNT(data.total_amount) + '</div>' +
+      '<div style="color:var(--gold);font-size:14px;text-align:left;margin-top:8px">立即可申請：</div>' + list +
+      '<div style="color:var(--dim);font-size:13px;margin:12px 0">完整清單與申請順序，顧問會用 LINE 與你聯繫，帶你一步步申請。</div>' +
+      '<a class="mc" href="https://line.me/R/ti/p/%40121lkspe" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;text-align:center">加 LINE 領取完整清單 → @121lkspe</a>';
+    document.getElementById('modal').classList.add('open');
+  }
   document.getElementById('mainForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const c = document.getElementById('contact');
@@ -661,10 +793,13 @@ const PAGE = `<!DOCTYPE html>
       contact: c.value.trim().slice(0,120),
       stage: (document.querySelector('input[name="stage"]:checked')||{}).value || '',
       biz: (document.querySelector('input[name="biz"]:checked')||{}).value || '',
-      needs: Array.from(document.querySelectorAll('.cl input[type="checkbox"]:checked')).map(x=>x.value)
+      needs: Array.from(document.querySelectorAll('.cl input[type="checkbox"]:checked')).map(x=>x.value),
+      hp: (document.getElementById('hp')||{}).value || ''
     };
-    fetch('/api/lead', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)}).catch(function(){});
-    document.getElementById('modal').classList.add('open');
+    fetch('/api/lead', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)})
+      .then(function(r){ return r.json(); })
+      .then(function(data){ if (data.ok && data.matches) showResult(data); else showFallback(); })
+      .catch(showFallback);
   });
 </script>
 </body>
@@ -674,6 +809,9 @@ const PAGE = `<!DOCTYPE html>
 async function ensureTable(env) {
   if (!env.CRM) return;
   await env.CRM.prepare("CREATE TABLE IF NOT EXISTS ai_subsidy_leads (id INTEGER PRIMARY KEY AUTOINCREMENT, contact TEXT NOT NULL, stage TEXT, biz TEXT, needs TEXT, ip_hash TEXT, ua TEXT, created_at TEXT DEFAULT (datetime('now')))").run().catch(()=>{});
+  // v2.0 新欄位(已存在時 ALTER 會報錯,忽略即可)
+  await env.CRM.prepare("ALTER TABLE ai_subsidy_leads ADD COLUMN matched_json TEXT").run().catch(()=>{});
+  await env.CRM.prepare("ALTER TABLE ai_subsidy_leads ADD COLUMN total_amount INTEGER DEFAULT 0").run().catch(()=>{});
 }
 
 export default {
@@ -687,19 +825,33 @@ export default {
     if (url.pathname === '/api/lead' && request.method === 'POST') {
       try {
         const b = await request.json();
+        // honeypot:隱藏欄位有值=機器人,回空結果不入庫不通知
+        if (b.hp) return new Response(JSON.stringify({ok:true,matches:{high:[],mid:[],future:[]},total_amount:0}),{headers:{'Content-Type':'application/json'}});
         const contact = String(b.contact||'').trim().slice(0,120);
         if (!contact) return new Response(JSON.stringify({ok:false,err:'no contact'}),{status:400,headers:{'Content-Type':'application/json'}});
+        if (!/^09\d{8}$/.test(contact) && !/^@?[A-Za-z0-9._-]{2,30}$/.test(contact))
+          return new Response(JSON.stringify({ok:false,err:'contact_format'}),{status:400,headers:{'Content-Type':'application/json'}});
         const stage = String(b.stage||'').slice(0,20), biz = String(b.biz||'').slice(0,20);
-        const needs = Array.isArray(b.needs)? b.needs.map(String).join(',').slice(0,200) : '';
+        const needsArr = Array.isArray(b.needs)? b.needs.map(String).slice(0,10) : [];
         const ipRaw = request.headers.get('cf-connecting-ip')||'';
         const ipBuf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ipRaw));
         const ipHash = [...new Uint8Array(ipBuf)].slice(0,8).map(x=>x.toString(16).padStart(2,'0')).join('');
         await ensureTable(env);
+        // rate limit:同 IP 每日 20 筆(無 KV binding,直接以 D1 計數)
         if (env.CRM) {
-          ctx.waitUntil(env.CRM.prepare("INSERT INTO ai_subsidy_leads (contact,stage,biz,needs,ip_hash,ua) VALUES (?,?,?,?,?,?)")
-            .bind(contact,stage,biz,needs,ipHash,(request.headers.get('user-agent')||'').slice(0,150)).run().catch(e=>console.error('[ai-subsidy] insert',e.message)));
+          const rl = await env.CRM.prepare("SELECT COUNT(*) n FROM ai_subsidy_leads WHERE ip_hash=? AND created_at >= datetime('now','-1 day')").bind(ipHash).first().catch(()=>null);
+          if (rl && rl.n >= 20) return new Response(JSON.stringify({ok:false,err:'rate_limited'}),{status:429,headers:{'Content-Type':'application/json'}});
         }
-        return new Response(JSON.stringify({ok:true}),{headers:{'Content-Type':'application/json'}});
+        const { matches, total_amount } = matchSubsidies({ stage, biz, needs: needsArr });
+        if (env.CRM) {
+          ctx.waitUntil(env.CRM.prepare("INSERT INTO ai_subsidy_leads (contact,stage,biz,needs,ip_hash,ua,matched_json,total_amount) VALUES (?,?,?,?,?,?,?,?)")
+            .bind(contact,stage,biz,needsArr.join(',').slice(0,200),ipHash,(request.headers.get('user-agent')||'').slice(0,150),JSON.stringify(matches),total_amount).run().catch(e=>console.error('[ai-subsidy] insert',e.message)));
+        }
+        // 省 LINE 免費額度(200 則/月):只在有高適配時 push
+        if (matches.high.length > 0) {
+          ctx.waitUntil(notifyAdmin(env, { stage, biz, needs: needsArr, contact, matches, total_amount }));
+        }
+        return new Response(JSON.stringify({ok:true,matches,total_amount}),{headers:{'Content-Type':'application/json'}});
       } catch(e) { return new Response(JSON.stringify({ok:false}),{status:400,headers:{'Content-Type':'application/json'}}); }
     }
     if (url.pathname === '/' || url.pathname === '/index.html') {
