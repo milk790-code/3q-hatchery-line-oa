@@ -238,9 +238,11 @@ jobs:
           mkdir -p _debug
 
           # Probe D1 binding — if not accessible, deploy without CRM (becomes no-op)
-          d1_check=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
-            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}" \
-            | jq -r '.success // false')
+          # P2b fix: metadata GET 需要 token 沒有的 scope,改用 query POST 驗活(與 migrations 同權限)
+          d1_check=$(curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+            -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" \
+            -d '{"sql":"SELECT 1"}' | jq -r '.success // false')
           if [ "$d1_check" = "true" ]; then
             CRM_BINDING=",{\"name\": \"CRM\", \"type\": \"d1\", \"id\": \"$CRM_D1_ID\"}"
             echo "::notice::D1 binding OK"
