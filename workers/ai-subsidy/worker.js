@@ -1,6 +1,6 @@
 // 3q-ai-subsidy — AI 補助落地頁 worker(獨立,不碰 3q-art-portfolio / LINE 三層)
 // GET / → 落地頁(含 OG);POST /api/lead → D1 ai_subsidy_leads;GET /health。
-const VER = 'v1';
+const VER = 'v1.1';
 const PAGE = `<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -703,6 +703,18 @@ export default {
       } catch(e) { return new Response(JSON.stringify({ok:false}),{status:400,headers:{'Content-Type':'application/json'}}); }
     }
     if (url.pathname === '/' || url.pathname === '/index.html') {
+      // v1.1 訪問追蹤:寫 social_events(與 launch-plan 同表,utm 可比),失敗不影響頁面
+      if (env.CRM) {
+        ctx.waitUntil((async()=>{
+          try {
+            const ipRaw = request.headers.get('cf-connecting-ip')||'';
+            const ipBuf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ipRaw));
+            const ipHash = [...new Uint8Array(ipBuf)].slice(0,8).map(x=>x.toString(16).padStart(2,'0')).join('');
+            await env.CRM.prepare("INSERT INTO social_events (utm_source,utm_medium,utm_campaign,utm_content,event_type,ip_hash,referrer) VALUES (?,?,?,?,'visit',?,?)")
+              .bind(url.searchParams.get('utm_source')||'direct', url.searchParams.get('utm_medium')||'', url.searchParams.get('utm_campaign')||'ai-subsidy', url.searchParams.get('utm_content')||'', ipHash, (request.headers.get('referer')||'').slice(0,200)).run();
+          } catch(e) { console.error('[ai-subsidy] visit log', e.message); }
+        })());
+      }
       return new Response(PAGE, {headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'public, max-age=300'}});
     }
     return Response.redirect(url.origin + '/', 302);
