@@ -1,4 +1,4 @@
-// 3q-site — 3Q 官網三頁(index/assess/contact)靜態服務 v1
+// 3q-site v1.1 — 超強鉤子版
 const FILES = {
   "/3q-typography.css": { ct: "text/css; charset=utf-8", body: `/* ─── 三根手指頭 · Typography Tokens ──────────────────────────────
    三字體系統：中文標題 Noto Serif TC + 英文裝飾 Cormorant Garamond + 內文 Noto Sans TC
@@ -665,7 +665,7 @@ function CountUp({ end, suffix = '', prefix = '' }) {
 }
 
 const HEADLINES = {
-  '品牌主張': { line1: '你的事業體，', line2: '缺的不是努力。' },
+  '品牌主張': { line1: '整整三年，', line2: '不用花你一塊錢。' },
   '數據開場': { line1: '該拿的資源，', line2: '一項都不漏。' },
 };
 
@@ -3038,7 +3038,7 @@ __ds_ns.StatBadge = __ds_scope.StatBadge;
 export default {
   async fetch(request) {
     const url = new URL(request.url);
-    if (url.pathname === '/health') return new Response(JSON.stringify({ok:true,worker:'3q-site',ver:'v1',pages:Object.keys(FILES).filter(k=>k.endsWith('.html')).length}),{headers:{'Content-Type':'application/json'}});
+    if (url.pathname === '/health') return new Response(JSON.stringify({ok:true,worker:'3q-site',ver:'v1.1',pages:Object.keys(FILES).filter(k=>k.endsWith('.html')).length}),{headers:{'Content-Type':'application/json'}});
     let p = url.pathname;
     if (p === '/') p = '/index.html';
     if (!FILES[p] && FILES[p + '.html']) p = p + '.html';
