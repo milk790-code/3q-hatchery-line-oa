@@ -1,14 +1,18 @@
 name: 🚀 Deploy ALL microsites (orchestrator)
 
-# 一鍵全微站部署 dispatcher。
+# 一鍵 / 零鍵全微站部署 dispatcher。
 # matrix fan-out 觸發 9 支既有 deploy-* workflow，不複製任何部署邏輯（零 drift）。
 # 單支失敗不拖累其他（fail-fast:false + continue-on-error）。
+# summary 會回讀 9 支下游 run 的真實綠/紅燈，寫進 Step Summary，並（若有 LINE secret）推播到 OWNER。
 #
-# ⚠️ 前置（一次性）：GitHub 的 GITHUB_TOKEN 無法觸發其他 workflow 的 workflow_dispatch
-#   （防遞迴硬限制），故需一個 PAT。沒設 PAT 時本檔不會紅燈，會自動降級為「手動連結模式」。
-#   設定路徑：Settings → Secrets and variables → Actions → New repository secret
-#            Name = ORCHESTRATOR_PAT
-#            Value = 一個 fine-grained PAT，對本 repo 給 "Actions: Read and write" + "Contents: Read"
+# 觸發方式：
+#   1. 手動 Run workflow（可指定 targets）
+#   2. 排程：每週一 08:00 台灣（00:00 UTC）自動全站重建
+#
+# ⚠️ 前置（一次性）：
+#   - ORCHESTRATOR_PAT（必需，fan-out 用）：Settings → Secrets and variables → Actions
+#       fine-grained PAT 對本 repo 給 "Actions: Read and write" + "Contents: Read"
+#   - LINE_CHANNEL_ACCESS_TOKEN + OWNER_USER_ID（可選，週報推播用）：缺則自動略過、不報錯
 
 on:
   workflow_dispatch:
@@ -18,6 +22,8 @@ on:
         required: false
         default: 'all'
         type: string
+  schedule:
+    - cron: '0 0 * * 1'   # 每週一 00:00 UTC = 08:00 台灣，全站健檢式重建
 
 permissions:
   actions: write
@@ -95,33 +101,64 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - name: Write summary
+      - name: Poll downstream results + notify
         env:
+          GH_TOKEN: ${{ secrets.ORCHESTRATOR_PAT }}
           REPO: ${{ github.repository }}
           HAS_PAT: ${{ needs.preflight.outputs.has_pat }}
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          OWNER: ${{ secrets.OWNER_USER_ID }}
         run: |
           set -euo pipefail
           ALL="deploy-ai-subsidy deploy-art-portfolio deploy-fukubukuro deploy-tudigong deploy-sales-ai deploy-pop-line-oa deploy-outreach deploy-sanzhi-pages renovation-deploy"
+
+          if [ "${HAS_PAT}" != "true" ]; then
+            {
+              echo "## 🚀 全微站部署 orchestrator"
+              echo ""
+              echo "### ⚠️ 未設 \`ORCHESTRATOR_PAT\` — 降級為手動連結模式（本檔未失敗）"
+              echo "GitHub 的 \`GITHUB_TOKEN\` 無法 fan-out 觸發其他 workflow（防遞迴硬限制）。設一次 PAT 即可全自動。"
+              echo ""
+              for w in $ALL; do echo "- [$w](https://github.com/${REPO}/actions/workflows/$w.yml)"; done
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          echo "::notice::等待下游 run 完成（90s）後回讀綠/紅燈"
+          sleep 90
+
+          report=""; ok=0; bad=0; pending=0
+          for w in $ALL; do
+            concl=$(curl -sS -H "Authorization: Bearer ${GH_TOKEN}" \
+              "https://api.github.com/repos/${REPO}/actions/workflows/${w}.yml/runs?branch=main&per_page=1" \
+              | jq -r '.workflow_runs[0].conclusion // "in_progress"')
+            case "$concl" in
+              success) icon="✅"; ok=$((ok+1));;
+              failure|cancelled|timed_out|startup_failure) icon="❌"; bad=$((bad+1));;
+              *) icon="⏳"; pending=$((pending+1));;
+            esac
+            report="${report}- ${icon} ${w} (${concl})\n"
+          done
+
           {
             echo "## 🚀 全微站部署 orchestrator"
-            if [ "${HAS_PAT}" = "true" ]; then
-              echo "已對選定微站送出 \`workflow_dispatch\`。各自綠/紅燈見下方各連結："
-              echo ""
-              for w in $ALL; do
-                echo "- [$w](https://github.com/${REPO}/actions/workflows/$w.yml)"
-              done
-              echo ""
-              echo "👉 [一次看全部 dispatch 結果](https://github.com/${REPO}/actions?query=event%3Aworkflow_dispatch)"
-            else
-              echo "### ⚠️ 未設 \`ORCHESTRATOR_PAT\` — 已降級為手動連結模式（本檔未失敗）"
-              echo ""
-              echo "GitHub 的 \`GITHUB_TOKEN\` 無法 fan-out 觸發其他 workflow（防遞迴硬限制）。"
-              echo "設一次 PAT 即可全自動。路徑：**Settings → Secrets and variables → Actions → New repository secret**，Name = \`ORCHESTRATOR_PAT\`。"
-              echo ""
-              echo "在設好之前，逐支手動連結（點進去按 Run workflow）："
-              echo ""
-              for w in $ALL; do
-                echo "- [$w](https://github.com/${REPO}/actions/workflows/$w.yml)"
-              done
-            fi
+            echo ""
+            echo "**綠 ${ok} / 紅 ${bad} / 進行中 ${pending}**　（共 9 支）"
+            echo ""
+            printf '%b' "$report"
+            echo ""
+            echo "👉 [全部 dispatch 結果](https://github.com/${REPO}/actions?query=event%3Aworkflow_dispatch)"
           } >> "$GITHUB_STEP_SUMMARY"
+
+          # LINE 推播（guarded：缺 secret 或非 fan-out 模式則略過，永不擋流程）
+          if [ -n "${LINE_TOKEN:-}" ] && [ -n "${OWNER:-}" ]; then
+            msg=$(printf '🚀 3Q 全站重建\n綠 %s / 紅 %s / 進行中 %s\n\n%b' "$ok" "$bad" "$pending" "$report")
+            curl -sS -X POST https://api.line.me/v2/bot/message/push \
+              -H "Authorization: Bearer ${LINE_TOKEN}" \
+              -H "Content-Type: application/json" \
+              -d "$(jq -n --arg to "$OWNER" --arg t "$msg" '{to:$to, messages:[{type:"text", text:$t}]}')" \
+              >/dev/null && echo "::notice::LINE 週報已推播" \
+              || echo "::warning::LINE push 失敗（不擋流程）"
+          else
+            echo "::notice::LINE secret 不全（LINE_CHANNEL_ACCESS_TOKEN / OWNER_USER_ID），略過推播"
+          fi
