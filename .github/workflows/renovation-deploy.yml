@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'home-renovation/**'
+  schedule:
+    - cron: '0 */6 * * *'   # 每 6 小時自動跑：安全門 + 線上驗證（00:00 06:00 12:00 18:00 UTC）
   workflow_dispatch: {}
 
 jobs:
