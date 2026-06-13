@@ -53,6 +53,15 @@ jobs:
             && echo "::notice::3q-social-publisher OK (v$ver)" \
             || echo "::warning::3q-social-publisher /health no version field"
 
+      - name: Probe 3q-ai-subsidy (AI補助媒合 v2.0)
+        continue-on-error: true
+        run: |
+          resp=$(curl -sS --max-time 15 "https://3q-ai-subsidy.milk790.workers.dev/health" || echo '{}')
+          echo "$resp" | jq .
+          echo "$resp" | jq -e '.ok == true' > /dev/null \
+            && echo "::notice::3q-ai-subsidy OK" \
+            || echo "::warning::3q-ai-subsidy /health returned ok!=true"
+
       - name: Probe Pages PNG (rich menu asset)
         run: |
           set -euo pipefail
@@ -73,4 +82,5 @@ jobs:
           echo "| 3q-site | (見日誌) |" >> $GITHUB_STEP_SUMMARY
           echo "| 3q-outreach | (見日誌) |" >> $GITHUB_STEP_SUMMARY
           echo "| 3q-social-publisher | (見日誌) |" >> $GITHUB_STEP_SUMMARY
+          echo "| 3q-ai-subsidy | (見日誌) |" >> $GITHUB_STEP_SUMMARY
           echo "| Pages PNG | (見日誌) |" >> $GITHUB_STEP_SUMMARY
