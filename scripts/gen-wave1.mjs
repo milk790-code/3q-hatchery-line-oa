@@ -1,0 +1,95 @@
+#!/usr/bin/env node
+// 一次性生成器:3Q_30day_schedule.txt → content/feed/wave1a.json + wave1b.json
+// D1-D16 → wave1a(48筆); D17-D30 → wave1b(42筆)
+// 台北 08:00 = UTC 00:00(scheduled_at)
+import { writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+const IMG = 'https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports/og-ai-subsidy-sq.png';
+const BASE_URL = 'https://3q-site.milk790.workers.dev/';
+
+const TEMPLATES = [
+  {
+    caption: `開公司燒錢燒到手軟，政府每年數百億補助預算，你申請了多少？\n這不是廣告，是公開資訊：\nSBIR、SIIR、青年創業貸款……符合條件的企業主，\n透過補助疊加，三年自付成本可以壓到極低。\n多數老闆不是資格不夠——是根本沒空去查哪些計畫還在開放。\n三題快速測試，對出你目前符合的方案（無需登入、不留個資）\n👉 馬上測：${BASE_URL}\n你的行業有哪些申請窗口？加 LINE 免費諮詢。\n*補助申請結果以各主管機關審核為準，金額視計畫條件而定。`,
+    tags: '#政府補助 #創業補助攻略 #AI補助 #中小企業補助 #SBIR #台灣創業 #補助申請',
+    topic_tag: '政府補助',
+  },
+  {
+    caption: `直接說重點：台灣現行政府補助計畫，單筆最高可達數百萬。\n不用你自己啃公文。\n我們把所有現行計畫逐條整理好了——\nSBIR、SIIR、微創鳳凰、青年創業貸款。\n符合條件的話，三年透過疊加申請，自付成本可以大幅降低。\n三個問題，立刻看你符合哪些方案，不用留個資\n👉 直接進連結測：${BASE_URL}\n你的產業現在開放哪些計畫？加 LINE 問我就好。\n*補助核定以各主管機關審查為準，個別金額視申請計畫而定。`,
+    tags: '#政府補助 #創業補助 #補助申請 #AI補助 #台灣創業 #SBIR #數位轉型',
+    topic_tag: '政府補助',
+  },
+  {
+    caption: `你知道嗎——已經在用政府補助降低營運成本的企業，比你想像的多。\n不是他們有什麼門路，是他們花時間查了哪些計畫還開放申請。\nSBIR、SIIR、數位轉型培力……公開計畫，符合條件就能提案。\n三年下來透過補助疊加，自付開銷可以大幅縮減。\n三題快速測試，對出你的補助資格路線，不用登入不用留資料\n👉 連結在這：${BASE_URL}\n你的行業有哪些可以申請？加 LINE 我幫你查。\n*申請結果以主管機關審核為準，補助金額視計畫條件而定。`,
+    tags: '#政府補助 #中小企業補助 #補助攻略 #SBIR #台灣創業 #AI創業 #補助申請',
+    topic_tag: '中小企業補助',
+  },
+  {
+    caption: `補助計畫都有年度申請截止日和名額上限——這是制度設計，不是在唬你。\n每年預算固定，先提案先審核，等你準備好才送件有機會成本。\nSBIR、SIIR 這類計畫，符合條件通過審核後不需償還。\n三年規劃下來，透過分批疊加申請，自付成本可以大幅下降。\n三題測出你現在能申請哪些，趁現行申請窗口還開著\n👉 趕快測：${BASE_URL}\n確認你目前的申請時間窗口？加 LINE 免費幫你確認。\n*各計畫申請期程以主管機關公告為準，請以官方資訊確認截止日。`,
+    tags: '#政府補助 #創業補助 #補助申請 #SBIR #台灣創業 #AI補助 #中小企業補助',
+    topic_tag: '創業補助',
+  },
+  {
+    caption: `以為政府補助流程很複雜？三個問題就能知道你符不符合資格。\nSBIR、SIIR、微創鳳凰、數位轉型補助——\n多數中小企業主符合其中至少一項申請資格。\n我們把現行所有計畫比對整理好了，不用你自己花時間翻公文。\n符合條件的情況下，三年補助疊加可以大幅降低自付成本。\n全程不用登入、不用留個資，進連結馬上測\n👉 測試連結：${BASE_URL}\n你的行業開放哪些申請？加 LINE 我幫你看。\n*補助申請核定以主管機關審查為準，個別金額視計畫條件而定。`,
+    tags: '#政府補助 #AI補助 #補助攻略 #台灣創業 #SBIR #中小企業補助 #創業資源',
+    topic_tag: 'AI補助',
+  },
+];
+
+// 以 2026-06-13 為基準，加 d 天
+function dateUtc(d) {
+  const dt = new Date('2026-06-13T00:00:00Z');
+  dt.setUTCDate(dt.getUTCDate() + d);
+  return dt.toISOString().replace('.000Z', 'Z'); // 2026-06-14T00:00:00Z
+}
+
+function utmTag(d) { return `w1d${String(d).padStart(2, '0')}`; }
+
+const all = [];
+for (let d = 1; d <= 30; d++) {
+  const t = TEMPLATES[(d - 1) % 5];
+  const utm = utmTag(d);
+  const scheduled_at = dateUtc(d);
+  const igCaption = `${t.caption}\n\n${t.tags}`;
+
+  // Facebook — plain text + link_url (UTM歸因走首留言)
+  all.push({
+    platform: 'facebook',
+    caption: t.caption,
+    link_url: `${BASE_URL}?utm_source=fb&utm_medium=organic&utm_campaign=30day&utm_content=${utm}`,
+    scheduled_at,
+    source_oa: '3q-hatchery',
+  });
+
+  // Threads — 加 topic_tag
+  all.push({
+    platform: 'threads',
+    caption: t.caption,
+    topic_tag: t.topic_tag,
+    link_url: `${BASE_URL}?utm_source=threads&utm_medium=organic&utm_campaign=30day&utm_content=${utm}`,
+    scheduled_at,
+    source_oa: '3q-hatchery',
+  });
+
+  // Instagram — 必填 image_url,caption 帶 hashtags
+  all.push({
+    platform: 'instagram',
+    caption: igCaption,
+    image_url: IMG,
+    scheduled_at,
+    source_oa: '3q-hatchery',
+  });
+}
+
+// 分檔(≤50筆)
+const wave1a = all.slice(0, 48);   // D1-D16
+const wave1b = all.slice(48, 90);  // D17-D30
+
+writeFileSync(join(ROOT, 'content/feed/wave1a.json'), JSON.stringify(wave1a, null, 2) + '\n');
+writeFileSync(join(ROOT, 'content/feed/wave1b.json'), JSON.stringify(wave1b, null, 2) + '\n');
+
+console.log(`wave1a.json: ${wave1a.length} 筆 (D1-D16)`);
+console.log(`wave1b.json: ${wave1b.length} 筆 (D17-D30)`);
+console.log(`合計: ${wave1a.length + wave1b.length} 筆`);
