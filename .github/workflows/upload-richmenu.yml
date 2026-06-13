@@ -1,5 +1,17 @@
 name: Upload LINE Rich Menus
 
+# Full automation:
+#   1. Rebuilds 3 LINE schemas (A/B/C) with --prune
+#   2. Parses the new richmenu IDs from output
+#   3. Auto-pushes IDs to Cloudflare Worker via Wrangler (if CLOUDFLARE_API_TOKEN is set)
+#
+# Required secrets:
+#   LINE_CHANNEL_ACCESS_TOKEN  — existing
+#   CLOUDFLARE_API_TOKEN       — needs Workers Scripts:Edit permission
+#   CLOUDFLARE_ACCOUNT_ID      — your CF account ID (found in dashboard sidebar)
+# Optional variable (defaults to 3q-hatchery-webhook):
+#   CF_WORKER_NAME             — Settings → Variables and variables → Repository variables
+
 on:
   workflow_dispatch:
 
@@ -33,17 +45,70 @@ jobs:
         run: |
           if [[ -z "$CHANNEL_TOKEN" ]]; then
             echo "::error::Repo secret LINE_CHANNEL_ACCESS_TOKEN is not set."
-            echo "Go to Settings → Secrets and variables → Actions → New repository secret"
             exit 1
           fi
           bash ../../scripts/upload-richmenu.sh --prune 2>&1 | tee /tmp/upload.log
-          {
-            echo "## Rich Menu Upload Result"
-            echo ""
-            echo '```'
+
+      - name: Parse new richmenu IDs
+        run: |
+          ID_A=$(grep 'RICHMENU_NEW' /tmp/upload.log | grep -oE "richmenu-[a-f0-9]+" | head -1)
+          ID_B=$(grep 'RICHMENU_INQUIRED' /tmp/upload.log | grep -oE "richmenu-[a-f0-9]+" | head -1)
+          ID_C=$(grep 'RICHMENU_CONVERTED' /tmp/upload.log | grep -oE "richmenu-[a-f0-9]+" | head -1)
+
+          if [[ -z "$ID_A" || -z "$ID_B" || -z "$ID_C" ]]; then
+            echo "::error::Could not parse richmenu IDs from upload output."
             cat /tmp/upload.log
-            echo '```'
+            exit 1
+          fi
+
+          echo "  A版 → $ID_A"
+          echo "  B版 → $ID_B"
+          echo "  C版 → $ID_C"
+
+          {
+            echo "ID_A=$ID_A"
+            echo "ID_B=$ID_B"
+            echo "ID_C=$ID_C"
+          } >> "$GITHUB_ENV"
+
+      - name: Auto-update Cloudflare Worker secrets
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WORKER_NAME: ${{ vars.CF_WORKER_NAME || '3q-hatchery-webhook' }}
+        run: |
+          if [[ -z "${CLOUDFLARE_API_TOKEN:-}" ]]; then
+            echo "::warning::CLOUDFLARE_API_TOKEN not set — skipping auto CF update."
+            echo "Add CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID secrets to enable full automation."
+            exit 0
+          fi
+
+          npm install --no-save wrangler --quiet 2>/dev/null
+
+          echo "▸ Pushing to Cloudflare Worker '$WORKER_NAME'..."
+          printf '%s' "$ID_A" | npx wrangler secret put RICHMENU_NEW       --name "$WORKER_NAME"
+          printf '%s' "$ID_B" | npx wrangler secret put RICHMENU_INQUIRED  --name "$WORKER_NAME"
+          printf '%s' "$ID_C" | npx wrangler secret put RICHMENU_CONVERTED --name "$WORKER_NAME"
+
+          echo "::notice::✅ Cloudflare Worker secrets updated — hot-reloads within ~5s"
+
+      - name: Summary
+        run: |
+          cf_status="⚠️ 未設定 CLOUDFLARE_API_TOKEN，需手動更新"
+          [[ -n "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]] && cf_status="✅ 已自動更新"
+          {
+            echo "## Rich Menu Upload 完成"
             echo ""
-            echo "### Next step"
-            echo "Copy the three \`const RICHMENU_*\` lines above and paste into Cloudflare Worker env vars."
+            echo "| 版本 | Schema ID |"
+            echo "|------|-----------|"
+            echo "| A版 (新朋友) | \`$ID_A\` |"
+            echo "| B版 (詢問中) | \`$ID_B\` |"
+            echo "| C版 (會員)   | \`$ID_C\` |"
+            echo ""
+            echo "### Cloudflare Worker"
+            echo "$cf_status"
+            echo ""
+            echo '```'
+            cat /tmp/upload.log | grep -A3 "三個 Rich Menu"
+            echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
