@@ -18,8 +18,8 @@ function pickModel(history) {
 // /go=LINE轉跳  /health
 // 大腦:ANTHROPIC_API_KEY → claude-sonnet-4-6;無 → Workers AI llama
 
-const LINE_URL = 'https://line.me/R/ti/p/@tudigong';
-const LINE_ID = '@tudigong';
+const LINE_URL = 'https://line.me/R/ti/p/@207cpaps';
+const LINE_ID = '@207cpaps';
 const BRAND = '呆丸土地公';
 const CAMPAIGN = 'tudigong-sales-ai';
 
@@ -163,7 +163,7 @@ function add(t,me){const d=document.createElement('div');d.className='msg '+(me?
 async function send(){const t=inp.value.trim();if(!t)return;inp.value='';add(t,true);btn.disabled=true;
 const w=document.createElement('div');w.className='msg ai';w.textContent='…';box.appendChild(w);
 try{const r=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sid,message:t})});
-const d=await r.json();w.textContent=d.reply||'等我一下,馬上回你。';}catch(e){w.textContent='連線不穩,加 LINE 找我們:@tudigong';}
+const d=await r.json();w.textContent=d.reply||'等我一下,馬上回你。';}catch(e){w.textContent='連線不穩,加 LINE 找我們:@207cpaps';}
 btn.disabled=false;box.scrollTop=box.scrollHeight;}
 btn.onclick=send;inp.addEventListener('keydown',e=>{if(e.key==='Enter')send();});
 `;
@@ -267,7 +267,7 @@ h1 span{color:#e8632c}
 <div class="g"><b>中立立場</b>不賣房、不帶看、不收房仲業配,情報只對你負責。</div>
 <div class="g"><b>深度報告</b>要更完整的商圈與行情判讀,談付費選址報告。</div>
 </div>
-<a class="cta" href="/go">加 LINE @tudigong 傳地址</a>
+<a class="cta" href="/go">加 LINE @207cpaps 傳地址</a>
 <h1 style="font-size:18px;margin-bottom:10px">先問問土地公</h1>
 <div id="chat"></div>
 <div class="inrow"><input id="inp" placeholder="例:租店面要注意哪些嫌惡設施"><button id="send">送出</button></div>
