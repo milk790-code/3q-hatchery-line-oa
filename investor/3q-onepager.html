@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3Q × CDG — 投資人摘要</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Noto+Serif+TC:wght@300;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --ink:#0B0E14;--ink2:#10151E;--ink3:#151B26;--panel:#0E131C;
+  --line:#222C3B;--soft:#1A2230;
+  --teal:#2DD4BF;--teal-s:#0E2E2B;--teal-d:rgba(45,212,191,.12);
+  --violet:#8B7DF6;--vio-s:#1C1A33;
+  --amber:#E6B450;--amb-s:#2A2113;
+  --rose:#F2768E;--green:#3DD68C;--red:#F87171;
+  --text:#EAF0F7;--t2:#9DAFC3;--t3:#5C6C80;
+  --sans:'Noto Sans TC',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --serif:'Noto Serif TC',Georgia,serif;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--ink);color:var(--text);font-family:var(--sans);line-height:1.6;}
+
+/* noise overlay */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:.35;z-index:0;}
+
+/* ── layout ── */
+.wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 32px;}
+
+/* ── hero ── */
+.hero{padding:88px 0 64px;border-bottom:1px solid var(--line);}
+.hero-eye{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--teal);text-transform:uppercase;margin-bottom:22px;display:flex;align-items:center;gap:10px;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);display:inline-block;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.hero h1{font-family:var(--serif);font-size:clamp(32px,4.5vw,54px);font-weight:700;line-height:1.2;letter-spacing:-.01em;margin-bottom:28px;}
+.hero h1 em{color:var(--teal);font-style:normal;}
+.hero-sub{font-size:17px;color:var(--t2);max-width:680px;line-height:1.75;}
+
+/* ── live metrics ── */
+.metrics{padding:52px 0;border-bottom:1px solid var(--line);}
+.metrics-label{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--t3);text-transform:uppercase;margin-bottom:28px;}
+.m-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.mc{background:var(--ink2);border:1px solid var(--line);border-radius:16px;padding:22px 24px;}
+.mc.gold{border-color:rgba(230,180,80,.3);}
+.mc.teal-b{border-color:rgba(45,212,191,.3);}
+.mc .num{font-family:var(--mono);font-size:36px;font-weight:700;line-height:1;color:#fff;margin-bottom:6px;}
+.mc.gold .num{color:var(--amber);}
+.mc.teal-b .num{color:var(--teal);}
+.mc .num sup{font-size:18px;opacity:.7;}
+.mc .desc{font-size:13px;color:var(--t2);line-height:1.45;}
+.mc .tag{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--t3);margin-top:4px;}
+
+/* ── section ── */
+.section{padding:52px 0;border-bottom:1px solid var(--line);}
+.sec-eye{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--teal);text-transform:uppercase;margin-bottom:14px;}
+.sec-h{font-family:var(--serif);font-size:28px;font-weight:700;margin-bottom:18px;line-height:1.3;}
+.sec-h em{color:var(--teal);font-style:normal;}
+.sec-p{font-size:15.5px;color:var(--t2);line-height:1.8;max-width:720px;}
+.sec-p b{color:var(--text);}
+
+/* ── two-brain cards ── */
+.brain-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:28px;}
+.bc{border-radius:16px;padding:26px;position:relative;overflow:hidden;}
+.bc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.bc.b1{background:linear-gradient(135deg,rgba(45,212,191,.08),rgba(45,212,191,.03));border:1px solid rgba(45,212,191,.2);}
+.bc.b1::before{background:var(--teal);}
+.bc.b2{background:linear-gradient(135deg,rgba(139,125,246,.08),rgba(139,125,246,.03));border:1px solid rgba(139,125,246,.2);}
+.bc.b2::before{background:var(--violet);}
+.bc-icon{font-size:28px;margin-bottom:10px;}
+.bc-tag{font-family:var(--mono);font-size:10px;letter-spacing:.1em;margin-bottom:6px;}
+.bc.b1 .bc-tag{color:var(--teal);}.bc.b2 .bc-tag{color:var(--violet);}
+.bc-t{font-size:18px;font-weight:900;margin-bottom:10px;}
+.bc-d{font-size:13.5px;color:var(--t2);line-height:1.65;}
+.bc-d b{color:var(--text);}
+
+/* ── flywheel pill ── */
+.flywheel{background:var(--teal-s);border:1px solid rgba(45,212,191,.2);border-radius:12px;padding:14px 20px;margin-top:20px;font-family:var(--mono);font-size:13px;color:var(--teal);text-align:center;letter-spacing:.03em;}
+
+/* ── moat ── */
+.moat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:24px;}
+.mt{background:var(--ink2);border:1px solid var(--line);border-radius:14px;padding:18px 20px;}
+.mt .mt-i{font-size:22px;margin-bottom:8px;}
+.mt .mt-t{font-size:14px;font-weight:700;margin-bottom:5px;}
+.mt .mt-d{font-size:12.5px;color:var(--t2);line-height:1.5;}
+
+/* ── traction timeline ── */
+.traction{margin-top:26px;}
+.tr-row{display:flex;align-items:flex-start;gap:16px;padding:14px 0;border-bottom:1px solid var(--soft);}
+.tr-row:last-child{border:none;}
+.tr-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.dot-g{background:var(--green);}.dot-a{background:var(--amber);}.dot-v{background:var(--violet);}
+.tr-body{flex:1;}
+.tr-title{font-size:14.5px;font-weight:700;margin-bottom:3px;}
+.tr-desc{font-size:13px;color:var(--t2);}
+
+/* ── use of funds ── */
+.fund-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px;}
+.fd{background:var(--ink2);border:1px solid var(--line);border-radius:14px;padding:16px 18px;text-align:center;}
+.fd .fp{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--teal);margin-bottom:6px;}
+.fd .fl{font-size:12px;color:var(--t2);line-height:1.4;}
+
+/* ── ask block ── */
+.ask{background:linear-gradient(135deg,var(--teal-s),var(--vio-s));border:1px solid rgba(45,212,191,.2);border-radius:20px;padding:36px 40px;margin-top:0;display:flex;align-items:center;gap:40px;}
+.ask-num{flex-shrink:0;}
+.ask-num .an{font-family:var(--mono);font-size:52px;font-weight:700;color:var(--teal);line-height:1;}
+.ask-num .al{font-family:var(--mono);font-size:13px;color:var(--teal);opacity:.7;margin-top:4px;letter-spacing:.08em;}
+.ask-body h3{font-size:20px;font-weight:900;margin-bottom:10px;}
+.ask-body p{font-size:14px;color:var(--t2);line-height:1.7;}
+.ask-body p b{color:var(--text);}
+
+/* ── cta ── */
+.cta-section{padding:64px 0 80px;}
+.cta-inner{background:var(--ink2);border:1px solid var(--line);border-radius:20px;padding:48px 48px;text-align:center;}
+.cta-inner h2{font-family:var(--serif);font-size:30px;font-weight:700;margin-bottom:14px;}
+.cta-inner h2 em{color:var(--teal);font-style:normal;}
+.cta-inner p{font-size:15px;color:var(--t2);max-width:520px;margin:0 auto 28px;line-height:1.7;}
+.cta-buttons{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:999px;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer;border:none;font-family:var(--sans);}
+.btn-primary{background:var(--teal);color:#0B0E14;}
+.btn-secondary{background:transparent;color:var(--text);border:1px solid var(--line);}
+.btn-secondary:hover{border-color:var(--teal);color:var(--teal);}
+
+/* ── header nav ── */
+.topbar{position:sticky;top:0;z-index:100;background:rgba(11,14,20,.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--soft);}
+.topbar-inner{max-width:900px;margin:0 auto;padding:0 32px;height:52px;display:flex;align-items:center;justify-content:space-between;}
+.topbar-logo{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--teal);letter-spacing:.08em;}
+.topbar-chips{display:flex;gap:10px;}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-family:var(--mono);font-size:11px;border:1px solid var(--line);color:var(--t2);}
+.chip.live{border-color:rgba(61,214,140,.3);color:var(--green);}
+
+/* ── footer ── */
+.foot{border-top:1px solid var(--soft);padding:24px 0;}
+.foot-inner{display:flex;justify-content:space-between;align-items:center;}
+.foot-copy{font-family:var(--mono);font-size:11px;color:var(--t3);}
+.foot-copy b{color:var(--teal);}
+
+@media(max-width:640px){
+  .m-grid,.brain-row,.moat-row,.fund-row{grid-template-columns:1fr 1fr;}
+  .ask{flex-direction:column;gap:20px;}
+  .fund-row{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-logo">3Q × CDG</div>
+    <div class="topbar-chips">
+      <span class="chip live"><span class="live-dot"></span>LIVE</span>
+      <span class="chip">Seed Round · NT$2,000萬</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── HERO ── -->
+<div class="wrap">
+  <section class="hero">
+    <div class="hero-eye"><span class="live-dot"></span>2026-06-13 實證快照 · 此刻正在運轉</div>
+    <h1>你看過哪個台灣新創,<br>拿到投資之前就已經有<br><em>23 個系統在自動接客賺錢</em>?</h1>
+    <p class="hero-sub">3Q 台灣在地品牌孵化所打造了一套 AI 商業基礎設施——一顆業務大腦同時驅動多個品牌,一顆自走工廠維護並進化整個系統。不是簡報裡的藍圖;是此刻正在跑的真東西。</p>
+  </section>
+
+  <!-- ── LIVE METRICS ── -->
+  <section class="metrics">
+    <div class="metrics-label">即時鐵證 · 2026-06-13 快照</div>
+    <div class="m-grid">
+      <div class="mc teal-b">
+        <div class="num">23</div>
+        <div class="desc">已部署 Cloudflare Worker</div>
+        <div class="tag">13 支近 12h 內重佈</div>
+      </div>
+      <div class="mc gold">
+        <div class="num">13,636</div>
+        <div class="desc">獲客引擎排程運轉中</div>
+        <div class="tag">Social Distributor 中控台</div>
+      </div>
+      <div class="mc">
+        <div class="num">6</div>
+        <div class="desc">自走自動化閉環</div>
+        <div class="tag">生代碼→審核→部署 全自動</div>
+      </div>
+      <div class="mc">
+        <div class="num">3</div>
+        <div class="desc">品牌業務 AI Bot 接客中</div>
+        <div class="tag">泡泡怪獸 · 3Q · 呆丸土地公</div>
+      </div>
+      <div class="mc">
+        <div class="num">89<sup>/130</sup></div>
+        <div class="desc">陌生開發已觸及</div>
+        <div class="tag">outreach 引擎自動派送</div>
+      </div>
+      <div class="mc teal-b">
+        <div class="num">v1.3</div>
+        <div class="desc">CDG 中央大腦線上運行</div>
+        <div class="tag">cdg-core · Cloudflare Worker</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TWO BRAINS ── -->
+  <section class="section">
+    <div class="sec-eye">The Architecture · 為什麼別人抄不走</div>
+    <h2 class="sec-h">兩顆腦,<em>一套會自我加速的飛輪</em></h2>
+    <p class="sec-p">大部分 AI 工具是「一次性輸入輸出」——每次都要重來。CDG 的差別是<b>每一筆成交都回填進系統</b>,讓所有品牌共享學到的東西、越跑越準。LOOP 工廠腦則讓整個系統<b>自己維護自己、自己進化自己</b>。人力不隨規模線性增加。</p>
+    <div class="brain-row">
+      <div class="bc b1">
+        <div class="bc-icon">🧠</div>
+        <div class="bc-tag">PRODUCT BRAIN · 賺錢的產品</div>
+        <div class="bc-t">CDG 業務腦</div>
+        <div class="bc-d">一顆引擎多個品牌,新品牌上線 = 加一份 config 零改動。<b>從每一筆真實成交回填學習</b>,跨品牌共享洞察。護城河 = 時間複利的私有成交基因庫。</div>
+      </div>
+      <div class="bc b2">
+        <div class="bc-icon">🏭</div>
+        <div class="bc-tag">FACTORY BRAIN · 自走基礎設施</div>
+        <div class="bc-t">LOOP 工廠腦</div>
+        <div class="bc-d">6 支自走 Actions,<b>自己生代碼、自己審核、自己部署</b>。可逆的全自動、不可逆的留人拍板。蓋出並維護一切——包含 CDG 本身。</div>
+      </div>
+    </div>
+    <div class="flywheel">機器蓋機器：LOOP 蓋出並維護 CDG → CDG 跑出成交資料 → 資料讓兩顆腦都更聰明 → 下一個品牌零成本接入</div>
+  </section>
+
+  <!-- ── MOAT ── -->
+  <section class="section">
+    <div class="sec-eye">Moat · 護城河</div>
+    <h2 class="sec-h">對手抄得走<em>介面</em>,抄不走<em>你跑出來的資料</em></h2>
+    <div class="moat-row">
+      <div class="mt">
+        <div class="mt-i">🧬</div>
+        <div class="mt-t">私有成交基因庫</div>
+        <div class="mt-d">每一筆成交沉澱進三層基因(DNA/RNA/EPIGENOME),跨品牌共享,時間複利。越晚進場越難追。</div>
+      </div>
+      <div class="mt">
+        <div class="mt-i">⚡</div>
+        <div class="mt-t">零邊際品牌成本</div>
+        <div class="mt-d">新品牌接入 = 加一筆 config。無需重新建系統、訓練模型、招工程師。規模不帶人力成本。</div>
+      </div>
+      <div class="mt">
+        <div class="mt-i">🔁</div>
+        <div class="mt-t">補助飛輪鎖客</div>
+        <div class="mt-d">幫客戶申請台灣政府補助(最高 1,200 萬),申請下來的錢回流買 3Q 服務。等於政府幫我們留客。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TRACTION ── -->
+  <section class="section">
+    <div class="sec-eye">Traction · 已驗證的進展</div>
+    <h2 class="sec-h">不是<em>計畫要做</em>,是<em>已經做到的</em></h2>
+    <div class="traction">
+      <div class="tr-row">
+        <div class="tr-dot dot-g"></div>
+        <div class="tr-body">
+          <div class="tr-title">多品牌業務 AI Bot 接客中</div>
+          <div class="tr-desc">泡泡怪獸(汽美耗材)、3Q 孵化所、呆丸土地公——三個品牌 LINE OA 自動接客,AI 依品牌聲腔成交</div>
+        </div>
+      </div>
+      <div class="tr-row">
+        <div class="tr-dot dot-g"></div>
+        <div class="tr-body">
+          <div class="tr-title">Social Distributor 13,636 排程運轉</div>
+          <div class="tr-desc">Railway 中控台自動排程 IG/FB 發文,引流進 CDG 業務腦接客漏斗</div>
+        </div>
+      </div>
+      <div class="tr-row">
+        <div class="tr-dot dot-g"></div>
+        <div class="tr-body">
+          <div class="tr-title">陌生開發引擎已觸及 89 名潛在客戶</div>
+          <div class="tr-desc">outreach 自動化派送,日/週/30min 三種排程,sent 89/130</div>
+        </div>
+      </div>
+      <div class="tr-row">
+        <div class="tr-dot dot-g"></div>
+        <div class="tr-body">
+          <div class="tr-title">補助情報頁 v1.1 上線</div>
+          <div class="tr-desc">台灣 35+ 政府補助完整清單,整合 landing page + lead capture,進入補助飛輪</div>
+        </div>
+      </div>
+      <div class="tr-row">
+        <div class="tr-dot dot-a"></div>
+        <div class="tr-body">
+          <div class="tr-title">孵化所 W1 梯次 6/16 開工</div>
+          <div class="tr-desc">首梯三品牌進三線 bot——這是三指方法論付費驗證的第一棒</div>
+        </div>
+      </div>
+      <div class="tr-row">
+        <div class="tr-dot dot-a"></div>
+        <div class="tr-body">
+          <div class="tr-title">自進化引擎（EPIGENOME evolve）差一個 patch 通電</div>
+          <div class="tr-desc">核心差異化點——通電後 AI 自動從每晚成交資料反思進化,無需人工介入</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ASK ── -->
+  <section class="section">
+    <div class="sec-eye">The Ask · 募資需求</div>
+    <h2 class="sec-h">我們需要的<em>不是概念驗證資金</em>,是<em>加速資金</em></h2>
+    <p class="sec-p" style="margin-bottom:28px;">系統已上線、接客已在跑、梯次已開工。這一輪募資的目的是把幾個已建好但還沒打開的開關全部通電,讓飛輪從「轉起來了」進入「轉快了」。</p>
+    <div class="ask">
+      <div class="ask-num">
+        <div class="an">2,000<span style="font-size:28px;opacity:.6">萬</span></div>
+        <div class="al">NT$ SEED ROUND</div>
+      </div>
+      <div class="ask-body">
+        <h3>資金用途拆解</h3>
+        <p><b>40% 技術加速</b> — evolve 自進化通電、ECPay 金流閉環、廣告通路解鎖(Google Ads 15 關鍵字已建好)<br>
+        <b>30% 孵化梯次擴張</b> — W2/W3 梯次招募與品牌矩陣擴展<br>
+        <b>20% 補助飛輪規模化</b> — 台灣補助代辦服務商化、客戶對號入座<br>
+        <b>10% 團隊補強</b> — 業務/客成一名</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA ── -->
+  <section class="cta-section">
+    <div class="cta-inner">
+      <h2>最好的盡調<em>不是讀簡報</em></h2>
+      <p>回覆這封信,我在 24 小時內開給你看後台——23 個系統的 live 狀態、Bot 接客的即時對話、成交回填的真實數字。親眼看完你自己決定值不值。</p>
+      <div class="cta-buttons">
+        <a href="mailto:contact@3q.tw?subject=想看 CDG×LOOP Demo&body=你好，我對 3Q 的 AI 商業基礎設施有興趣，想約個時間看 demo。" class="btn btn-primary">📩 回覆約 Demo</a>
+        <a href="CDG-LOOP-技術架構-募資版.html" target="_blank" class="btn btn-secondary">📐 技術架構附錄 →</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <div class="foot-inner">
+      <div class="foot-copy"><b>3Q</b> 台灣在地品牌孵化所 × CDG 超級商業大腦 · 2026</div>
+      <div class="foot-copy">Seed Round · Confidential</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
