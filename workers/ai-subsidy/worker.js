@@ -812,6 +812,7 @@ async function ensureTable(env) {
   // v2.0 新欄位(已存在時 ALTER 會報錯,忽略即可)
   await env.CRM.prepare("ALTER TABLE ai_subsidy_leads ADD COLUMN matched_json TEXT").run().catch(()=>{});
   await env.CRM.prepare("ALTER TABLE ai_subsidy_leads ADD COLUMN total_amount INTEGER DEFAULT 0").run().catch(()=>{});
+  await env.CRM.prepare("CREATE TABLE IF NOT EXISTS social_events (id INTEGER PRIMARY KEY AUTOINCREMENT, utm_source TEXT, utm_medium TEXT, utm_campaign TEXT, utm_content TEXT, event_type TEXT, ip_hash TEXT, referrer TEXT, created_at TEXT DEFAULT (datetime('now')))").run().catch(()=>{});
 }
 
 export default {
