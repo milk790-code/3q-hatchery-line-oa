@@ -1,6 +1,9 @@
 name: Upload LINE Rich Menus
 
-# Full automation:
+# Full automation loop — triggers automatically when schema text changes.
+# Manual workflow_dispatch still available for forced rebuild.
+#
+# Steps:
 #   1. Rebuilds 3 LINE schemas (A/B/C) with --prune
 #   2. Parses the new richmenu IDs from output
 #   3. Auto-pushes IDs to Cloudflare Worker via Wrangler (if CLOUDFLARE_API_TOKEN is set)
@@ -10,10 +13,14 @@ name: Upload LINE Rich Menus
 #   CLOUDFLARE_API_TOKEN       — needs Workers Scripts:Edit permission
 #   CLOUDFLARE_ACCOUNT_ID      — your CF account ID (found in dashboard sidebar)
 # Optional variable (defaults to 3q-hatchery-webhook):
-#   CF_WORKER_NAME             — Settings → Variables and variables → Repository variables
+#   CF_WORKER_NAME             — Settings → Variables → Repository variables
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/upload-richmenu.sh'
 
 jobs:
   upload:
