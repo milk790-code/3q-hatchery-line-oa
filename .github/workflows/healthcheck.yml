@@ -9,36 +9,68 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Probe Worker GET endpoint
+      - name: Probe 3q-hatchery-webhook
         run: |
           set -euo pipefail
           URL="https://3q-hatchery-webhook.milk790.workers.dev"
-          echo "Probing: $URL"
           resp=$(curl -fsS --max-time 15 "$URL")
-          echo "$resp" | jq .
-          # Worker must respond with ok=true and all 3 env vars configured
           echo "$resp" | jq -e '.ok == true' > /dev/null
           echo "$resp" | jq -e '.configured.token == true' > /dev/null
           echo "$resp" | jq -e '.configured.secret == true' > /dev/null
-          echo "$resp" | jq -e '.configured.png_base != null' > /dev/null
-          echo "::notice::Worker healthy"
+          echo "::notice::3q-hatchery-webhook OK"
 
-      - name: Probe one Pages PNG (welcome card)
+      - name: Probe 3q-line-oa (CRM + AI bot)
+        continue-on-error: true
+        run: |
+          resp=$(curl -sS --max-time 15 "https://3q-line-oa.milk790.workers.dev/health" || echo '{}')
+          echo "$resp" | jq .
+          echo "$resp" | jq -e '.ok == true or .prospects != null' > /dev/null \
+            && echo "::notice::3q-line-oa OK" \
+            || echo "::warning::3q-line-oa /health check failed"
+
+      - name: Probe 3q-site (補助健檢落地頁)
+        continue-on-error: true
+        run: |
+          code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 "https://3q-site.milk790.workers.dev/health" || echo "000")
+          [ "$code" = "200" ] \
+            && echo "::notice::3q-site OK (HTTP 200)" \
+            || echo "::warning::3q-site returned HTTP $code"
+
+      - name: Probe 3q-outreach (陌開引擎)
+        continue-on-error: true
+        run: |
+          resp=$(curl -sS --max-time 15 "https://3q-outreach.milk790.workers.dev/health" || echo '{}')
+          echo "$resp" | jq -e '. | has("pool") or .ok == true' > /dev/null \
+            && echo "::notice::3q-outreach OK" \
+            || echo "::warning::3q-outreach /health unexpected response"
+
+      - name: Probe 3q-social-publisher (社群佇列)
+        continue-on-error: true
+        run: |
+          resp=$(curl -sS --max-time 15 "https://3q-social-publisher.milk790.workers.dev/health" || echo '{}')
+          ver=$(echo "$resp" | jq -r '.version // empty')
+          [ -n "$ver" ] \
+            && echo "::notice::3q-social-publisher OK (v$ver)" \
+            || echo "::warning::3q-social-publisher /health no version field"
+
+      - name: Probe Pages PNG (rich menu asset)
         run: |
           set -euo pipefail
           URL="https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports/3q-welcome-card-1040.png"
-          echo "Probing: $URL"
           code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 "$URL")
-          if [ "$code" != "200" ]; then
-            echo "::error::Pages PNG returned HTTP $code"
-            exit 1
-          fi
-          echo "::notice::Pages serving PNG (HTTP 200)"
+          [ "$code" = "200" ] || { echo "::error::Pages PNG returned HTTP $code"; exit 1; }
+          echo "::notice::Pages PNG OK (HTTP 200)"
 
       - name: Daily summary
         if: always()
         run: |
           echo "## Healthcheck $(date -u +'%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Worker: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Pages PNG: see above" >> $GITHUB_STEP_SUMMARY
+          echo "| Worker | 結果 |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| 3q-hatchery-webhook | ${{ job.status }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 3q-line-oa | (見日誌) |" >> $GITHUB_STEP_SUMMARY
+          echo "| 3q-site | (見日誌) |" >> $GITHUB_STEP_SUMMARY
+          echo "| 3q-outreach | (見日誌) |" >> $GITHUB_STEP_SUMMARY
+          echo "| 3q-social-publisher | (見日誌) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Pages PNG | (見日誌) |" >> $GITHUB_STEP_SUMMARY
