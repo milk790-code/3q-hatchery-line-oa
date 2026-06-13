@@ -596,13 +596,17 @@ Object.assign(window, {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>3Q孵化所 · 幫你拿到該拿的資源</title>
-  <!-- 網址預覽（LINE / FB 分享卡）。部署後：把 og:image 與 og:url 換成完整網址 -->
+  <!-- 分享卡 OG（2026-06-13 修正：本站網域 + 強鉤子圖） -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="3Q孵化所｜幫你拿到該拿的資源">
-  <meta property="og:description" content="補助媒合 × 計畫書代撰 × 募資架構設計。三個問題，找出你的補助路徑。">
-  <meta property="og:image" content="https://3q-sales-ai.milk790.workers.dev/og.png">
-  <meta property="og:url" content="https://3q-sales-ai.milk790.workers.dev/">
+  <meta property="og:title" content="整整三年，不用花你一塊錢｜3Q孵化所">
+  <meta property="og:description" content="政府每年釋出數百億補助。3 個問題、1 分鐘，免費評估你能申請什麼。補助媒合 × 計畫書代撰 × 募資架構設計。">
+  <meta property="og:image" content="https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports/og-3q-site.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://3q-site.milk790.workers.dev/">
+  <link rel="canonical" href="https://3q-site.milk790.workers.dev/">
   <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"ProfessionalService","name":"3Q孵化所","url":"https://3q-site.milk790.workers.dev/","description":"補助媒合 × 計畫書代撰 × 募資架構設計。免費補助健檢，1 分鐘找出你能申請的政府補助。","areaServed":"TW","founder":{"@type":"Person","name":"陳學誼"}}</script>
   <meta name="description" content="補助媒合 × 計畫書代撰 × 募資架構設計。三個問題，找出你的補助路徑。">
   <link rel="stylesheet" href="3q-typography.css">
   <script src="3q-fonts.js"></script>
@@ -623,7 +627,7 @@ Object.assign(window, {
 <template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#FAF6EF"/><rect x="30" y="30" width="40" height="40" rx="10" fill="#6E5B8C"/><text x="50" y="57" font-family="Georgia,serif" font-style="italic" font-size="18" fill="#FFFCF7" text-anchor="middle">3Q</text></svg></template>
 <div class="ambient"></div>
 <div class="grain"></div>
-<div id="root"></div>
+<div id="root"><h1>整整三年，不用花你一塊錢。</h1><p>政府每年釋出數百億的補助與政策性貸款。3Q孵化所：補助媒合 × 計畫書代撰 × 募資架構設計。追蹤中：中央型 SBIR、SIIR、台中地方型 SBIR、CITD、青創貸款、數位轉型補助、雲市集 TCloud、產創 23-2。</p><p><a href="/assess">免費補助評估（3 個問題、1 分鐘）</a> · <a href="/contact">聯絡 3Q</a></p></div>
 
 <script type="text/babel">
 const { Button, Badge, ServiceCard, StatBadge } = window.DesignSystem_8e9232;
@@ -904,11 +908,14 @@ ReactDOM.createRoot(document.getElementById('root')).render(<App />);
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>聯絡合作 · 3Q孵化所</title>
-  <!-- 網址預覽（LINE / FB 分享卡）。部署後：把 og:image 換成完整網址 -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="聯絡合作｜3Q孵化所">
   <meta property="og:description" content="預約免費補助健檢，或洽投資合作。半小時內告訴你下一步。">
-  <meta property="og:image" content="https://3q-sales-ai.milk790.workers.dev/og.png">
+  <meta property="og:image" content="https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports/og-3q-site.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://3q-site.milk790.workers.dev/contact">
+  <link rel="canonical" href="https://3q-site.milk790.workers.dev/contact">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="description" content="預約免費補助健檢，或洽投資合作。半小時內告訴你下一步。">
   <link rel="stylesheet" href="3q-typography.css">
@@ -1111,11 +1118,14 @@ ReactDOM.createRoot(document.getElementById('root')).render(<App />);
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>補助評估 · 3Q孵化所</title>
-  <!-- 網址預覽（LINE / FB 分享卡）。部署後：把 og:image 換成完整網址 -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="補助評估｜3Q孵化所">
+  <meta property="og:title" content="1 分鐘查你能領哪些補助｜3Q孵化所">
   <meta property="og:description" content="不用登入、不留個資。回答三個問題，立刻比對現行政府補助計畫。">
-  <meta property="og:image" content="https://3q-sales-ai.milk790.workers.dev/og.png">
+  <meta property="og:image" content="https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports/og-3q-site.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://3q-site.milk790.workers.dev/assess">
+  <link rel="canonical" href="https://3q-site.milk790.workers.dev/assess">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="description" content="不用登入、不留個資。回答三個問題，立刻比對現行政府補助計畫。">
   <link rel="stylesheet" href="3q-typography.css">
@@ -3038,7 +3048,9 @@ __ds_ns.StatBadge = __ds_scope.StatBadge;
 export default {
   async fetch(request) {
     const url = new URL(request.url);
-    if (url.pathname === '/health') return new Response(JSON.stringify({ok:true,worker:'3q-site',ver:'v1.1',pages:Object.keys(FILES).filter(k=>k.endsWith('.html')).length}),{headers:{'Content-Type':'application/json'}});
+    if (url.pathname === '/robots.txt') return new Response('User-agent: *\nAllow: /\nSitemap: https://3q-site.milk790.workers.dev/sitemap.xml\n', { headers: { 'Content-Type': 'text/plain' } });
+    if (url.pathname === '/sitemap.xml') return new Response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://3q-site.milk790.workers.dev/</loc></url><url><loc>https://3q-site.milk790.workers.dev/assess</loc></url><url><loc>https://3q-site.milk790.workers.dev/contact</loc></url></urlset>', { headers: { 'Content-Type': 'application/xml' } });
+    if (url.pathname === '/health') return new Response(JSON.stringify({ok:true,worker:'3q-site',ver:'v1.2',pages:Object.keys(FILES).filter(k=>k.endsWith('.html')).length}),{headers:{'Content-Type':'application/json'}});
     let p = url.pathname;
     if (p === '/') p = '/index.html';
     if (!FILES[p] && FILES[p + '.html']) p = p + '.html';
