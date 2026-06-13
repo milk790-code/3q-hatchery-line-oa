@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分項施工驗收清單(Checklist)</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+:root{--black:#0A0A0A;--paper:#F5F2EC;--gold:#B8924A;--ink:#1A1A1A;--stone:#8A8A8A;--sand:#E8DFD0;--rule:rgba(10,10,10,.12)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:"Noto Sans TC",-apple-system,system-ui,sans-serif;line-height:1.85;-webkit-text-size-adjust:100%}
+.bar{position:sticky;top:0;z-index:10;background:rgba(10,10,10,.96);backdrop-filter:blur(6px);color:var(--paper);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;border-bottom:1px solid var(--gold)}
+.bar a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:.06em;white-space:nowrap}
+.bar .t{font-family:"Noto Serif TC",serif;font-size:15px;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar button{background:transparent;border:1px solid var(--gold);color:var(--gold);font-size:12px;padding:6px 12px;border-radius:4px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.secret{background:#a8442a;color:#fff;text-align:center;font-size:12.5px;letter-spacing:.12em;padding:8px}
+.doc{max-width:760px;margin:0 auto;padding:28px 20px 80px}
+.doc h1{font-family:"Noto Serif TC",serif;font-weight:600;font-size:clamp(26px,7vw,38px);line-height:1.35;letter-spacing:.03em;margin:8px 0 22px;padding-bottom:14px;border-bottom:2px solid var(--gold);color:var(--black)}
+.doc h2{font-family:"Noto Serif TC",serif;font-weight:600;font-size:clamp(21px,5.5vw,28px);margin:38px 0 14px;padding-left:13px;border-left:4px solid var(--gold);color:var(--black);letter-spacing:.03em}
+.doc h3{font-family:"Noto Serif TC",serif;font-weight:500;font-size:clamp(18px,4.8vw,22px);margin:28px 0 10px;color:var(--black);letter-spacing:.03em}
+.doc h4{font-size:16px;font-weight:700;margin:20px 0 8px;color:var(--ink)}
+.doc p{margin:13px 0;font-size:16.5px}
+.doc ul,.doc ol{margin:13px 0;padding-left:24px}
+.doc li{margin:7px 0;font-size:16.5px}
+.doc li::marker{color:var(--gold)}
+.doc input[type=checkbox]{width:17px;height:17px;margin-right:7px;accent-color:var(--gold);vertical-align:-2px}
+.doc strong{color:var(--black);font-weight:700}
+.doc a{color:var(--gold)}
+.doc blockquote{margin:18px 0;padding:12px 18px;background:var(--sand);border-left:4px solid var(--gold);border-radius:0 6px 6px 0}
+.doc blockquote p{margin:4px 0;font-size:16px}
+.doc code{background:var(--sand);padding:2px 7px;border-radius:4px;font-size:.92em;font-family:"SFMono-Regular",Menlo,Consolas,monospace}
+.doc pre{background:var(--black);color:var(--paper);padding:16px;border-radius:8px;overflow-x:auto;margin:18px 0;-webkit-overflow-scrolling:touch}
+.doc pre code{background:none;color:inherit;padding:0;font-size:13px;line-height:1.6;white-space:pre}
+.doc hr{border:none;border-top:1px solid var(--rule);margin:30px 0}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:18px 0;border:1px solid var(--rule);border-radius:8px}
+.doc table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:420px}
+.doc th{background:var(--black);color:var(--paper);text-align:left;padding:11px 13px;font-weight:500;letter-spacing:.04em;white-space:nowrap}
+.doc td{border-bottom:1px solid var(--rule);padding:11px 13px;vertical-align:top}
+.doc tbody tr:nth-child(even){background:#faf8f4}
+.doc table strong{color:var(--gold)}
+</style></head>
+<body>
+<div class="bar"><a href="../index.html">← 導覽中心</a><span class="t">分項施工驗收清單(Checklist)</span><button onclick="window.print()">列印</button></div>
+
+<main class="doc"><h1>分項施工驗收清單(Checklist)</h1>
+<blockquote>
+<p>本清單為 3Q 室內裝修統包之品質基準,依工種分段驗收。
+使用方式:每一工種完工後,由班頭自檢 → 工務複驗 → 勾選簽認後方得進入下一工種(隱蔽工程務必複驗後才封板)。
+<strong>未通過項目須限期改善並複驗;所有勾選紀錄為按案結算之依據。</strong></p>
+</blockquote>
+<p>圖例:<code>- [ ]</code> 待驗 / <code>- [x]</code> 通過 ·  <strong>複驗點</strong> = 須工務二次確認 ·  常見缺失供自檢參考。</p>
+<hr>
+<h2>一、拆除工程</h2>
+<ul>
+<li><input disabled="" type="checkbox"> 拆除範圍與設計圖一致,該拆未拆／不該拆已拆皆無</li>
+<li><input disabled="" type="checkbox"> 結構樑柱、剪力牆、承重牆<strong>未受破壞</strong>(<strong>複驗點</strong>)</li>
+<li><input disabled="" type="checkbox"> 既有管線(水、電、瓦斯、消防)拆除前已確認斷源、做好標記與保護(<strong>複驗點</strong>)</li>
+<li><input disabled="" type="checkbox"> 樓地板、不拆牆面、門窗、鄰戶界面無誤傷</li>
+<li><input disabled="" type="checkbox"> 廢料當日清運至指定點,無堆積、無落地粉塵殘留</li>
+<li><input disabled="" type="checkbox"> 公共區與電梯保護完好,動線清潔</li>
+</ul>
+<p><strong>常見缺失</strong>:誤拆承重結構、未斷水電即拆除導致漏水跳電、廢料堵塞梯廳、敲打超時擾鄰。</p>
+<hr>
+<h2>二、水電工程(隱蔽工程，封板前必複驗)</h2>
+<ul>
+<li><input disabled="" type="checkbox"> 給水管路試壓無滲漏,壓力與時間達標(<strong>複驗點</strong>)</li>
+<li><input disabled="" type="checkbox"> 排水洩水坡度正確、管徑足、無逆坡與積水</li>
+<li><input disabled="" type="checkbox"> 排水／糞管接點密合,通水測試順暢無回堵</li>
+<li><input disabled="" type="checkbox"> 電線線徑、迴路規劃符合負載與規範,無串接過載</li>
+<li><input disabled="" type="checkbox"> 配電箱迴路標示清楚、無虛接、接地確實(<strong>複驗點</strong>)</li>
+<li><input disabled="" type="checkbox"> 弱電(網路、電視、對講機)管線到位、預留充足</li>
+<li><input disabled="" type="checkbox"> 開關、插座、出線口位置與數量符合圖面與實際使用</li>
+<li><input disabled="" type="checkbox"> 冷氣排水、冷媒管走向正確,洩水順暢</li>
+<li><input disabled="" type="checkbox"> <strong>封板前拍照記錄管線位置與走向</strong>(留存供日後維修)(<strong>複驗點</strong>)</li>
+</ul>
+<p><strong>常見缺失</strong>:排水逆坡積水、給水未試壓即封牆、迴路過載、插座數量不足、封板後無紀錄導致日後鑽孔打到管線。</p>
+<hr>
+<h2>三、泥作工程</h2>
+<ul>
+<li><input disabled="" type="checkbox"> 防水層施作完整(浴室、陽台、廚房),依規範做到足夠高度與洩水(<strong>複驗點</strong>)</li>
+<li><input disabled="" type="checkbox"> <strong>防水完成後做閉水／蓄水測試</strong>,確認不滲漏才進入後續(<strong>複驗點</strong>)</li>
+<li><input disabled="" type="checkbox"> 地坪洩水坡度正確,無積水死角</li>
+<li><input disabled="" type="checkbox"> 牆面、地面平整、垂直、無空心(敲擊檢查)</li>
+<li><input disabled="" type="checkbox"> 磁磚／石材排版對縫整齊、收邊乾淨、無翹曲爆磁</li>
+<li><input disabled="" type="checkbox"> 填縫飽滿均勻、顏色一致、無裂縫</li>
+<li><input disabled="" type="checkbox"> 門檻、落水頭、地排收邊密合不滲水</li>
+<li><input disabled="" type="checkbox"> 砌牆垂直、無裂、與既有結構接合確實</li>
+</ul>
+<p><strong>常見缺失</strong>:防水高度不足或未做閉水測試、磁磚空心日後脫落、洩水不良積水、填縫不實滲水、對縫歪斜。</p>
+<hr>
+<h2>四、木作工程</h2>
+<ul>
+<li><input disabled="" type="checkbox"> 天花板水平、無波浪、接縫平整,維修孔預留到位</li>
+<li><input disabled="" type="checkbox"> 矽酸鈣板／角料固定確實,無異音、無下垂</li>
+<li><input disabled="" type="checkbox"> 隔間牆垂直、隔音填充到位、面板平整</li>
+<li><input disabled="" type="checkbox"> 木作櫃體垂直水平、立面平整、門片縫隙均勻一致</li>
+<li><input disabled="" type="checkbox"> 五金(鉸鏈、滑軌)安裝牢固、開闔順暢無異音</li>
+<li><input disabled="" type="checkbox"> 收邊封板乾淨、轉角密合、無外露釘孔與毛邊</li>
+<li><input disabled="" type="checkbox"> 與水電出線口、燈具、空調出風口位置吻合</li>
+<li><input disabled="" type="checkbox"> 用料與設計指定相符,無偷料換料</li>
+</ul>
+<p><strong>常見缺失</strong>:天花板波浪不平、櫃體門縫不均、滑軌歪斜卡頓、維修孔漏留、釘孔未補。</p>
+<hr>
+<h2>五、油漆工程</h2>
+<ul>
+<li><input disabled="" type="checkbox"> 批土飽滿、研磨平整,無凹凸與接痕</li>
+<li><input disabled="" type="checkbox"> 漆面均勻、飽和、無刷痕、無流掛、無漏漆</li>
+<li><input disabled="" type="checkbox"> 陰陽角俐落筆直、收邊乾淨</li>
+<li><input disabled="" type="checkbox"> 顏色與指定色號一致,各面無色差</li>
+<li><input disabled="" type="checkbox"> 天花、牆面、門框交接處俐落,無沾染溢色</li>
+<li><input disabled="" type="checkbox"> 五金、地坪、窗框、家具已確實遮蔽保護,無噴濺殘留</li>
+<li><input disabled="" type="checkbox"> 牆面無釘孔、裂縫殘留,皆已補平</li>
+</ul>
+<p><strong>常見缺失</strong>:批土不平透光看見凹凸、漆面刷痕流掛、陰陽角不直、色差、未遮蔽噴濺到地坪窗框。</p>
+<hr>
+<h2>六、系統櫃工程</h2>
+<ul>
+<li><input disabled="" type="checkbox"> 板材、五金品牌與規格與報價相符,無降規(<strong>複驗點</strong>)</li>
+<li><input disabled="" type="checkbox"> 櫃體垂直水平、靠牆密合、與天花地板收邊俐落</li>
+<li><input disabled="" type="checkbox"> 門片、抽屜縫隙均勻一致,開闔順暢、定位準確</li>
+<li><input disabled="" type="checkbox"> 鉸鏈、滑軌、把手安裝牢固,無鬆動異音</li>
+<li><input disabled="" type="checkbox"> 層板承重足夠、固定確實,無下垂</li>
+<li><input disabled="" type="checkbox"> 封邊完整無翹起、無破口、無外露毛邊</li>
+<li><input disabled="" type="checkbox"> 預留電器孔、插座、線槽位置正確</li>
+<li><input disabled="" type="checkbox"> 櫃內清潔、無木屑與包材殘留</li>
+</ul>
+<p><strong>常見缺失</strong>:板材降規偷料、門縫不均、封邊翹起、層板下垂、電器孔位錯誤、靠牆有縫。</p>
+<hr>
+<h2>七、衛浴鍍膜(交付加值，須在清潔後施作)</h2>
+<ul>
+<li><input disabled="" type="checkbox"> 施作面(磁磚、玻璃、面盆、龍頭、五金)先清潔除水垢、徹底乾燥</li>
+<li><input disabled="" type="checkbox"> 鍍膜均勻塗佈,無漏塗、無堆積、無霧斑</li>
+<li><input disabled="" type="checkbox"> 完成後做潑水／撥水測試,呈現明顯撥水效果(<strong>複驗點</strong>)</li>
+<li><input disabled="" type="checkbox"> 鏡面、玻璃無刮傷、無殘留藥劑痕跡</li>
+<li><input disabled="" type="checkbox"> 依產品要求完成靜置／養護時間,養護期間禁止用水</li>
+<li><input disabled="" type="checkbox"> 向工務交付鍍膜批號／施作日期,登錄保固起算(<strong>複驗點</strong>)</li>
+</ul>
+<p><strong>常見缺失</strong>:基材未乾即施作造成霧斑、漏塗、養護不足即用水、未登錄保固資訊。</p>
+<hr>
+<h2>八、清潔交屋</h2>
+<ul>
+<li><input disabled="" type="checkbox"> 全室細清:地面、牆面、天花、踢腳板無粉塵、無漆點、無膠殘</li>
+<li><input disabled="" type="checkbox"> 玻璃、窗框、軌道清潔明亮,無水痕、無膠紙殘留</li>
+<li><input disabled="" type="checkbox"> 櫃體內外、層板、抽屜清潔,無木屑雜物</li>
+<li><input disabled="" type="checkbox"> 衛浴五金、面盆、馬桶、地排清潔光亮、無水垢、無施工殘漬</li>
+<li><input disabled="" type="checkbox"> 廚具檯面、水槽、爐具、抽油煙機清潔</li>
+<li><input disabled="" type="checkbox"> 燈具、開關、插座面板清潔,功能逐一測試正常</li>
+<li><input disabled="" type="checkbox"> 門窗開闔順暢、五金正常、無刮傷</li>
+<li><input disabled="" type="checkbox"> 保護材全數拆除清運,公共區與電梯保護復原</li>
+<li><input disabled="" type="checkbox"> 全室通水、通電、排水最終測試正常(<strong>複驗點</strong>)</li>
+<li><input disabled="" type="checkbox"> 現場無任何廢料、工具、包材殘留,達可入住乾淨度</li>
+</ul>
+<p><strong>常見缺失</strong>:玻璃水痕膠殘、地排殘漬、櫃內木屑、保護材未拆乾淨、燈具開關未逐一測試。</p>
+<hr>
+<h2>九、交屋總驗收</h2>
+<blockquote>
+<p>各分項皆通過後,由工務會同(或偕同客戶)進行全屋總驗收。</p>
+</blockquote>
+<ul>
+<li><input disabled="" type="checkbox"> 八大工項分項驗收皆已勾選通過</li>
+<li><input disabled="" type="checkbox"> 隱蔽工程(水電、防水)複驗紀錄與照片齊備</li>
+<li><input disabled="" type="checkbox"> 全屋水、電、排水、空調、燈具功能總測試正常</li>
+<li><input disabled="" type="checkbox"> 全屋面材、櫃體、油漆外觀總檢,無明顯瑕疵</li>
+<li><input disabled="" type="checkbox"> 鍍膜施作完成並登錄保固</li>
+<li><input disabled="" type="checkbox"> 達「可入住」乾淨度,公共區與電梯保護已復原</li>
+<li><input disabled="" type="checkbox"> 缺失改善清單(如有)已逐項完成並複驗</li>
+<li><input disabled="" type="checkbox"> 保固卡、保固範圍與售後說明已交付客戶</li>
+</ul>
+<p><strong>待改善缺失清單(如有):</strong></p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>缺失項目</th>
+<th>工種</th>
+<th>限改日期</th>
+<th>複驗結果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td></td>
+<td></td>
+<td></td>
+<td>□ 通過</td>
+</tr>
+<tr>
+<td>2</td>
+<td></td>
+<td></td>
+<td></td>
+<td>□ 通過</td>
+</tr>
+<tr>
+<td>3</td>
+<td></td>
+<td></td>
+<td></td>
+<td>□ 通過</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>十、簽收欄</h2>
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>姓名</th>
+<th>簽名</th>
+<th>日期</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>工班／班頭</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>工務／監工</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>客戶簽收</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>客戶簽收即表示已完成驗收、確認交屋;後續問題依保固範圍由公司負責處理。
+本清單留存作為 3Q 透明施工與按案結算之品質紀錄。</p>
+</blockquote>
+</main>
+<script>
+// 讓所有表格可在手機橫向滑動
+document.querySelectorAll('.doc table').forEach(t=>{const w=document.createElement('div');w.className='tw';t.replaceWith(w);w.appendChild(t);});
+</script>
+</body></html>

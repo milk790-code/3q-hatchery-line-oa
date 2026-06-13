@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3Q 室內裝修統包 — 內部・客戶旅程營運 SOP</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+:root{--black:#0A0A0A;--paper:#F5F2EC;--gold:#B8924A;--ink:#1A1A1A;--stone:#8A8A8A;--sand:#E8DFD0;--rule:rgba(10,10,10,.12)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:"Noto Sans TC",-apple-system,system-ui,sans-serif;line-height:1.85;-webkit-text-size-adjust:100%}
+.bar{position:sticky;top:0;z-index:10;background:rgba(10,10,10,.96);backdrop-filter:blur(6px);color:var(--paper);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;border-bottom:1px solid var(--gold)}
+.bar a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:.06em;white-space:nowrap}
+.bar .t{font-family:"Noto Serif TC",serif;font-size:15px;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar button{background:transparent;border:1px solid var(--gold);color:var(--gold);font-size:12px;padding:6px 12px;border-radius:4px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.secret{background:#a8442a;color:#fff;text-align:center;font-size:12.5px;letter-spacing:.12em;padding:8px}
+.doc{max-width:760px;margin:0 auto;padding:28px 20px 80px}
+.doc h1{font-family:"Noto Serif TC",serif;font-weight:600;font-size:clamp(26px,7vw,38px);line-height:1.35;letter-spacing:.03em;margin:8px 0 22px;padding-bottom:14px;border-bottom:2px solid var(--gold);color:var(--black)}
+.doc h2{font-family:"Noto Serif TC",serif;font-weight:600;font-size:clamp(21px,5.5vw,28px);margin:38px 0 14px;padding-left:13px;border-left:4px solid var(--gold);color:var(--black);letter-spacing:.03em}
+.doc h3{font-family:"Noto Serif TC",serif;font-weight:500;font-size:clamp(18px,4.8vw,22px);margin:28px 0 10px;color:var(--black);letter-spacing:.03em}
+.doc h4{font-size:16px;font-weight:700;margin:20px 0 8px;color:var(--ink)}
+.doc p{margin:13px 0;font-size:16.5px}
+.doc ul,.doc ol{margin:13px 0;padding-left:24px}
+.doc li{margin:7px 0;font-size:16.5px}
+.doc li::marker{color:var(--gold)}
+.doc input[type=checkbox]{width:17px;height:17px;margin-right:7px;accent-color:var(--gold);vertical-align:-2px}
+.doc strong{color:var(--black);font-weight:700}
+.doc a{color:var(--gold)}
+.doc blockquote{margin:18px 0;padding:12px 18px;background:var(--sand);border-left:4px solid var(--gold);border-radius:0 6px 6px 0}
+.doc blockquote p{margin:4px 0;font-size:16px}
+.doc code{background:var(--sand);padding:2px 7px;border-radius:4px;font-size:.92em;font-family:"SFMono-Regular",Menlo,Consolas,monospace}
+.doc pre{background:var(--black);color:var(--paper);padding:16px;border-radius:8px;overflow-x:auto;margin:18px 0;-webkit-overflow-scrolling:touch}
+.doc pre code{background:none;color:inherit;padding:0;font-size:13px;line-height:1.6;white-space:pre}
+.doc hr{border:none;border-top:1px solid var(--rule);margin:30px 0}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:18px 0;border:1px solid var(--rule);border-radius:8px}
+.doc table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:420px}
+.doc th{background:var(--black);color:var(--paper);text-align:left;padding:11px 13px;font-weight:500;letter-spacing:.04em;white-space:nowrap}
+.doc td{border-bottom:1px solid var(--rule);padding:11px 13px;vertical-align:top}
+.doc tbody tr:nth-child(even){background:#faf8f4}
+.doc table strong{color:var(--gold)}
+</style></head>
+<body>
+<div class="bar"><a href="../index.html">← 導覽中心</a><span class="t">3Q 室內裝修統包 — 內部・客戶旅程營運 SOP</span><button onclick="window.print()">列印</button></div>
+<div class="secret">🔴 內部機密 · 切勿公開或外流</div>
+<main class="doc"><h1>3Q 室內裝修統包 — 內部・客戶旅程營運 SOP</h1>
+<blockquote>
+<p>文件性質:<strong>內部營運手冊</strong>。
+核心原則:<strong>全程透明、有人負責到底、按案結算不拖工、一次裝修 → 長期關係。</strong></p>
+</blockquote>
+<blockquote>
+<p>⚠️ 文中工時、頻率、人力配置為<strong>假設值/建議值,需依實際團隊規模與案量調整</strong>。</p>
+</blockquote>
+<hr>
+<h2>一、客戶旅程全貌(ASCII 流程圖)</h2>
+<pre><code> ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────────┐   ┌──────────┐   ┌──────────┐
+ │ ① 接案    │──▶│ ② 到府    │──▶│ ③ 報價    │──▶│ ④ 施工        │──▶│ ⑤ 交屋    │──▶│ ⑥ 售後    │
+ │   引流    │   │   估價    │   │   簽約    │   │  (透明連線)  │   │   鍍膜    │   │   維護    │
+ └────┬─────┘   └────┬─────┘   └────┬─────┘   └──────┬───────┘   └────┬─────┘   └────┬─────┘
+      │              │              │                 │                │              │
+   LINE OA        現勘            電子合約         即時直播          鍍膜交付      訂閱清潔/水電
+   首次互動       需求單          訂金請款         每日進度          保固登錄      回購/轉介
+      │              │              │                 │                │              │
+      └──────────────┴──────────────┴── 全程 CRM 紀錄 ─┴────────────────┴──────────────┘
+                                          │
+                                          ▼
+                              口碑 + 轉介 ──▶ 回到 ① (超級閉環)
+</code></pre>
+<hr>
+<h2>二、各階段 SOP 明細</h2>
+<h3>① 接案 / 引流</h3>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>負責角色</strong></td>
+<td>業務 / 行銷 / 警衛地推網</td>
+</tr>
+<tr>
+<td><strong>動作清單</strong></td>
+<td>1. 警衛地推、老客轉介、廣告引流到 LINE OA<br>2. 自動歡迎訊息 + 服務簡介<br>3. 初步需求問答(坪數、屋況、預算帶、時程)<br>4. 判斷分級(基礎/標準/頂級)並排估價</td>
+</tr>
+<tr>
+<td><strong>產出文件</strong></td>
+<td>客戶基本資料卡(進 CRM)、初步需求紀錄</td>
+</tr>
+<tr>
+<td><strong>客戶觸點</strong></td>
+<td>LINE OA 對話、社區/警衛口碑</td>
+</tr>
+<tr>
+<td><strong>品質關卡</strong></td>
+<td>是否符合目標客群?是否高端社區?(高價篩選)</td>
+</tr>
+<tr>
+<td><strong>自動化 / LINE 觸發</strong></td>
+<td>✅ 加好友自動歡迎詞;✅ 表單收集需求;✅ 自動建立 CRM 名片</td>
+</tr>
+</tbody></table>
+<h3>② 到府估價</h3>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>負責角色</strong></td>
+<td>估價師 + 專案窗口</td>
+</tr>
+<tr>
+<td><strong>動作清單</strong></td>
+<td>1. 預約現勘(LINE 自動提醒)<br>2. 現場丈量、拍照、記錄屋況與隱患<br>3. 確認需求與風格、說明透明連線與按案結算制度<br>4. 當場給「分級建議」與報價區間</td>
+</tr>
+<tr>
+<td><strong>產出文件</strong></td>
+<td>現勘需求單、屋況照片、初步報價區間</td>
+</tr>
+<tr>
+<td><strong>客戶觸點</strong></td>
+<td>面對面(信任建立關鍵點)</td>
+</tr>
+<tr>
+<td><strong>品質關卡</strong></td>
+<td>屋況隱患是否全數記錄?客戶痛點是否抓到?</td>
+</tr>
+<tr>
+<td><strong>自動化 / LINE 觸發</strong></td>
+<td>✅ 預約前一天自動提醒;✅ 現勘照片回傳客戶相簿</td>
+</tr>
+</tbody></table>
+<h3>③ 報價 / 簽約</h3>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>負責角色</strong></td>
+<td>專案窗口 + 主管覆核</td>
+</tr>
+<tr>
+<td><strong>動作清單</strong></td>
+<td>1. 出正式三級報價單(鍍膜整合進頂級)<br>2. 說明保固、清潔、按案結算規則<br>3. 簽電子合約、收訂金<br>4. 建立專案、排工班、開透明連線頻道</td>
+</tr>
+<tr>
+<td><strong>產出文件</strong></td>
+<td>正式報價單、合約、付款排程、施工排程</td>
+</tr>
+<tr>
+<td><strong>客戶觸點</strong></td>
+<td>LINE 推送報價、電子簽約</td>
+</tr>
+<tr>
+<td><strong>品質關卡</strong></td>
+<td>報價毛利是否達標?工班是否確認可按案完工?</td>
+</tr>
+<tr>
+<td><strong>自動化 / LINE 觸發</strong></td>
+<td>✅ 報價單推送;✅ 訂金請款通知;✅ 簽約完成自動建立施工頻道</td>
+</tr>
+</tbody></table>
+<h3>④ 施工(透明連線)</h3>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>負責角色</strong></td>
+<td>工班 + 工地負責人 + 專案窗口</td>
+</tr>
+<tr>
+<td><strong>動作清單</strong></td>
+<td>1. 開工通知 + 直播連線啟用<br>2. 每日進度回報(照片+短文)<br>3. 維持乾淨工地、守社區規矩(禁菸、準時撤場)<br>4. 隱蔽工程(水電/防水)拍照存證<br>5. 變更/追加經客戶確認才動工</td>
+</tr>
+<tr>
+<td><strong>產出文件</strong></td>
+<td>每日進度紀錄、隱蔽工程存證、變更單</td>
+</tr>
+<tr>
+<td><strong>客戶觸點</strong></td>
+<td>即時直播、每日 LINE 進度</td>
+</tr>
+<tr>
+<td><strong>品質關卡</strong></td>
+<td>隱蔽工程驗收;階段查核點(泥作/水電/木作/油漆)逐關簽核</td>
+</tr>
+<tr>
+<td><strong>自動化 / LINE 觸發</strong></td>
+<td>✅ 開工通知;✅ 每日進度自動彙整推送;✅ 階段完成請款通知</td>
+</tr>
+</tbody></table>
+<h3>⑤ 交屋 / 鍍膜</h3>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>負責角色</strong></td>
+<td>工地負責人 + 鍍膜技師 + 專案窗口</td>
+</tr>
+<tr>
+<td><strong>動作清單</strong></td>
+<td>1. 全室清潔<br>2. 居家/浴室鍍膜施作(見鍍膜政策文件)<br>3. 完工驗收、缺失點修<br>4. 交屋說明 + 保固登錄 + 保養須知<br>5. 首年免費清潔預約(標準/頂級)</td>
+</tr>
+<tr>
+<td><strong>產出文件</strong></td>
+<td>驗收單、保固卡、鍍膜施作紀錄、保養手冊</td>
+</tr>
+<tr>
+<td><strong>客戶觸點</strong></td>
+<td>交屋儀式、保固登錄、保養教學</td>
+</tr>
+<tr>
+<td><strong>品質關卡</strong></td>
+<td>缺失全數結清才交屋;鍍膜固化確認</td>
+</tr>
+<tr>
+<td><strong>自動化 / LINE 觸發</strong></td>
+<td>✅ 保固自動登錄 CRM;✅ 尾款請款;✅ 滿意度問卷;✅ 轉介邀請</td>
+</tr>
+</tbody></table>
+<h3>⑥ 售後 / 維護</h3>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>負責角色</strong></td>
+<td>客服 + 維修技師 + 清潔排程</td>
+</tr>
+<tr>
+<td><strong>動作清單</strong></td>
+<td>1. 保固期內報修快速回應<br>2. 年度過年前清潔提醒(訂閱)<br>3. 水電/小修繕交叉銷售<br>4. 鍍膜續保提醒(到期前 60 天)<br>5. 定期關懷、邀轉介</td>
+</tr>
+<tr>
+<td><strong>產出文件</strong></td>
+<td>維修紀錄、清潔訂單、續保單</td>
+</tr>
+<tr>
+<td><strong>客戶觸點</strong></td>
+<td>LINE 定期關懷、季節提醒</td>
+</tr>
+<tr>
+<td><strong>品質關卡</strong></td>
+<td>報修回應時效;清潔/維修滿意度</td>
+</tr>
+<tr>
+<td><strong>自動化 / LINE 觸發</strong></td>
+<td>✅ 保固到期提醒;✅ 過年前清潔自動推播(接 cron);✅ 續保提醒;✅ 生日/週年關懷</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>三、透明施工直播 SOP(子章節)</h2>
+<blockquote>
+<p>透明連線是 3Q 最難被低價同業複製的信任機制 —— 但<strong>做不好會變成負擔與隱私風險</strong>,務必照 SOP。</p>
+</blockquote>
+<h3>3.1 怎麼連線</h3>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>建議做法(假設值,可調整)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>設備</td>
+<td>工地固定式網路攝影機(主視角)+ 工地負責人手機(機動拍特寫)</td>
+</tr>
+<tr>
+<td>平台</td>
+<td>客戶專屬連結/頻道,<strong>一案一連結、需登入</strong></td>
+</tr>
+<tr>
+<td>權限</td>
+<td>僅屋主本人 + 同住家人;連結不可外流</td>
+</tr>
+<tr>
+<td>時段</td>
+<td>施工時段開放即時看;非施工時段顯示靜態畫面或關閉</td>
+</tr>
+</tbody></table>
+<h3>3.2 拍什麼</h3>
+<table>
+<thead>
+<tr>
+<th>必拍</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>每日整體進度</td>
+<td>主視角全景,證明有在動工、工地乾淨</td>
+</tr>
+<tr>
+<td>隱蔽工程</td>
+<td>水電配管、防水、結構 → <strong>逐項拍照存證</strong>(日後爭議關鍵)</td>
+</tr>
+<tr>
+<td>階段查核點</td>
+<td>泥作/水電/木作/油漆每關完成特寫</td>
+</tr>
+<tr>
+<td>變更前後</td>
+<td>任何追加/變更,前後對照</td>
+</tr>
+</tbody></table>
+<h3>3.3 頻率</h3>
+<table>
+<thead>
+<tr>
+<th>類型</th>
+<th>頻率(建議)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>即時直播</td>
+<td>施工時段全程開放</td>
+</tr>
+<tr>
+<td>進度彙整推送</td>
+<td><strong>每日 1 次</strong>(下午撤場後),照片+短文</td>
+</tr>
+<tr>
+<td>隱蔽工程存證</td>
+<td>即時上傳,當天通知客戶查看</td>
+</tr>
+<tr>
+<td>階段查核點</td>
+<td>每階段完成即時通知</td>
+</tr>
+</tbody></table>
+<h3>3.4 隱私與資安注意</h3>
+<table>
+<thead>
+<tr>
+<th>風險</th>
+<th>對策</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>工人隱私/勞權</td>
+<td>事前告知工班「會直播」,<strong>鏡頭對工地不對人臉特寫</strong>;禁拍工人用餐/休息</td>
+</tr>
+<tr>
+<td>客戶隱私</td>
+<td>連結需登入、一案一連結、不公開;<strong>禁止把客戶工地畫面當公開行銷素材</strong>,除非取得書面同意</td>
+</tr>
+<tr>
+<td>資料保存</td>
+<td>隱蔽工程存證至少保存至保固期滿;影像依個資原則限期清理</td>
+</tr>
+<tr>
+<td>收音</td>
+<td>預設<strong>不開麥克風收音</strong>,避免錄到私下對話</td>
+</tr>
+<tr>
+<td>斷線/故障</td>
+<td>設備故障 30 分鐘內通知客戶並補拍,避免「斷線=偷懶」的疑慮</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>直播的目的是<strong>證明乾淨、證明用心、留下存證</strong>,不是監控工人。守住這條線,透明才是資產。</p>
+</blockquote>
+<hr>
+<h2>四、跨階段共用原則</h2>
+<ul>
+<li><strong>單一窗口</strong>:每案一位專案窗口,客戶任何問題只找一個人。</li>
+<li><strong>按案結算</strong>:對工班、對屋主皆按案不按天,杜絕拖工(見策略全書)。</li>
+<li><strong>CRM 貫穿</strong>:從①到⑥每個觸點都進 CRM,交屋後自動轉入長期關係流程。</li>
+<li><strong>缺失零交屋</strong>:點交前缺失全數結清,品質不妥協。</li>
+</ul>
+</main>
+<script>
+// 讓所有表格可在手機橫向滑動
+document.querySelectorAll('.doc table').forEach(t=>{const w=document.createElement('div');w.className='tw';t.replaceWith(w);w.appendChild(t);});
+</script>
+</body></html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>透明施工承諾書 · 透明裝修</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html,body{ background:#5a5650; font-family:var(--font-sans); color:var(--color-black); -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .sheet{ width:210mm; min-height:297mm; margin:12mm auto; background:var(--color-paper); padding:20mm 18mm; box-shadow:0 8px 40px rgba(0,0,0,.35); position:relative; }
+  .sheet::before{ content:""; position:absolute; top:10mm; left:10mm; right:10mm; bottom:10mm; border:1px solid var(--color-gold); pointer-events:none; }
+  .inner{ position:relative; }
+  .head{ text-align:center; border-bottom:1px solid var(--color-gold); padding-bottom:8mm; }
+  .head .brand{ font-family:var(--font-serif); font-size:18px; letter-spacing:.06em; }
+  .head .brand b{ color:var(--color-gold); }
+  .head h1{ font-family:var(--font-serif); font-weight:500; font-size:34px; letter-spacing:.12em; margin-top:6mm; }
+  .head .sub{ font-size:11px; letter-spacing:.3em; color:var(--color-stone); margin-top:3mm; }
+  .lead{ font-size:13px; line-height:2; color:#333; margin:9mm 0; letter-spacing:.03em; text-align:center; }
+  .vow{ list-style:none; }
+  .vow li{ display:flex; gap:6mm; padding:5mm 0; border-bottom:1px solid rgba(10,10,10,.1); }
+  .vow .n{ font-family:var(--font-serif); color:var(--color-gold); font-size:24px; min-width:10mm; }
+  .vow .c .t{ font-size:15px; font-weight:500; letter-spacing:.04em; }
+  .vow .c .d{ font-size:12px; color:#555; line-height:1.8; margin-top:1.5mm; }
+  .sign{ display:flex; gap:14mm; margin-top:14mm; }
+  .sign .b{ flex:1; }
+  .sign .l{ border-bottom:1px solid #333; height:14mm; }
+  .sign .lab{ font-size:11px; color:var(--color-stone); margin-top:2mm; letter-spacing:.1em; }
+  .date{ text-align:center; font-size:11px; color:var(--color-stone); margin-top:10mm; letter-spacing:.1em; }
+  .printbar{ position:fixed; top:16px; right:16px; }
+  .printbar button{ background:var(--color-gold); color:#fff; border:none; padding:10px 18px; font-size:13px; letter-spacing:.1em; cursor:pointer; font-family:var(--font-sans); }
+  @media print{ html,body{ background:#fff; } .sheet{ margin:0; box-shadow:none; } .printbar{ display:none; } @page{ size:A4 portrait; margin:0; } }
+</style>
+</head>
+<body>
+<div class="printbar"><button onclick="window.print()">列印 / 存 PDF</button></div>
+
+<div class="sheet"><div class="inner">
+  <div class="head">
+    <div class="brand">透明裝修 · <b>一站式室內裝修統包</b></div>
+    <h1>透明施工承諾書</h1>
+    <div class="sub">OUR PROMISE TO YOU</div>
+  </div>
+
+  <p class="lead">我們知道，把家交給別人，需要很大的信任。<br>所以我們把「看得見」寫成承諾，請你拿著它監督我們。</p>
+
+  <ul class="vow">
+    <li><span class="n">壹</span><div class="c"><div class="t">全程透明・即時連線</div><div class="d">施工期間提供即時連線，您可隨時查看自家工地進度，不必等待、不必懷疑。</div></div></li>
+    <li><span class="n">貳</span><div class="c"><div class="t">單一窗口・負責到底</div><div class="d">由專屬窗口統一負責，任何問題找得到人，責任歸屬清楚明確。</div></div></li>
+    <li><span class="n">參</span><div class="c"><div class="t">透明報價・按案結算</div><div class="d">報價白紙黑字、按進度節點結算；任何追加須經您書面同意，絕不中途亂加。</div></div></li>
+    <li><span class="n">肆</span><div class="c"><div class="t">乾淨工地・社區友善</div><div class="d">不在外抽菸、不亂丟、每日收尾清掃、依社區規定作息，尊重您的家與鄰居。</div></div></li>
+    <li><span class="n">伍</span><div class="c"><div class="t">交付鍍膜・長期照顧</div><div class="d">提供保固；頂級方案含居家鍍膜與保養說明、過年前年度清潔回訪。</div></div></li>
+  </ul>
+
+  <div class="sign">
+    <div class="b"><div class="l"></div><div class="lab">公司代表簽章</div></div>
+    <div class="b"><div class="l"></div><div class="lab">客戶簽收</div></div>
+  </div>
+  <div class="date">立書日期：＿＿＿＿ 年 ＿＿ 月 ＿＿ 日</div>
+</div></div>
+
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一站式裝修統包 · 資料中心</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ background:var(--color-paper); color:var(--color-black); font-family:var(--font-sans); }
+  .wrap{ max-width:1000px; margin:0 auto; padding:0 6vw; }
+  header{ background:var(--color-black); color:var(--color-paper); padding:13vh 0 9vh; }
+  header .kick{ font-size:12px; letter-spacing:.32em; color:var(--color-gold); margin-bottom:4vh; }
+  header h1{ font-family:var(--font-serif); font-weight:500; font-size:clamp(32px,5vw,58px); letter-spacing:.04em; }
+  header h1 b{ color:var(--color-gold); }
+  header p{ color:var(--color-stone); margin-top:4vh; font-size:15px; letter-spacing:.05em; line-height:1.9; max-width:640px; }
+  section{ padding:8vh 0; border-bottom:1px solid var(--rule); }
+  .tag{ font-size:12px; letter-spacing:.3em; text-transform:uppercase; margin-bottom:1vh; }
+  .tag.pub{ color:#3a7d44; } .tag.crew{ color:var(--color-ink); } .tag.sec{ color:#a8442a; }
+  h2{ font-family:var(--font-serif); font-weight:500; font-size:clamp(22px,3vw,34px); letter-spacing:.04em; margin-bottom:1vh; }
+  .desc{ font-size:13px; color:var(--color-stone); margin-bottom:4vh; letter-spacing:.04em; }
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:16px; }
+  a.item{ display:block; background:var(--color-white); border:1px solid var(--rule); border-left:3px solid var(--color-gold); padding:20px 22px; text-decoration:none; color:var(--color-black); transition:.15s; }
+  a.item:hover{ transform:translateY(-2px); border-left-color:var(--color-black); }
+  a.item .t{ font-size:16px; font-weight:500; letter-spacing:.03em; }
+  a.item .m{ font-size:12px; color:var(--color-stone); margin-top:6px; line-height:1.6; }
+  a.item .ext{ font-size:11px; color:var(--color-gold); letter-spacing:.1em; margin-top:8px; }
+  .sec .grid a.item{ border-left-color:#a8442a; }
+  .warn{ background:#faece6; border:1px solid #e0b4a4; padding:16px 20px; font-size:13px; color:#8a3a22; line-height:1.8; letter-spacing:.03em; margin-bottom:4vh; }
+  .warn b{ color:#a8442a; }
+  footer{ background:var(--color-black); color:var(--color-stone); padding:6vh 0; font-size:12px; letter-spacing:.1em; text-align:center; }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="kick">內部資料中心 · 夜班整理</div>
+  <h1>一站式<b>裝修統包</b><br>資料中心</h1>
+  <p>三層分流：<b style="color:#7fcf8a">公開客戶端</b>（可上官網）· <b style="color:#fff">工班端</b> · <b style="color:#e8917a">內部機密</b>（切勿公開）。點任一張卡片直接開啟。</p>
+</div></header>
+
+<!-- 公開 -->
+<section><div class="wrap">
+  <div class="tag pub">● 公開 · 客戶端（可上官網）</div>
+  <h2>客戶看得到的</h2>
+  <div class="desc">這些內容安全，不含定價邏輯、毛利或獲客手法，可公開到客人官網。</div>
+  <div class="grid">
+    <a class="item" href="公開-客戶端/客戶-著陸頁.html"><div class="t">著陸頁</div><div class="m">主打透明、安心、鍍膜的官網首頁</div><div class="ext">HTML →</div></a>
+    <a class="item" href="公開-客戶端/客戶-方案價格.html"><div class="t">方案與價格</div><div class="m">基礎／標準／頂級三級錨定</div><div class="ext">HTML →</div></a>
+    <a class="item" href="公開-客戶端/客戶-常見問題FAQ.html"><div class="t">常見問題 FAQ</div><div class="m">把被坑經驗翻成信任</div><div class="ext">HTML →</div></a>
+    <a class="item" href="公開-客戶端/客戶-報價單模板.html"><div class="t">報價單模板</div><div class="m">可填可印 A4</div><div class="ext">HTML · 列印 →</div></a>
+    <a class="item" href="公開-客戶端/客戶-保固卡.html"><div class="t">保固卡</div><div class="m">交屋發給客戶（正反面）</div><div class="ext">HTML · 列印 →</div></a>
+    <a class="item" href="公開-客戶端/客戶-透明施工承諾書.html"><div class="t">透明施工承諾書</div><div class="m">簽給客戶的信任狀 A4</div><div class="ext">HTML · 列印 →</div></a>
+  </div>
+</div></section>
+
+<!-- 工班 -->
+<section><div class="wrap">
+  <div class="tag crew">● 工班端</div>
+  <h2>給師傅看的</h2>
+  <div class="desc">招募、規範、驗收、合約。</div>
+  <div class="grid">
+    <a class="item" href="工班端/工班-閉環一頁卡.html"><div class="t">閉環一頁卡</div><div class="m">一眼看懂合作價值（招募用）</div><div class="ext">HTML · 列印 →</div></a>
+    <a class="item" href="工班端/工班-合作公約SOP.html"><div class="t">合作公約 SOP</div><div class="m">工地行為與社區友善守則</div><div class="ext">HTML →</div></a>
+    <a class="item" href="工班端/工班-施工驗收清單.html"><div class="t">施工驗收清單</div><div class="m">8 工種可勾選驗收標準</div><div class="ext">HTML →</div></a>
+    <a class="item" href="工班端/工班-按案結算合約樣板.html"><div class="t">按案結算合約樣板</div><div class="m">非按天 · 分期節點（需律師覆核）</div><div class="ext">HTML →</div></a>
+  </div>
+</div></section>
+
+<!-- 機密 -->
+<section class="sec"><div class="wrap">
+  <div class="tag sec">● 內部機密 · 切勿公開</div>
+  <h2>只給自己看的</h2>
+  <div class="warn"><b>⚠ 警告：</b>以下含定價邏輯、毛利模型、警衛地推手法等商業機密。<b>絕對不要</b>放上公開官網或外流，否則等於把底牌給同業與客戶看。</div>
+  <div class="grid">
+    <a class="item" href="內部機密/內部-策略全書.html"><div class="t">策略全書</div><div class="m">完整商業邏輯 12 章</div><div class="ext">HTML →</div></a>
+    <a class="item" href="內部機密/內部-商業模式簡報.html"><div class="t">商業模式簡報</div><div class="m">13 頁 · 招商／招工班</div><div class="ext">HTML →</div></a>
+    <a class="item" href="內部機密/內部-警衛地推playbook.html"><div class="t">警衛地推 Playbook</div><div class="m">必殺技完整話術與追蹤</div><div class="ext">HTML →</div></a>
+    <a class="item" href="內部機密/內部-社區滲透策略.html"><div class="t">社區滲透策略</div><div class="m">高端社區／新建案攻略</div><div class="ext">HTML →</div></a>
+    <a class="item" href="內部機密/內部-定價毛利模型.html"><div class="t">定價毛利模型</div><div class="m">三級方案成本與毛利</div><div class="ext">HTML →</div></a>
+    <a class="item" href="內部機密/內部-營運SOP客戶旅程.html"><div class="t">營運 SOP</div><div class="m">客戶旅程全流程 + 直播 SOP</div><div class="ext">HTML →</div></a>
+    <a class="item" href="內部機密/內部-鍍膜保固政策.html"><div class="t">鍍膜保固政策</div><div class="m">交付 SOP 與保固設計</div><div class="ext">HTML →</div></a>
+    <a class="item" href="內部機密/內部-年度清潔訂閱模型.html"><div class="t">年度清潔訂閱模型</div><div class="m">過年前回購 · LTV</div><div class="ext">HTML →</div></a>
+    <a class="item" href="內部機密/內部-轉介紹獎勵機制.html"><div class="t">轉介紹獎勵機制</div><div class="m">老客帶新客的雙邊獎勵</div><div class="ext">HTML →</div></a>
+    <a class="item" href="00-需求發散-brainstorm.html"><div class="t">需求發散 Brainstorm</div><div class="m">完整需求地圖與交付清單</div><div class="ext">HTML →</div></a>
+  </div>
+</div></section>
+
+<footer>一站式裝修統包 · 資料中心　|　公開 / 工班 / 機密 三層分流　|　機密層僅存 repo，不公開</footer>
+</body>
+</html>

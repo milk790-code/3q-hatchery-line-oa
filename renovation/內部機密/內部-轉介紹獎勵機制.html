@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>內部機密 ‧ 轉介紹獎勵機制設計</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+:root{--black:#0A0A0A;--paper:#F5F2EC;--gold:#B8924A;--ink:#1A1A1A;--stone:#8A8A8A;--sand:#E8DFD0;--rule:rgba(10,10,10,.12)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:"Noto Sans TC",-apple-system,system-ui,sans-serif;line-height:1.85;-webkit-text-size-adjust:100%}
+.bar{position:sticky;top:0;z-index:10;background:rgba(10,10,10,.96);backdrop-filter:blur(6px);color:var(--paper);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;border-bottom:1px solid var(--gold)}
+.bar a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:.06em;white-space:nowrap}
+.bar .t{font-family:"Noto Serif TC",serif;font-size:15px;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar button{background:transparent;border:1px solid var(--gold);color:var(--gold);font-size:12px;padding:6px 12px;border-radius:4px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.secret{background:#a8442a;color:#fff;text-align:center;font-size:12.5px;letter-spacing:.12em;padding:8px}
+.doc{max-width:760px;margin:0 auto;padding:28px 20px 80px}
+.doc h1{font-family:"Noto Serif TC",serif;font-weight:600;font-size:clamp(26px,7vw,38px);line-height:1.35;letter-spacing:.03em;margin:8px 0 22px;padding-bottom:14px;border-bottom:2px solid var(--gold);color:var(--black)}
+.doc h2{font-family:"Noto Serif TC",serif;font-weight:600;font-size:clamp(21px,5.5vw,28px);margin:38px 0 14px;padding-left:13px;border-left:4px solid var(--gold);color:var(--black);letter-spacing:.03em}
+.doc h3{font-family:"Noto Serif TC",serif;font-weight:500;font-size:clamp(18px,4.8vw,22px);margin:28px 0 10px;color:var(--black);letter-spacing:.03em}
+.doc h4{font-size:16px;font-weight:700;margin:20px 0 8px;color:var(--ink)}
+.doc p{margin:13px 0;font-size:16.5px}
+.doc ul,.doc ol{margin:13px 0;padding-left:24px}
+.doc li{margin:7px 0;font-size:16.5px}
+.doc li::marker{color:var(--gold)}
+.doc input[type=checkbox]{width:17px;height:17px;margin-right:7px;accent-color:var(--gold);vertical-align:-2px}
+.doc strong{color:var(--black);font-weight:700}
+.doc a{color:var(--gold)}
+.doc blockquote{margin:18px 0;padding:12px 18px;background:var(--sand);border-left:4px solid var(--gold);border-radius:0 6px 6px 0}
+.doc blockquote p{margin:4px 0;font-size:16px}
+.doc code{background:var(--sand);padding:2px 7px;border-radius:4px;font-size:.92em;font-family:"SFMono-Regular",Menlo,Consolas,monospace}
+.doc pre{background:var(--black);color:var(--paper);padding:16px;border-radius:8px;overflow-x:auto;margin:18px 0;-webkit-overflow-scrolling:touch}
+.doc pre code{background:none;color:inherit;padding:0;font-size:13px;line-height:1.6;white-space:pre}
+.doc hr{border:none;border-top:1px solid var(--rule);margin:30px 0}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:18px 0;border:1px solid var(--rule);border-radius:8px}
+.doc table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:420px}
+.doc th{background:var(--black);color:var(--paper);text-align:left;padding:11px 13px;font-weight:500;letter-spacing:.04em;white-space:nowrap}
+.doc td{border-bottom:1px solid var(--rule);padding:11px 13px;vertical-align:top}
+.doc tbody tr:nth-child(even){background:#faf8f4}
+.doc table strong{color:var(--gold)}
+</style></head>
+<body>
+<div class="bar"><a href="../index.html">← 導覽中心</a><span class="t">內部機密 ‧ 轉介紹獎勵機制設計</span><button onclick="window.print()">列印</button></div>
+<div class="secret">🔴 內部機密 · 切勿公開或外流</div>
+<main class="doc"><h1>內部機密 ‧ 轉介紹獎勵機制設計</h1>
+<blockquote>
+<p><strong>機密等級:內部限閱(業務 / 行銷 / 經營層)</strong>
+目的:把「客傳客」從靠運氣變成<strong>有制度、可追蹤、綁回購</strong>的成長引擎。
+核心原則:<strong>獎勵用「服務」不用「現金」</strong> —— 折抵清潔/保養/免費年度清潔,既省成本、又把客戶綁回我們的售後循環(鍍膜/清潔/水電),強化 LTV。</p>
+</blockquote>
+<hr>
+<h2>一、為什麼用「服務」而不是「現金」</h2>
+<table>
+<thead>
+<tr>
+<th>比較</th>
+<th>現金回饋</th>
+<th><strong>服務回饋(本機制採用)</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>成本</td>
+<td>直接吃毛利</td>
+<td>邊際成本低(清潔/保養我們本來就在做)</td>
+</tr>
+<tr>
+<td>對品牌</td>
+<td>像「買推薦」,廉價感、傷頂價人設</td>
+<td>像「VIP 禮遇」,強化高端、安心定位</td>
+</tr>
+<tr>
+<td>回購綁定</td>
+<td>拿了就走,無黏著</td>
+<td>把客戶<strong>拉回社區/回我們做售後</strong> → 二次接觸、再轉介</td>
+</tr>
+<tr>
+<td>客戶感受</td>
+<td>一次性</td>
+<td>「被當自己人照顧」的長期關係</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>一句話:現金是支出,服務是投資 —— 投資在把客戶留在我們的閉環裡。</strong></p>
+</blockquote>
+<hr>
+<h2>二、雙邊獎勵設計(介紹人 + 被介紹人都有)</h2>
+<p>雙邊獎勵才有「開口的理由」和「上門的動機」。<strong>以下數字皆為假設範例,請依毛利結構校正。</strong></p>
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>獎勵內容(假設範例)</th>
+<th>設計邏輯</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>介紹人(老客)</strong></td>
+<td>被介紹人成交後 → <strong>免費年度過年前清潔 1 次</strong>(或鍍膜保養折抵券)</td>
+<td>綁回購、製造下次接觸點;過年清潔=高頻情感時刻</td>
+</tr>
+<tr>
+<td><strong>被介紹人(新客)</strong></td>
+<td>簽約後 → <strong>交屋鍍膜升級 / 首年保養折抵</strong>(如折 NT$X,000 或加值服務)</td>
+<td>降低首次成交門檻,但不破壞頂價(用「加值」不用「降價」)</td>
+</tr>
+<tr>
+<td><strong>加碼(雙成交)</strong></td>
+<td>介紹人若一年內成功介紹 ≥ 2 戶成交 → 升級「社區大使」,享更高層級售後禮遇</td>
+<td>鼓勵連續轉介,做出社區滲透複製</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>設計要點:被介紹人獎勵盡量是「加值/升級」,不是「打折」。</strong> 折價會傷害頂價定位並引發社區比價;加值維持「貴得有道理」的人設。</p>
+</blockquote>
+<hr>
+<h2>三、觸發與認列規則(防濫用)</h2>
+<p>清楚的規則才不會吵架、不會被鑽漏洞。</p>
+<h3>3.1 認列條件(全部成立才算數)</h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>新客為真實新客</strong>:非既有客戶、非已在洽談中的線索(以 CRM 首次接觸紀錄為準)。</li>
+<li><input disabled="" type="checkbox"> <strong>介紹關係先登記</strong>:被介紹人在<strong>首次估價前 / 簽約前</strong>主動告知或由介紹人報備(事後補登原則上不認列,避免冒領)。</li>
+<li><input disabled="" type="checkbox"> <strong>以「成交」為觸發點</strong>:被介紹人<strong>正式簽約並完成首期付款</strong>後,獎勵才生效。</li>
+<li><input disabled="" type="checkbox"> <strong>完工後發放</strong>:介紹人獎勵於被介紹人<strong>完工交屋後</strong>核發(避免中途解約的呆帳)。</li>
+</ul>
+<h3>3.2 防濫用條款</h3>
+<table>
+<thead>
+<tr>
+<th>風險</th>
+<th>防範規則</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>自我轉介 / 人頭</td>
+<td>同一聯絡方式、同戶、同付款人不可互轉</td>
+</tr>
+<tr>
+<td>重複領取</td>
+<td>每一新客只認列一位介紹人(以最早登記者為準)</td>
+</tr>
+<tr>
+<td>套利囤券</td>
+<td>服務獎勵有效期(如 12 個月)、不可折現、不可轉讓</td>
+</tr>
+<tr>
+<td>解約冒領</td>
+<td>中途解約則獎勵取消;已發放者列入黑名單檢討</td>
+</tr>
+<tr>
+<td>業務灌水</td>
+<td>認列須有 CRM/LINE 紀錄佐證,經主管覆核</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>四、不同來源的轉介獎勵差異</h2>
+<p>轉介來源不同,<strong>獎勵形式與定位也不同</strong>,別混為一談(尤其警衛,務必對照警衛 Playbook 第七節分寸)。</p>
+<table>
+<thead>
+<tr>
+<th>來源</th>
+<th>獎勵形式</th>
+<th>定位</th>
+<th>注意</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>老客戶</strong></td>
+<td>服務型(免費年度清潔/保養折抵)</td>
+<td>VIP 禮遇、綁回購</td>
+<td>雙邊獎勵,公開透明</td>
+</tr>
+<tr>
+<td><strong>工班師傅</strong></td>
+<td>內部派工獎勵 / 成交獎金(按制度)</td>
+<td>內部激勵,鼓勵帶案+顧品質</td>
+<td>與按案計酬制度整合,不影響其工程品質責任</td>
+</tr>
+<tr>
+<td><strong>警衛 / 管理室</strong></td>
+<td><strong>「朋友感謝」型</strong>(請客/節慶伴手禮)</td>
+<td>人情關係,<strong>不制度化成傭金</strong></td>
+<td>⚠️ 不可簽抽成、不可現金按件,避免違法利誘/收賄疑慮(見警衛 Playbook 第七節)</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>關鍵區隔:老客走「服務獎勵」,工班走「內部獎金」,警衛走「人情感謝」。</strong> 三條線分開設計、分開記帳,絕不混用。</p>
+</blockquote>
+<hr>
+<h2>五、追蹤方式(結合既有 LINE / CRM)</h2>
+<table>
+<thead>
+<tr>
+<th>環節</th>
+<th>工具</th>
+<th>做法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>登記轉介</strong></td>
+<td>LINE OA / CRM</td>
+<td>介紹人透過 LINE 回報,或業務在 CRM 建「轉介關係」欄位(介紹人↔被介紹人)</td>
+</tr>
+<tr>
+<td><strong>認列審核</strong></td>
+<td>CRM 流程</td>
+<td>成交時系統標記來源=轉介,主管覆核</td>
+</tr>
+<tr>
+<td><strong>獎勵發放</strong></td>
+<td>CRM + LINE 通知</td>
+<td>條件達成自動觸發提醒,核發服務券(電子券綁 LINE)</td>
+</tr>
+<tr>
+<td><strong>效益分析</strong></td>
+<td>CRM 報表</td>
+<td>追蹤轉介成交數、轉介 CAC、各社區轉介率</td>
+</tr>
+</tbody></table>
+<h3>建議 CRM 欄位</h3>
+<p><code>介紹人ID / 被介紹人ID / 來源類型(老客/工班/警衛)/ 登記日 / 成交日 / 完工日 / 獎勵類型 / 發放日 / 狀態</code></p>
+<h3>追蹤表(範例)</h3>
+<table>
+<thead>
+<tr>
+<th>介紹人</th>
+<th>被介紹人</th>
+<th>來源</th>
+<th>社區</th>
+<th>登記日</th>
+<th>成交?</th>
+<th>完工日</th>
+<th>介紹人獎勵</th>
+<th>被介紹人獎勵</th>
+<th>狀態</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>王小姐</td>
+<td>林先生</td>
+<td>老客</td>
+<td>○○莊園</td>
+<td>2026/06/10</td>
+<td>是</td>
+<td>2026/09/01</td>
+<td>免費年度清潔×1</td>
+<td>鍍膜升級</td>
+<td>已核發</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>六、話術與提出時機(交屋滿意當下=黃金一刻)</h2>
+<p><strong>鐵律:在客戶最開心、最信任的瞬間開口 —— 交屋驗收滿意當下。</strong> 過了這個情緒高點,轉介意願快速下滑。</p>
+<h3>6.1 最佳時機排序</h3>
+<ol>
+<li><strong>交屋驗收、客戶滿意點頭那一刻</strong>(最強)</li>
+<li>入住後第一次售後/清潔,客戶再次滿意時</li>
+<li>客戶主動稱讚 / 在群組發好評時(順勢接話)</li>
+</ol>
+<h3>6.2 話術腳本</h3>
+<blockquote>
+<p><strong>交屋當下:</strong>
+「林先生,看您滿意我們也很開心~對了跟您說,我們很多案子都是住戶互相介紹的。如果您身邊、或社區鄰居有要裝修的,介紹給我們、對方有成交,<strong>我們會送您一次過年前的免費居家清潔</strong>,讓您家過年前清清爽爽。對方也會有鍍膜升級的禮遇,等於兩邊都好。」</p>
+</blockquote>
+<blockquote>
+<p><strong>群組好評順勢接(客戶主動誇時):</strong>
+「太感謝您的肯定了!如果群組裡鄰居有需要,幫我們提一聲就好,介紹成了我請您喝咖啡之外,還有免費年度清潔可以折。」</p>
+</blockquote>
+<blockquote>
+<p><strong>重點:輕鬆、不強迫、強調「雙邊都好」+「為您家好(過年清潔)」</strong>,讓開口很自然。</p>
+</blockquote>
+<hr>
+<h2>七、獎勵成本與 LTV 平衡(範例數字皆為假設)</h2>
+<h3>7.1 成本端(假設)</h3>
+<table>
+<thead>
+<tr>
+<th>獎勵</th>
+<th>我方成本(邊際)</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>免費年度清潔 1 次(介紹人)</td>
+<td>約 NT$2,000–3,000(主要是工時/耗材)</td>
+<td>本來就有清潔業務,邊際成本低</td>
+</tr>
+<tr>
+<td>鍍膜升級 / 保養折抵(被介紹人)</td>
+<td>約 NT$2,000–4,000</td>
+<td>鍍膜整合進交付,加值成本可控</td>
+</tr>
+<tr>
+<td><strong>單筆成功轉介總成本</strong></td>
+<td><strong>約 NT$4,000–7,000(假設)</strong></td>
+<td>—</td>
+</tr>
+</tbody></table>
+<h3>7.2 收益端(假設)</h3>
+<ul>
+<li>一筆裝修統包(含鍍膜)毛利貢獻<strong>遠高於上述轉介成本</strong>(以倍數計)。</li>
+<li><strong>轉介 CAC 遠低於陌生開發</strong> —— 不用廣告費、信任成本低、成交率高。</li>
+<li><strong>LTV 延伸</strong>:被介紹的新客之後也有售後回購(清潔/保養/水電)+ 可能再轉介鄰居 → 一筆轉介撬動一條長期關係鏈。</li>
+</ul>
+<h3>7.3 平衡守則</h3>
+<pre><code>單筆轉介獎勵總成本  &lt;&lt;  該成交毛利貢獻       (建議遠小於,留足空間)
+轉介 CAC            &lt;   陌生開發 CAC          (轉介必須更便宜才有意義)
+獎勵形式優先序:綁回購的服務 &gt; 加值升級 &gt; (盡量避免)現金/折價
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>健康指標(範例假設)</th>
+<th>監控意義</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>轉介成交佔總成交比</td>
+<td>越高代表「客傳客」引擎越強</td>
+</tr>
+<tr>
+<td>轉介 CAC vs 陌生 CAC</td>
+<td>確認轉介確實更省</td>
+</tr>
+<tr>
+<td>介紹人獎勵兌換率(年度清潔使用率)</td>
+<td>兌換=回購接觸點,順帶再轉介</td>
+</tr>
+<tr>
+<td>社區內轉介率</td>
+<td>對應社區滲透策略的複製效果</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>警訊:若獎勵成本逼近毛利、或出現大量冒領/濫用 → 立即收緊認列規則與獎勵額度。</strong> 機制要能賺,不能變成漏財口。</p>
+</blockquote>
+<hr>
+<h2>八、一頁速記</h2>
+<ol>
+<li><strong>獎勵用服務不用現金</strong> —— 綁回購、護頂價、低成本。</li>
+<li><strong>雙邊都給</strong>:介紹人=免費年度清潔/保養折抵;被介紹人=鍍膜升級/加值(不打折)。</li>
+<li><strong>規則嚴</strong>:先登記、以成交觸發、完工發放、防自我轉介與冒領。</li>
+<li><strong>三條線分開</strong>:老客(服務)/工班(內部獎金)/警衛(人情感謝,不制度化)。</li>
+<li><strong>接 LINE/CRM</strong>:建轉介關係欄位、電子券、自動追蹤。</li>
+<li><strong>黃金時機</strong>:交屋滿意當下開口,輕鬆不強迫。</li>
+<li><strong>算帳</strong>:轉介成本 &lt;&lt; 毛利、轉介 CAC &lt; 陌生 CAC,定期盯指標。</li>
+</ol>
+<blockquote>
+<p><strong>數字皆為假設範例,落地前請以實際毛利與服務成本校正。</strong>
+<strong>記住:每一個滿意的客戶,都是下一個社區的入口。把好評變成制度,把信任變成複製。</strong></p>
+</blockquote>
+</main>
+<script>
+// 讓所有表格可在手機橫向滑動
+document.querySelectorAll('.doc table').forEach(t=>{const w=document.createElement('div');w.className='tw';t.replaceWith(w);w.appendChild(t);});
+</script>
+</body></html>
