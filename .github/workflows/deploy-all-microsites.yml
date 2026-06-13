@@ -1,164 +1,156 @@
-name: 🚀 Deploy ALL microsites (orchestrator)
+name: Deploy All Microsites (orchestrator)
 
-# 一鍵 / 零鍵全微站部署 dispatcher。
-# matrix fan-out 觸發 12 支既有 deploy-* workflow，不複製任何部署邏輯（零 drift）。
-# 單支失敗不拖累其他（fail-fast:false + continue-on-error）。
-# summary 會回讀 12 支下游 run 的真實綠/紅燈，寫進 Step Summary，並（若有 LINE secret）推播到 OWNER。
-#
-# 觸發方式：
-#   1. 手動 Run workflow（可指定 targets）
-#   2. 排程：每週一 08:00 台灣（00:00 UTC）自動全站重建
-#
-# ⚠️ 前置（一次性）：
-#   - ORCHESTRATOR_PAT（必需，fan-out 用）：Settings → Secrets and variables → Actions
-#       fine-grained PAT 對本 repo 給 "Actions: Read and write" + "Contents: Read"
-#   - LINE_CHANNEL_ACCESS_TOKEN + OWNER_USER_ID（可選，週報推播用）：缺則自動略過、不報錯
+# One-button matrix fan-out for the 9 brand microsites in this monorepo.
+# - workflow_dispatch: run on demand (input "sites" = "all" or comma list)
+# - schedule: weekly full rebuild, Mon 08:00 Taiwan (00:00 UTC)
+# Safety: GITHUB_TOKEN cannot trigger other workflows (GitHub anti-recursion),
+# so fan-out needs a fine-grained PAT in secret ORCHESTRATOR_PAT
+# (Actions: Read/Write + Contents: Read). With NO PAT it degrades to
+# "manual-link mode" — prints links, deploys nothing, never fails.
+# => The weekly cron is a harmless no-op until you opt in by adding the PAT.
 
 on:
   workflow_dispatch:
     inputs:
-      targets:
-        description: '要推的微站（逗號分隔檔名去 .yml，或 all）'
-        required: false
+      sites:
+        description: 'Targets: "all" or comma list e.g. deploy-fukubukuro,deploy-tudigong'
         default: 'all'
-        type: string
+        required: false
   schedule:
-    - cron: '0 0 * * 1'   # 每週一 00:00 UTC = 08:00 台灣，全站健檢式重建
+    - cron: '0 0 * * 1'   # Mon 00:00 UTC = 08:00 Taiwan — weekly full rebuild
 
 permissions:
-  actions: write
   contents: read
 
 jobs:
-  preflight:
+  fan-out:
     runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.build.outputs.matrix }}
-      has_pat: ${{ steps.pat.outputs.has_pat }}
+    env:
+      # ai-subsidy FIRST (art-portfolio binds its service), then the rest.
+      ALL_SITES: >-
+        deploy-ai-subsidy.yml
+        deploy-art-portfolio.yml
+        deploy-fukubukuro.yml
+        deploy-tudigong.yml
+        deploy-sales-ai.yml
+        deploy-pop-line-oa.yml
+        deploy-outreach.yml
+        deploy-sanzhi-pages.yml
+        renovation-deploy.yml
     steps:
-      - name: Detect PAT
-        id: pat
-        env:
-          ORCH_PAT: ${{ secrets.ORCHESTRATOR_PAT }}
+      - name: Resolve target list
+        id: pick
         run: |
           set -euo pipefail
-          if [ -n "${ORCH_PAT:-}" ]; then
-            echo "has_pat=true" >> "$GITHUB_OUTPUT"
-            echo "::notice::ORCHESTRATOR_PAT 已設 → 全自動 fan-out 模式"
+          raw='${{ github.event.inputs.sites }}'
+          if [ -z "$raw" ] || [ "$raw" = "all" ]; then
+            list="$ALL_SITES"
           else
+            list=$(echo "$raw" | tr ',' ' ')
+          fi
+          # normalise: ensure each ends in .yml, collapse whitespace
+          norm=""
+          for w in $list; do
+            case "$w" in *.yml) ;; *) w="$w.yml" ;; esac
+            norm="$norm $w"
+          done
+          norm=$(echo "$norm" | xargs)
+          echo "list=$norm" >> "$GITHUB_OUTPUT"
+          echo "::notice::Targets: $norm"
+
+      - name: Guard — is ORCHESTRATOR_PAT present?
+        id: guard
+        env:
+          PAT: ${{ secrets.ORCHESTRATOR_PAT }}
+        run: |
+          if [ -z "${PAT:-}" ]; then
             echo "has_pat=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::ORCHESTRATOR_PAT 未設 → 降級為手動連結模式（不報錯）"
-          fi
-
-      - name: Build target matrix
-        id: build
-        env:
-          TARGETS: ${{ inputs.targets }}
-        run: |
-          set -euo pipefail
-          all='["deploy","deploy-3q-line-oa","deploy-3q-site","deploy-ai-subsidy","deploy-art-portfolio","deploy-fukubukuro","deploy-tudigong","deploy-sales-ai","deploy-pop-line-oa","deploy-outreach","deploy-sanzhi-pages","renovation-deploy"]'
-          if [ -z "${TARGETS:-}" ] || [ "$TARGETS" = "all" ]; then
-            echo "matrix=$all" >> "$GITHUB_OUTPUT"
+            echo "::warning::ORCHESTRATOR_PAT not set — manual-link mode (no deploys). Add a fine-grained PAT (Actions:RW, Contents:R) to enable fan-out."
           else
-            sel=$(printf '%s' "$TARGETS" | tr ',' '\n' | tr -d '[:space:]' | grep -v '^$' | jq -R . | jq -cs .)
-            echo "matrix=$sel" >> "$GITHUB_OUTPUT"
+            echo "has_pat=true" >> "$GITHUB_OUTPUT"
           fi
 
-  dispatch:
-    needs: preflight
-    if: needs.preflight.outputs.has_pat == 'true'
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        wf: ${{ fromJson(needs.preflight.outputs.matrix) }}
-    steps:
-      - name: Dispatch ${{ matrix.wf }}
+      - name: Manual-link mode (no PAT)
+        if: steps.guard.outputs.has_pat == 'false'
+        run: |
+          {
+            echo "## Manual deploy links (set ORCHESTRATOR_PAT to automate)"
+            for wf in ${{ steps.pick.outputs.list }}; do
+              echo "- https://github.com/${{ github.repository }}/actions/workflows/$wf"
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Dispatch microsites
+        if: steps.guard.outputs.has_pat == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.ORCHESTRATOR_PAT }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -uo pipefail
+          for wf in ${{ steps.pick.outputs.list }}; do
+            if gh workflow run "$wf" --ref main; then
+              echo "::notice::dispatched $wf"
+            else
+              echo "::warning::dispatch failed (no workflow_dispatch trigger?): $wf"
+            fi
+            sleep 4
+          done
+
+      - name: Poll downstream conclusions
+        if: steps.guard.outputs.has_pat == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.ORCHESTRATOR_PAT }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -uo pipefail
+          sleep 20
+          ok=0; fail=0; pending=0; report=""
+          for wf in ${{ steps.pick.outputs.list }}; do
+            concl=""
+            for i in $(seq 1 20); do
+              row=$(gh run list --workflow "$wf" --limit 1 --json status,conclusion -q '.[0]') || row=""
+              st=$(echo "$row" | jq -r '.status // ""' 2>/dev/null || echo "")
+              if [ "$st" = "completed" ]; then
+                concl=$(echo "$row" | jq -r '.conclusion // ""' 2>/dev/null || echo "")
+                break
+              fi
+              sleep 15
+            done
+            case "$concl" in
+              success) ok=$((ok+1));      mark="OK ";;
+              "")      pending=$((pending+1)); mark="...";  concl="running";;
+              *)       fail=$((fail+1));    mark="XX ";;
+            esac
+            report="${report}
+          ${mark} ${wf%.yml}: ${concl}"
+          done
+          {
+            echo "## Microsite deploy report"
+            echo "OK=$ok  FAIL=$fail  PENDING=$pending"
+            echo '```'
+            echo "$report"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "RPT_OK=$ok"; echo "RPT_FAIL=$fail"; echo "RPT_PENDING=$pending"
+            echo "RPT_BODY<<EOF"; echo "$report"; echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      - name: LINE weekly report (best-effort)
+        if: steps.guard.outputs.has_pat == 'true'
         continue-on-error: true
         env:
-          GH_TOKEN: ${{ secrets.ORCHESTRATOR_PAT }}
-          REPO: ${{ github.repository }}
-          WF: ${{ matrix.wf }}
-        run: |
-          set -euo pipefail
-          echo "::notice::dispatching ${WF}.yml @ main"
-          code=$(curl -sS -o /tmp/resp.txt -w '%{http_code}' -X POST \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "https://api.github.com/repos/${REPO}/actions/workflows/${WF}.yml/dispatches" \
-            -d '{"ref":"main"}')
-          if [ "$code" = "204" ]; then
-            echo "✅ ${WF} dispatched (HTTP 204)"
-          else
-            echo "::error::${WF} dispatch failed (HTTP ${code})"
-            cat /tmp/resp.txt || true
-            exit 1
-          fi
-
-  summary:
-    needs: [preflight, dispatch]
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Poll downstream results + notify
-        env:
-          GH_TOKEN: ${{ secrets.ORCHESTRATOR_PAT }}
-          REPO: ${{ github.repository }}
-          HAS_PAT: ${{ needs.preflight.outputs.has_pat }}
           LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
           OWNER: ${{ secrets.OWNER_USER_ID }}
         run: |
-          set -euo pipefail
-          ALL="deploy deploy-3q-line-oa deploy-3q-site deploy-ai-subsidy deploy-art-portfolio deploy-fukubukuro deploy-tudigong deploy-sales-ai deploy-pop-line-oa deploy-outreach deploy-sanzhi-pages renovation-deploy"
-
-          if [ "${HAS_PAT}" != "true" ]; then
-            {
-              echo "## 🚀 全微站部署 orchestrator"
-              echo ""
-              echo "### ⚠️ 未設 \`ORCHESTRATOR_PAT\` — 降級為手動連結模式（本檔未失敗）"
-              echo "GitHub 的 \`GITHUB_TOKEN\` 無法 fan-out 觸發其他 workflow（防遞迴硬限制）。設一次 PAT 即可全自動。"
-              echo ""
-              for w in $ALL; do echo "- [$w](https://github.com/${REPO}/actions/workflows/$w.yml)"; done
-            } >> "$GITHUB_STEP_SUMMARY"
+          set -uo pipefail
+          if [ -z "${LINE_TOKEN:-}" ] || [ -z "${OWNER:-}" ]; then
+            echo "::warning::LINE_TOKEN or OWNER_USER_ID missing — skip LINE report"
             exit 0
           fi
-
-          echo "::notice::等待下游 run 完成（90s）後回讀綠/紅燈"
-          sleep 90
-
-          report=""; ok=0; bad=0; pending=0
-          for w in $ALL; do
-            concl=$(curl -sS -H "Authorization: Bearer ${GH_TOKEN}" \
-              "https://api.github.com/repos/${REPO}/actions/workflows/${w}.yml/runs?branch=main&per_page=1" \
-              | jq -r '.workflow_runs[0].conclusion // "in_progress"')
-            case "$concl" in
-              success) icon="✅"; ok=$((ok+1));;
-              failure|cancelled|timed_out|startup_failure) icon="❌"; bad=$((bad+1));;
-              *) icon="⏳"; pending=$((pending+1));;
-            esac
-            report="${report}- ${icon} ${w} (${concl})\n"
-          done
-
-          {
-            echo "## 🚀 全微站部署 orchestrator"
-            echo ""
-            echo "**綠 ${ok} / 紅 ${bad} / 進行中 ${pending}**　（共 12 支）"
-            echo ""
-            printf '%b' "$report"
-            echo ""
-            echo "👉 [全部 dispatch 結果](https://github.com/${REPO}/actions?query=event%3Aworkflow_dispatch)"
-          } >> "$GITHUB_STEP_SUMMARY"
-
-          # LINE 推播（guarded：缺 secret 或非 fan-out 模式則略過，永不擋流程）
-          if [ -n "${LINE_TOKEN:-}" ] && [ -n "${OWNER:-}" ]; then
-            msg=$(printf '🚀 3Q 全站重建\n綠 %s / 紅 %s / 進行中 %s\n\n%b' "$ok" "$bad" "$pending" "$report")
-            curl -sS -X POST https://api.line.me/v2/bot/message/push \
-              -H "Authorization: Bearer ${LINE_TOKEN}" \
-              -H "Content-Type: application/json" \
-              -d "$(jq -n --arg to "$OWNER" --arg t "$msg" '{to:$to, messages:[{type:"text", text:$t}]}')" \
-              >/dev/null && echo "::notice::LINE 週報已推播" \
-              || echo "::warning::LINE push 失敗（不擋流程）"
-          else
-            echo "::notice::LINE secret 不全（LINE_CHANNEL_ACCESS_TOKEN / OWNER_USER_ID），略過推播"
-          fi
+          msg="3Q 微站週報  ${RPT_OK} OK / ${RPT_FAIL} FAIL / ${RPT_PENDING} 進行中${RPT_BODY}"
+          curl -sS -X POST https://api.line.me/v2/bot/message/push \
+            -H "Authorization: Bearer $LINE_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n --arg to "$OWNER" --arg t "$msg" '{to:$to, messages:[{type:"text", text:$t}]}')" \
+            | jq -r '.sentMessages? // .message? // "sent"'
