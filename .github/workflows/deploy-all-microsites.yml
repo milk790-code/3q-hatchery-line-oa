@@ -1,9 +1,9 @@
 name: 🚀 Deploy ALL microsites (orchestrator)
 
 # 一鍵 / 零鍵全微站部署 dispatcher。
-# matrix fan-out 觸發 9 支既有 deploy-* workflow，不複製任何部署邏輯（零 drift）。
+# matrix fan-out 觸發 12 支既有 deploy-* workflow，不複製任何部署邏輯（零 drift）。
 # 單支失敗不拖累其他（fail-fast:false + continue-on-error）。
-# summary 會回讀 9 支下游 run 的真實綠/紅燈，寫進 Step Summary，並（若有 LINE secret）推播到 OWNER。
+# summary 會回讀 12 支下游 run 的真實綠/紅燈，寫進 Step Summary，並（若有 LINE secret）推播到 OWNER。
 #
 # 觸發方式：
 #   1. 手動 Run workflow（可指定 targets）
@@ -56,7 +56,7 @@ jobs:
           TARGETS: ${{ inputs.targets }}
         run: |
           set -euo pipefail
-          all='["deploy-ai-subsidy","deploy-art-portfolio","deploy-fukubukuro","deploy-tudigong","deploy-sales-ai","deploy-pop-line-oa","deploy-outreach","deploy-sanzhi-pages","renovation-deploy"]'
+          all='["deploy","deploy-3q-line-oa","deploy-3q-site","deploy-ai-subsidy","deploy-art-portfolio","deploy-fukubukuro","deploy-tudigong","deploy-sales-ai","deploy-pop-line-oa","deploy-outreach","deploy-sanzhi-pages","renovation-deploy"]'
           if [ -z "${TARGETS:-}" ] || [ "$TARGETS" = "all" ]; then
             echo "matrix=$all" >> "$GITHUB_OUTPUT"
           else
@@ -110,7 +110,7 @@ jobs:
           OWNER: ${{ secrets.OWNER_USER_ID }}
         run: |
           set -euo pipefail
-          ALL="deploy-ai-subsidy deploy-art-portfolio deploy-fukubukuro deploy-tudigong deploy-sales-ai deploy-pop-line-oa deploy-outreach deploy-sanzhi-pages renovation-deploy"
+          ALL="deploy deploy-3q-line-oa deploy-3q-site deploy-ai-subsidy deploy-art-portfolio deploy-fukubukuro deploy-tudigong deploy-sales-ai deploy-pop-line-oa deploy-outreach deploy-sanzhi-pages renovation-deploy"
 
           if [ "${HAS_PAT}" != "true" ]; then
             {
@@ -143,7 +143,7 @@ jobs:
           {
             echo "## 🚀 全微站部署 orchestrator"
             echo ""
-            echo "**綠 ${ok} / 紅 ${bad} / 進行中 ${pending}**　（共 9 支）"
+            echo "**綠 ${ok} / 紅 ${bad} / 進行中 ${pending}**　（共 12 支）"
             echo ""
             printf '%b' "$report"
             echo ""
