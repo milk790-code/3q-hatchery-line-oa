@@ -15,6 +15,9 @@ const startedAt = new Date();
 const lockTtlMs = minutes(process.env.LOOPS_LOCK_TTL_MINUTES || 55);
 const maxCandidates = Number.parseInt(process.env.LOOPS_MAX_CANDIDATES || '8', 10);
 const defaultSocialPublisherUrl = 'https://3q-social-publisher.milk790.workers.dev';
+const argv = new Set(process.argv.slice(2));
+const autoCompleteEnabled = !argv.has('--report-only')
+  && (argv.has('--auto-complete') || truthy(process.env.LOOPS_AUTO_COMPLETE));
 
 const codexHome = process.env.CODEX_HOME
   || (process.env.USERPROFILE ? path.join(process.env.USERPROFILE, '.codex') : path.join(os.homedir(), '.codex'));
@@ -47,6 +50,7 @@ async function main() {
 
   let result;
   let candidates = [];
+  let autoCompletions = [];
 
   try {
     const previousState = await readJson(statePath, defaultState());
@@ -67,6 +71,10 @@ async function main() {
       .sort((a, b) => b.score - a.score)
       .slice(0, maxCandidates);
 
+    if (autoCompleteEnabled) {
+      autoCompletions = await runAutoCompletions(scored);
+    }
+
     result = {
       runId,
       automationId,
@@ -78,11 +86,16 @@ async function main() {
       candidateCount: candidates.length,
       selectedCount: scored.length,
       topCandidate: scored[0] ? summarizeCandidate(scored[0]) : null,
+      autoComplete: summarizeAutoCompletions(autoCompletions),
     };
 
-    await writeReport(result, scored);
-    await appendRunToState(result, scored);
-    console.log(JSON.stringify({ ...result, selected: scored.map(summarizeCandidate) }, null, 2));
+    await writeReport(result, scored, autoCompletions);
+    await appendRunToState(result, scored, autoCompletions);
+    console.log(JSON.stringify({
+      ...result,
+      selected: scored.map(summarizeCandidate),
+      autoCompletions: autoCompletions.map(summarizeCompletion),
+    }, null, 2));
   } catch (error) {
     result = {
       runId,
@@ -505,6 +518,142 @@ async function discoverWebhookCron() {
   }];
 }
 
+async function runAutoCompletions(candidates) {
+  const completions = [];
+  const ids = new Set(candidates.map(candidate => candidate.id));
+  const byId = new Map(candidates.map(candidate => [candidate.id, candidate]));
+
+  if (ids.has('dirty-worktree')) {
+    const dirty = byId.get('dirty-worktree');
+    if (dirty?.evidence?.sliceHandoffPath) {
+      completions.push(blockedCompletion(
+        'dirty-worktree',
+        `Current slice handoff already exists: ${dirty.evidence.sliceHandoffPath}`
+      ));
+    } else {
+      if (!dirty?.evidence?.snapshotPath) {
+        completions.push(runLocalStep('snapshot-worktree', 'node', ['scripts/loops-24/snapshot-worktree.mjs'], 120_000));
+      }
+      if (!dirty?.evidence?.boundaryPlanPath) {
+        completions.push(runLocalStep('plan-commit-boundaries', 'node', ['scripts/loops-24/plan-commit-boundaries.mjs'], 120_000));
+      }
+
+      const boundary = await readJson(path.join(stateDir, 'commit-boundaries', 'latest.json'), null);
+      const groups = Array.isArray(boundary?.groups) ? boundary.groups : [];
+      for (const group of groups) {
+        if (group.gate === 'large-payload-review') {
+          completions.push(blockedCompletion(
+            `handoff:${group.id}`,
+            'Large frontend/artifact payload needs human review before staging.'
+          ));
+          continue;
+        }
+        completions.push(runLocalStep(
+          `handoff:${group.id}`,
+          'node',
+          ['scripts/loops-24/prepare-slice-handoff.mjs', '--group', group.id],
+          120_000
+        ));
+      }
+    }
+  }
+
+  if (ids.has('wrangler-cache-visible')) {
+    const candidate = byId.get('wrangler-cache-visible');
+    if (candidate?.evidence?.auditPath) {
+      completions.push(blockedCompletion('audit-wrangler-cache', `Current Wrangler audit already exists: ${candidate.evidence.auditPath}`));
+    } else {
+      completions.push(runLocalStep('audit-wrangler-cache', 'node', ['scripts/loops-24/audit-wrangler-cache.mjs'], 120_000));
+    }
+  }
+
+  if (ids.has('content-queue-seed-inventory')) {
+    const candidate = byId.get('content-queue-seed-inventory');
+    if (candidate?.evidence?.reconciliation?.reportPath) {
+      completions.push(blockedCompletion('reconcile-content-queue', `Current reconciliation already exists: ${candidate.evidence.reconciliation.reportPath}`));
+    } else {
+      completions.push(runLocalStep('reconcile-content-queue', 'node', ['scripts/loops-24/reconcile-content-queue.mjs'], 120_000));
+    }
+  }
+
+  const outreachCandidate = candidates.find(candidate => candidate.id?.startsWith('cold-outreach-batch-'));
+  if (outreachCandidate) {
+    completions.push(runLocalStep('generate-cold-outreach-drafts', 'node', ['scripts/loops-24/generate-cold-outreach.mjs'], 120_000));
+  }
+
+  for (const candidate of candidates) {
+    if (candidate.id === 'google-prospecting-api-key-missing') {
+      completions.push(blockedCompletion(candidate.id, 'Needs GOOGLE_MAPS_API_KEY or GOOGLE_PLACES_API_KEY; secrets are not written by the loop.'));
+    } else if (candidate.id === 'social-publisher-token-missing') {
+      completions.push(blockedCompletion(candidate.id, 'Needs SOCIAL_PUBLISHER_TOKEN or TRIGGER_TOKEN; secrets are not written by the loop.'));
+    } else if (candidate.id === 'social-publisher-health-failed') {
+      completions.push(blockedCompletion(candidate.id, 'Live worker repair requires deployment review.'));
+    } else if (candidate.id === 'webhook-cron-map') {
+      completions.push(blockedCompletion(candidate.id, 'Cron status verification waits for deploy approval and TRIGGER_TOKEN.'));
+    } else if (candidate.id === 'project-state-base64') {
+      completions.push(blockedCompletion(candidate.id, 'Project-state normalization edits a tracked file and needs local review first.'));
+    } else if (candidate.id === 'cold-outreach-cooldown-active') {
+      completions.push(blockedCompletion(candidate.id, 'Outreach drafts already exist or prospects are cooling down; sending remains manual.'));
+    } else if (candidate.id === 'cold-outreach-needs-prospects') {
+      completions.push(blockedCompletion(candidate.id, 'Needs fresh reviewed prospects before drafts can be generated.'));
+    }
+  }
+
+  return completions;
+}
+
+function runLocalStep(label, command, args, timeout) {
+  const started = Date.now();
+  const result = runCommand(command, args, timeout);
+  const data = parseJsonOutput(result.stdout);
+  const completion = {
+    label,
+    status: result.ok ? 'completed' : 'failed',
+    command: [command, ...args].join(' '),
+    durationMs: Date.now() - started,
+    summary: completionSummary(label, data, result),
+  };
+
+  if (data) {
+    completion.data = redactEvidence(data);
+  } else {
+    completion.stdout = trim(result.stdout, 1000);
+    completion.stderr = trim(result.stderr, 1000);
+  }
+
+  return completion;
+}
+
+function blockedCompletion(label, reason) {
+  return {
+    label,
+    status: 'blocked',
+    reason,
+    summary: reason,
+  };
+}
+
+function completionSummary(label, data, result) {
+  if (!result.ok) return `${label} failed with status ${result.status}`;
+  if (data?.summary) {
+    return typeof data.summary === 'string' ? data.summary : JSON.stringify(data.summary);
+  }
+  if (data?.reportPath) return `${label} wrote ${data.reportPath}`;
+  if (data?.stageScriptPath) return `${label} wrote ${data.stageScriptPath}`;
+  if (typeof data?.generated_count === 'number') return `${label} generated ${data.generated_count} item(s)`;
+  return `${label} completed`;
+}
+
+function parseJsonOutput(value) {
+  const text = String(value || '').trim();
+  if (!text) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
 function scoreCandidates(candidates, previousState) {
   const seen = previousState.candidateLedger || {};
   const now = Date.now();
@@ -533,7 +682,7 @@ function scoreCandidates(candidates, previousState) {
   });
 }
 
-async function writeReport(result, candidates) {
+async function writeReport(result, candidates, autoCompletions = []) {
   const reportPath = path.join(runsDir, `${toStamp(startedAt)}-${runId.slice(0, 8)}.md`);
   const lines = [
     `# LOOPS 24 run ${result.runId}`,
@@ -543,6 +692,7 @@ async function writeReport(result, candidates) {
     `- started_at: ${result.startedAt}`,
     `- finished_at: ${result.finishedAt}`,
     `- repo_root: ${repoRoot}`,
+    `- auto_complete: ${autoCompleteEnabled ? 'enabled' : 'disabled'}`,
     '',
     '## Selected candidates',
     '',
@@ -569,6 +719,31 @@ async function writeReport(result, candidates) {
   }
 
   lines.push('');
+  lines.push('## Auto-complete');
+  lines.push('');
+
+  if (!autoCompleteEnabled) {
+    lines.push('- Disabled for this run.');
+  } else if (autoCompletions.length === 0) {
+    lines.push('- Nothing eligible for local auto-completion.');
+  } else {
+    for (const item of autoCompletions) {
+      lines.push(`- ${item.status}: ${item.label}`);
+      lines.push(`  - summary: ${item.summary || item.reason || ''}`);
+      if (item.command) lines.push(`  - command: \`${item.command}\``);
+      if (item.data) {
+        lines.push('  - data:');
+        lines.push('');
+        lines.push('```json');
+        lines.push(JSON.stringify(item.data, null, 2));
+        lines.push('```');
+        lines.push('');
+      }
+      if (item.stderr) lines.push(`  - stderr: ${item.stderr}`);
+    }
+  }
+
+  lines.push('');
   lines.push('## Notes');
   lines.push('');
   lines.push('- This runner does not deploy, publish, delete, or mutate external systems.');
@@ -579,7 +754,7 @@ async function writeReport(result, candidates) {
   result.reportPath = reportPath;
 }
 
-async function appendRunToState(run, candidates) {
+async function appendRunToState(run, candidates, autoCompletions = []) {
   const state = await readJson(statePath, defaultState());
   state.version = 1;
   state.automationId = automationId;
@@ -605,6 +780,7 @@ async function appendRunToState(run, candidates) {
   }
 
   state.next = (candidates || []).map(summarizeCandidate);
+  state.lastAutoCompletions = autoCompletions.map(summarizeCompletion);
   await fs.writeFile(statePath, `${JSON.stringify(state, null, 2)}\n`, 'utf8');
 }
 
@@ -721,6 +897,34 @@ function summarizeCandidate(candidate) {
   };
 }
 
+function summarizeAutoCompletions(items) {
+  const counts = countBy(items || [], item => item.status || 'unknown');
+  return {
+    enabled: autoCompleteEnabled,
+    total: (items || []).length,
+    completed: counts.completed || 0,
+    blocked: counts.blocked || 0,
+    failed: counts.failed || 0,
+  };
+}
+
+function summarizeCompletion(item) {
+  return {
+    label: item.label,
+    status: item.status,
+    summary: item.summary || item.reason || '',
+  };
+}
+
+function countBy(items, pickKey) {
+  const out = {};
+  for (const item of items || []) {
+    const key = pickKey(item);
+    out[key] = (out[key] || 0) + 1;
+  }
+  return out;
+}
+
 function maybeDecodeBase64(value) {
   const compact = value.replace(/\s+/g, '');
   if (compact.length < 80 || compact.length % 4 !== 0 || !/^[A-Za-z0-9+/=]+$/.test(compact)) return '';
@@ -829,6 +1033,10 @@ function redactEvidence(value) {
 
 function toStamp(date) {
   return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+}
+
+function truthy(value) {
+  return /^(1|true|yes|on)$/i.test(String(value || '').trim());
 }
 
 main();

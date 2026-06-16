@@ -7,11 +7,25 @@ It turns each wakeup into a bounded coordination round:
 2. Load previous run state.
 3. Discover candidate work in this repository.
 4. Score candidates with value, urgency, starvation, loopability, freshness, risk, and duplicate penalties.
-5. Write a heartbeat, state file, and per-run report.
+5. Auto-complete safe local follow-up work.
+6. Write a heartbeat, state file, and per-run report.
 
-The runner is intentionally read-only against external services. It does not
-deploy, publish, delete, change permissions, or send bulk messages. Live probes
-only run when environment variables are provided.
+The runner is intentionally safe against external services. It does not deploy,
+publish, delete, change permissions, or send bulk messages. Live probes only run
+when environment variables are provided.
+
+By default, `run.ps1` calls `run.mjs --auto-complete`. Auto-complete is limited
+to local, review-ready artifacts:
+
+- worktree snapshots
+- commit boundary plans
+- slice handoffs and stage scripts
+- content queue reconciliation reports
+- Wrangler cache audit reports
+- cold outreach drafts only when prospects are eligible
+
+It stops at review gates for secrets, tokens, deploy approval, outbound sending,
+and broad frontend/artifact payloads.
 
 It can also surface a `cold_outreach` candidate from
 `scripts/outreach.prospects.json`. That path creates review-ready draft work for
@@ -31,7 +45,19 @@ powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\run.ps1
 or:
 
 ```bash
-node scripts/loops-24/run.mjs
+node scripts/loops-24/run.mjs --auto-complete
+```
+
+Report-only mode:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\run.ps1 -ReportOnly
+```
+
+Node equivalent:
+
+```bash
+node scripts/loops-24/run.mjs --report-only
 ```
 
 Default state path:
