@@ -5,6 +5,7 @@ import os from 'node:os';
 import process from 'node:process';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { gitWorktreeFingerprint } from './lib/git-worktree-fingerprint.mjs';
 
 const automationId = process.env.LOOPS_AUTOMATION_ID || 'loops-24';
 const repoRoot = path.resolve(process.env.LOOPS_REPO_ROOT || process.cwd());
@@ -38,7 +39,7 @@ if (ahead <= 0) {
 const statusTracked = runGit(['status', '--short', '--untracked-files=no'])
   .split(/\r?\n/)
   .filter(Boolean);
-const statusFingerprint = hash(statusTracked.join('\n'));
+const statusFingerprint = gitWorktreeFingerprint({ cwd: repoRoot, statusLines: statusTracked });
 const commits = runGit(['log', '--oneline', `${upstream}..HEAD`])
   .split(/\r?\n/)
   .filter(Boolean);
