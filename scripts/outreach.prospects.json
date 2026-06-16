@@ -1,0 +1,201 @@
+{
+  "batch_size": 5,
+  "cooldown_days": 14,
+  "campaign": {
+    "id": "3q-google-business-cold-outreach",
+    "brand_name": "3Q Hatchery",
+    "sender_name": "3Q Hatchery",
+    "offer": "我可以先免費幫你整理一頁「陌生客看得懂、願意詢問」的品牌方向稿，包含第一屏賣點、LINE/IG/Google 承接、詢價或預約入口。",
+    "cta": "如果你願意，我先做 1 頁方向給你看；適合再聊，不適合就當作多一個外部視角。",
+    "review_gate": "manual_send_only"
+  },
+  "google_prospecting": {
+    "api_key_env": "GOOGLE_MAPS_API_KEY",
+    "fallback_api_key_env": "GOOGLE_PLACES_API_KEY",
+    "language_code": "zh-TW",
+    "region_code": "TW",
+    "limit_per_query": 8,
+    "max_new": 20,
+    "min_rating": 4.1,
+    "min_user_rating_count": 20,
+    "review_gate": "manual_send_only",
+    "queries": [
+      {
+        "id": "taichung-dessert-gift",
+        "text_query": "台中 甜點禮盒",
+        "segment": "craft-dessert",
+        "priority": 0.92,
+        "fit_score": 0.86,
+        "outreach_angle": "商品照、禮盒頁、節慶檔期與 LINE 導購入口"
+      },
+      {
+        "id": "taichung-souvenir",
+        "text_query": "台中 伴手禮",
+        "segment": "taichung-gift-food",
+        "priority": 0.9,
+        "fit_score": 0.84,
+        "outreach_angle": "Google 評價亮點、商品故事、送禮情境與詢價入口"
+      },
+      {
+        "id": "taichung-cafe-dessert",
+        "text_query": "台中 咖啡廳 甜點",
+        "segment": "craft-dessert",
+        "priority": 0.84,
+        "fit_score": 0.82,
+        "outreach_angle": "店面故事、招牌品項、訂位或私訊入口"
+      },
+      {
+        "id": "taichung-restaurant-reservation",
+        "text_query": "台中 餐廳 預約",
+        "segment": "restaurant-local",
+        "priority": 0.82,
+        "fit_score": 0.8,
+        "outreach_angle": "菜單第一屏、Google 評價亮點、訂位與包場入口"
+      },
+      {
+        "id": "taichung-nail-studio",
+        "text_query": "台中 美甲工作室",
+        "segment": "beauty-service",
+        "priority": 0.78,
+        "fit_score": 0.8,
+        "outreach_angle": "作品集、價目區間、預約流程與初次到店信任證據"
+      },
+      {
+        "id": "taichung-pet-grooming",
+        "text_query": "台中 寵物美容",
+        "segment": "pet-service",
+        "priority": 0.76,
+        "fit_score": 0.78,
+        "outreach_angle": "服務項目、案例照片、預約入口與回訪提醒"
+      }
+    ]
+  },
+  "segments": [
+    {
+      "id": "taichung-gift-food",
+      "label": "台中伴手禮與食品品牌",
+      "priority": 0.92,
+      "fit_score": 0.86,
+      "outreach_angle": "Google 評價亮點、商品故事、送禮情境與詢價入口"
+    },
+    {
+      "id": "craft-dessert",
+      "label": "甜點、咖啡與手作烘焙",
+      "priority": 0.86,
+      "fit_score": 0.82,
+      "outreach_angle": "商品照、禮盒頁、節慶檔期與 LINE 導購入口"
+    },
+    {
+      "id": "restaurant-local",
+      "label": "餐廳、私廚與預約型店家",
+      "priority": 0.82,
+      "fit_score": 0.8,
+      "outreach_angle": "菜單第一屏、Google 評價亮點、訂位與包場入口"
+    },
+    {
+      "id": "beauty-service",
+      "label": "美甲、美容與預約服務",
+      "priority": 0.78,
+      "fit_score": 0.8,
+      "outreach_angle": "作品集、價目區間、預約流程與初次到店信任證據"
+    },
+    {
+      "id": "pet-service",
+      "label": "寵物美容與在地服務",
+      "priority": 0.76,
+      "fit_score": 0.78,
+      "outreach_angle": "服務項目、案例照片、預約入口與回訪提醒"
+    },
+    {
+      "id": "experience-store",
+      "label": "體驗店、課程與工作坊",
+      "priority": 0.72,
+      "fit_score": 0.72,
+      "outreach_angle": "體驗流程、預約頁、團體包場與短影音素材入口"
+    },
+    {
+      "id": "google-local-business",
+      "label": "Google 公開商家",
+      "priority": 0.75,
+      "fit_score": 0.75,
+      "outreach_angle": "Google 商家頁、社群內容與一頁式詢問動線"
+    }
+  ],
+  "prospects": [
+    {
+      "id": "oshop-taichung",
+      "name": "o.shop 台中",
+      "segment": "taichung-gift-food",
+      "channel": "line_oa",
+      "source_type": "public_seed",
+      "source_url": "https://page.line.me/372kvueh",
+      "contact_hint": "LINE OA @372kvueh",
+      "public_signal": "公開 LINE 頁已有商品與伴手禮入口，適合補一頁更清楚的陌生客轉換頁。",
+      "fit_reason": "食品與送禮品項適合用商品照、節慶情境與 LINE 導購串成詢問流程。",
+      "fit_score": 0.88,
+      "priority": 0.88,
+      "status": "new",
+      "discovered_at": "2026-06-16"
+    },
+    {
+      "id": "shanmudao-taichung",
+      "name": "Shanmudao 山木島台中",
+      "segment": "taichung-gift-food",
+      "channel": "line_oa",
+      "source_type": "public_seed",
+      "source_url": "https://page.line.me/694uqjam",
+      "contact_hint": "LINE OA",
+      "public_signal": "品牌有清楚商品故事與送禮感，適合整理成第一屏賣點與禮盒詢價入口。",
+      "fit_reason": "伴手禮品牌的 Google/社群注意力可以接到一頁式禮盒頁與 LINE 諮詢。",
+      "fit_score": 0.86,
+      "priority": 0.84,
+      "status": "new",
+      "discovered_at": "2026-06-16"
+    },
+    {
+      "id": "doughdiy-taichung",
+      "name": "DOUGH 手作烘焙 DIY",
+      "segment": "experience-store",
+      "channel": "website",
+      "source_type": "public_seed",
+      "source_url": "https://www.doughdiy.org/",
+      "contact_hint": "官網公開聯絡入口",
+      "public_signal": "體驗型服務需要讓第一次來的人快速看懂流程、價格感與預約方式。",
+      "fit_reason": "體驗課程適合用流程圖、作品照、團體包場情境和 LINE 預約入口承接。",
+      "fit_score": 0.78,
+      "priority": 0.76,
+      "status": "new",
+      "discovered_at": "2026-06-16"
+    },
+    {
+      "id": "ironwood-coffee",
+      "name": "Ironwood Coffee",
+      "segment": "craft-dessert",
+      "channel": "line_oa",
+      "source_type": "public_seed",
+      "source_url": "https://page.line.me/075bykta",
+      "contact_hint": "LINE OA",
+      "public_signal": "咖啡甜點店可把招牌品項、店面氛圍與訂位/私訊入口整理得更集中。",
+      "fit_reason": "適合用一頁式入口把社群內容、Google 搜尋流量與 LINE 私訊接起來。",
+      "fit_score": 0.78,
+      "priority": 0.74,
+      "status": "new",
+      "discovered_at": "2026-06-16"
+    },
+    {
+      "id": "one-percent-bakery",
+      "name": "1% Bakery",
+      "segment": "craft-dessert",
+      "channel": "line_oa",
+      "source_type": "public_seed",
+      "source_url": "https://page.line.me/kdf1129a",
+      "contact_hint": "LINE OA",
+      "public_signal": "烘焙品牌適合把招牌品項、預訂方式與節慶檔期整理成可轉換頁。",
+      "fit_reason": "甜點烘焙店的陌生客需要更快看到品項、價格感、預訂方式和社群證據。",
+      "fit_score": 0.8,
+      "priority": 0.74,
+      "status": "new",
+      "discovered_at": "2026-06-16"
+    }
+  ]
+}

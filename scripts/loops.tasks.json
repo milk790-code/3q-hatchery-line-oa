@@ -1,8 +1,34 @@
 {
   "tasks": [
     {
+      "task_type": "github_label_control",
+      "source_id": "github-label-control",
+      "lane": "repo-hygiene",
+      "manual_gate": "manual_create_only",
+      "expected_artifact": "local GitHub label-control run plan; no comments or label removal by default",
+      "dedup_policy": "control labels are read into the local run plan; acknowledgement requires explicit approval",
+      "priority_base": 75,
+      "dedup_window_minutes": 0,
+      "loopability_score": 1,
+      "risk_score": 0.08,
+      "payload": {
+        "repository": "milk790-code/3q-hatchery-line-oa",
+        "labels": {
+          "retry": "loop:retry",
+          "ignore": "loop:ignore",
+          "promote": "loop:promote"
+        },
+        "acknowledge_labels": false,
+        "max_issues_per_label": 20
+      }
+    },
+    {
       "task_type": "cloudflare_worker_health",
       "source_id": "3q-social-publisher-health",
+      "lane": "deployment",
+      "manual_gate": "none_read_only",
+      "expected_artifact": "local health probe result in the run report",
+      "dedup_policy": "55m per health URL; never deploy from this task",
       "priority_base": 80,
       "dedup_window_minutes": 55,
       "loopability_score": 1,
@@ -15,6 +41,10 @@
     {
       "task_type": "google_business_prospecting",
       "source_id": "3q-google-business-prospecting",
+      "lane": "revenue",
+      "manual_gate": "manual_send_only",
+      "expected_artifact": "deduped public business prospects for manual review",
+      "dedup_policy": "720m per query/fingerprint; no outbound sending",
       "priority_base": 92,
       "dedup_window_minutes": 720,
       "loopability_score": 0.9,
@@ -29,6 +59,10 @@
     {
       "task_type": "cold_outreach_batch",
       "source_id": "3q-cold-outreach-draft-batch",
+      "lane": "outreach-draft",
+      "manual_gate": "manual_send_only",
+      "expected_artifact": "review-ready outreach drafts only",
+      "dedup_policy": "720m source dedup plus 14d prospect cooldown",
       "priority_base": 90,
       "dedup_window_minutes": 720,
       "loopability_score": 0.9,
@@ -43,6 +77,10 @@
     {
       "task_type": "repo_status",
       "source_id": "repo-working-tree-status",
+      "lane": "repo-hygiene",
+      "manual_gate": "none_read_only",
+      "expected_artifact": "dirty worktree summary and local snapshot/commit boundary recommendation",
+      "dedup_policy": "55m repo status fingerprint",
       "priority_base": 60,
       "dedup_window_minutes": 55,
       "loopability_score": 1,
@@ -54,6 +92,10 @@
     {
       "task_type": "github_issue_from_latest_run",
       "source_id": "github-loop-issue-bridge",
+      "lane": "demo-sales",
+      "manual_gate": "manual_create_only",
+      "expected_artifact": "local GitHub issue draft/handoff, not a created issue",
+      "dedup_policy": "720m open-issue/actionable fingerprint with manual create gate",
       "priority_base": 86,
       "dedup_window_minutes": 720,
       "loopability_score": 0.85,

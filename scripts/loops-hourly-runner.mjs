@@ -6,6 +6,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { runColdOutreachBatch } from './lib/cold-outreach.mjs';
 import { runGithubIssueFromLatestRun } from './lib/github-loop-bridge.mjs';
+import { readGithubLabelControlTasks } from './lib/github-label-control.mjs';
 import { runGoogleBusinessProspecting } from './lib/google-business-prospector.mjs';
 
 const projectRoot = process.cwd();
@@ -112,12 +113,28 @@ async function main() {
 
 async function discoverCandidates(state) {
   const configTasks = await readConfigTasks();
+  const labelControl = await readGithubLabelControlTasks({ configTasks, now, dryRun });
+  if (labelControl.warnings.length > 0) {
+    for (const warning of labelControl.warnings) {
+      await safeAppendJson(runsPath, {
+        run_id: runId,
+        level: 'warning',
+        source: 'github_label_control',
+        warning,
+        at: new Date().toISOString(),
+      });
+    }
+  }
+  const controlledConfigTasks = configTasks.filter((task) => {
+    if (task.task_type === 'github_label_control') return false;
+    return !labelControl.ignoredKeys.has(`${task.task_type}:${task.source_id}`);
+  });
   const inboxTasks = await readInboxTasks();
   const retryTasks = state.pending_tasks
     .filter((task) => !task.retry_at || new Date(task.retry_at).getTime() <= Date.now())
     .map((task) => ({ ...task, source: 'state' }));
 
-  return [...retryTasks, ...configTasks, ...inboxTasks];
+  return [...retryTasks, ...labelControl.tasks, ...controlledConfigTasks, ...inboxTasks];
 }
 
 async function readConfigTasks() {
