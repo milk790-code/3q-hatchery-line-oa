@@ -20,6 +20,7 @@ to local, review-ready artifacts:
 - worktree snapshots
 - commit boundary plans
 - slice handoffs and stage scripts
+- frontend/artifact review reports
 - content queue reconciliation reports
 - Wrangler cache audit reports
 - cold outreach drafts only when prospects are eligible
@@ -193,6 +194,18 @@ directory but does not run it.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\prepare-slice-handoff.ps1 -Group loops_control_plane
+```
+
+## Review frontend/artifact payload
+
+Create a read-only inventory for the large frontend/artifact group from the
+latest commit-boundary plan. The report summarizes sizes, top-level bundles,
+package manifests, Wrangler deploy configs, entry candidates, and potential
+secret/absolute-path findings. It does not stage, commit, push, deploy, or
+delete files.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\review-frontend-artifacts.ps1
 ```
 
 ## Audit Wrangler cache

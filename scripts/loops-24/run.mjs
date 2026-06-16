@@ -59,6 +59,7 @@ async function main() {
     candidates = [
       ...(await discoverProjectState(ctx)),
       ...(await discoverGitState(ctx)),
+      ...(await discoverFrontendArtifacts(ctx)),
       ...(await discoverWranglerCacheRisk(ctx)),
       ...(await discoverGoogleBusinessProspecting(ctx)),
       ...(await discoverColdOutreach(ctx)),
@@ -170,6 +171,8 @@ async function discoverGitState() {
   const boundaryPlanCurrent = latestBoundaryPlan?.statusFingerprint === statusFingerprint;
   const latestSliceHandoff = await readJson(path.join(stateDir, 'slice-handoffs', 'loops_control_plane-latest.json'), null);
   const sliceHandoffCurrent = latestSliceHandoff?.statusFingerprint === statusFingerprint;
+  const latestFrontendReview = await readJson(path.join(stateDir, 'frontend-artifact-reviews', 'latest.json'), null);
+  const frontendReviewCurrent = latestFrontendReview?.statusFingerprint === statusFingerprint;
 
   const counts = {
     staged: lines.filter(line => line[0] && line[0] !== ' ' && line[0] !== '?').length,
@@ -227,6 +230,49 @@ async function discoverGitState() {
         gate: group.gate,
         total: group.counts?.total || 0,
       })) : null,
+      frontendReviewPath: frontendReviewCurrent ? latestFrontendReview.reportPath : null,
+    },
+  }];
+}
+
+async function discoverFrontendArtifacts() {
+  const status = runCommand('git', ['status', '--short'], 45_000);
+  if (!status.ok) return [];
+
+  const statusLines = status.stdout.split(/\r?\n/).filter(Boolean);
+  const statusFingerprint = hash(statusLines.join('\n'));
+  const boundary = await readJson(path.join(stateDir, 'commit-boundaries', 'latest.json'), null);
+  if (boundary?.statusFingerprint !== statusFingerprint) return [];
+
+  const group = (boundary.groups || []).find(item => item.id === 'frontend_artifacts');
+  if (!group) return [];
+
+  const groupFingerprint = hash((group.paths || []).slice().sort().join('\n'));
+  const latestReview = await readJson(path.join(stateDir, 'frontend-artifact-reviews', 'latest.json'), null);
+  const reviewCurrent = latestReview?.statusFingerprint === statusFingerprint
+    && latestReview?.groupFingerprint === groupFingerprint;
+
+  return [{
+    type: 'repo_health',
+    id: reviewCurrent ? 'frontend-artifacts-review-ready' : 'frontend-artifacts-audit-needed',
+    title: reviewCurrent ? 'Review frontend/artifacts audit' : 'Audit frontend/artifacts payload',
+    value: reviewCurrent ? 0.32 : 0.64,
+    urgency: reviewCurrent ? 0.24 : 0.5,
+    loopability: reviewCurrent ? 0.55 : 0.78,
+    freshness: 0.65,
+    risk: 0.2,
+    action: reviewCurrent
+      ? 'Use the frontend artifact review to split the payload before any staging or preview.'
+      : 'Create a read-only frontend/artifact review with package, size, deploy-config, and secret-risk summaries.',
+    evidence: {
+      statusFingerprint,
+      groupFingerprint,
+      total: group.counts?.total || 0,
+      untracked: group.counts?.untracked || 0,
+      gate: group.gate,
+      boundaryReportPath: boundary.reportPath,
+      reviewPath: reviewCurrent ? latestReview.reportPath : null,
+      reviewSummary: reviewCurrent ? latestReview.summary : null,
     },
   }];
 }
@@ -542,10 +588,22 @@ async function runAutoCompletions(candidates) {
       const groups = Array.isArray(boundary?.groups) ? boundary.groups : [];
       for (const group of groups) {
         if (group.gate === 'large-payload-review') {
-          completions.push(blockedCompletion(
-            `handoff:${group.id}`,
-            'Large frontend/artifact payload needs human review before staging.'
-          ));
+          const latestReview = await readJson(path.join(stateDir, 'frontend-artifact-reviews', 'latest.json'), null);
+          const groupFingerprint = hash((group.paths || []).slice().sort().join('\n'));
+          if (latestReview?.statusFingerprint === boundary.statusFingerprint
+            && latestReview?.groupFingerprint === groupFingerprint) {
+            completions.push(blockedCompletion(
+              `review:${group.id}`,
+              `Current frontend/artifact review already exists: ${latestReview.reportPath}`
+            ));
+          } else {
+            completions.push(runLocalStep(
+              `review:${group.id}`,
+              'node',
+              ['scripts/loops-24/review-frontend-artifacts.mjs'],
+              120_000
+            ));
+          }
           continue;
         }
         completions.push(runLocalStep(
@@ -596,6 +654,8 @@ async function runAutoCompletions(candidates) {
       completions.push(blockedCompletion(candidate.id, 'Outreach drafts already exist or prospects are cooling down; sending remains manual.'));
     } else if (candidate.id === 'cold-outreach-needs-prospects') {
       completions.push(blockedCompletion(candidate.id, 'Needs fresh reviewed prospects before drafts can be generated.'));
+    } else if (candidate.id === 'frontend-artifacts-review-ready') {
+      completions.push(blockedCompletion(candidate.id, 'Frontend/artifact review exists; staging the payload still needs a separate split decision.'));
     }
   }
 
