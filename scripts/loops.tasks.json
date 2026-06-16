@@ -63,6 +63,7 @@
         "title_prefix": "[LOOPS]",
         "labels": ["loops", "automation"],
         "issue_policy": "actionable_only",
+        "dedupe_open_issues": true,
         "review_gate": "manual_create_only",
         "mode": "draft"
       }
