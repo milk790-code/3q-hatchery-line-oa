@@ -4,6 +4,13 @@
 ALTER TABLE inquiries ADD COLUMN followed_up_24h INTEGER DEFAULT 0;
 ALTER TABLE inquiries ADD COLUMN followed_up_72h INTEGER DEFAULT 0;
 ALTER TABLE inquiries ADD COLUMN followed_up_168h INTEGER DEFAULT 0;
+ALTER TABLE inquiries ADD COLUMN lead_score TEXT DEFAULT 'cold';
+ALTER TABLE inquiries ADD COLUMN status TEXT DEFAULT 'new';
+ALTER TABLE inquiries ADD COLUMN booking_requested INTEGER DEFAULT 0;
+ALTER TABLE inquiries ADD COLUMN booking_note TEXT;
+
+CREATE INDEX IF NOT EXISTS idx_inquiries_lead_score ON inquiries(lead_score);
+CREATE INDEX IF NOT EXISTS idx_inquiries_status ON inquiries(status);
 
 -- Campaign registrations table (separate from KV slots for permanent record)
 CREATE TABLE IF NOT EXISTS campaigns (

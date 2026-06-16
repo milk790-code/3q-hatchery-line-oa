@@ -962,16 +962,27 @@ document.querySelectorAll('.tl-block').forEach((block, i) => {
   setInterval(update, 30000);
 })();
 
-/* ── SLOT COUNTER (localStorage persistence) ── */
+/* ── SLOT COUNTER (KV-backed with safe fallback) ── */
 (function() {
-  const key = '3q-launch-slots';
-  // Default: 3 taken, 2 open (adjust if needed)
-  const taken = parseInt(localStorage.getItem(key) || '3', 10);
-  const left = Math.max(0, 5 - taken);
-  document.getElementById('slotsLeft').textContent = left;
-  document.querySelectorAll('.slot-block').forEach((b, i) => {
-    b.className = 'slot-block ' + (i < taken ? 'filled' : 'empty');
-  });
+  const endpoint = 'https://3q-hatchery-webhook.milk790.workers.dev/admin/seat';
+  const fallback = { left: 2, total: 5 };
+
+  function renderSeat(state) {
+    const total = Math.max(1, parseInt(state.total || fallback.total, 10));
+    const left = Math.max(0, Math.min(total, parseInt(state.left ?? fallback.left, 10)));
+    const taken = Math.max(0, total - left);
+    const label = document.getElementById('slotsLeft');
+    if (label) label.textContent = left;
+    document.querySelectorAll('.slot-block').forEach((b, i) => {
+      b.className = 'slot-block ' + (i < taken ? 'filled' : 'empty');
+    });
+  }
+
+  renderSeat(fallback);
+  fetch(endpoint, { cache: 'no-store' })
+    .then(r => r.ok ? r.json() : null)
+    .then(data => { if (data && data.ok) renderSeat(data); })
+    .catch(() => {});
 })();
 </script>
 </body>
