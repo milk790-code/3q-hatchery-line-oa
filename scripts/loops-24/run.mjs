@@ -1263,7 +1263,9 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
   const latestMarkdownPath = path.join(dashboardDir, 'latest.md');
   const completed = autoCompletions.filter(item => item.status === 'completed');
   const blocked = autoCompletions.filter(item => item.status === 'blocked');
-  const approvals = summarizeApprovals(blocked);
+  const manualWaits = summarizeManualWaits(candidates, autoCompletions);
+  const waiting = [...blocked, ...manualWaits];
+  const approvals = summarizeApprovals(waiting);
   const escalated = blocked.filter(item => item.escalated);
   const loopos = result.loopos || buildLooposSummary(candidates, autoCompletions, { registries: [], warnings: [] });
 
@@ -1280,6 +1282,8 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     loopos,
     completed: completed.map(summarizeCompletion),
     blocked: blocked.map(summarizeCompletion),
+    manualWaits: manualWaits.map(summarizeCompletion),
+    waiting: waiting.map(summarizeCompletion),
     nextApproval: approvals,
     escalatedBlockers: escalated.map(summarizeCompletion),
   };
@@ -1305,7 +1309,7 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     '',
     '## Blocked / Waiting',
     '',
-    ...renderDashboardList(payload.blocked, '- No blocked items.'),
+    ...renderDashboardList(payload.waiting, '- No blocked or manual-gated items.'),
     '',
     '## Next Approval Gate',
     '',
@@ -1711,6 +1715,36 @@ function requiresManualGate(task = {}) {
   return /outreach|send|github|issue|pr|push|deploy|worker|secret|token|publish/.test(text);
 }
 
+function summarizeManualWaits(candidates, autoCompletions = []) {
+  const completedOrBlocked = new Set();
+  for (const item of autoCompletions || []) {
+    for (const key of [item.label, item.id, item.type]) {
+      if (key) completedOrBlocked.add(String(key));
+    }
+  }
+
+  return (candidates || [])
+    .filter(candidate => {
+      const manualGate = candidate.manualGate || inferManualGate(candidate);
+      if (!manualGate || manualGate === 'none_read_only') return false;
+      return ![candidate.id, candidate.type, candidate.title].some(key => key && completedOrBlocked.has(String(key)));
+    })
+    .map(candidate => {
+      const manualGate = candidate.manualGate || inferManualGate(candidate);
+      return {
+        label: candidate.id || candidate.title || candidate.type || 'manual-gated-candidate',
+        status: 'waiting',
+        lane: candidate.lane || inferLane(candidate),
+        summary: `Selected candidate waits at ${manualGate}: ${candidate.action}`,
+        ageHours: candidate.ageHours || 0,
+        firstSeenAt: candidate.firstSeenAt || null,
+        escalated: Boolean(candidate.escalated),
+        escalation: candidate.escalation || null,
+        nextApproval: classifyApproval(candidate.id || candidate.title || candidate.type, candidate),
+      };
+    });
+}
+
 function summarizeApprovals(blocked) {
   const groups = new Map();
   for (const item of blocked || []) {
@@ -1741,7 +1775,7 @@ function renderApprovalList(groups) {
   const lines = [];
   for (const group of groups) {
     const escalation = group.escalated ? ` escalated=${group.escalated}` : '';
-    lines.push(`- ${group.approval}: ${group.count} blocked${escalation}`);
+    lines.push(`- ${group.approval}: ${group.count} waiting${escalation}`);
     for (const item of group.items.slice(0, 4)) {
       const marker = item.escalated ? ' ESCALATED' : '';
       lines.push(`  - ${item.label}${marker}`);
