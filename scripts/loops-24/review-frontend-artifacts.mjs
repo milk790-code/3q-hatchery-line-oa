@@ -56,12 +56,16 @@ const wranglerConfigs = records
 const textRecords = records.filter(item => item.exists && item.isTextLike && item.bytes <= 1_000_000);
 const secretFindings = [];
 const absolutePathFindings = [];
+const jsSyntaxFindings = [];
 for (const record of textRecords) {
   const text = await fs.readFile(path.join(repoRoot, record.path), 'utf8').catch(() => '');
   scanText(record.path, text, secretFindings, absolutePathFindings);
+  if (record.ext === '.js') {
+    checkJavaScriptSyntax(record.path, jsSyntaxFindings);
+  }
 }
 
-const summary = summarize(records, packages, wranglerConfigs, secretFindings, absolutePathFindings);
+const summary = summarize(records, packages, wranglerConfigs, secretFindings, absolutePathFindings, jsSyntaxFindings);
 const recommendations = buildRecommendations(summary, packages, wranglerConfigs);
 const payload = {
   generatedAt: now.toISOString(),
@@ -78,6 +82,7 @@ const payload = {
   findings: {
     secrets: secretFindings,
     absolutePaths: absolutePathFindings,
+    jsSyntax: jsSyntaxFindings,
   },
   records,
 };
@@ -114,7 +119,7 @@ async function inspectPath(relPath) {
   };
 }
 
-function summarize(inputRecords, inputPackages, inputWranglerConfigs, inputSecretFindings, inputAbsolutePathFindings) {
+function summarize(inputRecords, inputPackages, inputWranglerConfigs, inputSecretFindings, inputAbsolutePathFindings, inputJsSyntaxFindings) {
   const totalBytes = inputRecords.reduce((sum, item) => sum + item.bytes, 0);
   return {
     totalPaths: inputRecords.length,
@@ -131,6 +136,7 @@ function summarize(inputRecords, inputPackages, inputWranglerConfigs, inputSecre
     wranglerConfigPaths: inputWranglerConfigs,
     secretFindings: inputSecretFindings.length,
     absolutePathFindings: inputAbsolutePathFindings.length,
+    jsSyntaxFindings: inputJsSyntaxFindings.length,
     largestFiles: inputRecords
       .filter(item => item.exists)
       .sort((a, b) => b.bytes - a.bytes)
@@ -188,6 +194,14 @@ function buildRecommendations(summary, inputPackages, inputWranglerConfigs) {
       reason: 'Potential secret-like strings were detected. Do not stage until each finding is reviewed.',
     });
   }
+  if (summary.jsSyntaxFindings > 0) {
+    recommendations.unshift({
+      slice: 'js-syntax-review',
+      gate: 'hard-stop',
+      paths: ['frontend_artifacts'],
+      reason: 'JavaScript syntax errors were detected. Do not stage affected slices until the files are repaired or removed from the slice.',
+    });
+  }
   if (recommendations.length === 0) {
     recommendations.push({
       slice: 'no-frontend-artifacts',
@@ -240,6 +254,23 @@ function scanText(file, text, secretFindings, absolutePathFindings) {
   });
 }
 
+function checkJavaScriptSyntax(file, jsSyntaxFindings) {
+  const result = spawnSync(process.execPath, ['--check', file], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    windowsHide: true,
+    timeout: 15_000,
+  });
+  if (result.status !== 0 || result.error) {
+    jsSyntaxFindings.push({
+      file,
+      status: result.status,
+      error: result.error?.message || null,
+      sample: trimSyntaxMessage(result.stderr || result.stdout || ''),
+    });
+  }
+}
+
 function renderMarkdown(data) {
   const lines = [
     '# Frontend Artifact Review',
@@ -259,6 +290,7 @@ function renderMarkdown(data) {
     `- wrangler_configs: ${data.summary.wranglerConfigs}`,
     `- secret_findings: ${data.summary.secretFindings}`,
     `- absolute_path_findings: ${data.summary.absolutePathFindings}`,
+    `- js_syntax_findings: ${data.summary.jsSyntaxFindings}`,
     '',
     '## Top-Level Groups',
     '',
@@ -321,6 +353,10 @@ function renderMarkdown(data) {
   for (const item of data.findings.absolutePaths.slice(0, 20)) {
     lines.push(`  - \`${item.file}:${item.line}\`: ${item.sample}`);
   }
+  lines.push(`- js_syntax_errors: ${data.findings.jsSyntax.length}`);
+  for (const item of data.findings.jsSyntax.slice(0, 20)) {
+    lines.push(`  - \`${item.file}\`: ${item.sample}`);
+  }
 
   lines.push('');
   lines.push('## Hard Stops');
@@ -329,6 +365,7 @@ function renderMarkdown(data) {
   lines.push('- Do not commit the full frontend/artifact payload as one unit.');
   lines.push('- Any slice with `wrangler.toml` needs deploy review before public deployment.');
   lines.push('- Any potential secret finding must be resolved before staging.');
+  lines.push('- Any JavaScript syntax finding must be resolved before staging the affected slice.');
   return lines.join('\n');
 }
 
@@ -399,4 +436,11 @@ function round(value, digits = 2) {
 
 function redact(value) {
   return value.replace(/[A-Za-z0-9_./+=-]{20,}/g, '[REDACTED]');
+}
+
+function trimSyntaxMessage(value) {
+  return String(value || '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 500);
 }

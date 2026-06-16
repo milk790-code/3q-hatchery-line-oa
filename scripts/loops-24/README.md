@@ -30,6 +30,9 @@ to local, review-ready artifacts:
 It stops at review gates for secrets, tokens, deploy approval, outbound sending,
 and broad frontend/artifact payloads.
 
+Frontend/artifact review also runs syntax checks for plain `.js` files and
+marks affected slices as hard stops when syntax errors are detected.
+
 It can also surface a `github_publication` candidate when the current branch is
 ahead of its upstream. Auto-complete may generate a local PR handoff under the
 automation state directory, but it never runs `git push`, creates a pull request,
