@@ -38,6 +38,10 @@ ahead of its upstream. Auto-complete may generate a local PR handoff under the
 automation state directory, but it never runs `git push`, creates a pull request,
 merges, deploys, or publishes.
 
+When the GitHub handoff is current, LOOPS can also generate a PR readiness packet
+that aggregates the latest manual gates and evidence. This remains local-only and
+does not push or create a pull request.
+
 It can also surface a `cold_outreach` candidate from
 `scripts/outreach.prospects.json`. That path creates review-ready draft work for
 the hourly runner, but outbound LINE/IG/email sending remains manual.
@@ -257,6 +261,18 @@ directory but does not run it.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\prepare-slice-handoff.ps1 -Group loops_control_plane
+```
+
+## Prepare PR readiness
+
+Create a local packet for final review before explicit push or draft PR approval.
+It aggregates the current GitHub handoff, secret gates, Worker deploy review,
+wakeup health, commit boundary, content queue, and frontend/manual gates. It
+does not run `git push`, create a pull request, deploy, merge, publish, or write
+secrets.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\prepare-pr-readiness.ps1
 ```
 
 ## Review Worker deploy slices

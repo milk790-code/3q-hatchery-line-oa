@@ -61,6 +61,7 @@ async function main() {
       ...(await discoverWakeupHealth(ctx)),
       ...(await discoverGitState(ctx)),
       ...(await discoverGithubPublication(ctx)),
+      ...(await discoverPrReadiness(ctx)),
       ...(await discoverFrontendArtifacts(ctx)),
       ...(await discoverWranglerCacheRisk(ctx)),
       ...(await discoverGoogleBusinessProspecting(ctx)),
@@ -337,6 +338,71 @@ async function discoverGithubPublication() {
       statusFingerprint,
       dirtyTracked: statusLines,
       handoffPath: current ? latest.reportPath : null,
+      gate: 'push-and-pr-approval',
+    },
+  }];
+}
+
+async function discoverPrReadiness() {
+  const github = await readJson(path.join(stateDir, 'github-handoffs', 'latest.json'), null);
+  if (!github) return [];
+
+  const branch = runCommand('git', ['branch', '--show-current'], 45_000);
+  const upstream = runCommand('git', ['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'], 45_000);
+  const head = runCommand('git', ['rev-parse', '--short', 'HEAD'], 45_000);
+  if (!branch.ok || !upstream.ok || !head.ok) return [];
+
+  const branchName = branch.stdout.trim();
+  const upstreamName = upstream.stdout.trim();
+  const counts = runCommand('git', ['rev-list', '--left-right', '--count', `${upstreamName}...HEAD`], 45_000);
+  if (!counts.ok) return [];
+  const [behindRaw, aheadRaw] = counts.stdout.trim().split(/\s+/);
+  const behind = Number.parseInt(behindRaw || '0', 10);
+  const ahead = Number.parseInt(aheadRaw || '0', 10);
+  if (!Number.isFinite(ahead) || ahead <= 0) return [];
+
+  const status = runCommand('git', ['status', '--short', '--untracked-files=no'], 45_000);
+  const statusLines = status.ok ? status.stdout.split(/\r?\n/).filter(Boolean) : [];
+  const statusFingerprint = hash(statusLines.join('\n'));
+  const githubCurrent = github.branch === branchName
+    && github.upstream === upstreamName
+    && github.head === head.stdout.trim()
+    && github.ahead === ahead
+    && github.behind === behind
+    && github.statusFingerprint === statusFingerprint;
+  if (!githubCurrent) return [];
+
+  const latest = await readJson(path.join(stateDir, 'pr-readiness', 'latest.json'), null);
+  const current = latest?.branch === branchName
+    && latest?.upstream === upstreamName
+    && latest?.head === head.stdout.trim()
+    && latest?.ahead === ahead
+    && latest?.behind === behind
+    && latest?.statusFingerprint === statusFingerprint;
+
+  return [{
+    type: 'github_publication',
+    id: current ? 'pr-readiness-ready' : 'pr-readiness-needed',
+    title: current ? 'Review PR readiness packet' : 'Prepare PR readiness packet',
+    value: current ? 0.3 : 0.44,
+    urgency: current ? 0.24 : 0.36,
+    loopability: current ? 0.52 : 0.74,
+    freshness: 0.7,
+    risk: 0.18,
+    action: current
+      ? 'Review the PR readiness packet before explicit push or draft PR approval.'
+      : 'Generate a local PR readiness packet that aggregates handoff evidence and manual gates; do not push or create a PR.',
+    fingerprintSeed: `${branchName}:${upstreamName}:${ahead}:${head.stdout.trim()}:${statusFingerprint}:${latest?.readinessFingerprint || ''}`,
+    evidence: {
+      branch: branchName,
+      upstream: upstreamName,
+      ahead,
+      behind,
+      head: head.stdout.trim(),
+      statusFingerprint,
+      githubHandoffPath: github.reportPath,
+      readinessPath: current ? latest.reportPath : null,
+      readyForApproval: current ? latest.summary?.readyForApproval : null,
       gate: 'push-and-pr-approval',
     },
   }];
@@ -714,6 +780,21 @@ async function runAutoCompletions(candidates) {
     completions.push(blockedCompletion(
       'github-local-pr-handoff-ready',
       `GitHub handoff already exists: ${candidate?.evidence?.handoffPath || path.join(stateDir, 'github-handoffs')}; push and PR creation require approval.`
+    ));
+  }
+
+  if (ids.has('pr-readiness-needed')) {
+    completions.push(runLocalStep(
+      'prepare-pr-readiness',
+      'node',
+      ['scripts/loops-24/prepare-pr-readiness.mjs'],
+      120_000
+    ));
+  } else if (ids.has('pr-readiness-ready')) {
+    const candidate = byId.get('pr-readiness-ready');
+    completions.push(blockedCompletion(
+      'pr-readiness-ready',
+      `Current PR readiness packet already exists: ${candidate?.evidence?.readinessPath || path.join(stateDir, 'pr-readiness')}; push and PR creation require approval.`
     ));
   }
 
