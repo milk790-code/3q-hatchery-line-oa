@@ -11,18 +11,34 @@ export async function runGithubIssueFromLatestRun({ stateDir, task, now }) {
     return { ok: true, summary: 'no loop runs found to report', skipped: true };
   }
 
+  const action = classifyRunAction(latestRun);
   const titlePrefix = payload.title_prefix || '[LOOPS]';
-  const title = `${titlePrefix} ${summarizeRunForTitle(latestRun)}`.slice(0, 240);
-  const body = renderIssueBody(latestRun, now);
+  const title = `${titlePrefix} ${summarizeRunForTitle(latestRun, action)}`.slice(0, 240);
+  const body = renderIssueBody(latestRun, now, action);
   const draftPath = path.join(outDir, `${safeStamp(now)}-${latestRun.run_id || 'latest'}-issue.md`);
 
   await fs.mkdir(outDir, { recursive: true });
   await fs.writeFile(draftPath, `# ${title}\n\n${body}\n`, 'utf8');
 
+  const issuePolicy = payload.issue_policy || 'actionable_only';
+  if (!shouldCreateIssue(action, issuePolicy)) {
+    return {
+      ok: true,
+      created: false,
+      issue_policy: issuePolicy,
+      actionable: action.actionable,
+      action_reason: action.reason,
+      summary: `created GitHub issue draft only; ${action.reason}`,
+      artifact_paths: { markdown: draftPath },
+    };
+  }
+
   if (payload.mode === 'draft' || payload.review_gate === 'manual_create_only') {
     return {
       ok: true,
       created: false,
+      actionable: action.actionable,
+      action_reason: action.reason,
       review_gate: payload.review_gate || 'manual_create_only',
       summary: 'created GitHub issue draft only',
       artifact_paths: { markdown: draftPath },
@@ -35,6 +51,8 @@ export async function runGithubIssueFromLatestRun({ stateDir, task, now }) {
     return {
       ok: true,
       created: false,
+      actionable: action.actionable,
+      action_reason: action.reason,
       review_gate: 'missing_github_token_or_repository',
       summary: 'created GitHub issue draft; GitHub token/repository not available',
       artifact_paths: { markdown: draftPath },
@@ -74,6 +92,8 @@ export async function runGithubIssueFromLatestRun({ stateDir, task, now }) {
     created: true,
     status: response.status,
     issue_url: data?.html_url,
+    actionable: action.actionable,
+    action_reason: action.reason,
     summary: `created GitHub issue ${data?.number ? `#${data.number}` : ''}`.trim(),
     artifact_paths: { markdown: draftPath },
   };
@@ -96,7 +116,7 @@ async function readLatestRun(runsPath) {
   return null;
 }
 
-function renderIssueBody(run, now) {
+function renderIssueBody(run, now, action) {
   const selected = Array.isArray(run.selected) ? run.selected : [];
   const results = Array.isArray(run.results) ? run.results : [];
   const skipped = Array.isArray(run.skipped) ? run.skipped : [];
@@ -109,6 +129,8 @@ function renderIssueBody(run, now) {
     `- Finished: \`${run.finished_at || 'unknown'}\``,
     `- Reporter time: \`${now.toISOString()}\``,
     `- Status: \`${run.ok ? 'ok' : 'failed'}\``,
+    `- Actionable: \`${action.actionable ? 'yes' : 'no'}\``,
+    `- Reason: ${action.reason}`,
     '',
     '## Selected',
     '',
@@ -150,11 +172,61 @@ function listSkipped(skipped) {
   });
 }
 
-function summarizeRunForTitle(run) {
+function summarizeRunForTitle(run, action) {
+  if (action.actionable) return `${action.title} ${run.run_id || ''}`.trim();
   if (!run.ok) return `failed run ${run.run_id || ''}`.trim();
   const resultCount = Array.isArray(run.results) ? run.results.length : 0;
   if (resultCount === 0) return `heartbeat ${run.run_id || ''}`.trim();
   return `${resultCount} result${resultCount === 1 ? '' : 's'} from ${run.run_id || 'latest run'}`;
+}
+
+function classifyRunAction(run) {
+  if (!run.ok) {
+    return { actionable: true, title: 'failed run', reason: 'loop run failed' };
+  }
+
+  const results = Array.isArray(run.results) ? run.results : [];
+  const failed = results.find((item) => item?.result && item.result.ok === false);
+  if (failed) {
+    return {
+      actionable: true,
+      title: 'task failed',
+      reason: `${failed.task?.task_type || 'task'} / ${failed.task?.source_id || 'unknown'} failed`,
+    };
+  }
+
+  const retryable = results.find((item) => item?.result?.retryable);
+  if (retryable) {
+    return {
+      actionable: true,
+      title: 'retryable task',
+      reason: `${retryable.task?.task_type || 'task'} / ${retryable.task?.source_id || 'unknown'} is retryable`,
+    };
+  }
+
+  const generated = results.find((item) => {
+    const result = item?.result || {};
+    return Number(result.generated_count || 0) > 0 || Boolean(result.batch_id) || Boolean(result.issue_url);
+  });
+  if (generated) {
+    return {
+      actionable: true,
+      title: 'new loop output',
+      reason: `${generated.task?.task_type || 'task'} / ${generated.task?.source_id || 'unknown'} produced new output`,
+    };
+  }
+
+  if (run.empty_heartbeat) {
+    return { actionable: false, title: 'heartbeat', reason: 'empty heartbeat; no action needed' };
+  }
+
+  return { actionable: false, title: 'heartbeat', reason: 'all selected tasks completed without actionable output' };
+}
+
+function shouldCreateIssue(action, policy) {
+  if (policy === 'always') return true;
+  if (policy === 'failed_only') return action.actionable && /fail|retry/i.test(action.reason);
+  return action.actionable;
 }
 
 function safeStamp(date) {
