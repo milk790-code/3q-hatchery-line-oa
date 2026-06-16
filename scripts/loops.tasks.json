@@ -1,0 +1,70 @@
+{
+  "tasks": [
+    {
+      "task_type": "cloudflare_worker_health",
+      "source_id": "3q-social-publisher-health",
+      "priority_base": 80,
+      "dedup_window_minutes": 55,
+      "loopability_score": 1,
+      "risk_score": 0.05,
+      "payload": {
+        "url": "https://3q-social-publisher.milk790.workers.dev/health",
+        "expect_ok": true
+      }
+    },
+    {
+      "task_type": "google_business_prospecting",
+      "source_id": "3q-google-business-prospecting",
+      "priority_base": 92,
+      "dedup_window_minutes": 720,
+      "loopability_score": 0.9,
+      "risk_score": 0.22,
+      "payload": {
+        "config_path": "scripts/outreach.prospects.json",
+        "limit_per_query": 8,
+        "max_new": 20,
+        "review_gate": "manual_send_only"
+      }
+    },
+    {
+      "task_type": "cold_outreach_batch",
+      "source_id": "3q-cold-outreach-draft-batch",
+      "priority_base": 90,
+      "dedup_window_minutes": 720,
+      "loopability_score": 0.9,
+      "risk_score": 0.18,
+      "payload": {
+        "config_path": "scripts/outreach.prospects.json",
+        "batch_size": 5,
+        "cooldown_days": 14,
+        "review_gate": "manual_send_only"
+      }
+    },
+    {
+      "task_type": "repo_status",
+      "source_id": "repo-working-tree-status",
+      "priority_base": 60,
+      "dedup_window_minutes": 55,
+      "loopability_score": 1,
+      "risk_score": 0.05,
+      "payload": {
+        "cwd": "."
+      }
+    },
+    {
+      "task_type": "github_issue_from_latest_run",
+      "source_id": "github-loop-issue-bridge",
+      "priority_base": 86,
+      "dedup_window_minutes": 720,
+      "loopability_score": 0.85,
+      "risk_score": 0.12,
+      "payload": {
+        "repository": "milk790-code/3q-hatchery-line-oa",
+        "title_prefix": "[LOOPS]",
+        "labels": ["loops", "automation"],
+        "review_gate": "manual_create_only",
+        "mode": "draft"
+      }
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+name: LOOPS hourly runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      create_github_issue:
+        description: Create a GitHub issue from the latest loop run instead of draft-only
+        required: false
+        default: "false"
+  schedule:
+    - cron: "17 * * * *"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  run-loops:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      LOOPS_STATE_DIR: .loops
+      LOOPS_MAX_TASKS: "3"
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run loop
+        run: node scripts/loops-hourly-runner.mjs --json
+
+      - name: Report latest loop run to GitHub draft
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.create_github_issue != 'true' }}
+        run: node scripts/github-loop-report.mjs
+
+      - name: Create GitHub issue for latest loop run
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.create_github_issue == 'true' }}
+        run: node scripts/github-loop-report.mjs --create-issue
+
+      - name: Upload loop artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: loops-${{ github.run_id }}
+          path: |
+            .loops/runs.jsonl
+            .loops/state.json
+            .loops/github/*.md
+            .loops/outreach/*.md
+            .loops/outreach/*.json
+          if-no-files-found: ignore
