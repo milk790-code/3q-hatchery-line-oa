@@ -30,16 +30,19 @@ const latestRunAgeMinutes = ageMinutes(latestRun?.finishedAt || latestRun?.start
 const latestSuccessAgeMinutes = ageMinutes(latestSuccess?.finishedAt || latestSuccess?.startedAt, now);
 const lockAgeMinutes = lock ? ageMinutes(lock.updatedAt || lock.acquiredAt || lock.startedAt, now) : null;
 const nextRunInMinutes = minutesUntil(task?.nextRunTime, now);
+const taskState = String(task?.state || '');
+const taskLastResult = Number(task?.lastTaskResult);
+const taskCurrentlyRunning = taskState === 'Running' && taskLastResult === 267009;
 
 const checks = {
   stateFileExists: Boolean(state),
   latestSuccessFresh: latestSuccessAgeMinutes !== null && latestSuccessAgeMinutes <= staleMinutes,
   noStaleLock: !lock || (lockAgeMinutes !== null && lockAgeMinutes <= lockStaleMinutes),
   scheduledTaskReady: task.platform === 'win32'
-    ? Boolean(task.found && ['Ready', 'Running'].includes(String(task.state || '')))
+    ? Boolean(task.found && ['Ready', 'Running'].includes(taskState))
     : null,
   scheduledTaskLastResultOk: task.platform === 'win32'
-    ? Boolean(task.found && Number(task.lastTaskResult) === 0)
+    ? Boolean(task.found && (taskLastResult === 0 || taskCurrentlyRunning))
     : null,
   scheduledTaskNextRunPlausible: task.platform === 'win32'
     ? Boolean(task.found && (nextRunInMinutes === null || nextRunInMinutes > -10))
