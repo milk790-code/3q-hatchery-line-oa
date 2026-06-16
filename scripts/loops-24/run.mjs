@@ -18,6 +18,8 @@ const defaultSocialPublisherUrl = 'https://3q-social-publisher.milk790.workers.d
 const argv = new Set(process.argv.slice(2));
 const autoCompleteEnabled = !argv.has('--report-only')
   && (argv.has('--auto-complete') || truthy(process.env.LOOPS_AUTO_COMPLETE));
+const onlySafeLocal = argv.has('--only-safe-local') || truthy(process.env.LOOPS_ONLY_SAFE_LOCAL);
+const blockerEscalateHours = Number.parseFloat(process.env.LOOPS_BLOCKER_ESCALATE_HOURS || '24');
 
 const codexHome = process.env.CODEX_HOME
   || (process.env.USERPROFILE ? path.join(process.env.USERPROFILE, '.codex') : path.join(os.homedir(), '.codex'));
@@ -87,6 +89,7 @@ async function main() {
       status: 'success',
       repoRoot,
       stateDir,
+      onlySafeLocal,
       candidateCount: candidates.length,
       selectedCount: scored.length,
       topCandidate: scored[0] ? summarizeCandidate(scored[0]) : null,
@@ -94,6 +97,7 @@ async function main() {
     };
 
     await writeReport(result, scored, autoCompletions);
+    await writeDashboard(result, scored, autoCompletions);
     await appendRunToState(result, scored, autoCompletions);
     console.log(JSON.stringify({
       ...result,
@@ -109,6 +113,7 @@ async function main() {
       status: 'failed',
       repoRoot,
       stateDir,
+      onlySafeLocal,
       error: error && error.stack ? error.stack : String(error),
     };
     await appendRunToState(result, candidates);
@@ -561,6 +566,31 @@ async function discoverSocialPublisher() {
   );
   const token = process.env.SOCIAL_PUBLISHER_TOKEN || process.env.TRIGGER_TOKEN || '';
 
+  if (onlySafeLocal) {
+    return [{
+      type: 'social_publisher',
+      id: token ? 'social-publisher-safe-local-live-probe-skipped' : 'social-publisher-token-missing',
+      title: token ? 'Social-publisher local review ready' : 'Add queue-list token for live probe',
+      value: token ? 0.5 : 0.72,
+      urgency: token ? 0.38 : 0.68,
+      loopability: 0.9,
+      freshness: 0.7,
+      risk: 0.1,
+      action: token
+        ? 'Safe-local mode skipped /health and /queue/list. Run without --only-safe-local only after live probe approval.'
+        : 'Set SOCIAL_PUBLISHER_TOKEN or TRIGGER_TOKEN locally; safe-local mode will still skip live /queue/list until approval.',
+      evidence: {
+        safeLocal: true,
+        worker: relative(worker),
+        wrangler: relative(wrangler),
+        endpoints,
+        crons,
+        baseUrl: baseUrl ? redactUrl(baseUrl) : '',
+        tokenPresent: Boolean(token),
+      },
+    }];
+  }
+
   if (!baseUrl) {
     return [{
       type: 'social_publisher',
@@ -764,7 +794,8 @@ async function runAutoCompletions(candidates) {
     const candidate = byId.get('wakeup-health-ready');
     completions.push(blockedCompletion(
       'wakeup-health-ready',
-      `Current wakeup health report already exists: ${candidate?.evidence?.reportPath || path.join(stateDir, 'wakeup-health')}`
+      `Current wakeup health report already exists: ${candidate?.evidence?.reportPath || path.join(stateDir, 'wakeup-health')}`,
+      candidate
     ));
   }
 
@@ -779,7 +810,8 @@ async function runAutoCompletions(candidates) {
     const candidate = byId.get('github-local-pr-handoff-ready');
     completions.push(blockedCompletion(
       'github-local-pr-handoff-ready',
-      `GitHub handoff already exists: ${candidate?.evidence?.handoffPath || path.join(stateDir, 'github-handoffs')}; push and PR creation require approval.`
+      `GitHub handoff already exists: ${candidate?.evidence?.handoffPath || path.join(stateDir, 'github-handoffs')}; push and PR creation require approval.`,
+      candidate
     ));
   }
 
@@ -794,7 +826,8 @@ async function runAutoCompletions(candidates) {
     const candidate = byId.get('pr-readiness-ready');
     completions.push(blockedCompletion(
       'pr-readiness-ready',
-      `Current PR readiness packet already exists: ${candidate?.evidence?.readinessPath || path.join(stateDir, 'pr-readiness')}; push and PR creation require approval.`
+      `Current PR readiness packet already exists: ${candidate?.evidence?.readinessPath || path.join(stateDir, 'pr-readiness')}; push and PR creation require approval.`,
+      candidate
     ));
   }
 
@@ -803,7 +836,8 @@ async function runAutoCompletions(candidates) {
     if (dirty?.evidence?.sliceHandoffPath) {
       completions.push(blockedCompletion(
         'dirty-worktree',
-        `Current slice handoff already exists: ${dirty.evidence.sliceHandoffPath}`
+        `Current slice handoff already exists: ${dirty.evidence.sliceHandoffPath}`,
+        dirty
       ));
     } else {
       if (!dirty?.evidence?.snapshotPath) {
@@ -820,7 +854,8 @@ async function runAutoCompletions(candidates) {
         if (latestWorkerReview?.statusFingerprint === boundary.statusFingerprint) {
           completions.push(blockedCompletion(
             'review:worker_deploy_slices',
-            `Current Worker deploy review already exists: ${latestWorkerReview.reportPath}`
+            `Current Worker deploy review already exists: ${latestWorkerReview.reportPath}`,
+            dirty
           ));
         } else {
           completions.push(runLocalStep(
@@ -830,6 +865,12 @@ async function runAutoCompletions(candidates) {
             120_000
           ));
         }
+        completions.push(runLocalStep(
+          'prepare-worker-deploy-checklist',
+          'node',
+          ['scripts/loops-24/prepare-worker-deploy-checklist.mjs'],
+          120_000
+        ));
       }
       for (const group of groups) {
         if (group.gate === 'large-payload-review') {
@@ -839,7 +880,8 @@ async function runAutoCompletions(candidates) {
             && latestReview?.groupFingerprint === groupFingerprint) {
             completions.push(blockedCompletion(
               `review:${group.id}`,
-              `Current frontend/artifact review already exists: ${latestReview.reportPath}`
+              `Current frontend/artifact review already exists: ${latestReview.reportPath}`,
+              dirty
             ));
           } else {
             completions.push(runLocalStep(
@@ -864,7 +906,7 @@ async function runAutoCompletions(candidates) {
   if (ids.has('wrangler-cache-visible')) {
     const candidate = byId.get('wrangler-cache-visible');
     if (candidate?.evidence?.auditPath) {
-      completions.push(blockedCompletion('audit-wrangler-cache', `Current Wrangler audit already exists: ${candidate.evidence.auditPath}`));
+      completions.push(blockedCompletion('audit-wrangler-cache', `Current Wrangler audit already exists: ${candidate.evidence.auditPath}`, candidate));
     } else {
       completions.push(runLocalStep('audit-wrangler-cache', 'node', ['scripts/loops-24/audit-wrangler-cache.mjs'], 120_000));
     }
@@ -873,7 +915,7 @@ async function runAutoCompletions(candidates) {
   if (ids.has('content-queue-seed-inventory')) {
     const candidate = byId.get('content-queue-seed-inventory');
     if (candidate?.evidence?.reconciliation?.reportPath) {
-      completions.push(blockedCompletion('reconcile-content-queue', `Current reconciliation already exists: ${candidate.evidence.reconciliation.reportPath}`));
+      completions.push(blockedCompletion('reconcile-content-queue', `Current reconciliation already exists: ${candidate.evidence.reconciliation.reportPath}`, candidate));
     } else {
       completions.push(runLocalStep('reconcile-content-queue', 'node', ['scripts/loops-24/reconcile-content-queue.mjs'], 120_000));
     }
@@ -900,24 +942,24 @@ async function runAutoCompletions(candidates) {
 
   for (const candidate of candidates) {
     if (candidate.id === 'google-prospecting-api-key-missing') {
-      completions.push(blockedCompletion(candidate.id, 'Needs GOOGLE_MAPS_API_KEY or GOOGLE_PLACES_API_KEY; review the secret-gates handoff, then add the value only to the local runner environment.'));
+      completions.push(blockedCompletion(candidate.id, 'Needs GOOGLE_MAPS_API_KEY or GOOGLE_PLACES_API_KEY; review the secret-gates handoff, then add the value only to the local runner environment.', candidate));
     } else if (candidate.id === 'social-publisher-token-missing') {
-      completions.push(blockedCompletion(candidate.id, 'Needs SOCIAL_PUBLISHER_TOKEN or TRIGGER_TOKEN; review the secret-gates handoff, then add the value only to the local runner environment.'));
+      completions.push(blockedCompletion(candidate.id, 'Needs SOCIAL_PUBLISHER_TOKEN or TRIGGER_TOKEN; review the secret-gates handoff, then add the value only to the local runner environment.', candidate));
     } else if (candidate.id === 'social-publisher-health-failed') {
-      completions.push(blockedCompletion(candidate.id, 'Live worker repair requires deployment review.'));
+      completions.push(blockedCompletion(candidate.id, 'Live worker repair requires deployment review.', candidate));
     } else if (candidate.id === 'webhook-cron-map') {
-      completions.push(blockedCompletion(candidate.id, 'Cron status verification waits for deploy approval and TRIGGER_TOKEN.'));
+      completions.push(blockedCompletion(candidate.id, 'Cron status verification waits for deploy approval and TRIGGER_TOKEN.', candidate));
     } else if (candidate.id === 'project-state-base64') {
-      completions.push(blockedCompletion(candidate.id, 'Project-state normalization edits a tracked file and needs local review first.'));
+      completions.push(blockedCompletion(candidate.id, 'Project-state normalization edits a tracked file and needs local review first.', candidate));
     } else if (candidate.id === 'cold-outreach-cooldown-active') {
-      completions.push(blockedCompletion(candidate.id, 'Outreach drafts already exist or prospects are cooling down; sending remains manual.'));
+      completions.push(blockedCompletion(candidate.id, 'Outreach drafts already exist or prospects are cooling down; sending remains manual.', candidate));
     } else if (candidate.id === 'cold-outreach-needs-prospects') {
-      completions.push(blockedCompletion(candidate.id, 'Needs fresh reviewed prospects before drafts can be generated.'));
+      completions.push(blockedCompletion(candidate.id, 'Needs fresh reviewed prospects before drafts can be generated.', candidate));
     } else if (candidate.id === 'frontend-artifacts-review-ready') {
       const latestHandoff = await readJson(path.join(stateDir, 'frontend-slice-handoffs', 'latest.json'), null);
       if (latestHandoff?.statusFingerprint === candidate.evidence?.statusFingerprint
         && latestHandoff?.groupFingerprint === candidate.evidence?.groupFingerprint) {
-        completions.push(blockedCompletion(candidate.id, `Frontend slice handoffs already exist: ${path.join(stateDir, 'frontend-slice-handoffs')}`));
+        completions.push(blockedCompletion(candidate.id, `Frontend slice handoffs already exist: ${path.join(stateDir, 'frontend-slice-handoffs')}`, candidate));
       } else {
         const latestReview = await readJson(path.join(stateDir, 'frontend-artifact-reviews', 'latest.json'), null);
         const currentStatus = runCommand('git', ['status', '--short'], 45_000);
@@ -940,7 +982,7 @@ async function runAutoCompletions(candidates) {
         ));
       }
     } else if (candidate.id === 'frontend-artifacts-slice-handoffs-ready') {
-      completions.push(blockedCompletion(candidate.id, 'Frontend slice handoffs exist; staging each slice still needs review and the generated stage script must be run manually.'));
+      completions.push(blockedCompletion(candidate.id, 'Frontend slice handoffs exist; staging each slice still needs review and the generated stage script must be run manually.', candidate));
     }
   }
 
@@ -969,13 +1011,33 @@ function runLocalStep(label, command, args, timeout) {
   return completion;
 }
 
-function blockedCompletion(label, reason) {
+function blockedCompletion(label, reason, candidate = null) {
+  const ageHours = Number(candidate?.ageHours || 0);
+  const escalated = Boolean(candidate?.escalated || ageHours >= blockerEscalateHours);
+  const escalationSummary = escalated
+    ? `ESCALATED: blocked for ${ageHours.toFixed(1)}h. ${reason}`
+    : reason;
   return {
     label,
     status: 'blocked',
     reason,
-    summary: reason,
+    summary: escalationSummary,
+    ageHours,
+    firstSeenAt: candidate?.firstSeenAt || null,
+    escalated,
+    escalation: escalated ? (candidate?.escalation || `blocked_over_${blockerEscalateHours}h`) : null,
+    nextApproval: classifyApproval(label, candidate),
   };
+}
+
+function classifyApproval(label, candidate = null) {
+  const text = `${label} ${candidate?.id || ''} ${candidate?.type || ''} ${candidate?.action || ''}`.toLowerCase();
+  if (/token|secret|api-key|api_key|google|places/.test(text)) return 'secret-input';
+  if (/deploy|worker|cron|webhook|social-publisher/.test(text)) return 'deploy-approval';
+  if (/github|pr|push/.test(text)) return 'push-and-pr-approval';
+  if (/outreach|send|publish/.test(text)) return 'manual-send-approval';
+  if (/frontend|slice|handoff|worktree/.test(text)) return 'local-review';
+  return 'review';
 }
 
 function completionSummary(label, data, result) {
@@ -1012,6 +1074,8 @@ function scoreCandidates(candidates, previousState) {
     const starvation = Math.min(1, ageHours / 24);
     const duplicatePenalty = ledger?.lastSeenAt ? Math.min(0.35, (ledger.count || 1) * 0.04) : 0;
     const retryPenalty = candidate.retryPenalty || 0;
+    const roundedAgeHours = round(ageHours);
+    const escalated = ageHours >= blockerEscalateHours;
 
     const score = round(
       0.35 * norm(candidate.value)
@@ -1024,7 +1088,16 @@ function scoreCandidates(candidates, previousState) {
       - 0.10 * duplicatePenalty
     );
 
-    return { ...candidate, score, fingerprint, firstSeenAt: new Date(firstSeenAt).toISOString(), seenCount: ledger?.count || 0 };
+    return {
+      ...candidate,
+      score,
+      fingerprint,
+      firstSeenAt: new Date(firstSeenAt).toISOString(),
+      seenCount: ledger?.count || 0,
+      ageHours: roundedAgeHours,
+      escalated,
+      escalation: escalated ? `blocked_over_${blockerEscalateHours}h` : null,
+    };
   });
 }
 
@@ -1039,6 +1112,7 @@ async function writeReport(result, candidates, autoCompletions = []) {
     `- finished_at: ${result.finishedAt}`,
     `- repo_root: ${repoRoot}`,
     `- auto_complete: ${autoCompleteEnabled ? 'enabled' : 'disabled'}`,
+    `- only_safe_local: ${onlySafeLocal ? 'enabled' : 'disabled'}`,
     '',
     '## Selected candidates',
     '',
@@ -1053,6 +1127,8 @@ async function writeReport(result, candidates, autoCompletions = []) {
       lines.push(`  - id: ${candidate.id}`);
       lines.push(`  - action: ${candidate.action}`);
       lines.push(`  - fingerprint: ${candidate.fingerprint}`);
+      lines.push(`  - age_hours: ${candidate.ageHours}`);
+      if (candidate.escalated) lines.push(`  - escalation: ${candidate.escalation}`);
       if (candidate.evidence) {
         lines.push('  - evidence:');
         lines.push('');
@@ -1093,11 +1169,71 @@ async function writeReport(result, candidates, autoCompletions = []) {
   lines.push('## Notes');
   lines.push('');
   lines.push('- This runner does not deploy, publish, delete, or mutate external systems.');
+  if (onlySafeLocal) lines.push('- Only-safe-local mode is enabled; external HTTP probes are disabled.');
   lines.push('- Secrets are never written to the report.');
   lines.push('');
 
   await fs.writeFile(reportPath, `${lines.join('\n')}\n`, 'utf8');
   result.reportPath = reportPath;
+}
+
+async function writeDashboard(result, candidates, autoCompletions = []) {
+  const dashboardDir = path.join(stateDir, 'dashboard');
+  const reportPath = path.join(dashboardDir, `${toStamp(startedAt)}-${runId.slice(0, 8)}-dashboard.md`);
+  const jsonPath = path.join(dashboardDir, `${toStamp(startedAt)}-${runId.slice(0, 8)}-dashboard.json`);
+  const latestPath = path.join(dashboardDir, 'latest.json');
+  const latestMarkdownPath = path.join(dashboardDir, 'latest.md');
+  const completed = autoCompletions.filter(item => item.status === 'completed');
+  const blocked = autoCompletions.filter(item => item.status === 'blocked');
+  const approvals = summarizeApprovals(blocked);
+  const escalated = blocked.filter(item => item.escalated);
+
+  const payload = {
+    generatedAt: new Date().toISOString(),
+    runId: result.runId,
+    status: result.status,
+    reportPath,
+    jsonPath,
+    latestPath,
+    latestMarkdownPath,
+    onlySafeLocal,
+    autoComplete: result.autoComplete,
+    completed: completed.map(summarizeCompletion),
+    blocked: blocked.map(summarizeCompletion),
+    nextApproval: approvals,
+    escalatedBlockers: escalated.map(summarizeCompletion),
+  };
+
+  const lines = [
+    '# LOOPS Dashboard',
+    '',
+    `- updated_at: ${payload.generatedAt}`,
+    `- run_id: ${payload.runId}`,
+    `- only_safe_local: ${onlySafeLocal ? 'enabled' : 'disabled'}`,
+    '',
+    '## Completed',
+    '',
+    ...renderDashboardList(payload.completed, '- No completed local actions in this run.'),
+    '',
+    '## Blocked',
+    '',
+    ...renderDashboardList(payload.blocked, '- No blocked items.'),
+    '',
+    '## Next Approval',
+    '',
+    ...renderApprovalList(payload.nextApproval),
+    '',
+  ];
+
+  await fs.mkdir(dashboardDir, { recursive: true });
+  await fs.writeFile(jsonPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+  await fs.writeFile(latestPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+  await fs.writeFile(reportPath, `${lines.join('\n')}\n`, 'utf8');
+  await fs.writeFile(latestMarkdownPath, `${lines.join('\n')}\n`, 'utf8');
+
+  result.dashboardPath = reportPath;
+  result.dashboardJsonPath = jsonPath;
+  result.escalatedBlockers = escalated.length;
 }
 
 async function appendRunToState(run, candidates, autoCompletions = []) {
@@ -1179,6 +1315,9 @@ function runCommand(command, args, timeout) {
 }
 
 async function fetchJson(url) {
+  if (onlySafeLocal) {
+    return { ok: false, status: 0, error: 'external-fetch-disabled-by-only-safe-local' };
+  }
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 12_000);
   try {
@@ -1240,6 +1379,10 @@ function summarizeCandidate(candidate) {
     id: candidate.id,
     action: candidate.action,
     fingerprint: candidate.fingerprint,
+    firstSeenAt: candidate.firstSeenAt,
+    ageHours: candidate.ageHours,
+    escalated: candidate.escalated,
+    escalation: candidate.escalation,
   };
 }
 
@@ -1259,7 +1402,51 @@ function summarizeCompletion(item) {
     label: item.label,
     status: item.status,
     summary: item.summary || item.reason || '',
+    ageHours: item.ageHours || 0,
+    firstSeenAt: item.firstSeenAt || null,
+    escalated: Boolean(item.escalated),
+    escalation: item.escalation || null,
+    nextApproval: item.nextApproval || null,
   };
+}
+
+function summarizeApprovals(blocked) {
+  const groups = new Map();
+  for (const item of blocked || []) {
+    const key = item.nextApproval || 'review';
+    const group = groups.get(key) || { approval: key, count: 0, escalated: 0, items: [] };
+    group.count++;
+    if (item.escalated) group.escalated++;
+    group.items.push(summarizeCompletion(item));
+    groups.set(key, group);
+  }
+  return Array.from(groups.values()).sort((a, b) => {
+    if (b.escalated !== a.escalated) return b.escalated - a.escalated;
+    return b.count - a.count;
+  });
+}
+
+function renderDashboardList(items, emptyText) {
+  if (!items.length) return [emptyText];
+  return items.map(item => {
+    const age = item.ageHours ? ` age=${Number(item.ageHours).toFixed(1)}h` : '';
+    const escalation = item.escalated ? ' ESCALATED' : '';
+    return `- ${item.label}${escalation}${age}: ${item.summary}`;
+  });
+}
+
+function renderApprovalList(groups) {
+  if (!groups.length) return ['- No approval gates in this run.'];
+  const lines = [];
+  for (const group of groups) {
+    const escalation = group.escalated ? ` escalated=${group.escalated}` : '';
+    lines.push(`- ${group.approval}: ${group.count} blocked${escalation}`);
+    for (const item of group.items.slice(0, 4)) {
+      const marker = item.escalated ? ' ESCALATED' : '';
+      lines.push(`  - ${item.label}${marker}`);
+    }
+  }
+  return lines;
 }
 
 function countBy(items, pickKey) {

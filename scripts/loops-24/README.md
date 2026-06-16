@@ -23,6 +23,8 @@ to local, review-ready artifacts:
 - frontend/artifact review reports
 - frontend slice handoffs and stage scripts
 - GitHub local PR handoffs for branches that are ahead of upstream
+- Worker deploy-ready checklists
+- a compact completed / blocked / next approval dashboard
 - content queue reconciliation reports
 - Wrangler cache audit reports
 - cold outreach drafts only when prospects are eligible
@@ -74,6 +76,37 @@ Node equivalent:
 ```bash
 node scripts/loops-24/run.mjs --report-only
 ```
+
+Only-safe-local mode disables external HTTP probes even when live URLs or tokens
+are present:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\run.ps1 -OnlySafeLocal
+```
+
+Node equivalent:
+
+```bash
+node scripts/loops-24/run.mjs --auto-complete --only-safe-local
+```
+
+## Loop dashboard
+
+Each successful run writes a compact dashboard with only completed actions,
+blocked actions, and the next approval gate:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\show-dashboard.ps1
+```
+
+Latest dashboard path:
+
+```text
+%USERPROFILE%\.codex\automations\loops-24\dashboard\latest.md
+```
+
+Blocked items older than `LOOPS_BLOCKER_ESCALATE_HOURS` are marked as
+`ESCALATED` in the dashboard and run report.
 
 ## Check wakeup health
 
@@ -127,6 +160,16 @@ The handoff is written under the automation state directory and records only
 readiness booleans. It does not execute `secrets.local.ps1`, print values, write
 secrets, or call protected live endpoints.
 
+One-click local checker:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\check-secret-gates.ps1
+```
+
+The checker exits `0` when every required gate is ready for the local runner
+wrapper, and exits non-zero when one or more gates are missing. It never prints secret
+values.
+
 ## Optional live social-publisher probe
 
 The runner defaults to the current public 3Q social-publisher URL:
@@ -159,6 +202,8 @@ LOOPS_OUTREACH_BATCH_SIZE=5
 LOOPS_OUTREACH_COOLDOWN_DAYS=14
 LOOPS_GOOGLE_LIMIT_PER_QUERY=8
 LOOPS_GOOGLE_MAX_NEW=20
+LOOPS_ONLY_SAFE_LOCAL=1
+LOOPS_BLOCKER_ESCALATE_HOURS=24
 GOOGLE_MAPS_API_KEY=<set in environment only, never commit>
 ```
 
@@ -286,6 +331,15 @@ protected live endpoints.
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\review-worker-deploy-slices.ps1
 ```
+
+Turn the latest Worker deploy review into a deploy-ready checklist:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\prepare-worker-deploy-checklist.ps1
+```
+
+The checklist includes inferred deploy commands and post-deploy verification
+steps, but it does not run `wrangler deploy` or call protected endpoints.
 
 ## Review frontend/artifact payload
 

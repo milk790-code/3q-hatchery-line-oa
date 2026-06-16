@@ -1,6 +1,7 @@
 param(
   [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path,
-  [switch]$ReportOnly
+  [switch]$ReportOnly,
+  [switch]$OnlySafeLocal
 )
 
 $ErrorActionPreference = 'Stop'
@@ -38,6 +39,9 @@ try {
     $runnerArgs += '--report-only'
   } else {
     $runnerArgs += '--auto-complete'
+  }
+  if ($OnlySafeLocal) {
+    $runnerArgs += '--only-safe-local'
   }
   node (Join-Path $PSScriptRoot 'run.mjs') @runnerArgs
   $exitCode = $LASTEXITCODE
