@@ -1620,6 +1620,7 @@ function summarizeCompletion(item) {
 
 function inferLane(item = {}) {
   const text = `${item.lane || ''} ${item.label || ''} ${item.id || ''} ${item.type || ''} ${item.action || ''} ${item.title || ''}`.toLowerCase();
+  if (/repo_health|worktree|commit boundary|snapshot dirty|dirty-worktree/.test(text)) return 'repo-hygiene';
   if (/draft|manual_send|cold_outreach|cold-outreach|send-only/.test(text)) return 'outreach-draft';
   if (/google|prospect|lead|revenue|cash|sales/.test(text)) return 'revenue';
   if (/deploy|worker|wrangler|cloudflare|cron|webhook|secret|social-publisher|health|queue|content/.test(text)) return 'deployment';
@@ -1632,7 +1633,7 @@ function inferManualGate(item = {}) {
   if (/secret|token|api-key|api_key|password/.test(text)) return 'manual_secret_input';
   if (/send|outreach|line|ig|email|bulk|publish/.test(text)) return 'manual_send_only';
   if (/deploy|wrangler|production|worker|cron/.test(text)) return 'manual_deploy_approval';
-  if (/github|pr|push|merge|issue/.test(text)) return 'manual_create_only';
+  if (/github|\bpr\b|local-pr|pull request|push|merge|issue/.test(text)) return 'manual_create_only';
   if (/frontend|handoff|slice|worktree|commit/.test(text)) return 'manual_review_only';
   return 'none_read_only';
 }
@@ -1640,9 +1641,9 @@ function inferManualGate(item = {}) {
 function inferExpectedArtifact(item = {}) {
   const text = `${item.expectedArtifact || ''} ${item.label || ''} ${item.id || ''} ${item.type || ''} ${item.action || ''} ${item.title || ''}`.toLowerCase();
   if (/dashboard/.test(text)) return 'dashboard/latest.md';
-  if (/secret/.test(text)) return 'redacted secret-gate handoff';
+  if (/secret|token|api-key|api_key|password|places api key|google_maps_api_key|google_places_api_key/.test(text)) return 'redacted secret-gate handoff';
   if (/deploy|worker|wrangler/.test(text)) return 'deploy-ready checklist';
-  if (/github|pr|push|issue/.test(text)) return 'local GitHub handoff draft';
+  if (/github|\bpr\b|local-pr|pull request|push|issue/.test(text)) return 'local GitHub handoff draft';
   if (/outreach|prospect|cold|send/.test(text)) return 'manual-review outreach draft';
   if (/worktree|commit|slice/.test(text)) return 'snapshot and commit boundary plan';
   if (/health|cron|queue|content/.test(text)) return 'local health or reconciliation report';
