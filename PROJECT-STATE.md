@@ -1,1 +1,158 @@
-IyDlhajpm7Lnq6/os4fnlKLnuL3opr0gwrcgUFJPSkVDVC1TVEFURS5tZAoKPiDmnIDlvozlkIzmraXvvJoyMDI2LTA1LTIxIMK3IOeUsSBDbGF1ZGUgQ29kZSDlhajoh6rli5XmjoPmj48gR2l0SHViIMOXIENsb3VkZmxhcmUgw5cgR21haWwgw5cgRHJpdmUgw5cgQ2FudmEg5pW05ZCICgotLS0KCiMjIOS4gOOAgeezu+e1seaetuani+e4veimvQoKYGBgCumZs+WtuOiqvOWTgeeJjOefqemZowrilJzilIDilIAgM1EgSGF0Y2hlcnkg5a215YyW5omA77yI5ZOB54mM5a215YyWIEIyQu+8iQrilIIgICDilJzilIDilIAgTElORSBPQSDihpIgQ2xvdWRmbGFyZSBXb3JrZXIgKDNxLWhhdGNoZXJ5LXdlYmhvb2sgdjMuNSkK4pSCICAg4pSc4pSA4pSAIEtWIFNlc3Npb24gKDNxLWhhdGNoZXJ5LXNlc3Npb24pCuKUgiAgIOKUnOKUgOKUgCBEMSBDUk0gKDNxLWhhdGNoZXJ5LWNybSkK4pSCICAg4pSU4pSA4pSAIEdpdEh1YiBQYWdlcyAoYXNzZXRzL2V4cG9ydHMvIOKGkiAyNisgUE5HcykK4pSc4pSA4pSAIDNRIOiyouS4uO+8iOWuouacjeapn+WZqOS6uu+8iQrilIIgICDilJTilIDilIAgTElORSBPQSDihpIgUHl0aG9uIEZhc3RBUEkgb24gUmVuZGVyICgzcWdvbmd3YW4tYm90LTEpCuKUnOKUgOKUgCBQb3AgTW9uc3RlciDms6Hms6HmgKrnjbjvvIjou4rnvo7lrrkgQjJD77yJCuKUgiAgIOKUnOKUgOKUgCBMSU5FIE9BIOKGkiBDbG91ZGZsYXJlIFdvcmtlciAocG9wLW1vbnN0ZXItd2ViaG9vaykK4pSCICAg4pSc4pSA4pSAIOWumOe2siDihpIgQ2xvdWRmbGFyZSBQYWdlcyAocG9wbW9uc3Rlci52aXApCuKUgiAgIOKUlOKUgOKUgCDonabnmq4gNS4wIOipleWIhgrilJTilIDilIAgT2ggTXkgTmlnaHQgQ3Jld++8iOiHquWLleWMluWknOePreS7o+eQhu+8iQogICAg4pSc4pSA4pSAIENsb3VkZmxhcmUgV29ya2VyIChvaC1teS1uaWdodC1jcmV3IHYwLjMpCiAgICDilJzilIDilIAgS1YgU3RhdGUgKG9oLW15LW5pZ2h0LXN0YXRlKQogICAg4pSU4pSA4pSAIEQxIERhdGFiYXNlIChzaGlmdHMgbG9nICsgaGVhcnRiZWF0cykKYGBgCgotLS0KCiMjIOS6jOOAgUdpdEh1YiBSZXBvcwoKIyMjIGBtaWxrNzkwLWNvZGUvM3EtaGF0Y2hlcnktbGluZS1vYWDvvIjmnKwgUmVwb++8iQoKfCDpoIXnm64gfCDni4DmhYsgfAp8LS0tfC0tLXwKfCDkuLvliIbmlK8gSEVBRCB8IGA0ZjY0NTllYWAgKDIwMjYtMDUtMjEgdjMuNSBkZXBsb3kpIHwKfCBXb3JrZXIg54mI5pysIHwgdjMuNSAoRmxleCArIEtWICsgRDEgQ1JNICsgTGVhZCBTY29yZSArIE1lbWJlciBDYXJkICsgQm9va2luZyArIFN1YnNjcmliZXIpIHwKfCBHaXRIdWIgUGFnZXMgfCBgaHR0cHM6Ly9taWxrNzkwLWNvZGUuZ2l0aHViLmlvLzNxLWhhdGNoZXJ5LWxpbmUtb2EvYXNzZXRzL2V4cG9ydHMvYCB8CnwgQWN0aW9ucyB8IGBkZXBsb3kueW1sYCAoV29ya2VyICsgUmljaCBNZW51ICsgRDEgbWlncmF0aW9ucykgwrcgYHJlbmRlci1hc3NldHMueW1sYCAoUE5HIOa4suafkykgfAoKKip2My41IOaWsOWinuWKn+iDve+8iDIwMjYtMDUtMjHvvInvvJoqKgotIEEx77yaTGVhZCBzY29yaW5n77yIaG908J+UpS93YXJt4pqhL2NvbGTwn4yx77yJKyBPd25lciBGbGV4IOmAmuefpeWQq+W/q+mAn+WbnuimhuaMiemIlQotIEEy77yaT3duZXIgcG9zdGJhY2sgaGFuZGxlcu+8iOW3suiBr+e5qyAvIOS4jeaEn+iIiOi2oyAvIOaIkOS6pO+8ieKGkiBEMSBzdGF0dXMg5pu05pawCi0gQTPvvJpib29raW5nIOmgkOe0hOirruipoua1geeoi++8iGZsb3c6bnh0PWJvb2sg4oaSIOetieW+heiHqueUseaWh+WtlyDihpIg5a+r5YWlIEQx77yJCi0gQjHvvJpSaWNoIE1lbnUg6Ieq5YuV5YiH5o+b77yIZm9sbG93IOKGkiBSSUNITUVOVV9ORVfvvIxzdWJtaXQg4oaSIFJJQ0hNRU5VX0lOUVVJUkVE77yMd29uIOKGkiBSSUNITUVOVV9DT05WRVJURUTvvIkKLSBCMu+8muacg+WToeWNoeiHquWLleeZvOihjO+8iGZvbGxvdyDmmYLlu7rnq4sgS1YgbWVtYmVyIOiomOmMhO+8jHRpZXI6IHZpc2l0b3IvaW5xdWlyZWQvcGFydG5lcu+8iQotIEIz77ya6KiC6Zax5ZCN5Zau77yI6KiC6ZaxL+WPlua2iOiogumWsSDmloflrZfop7jnmbzvvIkrIOWto+evgOaOqOaSrSBjcm9u77yI5q+P5a2jIDEg6JmfIDA5OjAwIFRX77yJCgoqKuW3sua4suafkyBQTkdz77yIMjYrIOWAi++8ie+8mioqCi0gQXZhdGFyIC8gQ292ZXIgLyBSaWNoIE1lbnUgLyBXZWxjb21lIENhcmQgLyBDaGF0IEJHCi0gQ2Fyb3VzZWwgw5c077yIMDEvMDIvMDMvMDTvvIkKLSBTZWFzb25hbCBIZXJvIMOXNO+8iHNwcmluZy9zdW1tZXIvYXV0dW1uL3dpbnRlciwgMTA4MMOXODc477yJCi0gUmVhY3Rpb24gw5cyMO+8iDEwIOWOn+eJiCArIDEwIOaWsOmjn+eJqS/lt6Xol53ns7vliJcsIDQ4MMOXNDgw77yJCi0gRnVrdWJ1a3VybyDDlzXvvIgwMF9tYWluICsgMDFfMDczMCArIDAyXzEyMzAgKyAwM18xODMwICsgMDRfMjIwMO+8iQoKLS0tCgojIyMgYG1pbGs3OTAtY29kZS8zcWdvbmd3YW4tYm90YAoKfCDpoIXnm64gfCDni4DmhYsgfAp8LS0tfC0tLXwKfCBQeXRob24gYm90IHwgYG1haW4ucHlgIChGYXN0QVBJLCBSZW5kZXIg6YOo572yKSB8Cnwg6YOo572y6Kit5a6aIHwgYHJlbmRlci55YW1sYCB8Cnwg5ZCM5q2l55uu6YyEIHwgYGhhdGNoZXJ5LXdlYmhvb2svYCAo5bey5ZCM5q2l6IezIHYzLjXvvIwyMDI2LTA1LTIxKSB8CgotLS0KCiMjIOS4ieOAgUNsb3VkZmxhcmUgV29ya2VycwoKfCBXb3JrZXIg5ZCN56ixIHwg5bCN5oeJ5pyN5YuZIHwg54mI5pysIHwg5pyA5b6M5pu05pawIHwg54uA5oWLIHwKfC0tLXwtLS18LS0tfC0tLXwtLS18CnwgYDNxLWhhdGNoZXJ5LXdlYmhvb2tgIHwgM1EgSGF0Y2hlcnkgTElORSBPQSB8IHYzLjUgfCAyMDI2LTA1LTIxIHwg4pyFIExJVkUgfAp8IGBwb3AtbW9uc3Rlci13ZWJob29rYCB8IOazoeazoeaAqueNuCBMSU5FIE9BIHwg4oCUIHwgMjAyNi0wNS0xOCAwNTo0MiB8IOKchSBMSVZFIHwKfCBgb2gtbXktbmlnaHQtY3Jld2AgfCDoh6rli5XljJblpJznj63ku6PnkIYgfCB2MC4zIHwgMjAyNi0wNS0xOCAwMTozNSB8IOKchSBMSVZFIHwKCiMjIyBgM3EtaGF0Y2hlcnktd2ViaG9va2AgdjMuNSDlip/og73mkZjopoEKLSAqKkxJTkUgV2ViaG9va++8mioqIEZsZXggTWVzc2FnZSA15q2l6Kmi5ZWP5rWB56iLICsgcG9zdGJhY2sgc3RhdGUgbWFjaGluZQotICoqS1bvvJoqKiDlsI3oqbEgc2Vzc2lvbu+8iDJoIFRUTO+8iSsg5pyD5ZOh5Y2h77yIbWVtYmVyOnt1aWR977yJKyDoqILplrHlkI3llq7vvIhzdWJzY3JpYmVyczpsaXN077yJCi0gKipEMe+8mioqIGlucXVpcmllcyB0YWJsZe+8iOWQqyBsZWFkX3Njb3JlL3N0YXR1cy9ib29raW5nIOashOS9je+8iQotICoqQUnvvJoqKiBXb3JrZXJzIEFJIExsYW1hLTMgZmFsbGJhY2vvvIjnhKHpl5zpjbXlrZfmmYLvvIkKLSAqKkNyb27vvJoqKiBmb2xsb3ctdXAg5q+PIDUg5YiG6ZCYIMK3IOmAseWgseavj+mAseS4gCDCtyDlraPnr4Dmjqjmkq3mr4/lraMgMSDomZ8KCi0tLQoKIyMg5Zub44CBQ2xvdWRmbGFyZSBLViArIEQxCgp8IOizh+a6kCB8IElEIHwg57aB5a6aIFdvcmtlciB8IOeUqOmAlCB8CnwtLS18LS0tfC0tLXwtLS18CnwgS1YgYDNxLWhhdGNoZXJ5LXNlc3Npb25gIHwgYDIwYTY4YjEwYWZjODQ3NjRiYTc3MGI2NGYwZjMzZjMwYCB8IDNxLWhhdGNoZXJ5LXdlYmhvb2sgfCDnlKjmiLblsI3oqbHni4DmhYvvvIgyaCBUVEzvvIkrIOacg+WToeWNoSArIOiogumWseWQjeWWriB8CnwgRDEgYDNxLWhhdGNoZXJ5LWNybWAgfCBgZTU0NjcxYjEtZDE1ZS00NTUyLWJhYmYtY2VmMzY3MjY3NTY4YCB8IDNxLWhhdGNoZXJ5LXdlYmhvb2sgfCDoqaLllY/mjIHkuYXljJYgQ1JN77yIaW5xdWlyaWVzIHRhYmxl77yJfAp8IEtWIGBvaC1teS1uaWdodC1zdGF0ZWAgfCBgNjMyNTBmOTNiMGExNDE4Mzk2YTY0N2ZiODllYmI2ZTFgIHwgb2gtbXktbmlnaHQtY3JldyB8IOS7o+eQhuS6uuezu+e1sSBwcm9tcHQgKyDku7vli5npmorliJcgfAoKLS0tCgojIyDkupTjgIFHb29nbGUgRHJpdmUg55u46Zec6LOH55SiCgp8IOaqlOahiCB8IOmhnuWeiyB8IOiqquaYjiB8CnwtLS18LS0tfC0tLXwKfCBgM1EgSGF0Y2hlcnkgRGVzaWduIFN5c3RlbS56aXBgICjDlzIpIHwgWklQIDIuMU1CIHwg6Kit6KiI57O757Wx5omT5YyFIHwKfCBgM1EtSEFUQ0hFUllfd2VsY29tZV8xMDQweDEwNDAucG5nYCAo5aSa5Lu9KSB8IFBORyB8IFdlbGNvbWUgY2FyZCDlgpnku70gfAp8IGBsb2dvLW1hcmstM1Euc3ZnYCB8IFNWRyB8IOWTgeeJjCBMb2dvIOWQkemHjyB8CnwgYFNvY2lhbFNwZWNzLmpzYCAow5c4KSB8IEpTIHwg56S+576k5bmz5Y+w5ZyW54mH6KaP5qC8IHwKfCBgMDBf5q+P5pel5Zub6bue56aP6KKLX+S4u+imluimui5wbmdgIHwgUE5HIDg4S0IgfCDmr4/ml6Xmjqjmkq3kuLvoppboprogfAp8IGAwMV/mmajlhYnnpo/oootfMDctMzAucG5nYCB8IFBORyA4OUtCIHwg5pep5LiKIDA3OjMwIOaOqOaSreWcliB8CnwgYDAyX+WNiOmZveemj+iii18xMi0zMC5wbmdgIHwgUE5HIDg5S0IgfCDkuIvljYggMTI6MzAg5o6o5pKt5ZyWIHwKfCBgMDNf5pqu6Imy56aP6KKLXzE4LTMwLnBuZ2AgfCBQTkcgOTNLQiB8IOS4i+WNiCAxODozMCDmjqjmkq3lnJYgfAp8IGAwNF/mnIjlhYnnpo/oootfMjItMDAucG5nYCB8IFBORyA4NUtCIHwg5pma5LiKIDIyOjAwIOaOqOaSreWcliB8CgotLS0KCiMjIOWFreOAgUNhbnZhIOioreioiAoKfCDoqK3oqIjlkI3nqLEgfCDpoIHmlbggfCDoqqrmmI4gfAp8LS0tfC0tLXwtLS18CnwgYDNRIOWtteWMluaJgCDCtyBMSU5FIE9BIOS4iue3muaWh+S7tmAgfCAxIHwgTElORSBPQSDkuIrnt5rliY3mqqLmn6XmuIXllq4gfAp8IGAzUSDCtyBXZWxjb21lIENhcmQgwrcgMTA0MMOXMTA0MGAgfCAxIHwgV2VsY29tZSBDYXJkIOioreioiOeovyB8CgotLS0KCiMjICS4g+OAgUdtYWlsIENJIOmAmuefpeeLgOaFiwoKfCBSZXBvIHwg5pyA6L+R54uA5oWLIHwg6Kqq5piOIHwKfC0tLXwtLS18LS0tfAp8IGAzcS1oYXRjaGVyeS1saW5lLW9hYCB8IOKchSDlhajntqAgfCBkZXBsb3kueW1sIHYzLjUg56mp5a6aIHwKfCBgM3Fnb25nd2FuLWJvdGAgKFJlbmRlcikgfCDinIUg5q2j5bi4IHwgUHl0aG9uIEZhc3RBUEkg6YGL6KGM5LitIHwKfCBgcG9wLW1vbnN0ZXItbGluZS1vYWAgfCDinYwgMiDlpLHmlZcgfCAyMDI2LTA1LTE1IGRlcGxveSBmYWlsdXJlc++8iOmcgOiqv+afpe+8iXwKfCBgcG9wbW9uc3Rlci12aXBgIHwg4pyFIOaIkOWKnyB8IENsb3VkZmxhcmUgUGFnZXMg6YOo572y5oiQ5YqfIHwKCi0tLQoKIyMg5YWr44CB5b+r6YCf5pON5L2c5Y+D6ICDCgojIyMg6auY5YSq5YWICjEuICoqUklDSE1FTlVfKiDnkrDlooPoorqmlbjoqK3lrpoqKu+8mnYzLjUg5paw5aKeIFJpY2ggTWVudSDoh6rli5XliIfmj5vvvIzpnIDlnKggQ2xvdWRmbGFyZSBXb3JrZXIg6Kit5a6aIGBSSUNITUVOVV9ORVdg44CBYFJJQ0hNRU5VX0lOUVVJUkVEYOOAgWBSSUNITUVOVV9DT05WRVJURURgIOS4ieWAi+eSsOWig+iuiuaVuO+8iFJpY2ggTWVudSBJRO+8ieOAggoyLiAqKnBvcC1tb25zdGVyLWxpbmUtb2EgZGVwbG95IOS/ruW+qSoq77yaMiDnrYYgQ0kg5aSx5pWX77yIMjAyNi0wNS0xNe+8ieOAggoKIyMjIOS4reWEquWFiAozLiAqKlN0cmVhbSBBIOecn+WvpueFp+eJh+abv+aPmyoq77yaYGFzc2V0cy9waG90b2dyYXBoeS9gIOS7jeeCuiBTVkcg5o+S55Wr77yM5b6FIFVuc3BsYXNoIOeFp+eJh+abv+aPm+OAggo0LiAqKumAseWgsSBLViDms6jlhaUqKu+8mmB3ZWVrbHlfcmVwb3J0X21kYCDpnIDlrprmnJ/mm7TmlrDoh7MgS1bjgIIKCi0tLQoKIyMg5Lmd44CB5b+r6YCf5pON5L2c5Y+D6ICDCgpgYGBiYXNoCiMgM1EgSGF0Y2hlcnkgV29ya2VyIOWBpeW6t+aqouafpQpjdXJsIGh0dHBzOi8vM3EtaGF0Y2hlcnktd2ViaG9vay48c3ViZG9tYWluPi53b3JrZXJzLmRldgoKIyDmn6XoqaIgRDEgQ1JNIOacgOaWsOipouWVjwp3cmFuZ2xlciBkMSBleGVjdXRlIDNxLWhhdGNoZXJ5LWNybSAtLXJlbW90ZSAtLWNvbW1hbmQgJ1NFTEVDVCAqIEZST00gaW5xdWlyaWVzIE9SREVSIEJZIGlkIERFU0MgTElNSVQgNScKCiMgb2gtbXktbmlnaHQtY3JldyDni4DmhYvmn6XoqaIKY3VybCAiaHR0cHM6Ly9vaC1teS1uaWdodC1jcmV3LjxzdWJkb21haW4+LndvcmtlcnMuZGV2L3N0YXR1cz90b2tlbj08VE9LRU4+IgpgYGAKCi0tLQoKKuatpOaWh+S7tueUsSBDbGF1ZGUgQ29kZSDoh6rli5XmjoPmj4/miYDmnInpm7Lnq6/os4fmupDlvozmlbTlkIjnlJ/miJDjgILlpoLpnIDmm7TmlrDvvIzph43mlrDln7fooYzjgIzlhajpm7Lnq6/lkIzmraXjgI3lt6XkvZzmtYHjgIIq
+# 全雲端資產總覽 · PROJECT-STATE.md
+
+> 最後同步：2026-05-21 · 由 Claude Code 全自動掃描 GitHub × Cloudflare × Gmail × Drive × Canva 整合
+
+---
+
+## 一、系統架構總覽
+
+```
+陳學誼品牌矩陣
+├── 3Q Hatchery 孵化所（品牌孵化 B2B）
+│   ├── LINE OA → Cloudflare Worker (3q-hatchery-webhook v3.5)
+│   ├── KV Session (3q-hatchery-session)
+│   ├── D1 CRM (3q-hatchery-crm)
+│   └── GitHub Pages (assets/exports/ → 26+ PNGs)
+├── 3Q 貢丸（客服機器人）
+│   └── LINE OA → Python FastAPI on Render (3qgongwan-bot-1)
+├── Pop Monster 泡泡怪獸（車美容 B2C）
+│   ├── LINE OA → Cloudflare Worker (pop-monster-webhook)
+│   ├── 官網 → Cloudflare Pages (popmonster.vip)
+│   └── 蝦皮 5.0 評分
+└── Oh My Night Crew（自動化夜班代理）
+    ├── Cloudflare Worker (oh-my-night-crew v0.3)
+    ├── KV State (oh-my-night-state)
+    └── D1 Database (shifts log + heartbeats)
+```
+
+---
+
+## 二、GitHub Repos
+
+### `milk790-code/3q-hatchery-line-oa`（本 Repo）
+
+| 項目 | 狀態 |
+|---|---|
+| 主分支 HEAD | `4f6459ea` (2026-05-21 v3.5 deploy) |
+| Worker 版本 | v3.5 (Flex + KV + D1 CRM + Lead Score + Member Card + Booking + Subscriber) |
+| GitHub Pages | `https://milk790-code.github.io/3q-hatchery-line-oa/assets/exports/` |
+| Actions | `deploy.yml` (Worker + Rich Menu + D1 migrations) · `render-assets.yml` (PNG 渲染) |
+
+**v3.5 新增功能（2026-05-21）：**
+- A1：Lead scoring（hot🔥/warm⚡/cold🌱）+ Owner Flex 通知含快速回覆按鈕
+- A2：Owner postback handler（已聯繫 / 不感興趣 / 成交）→ D1 status 更新
+- A3：booking 預約諮詢流程（flow:nxt=book → 等待自由文字 → 寫入 D1）
+- B1：Rich Menu 自動切換（follow → RICHMENU_NEW，submit → RICHMENU_INQUIRED，won → RICHMENU_CONVERTED）
+- B2：會員卡自動發行（follow 時建立 KV member 記錄，tier: visitor/inquired/partner）
+- B3：訂閱名單（訂閱/取消訂閱 文字觸發）+ 季節推播 cron（每季 1 號 09:00 TW）
+
+**已渲染 PNGs（26+ 個）：**
+- Avatar / Cover / Rich Menu / Welcome Card / Chat BG
+- Carousel ×4（01/02/03/04）
+- Seasonal Hero ×4（spring/summer/autumn/winter, 1080×878）
+- Reaction ×20（10 原版 + 10 新食物/工藝系列, 480×480）
+- Fukubukuro ×5（00_main + 01_0730 + 02_1230 + 03_1830 + 04_2200）
+
+---
+
+### `milk790-code/3qgongwan-bot`
+
+| 項目 | 狀態 |
+|---|---|
+| Python bot | `main.py` (FastAPI, Render 部署) |
+| 部署設定 | `render.yaml` |
+| 同步目錄 | `hatchery-webhook/` (已同步至 v3.5，2026-05-21) |
+
+---
+
+## 三、Cloudflare Workers
+
+| Worker 名稱 | 對應服務 | 版本 | 最後更新 | 狀態 |
+|---|---|---|---|---|
+| `3q-hatchery-webhook` | 3Q Hatchery LINE OA | v3.5 | 2026-05-21 | ✅ LIVE |
+| `pop-monster-webhook` | 泡泡怪獸 LINE OA | — | 2026-05-18 05:42 | ✅ LIVE |
+| `oh-my-night-crew` | 自動化夜班代理 | v0.3 | 2026-05-18 01:35 | ✅ LIVE |
+
+### `3q-hatchery-webhook` v3.5 功能摘要
+- **LINE Webhook：** Flex Message 5步詢問流程 + postback state machine
+- **KV：** 對話 session（2h TTL）+ 會員卡（member:{uid}）+ 訂閱名單（subscribers:list）
+- **D1：** inquiries table（含 lead_score/status/booking 欄位）
+- **AI：** Workers AI Llama-3 fallback（無關鍵字時）
+- **Cron：** follow-up 每 5 分鐘 · 週報每週一 · 季節推播每季 1 號
+
+---
+
+## 四、Cloudflare KV + D1
+
+| 資源 | ID | 綁定 Worker | 用途 |
+|---|---|---|---|
+| KV `3q-hatchery-session` | `20a68b10afc84764ba770b64f0f33f30` | 3q-hatchery-webhook | 用戶對話狀態（2h TTL）+ 會員卡 + 訂閱名單 |
+| D1 `3q-hatchery-crm` | `e54671b1-d15e-4552-babf-cef367267568` | 3q-hatchery-webhook | 詢問持久化 CRM（inquiries table）|
+| KV `oh-my-night-state` | `63250f93b0a1418396a647fb89ebb6e1` | oh-my-night-crew | 代理人系統 prompt + 任務隊列 |
+
+---
+
+## 五、Google Drive 相關資產
+
+| 檔案 | 類型 | 說明 |
+|---|---|---|
+| `3Q Hatchery Design System.zip` (×2) | ZIP 2.1MB | 設計系統打包 |
+| `3Q-HATCHERY_welcome_1040x1040.png` (多份) | PNG | Welcome card 備份 |
+| `logo-mark-3Q.svg` | SVG | 品牌 Logo 向量 |
+| `SocialSpecs.js` (×8) | JS | 社群平台圖片規格 |
+| `00_每日四點福袋_主視覺.png` | PNG 88KB | 每日推播主視覺 |
+| `01_晨光福袋_07-30.png` | PNG 89KB | 早上 07:30 推播圖 |
+| `02_午陽福袋_12-30.png` | PNG 89KB | 下午 12:30 推播圖 |
+| `03_暮色福袋_18-30.png` | PNG 93KB | 下午 18:30 推播圖 |
+| `04_月光福袋_22-00.png` | PNG 85KB | 晚上 22:00 推播圖 |
+
+---
+
+## 六、Canva 設計
+
+| 設計名稱 | 頁數 | 說明 |
+|---|---|---|
+| `3Q 孵化所 · LINE OA 上線文件` | 1 | LINE OA 上線前檢查清單 |
+| `3Q · Welcome Card · 1040×1040` | 1 | Welcome Card 設計稿 |
+
+---
+
+## 七、Gmail CI 通知狀態
+
+| Repo | 最近狀態 | 說明 |
+|---|---|---|
+| `3q-hatchery-line-oa` | ✅ 全綠 | deploy.yml v3.5 穩定 |
+| `3qgongwan-bot` (Render) | ✅ 正常 | Python FastAPI 運行中 |
+| `pop-monster-line-oa` | ❌ 2 失敗 | 2026-05-15 deploy failures（需調查）|
+| `popmonster-vip` | ✅ 成功 | Cloudflare Pages 部署成功 |
+
+---
+
+## 八、快速操作參考
+
+### 高優先
+1. **RICHMENU_* 環境變數設定**：v3.5 新增 Rich Menu 自動切換，需在 Cloudflare Worker 設定 `RICHMENU_NEW`、`RICHMENU_INQUIRED`、`RICHMENU_CONVERTED` 三個環境變數（Rich Menu ID）。
+2. **pop-monster-line-oa deploy 修復**：2 筆 CI 失敗（2026-05-15）。
+
+### 中優先
+3. **Stream A 真實照片替換**：`assets/photography/` 仍為 SVG 插畫，待 Unsplash 照片替換。
+4. **週報 KV 注入**：`weekly_report_md` 需定期更新至 KV。
+
+---
+
+## 九、快速操作參考
+
+```bash
+# 3Q Hatchery Worker 健康檢查
+curl https://3q-hatchery-webhook.<subdomain>.workers.dev
+
+# 查詢 D1 CRM 最新詢問
+wrangler d1 execute 3q-hatchery-crm --remote --command 'SELECT * FROM inquiries ORDER BY id DESC LIMIT 5'
+
+# oh-my-night-crew 狀態查詢
+curl "https://oh-my-night-crew.<subdomain>.workers.dev/status?token=<TOKEN>"
+```
+
+---
+
+*此文件由 Claude Code 自動掃描所有雲端資源後整合生成。如需更新，重新執行「全雲端同步」工作流。*
