@@ -31,6 +31,25 @@ const stateDir = path.resolve(
 const runsDir = path.join(stateDir, 'runs');
 const statePath = path.join(stateDir, 'state.json');
 const lockPath = path.join(stateDir, 'lock.json');
+const taskRegistryFiles = [
+  { id: 'fleet', path: path.join(repoRoot, 'scripts', 'loops.tasks.json') },
+  { id: 'cold-outreach', path: path.join(repoRoot, 'scripts', 'loops.cold-outreach.tasks.json') },
+];
+
+const lanePriority = {
+  revenue: 5,
+  deployment: 4,
+  'outreach-draft': 3,
+  'demo-sales': 2,
+  'repo-hygiene': 1,
+};
+
+const manualRedLines = [
+  'No git push, PR creation, merge, deploy, production setting change, or permission change.',
+  'No LINE, IG, email, public post, or bulk outbound send.',
+  'No secret, token, password, customer PII, or financial-account value written to reports.',
+  'No deletion or irreversible external mutation.',
+];
 
 async function main() {
   await fs.mkdir(runsDir, { recursive: true });
@@ -56,6 +75,7 @@ async function main() {
 
   try {
     const previousState = await readJson(statePath, defaultState());
+    const taskRegistry = await loadTaskRegistry();
     const ctx = { previousState };
 
     candidates = [
@@ -94,6 +114,7 @@ async function main() {
       selectedCount: scored.length,
       topCandidate: scored[0] ? summarizeCandidate(scored[0]) : null,
       autoComplete: summarizeAutoCompletions(autoCompletions),
+      loopos: buildLooposSummary(scored, autoCompletions, taskRegistry),
     };
 
     await writeReport(result, scored, autoCompletions);
@@ -1067,6 +1088,10 @@ function scoreCandidates(candidates, previousState) {
   const now = Date.now();
 
   return candidates.map(candidate => {
+    const lane = candidate.lane || inferLane(candidate);
+    const manualGate = candidate.manualGate || inferManualGate(candidate);
+    const expectedArtifact = candidate.expectedArtifact || inferExpectedArtifact(candidate);
+    const dedupPolicy = candidate.dedupPolicy || inferDedupPolicy(candidate);
     const fingerprint = hash(`${candidate.type}:${candidate.id}:${candidate.fingerprintSeed || JSON.stringify(candidate.evidence || {})}`);
     const ledger = seen[fingerprint];
     const firstSeenAt = ledger?.firstSeenAt ? Date.parse(ledger.firstSeenAt) : now;
@@ -1090,6 +1115,10 @@ function scoreCandidates(candidates, previousState) {
 
     return {
       ...candidate,
+      lane,
+      manualGate,
+      expectedArtifact,
+      dedupPolicy,
       score,
       fingerprint,
       firstSeenAt: new Date(firstSeenAt).toISOString(),
@@ -1114,6 +1143,18 @@ async function writeReport(result, candidates, autoCompletions = []) {
     `- auto_complete: ${autoCompleteEnabled ? 'enabled' : 'disabled'}`,
     `- only_safe_local: ${onlySafeLocal ? 'enabled' : 'disabled'}`,
     '',
+    '## LoopOS morning decision',
+    '',
+    ...renderMorningDecision(result.loopos?.morningDecision),
+    '',
+    '## Lane summary',
+    '',
+    ...renderLaneSummary(result.loopos?.lanes),
+    '',
+    '## Manual red lines',
+    '',
+    ...manualRedLines.map(line => `- ${line}`),
+    '',
     '## Selected candidates',
     '',
   ];
@@ -1124,7 +1165,11 @@ async function writeReport(result, candidates, autoCompletions = []) {
     for (const candidate of candidates) {
       lines.push(`- score ${candidate.score.toFixed(3)} | ${candidate.title}`);
       lines.push(`  - type: ${candidate.type}`);
+      lines.push(`  - lane: ${candidate.lane}`);
       lines.push(`  - id: ${candidate.id}`);
+      lines.push(`  - manual_gate: ${candidate.manualGate}`);
+      lines.push(`  - expected_artifact: ${candidate.expectedArtifact}`);
+      lines.push(`  - dedup_policy: ${candidate.dedupPolicy}`);
       lines.push(`  - action: ${candidate.action}`);
       lines.push(`  - fingerprint: ${candidate.fingerprint}`);
       lines.push(`  - age_hours: ${candidate.ageHours}`);
@@ -1187,6 +1232,7 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
   const blocked = autoCompletions.filter(item => item.status === 'blocked');
   const approvals = summarizeApprovals(blocked);
   const escalated = blocked.filter(item => item.escalated);
+  const loopos = result.loopos || buildLooposSummary(candidates, autoCompletions, { registries: [], warnings: [] });
 
   const payload = {
     generatedAt: new Date().toISOString(),
@@ -1198,6 +1244,7 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     latestMarkdownPath,
     onlySafeLocal,
     autoComplete: result.autoComplete,
+    loopos,
     completed: completed.map(summarizeCompletion),
     blocked: blocked.map(summarizeCompletion),
     nextApproval: approvals,
@@ -1205,23 +1252,35 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
   };
 
   const lines = [
-    '# LOOPS Dashboard',
+    '# LoopOS Morning Decision Dashboard',
     '',
     `- updated_at: ${payload.generatedAt}`,
     `- run_id: ${payload.runId}`,
     `- only_safe_local: ${onlySafeLocal ? 'enabled' : 'disabled'}`,
     '',
-    '## Completed',
+    '## Today First',
+    '',
+    ...renderMorningDecision(loopos.morningDecision),
+    '',
+    '## Safe Local Actions Completed',
     '',
     ...renderDashboardList(payload.completed, '- No completed local actions in this run.'),
     '',
-    '## Blocked',
+    '## Manual Red Lines',
+    '',
+    ...manualRedLines.map(line => `- ${line}`),
+    '',
+    '## Blocked / Waiting',
     '',
     ...renderDashboardList(payload.blocked, '- No blocked items.'),
     '',
-    '## Next Approval',
+    '## Next Approval Gate',
     '',
     ...renderApprovalList(payload.nextApproval),
+    '',
+    '## Lane Summary',
+    '',
+    ...renderLaneSummary(loopos.lanes),
     '',
   ];
 
@@ -1263,7 +1322,150 @@ async function appendRunToState(run, candidates, autoCompletions = []) {
 
   state.next = (candidates || []).map(summarizeCandidate);
   state.lastAutoCompletions = autoCompletions.map(summarizeCompletion);
+  state.loopos = run.loopos || null;
   await fs.writeFile(statePath, `${JSON.stringify(state, null, 2)}\n`, 'utf8');
+}
+
+async function loadTaskRegistry() {
+  const registries = [];
+  const warnings = [];
+
+  for (const registry of taskRegistryFiles) {
+    const raw = await readJson(registry.path, null);
+    if (!raw) {
+      warnings.push({ registry: registry.id, path: relative(registry.path), warning: 'missing-or-invalid-json' });
+      continue;
+    }
+
+    const tasks = Array.isArray(raw.tasks) ? raw.tasks : [];
+    const normalized = tasks.map(task => normalizeRegistryTask(task, registry));
+    for (const task of normalized) {
+      if (requiresManualGate(task) && !/^manual_|^none_read_only$/.test(task.manualGate)) {
+        warnings.push({
+          registry: registry.id,
+          sourceId: task.sourceId,
+          warning: 'risky-task-without-manual-gate',
+          manualGate: task.manualGate,
+        });
+      }
+    }
+
+    registries.push({
+      id: registry.id,
+      path: relative(registry.path),
+      taskCount: normalized.length,
+      lanes: countBy(normalized, task => task.lane),
+      tasks: normalized,
+    });
+  }
+
+  return { registries, warnings };
+}
+
+function normalizeRegistryTask(task, registry) {
+  const probe = {
+    type: task.task_type,
+    id: task.source_id,
+    action: JSON.stringify(task.payload || {}),
+  };
+  const dedupMinutes = Number(task.dedup_window_minutes || 0);
+  return {
+    registry: registry.id,
+    taskType: task.task_type || 'unknown',
+    sourceId: task.source_id || 'unknown',
+    lane: task.lane || inferLane(probe),
+    manualGate: task.manual_gate || task.payload?.review_gate || inferManualGate(probe),
+    expectedArtifact: task.expected_artifact || inferExpectedArtifact(probe),
+    dedupPolicy: task.dedup_policy || (dedupMinutes
+      ? `${dedupMinutes}m window for ${task.source_id || task.task_type || 'task'}`
+      : 'fingerprint ledger'),
+    riskScore: Number(task.risk_score || 0),
+    priorityBase: Number(task.priority_base || 0),
+  };
+}
+
+function buildLooposSummary(candidates, autoCompletions, taskRegistry) {
+  const laneItems = {};
+  for (const lane of Object.keys(lanePriority)) {
+    laneItems[lane] = {
+      lane,
+      selected: 0,
+      blocked: 0,
+      completed: 0,
+      topScore: 0,
+    };
+  }
+
+  for (const candidate of candidates || []) {
+    const lane = candidate.lane || inferLane(candidate);
+    const item = laneItems[lane] || (laneItems[lane] = { lane, selected: 0, blocked: 0, completed: 0, topScore: 0 });
+    item.selected++;
+    item.topScore = Math.max(item.topScore, Number(candidate.score || 0));
+  }
+
+  for (const completion of autoCompletions || []) {
+    const lane = completion.lane || inferLane(completion);
+    const item = laneItems[lane] || (laneItems[lane] = { lane, selected: 0, blocked: 0, completed: 0, topScore: 0 });
+    if (completion.status === 'blocked') item.blocked++;
+    if (completion.status === 'completed') item.completed++;
+  }
+
+  return {
+    version: 1,
+    lanes: Object.values(laneItems)
+      .filter(item => item.selected || item.blocked || item.completed)
+      .sort((a, b) => (lanePriority[b.lane] || 0) - (lanePriority[a.lane] || 0)),
+    morningDecision: chooseMorningDecision(candidates, autoCompletions),
+    redLines: manualRedLines,
+    taskRegistry,
+    governance: {
+      statePath,
+      runsDir,
+      dashboardPath: path.join(stateDir, 'dashboard', 'latest.md'),
+      memoryRule: 'Read automation state before each loop; write only redacted local run artifacts after each loop.',
+    },
+  };
+}
+
+function chooseMorningDecision(candidates, autoCompletions) {
+  const blockedByLabel = new Map((autoCompletions || [])
+    .filter(item => item.status === 'blocked')
+    .map(item => [item.label, item]));
+
+  const ranked = (candidates || []).map(candidate => {
+    const lane = candidate.lane || inferLane(candidate);
+    const gateWeight = candidate.manualGate && candidate.manualGate !== 'none_read_only' ? 0.06 : 0;
+    const score = Number(candidate.score || 0)
+      + (lanePriority[lane] || 0) * 0.08
+      + gateWeight
+      - Number(candidate.risk || 0) * 0.03;
+    return { candidate, lane, score };
+  }).sort((a, b) => b.score - a.score);
+
+  const top = ranked[0]?.candidate || null;
+  if (!top) {
+    return {
+      label: 'Heartbeat only',
+      lane: 'repo-hygiene',
+      action: 'No actionable LoopOS candidate was selected in this run.',
+      manualGate: 'none_read_only',
+      expectedArtifact: 'state heartbeat',
+      why: 'No candidates discovered.',
+    };
+  }
+
+  const blocked = blockedByLabel.get(top.id) || blockedByLabel.get(top.type) || null;
+  return {
+    label: top.title,
+    lane: top.lane || inferLane(top),
+    action: top.action,
+    manualGate: top.manualGate || inferManualGate(top),
+    expectedArtifact: top.expectedArtifact || inferExpectedArtifact(top),
+    dedupPolicy: top.dedupPolicy || inferDedupPolicy(top),
+    score: top.score,
+    nextApproval: blocked?.nextApproval || classifyApproval(top.id, top),
+    why: 'Highest combined LoopOS lane priority and candidate score.',
+  };
 }
 
 async function acquireLock() {
@@ -1376,8 +1578,12 @@ function summarizeCandidate(candidate) {
     score: candidate.score,
     title: candidate.title,
     type: candidate.type,
+    lane: candidate.lane || inferLane(candidate),
     id: candidate.id,
     action: candidate.action,
+    manualGate: candidate.manualGate || inferManualGate(candidate),
+    expectedArtifact: candidate.expectedArtifact || inferExpectedArtifact(candidate),
+    dedupPolicy: candidate.dedupPolicy || inferDedupPolicy(candidate),
     fingerprint: candidate.fingerprint,
     firstSeenAt: candidate.firstSeenAt,
     ageHours: candidate.ageHours,
@@ -1401,6 +1607,7 @@ function summarizeCompletion(item) {
   return {
     label: item.label,
     status: item.status,
+    lane: item.lane || inferLane(item),
     summary: item.summary || item.reason || '',
     ageHours: item.ageHours || 0,
     firstSeenAt: item.firstSeenAt || null,
@@ -1408,6 +1615,48 @@ function summarizeCompletion(item) {
     escalation: item.escalation || null,
     nextApproval: item.nextApproval || null,
   };
+}
+
+function inferLane(item = {}) {
+  const text = `${item.lane || ''} ${item.label || ''} ${item.id || ''} ${item.type || ''} ${item.action || ''} ${item.title || ''}`.toLowerCase();
+  if (/draft|manual_send|cold_outreach|cold-outreach|send-only/.test(text)) return 'outreach-draft';
+  if (/google|prospect|lead|revenue|cash|sales/.test(text)) return 'revenue';
+  if (/deploy|worker|wrangler|cloudflare|cron|webhook|secret|social-publisher|health|queue|content/.test(text)) return 'deployment';
+  if (/demo|record|showcase|script/.test(text)) return 'demo-sales';
+  return 'repo-hygiene';
+}
+
+function inferManualGate(item = {}) {
+  const text = `${item.manualGate || ''} ${item.label || ''} ${item.id || ''} ${item.type || ''} ${item.action || ''} ${item.title || ''}`.toLowerCase();
+  if (/secret|token|api-key|api_key|password/.test(text)) return 'manual_secret_input';
+  if (/send|outreach|line|ig|email|bulk|publish/.test(text)) return 'manual_send_only';
+  if (/deploy|wrangler|production|worker|cron/.test(text)) return 'manual_deploy_approval';
+  if (/github|pr|push|merge|issue/.test(text)) return 'manual_create_only';
+  if (/frontend|handoff|slice|worktree|commit/.test(text)) return 'manual_review_only';
+  return 'none_read_only';
+}
+
+function inferExpectedArtifact(item = {}) {
+  const text = `${item.expectedArtifact || ''} ${item.label || ''} ${item.id || ''} ${item.type || ''} ${item.action || ''} ${item.title || ''}`.toLowerCase();
+  if (/dashboard/.test(text)) return 'dashboard/latest.md';
+  if (/secret/.test(text)) return 'redacted secret-gate handoff';
+  if (/deploy|worker|wrangler/.test(text)) return 'deploy-ready checklist';
+  if (/github|pr|push|issue/.test(text)) return 'local GitHub handoff draft';
+  if (/outreach|prospect|cold|send/.test(text)) return 'manual-review outreach draft';
+  if (/worktree|commit|slice/.test(text)) return 'snapshot and commit boundary plan';
+  if (/health|cron|queue|content/.test(text)) return 'local health or reconciliation report';
+  return 'local run report';
+}
+
+function inferDedupPolicy(item = {}) {
+  if (item.dedupPolicy) return item.dedupPolicy;
+  if (item.dedup_window_minutes) return `${item.dedup_window_minutes}m task dedup window`;
+  return 'candidate fingerprint ledger with starvation scoring';
+}
+
+function requiresManualGate(task = {}) {
+  const text = `${task.taskType || ''} ${task.sourceId || ''} ${task.manualGate || ''} ${task.expectedArtifact || ''}`.toLowerCase();
+  return /outreach|send|github|issue|pr|push|deploy|worker|secret|token|publish/.test(text);
 }
 
 function summarizeApprovals(blocked) {
@@ -1447,6 +1696,29 @@ function renderApprovalList(groups) {
     }
   }
   return lines;
+}
+
+function renderMorningDecision(decision) {
+  if (!decision) return ['- No LoopOS decision generated.'];
+  const lines = [
+    `- highest_profit_next_action: ${decision.label}`,
+    `- lane: ${decision.lane}`,
+    `- action: ${decision.action}`,
+    `- manual_gate: ${decision.manualGate}`,
+    `- expected_artifact: ${decision.expectedArtifact}`,
+  ];
+  if (decision.nextApproval) lines.push(`- next_approval: ${decision.nextApproval}`);
+  if (decision.dedupPolicy) lines.push(`- dedup_policy: ${decision.dedupPolicy}`);
+  if (typeof decision.score === 'number') lines.push(`- score: ${decision.score.toFixed(3)}`);
+  lines.push(`- why: ${decision.why}`);
+  return lines;
+}
+
+function renderLaneSummary(lanes) {
+  if (!lanes || lanes.length === 0) return ['- No lane activity in this run.'];
+  return lanes.map(item => (
+    `- ${item.lane}: selected=${item.selected || 0}, completed=${item.completed || 0}, blocked=${item.blocked || 0}, top_score=${Number(item.topScore || 0).toFixed(3)}`
+  ));
 }
 
 function countBy(items, pickKey) {

@@ -14,6 +14,26 @@ The runner is intentionally safe against external services. It does not deploy,
 publish, delete, change permissions, or send bulk messages. Live probes only run
 when environment variables are provided.
 
+## LoopOS operating model
+
+LoopOS is the owner-facing layer on top of this runner:
+
+1. Read local automation memory and current repo evidence.
+2. Rank work into one of five lanes: `revenue`, `deployment`,
+   `outreach-draft`, `repo-hygiene`, or `demo-sales`.
+3. Produce local, review-ready artifacts.
+4. Stop at the next human approval gate.
+
+The lane map lives in `scripts/loops-24/LOOPOS-LANE-MAP.md`. The recordable
+sales/demo script lives in `scripts/loops-24/LOOPOS-DEMO-SCRIPT.md`.
+
+The task registry is `scripts/loops.tasks.json`. Each task should declare
+`lane`, `manual_gate`, `expected_artifact`, and `dedup_policy`.
+
+Tasks that can lead to outbound messages, GitHub writes, deploys, secrets,
+permission changes, public posting, or production changes must keep a manual
+gate. The runner may prepare handoffs, but it must not cross those gates.
+
 By default, `run.ps1` calls `run.mjs --auto-complete`. Auto-complete is limited
 to local, review-ready artifacts:
 
@@ -92,8 +112,9 @@ node scripts/loops-24/run.mjs --auto-complete --only-safe-local
 
 ## Loop dashboard
 
-Each successful run writes a compact dashboard with only completed actions,
-blocked actions, and the next approval gate:
+Each successful run writes a compact LoopOS dashboard with the morning decision,
+safe local actions, manual red lines, blocked actions, lane summary, and the next
+approval gate:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\show-dashboard.ps1
@@ -107,6 +128,21 @@ Latest dashboard path:
 
 Blocked items older than `LOOPS_BLOCKER_ESCALATE_HOURS` are marked as
 `ESCALATED` in the dashboard and run report.
+
+The dashboard is intentionally not a generic analytics page. Its job is to let
+Hsuehyi decide the next approval or intervention within one minute.
+
+The morning decision is derived from the selected candidates, lane priority, risk
+signals, and manual gates. Task registry metadata is read from:
+
+```text
+scripts/loops.tasks.json
+scripts/loops.cold-outreach.tasks.json
+```
+
+The registry is advisory governance metadata only. It documents expected
+artifacts, dedup policies, and review gates; it does not grant permission to
+push, deploy, send, delete, or write secrets.
 
 ## Check wakeup health
 
