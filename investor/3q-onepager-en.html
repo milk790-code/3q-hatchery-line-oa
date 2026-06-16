@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3Q Hatchery — Investor Brief</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --ink:#0B0E14;--ink2:#10151E;--ink3:#151B26;--panel:#0E131C;
+  --line:#222C3B;--soft:#1A2230;
+  --teal:#2DD4BF;--teal-s:#0E2E2B;--teal-d:rgba(45,212,191,.12);
+  --violet:#8B7DF6;--amber:#E6B450;--rose:#F2768E;--green:#3DD68C;
+  --text:#EAF0F7;--t2:#9DAFC3;--t3:#5C6C80;
+  --sans:'Inter',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--ink);color:var(--text);font-family:var(--sans);line-height:1.6;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:.35;z-index:0;}
+
+/* layout */
+.wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 32px;}
+
+/* topbar */
+.topbar{position:sticky;top:0;z-index:100;background:rgba(11,14,20,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);}
+.topbar-inner{max-width:900px;margin:0 auto;padding:0 32px;height:52px;display:flex;align-items:center;justify-content:space-between;}
+.topbar-logo{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--teal);letter-spacing:.08em;}
+.topbar-chips{display:flex;gap:8px;}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-family:var(--mono);font-size:11px;border:1px solid var(--line);color:var(--t2);}
+.chip.live{border-color:rgba(61,214,140,.35);color:var(--green);}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);display:inline-block;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* hero */
+.hero{padding:88px 0 64px;border-bottom:1px solid var(--line);}
+.hero-eye{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--teal);text-transform:uppercase;margin-bottom:22px;display:flex;align-items:center;gap:10px;}
+.hero h1{font-size:clamp(30px,4.2vw,52px);font-weight:800;line-height:1.2;letter-spacing:-.02em;margin-bottom:28px;}
+.hero h1 em{color:var(--teal);font-style:normal;}
+.hero-sub{font-size:17px;color:var(--t2);max-width:680px;line-height:1.8;}
+.hero-sub strong{color:var(--text);}
+
+/* metrics */
+.metrics{padding:52px 0;border-bottom:1px solid var(--line);}
+.metrics-label{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--t3);text-transform:uppercase;margin-bottom:28px;}
+.m-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.mc{background:var(--ink2);border:1px solid var(--line);border-radius:16px;padding:22px 24px;}
+.mc.gold{border-color:rgba(230,180,80,.3);}
+.mc.teal-b{border-color:rgba(45,212,191,.3);}
+.mc .num{font-family:var(--mono);font-size:36px;font-weight:700;line-height:1;color:#fff;margin-bottom:6px;}
+.mc.gold .num{color:var(--amber);}
+.mc.teal-b .num{color:var(--teal);}
+.mc .num sup{font-size:18px;opacity:.7;}
+.mc .desc{font-size:13px;color:var(--t2);line-height:1.45;margin-bottom:4px;}
+.mc .tag{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--t3);}
+
+/* section */
+.section{padding:56px 0;border-bottom:1px solid var(--line);}
+.sec-eye{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--teal);text-transform:uppercase;margin-bottom:14px;}
+.sec-h{font-size:28px;font-weight:800;margin-bottom:18px;line-height:1.3;}
+.sec-h em{color:var(--teal);font-style:normal;}
+.sec-p{font-size:15.5px;color:var(--t2);line-height:1.8;max-width:720px;}
+
+/* brain cards */
+.brain-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:28px;}
+.bc{border-radius:16px;padding:26px;position:relative;overflow:hidden;}
+.b1{background:linear-gradient(135deg,var(--ink2),var(--teal-s));border:1px solid rgba(45,212,191,.25);}
+.b2{background:linear-gradient(135deg,var(--ink2),var(--vio-s,#1C1A33));border:1px solid rgba(139,125,246,.25);}
+.bc-icon{font-size:28px;margin-bottom:10px;}
+.bc-tag{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--t3);text-transform:uppercase;margin-bottom:6px;}
+.bc-t{font-size:18px;font-weight:700;margin-bottom:10px;}
+.bc-d{font-size:13.5px;color:var(--t2);line-height:1.65;}
+.flywheel{background:var(--teal-s);border:1px solid rgba(45,212,191,.2);border-radius:12px;padding:14px 20px;margin-top:20px;font-family:var(--mono);font-size:13px;color:var(--teal);text-align:center;letter-spacing:.03em;}
+
+/* moat */
+.moat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:24px;}
+.mt .mt-i{font-size:22px;margin-bottom:8px;}
+.mt .mt-t{font-size:14px;font-weight:700;margin-bottom:5px;}
+.mt .mt-d{font-size:12.5px;color:var(--t2);line-height:1.5;}
+
+/* traction */
+.traction{margin-top:24px;display:flex;flex-direction:column;gap:0;}
+.tr-row{display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--line);}
+.tr-row:last-child{border-bottom:none;}
+.tr-dot{width:10px;height:10px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.dot-g{background:var(--green);box-shadow:0 0 6px var(--green);}
+.dot-a{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.tr-title{font-size:14.5px;font-weight:700;margin-bottom:3px;}
+.tr-desc{font-size:13px;color:var(--t2);}
+
+/* fund row */
+.fund-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px;}
+.fd{background:var(--ink2);border:1px solid var(--line);border-radius:12px;padding:20px;}
+.fd .fp{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--teal);margin-bottom:6px;}
+.fd .fl{font-size:12px;color:var(--t2);line-height:1.4;}
+
+/* ask */
+.ask{display:flex;gap:48px;align-items:flex-start;margin-top:28px;}
+.ask-num .an{font-family:var(--mono);font-size:52px;font-weight:700;color:var(--teal);line-height:1;}
+.ask-num .al{font-family:var(--mono);font-size:13px;color:var(--teal);opacity:.7;margin-top:4px;letter-spacing:.08em;}
+.ask-body h3{font-size:20px;font-weight:700;margin-bottom:10px;}
+.ask-body p{font-size:14px;color:var(--t2);line-height:1.8;}
+
+/* cta */
+.cta-section{padding:64px 0 80px;}
+.cta-inner{background:var(--ink2);border:1px solid var(--line);border-radius:20px;padding:48px;text-align:center;}
+.cta-inner h2{font-size:30px;font-weight:800;margin-bottom:14px;}
+.cta-inner h2 em{color:var(--teal);font-style:normal;}
+.cta-inner p{font-size:15px;color:var(--t2);max-width:520px;margin:0 auto 28px;line-height:1.7;}
+.cta-buttons{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:999px;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer;border:none;font-family:var(--sans);}
+.btn-primary{background:var(--teal);color:#0B0E14;}
+.btn-secondary{background:transparent;color:var(--text);border:1px solid var(--line);}
+
+/* footer */
+.foot{padding:32px 0;border-top:1px solid var(--line);}
+.foot-inner{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+.foot-copy{font-family:var(--mono);font-size:11px;color:var(--t3);}
+
+/* responsive */
+@media(max-width:640px){
+  .m-grid,.brain-row,.moat-row,.fund-row{grid-template-columns:1fr 1fr;}
+  .ask{flex-direction:column;gap:20px;}
+  .wrap{padding:0 18px;}
+  .hero{padding:56px 0 40px;}
+  .topbar-inner{padding:0 18px;}
+  .cta-inner{padding:32px 20px;}
+  .cta-buttons{flex-direction:column;align-items:stretch;}
+  .btn{justify-content:center;}
+  .foot-inner{flex-direction:column;text-align:center;}
+}
+@media(max-width:420px){
+  .m-grid{grid-template-columns:1fr;}
+  .brain-row{grid-template-columns:1fr;}
+  .moat-row{grid-template-columns:1fr;}
+  .fund-row{grid-template-columns:1fr 1fr;}
+  .mc .num{font-size:28px;}
+  .ask-num .an{font-size:38px;}
+  .topbar-chips .chip:last-child{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-logo">3Q HATCHERY</div>
+    <div class="topbar-chips">
+      <span class="chip live"><span class="live-dot"></span>LIVE</span>
+      <span class="chip">Pre-Seed · USD $160K</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eye"><span class="live-dot"></span>Live snapshot · June 2026 · Systems running now</div>
+    <h1>AI brand incubation SaaS<br>built natively on <em>LINE OA</em> —<br>Asia's 200M-user messaging OS</h1>
+    <p class="hero-sub">3Q Hatchery (Taichung, Taiwan) built an AI-native commercial infrastructure — one business brain driving multiple brands, one self-evolving factory maintaining the whole system. <strong>Not a blueprint. Running in production.</strong></p>
+  </section>
+
+  <!-- LIVE METRICS -->
+  <section class="metrics">
+    <div class="metrics-label">Live traction · June 2026 · Zero ad spend</div>
+    <div class="m-grid">
+      <div class="mc gold">
+        <div class="num">136K</div>
+        <div class="desc">Organic IG followers</div>
+        <div class="tag">Zero paid acquisition</div>
+      </div>
+      <div class="mc teal-b">
+        <div class="num">5.27M</div>
+        <div class="desc">TikTok views</div>
+        <div class="tag">Organic content engine</div>
+      </div>
+      <div class="mc">
+        <div class="num">500<sup>+</sup></div>
+        <div class="desc">B2B distributors reached</div>
+        <div class="tag">TW · SG · MY</div>
+      </div>
+      <div class="mc teal-b">
+        <div class="num">23</div>
+        <div class="desc">Live Cloudflare Workers</div>
+        <div class="tag">AI systems in production</div>
+      </div>
+      <div class="mc">
+        <div class="num">3</div>
+        <div class="desc">AI sales bots live</div>
+        <div class="tag">LINE OA — closing deals now</div>
+      </div>
+      <div class="mc gold">
+        <div class="num">&lt;2%</div>
+        <div class="desc">Monthly B2B churn</div>
+        <div class="tag">LINE OA retention lock-in</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE THESIS -->
+  <section class="section">
+    <div class="sec-eye">The Thesis · Why LINE OA</div>
+    <h2 class="sec-h">LINE OA is the <em>enterprise messaging OS</em><br>for 200M+ APAC users</h2>
+    <p class="sec-p">Japan (97M), Thailand (54M), Taiwan (22M) — LINE isn't a chat app, it's the primary B2B communication layer. We ship AI inference natively inside it: sales copilot, subsidy matching engine, LIFF mini-programs — all running inside the messaging channel your customers already live in. No app install. No CAC. Zero cold-start.</p>
+    <div class="brain-row">
+      <div class="bc b1">
+        <div class="bc-icon">🧠</div>
+        <div class="bc-tag">Product Brain · Revenue engine</div>
+        <div class="bc-t">CDG — AI Sales Copilot</div>
+        <div class="bc-d">One AI engine, multiple brands. New brand = add one config file, zero rebuild. <strong>Every transaction feeds back into shared learning</strong> across brands. Moat = proprietary transaction gene pool compounding over time.</div>
+      </div>
+      <div class="bc b2">
+        <div class="bc-icon">🏭</div>
+        <div class="bc-tag">Factory Brain · Self-evolving infra</div>
+        <div class="bc-t">LOOP — Autonomous Factory</div>
+        <div class="bc-d">6 self-running GitHub Actions: <strong>self-generate code, self-review, self-deploy</strong>. Reversible actions are fully automated. Irreversible ones stop for human sign-off. Builds and maintains CDG itself.</div>
+      </div>
+    </div>
+    <div class="flywheel">Flywheel: LOOP builds CDG → CDG closes deals → data trains both brains → next brand onboards at zero marginal cost</div>
+  </section>
+
+  <!-- MOAT -->
+  <section class="section">
+    <div class="sec-eye">Moat · Why this is defensible</div>
+    <h2 class="sec-h">Competitors can copy the <em>UI</em>.<br>They can't copy <em>two years of transaction data</em>.</h2>
+    <div class="moat-row">
+      <div class="mt">
+        <div class="mt-i">🧬</div>
+        <div class="mt-t">Proprietary Transaction DNA</div>
+        <div class="mt-d">Every deal sediments into three-layer brand genome (DNA/RNA/EPIGENOME), shared cross-brand, compounding over time. Late entrants fall further behind every month.</div>
+      </div>
+      <div class="mt">
+        <div class="mt-i">⚡</div>
+        <div class="mt-t">Zero Marginal Brand Cost</div>
+        <div class="mt-d">Onboarding a new brand = one config entry. No system rebuild, no model retraining, no new engineering hire. Scale without headcount.</div>
+      </div>
+      <div class="mt">
+        <div class="mt-i">🔁</div>
+        <div class="mt-t">Government Subsidy Flywheel</div>
+        <div class="mt-d">We match B2B clients to Taiwan government grants (up to NT$12M). Approved grant money flows back to pay for 3Q services. Government-funded retention.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRACTION -->
+  <section class="section">
+    <div class="sec-eye">Traction · Not planned — shipped</div>
+    <h2 class="sec-h">Every bullet below is <em>live in production</em></h2>
+    <div class="traction">
+      <div class="tr-row">
+        <div class="tr-dot dot-g"></div>
+        <div class="tr-body">
+          <div class="tr-title">3 AI sales bots closing deals on LINE OA</div>
+          <div class="tr-desc">Bubble Monster (auto beauty supplies), 3Q Hatchery, Daiwantudigung — three brands, three LINE OA bots, AI responding in each brand's voice</div>
+        </div>
+      </div>
+      <div class="tr-row">
+        <div class="tr-dot dot-g"></div>
+        <div class="tr-body">
+          <div class="tr-title">136K organic followers — zero ad spend</div>
+          <div class="tr-desc">Social Distributor running 13,636 scheduled posts across IG/FB, funneling into AI sales pipeline automatically</div>
+        </div>
+      </div>
+      <div class="tr-row">
+        <div class="tr-dot dot-g"></div>
+        <div class="tr-body">
+          <div class="tr-title">AI subsidy matching live — 30-min reports</div>
+          <div class="tr-desc">Taiwan 35+ government grant database integrated with lead capture. Subsidy flywheel: grants pay for 3Q services</div>
+        </div>
+      </div>
+      <div class="tr-row">
+        <div class="tr-dot dot-g"></div>
+        <div class="tr-body">
+          <div class="tr-title">500+ B2B automotive beauty distributors reached</div>
+          <div class="tr-desc">Outreach automation: 89/130 sent, daily/weekly/30-min schedule cadences running</div>
+        </div>
+      </div>
+      <div class="tr-row">
+        <div class="tr-dot dot-g"></div>
+        <div class="tr-body">
+          <div class="tr-title">23 Cloudflare Workers in production</div>
+          <div class="tr-desc">AI infrastructure stack: Claude AI + LINE LIFF SDK + Cloudflare Workers. 13 redeployed within last 12h.</div>
+        </div>
+      </div>
+      <div class="tr-row">
+        <div class="tr-dot dot-a"></div>
+        <div class="tr-body">
+          <div class="tr-title">Hatchery Cohort W1 — starting June 16</div>
+          <div class="tr-desc">First paid cohort: 3 brands entering 3-bot methodology. First paid validation of the incubation model.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE ASK -->
+  <section class="section">
+    <div class="sec-eye">The Ask · Pre-Seed Round</div>
+    <h2 class="sec-h">This is <em>acceleration capital</em>,<br>not proof-of-concept capital</h2>
+    <p class="sec-p" style="margin-bottom:28px;">Systems are live. Deals are closing. Cohort is starting. This round turns on the switches already built — moving the flywheel from "spinning" to "accelerating."</p>
+    <div class="ask">
+      <div class="ask-num">
+        <div class="an">$160K</div>
+        <div class="al">USD PRE-SEED · NT$5M</div>
+      </div>
+      <div class="ask-body">
+        <h3>Use of Funds</h3>
+        <p><strong>40% Tech acceleration</strong> — Self-evolving EPIGENOME engine, payment gateway integration, Google Ads 15-keyword unlock<br><br>
+        <strong>30% Cohort expansion</strong> — W2/W3 cohort recruitment, brand matrix scale-up<br><br>
+        <strong>20% Subsidy flywheel</strong> — Productize Taiwan grant matching as B2B service<br><br>
+        <strong>10% Team</strong> — One sales/customer success hire</p>
+      </div>
+    </div>
+    <div style="margin-top:32px;">
+      <div class="fund-row">
+        <div class="fd">
+          <div class="fp">Q3 2026</div>
+          <div class="fl">Pre-Seed close<br>NT$5M · USD $160K</div>
+        </div>
+        <div class="fd">
+          <div class="fp">H1 2027</div>
+          <div class="fl">Seed round bridge<br>3 cohorts · 9+ brands live</div>
+        </div>
+        <div class="fd">
+          <div class="fp">200M+</div>
+          <div class="fl">LINE OA addressable users<br>JP · TH · TW markets</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-inner">
+      <h2>Best diligence is <em>watching it run</em></h2>
+      <p>Reply to this email. I'll give you live backend access within 24 hours — 23 systems live, AI bots closing deals in real-time, transaction data feeding back into the model. See it yourself, then decide.</p>
+      <div class="cta-buttons">
+        <a href="mailto:milk790@gmail.com?subject=3Q Hatchery — Request Live Demo&body=Hi Xueyi, I'd like to see the live backend demo for 3Q Hatchery." class="btn btn-primary">📩 Request Live Demo</a>
+        <a href="https://milk790-code.github.io/3q-hatchery-line-oa/investor/3q-onepager.html" target="_blank" class="btn btn-secondary">🇹🇼 中文版 →</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <div class="foot-inner">
+      <div class="foot-copy"><strong>3Q Hatchery</strong> · Taichung, Taiwan · Xueyi Chen · milk790@gmail.com</div>
+      <div class="foot-copy">Pre-Seed Round · Confidential · 2026</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

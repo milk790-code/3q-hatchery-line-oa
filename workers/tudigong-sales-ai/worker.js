@@ -1,10 +1,25 @@
 // 呆丸土地公 Sales AI — 超級業務AI 三形態 worker v1.0(選址情報所)
+// ═══ 模型三層路由 v1：成交時刻 Fable、純事實短問 Haiku、其餘 Sonnet（錯升不錯降）═══
+const MODELS = {
+  lite: 'claude-haiku-4-5-20251001',
+  chat: 'claude-sonnet-4-6',
+  escalate: 'claude-fable-5',
+};
+const ESCALATE_RX = /(健檢|報價|價格|多少錢|幾錢|預算|太貴|好貴|便宜一點|別家|考慮一下|合作|加盟|代理|經銷|夥伴|分潤|簽約|下訂|成交|怎麼付|申請|補助多少)/;
+const LITE_RX = /^(營業時間|地址|在哪|在哪裡|怎麼去|電話|運費|出貨|幾天到)[?？嗎]?$/;
+function pickModel(history) {
+  const lastUser = [...(history || [])].reverse().find(m => m && m.role === 'user');
+  const t = (lastUser && typeof lastUser.content === 'string') ? lastUser.content.trim() : '';
+  if (ESCALATE_RX.test(t)) return MODELS.escalate;
+  if (t.length <= 12 && LITE_RX.test(t)) return MODELS.lite;
+  return MODELS.chat;
+}
 // ① GET / 引流著陸頁  ② GET /intro 官網接待  ③ POST /chat 轉化回覆 API
 // /go=LINE轉跳  /health
 // 大腦:ANTHROPIC_API_KEY → claude-sonnet-4-6;無 → Workers AI llama
 
-const LINE_URL = 'https://line.me/R/ti/p/@tudigong';
-const LINE_ID = '@tudigong';
+const LINE_URL = 'https://line.me/R/ti/p/@207cpaps';
+const LINE_ID = '@207cpaps';
 const BRAND = '呆丸土地公';
 const CAMPAIGN = 'tudigong-sales-ai';
 
@@ -46,12 +61,17 @@ const SYSTEM_PROMPT = `你是「${BRAND}」的首席接待(台灣最接地氣的
 
 async function callBrain(history, env) {
   if (env.ANTHROPIC_API_KEY) {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const HDRS = { 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' };
+    let resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 700,
+      headers: HDRS,
+      body: JSON.stringify({ model: pickModel(history), max_tokens: 700,
         system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }], messages: history }),
     });
+    if (!resp.ok && [400, 403, 404, 429].includes(resp.status)) {
+      console.error('anthropic', resp.status, '-> fallback opus-4-8');
+      resp = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: HDRS, body: JSON.stringify({ model: 'claude-opus-4-8', max_tokens: 700, system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }], messages: history }) });
+      }
     if (resp.ok) { const d = await resp.json(); return d.content?.[0]?.text || ''; }
     console.error('[tudigong-sales-ai] anthropic error', resp.status);
   }
@@ -143,7 +163,7 @@ function add(t,me){const d=document.createElement('div');d.className='msg '+(me?
 async function send(){const t=inp.value.trim();if(!t)return;inp.value='';add(t,true);btn.disabled=true;
 const w=document.createElement('div');w.className='msg ai';w.textContent='…';box.appendChild(w);
 try{const r=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sid,message:t})});
-const d=await r.json();w.textContent=d.reply||'等我一下,馬上回你。';}catch(e){w.textContent='連線不穩,加 LINE 找我們:@tudigong';}
+const d=await r.json();w.textContent=d.reply||'等我一下,馬上回你。';}catch(e){w.textContent='連線不穩,加 LINE 找我們:@207cpaps';}
 btn.disabled=false;box.scrollTop=box.scrollHeight;}
 btn.onclick=send;inp.addEventListener('keydown',e=>{if(e.key==='Enter')send();});
 `;
@@ -247,7 +267,7 @@ h1 span{color:#e8632c}
 <div class="g"><b>中立立場</b>不賣房、不帶看、不收房仲業配,情報只對你負責。</div>
 <div class="g"><b>深度報告</b>要更完整的商圈與行情判讀,談付費選址報告。</div>
 </div>
-<a class="cta" href="/go">加 LINE @tudigong 傳地址</a>
+<a class="cta" href="/go">加 LINE @207cpaps 傳地址</a>
 <h1 style="font-size:18px;margin-bottom:10px">先問問土地公</h1>
 <div id="chat"></div>
 <div class="inrow"><input id="inp" placeholder="例:租店面要注意哪些嫌惡設施"><button id="send">送出</button></div>

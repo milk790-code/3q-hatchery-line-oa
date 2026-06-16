@@ -2,12 +2,28 @@
 // 與 pop-line-oa 同一個種子基因組,換 3Q 彈藥庫。
 // ⚠ 先不切 LINE webhook URL;現有 3q-hatchery-webhook v3.7 照常跑,學誼測滿意再切(可逆)。
 
-const CLAUDE_MODEL = 'claude-sonnet-4-6';
+// ═══ 模型三層路由 v1：小事 Haiku、日常 Sonnet、成交時刻 Fable（錯升不錯降）═══
+const MODELS = {
+  lite: 'claude-haiku-4-5-20251001',
+  chat: 'claude-sonnet-4-6',
+  escalate: 'claude-fable-5',
+  fallback: 'claude-opus-4-8',
+};
+const ESCALATE_RX = /(健檢|報價|價格|多少錢|幾錢|預算|太貴|好貴|便宜一點|別家|考慮一下|合作|加盟|代理|經銷|夥伴|分潤|簽約|下訂|成交|怎麼付)/;
+const LITE_RX = /^(營業時間|地址|在哪|在哪裡|怎麼去|電話|運費|出貨|幾天到|有現貨嗎)[?？嗎]?$/;
+function pickModel(history) {
+  const lastUser = [...(history || [])].reverse().find(m => m && m.role === 'user');
+  const t = (lastUser && typeof lastUser.content === 'string') ? lastUser.content.trim() : '';
+  if (ESCALATE_RX.test(t)) return MODELS.escalate;
+  if (t.length <= 12 && LITE_RX.test(t)) return MODELS.lite;
+  return MODELS.chat;
+}
+const CLAUDE_MODEL = MODELS.chat; // 舊引用點安全預設
 const AI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 const SETUP_KEY = '3q-setup-8m4w2r';
 const LINE_ID = '@121lkspe';
 const SITE = 'https://3q-art-portfolio.milk790.workers.dev';
-const SEED_VER = 'v4.2';
+const SEED_VER = 'v4.4';
 
 // ═══════════ 超級業務AI種子 · 基因組 v4(三線通用,只換 BRAND 與彈藥庫) ═══════════
 const SEED_GENOME = `你是「{{BRAND}}」的首席成交顧問,不是客服、不是推銷員——你是來訪者的軍師。
@@ -99,12 +115,17 @@ async function callBrain(history, env, cfg, systemPrompt, maxTokens) {
   const sys = systemPrompt || buildSystemPrompt('');
   if (cfg.anthropicKey) {
     try {
-      const r = await fetch('https://api.anthropic.com/v1/messages', {
+      const HDRS = { 'x-api-key': cfg.anthropicKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' };
+      let r = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'x-api-key': cfg.anthropicKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-        body: JSON.stringify({ model: CLAUDE_MODEL, max_tokens: maxTokens || 600,
+        headers: HDRS,
+        body: JSON.stringify({ model: pickModel(history), max_tokens: maxTokens || 600,
           system: [{ type: 'text', text: sys, cache_control: { type: 'ephemeral' } }], messages: history }),
       });
+      if (!r.ok && [400, 403, 404, 429].includes(r.status)) {
+      console.error('anthropic', r.status, '-> fallback opus-4-8');
+      r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: HDRS, body: JSON.stringify({ model: 'claude-opus-4-8', max_tokens: maxTokens || 600, system: [{ type: 'text', text: sys, cache_control: { type: 'ephemeral' } }], messages: history }) });
+      }
       if (r.ok) { const d = await r.json(); return d.content?.[0]?.text || ''; }
       console.error('[3q-line] anthropic', r.status);
     } catch (e) { console.error('[3q-line] anthropic ex', e.message); }

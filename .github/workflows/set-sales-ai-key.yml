@@ -1,0 +1,45 @@
+name: Set Sales AI Key (no code redeploy)
+# 只把 ANTHROPIC_API_KEY 寫進三支「現有」worker 的 secret binding,不重新部署程式碼。
+# 為何不用 deploy-sales-ai:那支會用 repo 的 worker.js 覆蓋線上,而 repo 是舊的 v1.0 單模型版,
+# 會把線上 v1.1 三層路由版回退掉。本 workflow 打 Cloudflare /secrets 端點,只加 secret、不換 code。
+# 需要的 GitHub secrets(都已存在):CF_ACCOUNT_ID, CF_API_TOKEN, ANTHROPIC_API_KEY
+# 上傳路徑:.github/workflows/set-sales-ai-key.yml → Actions → Run workflow
+on:
+  workflow_dispatch: {}
+
+jobs:
+  set-key:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        worker: [3q-sales-ai, pop-sales-ai, tudigong-sales-ai]
+    steps:
+      - name: PUT ANTHROPIC_API_KEY(script 不動)
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
+            echo "::error::GitHub secret ANTHROPIC_API_KEY 是空的,沒值可寫"; exit 1
+          fi
+          body=$(jq -n --arg v "$ANTHROPIC_API_KEY" '{name:"ANTHROPIC_API_KEY", text:$v, type:"secret_text"}')
+          resp=$(curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${{ matrix.worker }}/secrets" \
+            -H "Authorization: Bearer ${CF_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data "$body")
+          echo "$resp" | jq -e '.success == true' >/dev/null || { echo "$resp" | jq -c '.errors'; exit 1; }
+          echo "::notice::${{ matrix.worker }} secret 已寫入"
+
+      - name: 驗證 brain 已轉 claude
+        run: |
+          set -euo pipefail
+          sleep 4
+          url="https://${{ matrix.worker }}.milk790.workers.dev/health"
+          brain=$(curl -fsS "$url" | jq -r '.brain')
+          echo "${{ matrix.worker }} brain → $brain"
+          [ "$brain" = "claude-sonnet-4-6" ] || { echo "::error::brain 還是 $brain,沒生效"; exit 1; }
+          echo "::notice::${{ matrix.worker }} brain = claude-sonnet-4-6 ✅"

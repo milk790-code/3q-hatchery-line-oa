@@ -1,0 +1,156 @@
+name: Deploy All Microsites (orchestrator)
+
+# One-button matrix fan-out for the 9 brand microsites in this monorepo.
+# - workflow_dispatch: run on demand (input "sites" = "all" or comma list)
+# - schedule: weekly full rebuild, Mon 08:00 Taiwan (00:00 UTC)
+# Safety: GITHUB_TOKEN cannot trigger other workflows (GitHub anti-recursion),
+# so fan-out needs a fine-grained PAT in secret ORCHESTRATOR_PAT
+# (Actions: Read/Write + Contents: Read). With NO PAT it degrades to
+# "manual-link mode" — prints links, deploys nothing, never fails.
+# => The weekly cron is a harmless no-op until you opt in by adding the PAT.
+
+on:
+  workflow_dispatch:
+    inputs:
+      sites:
+        description: 'Targets: "all" or comma list e.g. deploy-fukubukuro,deploy-tudigong'
+        default: 'all'
+        required: false
+  schedule:
+    - cron: '0 0 * * 1'   # Mon 00:00 UTC = 08:00 Taiwan — weekly full rebuild
+
+permissions:
+  contents: read
+
+jobs:
+  fan-out:
+    runs-on: ubuntu-latest
+    env:
+      # ai-subsidy FIRST (art-portfolio binds its service), then the rest.
+      ALL_SITES: >-
+        deploy-ai-subsidy.yml
+        deploy-art-portfolio.yml
+        deploy-fukubukuro.yml
+        deploy-tudigong.yml
+        deploy-sales-ai.yml
+        deploy-pop-line-oa.yml
+        deploy-outreach.yml
+        deploy-sanzhi-pages.yml
+        renovation-deploy.yml
+    steps:
+      - name: Resolve target list
+        id: pick
+        run: |
+          set -euo pipefail
+          raw='${{ github.event.inputs.sites }}'
+          if [ -z "$raw" ] || [ "$raw" = "all" ]; then
+            list="$ALL_SITES"
+          else
+            list=$(echo "$raw" | tr ',' ' ')
+          fi
+          # normalise: ensure each ends in .yml, collapse whitespace
+          norm=""
+          for w in $list; do
+            case "$w" in *.yml) ;; *) w="$w.yml" ;; esac
+            norm="$norm $w"
+          done
+          norm=$(echo "$norm" | xargs)
+          echo "list=$norm" >> "$GITHUB_OUTPUT"
+          echo "::notice::Targets: $norm"
+
+      - name: Guard — is ORCHESTRATOR_PAT present?
+        id: guard
+        env:
+          PAT: ${{ secrets.ORCHESTRATOR_PAT }}
+        run: |
+          if [ -z "${PAT:-}" ]; then
+            echo "has_pat=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::ORCHESTRATOR_PAT not set — manual-link mode (no deploys). Add a fine-grained PAT (Actions:RW, Contents:R) to enable fan-out."
+          else
+            echo "has_pat=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Manual-link mode (no PAT)
+        if: steps.guard.outputs.has_pat == 'false'
+        run: |
+          {
+            echo "## Manual deploy links (set ORCHESTRATOR_PAT to automate)"
+            for wf in ${{ steps.pick.outputs.list }}; do
+              echo "- https://github.com/${{ github.repository }}/actions/workflows/$wf"
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Dispatch microsites
+        if: steps.guard.outputs.has_pat == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.ORCHESTRATOR_PAT }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -uo pipefail
+          for wf in ${{ steps.pick.outputs.list }}; do
+            if gh workflow run "$wf" --ref main; then
+              echo "::notice::dispatched $wf"
+            else
+              echo "::warning::dispatch failed (no workflow_dispatch trigger?): $wf"
+            fi
+            sleep 4
+          done
+
+      - name: Poll downstream conclusions
+        if: steps.guard.outputs.has_pat == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.ORCHESTRATOR_PAT }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -uo pipefail
+          sleep 20
+          ok=0; fail=0; pending=0; report=""
+          for wf in ${{ steps.pick.outputs.list }}; do
+            concl=""
+            for i in $(seq 1 20); do
+              row=$(gh run list --workflow "$wf" --limit 1 --json status,conclusion -q '.[0]') || row=""
+              st=$(echo "$row" | jq -r '.status // ""' 2>/dev/null || echo "")
+              if [ "$st" = "completed" ]; then
+                concl=$(echo "$row" | jq -r '.conclusion // ""' 2>/dev/null || echo "")
+                break
+              fi
+              sleep 15
+            done
+            case "$concl" in
+              success) ok=$((ok+1));      mark="OK ";;
+              "")      pending=$((pending+1)); mark="...";  concl="running";;
+              *)       fail=$((fail+1));    mark="XX ";;
+            esac
+            report="${report}
+          ${mark} ${wf%.yml}: ${concl}"
+          done
+          {
+            echo "## Microsite deploy report"
+            echo "OK=$ok  FAIL=$fail  PENDING=$pending"
+            echo '```'
+            echo "$report"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "RPT_OK=$ok"; echo "RPT_FAIL=$fail"; echo "RPT_PENDING=$pending"
+            echo "RPT_BODY<<EOF"; echo "$report"; echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      - name: LINE weekly report (best-effort)
+        if: steps.guard.outputs.has_pat == 'true'
+        continue-on-error: true
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          OWNER: ${{ secrets.OWNER_USER_ID }}
+        run: |
+          set -uo pipefail
+          if [ -z "${LINE_TOKEN:-}" ] || [ -z "${OWNER:-}" ]; then
+            echo "::warning::LINE_TOKEN or OWNER_USER_ID missing — skip LINE report"
+            exit 0
+          fi
+          msg="3Q 微站週報  ${RPT_OK} OK / ${RPT_FAIL} FAIL / ${RPT_PENDING} 進行中${RPT_BODY}"
+          curl -sS -X POST https://api.line.me/v2/bot/message/push \
+            -H "Authorization: Bearer $LINE_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n --arg to "$OWNER" --arg t "$msg" '{to:$to, messages:[{type:"text", text:$t}]}')" \
+            | jq -r '.sentMessages? // .message? // "sent"'
