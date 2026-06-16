@@ -251,19 +251,28 @@ async function discoverFrontendArtifacts() {
   const latestReview = await readJson(path.join(stateDir, 'frontend-artifact-reviews', 'latest.json'), null);
   const reviewCurrent = latestReview?.statusFingerprint === statusFingerprint
     && latestReview?.groupFingerprint === groupFingerprint;
+  const latestHandoff = await readJson(path.join(stateDir, 'frontend-slice-handoffs', 'latest.json'), null);
+  const handoffCurrent = latestHandoff?.statusFingerprint === statusFingerprint
+    && latestHandoff?.groupFingerprint === groupFingerprint;
 
   return [{
     type: 'repo_health',
-    id: reviewCurrent ? 'frontend-artifacts-review-ready' : 'frontend-artifacts-audit-needed',
-    title: reviewCurrent ? 'Review frontend/artifacts audit' : 'Audit frontend/artifacts payload',
-    value: reviewCurrent ? 0.32 : 0.64,
-    urgency: reviewCurrent ? 0.24 : 0.5,
-    loopability: reviewCurrent ? 0.55 : 0.78,
+    id: handoffCurrent
+      ? 'frontend-artifacts-slice-handoffs-ready'
+      : (reviewCurrent ? 'frontend-artifacts-review-ready' : 'frontend-artifacts-audit-needed'),
+    title: handoffCurrent
+      ? 'Review frontend slice handoffs'
+      : (reviewCurrent ? 'Review frontend/artifacts audit' : 'Audit frontend/artifacts payload'),
+    value: handoffCurrent ? 0.26 : (reviewCurrent ? 0.32 : 0.64),
+    urgency: handoffCurrent ? 0.2 : (reviewCurrent ? 0.24 : 0.5),
+    loopability: handoffCurrent ? 0.5 : (reviewCurrent ? 0.55 : 0.78),
     freshness: 0.65,
     risk: 0.2,
-    action: reviewCurrent
-      ? 'Use the frontend artifact review to split the payload before any staging or preview.'
-      : 'Create a read-only frontend/artifact review with package, size, deploy-config, and secret-risk summaries.',
+    action: handoffCurrent
+      ? 'Review the generated frontend slice handoffs before staging any artifact payload.'
+      : (reviewCurrent
+          ? 'Generate frontend slice handoffs for art-portfolio, design-showcase, token-editor, and shared-helper before staging.'
+          : 'Create a read-only frontend/artifact review with package, size, deploy-config, and secret-risk summaries.'),
     evidence: {
       statusFingerprint,
       groupFingerprint,
@@ -273,6 +282,8 @@ async function discoverFrontendArtifacts() {
       boundaryReportPath: boundary.reportPath,
       reviewPath: reviewCurrent ? latestReview.reportPath : null,
       reviewSummary: reviewCurrent ? latestReview.summary : null,
+      handoffDir: handoffCurrent ? path.join(stateDir, 'frontend-slice-handoffs') : null,
+      handoffSlices: handoffCurrent ? latestHandoff.slices : null,
     },
   }];
 }
@@ -655,7 +666,20 @@ async function runAutoCompletions(candidates) {
     } else if (candidate.id === 'cold-outreach-needs-prospects') {
       completions.push(blockedCompletion(candidate.id, 'Needs fresh reviewed prospects before drafts can be generated.'));
     } else if (candidate.id === 'frontend-artifacts-review-ready') {
-      completions.push(blockedCompletion(candidate.id, 'Frontend/artifact review exists; staging the payload still needs a separate split decision.'));
+      const latestHandoff = await readJson(path.join(stateDir, 'frontend-slice-handoffs', 'latest.json'), null);
+      if (latestHandoff?.statusFingerprint === candidate.evidence?.statusFingerprint
+        && latestHandoff?.groupFingerprint === candidate.evidence?.groupFingerprint) {
+        completions.push(blockedCompletion(candidate.id, `Frontend slice handoffs already exist: ${path.join(stateDir, 'frontend-slice-handoffs')}`));
+      } else {
+        completions.push(runLocalStep(
+          'prepare-frontend-slice-handoffs',
+          'node',
+          ['scripts/loops-24/prepare-frontend-slice-handoffs.mjs'],
+          120_000
+        ));
+      }
+    } else if (candidate.id === 'frontend-artifacts-slice-handoffs-ready') {
+      completions.push(blockedCompletion(candidate.id, 'Frontend slice handoffs exist; staging each slice still needs review and the generated stage script must be run manually.'));
     }
   }
 

@@ -21,6 +21,7 @@ to local, review-ready artifacts:
 - commit boundary plans
 - slice handoffs and stage scripts
 - frontend/artifact review reports
+- frontend slice handoffs and stage scripts
 - content queue reconciliation reports
 - Wrangler cache audit reports
 - cold outreach drafts only when prospects are eligible
@@ -206,6 +207,18 @@ delete files.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\review-frontend-artifacts.ps1
+```
+
+## Prepare frontend slice handoffs
+
+Turn the latest frontend/artifact review into separate review packets for the
+recommended slices, such as `art-portfolio-static-preview`,
+`design-showcase-vite-app`, `token-editor-app`, and `shared-helper`. This writes
+reports and stage scripts under the automation state directory, but does not run
+the stage scripts and does not modify frontend files.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\prepare-frontend-slice-handoffs.ps1
 ```
 
 ## Audit Wrangler cache
