@@ -102,6 +102,16 @@ Keep `secrets.local.ps1` out of git. The runner reads it locally, redacts token
 fields in reports, and still stops before deploys, pushes, PR creation, or
 outbound sending.
 
+Prepare a redacted local handoff for the current secret gates:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\prepare-secret-gates.ps1
+```
+
+The handoff is written under the automation state directory and records only
+readiness booleans. It does not execute `secrets.local.ps1`, print values, write
+secrets, or call protected live endpoints.
+
 ## Optional live social-publisher probe
 
 The runner defaults to the current public 3Q social-publisher URL:

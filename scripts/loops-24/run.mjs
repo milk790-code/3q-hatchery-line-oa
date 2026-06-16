@@ -716,6 +716,20 @@ async function runAutoCompletions(candidates) {
     }
   }
 
+  const secretGateIds = [
+    'google-prospecting-api-key-missing',
+    'social-publisher-live-env-missing',
+    'social-publisher-token-missing',
+  ];
+  if (secretGateIds.some(id => ids.has(id))) {
+    completions.push(runLocalStep(
+      'prepare-secret-gates',
+      'node',
+      ['scripts/loops-24/prepare-secret-gates.mjs'],
+      120_000
+    ));
+  }
+
   const outreachCandidate = candidates.find(candidate => candidate.id?.startsWith('cold-outreach-batch-'));
   if (outreachCandidate) {
     completions.push(runLocalStep('generate-cold-outreach-drafts', 'node', ['scripts/loops-24/generate-cold-outreach.mjs'], 120_000));
@@ -723,9 +737,9 @@ async function runAutoCompletions(candidates) {
 
   for (const candidate of candidates) {
     if (candidate.id === 'google-prospecting-api-key-missing') {
-      completions.push(blockedCompletion(candidate.id, 'Needs GOOGLE_MAPS_API_KEY or GOOGLE_PLACES_API_KEY; secrets are not written by the loop.'));
+      completions.push(blockedCompletion(candidate.id, 'Needs GOOGLE_MAPS_API_KEY or GOOGLE_PLACES_API_KEY; review the secret-gates handoff, then add the value only to the local runner environment.'));
     } else if (candidate.id === 'social-publisher-token-missing') {
-      completions.push(blockedCompletion(candidate.id, 'Needs SOCIAL_PUBLISHER_TOKEN or TRIGGER_TOKEN; secrets are not written by the loop.'));
+      completions.push(blockedCompletion(candidate.id, 'Needs SOCIAL_PUBLISHER_TOKEN or TRIGGER_TOKEN; review the secret-gates handoff, then add the value only to the local runner environment.'));
     } else if (candidate.id === 'social-publisher-health-failed') {
       completions.push(blockedCompletion(candidate.id, 'Live worker repair requires deployment review.'));
     } else if (candidate.id === 'webhook-cron-map') {
