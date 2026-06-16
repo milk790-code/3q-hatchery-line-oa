@@ -1080,18 +1080,48 @@ function blockedCompletion(label, reason, candidate = null) {
     escalated,
     escalation: escalated ? (candidate?.escalation || `blocked_over_${blockerEscalateHours}h`) : null,
     nextApproval: classifyApproval(label, candidate),
+    nextApprovals: classifyApprovalGates(label, candidate),
   };
 }
 
 function classifyApproval(label, candidate = null) {
+  return classifyApprovalGates(label, candidate)[0] || 'review';
+}
+
+function classifyApprovalGates(label, candidate = null) {
   const id = `${label} ${candidate?.id || ''}`.toLowerCase();
-  const text = `${id} ${candidate?.type || ''} ${candidate?.action || ''}`.toLowerCase();
-  if (/cold-outreach|outreach|manual-send|sending/.test(text)) return 'manual-send-approval';
-  if (/google-prospecting-api-key|social-publisher-token|secret-gates|api[_-]?key/.test(id)) return 'secret-input';
-  if (/webhook-cron|worker-deploy|deploy|cron-status|social-publisher-health|queue-list/.test(text)) return 'deploy-approval';
-  if (/github|local-pr|pr-readiness|pull request|push/.test(text)) return 'push-and-pr-approval';
-  if (/content-queue|wakeup|frontend|slice|handoff|worktree|wrangler-cache/.test(text)) return 'local-review';
-  return 'review';
+  const text = `${id} ${candidate?.manualGate || ''} ${candidate?.type || ''} ${candidate?.action || ''}`.toLowerCase();
+  const gates = [];
+  const addGate = gate => {
+    if (gate && !gates.includes(gate)) gates.push(gate);
+  };
+
+  switch (candidate?.manualGate || inferManualGate(candidate || {})) {
+    case 'manual_secret_input':
+      addGate('secret-input');
+      break;
+    case 'manual_send_only':
+      addGate('manual-send-approval');
+      break;
+    case 'manual_deploy_approval':
+      addGate('deploy-approval');
+      break;
+    case 'manual_create_only':
+      addGate(/github|local-pr|\bpr\b|pull request|push|merge|issue/.test(text) ? 'push-and-pr-approval' : 'local-review');
+      break;
+    case 'manual_review_only':
+      addGate('local-review');
+      break;
+    default:
+      break;
+  }
+
+  if (/cold-outreach|outreach|manual-send|sending/.test(text)) addGate('manual-send-approval');
+  if (/google-prospecting-api-key|social-publisher-token|secret-gates|api[_-]?key|secret|token/.test(text)) addGate('secret-input');
+  if (/webhook-cron|worker-deploy|deploy|cron-status|social-publisher-health|queue-list/.test(text)) addGate('deploy-approval');
+  if (/github|local-pr|pr-readiness|pull request|push/.test(text)) addGate('push-and-pr-approval');
+  if (/content-queue|wakeup|frontend|slice|handoff|worktree|wrangler-cache/.test(text)) addGate('local-review');
+  return gates.length ? gates : ['review'];
 }
 
 function completionSummary(label, data, result) {
@@ -1669,6 +1699,7 @@ function summarizeCompletion(item) {
     escalated: Boolean(item.escalated),
     escalation: item.escalation || null,
     nextApproval: item.nextApproval || null,
+    nextApprovals: item.nextApprovals || (item.nextApproval ? [item.nextApproval] : []),
   };
 }
 
@@ -1741,6 +1772,7 @@ function summarizeManualWaits(candidates, autoCompletions = []) {
         escalated: Boolean(candidate.escalated),
         escalation: candidate.escalation || null,
         nextApproval: classifyApproval(candidate.id || candidate.title || candidate.type, candidate),
+        nextApprovals: classifyApprovalGates(candidate.id || candidate.title || candidate.type, candidate),
       };
     });
 }
@@ -1748,12 +1780,14 @@ function summarizeManualWaits(candidates, autoCompletions = []) {
 function summarizeApprovals(blocked) {
   const groups = new Map();
   for (const item of blocked || []) {
-    const key = item.nextApproval || 'review';
-    const group = groups.get(key) || { approval: key, count: 0, escalated: 0, items: [] };
-    group.count++;
-    if (item.escalated) group.escalated++;
-    group.items.push(summarizeCompletion(item));
-    groups.set(key, group);
+    const keys = item.nextApprovals?.length ? item.nextApprovals : [item.nextApproval || 'review'];
+    for (const key of keys) {
+      const group = groups.get(key) || { approval: key, count: 0, escalated: 0, items: [] };
+      group.count++;
+      if (item.escalated) group.escalated++;
+      group.items.push(summarizeCompletion(item));
+      groups.set(key, group);
+    }
   }
   return Array.from(groups.values()).sort((a, b) => {
     if (b.escalated !== a.escalated) return b.escalated - a.escalated;
