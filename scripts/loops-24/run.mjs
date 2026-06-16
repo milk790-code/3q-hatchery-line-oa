@@ -174,6 +174,8 @@ async function discoverGitState() {
   const sliceHandoffCurrent = latestSliceHandoff?.statusFingerprint === statusFingerprint;
   const latestFrontendReview = await readJson(path.join(stateDir, 'frontend-artifact-reviews', 'latest.json'), null);
   const frontendReviewCurrent = latestFrontendReview?.statusFingerprint === statusFingerprint;
+  const latestWorkerDeployReview = await readJson(path.join(stateDir, 'worker-deploy-reviews', 'latest.json'), null);
+  const workerDeployReviewCurrent = latestWorkerDeployReview?.statusFingerprint === statusFingerprint;
 
   const counts = {
     staged: lines.filter(line => line[0] && line[0] !== ' ' && line[0] !== '?').length,
@@ -232,6 +234,7 @@ async function discoverGitState() {
         total: group.counts?.total || 0,
       })) : null,
       frontendReviewPath: frontendReviewCurrent ? latestFrontendReview.reportPath : null,
+      workerDeployReviewPath: workerDeployReviewCurrent ? latestWorkerDeployReview.reportPath : null,
     },
   }];
 }
@@ -668,6 +671,22 @@ async function runAutoCompletions(candidates) {
 
       const boundary = await readJson(path.join(stateDir, 'commit-boundaries', 'latest.json'), null);
       const groups = Array.isArray(boundary?.groups) ? boundary.groups : [];
+      if (groups.some(group => group.gate === 'deploy-approval')) {
+        const latestWorkerReview = await readJson(path.join(stateDir, 'worker-deploy-reviews', 'latest.json'), null);
+        if (latestWorkerReview?.statusFingerprint === boundary.statusFingerprint) {
+          completions.push(blockedCompletion(
+            'review:worker_deploy_slices',
+            `Current Worker deploy review already exists: ${latestWorkerReview.reportPath}`
+          ));
+        } else {
+          completions.push(runLocalStep(
+            'review:worker_deploy_slices',
+            'node',
+            ['scripts/loops-24/review-worker-deploy-slices.mjs'],
+            120_000
+          ));
+        }
+      }
       for (const group of groups) {
         if (group.gate === 'large-payload-review') {
           const latestReview = await readJson(path.join(stateDir, 'frontend-artifact-reviews', 'latest.json'), null);

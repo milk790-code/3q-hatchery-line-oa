@@ -248,6 +248,18 @@ directory but does not run it.
 powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\prepare-slice-handoff.ps1 -Group loops_control_plane
 ```
 
+## Review Worker deploy slices
+
+Create a local-only review for current `deploy-approval` Worker groups from the
+latest commit-boundary plan. The report runs JavaScript syntax checks, inspects
+Wrangler config basics, records endpoint signals, and scans for obvious secret
+literals. It does not stage, push, deploy, mutate Cloudflare settings, or call
+protected live endpoints.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\review-worker-deploy-slices.ps1
+```
+
 ## Review frontend/artifact payload
 
 Create a read-only inventory for the large frontend/artifact group from the
