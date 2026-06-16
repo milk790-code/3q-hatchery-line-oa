@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三根手指頭 × Phase 0 確認文件</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #4A7C59;
+    --primary-light: #A8C5A0;
+    --bg: #FEFDF8;
+    --accent: #F5EFD6;
+    --text: #2C2C2C;
+    --text-light: #666;
+    --border: #D8E8D4;
+    --white: #fff;
+    --red: #C0392B;
+    --orange: #E07B54;
+    --blue: #1B3A5C;
+    --gold: #C9A96E;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--primary);
+    color: #fff;
+    padding: 32px 24px 28px;
+    text-align: center;
+  }
+  header .logo-area { font-family: 'Noto Serif TC', serif; font-size: 26px; font-weight: 700; letter-spacing: 2px; }
+  header .subtitle { font-size: 13px; opacity: 0.85; margin-top: 6px; }
+  header .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 12px;
+    margin-top: 12px;
+  }
+
+  /* ── PROGRESS ── */
+  .progress-bar-wrap {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .progress-label { font-size: 12px; color: var(--text-light); margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .progress-track { background: #eee; border-radius: 10px; height: 8px; }
+  .progress-fill { background: var(--primary); height: 8px; border-radius: 10px; transition: width 0.5s ease; }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 780px; margin: 0 auto; padding: 0 16px 60px; }
+
+  /* ── SECTIONS ── */
+  .section {
+    background: var(--white);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    margin-top: 24px;
+    overflow: hidden;
+  }
+  .section-header {
+    background: var(--primary);
+    color: #fff;
+    padding: 16px 22px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-header .num {
+    background: rgba(255,255,255,0.25);
+    border-radius: 50%;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; flex-shrink: 0;
+  }
+  .section-header h2 { font-size: 16px; font-weight: 700; }
+  .section-header .tag {
+    margin-left: auto;
+    background: rgba(255,255,255,0.2);
+    border-radius: 12px;
+    padding: 2px 10px;
+    font-size: 11px;
+  }
+  .section-body { padding: 22px; }
+
+  /* ── CALLOUT BOXES ── */
+  .callout {
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+  .callout-info { background: #E8F4F0; border-left: 4px solid var(--primary); }
+  .callout-warn { background: #FFF8E7; border-left: 4px solid var(--orange); }
+  .callout-red  { background: #FEF0EE; border-left: 4px solid var(--red); }
+
+  /* ── INPUT FIELDS ── */
+  .field-group { margin-bottom: 18px; }
+  .field-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+    display: block;
+  }
+  .field-label .required { color: var(--red); margin-left: 3px; }
+  .field-label .hint { color: var(--text-light); font-weight: 400; margin-left: 6px; font-size: 12px; }
+  input[type="text"], input[type="number"], textarea, select {
+    width: 100%;
+    border: 1.5px solid #D5D5D5;
+    border-radius: 8px;
+    padding: 10px 13px;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--white);
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(74,124,89,0.12);
+  }
+  textarea { min-height: 80px; resize: vertical; }
+
+  /* ── COLOR PICKER ── */
+  .color-options { display: grid; gap: 12px; }
+  .color-card {
+    border: 2.5px solid #E0E0E0;
+    border-radius: 12px;
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .color-card:hover { border-color: var(--primary); }
+  .color-card.selected { border-color: var(--primary); background: #F2F9F4; }
+  .color-card .check {
+    position: absolute; top: 12px; right: 12px;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--primary);
+    display: none; align-items: center; justify-content: center;
+    color: white; font-size: 13px;
+  }
+  .color-card.selected .check { display: flex; }
+  .color-card input[type="radio"] { display: none; }
+  .color-card .palette {
+    display: flex; gap: 6px; margin-bottom: 10px;
+  }
+  .color-swatch { width: 28px; height: 28px; border-radius: 6px; }
+  .color-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .color-card p { font-size: 13px; color: var(--text-light); }
+  .color-card .tag-recommend {
+    display: inline-block;
+    background: var(--primary);
+    color: white;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-top: 6px;
+  }
+
+  /* ── CHECKLIST ── */
+  .checklist { list-style: none; }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px solid #F0F0F0;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li input[type="checkbox"] {
+    width: 20px; height: 20px; border-radius: 5px;
+    border: 2px solid #CCC; cursor: pointer;
+    flex-shrink: 0; margin-top: 2px;
+    accent-color: var(--primary);
+  }
+  .checklist li label { font-size: 14px; cursor: pointer; flex: 1; }
+  .checklist li label.done { text-decoration: line-through; color: var(--text-light); }
+  .checklist .badge-must {
+    background: var(--red); color: white;
+    font-size: 10px; padding: 2px 7px; border-radius: 10px; flex-shrink: 0;
+    margin-top: 3px;
+  }
+  .checklist .badge-nice {
+    background: #E8A000; color: white;
+    font-size: 10px; padding: 2px 7px; border-radius: 10px; flex-shrink: 0;
+    margin-top: 3px;
+  }
+  .checklist .badge-done {
+    background: var(--primary); color: white;
+    font-size: 10px; padding: 2px 7px; border-radius: 10px; flex-shrink: 0;
+    margin-top: 3px;
+  }
+  .group-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 18px 0 6px;
+    display: block;
+  }
+
+  /* ── PRICING TABLE ── */
+  .price-table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  .price-table th {
+    background: var(--accent);
+    padding: 10px 12px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text);
+  }
+  .price-table td { padding: 10px 12px; border-bottom: 1px solid #F0F0F0; }
+  .price-table tr:last-child td { border-bottom: none; }
+  .price-table .input-cell { padding: 6px 8px; }
+  .price-table input[type="number"] { padding: 7px 10px; font-size: 14px; }
+  .nt { color: var(--text-light); font-size: 13px; margin-right: 3px; }
+  .tbd { color: var(--orange); font-size: 12px; font-weight: 700; }
+
+  /* ── PHOTO LIST ── */
+  .photo-list { list-style: none; }
+  .photo-list li {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 0; border-bottom: 1px solid #F0F0F0;
+  }
+  .photo-list li:last-child { border-bottom: none; }
+  .photo-list .photo-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .photo-list .photo-info { flex: 1; }
+  .photo-list .photo-name { font-size: 14px; font-weight: 500; }
+  .photo-list .photo-hint { font-size: 12px; color: var(--text-light); }
+  .photo-list .photo-status select { font-size: 13px; padding: 6px 8px; width: auto; }
+
+  /* ── TAGS GRID ── */
+  .tag-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .tag-item {
+    background: var(--accent);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  .tag-item .tag-name { font-family: monospace; font-size: 12px; background: #fff; border-radius: 4px; padding: 2px 6px; display: inline-block; margin-bottom: 4px; }
+  .tag-item .tag-trigger { color: var(--text-light); font-size: 12px; }
+
+  /* ── SUBMIT ── */
+  .submit-wrap {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-top: 28px;
+    padding: 26px 22px;
+    text-align: center;
+  }
+  .submit-wrap h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .submit-wrap p { font-size: 14px; color: var(--text-light); margin-bottom: 20px; }
+  .btn-submit {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 40px;
+    font-size: 16px;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    letter-spacing: 1px;
+  }
+  .btn-submit:hover { background: #3d6b4a; }
+  .btn-submit:active { transform: scale(0.98); }
+  .btn-submit:disabled { background: #aaa; cursor: not-allowed; }
+
+  /* ── SUCCESS MODAL ── */
+  #successModal {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 999;
+    align-items: center; justify-content: center;
+  }
+  #successModal.show { display: flex; }
+  .modal-box {
+    background: white;
+    border-radius: 16px;
+    padding: 36px 28px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+  }
+  .modal-icon { font-size: 48px; margin-bottom: 14px; }
+  .modal-box h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+  .modal-box p { font-size: 14px; color: var(--text-light); line-height: 1.7; }
+  .modal-close {
+    margin-top: 22px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 32px;
+    font-size: 15px;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* ── MISC ── */
+  h3.sub-title { font-size: 15px; font-weight: 700; margin: 18px 0 10px; color: var(--primary); }
+  .divider { border: none; border-top: 1px solid #F0F0F0; margin: 18px 0; }
+  .note { font-size: 12px; color: var(--text-light); margin-top: 6px; }
+  .inforow { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .infopill {
+    background: var(--accent);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 13px;
+  }
+  .infopill strong { color: var(--primary); }
+
+  @media (max-width: 600px) {
+    .tag-grid { grid-template-columns: 1fr; }
+    .color-options { grid-template-columns: 1fr; }
+    header .logo-area { font-size: 21px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-area">三根手指頭｜洪川整合建設</div>
+  <div class="subtitle">Phase 0 交付文件 × 麥子確認頁</div>
+  <div class="badge">📅 7/1 開業倒數 · 請於 6/20（五）前完成確認</div>
+</header>
+
+<!-- STICKY PROGRESS -->
+<div class="progress-bar-wrap">
+  <div class="progress-label">
+    <span id="progressText">完成進度：計算中…</span>
+    <span id="progressPct">0%</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ══════════════════════════════════
+       SECTION 1: 品牌色選擇
+  ═══════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="num">1</div>
+      <h2>品牌色方案選擇</h2>
+      <div class="tag">三選一</div>
+    </div>
+    <div class="section-body">
+      <div class="callout callout-warn">
+        ⚠️ <strong>請在 6/20（五）前確認</strong>，3Q 才能啟動官網上稿和圖文選單設計。
+      </div>
+
+      <div class="color-options">
+
+        <!-- 方案 A -->
+        <label class="color-card" id="card-A" onclick="selectColor('A')">
+          <input type="radio" name="brandColor" value="A" id="colorA">
+          <div class="check">✓</div>
+          <div class="palette">
+            <div class="color-swatch" style="background:#C9A96E" title="霧金"></div>
+            <div class="color-swatch" style="background:#2C2C2C" title="深炭灰"></div>
+            <div class="color-swatch" style="background:#FAFAF8" title="米白" style="border:1px solid #eee"></div>
+            <div class="color-swatch" style="background:#E8F4F0" title="薄荷霧"></div>
+          </div>
+          <h3>方案 A｜霧金 × 白 — 「輕奢潔淨」</h3>
+          <p>想讓清潔服務顯得高端、不廉價。適合主打南屯中高收入家庭。</p>
+        </label>
+
+        <!-- 方案 B -->
+        <label class="color-card" id="card-B" onclick="selectColor('B')">
+          <input type="radio" name="brandColor" value="B" id="colorB">
+          <div class="check">✓</div>
+          <div class="palette">
+            <div class="color-swatch" style="background:#4A7C59" title="深草綠"></div>
+            <div class="color-swatch" style="background:#A8C5A0" title="薄荷綠"></div>
+            <div class="color-swatch" style="background:#FEFDF8" title="暖白" style="border:1px solid #eee"></div>
+            <div class="color-swatch" style="background:#F5EFD6" title="麥稈黃"></div>
+          </div>
+          <h3>方案 B｜草本綠 × 米白 — 「自然潔家」</h3>
+          <p>強調健康/除塵蟎/過敏改善，家庭客感覺最安全。未來加美容線也自然。</p>
+          <span class="tag-recommend">⭐ 3Q 首選推薦</span>
+        </label>
+
+        <!-- 方案 C -->
+        <label class="color-card" id="card-C" onclick="selectColor('C')">
+          <input type="radio" name="brandColor" value="C" id="colorC">
+          <div class="check">✓</div>
+          <div class="palette">
+            <div class="color-swatch" style="background:#1B3A5C" title="深海藍"></div>
+            <div class="color-swatch" style="background:#E07B54" title="珊瑚橙"></div>
+            <div class="color-swatch" style="background:#F8F9FA" title="淺灰白" style="border:1px solid #eee"></div>
+            <div class="color-swatch" style="background:#FEF3EE" title="杏橙霧"></div>
+          </div>
+          <h3>方案 C｜深藍 × 珊瑚橙 — 「值得信賴的專業」</h3>
+          <p>跟一般家事服務做區隔，走「整合建設」感，顯得正式專業。</p>
+        </label>
+
+      </div>
+
+      <div class="field-group" style="margin-top:16px">
+        <label class="field-label">補充說明或偏好<span class="hint">（選填）</span></label>
+        <textarea id="colorNote" placeholder="例如：我想要 A 的高端感但搭配 B 的綠色也可以討論……"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SECTION 2: 定價確認
+  ═══════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="num">2</div>
+      <h2>定價確認</h2>
+      <div class="tag">填入數字</div>
+    </div>
+    <div class="section-body">
+      <div class="callout callout-info">
+        3Q 已依市場行情提供建議值，<strong>請麥子確認或調整後填入</strong>，這些數字會直接上官網和 LINE OA。
+      </div>
+
+      <h3 class="sub-title">🧹 除塵蟎清潔（全室）— 依坪數定價</h3>
+      <table class="price-table">
+        <thead>
+          <tr>
+            <th>坪數區間</th>
+            <th>3Q 建議價</th>
+            <th>麥子確認價格（NT$）</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>20坪以下</td>
+            <td><span class="nt">NT$</span>2,000</td>
+            <td class="input-cell"><input type="number" id="price_20" placeholder="2000" min="0"></td>
+          </tr>
+          <tr>
+            <td>21–30坪</td>
+            <td><span class="nt">NT$</span>2,800</td>
+            <td class="input-cell"><input type="number" id="price_30" placeholder="2800" min="0"></td>
+          </tr>
+          <tr>
+            <td>31–40坪</td>
+            <td><span class="nt">NT$</span>3,500</td>
+            <td class="input-cell"><input type="number" id="price_40" placeholder="3500" min="0"></td>
+          </tr>
+          <tr>
+            <td>40坪以上</td>
+            <td><span class="nt">NT$</span>4,500 起</td>
+            <td class="input-cell"><input type="number" id="price_40plus" placeholder="4500" min="0"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <hr class="divider">
+
+      <h3 class="sub-title">🎟️ 第一階：體驗券</h3>
+      <div class="field-group">
+        <label class="field-label">除塵蟎局部體驗券（指定 1 房間）<span class="required">*</span><span class="hint">3Q 建議 NT$299</span></label>
+        <div style="display:flex; align-items:center; gap:8px">
+          <span style="color:var(--text-light); font-size:14px">NT$</span>
+          <input type="number" id="price_voucher" placeholder="299" min="0" style="max-width:140px">
+        </div>
+        <p class="note">體驗券加好友後可領，不需先付款（降低摩擦）</p>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">肌膚諮詢體驗（20 分鐘）<span class="hint">3Q 建議 NT$199</span></label>
+        <div style="display:flex; align-items:center; gap:8px">
+          <span style="color:var(--text-light); font-size:14px">NT$</span>
+          <input type="number" id="price_skin" placeholder="199" min="0" style="max-width:140px">
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <h3 class="sub-title">💆 美容服務（台中南屯）</h3>
+      <div class="field-group">
+        <label class="field-label">臉部肌膚管理（清粉刺/保濕護理）<span class="hint">3Q 建議 NT$1,200–2,500</span></label>
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+          <span style="font-size:13px; color:var(--text-light)">NT$</span>
+          <input type="number" id="price_beauty_low" placeholder="1200" min="0" style="max-width:120px">
+          <span style="color:var(--text-light)">–</span>
+          <input type="number" id="price_beauty_high" placeholder="2500" min="0" style="max-width:120px">
+          <span style="font-size:13px; color:var(--text-light)">（填區間）</span>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">肌膚定期護理月票（每月 2 次）<span class="hint">3Q 建議 NT$3,000/月</span></label>
+        <div style="display:flex; align-items:center; gap:8px">
+          <span style="color:var(--text-light); font-size:14px">NT$</span>
+          <input type="number" id="price_monthly" placeholder="3000" min="0" style="max-width:140px">
+          <span style="font-size:13px; color:var(--text-light)">/月</span>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">其他補充或想法<span class="hint">（選填）</span></label>
+        <textarea id="priceNote" placeholder="例如：局部清潔（臥室+客廳）的組合價想定 NT$1,800……"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SECTION 3: 照片清單確認
+  ═══════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="num">3</div>
+      <h2>照片準備狀態</h2>
+      <div class="tag">下週五前交給 3Q</div>
+    </div>
+    <div class="section-body">
+      <div class="callout callout-warn">
+        ⚠️ <strong>照片是官網上稿的前置條件</strong>。請逐一確認手邊是否有這些素材，沒有的告知 3Q 替代方案。
+      </div>
+      <ul class="photo-list" id="photoList">
+        <li>
+          <div class="photo-icon">🤖</div>
+          <div class="photo-info">
+            <div class="photo-name">清潔設備照（RITELLO）正面 × 1</div>
+            <div class="photo-hint">服務頁主視覺，需清楚</div>
+          </div>
+          <div class="photo-status">
+            <select class="photo-select" data-photo="ritello_front">
+              <option value="">-- 狀態 --</option>
+              <option value="ready">✅ 有，準備上傳</option>
+              <option value="need_shoot">📷 需要拍攝</option>
+              <option value="no">❌ 暫無</option>
+            </select>
+          </div>
+        </li>
+        <li>
+          <div class="photo-icon">🤖</div>
+          <div class="photo-info">
+            <div class="photo-name">RITELLO 使用中抓拍 × 1</div>
+            <div class="photo-hint">帶動態感，讓客戶感受服務過程</div>
+          </div>
+          <div class="photo-status">
+            <select class="photo-select" data-photo="ritello_action">
+              <option value="">-- 狀態 --</option>
+              <option value="ready">✅ 有，準備上傳</option>
+              <option value="need_shoot">📷 需要拍攝</option>
+              <option value="no">❌ 暫無</option>
+            </select>
+          </div>
+        </li>
+        <li>
+          <div class="photo-icon">🧪</div>
+          <div class="photo-info">
+            <div class="photo-name">除塵蟎前後對比（集塵桶特寫）× 1</div>
+            <div class="photo-hint">信任感最強的素材，強烈建議有</div>
+          </div>
+          <div class="photo-status">
+            <select class="photo-select" data-photo="before_after">
+              <option value="">-- 狀態 --</option>
+              <option value="ready">✅ 有，準備上傳</option>
+              <option value="need_shoot">📷 需要拍攝</option>
+              <option value="no">❌ 暫無</option>
+            </select>
+          </div>
+        </li>
+        <li>
+          <div class="photo-icon">💄</div>
+          <div class="photo-info">
+            <div class="photo-name">美容產品陳列照（淡雅背景）× 1</div>
+            <div class="photo-hint">美容服務頁用</div>
+          </div>
+          <div class="photo-status">
+            <select class="photo-select" data-photo="beauty_products">
+              <option value="">-- 狀態 --</option>
+              <option value="ready">✅ 有，準備上傳</option>
+              <option value="need_shoot">📷 需要拍攝</option>
+              <option value="no">❌ 暫無</option>
+            </select>
+          </div>
+        </li>
+        <li>
+          <div class="photo-icon">🏠</div>
+          <div class="photo-info">
+            <div class="photo-name">高雄門牌＋工具車 × 1</div>
+            <div class="photo-hint">修繕服務頁，展示父親工程行背景</div>
+          </div>
+          <div class="photo-status">
+            <select class="photo-select" data-photo="kaohsiung_store">
+              <option value="">-- 狀態 --</option>
+              <option value="ready">✅ 有，準備上傳</option>
+              <option value="need_shoot">📷 需要拍攝</option>
+              <option value="no">❌ 暫無</option>
+            </select>
+          </div>
+        </li>
+        <li>
+          <div class="photo-icon">🙋</div>
+          <div class="photo-info">
+            <div class="photo-name">麥子本人照（自然光，服裝乾淨）× 1</div>
+            <div class="photo-hint">關於頁 + 信任區，讓客戶看到你是誰</div>
+          </div>
+          <div class="photo-status">
+            <select class="photo-select" data-photo="founder_photo">
+              <option value="">-- 狀態 --</option>
+              <option value="ready">✅ 有，準備上傳</option>
+              <option value="need_shoot">📷 需要拍攝</option>
+              <option value="no">❌ 暫無</option>
+            </select>
+          </div>
+        </li>
+      </ul>
+      <div class="field-group" style="margin-top:16px">
+        <label class="field-label">照片補充說明<span class="hint">（選填）</span></label>
+        <textarea id="photoNote" placeholder="例如：RITELLO 照片上週拍了幾張，品質不確定夠不夠，要給你看……"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SECTION 4: LINE OA 歡迎訊息體驗價
+  ═══════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="num">4</div>
+      <h2>LINE OA 設定確認</h2>
+      <div class="tag">@648lwzbi</div>
+    </div>
+    <div class="section-body">
+
+      <div class="callout callout-info">
+        帳號 ID <strong>@648lwzbi</strong>。歡迎訊息已草擬，有一個地方需要麥子填入數字才能上稿：
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">歡迎訊息體驗券價格<span class="required">*</span></label>
+        <p style="font-size:13px; color:var(--text-light); margin-bottom:10px; background:#F7F7F7; padding:12px; border-radius:8px; line-height:1.8">
+          歡迎訊息預覽：<br>
+          「✨ 現在加入，享有早鳥優惠<br>
+          7/1正式開業特惠｜首次除塵蟎體驗價 <strong style="color:var(--red)">NT$[這裡填入]</strong>」
+        </p>
+        <div style="display:flex; align-items:center; gap:8px">
+          <span style="color:var(--text-light); font-size:14px">NT$</span>
+          <input type="number" id="welcome_price" placeholder="例如：299" min="0" style="max-width:160px">
+        </div>
+        <p class="note">通常跟體驗券定價相同，但可以分開設定（歡迎訊息強調早鳥限定感）</p>
+      </div>
+
+      <hr class="divider">
+
+      <h3 class="sub-title">圖文選單 4 格確認</h3>
+      <div class="callout callout-info" style="margin-bottom:14px">
+        3Q 規劃的 4 格配置如下，請確認或提出修改意見：
+      </div>
+      <table class="price-table" style="margin-bottom:12px">
+        <thead><tr><th>位置</th><th>圖示</th><th>標題</th><th>功能</th></tr></thead>
+        <tbody>
+          <tr><td>左上</td><td>🏠</td><td>官網</td><td>開啟官網首頁</td></tr>
+          <tr><td>右上</td><td>📅</td><td>預約服務</td><td>預約系統</td></tr>
+          <tr><td>左下</td><td>🎟️</td><td>優惠券</td><td>早鳥優惠頁</td></tr>
+          <tr><td>右下</td><td>📰</td><td>最新消息</td><td>官網 /news</td></tr>
+        </tbody>
+      </table>
+      <div class="field-group">
+        <label class="field-label">圖文選單修改意見<span class="hint">（沒意見寫「OK」即可）</span></label>
+        <textarea id="menuNote" placeholder="例如：右上的「預約服務」改成「清潔報價」……"></textarea>
+      </div>
+
+      <hr class="divider">
+
+      <h3 class="sub-title">認證帳號送審資料</h3>
+      <div class="inforow">
+        <div class="infopill"><strong>統一編號</strong>：62086050</div>
+        <div class="infopill"><strong>類別</strong>：生活服務 › 清潔/整理</div>
+        <div class="infopill"><strong>狀態</strong>：等 6/22 門牌</div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">6/22 取得門牌後</label>
+        <select id="auth_confirm">
+          <option value="">-- 選擇 --</option>
+          <option value="3q_do">✅ 確認，由 3Q 協助送審</option>
+          <option value="self_do">我自己處理</option>
+          <option value="delay">需要延後</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SECTION 5: 7/1 Checklist
+  ═══════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="num">5</div>
+      <h2>7/1 開業倒數 Checklist</h2>
+      <div class="tag">麥子親自打勾</div>
+    </div>
+    <div class="section-body">
+      <div class="callout callout-red">
+        🔴 <strong>紅色必做項目影響能否開門接客</strong>，請確認每一項進度。
+      </div>
+
+      <span class="group-label">🔴 法務行政</span>
+      <ul class="checklist" id="checklist-legal">
+        <li>
+          <input type="checkbox" id="c1" class="checklist-item">
+          <label for="c1">6/22 簽約並取得門牌（台中南屯借址，與五權合庫同址）</label>
+          <span class="badge-must">必做</span>
+        </li>
+        <li>
+          <input type="checkbox" id="c2" class="checklist-item">
+          <label for="c2">6/22 後送件：公司地址變更登記（統編 62086050）</label>
+          <span class="badge-must">必做</span>
+        </li>
+        <li>
+          <input type="checkbox" id="c3" class="checklist-item">
+          <label for="c3">尾款 NT$38,000 最晚本週由公司帳戶匯入</label>
+          <span class="badge-must">必做</span>
+        </li>
+        <li>
+          <input type="checkbox" id="c4" class="checklist-item">
+          <label for="c4">發票事宜確認（合作行銷公司代開，含統編）</label>
+          <span class="badge-must">必做</span>
+        </li>
+      </ul>
+
+      <span class="group-label">🌐 官網上線</span>
+      <ul class="checklist">
+        <li>
+          <input type="checkbox" id="c5" class="checklist-item">
+          <label for="c5">確認品牌色方案（A/B/C 三選一 → 見上方第一題）</label>
+          <span class="badge-must">必做</span>
+        </li>
+        <li>
+          <input type="checkbox" id="c6" class="checklist-item">
+          <label for="c6">補齊 6 張照片（下週五前交給 3Q → 見上方第三題）</label>
+          <span class="badge-must">必做</span>
+        </li>
+        <li>
+          <input type="checkbox" id="c7" class="checklist-item">
+          <label for="c7">確認網域選擇（threefingers.tw / sanfinger.com.tw，3Q 查詢可用性）</label>
+          <span class="badge-must">必做</span>
+        </li>
+        <li>
+          <input type="checkbox" id="c8" class="checklist-item">
+          <label for="c8">官網定稿親審並簽核（3Q 交付後）</label>
+          <span class="badge-must">必做</span>
+        </li>
+        <li>
+          <input type="checkbox" id="c9" class="checklist-item">
+          <label for="c9">7/1 前官網設為公開可搜尋</label>
+          <span class="badge-must">必做</span>
+        </li>
+      </ul>
+
+      <span class="group-label">📱 LINE OA</span>
+      <ul class="checklist">
+        <li>
+          <input type="checkbox" id="c10" class="checklist-item">
+          <label for="c10">確認歡迎訊息體驗券價格（→ 見上方第四題）</label>
+          <span class="badge-must">必做</span>
+        </li>
+        <li>
+          <input type="checkbox" id="c11" class="checklist-item">
+          <label for="c11">確認圖文選單 4 格（→ 見上方第四題）</label>
+          <span class="badge-must">必做</span>
+        </li>
+        <li>
+          <input type="checkbox" id="c12" class="checklist-item">
+          <label for="c12">LINE 認證帳號送審（取得門牌後，3Q 協助）</label>
+          <span class="badge-must">必做</span>
+        </li>
+        <li>
+          <input type="checkbox" id="c13" class="checklist-item">
+          <label for="c13">加好友→歡迎訊息→自動回覆 全程測試一遍</label>
+          <span class="badge-must">必做</span>
+        </li>
+      </ul>
+
+      <span class="group-label">💰 商品定價</span>
+      <ul class="checklist">
+        <li>
+          <input type="checkbox" id="c14" class="checklist-item">
+          <label for="c14">確認清潔各坪數定價（→ 見上方第二題）</label>
+          <span class="badge-must">必做</span>
+        </li>
+        <li>
+          <input type="checkbox" id="c15" class="checklist-item">
+          <label for="c15">確認美容服務定價（→ 見上方第二題）</label>
+          <span class="badge-must">必做</span>
+        </li>
+        <li>
+          <input type="checkbox" id="c16" class="checklist-item">
+          <label for="c16">整理團購廠商品項清單給 3Q（含直銷品詢價制確認）</label>
+          <span class="badge-must">必做</span>
+        </li>
+        <li>
+          <input type="checkbox" id="c17" class="checklist-item">
+          <label for="c17">確認第一階體驗券定價與有效期</label>
+          <span class="badge-must">必做</span>
+        </li>
+      </ul>
+
+      <span class="group-label">🟡 重要但可 7/1 後繼續完善</span>
+      <ul class="checklist">
+        <li>
+          <input type="checkbox" id="c18" class="checklist-item">
+          <label for="c18">現有 10+ 穩定客戶，逐一邀請加 LINE OA</label>
+          <span class="badge-nice">次要</span>
+        </li>
+        <li>
+          <input type="checkbox" id="c19" class="checklist-item">
+          <label for="c19">建立 Google 試算表客戶記錄檔</label>
+          <span class="badge-nice">次要</span>
+        </li>
+        <li>
+          <input type="checkbox" id="c20" class="checklist-item">
+          <label for="c20">開業公告文（IG/脆/LINE OA 推播）— 3Q 代筆，麥子確認</label>
+          <span class="badge-nice">次要</span>
+        </li>
+        <li>
+          <input type="checkbox" id="c21" class="checklist-item">
+          <label for="c21">開業優惠設定（7/1 起 1 週早鳥方案）</label>
+          <span class="badge-nice">次要</span>
+        </li>
+        <li>
+          <input type="checkbox" id="c22" class="checklist-item">
+          <label for="c22">SBIR 6/26 截止 — 確認本期是否參與</label>
+          <span class="badge-nice">次要</span>
+        </li>
+      </ul>
+
+      <span class="group-label">✅ 3Q 已完成</span>
+      <ul class="checklist">
+        <li>
+          <input type="checkbox" id="c_d1" checked disabled>
+          <label for="c_d1" class="done">品牌色提案（三方案）</label>
+          <span class="badge-done">完成</span>
+        </li>
+        <li>
+          <input type="checkbox" id="c_d2" checked disabled>
+          <label for="c_d2" class="done">官網架構規格</label>
+          <span class="badge-done">完成</span>
+        </li>
+        <li>
+          <input type="checkbox" id="c_d3" checked disabled>
+          <label for="c_d3" class="done">LINE OA 設定規格</label>
+          <span class="badge-done">完成</span>
+        </li>
+        <li>
+          <input type="checkbox" id="c_d4" checked disabled>
+          <label for="c_d4" class="done">商品階梯 v1</label>
+          <span class="badge-done">完成</span>
+        </li>
+        <li>
+          <input type="checkbox" id="c_d5" checked disabled>
+          <label for="c_d5" class="done">會員池標籤系統</label>
+          <span class="badge-done">完成</span>
+        </li>
+      </ul>
+
+      <div class="field-group" style="margin-top:16px">
+        <label class="field-label">Checklist 補充說明<span class="hint">（哪一件有卡點？寫給 3Q 知道）</span></label>
+        <textarea id="checklistNote" placeholder="例如：c3 尾款我這週五匯，c7 我想用 threefingers.tw……"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SECTION 6: 會員池標籤確認
+  ═══════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="num">6</div>
+      <h2>會員池標籤系統</h2>
+      <div class="tag">參考用，不需填空</div>
+    </div>
+    <div class="section-body">
+      <div class="callout callout-info">
+        以下是 3Q 規劃的 LINE OA 標籤系統，麥子服務完客戶後，到 LINE OA 後台手動給對應標籤即可。
+      </div>
+
+      <h3 class="sub-title">層 1：服務興趣</h3>
+      <div class="tag-grid">
+        <div class="tag-item"><div class="tag-name">興趣_清潔</div><div class="tag-trigger">詢問清潔/除塵蟎</div></div>
+        <div class="tag-item"><div class="tag-name">興趣_美容</div><div class="tag-trigger">詢問美容/清粉刺</div></div>
+        <div class="tag-item"><div class="tag-name">興趣_修繕</div><div class="tag-trigger">詢問修繕/工程</div></div>
+        <div class="tag-item"><div class="tag-name">興趣_團購</div><div class="tag-trigger">詢問商品/團購</div></div>
+      </div>
+
+      <h3 class="sub-title" style="margin-top:16px">層 2：地區</h3>
+      <div class="tag-grid">
+        <div class="tag-item"><div class="tag-name">地區_台中</div><div class="tag-trigger">地址含台中</div></div>
+        <div class="tag-item"><div class="tag-name">地區_彰化</div><div class="tag-trigger">地址含彰化</div></div>
+        <div class="tag-item"><div class="tag-name">地區_高雄</div><div class="tag-trigger">地址含高雄（工程線）</div></div>
+        <div class="tag-item"><div class="tag-name">地區_其他</div><div class="tag-trigger">其他地區詢問</div></div>
+      </div>
+
+      <h3 class="sub-title" style="margin-top:16px">層 3：客戶狀態</h3>
+      <div class="tag-grid">
+        <div class="tag-item"><div class="tag-name">潛在_詢問</div><div class="tag-trigger">有詢問訊息</div></div>
+        <div class="tag-item"><div class="tag-name">潛在_報價</div><div class="tag-trigger">已取得報價</div></div>
+        <div class="tag-item"><div class="tag-name">付費_清潔</div><div class="tag-trigger">完成清潔首次付款</div></div>
+        <div class="tag-item"><div class="tag-name">付費_美容</div><div class="tag-trigger">完成美容首次付款</div></div>
+        <div class="tag-item"><div class="tag-name">付費_修繕</div><div class="tag-trigger">完成修繕首次付款</div></div>
+        <div class="tag-item"><div class="tag-name">回頭客</div><div class="tag-trigger">第 2 次以上付款</div></div>
+        <div class="tag-item"><div class="tag-name">轉介人</div><div class="tag-trigger">介紹新客戶來的</div></div>
+      </div>
+
+      <div class="field-group" style="margin-top:18px">
+        <label class="field-label">對標籤系統有什麼想法？<span class="hint">（選填）</span></label>
+        <textarea id="tagNote" placeholder="例如：想加一個「修繕_高雄」的標籤，因為爸爸那邊的客獨立管理……"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SUBMIT
+  ═══════════════════════════════════ -->
+  <div class="submit-wrap">
+    <h3>填完了！送給 3Q</h3>
+    <p>確認後 3Q 會整理你的回覆，安排下一步動作。<br>有任何疑問直接 LINE 問學誼就好 🙌</p>
+    <button class="btn-submit" id="submitBtn" onclick="handleSubmit()">確認送出</button>
+    <p class="note" style="margin-top:12px">送出後頁面會顯示你的回覆摘要，也可以截圖存檔</p>
+  </div>
+
+</div>
+
+<!-- SUCCESS MODAL -->
+<div id="successModal">
+  <div class="modal-box">
+    <div class="modal-icon">🎉</div>
+    <h3>謝謝麥子！</h3>
+    <p>你的確認資料已記錄。3Q 收到後會整理成行動清單並回覆你。<br><br>
+    <strong>下一步</strong>：學誼看到會直接 LINE 跟你說明哪些可以馬上推進。<br><br>
+    7/1 開業加油 💪</p>
+    <button class="modal-close" onclick="closeModal()">確定</button>
+  </div>
+</div>
+
+<script>
+// ── COLOR PICKER ──
+function selectColor(opt) {
+  ['A','B','C'].forEach(x => {
+    document.getElementById('card-' + x).classList.remove('selected');
+  });
+  document.getElementById('card-' + opt).classList.add('selected');
+  document.getElementById('color' + opt).checked = true;
+  updateProgress();
+}
+
+// ── PROGRESS TRACKER ──
+function updateProgress() {
+  const items = [];
+
+  // 1. color selected
+  const colorSelected = document.querySelector('input[name="brandColor"]:checked');
+  items.push({ done: !!colorSelected, label: '品牌色' });
+
+  // 2. price_voucher filled
+  const voucher = document.getElementById('price_voucher').value;
+  items.push({ done: !!voucher, label: '體驗券定價' });
+
+  // 3. price_20 filled
+  const p20 = document.getElementById('price_20').value;
+  items.push({ done: !!p20, label: '清潔20坪定價' });
+
+  // 4. welcome_price filled
+  const wprice = document.getElementById('welcome_price').value;
+  items.push({ done: !!wprice, label: 'LINE歡迎訊息價格' });
+
+  // 5. at least 3 photo statuses filled
+  const photoSels = document.querySelectorAll('.photo-select');
+  let photoFilled = 0;
+  photoSels.forEach(s => { if (s.value) photoFilled++; });
+  items.push({ done: photoFilled >= 4, label: `照片狀態 (${photoFilled}/6)` });
+
+  // 6. at least 10 checklist items checked
+  const cItems = document.querySelectorAll('.checklist-item:not(:disabled)');
+  let cChecked = 0;
+  cItems.forEach(c => { if (c.checked) cChecked++; });
+  items.push({ done: cChecked >= 8, label: `Checklist (${cChecked}/${cItems.length})` });
+
+  // 7. auth_confirm filled
+  const auth = document.getElementById('auth_confirm').value;
+  items.push({ done: !!auth, label: '認證送審確認' });
+
+  const done = items.filter(i => i.done).length;
+  const total = items.length;
+  const pct = Math.round(done / total * 100);
+
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+
+  const remaining = items.filter(i => !i.done).map(i => i.label);
+  if (pct === 100) {
+    document.getElementById('progressText').textContent = '✅ 全部完成！可以送出了';
+  } else {
+    document.getElementById('progressText').textContent = `未完成：${remaining.join('、')}`;
+  }
+}
+
+// ── ATTACH LISTENERS ──
+document.querySelectorAll('input, textarea, select').forEach(el => {
+  el.addEventListener('change', updateProgress);
+  el.addEventListener('input', updateProgress);
+});
+document.querySelectorAll('.checklist-item').forEach(c => {
+  c.addEventListener('change', updateProgress);
+});
+
+// ── SUBMIT ──
+function handleSubmit() {
+  const colorSel = document.querySelector('input[name="brandColor"]:checked');
+  const colorLabels = { A: '方案 A｜霧金', B: '方案 B｜草本綠（3Q 推薦）', C: '方案 C｜深藍珊瑚橙' };
+
+  // collect photo statuses
+  const photoMap = { ready: '已有', need_shoot: '需拍攝', no: '暫無', '': '未填' };
+  const photoSels = document.querySelectorAll('.photo-select');
+  let photoLines = [];
+  photoSels.forEach(s => {
+    photoLines.push(`• ${s.dataset.photo}: ${photoMap[s.value] || '未填'}`);
+  });
+
+  // collect checklist
+  const cItems = document.querySelectorAll('.checklist-item:not(:disabled)');
+  let cDone = 0, cTotal = 0;
+  cItems.forEach(c => { cTotal++; if (c.checked) cDone++; });
+
+  const summary = [
+    '=== 三根手指頭 Phase 0 確認摘要 ===',
+    '日期：' + new Date().toLocaleDateString('zh-TW'),
+    '',
+    '[1] 品牌色：' + (colorSel ? colorLabels[colorSel.value] : '未選擇'),
+    '    備註：' + (document.getElementById('colorNote').value || '（無）'),
+    '',
+    '[2] 定價：',
+    '    清潔 20坪: NT$' + (document.getElementById('price_20').value || '未填'),
+    '    清潔 21-30坪: NT$' + (document.getElementById('price_30').value || '未填'),
+    '    清潔 31-40坪: NT$' + (document.getElementById('price_40').value || '未填'),
+    '    清潔 40坪+: NT$' + (document.getElementById('price_40plus').value || '未填'),
+    '    體驗券: NT$' + (document.getElementById('price_voucher').value || '未填'),
+    '    肌膚諮詢: NT$' + (document.getElementById('price_skin').value || '未填'),
+    '    美容服務: NT$' + (document.getElementById('price_beauty_low').value || '?') + '-' + (document.getElementById('price_beauty_high').value || '?'),
+    '    月票: NT$' + (document.getElementById('price_monthly').value || '未填'),
+    '    備註：' + (document.getElementById('priceNote').value || '（無）'),
+    '',
+    '[3] 照片狀態：',
+    photoLines.join('\n'),
+    '    備註：' + (document.getElementById('photoNote').value || '（無）'),
+    '',
+    '[4] LINE OA：',
+    '    歡迎訊息體驗價: NT$' + (document.getElementById('welcome_price').value || '未填'),
+    '    圖文選單意見：' + (document.getElementById('menuNote').value || '（無）'),
+    '    認證送審：' + (document.getElementById('auth_confirm').value || '未選'),
+    '',
+    '[5] Checklist：' + cDone + '/' + cTotal + ' 項已完成',
+    '    備註：' + (document.getElementById('checklistNote').value || '（無）'),
+    '',
+    '[6] 標籤備註：' + (document.getElementById('tagNote').value || '（無）'),
+  ].join('\n');
+
+  // open email pre-filled
+  const subject = encodeURIComponent('三根手指頭 Phase 0 確認回覆');
+  const body = encodeURIComponent(summary);
+  window.location.href = `mailto:milk790@gmail.com?subject=${subject}&body=${body}`;
+
+  document.getElementById('successModal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('successModal').classList.remove('show');
+}
+
+// init
+updateProgress();
+</script>
+</body>
+</html>
