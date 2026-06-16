@@ -89,11 +89,19 @@ const registry = await readTaskRegistries();
 const classified = classifyHits(hits, registry.tasks);
 const memoryStatus = await prepareSharedMemoryCopy();
 const summary = buildSummary(classified, registry, memoryStatus);
+const jsonPath = path.join(outDir, `${stamp}-manual-gate-adapter.json`);
+const reportPath = path.join(outDir, `${stamp}-manual-gate-adapter.md`);
+const latestJsonPath = path.join(outDir, 'latest.json');
+const latestReportPath = path.join(outDir, 'latest.md');
 
 const payload = {
   generatedAt: new Date().toISOString(),
   repoRoot,
   stateDir,
+  reportPath,
+  jsonPath,
+  latestJsonPath,
+  latestReportPath,
   summary,
   gates: classified,
   registry,
@@ -101,12 +109,10 @@ const payload = {
   redLines: gateRules.map(rule => ({ gate: rule.gate, hardStop: rule.hardStop })),
 };
 
-const jsonPath = path.join(outDir, `${stamp}-manual-gate-adapter.json`);
-const reportPath = path.join(outDir, `${stamp}-manual-gate-adapter.md`);
 await fs.writeFile(jsonPath, JSON.stringify(payload, null, 2));
 await fs.writeFile(reportPath, renderMarkdown(payload));
-await fs.copyFile(jsonPath, path.join(outDir, 'latest.json'));
-await fs.copyFile(reportPath, path.join(outDir, 'latest.md'));
+await fs.copyFile(jsonPath, latestJsonPath);
+await fs.copyFile(reportPath, latestReportPath);
 
 console.log(JSON.stringify({
   ok: true,
