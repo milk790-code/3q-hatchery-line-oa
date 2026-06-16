@@ -1,6 +1,15 @@
-// 3Q Hatchery — Social Publisher Worker v2.3
+// 3Q Hatchery — Social Publisher Worker v2.6
 // Auto-posts to Threads, Instagram, Facebook Page, TikTok, Google Business Profile
 // Tokens stored in SESSION KV and auto-refreshed every 50 days — no manual renewal.
+//
+// v2.6 (2026-06-17):
+//   - /queue/list gains filters, status counts, overdue counts, and a read-only
+//     dashboard at /queue/dashboard so queue state no longer depends on Actions logs.
+//   - /queue/add skipped rows include reason + duplicate fields.
+//
+// v2.5 (2026-06-17):
+//   - /queue/add 去重納入 link_url + scheduled_at，允許同文不同日期/UTM 的
+//     30 天 campaign feed 正常排入，仍防止完全相同 pending row 雙投。
 //
 // v2.3 (2026-06-12):
 //   - /queue/add 去重:platform+caption+seed+image 與 pending 列完全相同 → skip
@@ -683,6 +692,130 @@ function tokensMatch(a, b) {
   return diff === 0;
 }
 
+function clampLimit(value, fallback = 100, max = 500) {
+  const n = Number(value);
+  if (!Number.isInteger(n) || n <= 0) return fallback;
+  return Math.min(n, max);
+}
+
+function htmlEscape(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function bindQuery(stmt, values) {
+  return values.length ? stmt.bind(...values) : stmt;
+}
+
+async function queueSnapshot(env, url) {
+  const limit = clampLimit(url.searchParams.get('limit'), 100, 500);
+  const platform = url.searchParams.get('platform');
+  const status = url.searchParams.get('status');
+  const source = url.searchParams.get('source_oa');
+  const nowIso = new Date().toISOString();
+  const where = [];
+  const binds = [];
+  if (platform) { where.push('platform = ?'); binds.push(platform); }
+  if (status) { where.push('status = ?'); binds.push(status); }
+  if (source) { where.push('source_oa = ?'); binds.push(source); }
+  const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
+
+  const rowStmt = env.CRM.prepare(
+      `SELECT id, platform, substr(COALESCE(caption, caption_seed), 1, 80) AS preview,
+              link_url, scheduled_at, status, source_oa, error_msg, created_at, published_at
+       FROM content_queue ${whereSql}
+       ORDER BY id DESC LIMIT ?`
+    );
+  const countStmt = env.CRM.prepare(
+      `SELECT platform, status, COUNT(*) AS n
+       FROM content_queue ${whereSql}
+       GROUP BY platform, status
+       ORDER BY platform, status`
+    );
+
+  const [rows, counts, overdue] = await Promise.all([
+    rowStmt.bind(...binds, limit).all(),
+    bindQuery(countStmt, binds).all(),
+    env.CRM.prepare(
+      `SELECT platform, COUNT(*) AS n
+       FROM content_queue
+       WHERE status='pending' AND scheduled_at IS NOT NULL AND scheduled_at <= ?
+       GROUP BY platform
+       ORDER BY platform`
+    ).bind(nowIso).all(),
+  ]);
+
+  return {
+    ok: true,
+    generated_at: nowIso,
+    filters: { platform: platform || null, status: status || null, source_oa: source || null, limit },
+    rows: rows.results,
+    counts: counts.results,
+    overdue: overdue.results,
+  };
+}
+
+function queueDashboardHtml() {
+  return `<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>3Q Social Queue</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:24px;background:#0f1115;color:#e8eaed}
+input,select,button{background:#171b22;color:#e8eaed;border:1px solid #3a414d;border-radius:6px;padding:8px}
+button{cursor:pointer}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:end;margin-bottom:16px}
+.card{border:1px solid #2b313a;border-radius:8px;padding:12px;margin:12px 0;background:#151922}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border-bottom:1px solid #2b313a;padding:8px;text-align:left;vertical-align:top}
+th{color:#aab2bf}
+.err{color:#ff8b8b}.muted{color:#9aa4b2}code{color:#ffd479}
+</style>
+</head>
+<body>
+<h1>3Q Social Queue</h1>
+<div class="bar">
+  <label>Token<br><input id="token" type="password" autocomplete="off" placeholder="TRIGGER_TOKEN"></label>
+  <label>Platform<br><select id="platform"><option value="">all</option><option>facebook</option><option>instagram</option><option>threads</option><option>tiktok</option><option>google_biz</option></select></label>
+  <label>Status<br><select id="status"><option value="">all</option><option>pending</option><option>published</option><option>failed</option></select></label>
+  <label>Limit<br><input id="limit" type="number" min="1" max="500" value="100"></label>
+  <button id="load">Load</button>
+</div>
+<div id="out" class="card muted">Enter token and load queue.</div>
+<script>
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+document.getElementById('load').onclick = async () => {
+  const token = document.getElementById('token').value;
+  const qs = new URLSearchParams({
+    format: 'json',
+    limit: document.getElementById('limit').value || '100',
+  });
+  for (const id of ['platform','status']) {
+    const v = document.getElementById(id).value;
+    if (v) qs.set(id, v);
+  }
+  const res = await fetch('/queue/list?' + qs, { headers: { Authorization: 'Bearer ' + token } });
+  const data = await res.json().catch(() => ({ ok:false, error:'invalid JSON response' }));
+  if (!res.ok || !data.ok) {
+    document.getElementById('out').innerHTML = '<span class="err">' + esc(data.error || res.status) + '</span>';
+    return;
+  }
+  const counts = data.counts.map(c => '<code>' + esc(c.platform + '/' + c.status + '=' + c.n) + '</code>').join(' ');
+  const overdue = data.overdue.length ? data.overdue.map(c => '<code>' + esc(c.platform + '=' + c.n) + '</code>').join(' ') : '<span class="muted">none</span>';
+  const rows = data.rows.map(r => '<tr><td>'+r.id+'</td><td>'+esc(r.platform)+'</td><td>'+esc(r.status)+'</td><td>'+esc(r.scheduled_at || '')+'</td><td>'+esc(r.preview)+'</td><td>'+esc(r.source_oa || '')+'</td><td>'+esc(r.error_msg || '')+'</td></tr>').join('');
+  document.getElementById('out').innerHTML = '<p>Generated: '+esc(data.generated_at)+'</p><p>Counts: '+counts+'</p><p>Overdue pending: '+overdue+'</p><table><thead><tr><th>ID</th><th>Platform</th><th>Status</th><th>Scheduled</th><th>Preview</th><th>Source</th><th>Error</th></tr></thead><tbody>'+rows+'</tbody></table>';
+};
+</script>
+</body>
+</html>`;
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // Main export
 // ─────────────────────────────────────────────────────────────────────────
@@ -741,7 +874,7 @@ export default {
       return json({
         ok: true,
         worker: '3q-social-publisher',
-        version: '2.3',
+        version: '2.6',
         platforms: Object.keys(DAILY_LIMITS),
         configured: {
           threads:    Boolean(threadsToken),
@@ -772,12 +905,28 @@ export default {
         if (!PLATFORM_FNS[p.platform]) { errors.push({ index: i, error: `unknown platform: ${p.platform}` }); continue; }
         if (!p.caption && !p.caption_seed) { errors.push({ index: i, error: 'caption or caption_seed required' }); continue; }
         try {
-          // v2.3 dedup: an identical pending row (platform+caption+seed+image) means a
-          // double-seeded batch — the same post would publish twice (q40-46 vs q48-54).
+          // v2.5 dedup: only skip a truly identical pending row. Campaign feeds may
+          // reuse a caption across different days or UTM links; those are distinct
+          // scheduled posts and must not collapse into one pending row.
           const dup = await env.CRM.prepare(
-            "SELECT id FROM content_queue WHERE status='pending' AND platform=? AND COALESCE(caption,'')=COALESCE(?,'') AND COALESCE(caption_seed,'')=COALESCE(?,'') AND COALESCE(image_url,'')=COALESCE(?,'') LIMIT 1"
-          ).bind(p.platform, p.caption || null, p.caption_seed || null, p.image_url || null).first();
-          if (dup) { skipped.push({ index: i, duplicate_of: dup.id }); continue; }
+            "SELECT id FROM content_queue WHERE status='pending' AND platform=? AND COALESCE(caption,'')=COALESCE(?,'') AND COALESCE(caption_seed,'')=COALESCE(?,'') AND COALESCE(image_url,'')=COALESCE(?,'') AND COALESCE(link_url,'')=COALESCE(?,'') AND COALESCE(scheduled_at,'')=COALESCE(?,'') LIMIT 1"
+          ).bind(
+            p.platform,
+            p.caption || null,
+            p.caption_seed || null,
+            p.image_url || null,
+            p.link_url || null,
+            p.scheduled_at || null,
+          ).first();
+          if (dup) {
+            skipped.push({
+              index: i,
+              reason: 'duplicate_pending_row',
+              duplicate_of: dup.id,
+              duplicate_fields: ['platform', 'caption', 'caption_seed', 'image_url', 'link_url', 'scheduled_at'],
+            });
+            continue;
+          }
           const r = await env.CRM.prepare(
             "INSERT INTO content_queue (platform, image_url, caption_seed, caption, topic_tag, link_url, scheduled_at, status, source_oa) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?)"
           ).bind(
@@ -794,15 +943,17 @@ export default {
     }
 
     // Queue overview: GET /queue/list (TRIGGER_TOKEN protected)
-    // Scheduler page contract: { rows: [{id, platform, preview, scheduled_at, status, error_msg}] }
+    // Scheduler page contract: { rows, counts, overdue, filters }
     if ((url.pathname === '/queue/list' || url.pathname === '/queue') && request.method === 'GET') {
       if (!requireToken()) return new Response('forbidden', { status: 403 });
       if (!env.CRM) return json({ ok: false, error: 'D1 not bound' }, 500);
-      const [rows, counts] = await Promise.all([
-        env.CRM.prepare("SELECT id, platform, substr(COALESCE(caption, caption_seed), 1, 60) AS preview, scheduled_at, status, error_msg FROM content_queue ORDER BY id DESC LIMIT 50").all(),
-        env.CRM.prepare('SELECT platform, status, COUNT(*) AS n FROM content_queue GROUP BY platform, status ORDER BY platform').all(),
-      ]);
-      return json({ ok: true, rows: rows.results, counts: counts.results });
+      return json(await queueSnapshot(env, url));
+    }
+
+    // Read-only dashboard shell. Data still requires TRIGGER_TOKEN in the UI,
+    // sent as an Authorization header instead of a query string.
+    if (url.pathname === '/queue/dashboard' && request.method === 'GET') {
+      return new Response(queueDashboardHtml(), { headers: { 'Content-Type': 'text/html; charset=utf-8', ...CORS } });
     }
 
     // Delete a queued item: POST /queue/del?id=N (TRIGGER_TOKEN protected)
