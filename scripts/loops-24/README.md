@@ -145,6 +145,17 @@ Blocked items older than `LOOPS_BLOCKER_ESCALATE_HOURS` are marked as
 The dashboard is intentionally not a generic analytics page. Its job is to let
 Hsuehyi decide the next approval or intervention within one minute.
 
+Verify that manual-gated waiting items are mapped to the expected approval
+groups:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\verify-dashboard-gates.ps1
+```
+
+The verifier reads only the local dashboard JSON and writes a local report under
+the automation state directory. It does not push, create a PR, deploy, call
+protected endpoints, write secrets, or send messages.
+
 The morning decision is derived from the selected candidates, lane priority, risk
 signals, and manual gates. Task registry metadata is read from:
 

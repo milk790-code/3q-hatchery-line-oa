@@ -1079,6 +1079,7 @@ function blockedCompletion(label, reason, candidate = null) {
     firstSeenAt: candidate?.firstSeenAt || null,
     escalated,
     escalation: escalated ? (candidate?.escalation || `blocked_over_${blockerEscalateHours}h`) : null,
+    manualGate: candidate?.manualGate || inferManualGate(candidate || {}),
     nextApproval: classifyApproval(label, candidate),
     nextApprovals: classifyApprovalGates(label, candidate),
   };
@@ -1698,6 +1699,7 @@ function summarizeCompletion(item) {
     firstSeenAt: item.firstSeenAt || null,
     escalated: Boolean(item.escalated),
     escalation: item.escalation || null,
+    manualGate: item.manualGate || null,
     nextApproval: item.nextApproval || null,
     nextApprovals: item.nextApprovals || (item.nextApproval ? [item.nextApproval] : []),
   };
@@ -1771,6 +1773,7 @@ function summarizeManualWaits(candidates, autoCompletions = []) {
         firstSeenAt: candidate.firstSeenAt || null,
         escalated: Boolean(candidate.escalated),
         escalation: candidate.escalation || null,
+        manualGate,
         nextApproval: classifyApproval(candidate.id || candidate.title || candidate.type, candidate),
         nextApprovals: classifyApprovalGates(candidate.id || candidate.title || candidate.type, candidate),
       };
