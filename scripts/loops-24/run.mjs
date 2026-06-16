@@ -59,6 +59,7 @@ async function main() {
     candidates = [
       ...(await discoverProjectState(ctx)),
       ...(await discoverGitState(ctx)),
+      ...(await discoverGithubPublication(ctx)),
       ...(await discoverFrontendArtifacts(ctx)),
       ...(await discoverWranglerCacheRisk(ctx)),
       ...(await discoverGoogleBusinessProspecting(ctx)),
@@ -231,6 +232,61 @@ async function discoverGitState() {
         total: group.counts?.total || 0,
       })) : null,
       frontendReviewPath: frontendReviewCurrent ? latestFrontendReview.reportPath : null,
+    },
+  }];
+}
+
+async function discoverGithubPublication() {
+  const branch = runCommand('git', ['branch', '--show-current'], 45_000);
+  const upstream = runCommand('git', ['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'], 45_000);
+  if (!branch.ok || !branch.stdout.trim() || !upstream.ok || !upstream.stdout.trim()) {
+    return [];
+  }
+
+  const branchName = branch.stdout.trim();
+  const upstreamName = upstream.stdout.trim();
+  const counts = runCommand('git', ['rev-list', '--left-right', '--count', `${upstreamName}...HEAD`], 45_000);
+  if (!counts.ok) return [];
+
+  const [behindRaw, aheadRaw] = counts.stdout.trim().split(/\s+/);
+  const behind = Number.parseInt(behindRaw || '0', 10);
+  const ahead = Number.parseInt(aheadRaw || '0', 10);
+  if (!Number.isFinite(ahead) || ahead <= 0) return [];
+
+  const status = runCommand('git', ['status', '--short', '--untracked-files=no'], 45_000);
+  const head = runCommand('git', ['rev-parse', '--short', 'HEAD'], 45_000);
+  const statusLines = status.ok ? status.stdout.split(/\r?\n/).filter(Boolean) : [];
+  const statusFingerprint = hash(statusLines.join('\n'));
+  const latest = await readJson(path.join(stateDir, 'github-handoffs', 'latest.json'), null);
+  const current = latest?.branch === branchName
+    && latest?.upstream === upstreamName
+    && latest?.ahead === ahead
+    && latest?.head === (head.ok ? head.stdout.trim() : '')
+    && latest?.statusFingerprint === statusFingerprint;
+
+  return [{
+    type: 'github_publication',
+    id: current ? 'github-local-pr-handoff-ready' : 'github-local-pr-handoff-needed',
+    title: current ? 'Review GitHub local PR handoff' : 'Prepare GitHub local PR handoff',
+    value: current ? 0.28 : 0.46,
+    urgency: current ? 0.22 : 0.36,
+    loopability: current ? 0.45 : 0.72,
+    freshness: 0.7,
+    risk: 0.42,
+    action: current
+      ? 'Review the generated GitHub handoff before push or draft PR creation.'
+      : 'Generate a local GitHub handoff for the ahead branch; do not push or create a PR automatically.',
+    fingerprintSeed: `${branchName}:${upstreamName}:${ahead}:${head.ok ? head.stdout.trim() : ''}:${statusFingerprint}`,
+    evidence: {
+      branch: branchName,
+      upstream: upstreamName,
+      ahead,
+      behind,
+      head: head.ok ? head.stdout.trim() : null,
+      statusFingerprint,
+      dirtyTracked: statusLines,
+      handoffPath: current ? latest.reportPath : null,
+      gate: 'push-and-pr-approval',
     },
   }];
 }
@@ -580,6 +636,21 @@ async function runAutoCompletions(candidates) {
   const ids = new Set(candidates.map(candidate => candidate.id));
   const byId = new Map(candidates.map(candidate => [candidate.id, candidate]));
 
+  if (ids.has('github-local-pr-handoff-needed')) {
+    completions.push(runLocalStep(
+      'prepare-github-handoff',
+      'node',
+      ['scripts/loops-24/prepare-github-handoff.mjs'],
+      120_000
+    ));
+  } else if (ids.has('github-local-pr-handoff-ready')) {
+    const candidate = byId.get('github-local-pr-handoff-ready');
+    completions.push(blockedCompletion(
+      'github-local-pr-handoff-ready',
+      `GitHub handoff already exists: ${candidate?.evidence?.handoffPath || path.join(stateDir, 'github-handoffs')}; push and PR creation require approval.`
+    ));
+  }
+
   if (ids.has('dirty-worktree')) {
     const dirty = byId.get('dirty-worktree');
     if (dirty?.evidence?.sliceHandoffPath) {
@@ -671,6 +742,19 @@ async function runAutoCompletions(candidates) {
         && latestHandoff?.groupFingerprint === candidate.evidence?.groupFingerprint) {
         completions.push(blockedCompletion(candidate.id, `Frontend slice handoffs already exist: ${path.join(stateDir, 'frontend-slice-handoffs')}`));
       } else {
+        const latestReview = await readJson(path.join(stateDir, 'frontend-artifact-reviews', 'latest.json'), null);
+        const currentStatus = runCommand('git', ['status', '--short'], 45_000);
+        const currentFingerprint = currentStatus.ok
+          ? hash(currentStatus.stdout.split(/\r?\n/).filter(Boolean).join('\n'))
+          : '';
+        if (latestReview?.statusFingerprint !== currentFingerprint) {
+          completions.push(runLocalStep(
+            'review:frontend_artifacts',
+            'node',
+            ['scripts/loops-24/review-frontend-artifacts.mjs'],
+            120_000
+          ));
+        }
         completions.push(runLocalStep(
           'prepare-frontend-slice-handoffs',
           'node',
@@ -719,11 +803,12 @@ function blockedCompletion(label, reason) {
 
 function completionSummary(label, data, result) {
   if (!result.ok) return `${label} failed with status ${result.status}`;
-  if (data?.summary) {
-    return typeof data.summary === 'string' ? data.summary : JSON.stringify(data.summary);
-  }
   if (data?.reportPath) return `${label} wrote ${data.reportPath}`;
   if (data?.stageScriptPath) return `${label} wrote ${data.stageScriptPath}`;
+  if (data?.summary) {
+    const summary = typeof data.summary === 'string' ? data.summary : JSON.stringify(data.summary);
+    return trim(summary, 500);
+  }
   if (typeof data?.generated_count === 'number') return `${label} generated ${data.generated_count} item(s)`;
   return `${label} completed`;
 }

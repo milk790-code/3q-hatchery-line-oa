@@ -22,12 +22,18 @@ to local, review-ready artifacts:
 - slice handoffs and stage scripts
 - frontend/artifact review reports
 - frontend slice handoffs and stage scripts
+- GitHub local PR handoffs for branches that are ahead of upstream
 - content queue reconciliation reports
 - Wrangler cache audit reports
 - cold outreach drafts only when prospects are eligible
 
 It stops at review gates for secrets, tokens, deploy approval, outbound sending,
 and broad frontend/artifact payloads.
+
+It can also surface a `github_publication` candidate when the current branch is
+ahead of its upstream. Auto-complete may generate a local PR handoff under the
+automation state directory, but it never runs `git push`, creates a pull request,
+merges, deploys, or publishes.
 
 It can also surface a `cold_outreach` candidate from
 `scripts/outreach.prospects.json`. That path creates review-ready draft work for
@@ -67,6 +73,31 @@ Default state path:
 ```text
 %USERPROFILE%\.codex\automations\loops-24\
 ```
+
+## Local secrets file
+
+`run.ps1` loads this machine-local file before each run:
+
+```powershell
+%USERPROFILE%\.codex\automations\loops-24\secrets.local.ps1
+```
+
+`run.ps1` creates a blank example if it is missing. Use it as the template:
+
+```powershell
+Copy-Item "$env:USERPROFILE\.codex\automations\loops-24\secrets.example.ps1" `
+  "$env:USERPROFILE\.codex\automations\loops-24\secrets.local.ps1"
+```
+
+Supported env vars:
+
+- `GOOGLE_MAPS_API_KEY` or `GOOGLE_PLACES_API_KEY`
+- `SOCIAL_PUBLISHER_TOKEN` or `TRIGGER_TOKEN`
+- optional `SOCIAL_PUBLISHER_URL`
+
+Keep `secrets.local.ps1` out of git. The runner reads it locally, redacts token
+fields in reports, and still stops before deploys, pushes, PR creation, or
+outbound sending.
 
 ## Optional live social-publisher probe
 
