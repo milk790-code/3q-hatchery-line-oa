@@ -62,6 +62,7 @@
         "repository": "milk790-code/3q-hatchery-line-oa",
         "title_prefix": "[LOOPS]",
         "labels": ["loops", "automation"],
+        "issue_policy": "actionable_only",
         "review_gate": "manual_create_only",
         "mode": "draft"
       }
