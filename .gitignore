@@ -3,3 +3,8 @@ node_modules/
 *.log
 .env
 .env.local
+.loops/
+
+# Local Cloudflare/Wrangler runtime state
+.wrangler/
+**/.wrangler/

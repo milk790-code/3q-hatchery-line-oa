@@ -1,0 +1,32 @@
+{
+  "tasks": [
+    {
+      "task_type": "google_business_prospecting",
+      "source_id": "3q-google-business-prospecting",
+      "priority_base": 92,
+      "dedup_window_minutes": 720,
+      "loopability_score": 0.9,
+      "risk_score": 0.22,
+      "payload": {
+        "config_path": "scripts/outreach.prospects.json",
+        "limit_per_query": 8,
+        "max_new": 20,
+        "review_gate": "manual_send_only"
+      }
+    },
+    {
+      "task_type": "cold_outreach_batch",
+      "source_id": "3q-cold-outreach-draft-batch",
+      "priority_base": 90,
+      "dedup_window_minutes": 720,
+      "loopability_score": 0.9,
+      "risk_score": 0.18,
+      "payload": {
+        "config_path": "scripts/outreach.prospects.json",
+        "batch_size": 5,
+        "cooldown_days": 14,
+        "review_gate": "manual_send_only"
+      }
+    }
+  ]
+}
