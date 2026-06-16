@@ -8,3 +8,7 @@ node_modules/
 # Local Cloudflare/Wrangler runtime state
 .wrangler/
 **/.wrangler/
+
+# Local Codex/Claude runtime outputs
+.claude/launch.json
+scripts/.agents/
