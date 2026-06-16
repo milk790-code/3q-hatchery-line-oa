@@ -18,6 +18,7 @@ $stateDir = Join-Path $env:USERPROFILE '.codex\automations\loops-24'
 New-Item -ItemType Directory -Force -Path $stateDir | Out-Null
 
 $argument = @(
+  '-NonInteractive'
   '-NoProfile'
   '-ExecutionPolicy'
   'Bypass'

@@ -4,6 +4,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+$exitCode = 0
 
 Push-Location $RepoRoot
 try {
@@ -14,7 +15,10 @@ try {
     $runnerArgs += '--auto-complete'
   }
   node (Join-Path $PSScriptRoot 'run.mjs') @runnerArgs
+  $exitCode = $LASTEXITCODE
 }
 finally {
   Pop-Location
 }
+
+exit $exitCode
