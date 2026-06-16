@@ -5,6 +5,7 @@ import os from 'node:os';
 import process from 'node:process';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { gitWorktreeFingerprint } from './lib/git-worktree-fingerprint.mjs';
 
 const automationId = process.env.LOOPS_AUTOMATION_ID || 'loops-24';
 const repoRoot = path.resolve(process.env.LOOPS_REPO_ROOT || process.cwd());
@@ -19,7 +20,7 @@ if (!review) {
 }
 
 const statusLines = runGit(['status', '--short']).split(/\r?\n/).filter(Boolean);
-const statusFingerprint = hash(statusLines.join('\n'));
+const statusFingerprint = gitWorktreeFingerprint({ cwd: repoRoot, statusLines });
 if (review.statusFingerprint !== statusFingerprint) {
   throw new Error(`Frontend artifact review is stale. Expected ${statusFingerprint}, got ${review.statusFingerprint}. Re-run review-frontend-artifacts first.`);
 }

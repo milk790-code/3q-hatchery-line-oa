@@ -7,6 +7,7 @@ import { spawnSync } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
 import { previewColdOutreachCandidate } from '../lib/cold-outreach.mjs';
 import { previewGoogleBusinessProspectingCandidate } from '../lib/google-business-prospector.mjs';
+import { gitWorktreeFingerprint } from './lib/git-worktree-fingerprint.mjs';
 
 const automationId = process.env.LOOPS_AUTOMATION_ID || 'loops-24';
 const repoRoot = path.resolve(process.env.LOOPS_REPO_ROOT || process.cwd());
@@ -240,7 +241,7 @@ async function discoverGitState() {
 
   const lines = status.stdout.split(/\r?\n/).filter(Boolean);
   if (lines.length === 0) return [];
-  const statusFingerprint = hash(lines.join('\n'));
+  const statusFingerprint = gitWorktreeFingerprint({ cwd: repoRoot, statusLines: lines });
   const latestSnapshot = await readJson(path.join(stateDir, 'worktree-snapshots', 'latest.json'), null);
   const snapshotCurrent = latestSnapshot?.statusFingerprint === statusFingerprint;
   const latestBoundaryPlan = await readJson(path.join(stateDir, 'commit-boundaries', 'latest.json'), null);
@@ -334,7 +335,7 @@ async function discoverGithubPublication() {
   const status = runCommand('git', ['status', '--short', '--untracked-files=no'], 45_000);
   const head = runCommand('git', ['rev-parse', '--short', 'HEAD'], 45_000);
   const statusLines = status.ok ? status.stdout.split(/\r?\n/).filter(Boolean) : [];
-  const statusFingerprint = hash(statusLines.join('\n'));
+  const statusFingerprint = gitWorktreeFingerprint({ cwd: repoRoot, statusLines });
   const latest = await readJson(path.join(stateDir, 'github-handoffs', 'latest.json'), null);
   const current = latest?.branch === branchName
     && latest?.upstream === upstreamName
@@ -389,7 +390,7 @@ async function discoverPrReadiness() {
 
   const status = runCommand('git', ['status', '--short', '--untracked-files=no'], 45_000);
   const statusLines = status.ok ? status.stdout.split(/\r?\n/).filter(Boolean) : [];
-  const statusFingerprint = hash(statusLines.join('\n'));
+  const statusFingerprint = gitWorktreeFingerprint({ cwd: repoRoot, statusLines });
   const githubCurrent = github.branch === branchName
     && github.upstream === upstreamName
     && github.head === head.stdout.trim()
@@ -439,7 +440,7 @@ async function discoverFrontendArtifacts() {
   if (!status.ok) return [];
 
   const statusLines = status.stdout.split(/\r?\n/).filter(Boolean);
-  const statusFingerprint = hash(statusLines.join('\n'));
+  const statusFingerprint = gitWorktreeFingerprint({ cwd: repoRoot, statusLines });
   const boundary = await readJson(path.join(stateDir, 'commit-boundaries', 'latest.json'), null);
   if (boundary?.statusFingerprint !== statusFingerprint) return [];
 
@@ -985,7 +986,10 @@ async function runAutoCompletions(candidates) {
         const latestReview = await readJson(path.join(stateDir, 'frontend-artifact-reviews', 'latest.json'), null);
         const currentStatus = runCommand('git', ['status', '--short'], 45_000);
         const currentFingerprint = currentStatus.ok
-          ? hash(currentStatus.stdout.split(/\r?\n/).filter(Boolean).join('\n'))
+          ? gitWorktreeFingerprint({
+              cwd: repoRoot,
+              statusLines: currentStatus.stdout.split(/\r?\n/).filter(Boolean),
+            })
           : '';
         if (latestReview?.statusFingerprint !== currentFingerprint) {
           completions.push(runLocalStep(

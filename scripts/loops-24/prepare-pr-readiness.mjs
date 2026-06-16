@@ -5,6 +5,7 @@ import os from 'node:os';
 import process from 'node:process';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { gitWorktreeFingerprint } from './lib/git-worktree-fingerprint.mjs';
 
 const automationId = process.env.LOOPS_AUTOMATION_ID || 'loops-24';
 const repoRoot = path.resolve(process.env.LOOPS_REPO_ROOT || process.cwd());
@@ -30,7 +31,7 @@ const behind = Number.parseInt(counts[0] || '0', 10);
 const ahead = Number.parseInt(counts[1] || '0', 10);
 const staged = runGit(['diff', '--cached', '--name-only']).split(/\r?\n/).filter(Boolean);
 const dirtyTracked = runGit(['status', '--short', '--untracked-files=no']).split(/\r?\n/).filter(Boolean);
-const statusFingerprint = hash(dirtyTracked.join('\n'));
+const statusFingerprint = gitWorktreeFingerprint({ cwd: repoRoot, statusLines: dirtyTracked });
 
 const secretGates = await readJson(path.join(stateDir, 'secret-gates', 'latest.json'), null);
 const workerDeploy = await readJson(path.join(stateDir, 'worker-deploy-reviews', 'latest.json'), null);

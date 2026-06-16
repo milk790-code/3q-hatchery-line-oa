@@ -6,6 +6,7 @@ import os from 'node:os';
 import process from 'node:process';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { gitWorktreeFingerprint } from './lib/git-worktree-fingerprint.mjs';
 
 const automationId = process.env.LOOPS_AUTOMATION_ID || 'loops-24';
 const repoRoot = path.resolve(process.env.LOOPS_REPO_ROOT || process.cwd());
@@ -46,7 +47,7 @@ const trackedDirtyLines = runGit(['status', '--short', '--untracked-files=no']).
 const stagedLines = runGit(['diff', '--cached', '--name-only']).split(/\r?\n/).filter(Boolean);
 const dirtyPaths = trackedDirtyLines.map(parseStatusLine).map(item => item.path);
 const unexpectedDirty = dirtyPaths.filter(file => !expectedDirtyDeployFiles.includes(file));
-const statusFingerprint = hash(statusLines.join('\n'));
+const statusFingerprint = gitWorktreeFingerprint({ cwd: repoRoot, statusLines });
 
 const missingSecrets = Array.isArray(secrets?.summary?.missing) ? secrets.summary.missing : [];
 const workerCommands = Array.isArray(worker?.commands) ? worker.commands : [];

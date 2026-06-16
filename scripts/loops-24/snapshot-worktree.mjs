@@ -5,6 +5,7 @@ import os from 'node:os';
 import process from 'node:process';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { gitWorktreeFingerprint } from './lib/git-worktree-fingerprint.mjs';
 
 const automationId = process.env.LOOPS_AUTOMATION_ID || 'loops-24';
 const repoRoot = path.resolve(process.env.LOOPS_REPO_ROOT || process.cwd());
@@ -31,7 +32,7 @@ const now = new Date();
 const stamp = now.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
 const reportPath = path.join(snapDir, `${stamp}-worktree.md`);
 const latestPath = path.join(snapDir, 'latest.json');
-const statusFingerprint = hash(status.join('\n'));
+const statusFingerprint = gitWorktreeFingerprint({ cwd: repoRoot, statusLines: status });
 
 const staged = status.filter(line => line[0] && line[0] !== ' ' && !line.startsWith('??'));
 const modified = status.filter(line => line[1] && line[1] !== ' ');
