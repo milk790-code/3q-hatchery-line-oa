@@ -44,6 +44,7 @@ to local, review-ready artifacts:
 - frontend slice handoffs and stage scripts
 - GitHub local PR handoffs for branches that are ahead of upstream
 - Worker deploy-ready checklists
+- owner approval bundles
 - a compact completed / blocked / next approval dashboard
 - content queue reconciliation reports
 - Wrangler cache audit reports
@@ -63,6 +64,12 @@ merges, deploys, or publishes.
 When the GitHub handoff is current, LOOPS can also generate a PR readiness packet
 that aggregates the latest manual gates and evidence. This remains local-only and
 does not push or create a pull request.
+
+LOOPS also writes an owner approval bundle that consolidates the GitHub handoff,
+PR readiness, Worker deploy checklist, secret gates, wakeup health, and
+manual-send gates into one local decision page. It does not run `git push`,
+create a pull request, deploy, call protected endpoints, write secrets, or send
+messages.
 
 It can also surface a `cold_outreach` candidate from
 `scripts/outreach.prospects.json`. That path creates review-ready draft work for
@@ -354,6 +361,21 @@ secrets.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\prepare-pr-readiness.ps1
+```
+
+## Prepare owner approval bundle
+
+Create the single-page approval packet that explains which final actions need
+Hsuehyi approval and which commands remain gated.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\prepare-owner-approval-bundle.ps1
+```
+
+Latest approval bundle path:
+
+```text
+%USERPROFILE%\.codex\automations\loops-24\owner-approval-bundles\latest.json
 ```
 
 ## Review Worker deploy slices

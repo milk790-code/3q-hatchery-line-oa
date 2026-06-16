@@ -1007,7 +1007,25 @@ async function runAutoCompletions(candidates) {
     }
   }
 
+  if (candidates.some(candidate => (candidate.manualGate || inferManualGate(candidate)) !== 'none_read_only')
+    || autoCompletionsNeedOwnerBundle(completions)) {
+    completions.push(runLocalStep(
+      'prepare-owner-approval-bundle',
+      'node',
+      ['scripts/loops-24/prepare-owner-approval-bundle.mjs'],
+      120_000
+    ));
+  }
+
   return completions;
+}
+
+function autoCompletionsNeedOwnerBundle(completions) {
+  return (completions || []).some(item => item.status === 'blocked'
+    || item.label === 'prepare-pr-readiness'
+    || item.label === 'prepare-worker-deploy-checklist'
+    || item.label === 'prepare-github-handoff'
+    || item.label === 'prepare-secret-gates');
 }
 
 function runLocalStep(label, command, args, timeout) {
