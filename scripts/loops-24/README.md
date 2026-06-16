@@ -361,8 +361,10 @@ powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\prepare-pr-readiness
 Create a local-only review for current `deploy-approval` Worker groups from the
 latest commit-boundary plan. The report runs JavaScript syntax checks, inspects
 Wrangler config basics, records endpoint signals, and scans for obvious secret
-literals. It does not stage, push, deploy, mutate Cloudflare settings, or call
-protected live endpoints.
+literals. It also surfaces deployment red-line capabilities such as LINE push
+side effects, broadcast control paths, D1 delete paths, cron side effects,
+AI-generated publishing drafts, and protected admin endpoints. It does not stage,
+push, deploy, mutate Cloudflare settings, or call protected live endpoints.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\review-worker-deploy-slices.ps1

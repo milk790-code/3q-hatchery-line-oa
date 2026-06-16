@@ -61,6 +61,7 @@ payload.reviewFingerprint = hash(JSON.stringify({
     jsChecks: group.jsChecks.map(item => [item.path, item.ok, item.status]),
     wranglerChecks: group.wranglerChecks.map(item => [item.path, item.ok, item.name, item.main, item.compatibilityDate, item.crons]),
     secretFindings: group.secretFindings,
+    capabilityFindings: group.capabilityFindings,
   })),
 }));
 
@@ -98,12 +99,16 @@ async function inspectGroup(group, statusByPath) {
   const jsChecks = jsPaths.map(checkJsSyntax);
   const wranglerChecks = await Promise.all(wranglerPaths.map(inspectWrangler));
   const secretFindings = [];
+  const capabilityFindings = [];
 
   for (const filePath of paths) {
     const text = await readText(path.join(repoRoot, filePath));
     if (!text) continue;
     for (const finding of scanPotentialSecrets(text, filePath)) {
       secretFindings.push(finding);
+    }
+    for (const finding of scanManualGateCapabilities(text, filePath)) {
+      capabilityFindings.push(finding);
     }
   }
 
@@ -122,6 +127,7 @@ async function inspectGroup(group, statusByPath) {
     wranglerChecks,
     endpointSignals: await inspectEndpointSignals(paths),
     secretFindings,
+    capabilityFindings,
     ok: jsChecks.every(item => item.ok)
       && wranglerChecks.every(item => item.ok)
       && secretFindings.length === 0,
@@ -194,6 +200,7 @@ function summarize(groups) {
   const jsChecks = groups.flatMap(group => group.jsChecks);
   const wranglerChecks = groups.flatMap(group => group.wranglerChecks);
   const secretFindings = groups.flatMap(group => group.secretFindings);
+  const capabilityFindings = groups.flatMap(group => group.capabilityFindings || []);
   return {
     groupCount: groups.length,
     pathCount: groups.reduce((total, group) => total + group.paths.length, 0),
@@ -202,6 +209,8 @@ function summarize(groups) {
     wranglerChecks: wranglerChecks.length,
     wranglerFailures: wranglerChecks.filter(item => !item.ok).length,
     secretFindings: secretFindings.length,
+    manualGateFindings: capabilityFindings.length,
+    manualGateTypes: Array.from(new Set(capabilityFindings.map(item => item.gate))).sort(),
     allLocalChecksPass: groups.every(group => group.ok),
   };
 }
@@ -226,6 +235,8 @@ function renderMarkdown(data) {
     `- wrangler_checks: ${data.summary.wranglerChecks}`,
     `- wrangler_failures: ${data.summary.wranglerFailures}`,
     `- potential_secret_findings: ${data.summary.secretFindings}`,
+    `- manual_gate_findings: ${data.summary.manualGateFindings}`,
+    `- manual_gate_types: ${data.summary.manualGateTypes.length ? data.summary.manualGateTypes.join(', ') : '(none)'}`,
     `- all_local_checks_pass: ${data.summary.allLocalChecksPass}`,
     '',
     'This review is local-only. It does not run Wrangler deploy, mutate Cloudflare settings, call protected endpoints, push, merge, or publish.',
@@ -289,6 +300,17 @@ function renderMarkdown(data) {
       }
     }
     lines.push('');
+    lines.push('### Manual Gate Capabilities');
+    lines.push('');
+    if ((group.capabilityFindings || []).length === 0) {
+      lines.push('- No deploy red-line capabilities detected in this deploy group.');
+    } else {
+      for (const finding of group.capabilityFindings) {
+        lines.push(`- ${finding.file}:${finding.line} ${finding.kind} -> ${finding.gate}`);
+        lines.push(`  - ${finding.detail}`);
+      }
+    }
+    lines.push('');
   }
 
   lines.push('## Hard Stops');
@@ -323,6 +345,74 @@ function scanPotentialSecrets(text, file) {
     }
   });
   return findings;
+}
+
+function scanManualGateCapabilities(text, file) {
+  const findings = [];
+  const rules = [
+    {
+      kind: 'line-push-side-effect',
+      gate: 'manual-send-approval',
+      detail: 'Worker can push LINE messages. Owner/test pushes and customer-facing sends require manual approval before deployment.',
+      pattern: /https:\/\/api\.line\.me\/v2\/bot\/message\/push|bot\/message\/push/,
+    },
+    {
+      kind: 'broadcast-control-surface',
+      gate: 'manual-send-approval',
+      detail: 'Worker contains broadcast or scheduled broadcast control paths. Public/bulk messaging must remain human-approved.',
+      pattern: /\/admin\/broadcast|BROADCAST_|broadcastHandler|sendBroadcastMessages|runDueBroadcasts/,
+    },
+    {
+      kind: 'd1-delete-capability',
+      gate: 'manual-data-delete-approval',
+      detail: 'Worker can delete D1 rows. Any production delete path needs explicit review and rollback evidence.',
+      pattern: /\bDELETE\s+FROM\b/i,
+    },
+    {
+      kind: 'cron-side-effect',
+      gate: 'manual-deploy-approval',
+      detail: 'Scheduled handlers can mutate production state after deployment. Cron behavior must be reviewed before wrangler deploy.',
+      pattern: /async\s+scheduled\s*\(|runDueBroadcasts|runContentAutofill|runWeeklyDigest|runFollowUps/,
+    },
+    {
+      kind: 'ai-generated-publishing-draft',
+      gate: 'manual-content-review',
+      detail: 'Worker can generate publication drafts with AI. Drafts require human review before public posting.',
+      pattern: /env\.AI\.run|generateAutofillCaption|content_autofill|autofill/i,
+    },
+    {
+      kind: 'protected-admin-endpoint',
+      gate: 'manual-token-verification',
+      detail: 'Worker exposes protected admin/control endpoints. Live verification needs a local token and must not print secrets.',
+      pattern: /TRIGGER_TOKEN|adminTokenFrom|\/admin\/|\/queue\/approve|\/queue\/del|\/autofill/,
+    },
+  ];
+
+  text.split(/\r?\n/).forEach((line, index) => {
+    for (const rule of rules) {
+      if (rule.pattern.test(line)) {
+        findings.push({
+          file,
+          line: index + 1,
+          kind: rule.kind,
+          gate: rule.gate,
+          detail: rule.detail,
+        });
+      }
+    }
+  });
+
+  return dedupeFindings(findings);
+}
+
+function dedupeFindings(findings) {
+  const seen = new Set();
+  return findings.filter(finding => {
+    const key = `${finding.file}:${finding.line}:${finding.kind}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 function parseStatusLine(line) {

@@ -24,6 +24,10 @@ const statusLines = runGit(['status', '--short']).split(/\r?\n/).filter(Boolean)
 const statusFingerprint = hash(statusLines.join('\n'));
 const reviewIsCurrent = workerReview.statusFingerprint === statusFingerprint;
 const allLocalChecksPass = workerReview.summary?.allLocalChecksPass === true;
+const manualGateFindings = Number(workerReview.summary?.manualGateFindings || 0);
+const manualGateTypes = Array.isArray(workerReview.summary?.manualGateTypes)
+  ? workerReview.summary.manualGateTypes
+  : [];
 const missingSecrets = Array.isArray(secretGates?.summary?.missing) ? secretGates.summary.missing : [];
 const secretGatesReady = secretGates
   ? missingSecrets.length === 0
@@ -44,6 +48,13 @@ const checks = [
     id: 'local_checks',
     status: allLocalChecksPass ? 'pass' : 'attention',
     detail: `allLocalChecksPass=${allLocalChecksPass}`,
+  },
+  {
+    id: 'red_line_capabilities',
+    status: manualGateFindings > 0 ? 'manual_approval' : 'pass',
+    detail: manualGateFindings > 0
+      ? `manualGateFindings=${manualGateFindings}; gates=${manualGateTypes.join(', ')}`
+      : 'No red-line Worker capabilities detected.',
   },
   {
     id: 'secret_gates',
@@ -76,6 +87,8 @@ const payload = {
   secretGatesPath: secretGates?.reportPath || null,
   status: reviewIsCurrent && allLocalChecksPass ? 'ready-for-approval' : 'attention',
   deployApprovalRequired: true,
+  manualGateFindings,
+  manualGateTypes,
   groups: groups.map(summarizeGroup),
   checks,
   commands: groups.flatMap(deployCommandsForGroup),
@@ -180,6 +193,8 @@ function renderMarkdown(data) {
     `- repo: ${data.repoRoot}`,
     `- status: ${data.status}`,
     `- deploy_approval_required: ${data.deployApprovalRequired}`,
+    `- manual_gate_findings: ${data.manualGateFindings}`,
+    `- manual_gate_types: ${data.manualGateTypes.length ? data.manualGateTypes.join(', ') : '(none)'}`,
     `- worker_review: ${data.workerReviewPath || '(missing)'}`,
     `- secret_gates: ${data.secretGatesPath || '(missing)'}`,
     `- status_fingerprint: ${data.statusFingerprint}`,

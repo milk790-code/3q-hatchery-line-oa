@@ -87,6 +87,7 @@ Purpose: keep the local repo safe to operate before automation expands scope.
 Current task sources:
 
 - `repo_status`
+- `github_label_control`
 - Dirty worktree snapshots.
 - Commit boundary plans.
 - Frontend/artifact review reports.
@@ -97,11 +98,13 @@ Allowed artifacts:
 - Commit boundary plans.
 - Slice handoffs.
 - Syntax and artifact reports.
+- Local GitHub label-control run plans.
 
 Hard stops:
 
 - No staging unrelated changes without review.
 - No broad refactor just to make the dashboard look clean.
+- No GitHub issue comments or label removal unless explicitly approved.
 
 ### demo-sales
 

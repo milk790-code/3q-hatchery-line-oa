@@ -809,7 +809,7 @@ async function runAutoCompletions(candidates) {
       'check-wakeup-health',
       'node',
       ['scripts/loops-24/check-wakeup-health.mjs'],
-      120_000
+      240_000
     ));
   } else if (ids.has('wakeup-health-ready')) {
     const candidate = byId.get('wakeup-health-ready');

@@ -84,7 +84,7 @@ const gates = [
     id: 'worker_deploy_review',
     status: workerDeploy?.summary?.allLocalChecksPass ? 'manual_approval' : 'attention',
     detail: workerDeploy
-      ? `allLocalChecksPass=${workerDeploy.summary?.allLocalChecksPass} jsFailures=${workerDeploy.summary?.jsFailures} wranglerFailures=${workerDeploy.summary?.wranglerFailures} secretFindings=${workerDeploy.summary?.secretFindings}`
+      ? `allLocalChecksPass=${workerDeploy.summary?.allLocalChecksPass} jsFailures=${workerDeploy.summary?.jsFailures} wranglerFailures=${workerDeploy.summary?.wranglerFailures} secretFindings=${workerDeploy.summary?.secretFindings} manualGateFindings=${workerDeploy.summary?.manualGateFindings || 0} manualGateTypes=${(workerDeploy.summary?.manualGateTypes || []).join(', ') || '(none)'}`
       : 'No worker deploy review found.',
   },
   {

@@ -1,6 +1,28 @@
 {
   "tasks": [
     {
+      "task_type": "github_label_control",
+      "source_id": "github-label-control",
+      "lane": "repo-hygiene",
+      "manual_gate": "manual_create_only",
+      "expected_artifact": "local GitHub label-control run plan; no comments or label removal by default",
+      "dedup_policy": "control labels are read into the local run plan; acknowledgement requires explicit approval",
+      "priority_base": 75,
+      "dedup_window_minutes": 0,
+      "loopability_score": 1,
+      "risk_score": 0.08,
+      "payload": {
+        "repository": "milk790-code/3q-hatchery-line-oa",
+        "labels": {
+          "retry": "loop:retry",
+          "ignore": "loop:ignore",
+          "promote": "loop:promote"
+        },
+        "acknowledge_labels": false,
+        "max_issues_per_label": 20
+      }
+    },
+    {
       "task_type": "cloudflare_worker_health",
       "source_id": "3q-social-publisher-health",
       "lane": "deployment",
