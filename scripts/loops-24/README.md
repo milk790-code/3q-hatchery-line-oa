@@ -324,12 +324,16 @@ same read-only runner above.
 powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\install-windows-task.ps1
 ```
 
-The installed task defaults to a 15-minute execution limit so a stuck wakeup
-does not crowd out the next hourly round. Override it when needed:
+The installed task defaults to safe-local mode and a 30-minute execution limit
+so a stuck wakeup does not crowd out the next hourly round. Override the limit
+when needed:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\install-windows-task.ps1 -ExecutionTimeLimitMinutes 30
 ```
+
+Use `-AllowLiveProbes` only when you explicitly want the hourly task to run
+read-only public/live probes from the scheduler.
 
 Inspect:
 

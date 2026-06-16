@@ -2,7 +2,8 @@ param(
   [string]$TaskName = 'LOOPS-24-3Q-Hatchery',
   [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path,
   [int]$StartDelayMinutes = 5,
-  [int]$ExecutionTimeLimitMinutes = 15
+  [int]$ExecutionTimeLimitMinutes = 30,
+  [switch]$AllowLiveProbes
 )
 
 $ErrorActionPreference = 'Stop'
@@ -32,6 +33,10 @@ $argument = @(
   '-RepoRoot'
   "`"$RepoRoot`""
 ) -join ' '
+
+if (-not $AllowLiveProbes) {
+  $argument = "$argument -OnlySafeLocal"
+}
 
 $action = New-ScheduledTaskAction `
   -Execute $powershell `
