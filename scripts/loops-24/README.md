@@ -71,6 +71,17 @@ Node equivalent:
 node scripts/loops-24/run.mjs --report-only
 ```
 
+## Check wakeup health
+
+Create a local-only health report for the hourly wakeup path. The report checks
+Task Scheduler when running on Windows, recent LOOPS run state, and stale lock
+signals. It does not start a run, modify the scheduled task, push, deploy, or
+write secrets.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\check-wakeup-health.ps1
+```
+
 Default state path:
 
 ```text

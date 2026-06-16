@@ -58,6 +58,7 @@ async function main() {
 
     candidates = [
       ...(await discoverProjectState(ctx)),
+      ...(await discoverWakeupHealth(ctx)),
       ...(await discoverGitState(ctx)),
       ...(await discoverGithubPublication(ctx)),
       ...(await discoverFrontendArtifacts(ctx)),
@@ -144,6 +145,53 @@ async function discoverProjectState() {
   }
 
   return [];
+}
+
+async function discoverWakeupHealth() {
+  const latest = await readJson(path.join(stateDir, 'wakeup-health', 'latest.json'), null);
+  const generatedAtMs = Date.parse(latest?.generatedAt || '');
+  const ageMinutes = Number.isFinite(generatedAtMs)
+    ? Math.max(0, (Date.now() - generatedAtMs) / 60_000)
+    : null;
+  const fresh = ageMinutes !== null && ageMinutes <= 60;
+  const unhealthy = latest?.health?.ok === false;
+  const id = unhealthy ? 'wakeup-health-attention' : (fresh ? 'wakeup-health-ready' : 'wakeup-health-needed');
+
+  return [{
+    type: 'wakeup_health',
+    id,
+    title: unhealthy
+      ? 'Inspect LOOPS wakeup health warning'
+      : (fresh ? 'Review LOOPS wakeup health' : 'Check LOOPS wakeup health'),
+    value: unhealthy ? 0.82 : (fresh ? 0.28 : 0.52),
+    urgency: unhealthy ? 0.78 : (fresh ? 0.22 : 0.48),
+    loopability: 0.86,
+    freshness: fresh ? 0.72 : 0.42,
+    risk: 0.08,
+    action: unhealthy
+      ? 'Review the latest wakeup health report before relying on hourly automation.'
+      : (fresh
+          ? 'Use the latest wakeup health report as the current local heartbeat evidence.'
+          : 'Generate a local wakeup health report covering Task Scheduler, locks, and recent LOOPS runs.'),
+    fingerprintSeed: latest
+      ? `${latest.statusFingerprint || ''}:${latest.generatedAt || ''}:${latest.health?.ok}`
+      : 'missing-wakeup-health',
+    evidence: {
+      reportPath: latest?.reportPath || null,
+      generatedAt: latest?.generatedAt || null,
+      ageMinutes: ageMinutes === null ? null : Math.round(ageMinutes * 10) / 10,
+      health: latest?.health || null,
+      scheduledTask: latest?.scheduledTask
+        ? {
+            found: latest.scheduledTask.found,
+            state: latest.scheduledTask.state,
+            lastTaskResult: latest.scheduledTask.lastTaskResult,
+            nextRunTime: latest.scheduledTask.nextRunTime,
+            executionTimeLimit: latest.scheduledTask.executionTimeLimit,
+          }
+        : null,
+    },
+  }];
 }
 
 async function discoverGitState() {
@@ -638,6 +686,21 @@ async function runAutoCompletions(candidates) {
   const completions = [];
   const ids = new Set(candidates.map(candidate => candidate.id));
   const byId = new Map(candidates.map(candidate => [candidate.id, candidate]));
+
+  if (ids.has('wakeup-health-needed') || ids.has('wakeup-health-attention')) {
+    completions.push(runLocalStep(
+      'check-wakeup-health',
+      'node',
+      ['scripts/loops-24/check-wakeup-health.mjs'],
+      120_000
+    ));
+  } else if (ids.has('wakeup-health-ready')) {
+    const candidate = byId.get('wakeup-health-ready');
+    completions.push(blockedCompletion(
+      'wakeup-health-ready',
+      `Current wakeup health report already exists: ${candidate?.evidence?.reportPath || path.join(stateDir, 'wakeup-health')}`
+    ));
+  }
 
   if (ids.has('github-local-pr-handoff-needed')) {
     completions.push(runLocalStep(
