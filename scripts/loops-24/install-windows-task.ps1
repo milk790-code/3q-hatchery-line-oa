@@ -1,10 +1,15 @@
 param(
   [string]$TaskName = 'LOOPS-24-3Q-Hatchery',
   [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path,
-  [int]$StartDelayMinutes = 5
+  [int]$StartDelayMinutes = 5,
+  [int]$ExecutionTimeLimitMinutes = 15
 )
 
 $ErrorActionPreference = 'Stop'
+
+if ($ExecutionTimeLimitMinutes -lt 1) {
+  throw 'ExecutionTimeLimitMinutes must be at least 1.'
+}
 
 $scriptPath = Join-Path $RepoRoot 'scripts\loops-24\run.ps1'
 if (-not (Test-Path -LiteralPath $scriptPath)) {
@@ -42,7 +47,7 @@ $trigger = New-ScheduledTaskTrigger `
 $settings = New-ScheduledTaskSettingsSet `
   -StartWhenAvailable `
   -MultipleInstances IgnoreNew `
-  -ExecutionTimeLimit (New-TimeSpan -Minutes 50) `
+  -ExecutionTimeLimit (New-TimeSpan -Minutes $ExecutionTimeLimitMinutes) `
   -AllowStartIfOnBatteries `
   -DontStopIfGoingOnBatteries
 

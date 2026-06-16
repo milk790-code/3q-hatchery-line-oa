@@ -171,6 +171,13 @@ same read-only runner above.
 powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\install-windows-task.ps1
 ```
 
+The installed task defaults to a 15-minute execution limit so a stuck wakeup
+does not crowd out the next hourly round. Override it when needed:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\install-windows-task.ps1 -ExecutionTimeLimitMinutes 30
+```
+
 Inspect:
 
 ```powershell
