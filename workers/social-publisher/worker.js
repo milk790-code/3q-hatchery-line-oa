@@ -1,6 +1,10 @@
-// 3Q Hatchery — Social Publisher Worker v2.3
+// 3Q Hatchery — Social Publisher Worker v2.5
 // Auto-posts to Threads, Instagram, Facebook Page, TikTok, Google Business Profile
 // Tokens stored in SESSION KV and auto-refreshed every 50 days — no manual renewal.
+//
+// v2.5 (2026-06-17):
+//   - /queue/add 去重納入 link_url + scheduled_at，允許同文不同日期/UTM 的
+//     30 天 campaign feed 正常排入，仍防止完全相同 pending row 雙投。
 //
 // v2.3 (2026-06-12):
 //   - /queue/add 去重:platform+caption+seed+image 與 pending 列完全相同 → skip
@@ -741,7 +745,7 @@ export default {
       return json({
         ok: true,
         worker: '3q-social-publisher',
-        version: '2.3',
+        version: '2.5',
         platforms: Object.keys(DAILY_LIMITS),
         configured: {
           threads:    Boolean(threadsToken),
@@ -772,11 +776,19 @@ export default {
         if (!PLATFORM_FNS[p.platform]) { errors.push({ index: i, error: `unknown platform: ${p.platform}` }); continue; }
         if (!p.caption && !p.caption_seed) { errors.push({ index: i, error: 'caption or caption_seed required' }); continue; }
         try {
-          // v2.3 dedup: an identical pending row (platform+caption+seed+image) means a
-          // double-seeded batch — the same post would publish twice (q40-46 vs q48-54).
+          // v2.5 dedup: only skip a truly identical pending row. Campaign feeds may
+          // reuse a caption across different days or UTM links; those are distinct
+          // scheduled posts and must not collapse into one pending row.
           const dup = await env.CRM.prepare(
-            "SELECT id FROM content_queue WHERE status='pending' AND platform=? AND COALESCE(caption,'')=COALESCE(?,'') AND COALESCE(caption_seed,'')=COALESCE(?,'') AND COALESCE(image_url,'')=COALESCE(?,'') LIMIT 1"
-          ).bind(p.platform, p.caption || null, p.caption_seed || null, p.image_url || null).first();
+            "SELECT id FROM content_queue WHERE status='pending' AND platform=? AND COALESCE(caption,'')=COALESCE(?,'') AND COALESCE(caption_seed,'')=COALESCE(?,'') AND COALESCE(image_url,'')=COALESCE(?,'') AND COALESCE(link_url,'')=COALESCE(?,'') AND COALESCE(scheduled_at,'')=COALESCE(?,'') LIMIT 1"
+          ).bind(
+            p.platform,
+            p.caption || null,
+            p.caption_seed || null,
+            p.image_url || null,
+            p.link_url || null,
+            p.scheduled_at || null,
+          ).first();
           if (dup) { skipped.push({ index: i, duplicate_of: dup.id }); continue; }
           const r = await env.CRM.prepare(
             "INSERT INTO content_queue (platform, image_url, caption_seed, caption, topic_tag, link_url, scheduled_at, status, source_oa) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?)"
