@@ -134,9 +134,17 @@ async function readLatestRun(runsPath) {
   const lines = raw.split(/\r?\n/).filter(Boolean);
   for (let i = lines.length - 1; i >= 0; i -= 1) {
     const run = parseJsonMaybe(lines[i]);
-    if (run && !run.dry_run) return run;
+    if (!isRunRecord(run) || run.dry_run) continue;
+    return run;
   }
   return null;
+}
+
+function isRunRecord(value) {
+  if (!value || typeof value !== 'object') return false;
+  if (typeof value.ok === 'boolean') return true;
+  if (typeof value.status === 'string' && value.status === 'standby') return true;
+  return false;
 }
 
 function renderIssueBody(run, now, action, dedupeKey) {
