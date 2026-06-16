@@ -1011,8 +1011,18 @@ async function runAutoCompletions(candidates) {
     }
   }
 
-  if (candidates.some(candidate => (candidate.manualGate || inferManualGate(candidate)) !== 'none_read_only')
-    || autoCompletionsNeedOwnerBundle(completions)) {
+  const hasManualGateCandidates = candidates.some(candidate => (candidate.manualGate || inferManualGate(candidate)) !== 'none_read_only');
+
+  if (hasManualGateCandidates) {
+    completions.push(runLocalStep(
+      'prepare-manual-gate-adapter',
+      'node',
+      ['scripts/loops-24/prepare-manual-gate-adapter.mjs'],
+      120_000
+    ));
+  }
+
+  if (hasManualGateCandidates || autoCompletionsNeedOwnerBundle(completions)) {
     completions.push(runLocalStep(
       'prepare-owner-approval-bundle',
       'node',

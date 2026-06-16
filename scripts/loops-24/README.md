@@ -53,6 +53,12 @@ to local, review-ready artifacts:
 It stops at review gates for secrets, tokens, deploy approval, outbound sending,
 and broad frontend/artifact payloads.
 
+Before escalating a manual gate, LOOPS also prepares a manual-gate adapter report.
+That report groups similar blockers into one shared taxonomy, lists safe automatic
+substitutes, and keeps only the true hard stops for owner approval. The same
+contract can be synced into Codex, Claude, or additional operator accounts so
+their outputs do not drift.
+
 Frontend/artifact review also runs syntax checks for plain `.js` files and
 marks affected slices as hard stops when syntax errors are detected.
 
@@ -212,6 +218,40 @@ powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\check-secret-gates.p
 The checker exits `0` when every required gate is ready for the local runner
 wrapper, and exits non-zero when one or more gates are missing. It never prints secret
 values.
+
+## Prepare manual gate adapter
+
+Create a local report that finds manual-like gates across LOOPS scripts, docs,
+task registries, and workflows. It maps each gate to safe automatic substitutes
+before owner escalation.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\prepare-manual-gate-adapter.ps1
+```
+
+Latest adapter report path:
+
+```text
+%USERPROFILE%\.codex\automations\loops-24\manual-gate-adapter\latest.md
+```
+
+## Sync cross-agent memory
+
+Use `docs/loopos-cross-agent-memory.md` as the canonical rule for Codex, Claude,
+and extra operator accounts. When explicitly approved, this sync can write the
+same contract to the LoopOS state directory, a Codex ad hoc memory note, and a
+Claude memory file.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\sync-agent-memory.ps1 --dry-run
+```
+
+The sync defaults to dry-run. Use `--write` or `LOOPS_ALLOW_MEMORY_SYNC=1` only
+after explicit owner approval. It stores rules, not secrets or run evidence.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\sync-agent-memory.ps1 --write
+```
 
 ## Optional live social-publisher probe
 
