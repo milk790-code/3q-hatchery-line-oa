@@ -72,10 +72,10 @@ that aggregates the latest manual gates and evidence. This remains local-only an
 does not push or create a pull request.
 
 LOOPS also writes an owner approval bundle that consolidates the GitHub handoff,
-PR readiness, Worker deploy checklist, secret gates, wakeup health, and
-manual-send gates into one local decision page. It does not run `git push`,
-create a pull request, deploy, call protected endpoints, write secrets, or send
-messages.
+PR readiness, Worker deploy checklist, secret gates, wakeup health, dashboard
+gate verification, and manual-send gates into one local decision page. It does
+not run `git push`, create a pull request, deploy, call protected endpoints,
+write secrets, or send messages.
 
 It can also surface a `cold_outreach` candidate from
 `scripts/outreach.prospects.json`. That path creates review-ready draft work for

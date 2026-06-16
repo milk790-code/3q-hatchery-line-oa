@@ -33,6 +33,12 @@ const wakeup = await readJson(path.join(stateDir, 'wakeup-health', 'latest.json'
 const boundary = await readJson(path.join(stateDir, 'commit-boundaries', 'latest.json'), null);
 const frontend = await readJson(path.join(stateDir, 'frontend-slice-handoffs', 'latest.json'), null);
 const contentQueue = await readJson(path.join(stateDir, 'content-queue-reconciliations', 'latest.json'), null);
+const dashboard = await readJson(path.join(stateDir, 'dashboard', 'latest.json'), null);
+let dashboardGates = await readJson(path.join(stateDir, 'dashboard-verifications', 'latest.json'), null);
+if (dashboard?.jsonPath && (!dashboardGates || dashboardGates.dashboardJsonPath !== dashboard.jsonPath || dashboardGates.ok !== true)) {
+  runNodeMaybe(['scripts/loops-24/verify-dashboard-gates.mjs', '--dashboard-json', dashboard.jsonPath]);
+  dashboardGates = await readJson(path.join(stateDir, 'dashboard-verifications', 'latest.json'), null);
+}
 
 const branch = runGit(['branch', '--show-current']).trim();
 const upstream = runGitMaybe(['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}']).stdout.trim();
@@ -55,6 +61,9 @@ const prReady = pr?.summary?.readyForApproval === true;
 const workerReady = worker?.summary?.status === 'ready-for-approval';
 const wakeupOk = wakeup?.health?.ok === true;
 const localScopeClean = stagedLines.length === 0 && unexpectedDirty.length === 0;
+const dashboardGatesReady = Boolean(dashboard?.jsonPath
+  && dashboardGates?.ok === true
+  && dashboardGates?.dashboardJsonPath === dashboard.jsonPath);
 
 const gates = [
   {
@@ -65,6 +74,15 @@ const gates = [
     evidence: localScopeClean
       ? `Tracked dirty files are limited to: ${dirtyPaths.join(', ') || '(none)'}.`
       : `Unexpected dirty files or staged changes exist. staged=${stagedLines.join(', ') || '(none)'} unexpected=${unexpectedDirty.join(', ') || '(none)'}`,
+  },
+  {
+    id: 'dashboard_gate_verification',
+    label: 'Verify dashboard approval gates',
+    status: dashboardGatesReady ? 'ready' : 'attention',
+    ownerAction: 'Trust the dashboard approval groups only after the local verifier has checked the latest dashboard JSON.',
+    evidence: dashboardGatesReady
+      ? `ok=true waiting=${dashboardGates.summary?.waitingCount} groups=${dashboardGates.summary?.approvalGroupCount} report=${dashboardGates.reportPath}`
+      : `Dashboard verifier missing, failed, or stale. dashboard=${dashboard?.jsonPath || '(missing)'} verifier=${dashboardGates?.dashboardJsonPath || '(missing)'}`,
   },
   {
     id: 'push_draft_pr',
@@ -140,6 +158,7 @@ const payload = {
     commitBoundaries: boundary?.reportPath || null,
     frontendHandoffs: frontend?.reportPath || null,
     contentQueue: contentQueue?.reportPath || null,
+    dashboardGateVerification: dashboardGates?.reportPath || null,
   },
   gates,
   summary: {
@@ -151,6 +170,7 @@ const payload = {
     prReady,
     workerReady,
     wakeupOk,
+    dashboardGatesReady,
     localScopeClean,
   },
 };
@@ -300,6 +320,15 @@ function runGitMaybe(args) {
     stdout: result.stdout || '',
     stderr: result.stderr || (result.error ? result.error.message : ''),
   };
+}
+
+function runNodeMaybe(args) {
+  return spawnSync('node', args, {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    windowsHide: true,
+    maxBuffer: 1024 * 1024 * 8,
+  });
 }
 
 function parseStatusLine(line) {
