@@ -1486,10 +1486,16 @@ async function acquireLock() {
     if (error.code !== 'EEXIST') throw error;
     const owner = await readJson(lockPath, null);
     const expiresAt = owner?.expiresAt ? Date.parse(owner.expiresAt) : 0;
-    if (Number.isFinite(expiresAt) && expiresAt < Date.now()) {
+    const ownerAlive = isProcessAlive(owner?.pid);
+    if ((Number.isFinite(expiresAt) && expiresAt < Date.now()) || ownerAlive === false) {
       await fs.unlink(lockPath).catch(() => {});
       await fs.writeFile(lockPath, `${JSON.stringify(payload, null, 2)}\n`, { encoding: 'utf8', flag: 'wx' });
-      return { acquired: true, token, staleReplaced: true };
+      return {
+        acquired: true,
+        token,
+        staleReplaced: true,
+        staleReason: ownerAlive === false ? 'owner-process-exited' : 'lock-expired',
+      };
     }
     return { acquired: false, owner };
   }
@@ -1515,6 +1521,18 @@ function runCommand(command, args, timeout) {
     stdout: result.stdout || '',
     stderr: result.stderr || (result.error ? result.error.message : ''),
   };
+}
+
+function isProcessAlive(pid) {
+  const numericPid = Number(pid);
+  if (!Number.isInteger(numericPid) || numericPid <= 0) return null;
+  try {
+    process.kill(numericPid, 0);
+    return true;
+  } catch (error) {
+    if (error && error.code === 'ESRCH') return false;
+    return null;
+  }
 }
 
 async function fetchJson(url) {
