@@ -21,6 +21,7 @@ jobs:
     env:
       LOOPS_STATE_DIR: .loops
       LOOPS_MAX_TASKS: "3"
+      LOOPS_ALLOW_GITHUB_LABEL_ACK: "1"
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GITHUB_REPOSITORY: ${{ github.repository }}
     steps:
