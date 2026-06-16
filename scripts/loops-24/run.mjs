@@ -1052,12 +1052,13 @@ function blockedCompletion(label, reason, candidate = null) {
 }
 
 function classifyApproval(label, candidate = null) {
-  const text = `${label} ${candidate?.id || ''} ${candidate?.type || ''} ${candidate?.action || ''}`.toLowerCase();
-  if (/token|secret|api-key|api_key|google|places/.test(text)) return 'secret-input';
-  if (/deploy|worker|cron|webhook|social-publisher/.test(text)) return 'deploy-approval';
-  if (/github|pr|push/.test(text)) return 'push-and-pr-approval';
-  if (/outreach|send|publish/.test(text)) return 'manual-send-approval';
-  if (/frontend|slice|handoff|worktree/.test(text)) return 'local-review';
+  const id = `${label} ${candidate?.id || ''}`.toLowerCase();
+  const text = `${id} ${candidate?.type || ''} ${candidate?.action || ''}`.toLowerCase();
+  if (/cold-outreach|outreach|manual-send|sending/.test(text)) return 'manual-send-approval';
+  if (/google-prospecting-api-key|social-publisher-token|secret-gates|api[_-]?key/.test(id)) return 'secret-input';
+  if (/webhook-cron|worker-deploy|deploy|cron-status|social-publisher-health|queue-list/.test(text)) return 'deploy-approval';
+  if (/github|local-pr|pr-readiness|pull request|push/.test(text)) return 'push-and-pr-approval';
+  if (/content-queue|wakeup|frontend|slice|handoff|worktree|wrangler-cache/.test(text)) return 'local-review';
   return 'review';
 }
 

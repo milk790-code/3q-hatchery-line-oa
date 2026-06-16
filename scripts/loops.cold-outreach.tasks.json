@@ -3,6 +3,10 @@
     {
       "task_type": "google_business_prospecting",
       "source_id": "3q-google-business-prospecting",
+      "lane": "revenue",
+      "manual_gate": "manual_send_only",
+      "expected_artifact": "deduped public business prospects for manual review",
+      "dedup_policy": "720m per query/fingerprint; no outbound sending",
       "priority_base": 92,
       "dedup_window_minutes": 720,
       "loopability_score": 0.9,
@@ -17,6 +21,10 @@
     {
       "task_type": "cold_outreach_batch",
       "source_id": "3q-cold-outreach-draft-batch",
+      "lane": "outreach-draft",
+      "manual_gate": "manual_send_only",
+      "expected_artifact": "review-ready outreach drafts only",
+      "dedup_policy": "720m source dedup plus 14d prospect cooldown",
       "priority_base": 90,
       "dedup_window_minutes": 720,
       "loopability_score": 0.9,
