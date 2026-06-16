@@ -1,0 +1,20 @@
+{
+  "name": "loop-next-002",
+  "version": "0.1.0+codex.20260616154933",
+  "description": "Loop Next 002 plugin",
+  "author": {
+    "name": "Local developer"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Loop Next 002",
+    "shortDescription": "Use Loop Next 002 in Codex.",
+    "longDescription": "Loop Next 002 adds a local Codex plugin scaffold.",
+    "developerName": "Local developer",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": [
+      "Help me use Loop Next 002."
+    ]
+  }
+}

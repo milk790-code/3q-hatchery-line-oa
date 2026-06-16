@@ -1,0 +1,20 @@
+{
+  "name": "{{PLUGIN_NAME}}",
+  "version": "0.1.0",
+  "description": "{{DESCRIPTION}}",
+  "author": {
+    "name": "{{AUTHOR_NAME}}"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "{{DISPLAY_NAME}}",
+    "shortDescription": "{{SHORT_DESCRIPTION}}",
+    "longDescription": "{{LONG_DESCRIPTION}}",
+    "developerName": "{{DEVELOPER_NAME}}",
+    "category": "{{CATEGORY}}",
+    "capabilities": [],
+    "defaultPrompt": [
+      "{{DEFAULT_PROMPT}}"
+    ]
+  }
+}

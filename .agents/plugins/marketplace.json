@@ -1,0 +1,32 @@
+{
+  "name": "team-3q",
+  "interface": {
+    "displayName": "Team 3q"
+  },
+  "plugins": [
+    {
+      "name": "loop-next-001",
+      "source": {
+        "source": "local",
+        "path": "./plugins/loop-next-001"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "loop-next-002",
+      "source": {
+        "source": "local",
+        "path": "./plugins/loop-next-002"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

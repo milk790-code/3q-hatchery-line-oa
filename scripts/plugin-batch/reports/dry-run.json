@@ -1,0 +1,49 @@
+{
+    "generatedAt":  "2026-06-17T01:03:13.1768092+08:00",
+    "repoRoot":  "C:\\Users\\USER\\Documents\\GitHub\\3q-hatchery-line-oa",
+    "pluginParent":  "C:\\Users\\USER\\Documents\\GitHub\\3q-hatchery-line-oa\\plugins",
+    "marketplacePath":  "C:\\Users\\USER\\Documents\\GitHub\\3q-hatchery-line-oa\\.agents\\plugins\\marketplace.json",
+    "marketplaceName":  "team-3q",
+    "totals":  {
+                   "total":  2,
+                   "success":  0,
+                   "failed":  0,
+                   "skipped":  2,
+                   "created":  0,
+                   "templateApplied":  0,
+                   "validated":  0,
+                   "cachebusted":  0,
+                   "reinstalled":  0
+               },
+    "warnings":  [
+                     "codex CLI resolves to WindowsApps and is not runnable from this PowerShell session. Reinstall steps are skipped."
+                 ],
+    "records":  [
+                    {
+                        "Raw":  "loop-next-001",
+                        "Slug":  "loop-next-001",
+                        "PluginPath":  "C:\\Users\\USER\\Documents\\GitHub\\3q-hatchery-line-oa\\plugins\\loop-next-001",
+                        "Result":  "SKIPPED",
+                        "Step":  "dry-run",
+                        "Detail":  "Predicted path: C:\\Users\\USER\\Documents\\GitHub\\3q-hatchery-line-oa\\plugins\\loop-next-001",
+                        "Attempts":  0,
+                        "TemplateApplied":  false,
+                        "Validated":  false,
+                        "Cachebusted":  false,
+                        "Reinstalled":  false
+                    },
+                    {
+                        "Raw":  "loop-next-002",
+                        "Slug":  "loop-next-002",
+                        "PluginPath":  "C:\\Users\\USER\\Documents\\GitHub\\3q-hatchery-line-oa\\plugins\\loop-next-002",
+                        "Result":  "SKIPPED",
+                        "Step":  "dry-run",
+                        "Detail":  "Predicted path: C:\\Users\\USER\\Documents\\GitHub\\3q-hatchery-line-oa\\plugins\\loop-next-002",
+                        "Attempts":  0,
+                        "TemplateApplied":  false,
+                        "Validated":  false,
+                        "Cachebusted":  false,
+                        "Reinstalled":  false
+                    }
+                ]
+}
