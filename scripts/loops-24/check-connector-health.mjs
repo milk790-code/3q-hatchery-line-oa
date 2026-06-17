@@ -52,6 +52,12 @@ const connectors = [
     pluginPath: path.join(pluginCache, 'openai-bundled', 'chrome'),
     authNote: 'Browser session state is user-controlled and may require manual login.',
   }),
+  inspectCodexPlugin({
+    id: 'computer_use_plugin',
+    label: 'Computer Use plugin',
+    pluginPath: path.join(pluginCache, 'openai-bundled', 'computer-use'),
+    authNote: 'Windows app-control helper availability is thread-scoped; verify with a read-only Computer Use list_apps probe.',
+  }),
   inspectCliConnector({
     id: 'github_cli',
     label: 'GitHub CLI',

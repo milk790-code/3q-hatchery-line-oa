@@ -18,7 +18,14 @@ const stamp = toStamp(now);
 const connectorId = required(args.connector, '--connector');
 const status = args.status || 'ready';
 const ttlMinutes = Number(args.ttlMinutes || 1440);
-const allowedConnectors = new Set(['github_app', 'gmail_app', 'google_drive_app', 'slack_app', 'chrome_plugin']);
+const allowedConnectors = new Set([
+  'github_app',
+  'gmail_app',
+  'google_drive_app',
+  'slack_app',
+  'chrome_plugin',
+  'computer_use_plugin',
+]);
 const allowedStatuses = new Set(['ready', 'attention', 'failed']);
 
 if (!allowedConnectors.has(connectorId)) {

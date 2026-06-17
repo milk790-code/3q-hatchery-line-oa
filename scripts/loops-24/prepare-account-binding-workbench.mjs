@@ -288,6 +288,23 @@ function buildItems(health, checklist) {
         'Browser UI automation must stop before permission grants, sends, form submits, payments, or destructive actions.',
       ],
     },
+    {
+      id: 'computer_use_plugin',
+      label: 'Windows Computer Use helper',
+      category: 'desktop_control',
+      priority: 44,
+      revenueImpact: 'low',
+      sourceIds: ['computer_use_plugin'],
+      ownerAction: 'Repair or update the Computer Use helper/runtime, then rerun a read-only list_apps probe from the Codex thread.',
+      bindingSurface: 'Codex Computer Use plugin + local Windows helper',
+      why: 'Useful for Windows app inspection and local UI verification, but not required for the current revenue gate.',
+      verificationCommands: [
+        'Use the Codex Computer Use tool: run a read-only list_apps probe; do not click, type, launch apps, or change settings.',
+      ],
+      notes: [
+        'Computer Use must stop before permission changes, account dialogs, sends, deletes, or system setting changes.',
+      ],
+    },
   ];
 
   return specs.map(spec => makeItem(spec, healthById, checklistById, secretsExamplePath));
@@ -342,7 +359,17 @@ function deriveStatus(spec, health, checklist) {
   }
   if (spec.category === 'browser_session') {
     if (health?.status === 'missing_plugin') return 'plugin_missing';
+    if (health?.status === 'ready_thread_verified') return 'ready_thread_verified';
+    if (health?.status === 'thread_verification_failed') return 'thread_verification_failed';
+    if (health?.status === 'thread_verification_attention') return 'thread_verification_attention';
     return 'manual_session_required';
+  }
+  if (spec.category === 'desktop_control') {
+    if (health?.status === 'missing_plugin') return 'plugin_missing';
+    if (health?.status === 'ready_thread_verified') return 'ready_thread_verified';
+    if (health?.status === 'thread_verification_failed') return 'thread_verification_failed';
+    if (health?.status === 'thread_verification_attention') return 'thread_verification_attention';
+    return 'manual_helper_required';
   }
   if (spec.category === 'cli_auth') {
     if (health?.status === 'missing_cli' || health?.commandPresent === false) return 'cli_missing';
@@ -358,6 +385,7 @@ function whyNotAutoBind(category) {
   if (category === 'local_secret') return 'Secret entry is sensitive and must be done by the owner on this machine.';
   if (category === 'codex_app_auth') return 'OAuth consent and account scope grants must be completed by the owner in the Codex app.';
   if (category === 'browser_session') return 'Browser login and permission prompts require owner control.';
+  if (category === 'desktop_control') return 'Windows app-control repair or helper permissions can change local machine state.';
   if (category === 'cli_auth') return 'CLI login can open browser/device-code flows and change account state.';
   return 'Account binding is a permission-changing action.';
 }
