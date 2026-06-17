@@ -184,6 +184,10 @@ Within `summary`, `nextApproval` means the `Today First` approval gate, while
 When the latest wakeup-health evidence has Windows `WakeToRun=false`, the
 dashboard also routes the wakeup waiting item to `power-wake-policy` so the
 daily dashboard and owner approval bundle show the same sleep-wakeup decision.
+When the latest owner approval bundle is for the current `HEAD` and contains an
+`investor_review` gate, the dashboard adds `owner-gate:investor_review` under
+`investor-review` so investor packet decisions are visible without opening the
+full owner bundle.
 
 Verify that manual-gated waiting items are mapped to the expected approval
 groups:

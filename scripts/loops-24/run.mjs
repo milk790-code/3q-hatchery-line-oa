@@ -1384,7 +1384,8 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
   const completed = autoCompletions.filter(item => item.status === 'completed');
   const blocked = autoCompletions.filter(item => item.status === 'blocked');
   const manualWaits = summarizeManualWaits(candidates, autoCompletions);
-  const waiting = [...blocked, ...manualWaits];
+  const ownerGateWaits = await summarizeOwnerGateWaits();
+  const waiting = [...blocked, ...manualWaits, ...ownerGateWaits];
   const approvals = summarizeApprovals(waiting);
   const escalated = blocked.filter(item => item.escalated);
   const loopos = result.loopos || buildLooposSummary(candidates, autoCompletions, { registries: [], warnings: [] });
@@ -1418,6 +1419,7 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     completed: completed.map(summarizeCompletion),
     blocked: blocked.map(summarizeCompletion),
     manualWaits: manualWaits.map(summarizeCompletion),
+    ownerGateWaits: ownerGateWaits.map(summarizeCompletion),
     waiting: waiting.map(summarizeCompletion),
     approvalGroups: approvals,
     nextApproval: approvals,
@@ -1898,6 +1900,31 @@ function summarizeManualWaits(candidates, autoCompletions = []) {
         nextApprovals: classifyApprovalGates(candidate.id || candidate.title || candidate.type, candidate),
       };
     });
+}
+
+async function summarizeOwnerGateWaits() {
+  const bundle = await readJson(path.join(stateDir, 'owner-approval-bundles', 'latest.json'), null);
+  if (!bundle) return [];
+
+  const currentHead = runGitMaybe(['rev-parse', '--short', 'HEAD']).stdout.trim();
+  if (!currentHead || bundle.head !== currentHead) return [];
+
+  return (bundle.gates || [])
+    .filter(gate => gate.id === 'investor_review'
+      && ['attention', 'manual_approval', 'manual_input', 'ready_for_approval'].includes(gate.status))
+    .map(gate => ({
+      label: `owner-gate:${gate.id}`,
+      status: 'waiting',
+      lane: 'demo-sales',
+      summary: `${gate.ownerAction || 'Owner approval required.'} Evidence: ${gate.evidence || '(none)'}`,
+      ageHours: 0,
+      firstSeenAt: null,
+      escalated: false,
+      escalation: null,
+      manualGate: 'manual_investor_review',
+      nextApproval: 'investor-review',
+      nextApprovals: ['investor-review'],
+    }));
 }
 
 function summarizeApprovals(blocked) {
