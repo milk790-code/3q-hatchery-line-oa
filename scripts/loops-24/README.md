@@ -247,6 +247,10 @@ It also recomputes approval workbench expiry from the dashboard generation time
 and fails if `expires_in_minutes`, the requested expiry, expiry bound reason,
 wakeup freshness bound, Taipei-time mirror, or the expired flag drift from the
 embedded workbench artifact.
+It also verifies the embedded account binding workbench summary and fails when
+the dashboard mirror for attention count or next binding drifts from the
+workbench artifact, or when the workbench status/category totals no longer add
+up to the embedded summary total.
 Before writing an owner approval bundle, the main runner refreshes the local
 GitHub handoff and PR readiness packet when they no longer match the current
 branch, head, ahead/behind counts, or tracked worktree fingerprint. This keeps

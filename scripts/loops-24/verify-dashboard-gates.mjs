@@ -23,6 +23,7 @@ const approvalGroups = Array.isArray(dashboard.approvalGroups) ? dashboard.appro
 const approvalIndex = buildApprovalIndex(nextApproval);
 const findings = mergeFindings(
   verifyDashboardSchema(dashboard, waiting, nextApproval, approvalGroups),
+  verifyAccountBindingWorkbenchSummary(dashboard),
   verifyOwnerApprovalBundleSummary(dashboard),
   verifyApprovalWorkbenchSummary(dashboard),
   verifyWaitingItems(waiting, approvalIndex),
@@ -40,6 +41,7 @@ const payload = {
   summary: {
     waitingCount: waiting.length,
     approvalGroupCount: nextApproval.length,
+    accountBindingAttentionCount: dashboard.accountBindingWorkbench?.summary?.attentionCount ?? null,
     failureCount: findings.failures.length,
     warningCount: findings.warnings.length,
   },
@@ -55,6 +57,15 @@ const payload = {
       approval: group.approval,
       items: (group.items || []).map(item => item.label),
     })),
+    accountBindingWorkbench: dashboard.accountBindingWorkbench
+      ? {
+          total: dashboard.accountBindingWorkbench.summary?.total ?? null,
+          readyCount: dashboard.accountBindingWorkbench.summary?.readyCount ?? null,
+          attentionCount: dashboard.accountBindingWorkbench.summary?.attentionCount ?? null,
+          nextBindingId: dashboard.accountBindingWorkbench.summary?.nextBindingId ?? null,
+          nextBindingLabel: dashboard.accountBindingWorkbench.summary?.nextBindingLabel ?? null,
+        }
+      : null,
     failures: findings.failures,
   })),
 };
@@ -166,6 +177,78 @@ function verifyDashboardSchema(dashboard, waiting, nextApproval, approvalGroups)
   }
   if (!summary.topAction && dashboard.loopos?.morningDecision?.label) {
     warnings.push('summary.topAction is missing while loopos.morningDecision exists.');
+  }
+
+  return { failures, warnings };
+}
+
+function verifyAccountBindingWorkbenchSummary(dashboard) {
+  const failures = [];
+  const warnings = [];
+  const workbench = dashboard.accountBindingWorkbench;
+  const dashboardSummary = dashboard.summary || {};
+
+  if (!workbench || workbench.available === false) {
+    warnings.push('Dashboard has no accountBindingWorkbench artifact summary to verify.');
+    return { failures, warnings };
+  }
+
+  const summary = workbench.summary || {};
+  const items = Array.isArray(workbench.items) ? workbench.items : [];
+  const total = Number(summary.total);
+  const readyCount = Number(summary.readyCount);
+  const attentionCount = Number(summary.attentionCount);
+
+  if (!Number.isFinite(total)) failures.push('accountBindingWorkbench.summary.total is missing or invalid.');
+  if (!Number.isFinite(readyCount)) failures.push('accountBindingWorkbench.summary.readyCount is missing or invalid.');
+  if (!Number.isFinite(attentionCount)) failures.push('accountBindingWorkbench.summary.attentionCount is missing or invalid.');
+
+  if (items.length && Number.isFinite(total) && total !== items.length) {
+    failures.push(`accountBindingWorkbench.summary.total expected ${items.length} got ${summary.total}`);
+  }
+  if (items.length && Number.isFinite(readyCount)) {
+    const expectedReady = items.filter(item => !item.attention).length;
+    if (readyCount !== expectedReady) {
+      failures.push(`accountBindingWorkbench.summary.readyCount expected ${expectedReady} got ${summary.readyCount}`);
+    }
+  }
+  if (items.length && Number.isFinite(attentionCount)) {
+    const expectedAttention = items.filter(item => item.attention).length;
+    if (attentionCount !== expectedAttention) {
+      failures.push(`accountBindingWorkbench.summary.attentionCount expected ${expectedAttention} got ${summary.attentionCount}`);
+    }
+  }
+
+  const byStatusTotal = sumObjectNumbers(summary.byStatus);
+  if (summary.byStatus && Number.isFinite(total) && byStatusTotal !== total) {
+    failures.push(`accountBindingWorkbench.summary.byStatus total expected ${total} got ${byStatusTotal}`);
+  }
+  const byCategoryTotal = sumObjectNumbers(summary.byCategory);
+  if (summary.byCategory && Number.isFinite(total) && byCategoryTotal !== total) {
+    failures.push(`accountBindingWorkbench.summary.byCategory total expected ${total} got ${byCategoryTotal}`);
+  }
+
+  if (items.length) {
+    const nextBinding = items
+      .filter(item => item.attention)
+      .sort((a, b) => Number(b.priority || 0) - Number(a.priority || 0))[0] || null;
+    if ((summary.nextBindingId ?? null) !== (nextBinding?.id ?? null)) {
+      failures.push(`accountBindingWorkbench.summary.nextBindingId expected ${nextBinding?.id ?? null} got ${summary.nextBindingId ?? null}`);
+    }
+    if ((summary.nextBindingLabel ?? null) !== (nextBinding?.label ?? null)) {
+      failures.push(`accountBindingWorkbench.summary.nextBindingLabel expected ${nextBinding?.label ?? null} got ${summary.nextBindingLabel ?? null}`);
+    }
+  } else if (Number.isFinite(attentionCount) && attentionCount > 0 && !summary.nextBindingId) {
+    failures.push('accountBindingWorkbench.summary.nextBindingId is missing while attentionCount is greater than zero.');
+  }
+  if (Number(dashboardSummary.accountBindingAttentionCount || 0) !== Number(summary.attentionCount || 0)) {
+    failures.push(`summary.accountBindingAttentionCount expected ${summary.attentionCount || 0} got ${dashboardSummary.accountBindingAttentionCount}`);
+  }
+  if ((dashboardSummary.accountBindingNextBindingId ?? null) !== (summary.nextBindingId ?? null)) {
+    failures.push(`summary.accountBindingNextBindingId expected ${summary.nextBindingId ?? null} got ${dashboardSummary.accountBindingNextBindingId}`);
+  }
+  if ((dashboardSummary.accountBindingNextBindingLabel ?? null) !== (summary.nextBindingLabel ?? null)) {
+    failures.push(`summary.accountBindingNextBindingLabel expected ${summary.nextBindingLabel ?? null} got ${dashboardSummary.accountBindingNextBindingLabel}`);
   }
 
   return { failures, warnings };
@@ -420,6 +503,14 @@ function isTimestampExpired(value, relativeTo) {
 function toFiniteNumber(value) {
   const number = Number(value);
   return Number.isFinite(number) ? number : null;
+}
+
+function sumObjectNumbers(value) {
+  if (!value || typeof value !== 'object') return 0;
+  return Object.values(value).reduce((total, item) => {
+    const number = Number(item);
+    return total + (Number.isFinite(number) ? number : 0);
+  }, 0);
 }
 
 function round(value) {
