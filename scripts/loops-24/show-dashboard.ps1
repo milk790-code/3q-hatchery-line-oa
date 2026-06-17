@@ -19,7 +19,7 @@ function Read-JsonFile {
   }
 
   try {
-    return Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json
+    return Get-Content -LiteralPath $Path -Raw -Encoding UTF8 | ConvertFrom-Json
   } catch {
     Write-Warning "Could not read JSON for dashboard snapshot check: $Path ($($_.Exception.Message))"
     return $null
@@ -198,5 +198,5 @@ if ($Open) {
   Invoke-Item -LiteralPath $dashboardPath
 } else {
   Write-DashboardSnapshotWarnings -Warnings $snapshotWarnings
-  Get-Content -LiteralPath $dashboardPath
+  Get-Content -LiteralPath $dashboardPath -Encoding UTF8
 }
