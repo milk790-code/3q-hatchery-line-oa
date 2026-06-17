@@ -170,6 +170,8 @@ export async function runGoogleBusinessProspecting({
       channel: prospect.channel,
       source_url: prospect.source_url,
       contact_hint: prospect.contact_hint,
+      payment_likelihood: prospect.payment_likelihood,
+      payment_likelihood_reason: prospect.payment_likelihood_reason,
     })),
     errors,
   };
@@ -404,8 +406,11 @@ function normalizePlaceToProspect({ place, query, now }) {
   if (websiteUrl) contactParts.push(`官網 ${websiteUrl}`);
   contactParts.push('Google Maps 商家頁');
 
-  const fit = computeFitScore({ place, query, hasWebsite: Boolean(websiteUrl), hasPhone: Boolean(phone) });
+  const hasWebsite = Boolean(websiteUrl);
+  const hasPhone = Boolean(phone);
+  const fit = computeFitScore({ place, query, hasWebsite, hasPhone });
   const priority = computePriority({ rating, ratingCount, query });
+  const revenue = computeRevenueScore({ place, query, hasWebsite, hasPhone, rating, ratingCount });
   const signal = [
     place.formattedAddress ? `地址 ${place.formattedAddress}` : '',
     rating ? `Google 評分 ${rating}` : '',
@@ -432,6 +437,8 @@ function normalizePlaceToProspect({ place, query, now }) {
     outreach_angle: query.outreach_angle || defaultAngleForQuery(query),
     fit_score: fit,
     priority,
+    payment_likelihood: revenue.score,
+    payment_likelihood_reason: revenue.reasons.join('；'),
     rating,
     user_rating_count: ratingCount,
     business_status: place.businessStatus || '',
@@ -461,13 +468,57 @@ function computePriority({ rating, ratingCount, query }) {
   return round(clamp01(score));
 }
 
+function computeRevenueScore({ place, query, hasWebsite, hasPhone, rating, ratingCount }) {
+  const typeText = `${place.primaryType || ''} ${(place.types || []).join(' ')} ${query.text_query}`.toLowerCase();
+  const reasons = [];
+  let score = numberOr(query.payment_likelihood, numberOr(query.revenue_score, 0.52));
+
+  if (/bakery|cafe|restaurant|food|meal|dessert|gift|甜點|餐廳|咖啡|伴手禮|禮盒|餐盒|烘焙/.test(typeText)) {
+    score += 0.14;
+    reasons.push('food/gift category has direct purchase intent');
+  }
+  if (/beauty|hair|nail|spa|pet|clinic|fitness|美甲|美容|髮|寵物|診所|健身/.test(typeText)) {
+    score += 0.11;
+    reasons.push('appointment/service category can monetize leads quickly');
+  }
+  if (rating >= 4.4) {
+    score += 0.08;
+    reasons.push('strong public trust signal');
+  }
+  if (ratingCount >= 25 && ratingCount <= 500) {
+    score += 0.1;
+    reasons.push('enough demand without looking enterprise-heavy');
+  } else if (ratingCount > 500) {
+    score += 0.05;
+    reasons.push('large demand signal but may be harder to sell quickly');
+  } else if (ratingCount > 0 && ratingCount < 25) {
+    score += 0.03;
+    reasons.push('early listing may need conversion help');
+  }
+  if (hasPhone) {
+    score += 0.06;
+    reasons.push('has public direct contact');
+  }
+  if (hasWebsite) {
+    score += 0.05;
+    reasons.push('has online presence and likely understands web value');
+  } else {
+    score += 0.07;
+    reasons.push('no website found, one-page conversion offer may be clear');
+  }
+
+  if (reasons.length === 0) reasons.push('baseline Google listing fit');
+  return { score: round(clamp01(score)), reasons };
+}
+
 function scoreImportedProspect(prospect) {
   return (
-    0.4 * numberOr(prospect.fit_score, 0) +
-    0.25 * numberOr(prospect.priority, 0) +
-    0.15 * (prospect.website_url ? 1 : 0) +
-    0.1 * (prospect.phone ? 1 : 0) +
-    0.1 * (prospect.rating ? Math.min(1, prospect.rating / 5) : 0.5)
+    0.32 * numberOr(prospect.fit_score, 0) +
+    0.22 * numberOr(prospect.priority, 0) +
+    0.26 * numberOr(prospect.payment_likelihood, 0.5) +
+    0.1 * (prospect.website_url ? 1 : 0) +
+    0.06 * (prospect.phone ? 1 : 0) +
+    0.04 * (prospect.rating ? Math.min(1, prospect.rating / 5) : 0.5)
   );
 }
 
@@ -515,6 +566,8 @@ function renderProspectingMarkdown({ plan, prospects, errors }) {
     if (prospect.website_url) lines.push(`- website: ${prospect.website_url}`);
     if (prospect.phone) lines.push(`- phone: ${prospect.phone}`);
     if (prospect.rating) lines.push(`- rating: ${prospect.rating} (${prospect.user_rating_count || 0} reviews)`);
+    lines.push(`- payment_likelihood: ${prospect.payment_likelihood ?? '(unknown)'}`);
+    if (prospect.payment_likelihood_reason) lines.push(`- payment_reason: ${prospect.payment_likelihood_reason}`);
     lines.push(`- signal: ${prospect.public_signal}`);
     lines.push('');
   }

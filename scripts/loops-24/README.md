@@ -46,6 +46,9 @@ to local, review-ready artifacts:
 - Worker deploy-ready checklists
 - owner approval bundles
 - a compact completed / blocked / next approval dashboard
+- connector health reports that flag missing, failed, expired, timeout, skipped, or app-auth-unverified integrations
+- one-page local secret checklists derived from redacted secret gates
+- dirty worktree classification into deploy, investor, repo-hygiene, and other groups
 - content queue reconciliation reports
 - Wrangler cache audit reports
 - cold outreach drafts only when prospects are eligible
@@ -124,6 +127,9 @@ It also surfaces a `google_business_prospecting` candidate. That path uses the
 official Google Places API when `GOOGLE_MAPS_API_KEY` or `GOOGLE_PLACES_API_KEY`
 is present, appends deduped public business prospects locally, and never sends
 outbound messages by itself.
+Imported Google prospects include `payment_likelihood` and
+`payment_likelihood_reason` so manual review starts with the businesses most
+likely to pay for a conversion page, LINE intake, booking, or lead capture offer.
 
 ## Run locally
 
@@ -197,6 +203,9 @@ When the latest owner approval bundle is for the current `HEAD` and contains an
 `investor_review` gate, the dashboard adds `owner-gate:investor_review` under
 `investor-review` so investor packet decisions are visible without opening the
 full owner bundle.
+The dashboard also embeds compact summaries for connector health, local secret
+checklist status, and dirty worktree groups so the hourly loop can mark broken
+authorization or unsafe git scope without requiring a separate file hunt.
 
 Verify that manual-gated waiting items are mapped to the expected approval
 groups:

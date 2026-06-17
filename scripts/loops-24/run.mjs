@@ -82,6 +82,7 @@ async function main() {
     candidates = [
       ...(await discoverProjectState(ctx)),
       ...(await discoverWakeupHealth(ctx)),
+      ...(await discoverConnectorHealth(ctx)),
       ...(await discoverGitState(ctx)),
       ...(await discoverGithubPublication(ctx)),
       ...(await discoverPrReadiness(ctx)),
@@ -244,6 +245,51 @@ async function discoverWakeupHealth() {
   }];
 }
 
+async function discoverConnectorHealth() {
+  const latest = await readJson(path.join(stateDir, 'connector-health', 'latest.json'), null);
+  const generatedAtMs = Date.parse(latest?.generatedAt || '');
+  const ageMinutes = Number.isFinite(generatedAtMs)
+    ? Math.max(0, (Date.now() - generatedAtMs) / 60_000)
+    : null;
+  const maxAgeMinutes = Number.parseFloat(process.env.LOOPS_CONNECTOR_HEALTH_FRESH_MINUTES || '65');
+  const fresh = ageMinutes !== null && ageMinutes <= maxAgeMinutes;
+  const attentionCount = Number(latest?.summary?.attentionCount || 0);
+  const failedCount = Number(latest?.summary?.failedCount || 0);
+  const missingCount = Number(latest?.summary?.missingCount || 0);
+  const authUnverifiedCount = Number(latest?.summary?.authUnverifiedCount || 0);
+  const needsAttention = attentionCount > 0 || failedCount > 0 || missingCount > 0;
+  const id = !latest
+    ? 'connector-health-needed'
+    : (!fresh ? 'connector-health-stale' : (needsAttention ? 'connector-health-attention' : 'connector-health-ready'));
+
+  return [{
+    type: 'connector_health',
+    id,
+    title: !latest
+      ? 'Create connector health report'
+      : (!fresh ? 'Refresh connector health report' : (needsAttention ? 'Review connector auth attention' : 'Review connector health')),
+    value: needsAttention ? 0.78 : (!fresh ? 0.58 : 0.26),
+    urgency: needsAttention ? 0.7 : (!fresh ? 0.46 : 0.2),
+    loopability: 0.9,
+    freshness: fresh ? 0.8 : 0.35,
+    risk: 0.08,
+    manualGate: needsAttention ? 'manual_secret_input' : 'none_read_only',
+    action: needsAttention
+      ? 'Review the connector health artifact and re-auth or add local secrets only where the report marks missing, failed, expired, or timed out.'
+      : 'Use the connector health artifact to confirm which integrations are ready, skipped, or app-auth-unverified.',
+    fingerprintSeed: latest?.statusFingerprint || 'missing-connector-health',
+    evidence: {
+      reportPath: latest?.reportPath || null,
+      generatedAt: latest?.generatedAt || null,
+      ageMinutes: ageMinutes === null ? null : Math.round(ageMinutes * 10) / 10,
+      maxAgeMinutes,
+      onlySafeLocal: latest?.onlySafeLocal ?? null,
+      summary: latest?.summary || null,
+      authUnverifiedCount,
+    },
+  }];
+}
+
 async function discoverGitState() {
   const status = runCommand('git', ['status', '--short'], 45_000);
   if (!status.ok) {
@@ -274,6 +320,8 @@ async function discoverGitState() {
   const frontendReviewCurrent = latestFrontendReview?.statusFingerprint === statusFingerprint;
   const latestWorkerDeployReview = await readJson(path.join(stateDir, 'worker-deploy-reviews', 'latest.json'), null);
   const workerDeployReviewCurrent = latestWorkerDeployReview?.statusFingerprint === statusFingerprint;
+  const latestDirtyClassification = await readJson(path.join(stateDir, 'dirty-worktree', 'latest.json'), null);
+  const dirtyClassificationCurrent = latestDirtyClassification?.statusFingerprint === statusFingerprint;
 
   const counts = {
     staged: lines.filter(line => line[0] && line[0] !== ' ' && line[0] !== '?').length,
@@ -333,6 +381,8 @@ async function discoverGitState() {
       })) : null,
       frontendReviewPath: frontendReviewCurrent ? latestFrontendReview.reportPath : null,
       workerDeployReviewPath: workerDeployReviewCurrent ? latestWorkerDeployReview.reportPath : null,
+      dirtyClassificationPath: dirtyClassificationCurrent ? latestDirtyClassification.reportPath : null,
+      dirtyClassificationSummary: dirtyClassificationCurrent ? latestDirtyClassification.summary : null,
     },
   }];
 }
@@ -827,6 +877,16 @@ async function runAutoCompletions(candidates) {
   const ids = new Set(candidates.map(candidate => candidate.id));
   const byId = new Map(candidates.map(candidate => [candidate.id, candidate]));
 
+  completions.push(runLocalStep(
+    'check-connector-health',
+    'node',
+    [
+      'scripts/loops-24/check-connector-health.mjs',
+      ...(onlySafeLocal ? ['--only-safe-local'] : []),
+    ],
+    180_000
+  ));
+
   if (ids.has('wakeup-health-needed') || ids.has('wakeup-health-attention')) {
     completions.push(runLocalStep(
       'check-wakeup-health',
@@ -891,6 +951,12 @@ async function runAutoCompletions(candidates) {
 
   if (ids.has('dirty-worktree')) {
     const dirty = byId.get('dirty-worktree');
+    completions.push(runLocalStep(
+      'classify-dirty-worktree',
+      'node',
+      ['scripts/loops-24/classify-dirty-worktree.mjs'],
+      120_000
+    ));
     if (dirty?.evidence?.sliceHandoffPath) {
       completions.push(blockedCompletion(
         'dirty-worktree',
@@ -994,6 +1060,12 @@ async function runAutoCompletions(candidates) {
       'prepare-secret-gates',
       'node',
       ['scripts/loops-24/prepare-secret-gates.mjs'],
+      120_000
+    ));
+    completions.push(runLocalStep(
+      'prepare-secret-checklist',
+      'node',
+      ['scripts/loops-24/prepare-secret-checklist.mjs'],
       120_000
     ));
   }
@@ -1120,7 +1192,8 @@ function autoCompletionsNeedOwnerBundle(completions) {
     || item.label === 'prepare-pr-readiness'
     || item.label === 'prepare-worker-deploy-checklist'
     || item.label === 'prepare-github-handoff'
-    || item.label === 'prepare-secret-gates');
+    || item.label === 'prepare-secret-gates'
+    || item.label === 'prepare-secret-checklist');
 }
 
 function runLocalStep(label, command, args, timeout) {
@@ -1389,6 +1462,9 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
   const approvals = summarizeApprovals(waiting);
   const escalated = blocked.filter(item => item.escalated);
   const loopos = result.loopos || buildLooposSummary(candidates, autoCompletions, { registries: [], warnings: [] });
+  const connectorHealth = summarizeConnectorHealthArtifact(await readJson(path.join(stateDir, 'connector-health', 'latest.json'), null));
+  const secretChecklist = summarizeSecretChecklistArtifact(await readJson(path.join(stateDir, 'secret-checklists', 'latest.json'), null));
+  const dirtyClassification = summarizeDirtyClassificationArtifact(await readJson(path.join(stateDir, 'dirty-worktree', 'latest.json'), null));
   const summary = {
     completedCount: completed.length,
     blockedCount: blocked.length,
@@ -1401,6 +1477,9 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     topLane: loopos.morningDecision?.lane || null,
     nextApproval: loopos.morningDecision?.nextApproval || approvals[0]?.approval || null,
     largestApprovalGroup: approvals[0]?.approval || null,
+    connectorAttentionCount: connectorHealth.summary?.attentionCount || 0,
+    missingSecretGateCount: secretChecklist.summary?.missingCount || 0,
+    dirtyDeployCount: dirtyClassification.summary?.deploy || 0,
   };
 
   const payload = {
@@ -1414,6 +1493,9 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     onlySafeLocal,
     autoComplete: result.autoComplete,
     loopos,
+    connectorHealth,
+    secretChecklist,
+    dirtyClassification,
     summary,
     manualRedLines,
     completed: completed.map(summarizeCompletion),
@@ -1452,6 +1534,18 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     '## Next Approval Gate',
     '',
     ...renderApprovalList(payload.nextApproval),
+    '',
+    '## Connector Health',
+    '',
+    ...renderConnectorHealth(payload.connectorHealth),
+    '',
+    '## Secret Checklist',
+    '',
+    ...renderSecretChecklist(payload.secretChecklist),
+    '',
+    '## Dirty Worktree Groups',
+    '',
+    ...renderDirtyClassification(payload.dirtyClassification),
     '',
     '## Lane Summary',
     '',
@@ -1944,6 +2038,75 @@ function summarizeApprovals(blocked) {
     if (b.escalated !== a.escalated) return b.escalated - a.escalated;
     return b.count - a.count;
   });
+}
+
+function summarizeConnectorHealthArtifact(data) {
+  if (!data) return { available: false, summary: null, reportPath: null };
+  return {
+    available: true,
+    generatedAt: data.generatedAt || null,
+    reportPath: data.reportPath || null,
+    onlySafeLocal: Boolean(data.onlySafeLocal),
+    summary: data.summary || null,
+  };
+}
+
+function summarizeSecretChecklistArtifact(data) {
+  if (!data) return { available: false, summary: null, reportPath: null };
+  return {
+    available: true,
+    generatedAt: data.generatedAt || null,
+    reportPath: data.reportPath || null,
+    sourceSecretGatesPath: data.sourceSecretGatesPath || null,
+    summary: data.summary || null,
+  };
+}
+
+function summarizeDirtyClassificationArtifact(data) {
+  if (!data) return { available: false, summary: null, reportPath: null };
+  return {
+    available: true,
+    generatedAt: data.generatedAt || null,
+    reportPath: data.reportPath || null,
+    statusFingerprint: data.statusFingerprint || null,
+    summary: data.summary || null,
+  };
+}
+
+function renderConnectorHealth(data) {
+  if (!data?.available) return ['- No connector health artifact yet.'];
+  const summary = data.summary || {};
+  return [
+    `- report: ${data.reportPath || '(missing)'}`,
+    `- ready: ${summary.readyCount || 0}/${summary.total || 0}`,
+    `- attention: ${summary.attentionCount || 0}`,
+    `- missing: ${summary.missingIds?.length ? summary.missingIds.join(', ') : '(none)'}`,
+    `- failed_or_expired: ${summary.failedIds?.length ? summary.failedIds.join(', ') : '(none)'}`,
+    `- app_auth_unverified: ${summary.authUnverifiedIds?.length ? summary.authUnverifiedIds.join(', ') : '(none)'}`,
+  ];
+}
+
+function renderSecretChecklist(data) {
+  if (!data?.available) return ['- No secret checklist artifact yet.'];
+  const summary = data.summary || {};
+  return [
+    `- report: ${data.reportPath || '(missing)'}`,
+    `- source_secret_gates: ${data.sourceSecretGatesPath || '(missing)'}`,
+    `- ready_for_runner_wrapper: ${summary.readyForWrapperCount || 0}/${summary.total || 0}`,
+    `- missing: ${summary.missing?.length ? summary.missing.join(', ') : '(none)'}`,
+  ];
+}
+
+function renderDirtyClassification(data) {
+  if (!data?.available) return ['- No dirty worktree classification artifact yet.'];
+  const summary = data.summary || {};
+  return [
+    `- report: ${data.reportPath || '(missing)'}`,
+    `- deploy: ${summary.deploy || 0}`,
+    `- investor: ${summary.investor || 0}`,
+    `- repo_hygiene: ${summary.repoHygiene || 0}`,
+    `- other: ${summary.other || 0}`,
+  ];
 }
 
 function renderDashboardList(items, emptyText) {
