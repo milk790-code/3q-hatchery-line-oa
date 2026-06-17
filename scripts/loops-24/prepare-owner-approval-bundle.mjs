@@ -76,6 +76,10 @@ const prReady = pr?.summary?.readyForApproval === true && prCurrent;
 const workerReady = worker?.summary?.status === 'ready-for-approval';
 const wakeupFresh = wakeupAgeMinutes !== null && wakeupAgeMinutes <= wakeupFreshMinutes;
 const wakeupOk = wakeupHealth?.health?.ok === true && wakeupFresh;
+const wakeToRunEnabled = wakeupHealth?.scheduledTask?.platform === 'win32'
+  ? wakeupHealth?.scheduledTask?.wakeToRun === true
+  : null;
+const powerWakeNeedsApproval = wakeToRunEnabled === false;
 const localScopeClean = stagedLines.length === 0 && unexpectedDirty.length === 0;
 const dashboardGatesReady = Boolean(dashboard?.jsonPath
   && dashboardGates?.ok === true
@@ -99,6 +103,17 @@ const gates = [
     evidence: wakeupHealth
       ? `ok=${wakeupHealth.health?.ok} fresh=${wakeupFresh} ageMinutes=${wakeupAgeMinutes === null ? '(unknown)' : round(wakeupAgeMinutes)} limitMinutes=${wakeupFreshMinutes} report=${wakeupHealth.reportPath || '(missing)'}`
       : 'Missing wakeup-health report.',
+  },
+  {
+    id: 'power_wake_policy',
+    label: 'Decide Windows sleep wake policy',
+    status: powerWakeNeedsApproval ? 'manual_approval' : 'ready',
+    ownerAction: powerWakeNeedsApproval
+      ? 'Decide whether hourly LOOPS should wake a sleeping Windows machine; changing WakeToRun is a system setting and requires explicit approval.'
+      : 'Windows WakeToRun is enabled or not applicable.',
+    evidence: powerWakeNeedsApproval
+      ? `wakeToRun=false warning=${(wakeupHealth?.health?.warnings || []).join(' | ') || '(none)'} report=${wakeupHealth?.reportPath || '(missing)'}`
+      : `wakeToRun=${wakeupHealth?.scheduledTask?.wakeToRun ?? '(n/a)'} platform=${wakeupHealth?.scheduledTask?.platform || '(unknown)'}`,
   },
   {
     id: 'dashboard_gate_verification',
@@ -197,6 +212,8 @@ const payload = {
     wakeupOk,
     wakeupFresh,
     wakeupAgeMinutes: wakeupAgeMinutes === null ? null : round(wakeupAgeMinutes),
+    wakeToRunEnabled,
+    powerWakeNeedsApproval,
     dashboardGatesReady,
     localScopeClean,
   },
@@ -266,6 +283,7 @@ function renderMarkdown(payload) {
     '',
     '- Publish the committed control-plane work as a draft PR.',
     '- Review whether the four dirty Worker deploy files should be staged, committed, or deployed later.',
+    '- Decide whether Windows should wake from sleep for hourly LOOPS runs.',
     '- Add missing secrets only in the local machine environment.',
     '- Keep all outreach and public publishing manual-send only.',
     '',
@@ -273,6 +291,7 @@ function renderMarkdown(payload) {
     '',
     '- It does not authorize `git push`, PR creation, merge, deploy, secret writes, protected endpoint calls, public posting, or outbound sends.',
     '- It does not include the dirty Worker files in a PR unless the owner separately approves staging/committing those files.',
+    '- It does not change Windows Task Scheduler or power-management settings.',
     '- It does not store or print secret values.',
     '',
     '## Approval Gates',
@@ -309,7 +328,8 @@ function renderMarkdown(payload) {
     '2. If you approve GitHub publication, run the Push And Draft PR commands.',
     '3. If you approve Worker deploy, first decide whether to commit the Worker slice or deploy from the dirty worktree, then run the Worker Deploy commands.',
     '4. Add missing secrets only in the local secret file or shell environment.',
-    '5. Run protected verification only after deploy approval and token input.',
+    '5. If 24-hour sleep wakeups matter, separately approve a Windows WakeToRun change; this bundle only reports the decision gate.',
+    '6. Run protected verification only after deploy approval and token input.',
   ];
   return lines.join('\n');
 }

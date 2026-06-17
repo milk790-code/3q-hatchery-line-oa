@@ -143,7 +143,7 @@ function verifyBundle(bundle, context, related) {
   requireEqual(failures, 'summary.manualApprovalCount', Number(bundle.summary?.manualApprovalCount), expectedManualApprovalCount);
   requireEqual(failures, 'summary.manualInputCount', Number(bundle.summary?.manualInputCount), expectedManualInputCount);
 
-  for (const id of ['local_review', 'wakeup_health', 'dashboard_gate_verification', 'push_draft_pr', 'worker_deploy', 'secret_input', 'post_deploy_verification', 'manual_send']) {
+  for (const id of ['local_review', 'wakeup_health', 'power_wake_policy', 'dashboard_gate_verification', 'push_draft_pr', 'worker_deploy', 'secret_input', 'post_deploy_verification', 'manual_send']) {
     if (!gateById.has(id)) failures.push(`missing gate ${id}`);
   }
 
@@ -157,6 +157,7 @@ function verifyBundle(bundle, context, related) {
 
   verifyPrGate(bundle, related.pr, gateById.get('push_draft_pr'), failures, warnings);
   verifyWakeupGate(bundle, related.wakeup, gateById.get('wakeup_health'), failures);
+  verifyPowerWakeGate(bundle, related.wakeup, gateById.get('power_wake_policy'), failures);
   verifyDashboardGate(bundle, related.dashboard, related.dashboardGates, gateById.get('dashboard_gate_verification'), failures);
   verifyManualCommands(bundle, gateById, failures);
 
@@ -208,6 +209,25 @@ function verifyWakeupGate(bundle, wakeup, gate, failures) {
   }
 }
 
+function verifyPowerWakeGate(bundle, wakeup, gate, failures) {
+  const wakeToRun = wakeup?.scheduledTask?.platform === 'win32'
+    ? wakeup?.scheduledTask?.wakeToRun === true
+    : null;
+  const needsApproval = wakeToRun === false;
+  if (bundle.summary?.wakeToRunEnabled !== wakeToRun) {
+    failures.push(`summary.wakeToRunEnabled expected ${wakeToRun} got ${bundle.summary?.wakeToRunEnabled}`);
+  }
+  if (bundle.summary?.powerWakeNeedsApproval !== needsApproval) {
+    failures.push(`summary.powerWakeNeedsApproval expected ${needsApproval} got ${bundle.summary?.powerWakeNeedsApproval}`);
+  }
+  if (gate?.status !== (needsApproval ? 'manual_approval' : 'ready')) {
+    failures.push(`power_wake_policy gate has unexpected status ${gate?.status}`);
+  }
+  if ((gate?.commands || []).length) {
+    failures.push('power_wake_policy gate must not expose executable commands');
+  }
+}
+
 function verifyDashboardGate(bundle, dashboard, dashboardGates, gate, failures) {
   const ready = Boolean(dashboard?.jsonPath
     && dashboardGates?.ok === true
@@ -228,7 +248,7 @@ function verifyManualCommands(bundle, gateById, failures) {
   if (deployGate?.status === 'ready_for_approval' && !(deployGate.commands || []).length) {
     failures.push('worker_deploy gate is ready_for_approval but has no commands');
   }
-  for (const id of ['secret_input', 'post_deploy_verification', 'manual_send']) {
+  for (const id of ['power_wake_policy', 'secret_input', 'post_deploy_verification', 'manual_send']) {
     if ((gateById.get(id)?.commands || []).length) {
       failures.push(`${id} gate must not expose executable commands`);
     }

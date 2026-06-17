@@ -207,6 +207,9 @@ If `WakeToRun` is disabled, the report emits a non-blocking warning: LOOPS can
 catch up when Windows becomes available, but the task is not guaranteed to wake
 a sleeping machine.
 
+The warning is intentionally report-only. LOOPS does not change Task Scheduler
+or power-management settings without explicit owner approval.
+
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\check-wakeup-health.ps1
 ```
@@ -476,6 +479,10 @@ powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\verify-owner-approva
 The verifier reads local LOOPS JSON artifacts and git status only. It does not
 push, create PRs, deploy, call protected endpoints, write secrets, or send
 messages.
+
+When Windows `WakeToRun` is disabled, the owner bundle includes a
+`power_wake_policy` gate. That gate asks whether hourly LOOPS should wake a
+sleeping machine, but it never exposes or runs a Task Scheduler command.
 
 ## Review Worker deploy slices
 
