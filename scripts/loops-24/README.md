@@ -47,6 +47,7 @@ to local, review-ready artifacts:
 - owner approval bundles
 - approval workbenches that list owner-approved commands without running them
 - a compact completed / blocked / next approval dashboard
+- approval workbench TTL summaries embedded in the dashboard
 - connector health reports that flag missing, failed, expired, timeout, skipped, or app-auth-unverified integrations
 - one-page local secret checklists derived from redacted secret gates
 - dirty worktree classification into deploy, investor, repo-hygiene, and other groups
@@ -207,6 +208,11 @@ full owner bundle.
 The dashboard also embeds compact summaries for connector health, local secret
 checklist status, and dirty worktree groups so the hourly loop can mark broken
 authorization or unsafe git scope without requiring a separate file hunt.
+It also embeds the latest approval workbench status, `expires_at`, expired flag,
+ready command count, manual gate count, attention gate count, and verifier
+failure count. This keeps cross-session approval handoffs honest: if the
+workbench expires, the dashboard shows that owner commands must be regenerated
+before use.
 
 Verify that manual-gated waiting items are mapped to the expected approval
 groups:

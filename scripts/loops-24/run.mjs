@@ -1528,6 +1528,7 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
   const jsonPath = path.join(dashboardDir, `${toStamp(startedAt)}-${runId.slice(0, 8)}-dashboard.json`);
   const latestPath = path.join(dashboardDir, 'latest.json');
   const latestMarkdownPath = path.join(dashboardDir, 'latest.md');
+  const generatedAt = new Date();
   const completed = autoCompletions.filter(item => item.status === 'completed');
   const blocked = autoCompletions.filter(item => item.status === 'blocked');
   const manualWaits = summarizeManualWaits(candidates, autoCompletions);
@@ -1539,6 +1540,10 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
   const connectorHealth = summarizeConnectorHealthArtifact(await readJson(path.join(stateDir, 'connector-health', 'latest.json'), null));
   const secretChecklist = summarizeSecretChecklistArtifact(await readJson(path.join(stateDir, 'secret-checklists', 'latest.json'), null));
   const dirtyClassification = summarizeDirtyClassificationArtifact(await readJson(path.join(stateDir, 'dirty-worktree', 'latest.json'), null));
+  const approvalWorkbench = summarizeApprovalWorkbenchArtifact(
+    await readJson(path.join(stateDir, 'approval-workbench', 'latest.json'), null),
+    generatedAt
+  );
   const summary = {
     completedCount: completed.length,
     blockedCount: blocked.length,
@@ -1554,10 +1559,13 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     connectorAttentionCount: connectorHealth.summary?.attentionCount || 0,
     missingSecretGateCount: secretChecklist.summary?.missingCount || 0,
     dirtyDeployCount: dirtyClassification.summary?.deploy || 0,
+    approvalWorkbenchExpired: approvalWorkbench.available ? approvalWorkbench.summary?.expired : null,
+    approvalWorkbenchReadyCommandCount: approvalWorkbench.available ? Number(approvalWorkbench.summary?.readyCommandCount || 0) : null,
+    approvalWorkbenchAttentionGateCount: approvalWorkbench.available ? Number(approvalWorkbench.summary?.attentionGateCount || 0) : null,
   };
 
   const payload = {
-    generatedAt: new Date().toISOString(),
+    generatedAt: generatedAt.toISOString(),
     runId: result.runId,
     status: result.status,
     reportPath,
@@ -1570,6 +1578,7 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     connectorHealth,
     secretChecklist,
     dirtyClassification,
+    approvalWorkbench,
     summary,
     manualRedLines,
     completed: completed.map(summarizeCompletion),
@@ -1608,6 +1617,10 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     '## Next Approval Gate',
     '',
     ...renderApprovalList(payload.nextApproval),
+    '',
+    '## Owner Approval Workbench',
+    '',
+    ...renderApprovalWorkbench(payload.approvalWorkbench),
     '',
     '## Connector Health',
     '',
@@ -2160,6 +2173,26 @@ function summarizeDirtyClassificationArtifact(data) {
   };
 }
 
+function summarizeApprovalWorkbenchArtifact(data, relativeTo = new Date()) {
+  if (!data) return { available: false, summary: null, reportPath: null };
+  const expiresAt = data.expiresAt || data.summary?.expiresAt || null;
+  const expired = isTimestampExpired(expiresAt, relativeTo);
+  return {
+    available: true,
+    generatedAt: data.generatedAt || null,
+    reportPath: data.reportPath || null,
+    jsonPath: data.jsonPath || null,
+    status: data.status || null,
+    bundleFingerprint: data.bundleFingerprint || null,
+    projectionFingerprint: data.projectionFingerprint || null,
+    summary: {
+      ...(data.summary || {}),
+      expiresAt,
+      expired,
+    },
+  };
+}
+
 function renderConnectorHealth(data) {
   if (!data?.available) return ['- No connector health artifact yet.'];
   const summary = data.summary || {};
@@ -2193,6 +2226,21 @@ function renderDirtyClassification(data) {
     `- investor: ${summary.investor || 0}`,
     `- repo_hygiene: ${summary.repoHygiene || 0}`,
     `- other: ${summary.other || 0}`,
+  ];
+}
+
+function renderApprovalWorkbench(data) {
+  if (!data?.available) return ['- No approval workbench artifact yet.'];
+  const summary = data.summary || {};
+  return [
+    `- report: ${data.reportPath || '(missing)'}`,
+    `- status: ${data.status || '(unknown)'}`,
+    `- expires_at: ${summary.expiresAt || '(missing)'}`,
+    `- expired: ${summary.expired === true}`,
+    `- ready_commands: ${summary.readyCommandCount ?? 0}`,
+    `- manual_gates: ${summary.manualGateCount ?? 0}`,
+    `- attention_gates: ${summary.attentionGateCount ?? 0}`,
+    `- verification_failures: ${summary.verificationFailureCount ?? 0}`,
   ];
 }
 
@@ -2272,6 +2320,12 @@ function norm(value) {
 
 function round(value) {
   return Math.round(value * 1000) / 1000;
+}
+
+function isTimestampExpired(value, relativeTo = new Date()) {
+  const timestamp = Date.parse(value || '');
+  if (!Number.isFinite(timestamp)) return null;
+  return timestamp <= relativeTo.getTime();
 }
 
 function minutes(value) {
