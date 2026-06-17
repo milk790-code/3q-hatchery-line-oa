@@ -209,9 +209,9 @@ The dashboard also embeds compact summaries for connector health, local secret
 checklist status, and dirty worktree groups so the hourly loop can mark broken
 authorization or unsafe git scope without requiring a separate file hunt.
 It also embeds the latest owner approval bundle status, head freshness,
-publish readiness, local scope cleanliness, wakeup freshness, and power-wake
-policy flag so owner decisions can be made from the dashboard without opening
-the full bundle first.
+publish readiness, local scope cleanliness, wakeup freshness, wakeup freshness
+remaining minutes, and power-wake policy flag so owner decisions can be made
+from the dashboard without opening the full bundle first.
 It also embeds the latest approval workbench status, `expires_at`,
 `expires_at_taipei`, `expires_in_minutes`, expired flag, ready command count,
 manual gate count, attention gate count, and verifier failure count. This keeps
@@ -232,7 +232,8 @@ the automation state directory. It does not push, create a PR, deploy, call
 protected endpoints, write secrets, or send messages.
 It checks that the owner approval bundle summary mirrors the embedded bundle
 artifact and fails if a supposedly ready bundle has attention gates or is not
-for the current head.
+for the current head. It also recomputes the owner bundle wakeup freshness
+remaining minutes from the dashboard generation time.
 It also recomputes approval workbench expiry from the dashboard generation time
 and fails if `expires_in_minutes`, the Taipei-time mirror, or the expired flag
 drift from the embedded workbench artifact.

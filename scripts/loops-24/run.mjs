@@ -1543,7 +1543,8 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
   const currentHead = currentGitHead();
   const ownerApprovalBundle = summarizeOwnerApprovalBundleArtifact(
     await readJson(path.join(stateDir, 'owner-approval-bundles', 'latest.json'), null),
-    currentHead
+    currentHead,
+    generatedAt
   );
   const approvalWorkbench = summarizeApprovalWorkbenchArtifact(
     await readJson(path.join(stateDir, 'approval-workbench', 'latest.json'), null),
@@ -1572,6 +1573,7 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     ownerApprovalBundleLocalScopeClean: ownerApprovalBundle.available ? ownerApprovalBundle.summary?.localScopeClean : null,
     ownerApprovalBundleWakeupFresh: ownerApprovalBundle.available ? ownerApprovalBundle.summary?.wakeupFresh : null,
     ownerApprovalBundleWakeupFreshUntil: ownerApprovalBundle.available ? ownerApprovalBundle.summary?.wakeupFreshUntil : null,
+    ownerApprovalBundleWakeupFreshInMinutes: ownerApprovalBundle.available ? ownerApprovalBundle.summary?.wakeupFreshInMinutes : null,
     ownerApprovalBundlePowerWakeNeedsApproval: ownerApprovalBundle.available ? ownerApprovalBundle.summary?.powerWakeNeedsApproval : null,
     approvalWorkbenchExpired: approvalWorkbench.available ? approvalWorkbench.summary?.expired : null,
     approvalWorkbenchExpiresAtTaipei: approvalWorkbench.available ? approvalWorkbench.summary?.expiresAtTaipei : null,
@@ -2200,10 +2202,11 @@ function summarizeDirtyClassificationArtifact(data) {
   };
 }
 
-function summarizeOwnerApprovalBundleArtifact(data, currentHead = '') {
+function summarizeOwnerApprovalBundleArtifact(data, currentHead = '', relativeTo = new Date()) {
   if (!data) return { available: false, summary: null, reportPath: null };
   const summary = data.summary || {};
   const head = data.head || null;
+  const wakeupFreshUntil = summary.wakeupFreshUntil || null;
   return {
     available: true,
     generatedAt: data.generatedAt || null,
@@ -2224,7 +2227,8 @@ function summarizeOwnerApprovalBundleArtifact(data, currentHead = '') {
       prPublishReady: summary.prPublishReady ?? null,
       workerReady: summary.workerReady ?? null,
       wakeupFresh: summary.wakeupFresh ?? null,
-      wakeupFreshUntil: summary.wakeupFreshUntil || null,
+      wakeupFreshUntil,
+      wakeupFreshInMinutes: minutesUntil(wakeupFreshUntil, relativeTo),
       powerWakeNeedsApproval: summary.powerWakeNeedsApproval ?? null,
       localScopeClean: summary.localScopeClean ?? null,
       localInvestorPacketCount: Number(summary.localInvestorPacketCount || 0),
@@ -2311,6 +2315,7 @@ function renderOwnerApprovalBundle(data) {
     `- local_scope_clean: ${summary.localScopeClean === true}`,
     `- wakeup_fresh: ${summary.wakeupFresh === true}`,
     `- wakeup_fresh_until: ${summary.wakeupFreshUntil || '(unknown)'}`,
+    `- wakeup_fresh_in_minutes: ${summary.wakeupFreshInMinutes ?? '(unknown)'}`,
     `- power_wake_needs_approval: ${summary.powerWakeNeedsApproval === true}`,
   ];
 }

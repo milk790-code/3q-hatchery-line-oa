@@ -215,6 +215,10 @@ function verifyOwnerApprovalBundleSummary(dashboard) {
 
   const summary = bundle.summary || {};
   const attentionCount = Number(summary.attentionCount || 0);
+  const relativeTo = dashboard.generatedAt || dashboard.generatedAtTaipei;
+  const expectedWakeupMinutes = minutesUntil(summary.wakeupFreshUntil, relativeTo);
+  const actualWakeupMinutes = toFiniteNumber(summary.wakeupFreshInMinutes);
+  const mirroredWakeupMinutes = toFiniteNumber(dashboardSummary.ownerApprovalBundleWakeupFreshInMinutes);
 
   if (dashboardSummary.ownerApprovalBundleStatus !== bundle.status) {
     failures.push(`summary.ownerApprovalBundleStatus expected ${bundle.status} got ${dashboardSummary.ownerApprovalBundleStatus}`);
@@ -239,6 +243,16 @@ function verifyOwnerApprovalBundleSummary(dashboard) {
   }
   if (dashboardSummary.ownerApprovalBundleWakeupFreshUntil !== summary.wakeupFreshUntil) {
     failures.push(`summary.ownerApprovalBundleWakeupFreshUntil expected ${summary.wakeupFreshUntil} got ${dashboardSummary.ownerApprovalBundleWakeupFreshUntil}`);
+  }
+  if (actualWakeupMinutes === null) {
+    failures.push('ownerApprovalBundle.summary.wakeupFreshInMinutes is missing or invalid.');
+  } else if (expectedWakeupMinutes !== null && Math.abs(actualWakeupMinutes - expectedWakeupMinutes) > 0.01) {
+    failures.push(`ownerApprovalBundle.summary.wakeupFreshInMinutes expected ${expectedWakeupMinutes} got ${actualWakeupMinutes}`);
+  }
+  if (mirroredWakeupMinutes === null) {
+    failures.push('summary.ownerApprovalBundleWakeupFreshInMinutes is missing or invalid.');
+  } else if (actualWakeupMinutes !== null && Math.abs(mirroredWakeupMinutes - actualWakeupMinutes) > 0.01) {
+    failures.push(`summary.ownerApprovalBundleWakeupFreshInMinutes expected ${actualWakeupMinutes} got ${mirroredWakeupMinutes}`);
   }
   if (dashboardSummary.ownerApprovalBundlePowerWakeNeedsApproval !== summary.powerWakeNeedsApproval) {
     failures.push(`summary.ownerApprovalBundlePowerWakeNeedsApproval expected ${summary.powerWakeNeedsApproval} got ${dashboardSummary.ownerApprovalBundlePowerWakeNeedsApproval}`);
