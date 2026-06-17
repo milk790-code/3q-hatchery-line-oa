@@ -219,6 +219,10 @@ const gates = [
   },
 ];
 
+const ownerBundleStatus = gates.some(gate => gate.status === 'attention')
+  ? 'attention'
+  : 'ready-for-owner-approval';
+
 const payload = {
   generatedAt: now.toISOString(),
   repoRoot,
@@ -231,6 +235,7 @@ const payload = {
   head,
   ahead,
   behind,
+  status: ownerBundleStatus,
   statusFingerprint,
   trackedStatusFingerprint,
   dirtyTracked: trackedDirtyLines,
@@ -255,7 +260,7 @@ const payload = {
   },
   gates,
   summary: {
-    status: gates.some(gate => gate.status === 'attention') ? 'attention' : 'ready-for-owner-approval',
+    status: ownerBundleStatus,
     readyGateCount: gates.filter(gate => gate.status === 'ready' || gate.status === 'ready_for_approval').length,
     attentionCount: gates.filter(gate => gate.status === 'attention').length,
     manualApprovalCount: gates.filter(gate => gate.status === 'manual_approval' || gate.status === 'ready_for_approval').length,
@@ -291,6 +296,7 @@ payload.bundleFingerprint = hash(JSON.stringify({
   ahead,
   behind,
   statusFingerprint,
+  status: ownerBundleStatus,
   artifacts: payload.artifacts,
   localInvestorPacketPaths,
   gates,
@@ -298,6 +304,7 @@ payload.bundleFingerprint = hash(JSON.stringify({
 
 const latest = await readJson(payload.latestPath, null);
 if (latest?.bundleFingerprint === payload.bundleFingerprint
+  && latest?.status === payload.status
   && latest?.reportPath
   && fssync.existsSync(latest.reportPath)) {
   console.log(JSON.stringify({

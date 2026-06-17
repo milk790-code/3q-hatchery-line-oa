@@ -148,7 +148,9 @@ function verifyBundle(bundle, context, related) {
   requireEqual(failures, 'behind', Number(bundle.behind), context.behind);
   requireEqual(failures, 'statusFingerprint', bundle.statusFingerprint, context.statusFingerprint);
   requireEqual(failures, 'trackedStatusFingerprint', bundle.trackedStatusFingerprint, context.trackedStatusFingerprint);
+  requireEqual(failures, 'status', bundle.status, expectedSummaryStatus);
   requireEqual(failures, 'summary.status', bundle.summary?.status, expectedSummaryStatus);
+  requireEqual(failures, 'status summary mirror', bundle.status, bundle.summary?.status);
   requireEqual(failures, 'summary.readyGateCount', Number(bundle.summary?.readyGateCount), expectedReadyGateCount);
   requireEqual(failures, 'summary.attentionCount', Number(bundle.summary?.attentionCount), expectedAttentionCount);
   requireEqual(failures, 'summary.manualApprovalCount', Number(bundle.summary?.manualApprovalCount), expectedManualApprovalCount);
