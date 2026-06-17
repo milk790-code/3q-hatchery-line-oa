@@ -725,6 +725,9 @@ send messages.
 When Windows `WakeToRun` is disabled, the owner bundle includes a
 `power_wake_policy` gate. That gate asks whether hourly LOOPS should wake a
 sleeping machine, but it never exposes or runs a Task Scheduler command.
+Safe-local runs also prepare `power-wake-policy/latest.json` and verify it with
+`verify-power-wake-policy.mjs` so the decision stays reviewable without changing
+Windows Task Scheduler or power settings.
 
 ## Review Worker deploy slices
 

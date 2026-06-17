@@ -1264,6 +1264,18 @@ async function runPostDashboardAutoCompletions(candidates, autoCompletions, resu
         120_000
       ),
       runLocalStep(
+        'prepare-power-wake-policy',
+        'node',
+        ['scripts/loops-24/prepare-power-wake-policy.mjs'],
+        120_000
+      ),
+      runLocalStep(
+        'verify-power-wake-policy',
+        'node',
+        ['scripts/loops-24/verify-power-wake-policy.mjs'],
+        120_000
+      ),
+      runLocalStep(
         'prepare-approval-workbench',
         'node',
         ['scripts/loops-24/prepare-approval-workbench.mjs'],
@@ -1662,6 +1674,10 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     await readJson(path.join(stateDir, 'approval-workbench', 'latest.json'), null),
     generatedAt
   );
+  const powerWakePolicy = summarizePowerWakePolicyArtifact(
+    await readJson(path.join(stateDir, 'power-wake-policy', 'latest.json'), null),
+    await readJson(path.join(stateDir, 'power-wake-policy-verifications', 'latest.json'), null)
+  );
   const summary = {
     completedCount: completed.length,
     blockedCount: blocked.length,
@@ -1703,6 +1719,10 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     approvalWorkbenchWakeupFreshUntil: approvalWorkbench.available ? approvalWorkbench.summary?.wakeupFreshUntil : null,
     approvalWorkbenchReadyCommandCount: approvalWorkbench.available ? Number(approvalWorkbench.summary?.readyCommandCount || 0) : null,
     approvalWorkbenchAttentionGateCount: approvalWorkbench.available ? Number(approvalWorkbench.summary?.attentionGateCount || 0) : null,
+    powerWakePolicyStatus: powerWakePolicy.available ? powerWakePolicy.status : null,
+    powerWakePolicyNeedsOwnerDecision: powerWakePolicy.available ? powerWakePolicy.summary?.needsOwnerDecision : null,
+    powerWakePolicyWakeToRun: powerWakePolicy.available ? powerWakePolicy.summary?.wakeToRun : null,
+    powerWakePolicyVerificationOk: powerWakePolicy.available ? powerWakePolicy.verificationOk : null,
   };
 
   const payload = {
@@ -1724,6 +1744,7 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     dirtyClassification,
     ownerApprovalBundle,
     approvalWorkbench,
+    powerWakePolicy,
     summary,
     manualRedLines,
     completed: completed.map(summarizeCompletion),
@@ -1771,6 +1792,10 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     '## Owner Approval Workbench',
     '',
     ...renderApprovalWorkbench(payload.approvalWorkbench),
+    '',
+    '## Power Wake Policy',
+    '',
+    ...renderPowerWakePolicy(payload.powerWakePolicy),
     '',
     '## Connector Health',
     '',
@@ -2431,6 +2456,29 @@ function summarizeApprovalWorkbenchArtifact(data, relativeTo = new Date()) {
   };
 }
 
+function summarizePowerWakePolicyArtifact(data, verification) {
+  if (!data) return { available: false, summary: null, reportPath: null };
+  return {
+    available: true,
+    generatedAt: data.generatedAt || null,
+    reportPath: data.reportPath || null,
+    jsonPath: data.jsonPath || null,
+    status: data.status || null,
+    manualGate: data.manualGate || null,
+    needsOwnerDecision: data.needsOwnerDecision === true,
+    sourceWakeupHealthReportPath: data.sourceWakeupHealthReportPath || null,
+    verificationOk: verification?.ok === true,
+    verificationReportPath: verification?.reportPath || null,
+    statusFingerprint: data.statusFingerprint || null,
+    summary: {
+      ...(data.summary || {}),
+      needsOwnerDecision: data.needsOwnerDecision === true,
+      verificationFailureCount: Number(verification?.summary?.failureCount || 0),
+      verificationWarningCount: Number(verification?.summary?.warningCount || 0),
+    },
+  };
+}
+
 function renderConnectorHealth(data) {
   if (!data?.available) return ['- No connector health artifact yet.'];
   const summary = data.summary || {};
@@ -2543,6 +2591,24 @@ function renderApprovalWorkbench(data) {
     `- manual_gates: ${summary.manualGateCount ?? 0}`,
     `- attention_gates: ${summary.attentionGateCount ?? 0}`,
     `- verification_failures: ${summary.verificationFailureCount ?? 0}`,
+  ];
+}
+
+function renderPowerWakePolicy(data) {
+  if (!data?.available) return ['- No power wake policy artifact yet.'];
+  const summary = data.summary || {};
+  return [
+    `- report: ${data.reportPath || '(missing)'}`,
+    `- verification_report: ${data.verificationReportPath || '(missing)'}`,
+    `- status: ${data.status || '(unknown)'}`,
+    `- manual_gate: ${data.manualGate || '(unknown)'}`,
+    `- needs_owner_decision: ${summary.needsOwnerDecision === true}`,
+    `- wake_to_run: ${summary.wakeToRun === true}`,
+    `- start_when_available: ${summary.startWhenAvailable === true}`,
+    `- verification_ok: ${data.verificationOk === true}`,
+    `- verification_failures: ${summary.verificationFailureCount ?? 0}`,
+    `- source_wakeup_health: ${data.sourceWakeupHealthReportPath || '(missing)'}`,
+    `- recommended_owner_option: ${summary.recommendedOwnerOption || '(none)'}`,
   ];
 }
 
