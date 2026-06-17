@@ -133,16 +133,14 @@ console.log(JSON.stringify({
 function inspectCodexPlugin({ id, label, pluginPath, authNote }) {
   const installed = fssync.existsSync(pluginPath);
   const verification = freshThreadVerification(id);
-  const status = installed
-    ? (verification?.status === 'ready' ? 'ready_thread_verified' : 'installed_auth_unverified')
-    : 'missing_plugin';
+  const status = codexPluginStatus(installed, verification);
   return {
     id,
     label,
     kind: 'codex_app_plugin',
     installed,
     status,
-    attention: !installed,
+    attention: !installed || status === 'thread_verification_attention' || status === 'thread_verification_failed',
     authNote: verification?.status === 'ready'
       ? `Thread-side read-only verification is fresh until ${verification.expiresAt}.`
       : authNote,
@@ -159,6 +157,14 @@ function inspectCodexPlugin({ id, label, pluginPath, authNote }) {
       }
       : null,
   };
+}
+
+function codexPluginStatus(installed, verification) {
+  if (!installed) return 'missing_plugin';
+  if (verification?.status === 'ready') return 'ready_thread_verified';
+  if (verification?.status === 'attention') return 'thread_verification_attention';
+  if (verification?.status === 'failed') return 'thread_verification_failed';
+  return 'installed_auth_unverified';
 }
 
 function inspectCliConnector({ id, label, command, args, externalProbe }) {
