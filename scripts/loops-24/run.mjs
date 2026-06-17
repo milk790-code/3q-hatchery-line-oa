@@ -217,11 +217,12 @@ async function discoverWakeupHealth() {
       ageMinutes: ageMinutes === null ? null : Math.round(ageMinutes * 10) / 10,
       health: latest?.health || null,
       scheduledTask: latest?.scheduledTask
-        ? {
+          ? {
             found: latest.scheduledTask.found,
             state: latest.scheduledTask.state,
             lastTaskResult: latest.scheduledTask.lastTaskResult,
             nextRunTime: latest.scheduledTask.nextRunTime,
+            wakeToRun: latest.scheduledTask.wakeToRun,
             executionTimeLimit: latest.scheduledTask.executionTimeLimit,
           }
         : null,
@@ -821,9 +822,12 @@ async function runAutoCompletions(candidates) {
     ));
   } else if (ids.has('wakeup-health-ready')) {
     const candidate = byId.get('wakeup-health-ready');
+    const wakeToRunDisabled = candidate?.evidence?.scheduledTask?.wakeToRun === false;
     completions.push(blockedCompletion(
       'wakeup-health-ready',
-      `Current wakeup health report already exists: ${candidate?.evidence?.reportPath || path.join(stateDir, 'wakeup-health')}`,
+      wakeToRunDisabled
+        ? `Current wakeup health report already exists: ${candidate?.evidence?.reportPath || path.join(stateDir, 'wakeup-health')}; WakeToRun is disabled, so sleeping-machine wakeups require owner approval.`
+        : `Current wakeup health report already exists: ${candidate?.evidence?.reportPath || path.join(stateDir, 'wakeup-health')}`,
       candidate
     ));
   }
@@ -887,7 +891,12 @@ async function runAutoCompletions(candidates) {
         completions.push(runLocalStep('plan-commit-boundaries', 'node', ['scripts/loops-24/plan-commit-boundaries.mjs'], 120_000));
       }
 
-      const boundary = await readJson(path.join(stateDir, 'commit-boundaries', 'latest.json'), null);
+      let boundary = await readJson(path.join(stateDir, 'commit-boundaries', 'latest.json'), null);
+      const currentWorktree = currentWorktreeFingerprint();
+      if (currentWorktree.ok && boundary?.statusFingerprint !== currentWorktree.statusFingerprint) {
+        completions.push(runLocalStep('plan-commit-boundaries', 'node', ['scripts/loops-24/plan-commit-boundaries.mjs'], 120_000));
+        boundary = await readJson(path.join(stateDir, 'commit-boundaries', 'latest.json'), null);
+      }
       const groups = Array.isArray(boundary?.groups) ? boundary.groups : [];
       if (groups.some(group => group.gate === 'deploy-approval')) {
         const latestWorkerReview = await readJson(path.join(stateDir, 'worker-deploy-reviews', 'latest.json'), null);
@@ -1150,6 +1159,7 @@ function classifyApproval(label, candidate = null) {
 function classifyApprovalGates(label, candidate = null) {
   const id = `${label} ${candidate?.id || ''}`.toLowerCase();
   const text = `${id} ${candidate?.manualGate || ''} ${candidate?.type || ''} ${candidate?.action || ''}`.toLowerCase();
+  const evidenceText = `${candidate?.evidence?.scheduledTask?.wakeToRun === false ? 'waketorun=false ' : ''}${candidate?.evidence?.health?.warnings?.join(' ') || ''}`.toLowerCase();
   const gates = [];
   const addGate = gate => {
     if (gate && !gates.includes(gate)) gates.push(gate);
@@ -1180,6 +1190,9 @@ function classifyApprovalGates(label, candidate = null) {
   if (/webhook-cron|worker-deploy|deploy|cron-status|social-publisher-health|queue-list/.test(text)) addGate('deploy-approval');
   if (/github|local-pr|pr-readiness|pull request|push/.test(text)) addGate('push-and-pr-approval');
   if (/content-queue|wakeup|frontend|slice|handoff|worktree|wrangler-cache/.test(text)) addGate('local-review');
+  if (/waketorun=false|waketorun is disabled|sleeping-machine|sleeping machine|power-wake/.test(`${text} ${evidenceText}`)) {
+    addGate('power-wake-policy');
+  }
   return gates.length ? gates : ['review'];
 }
 
@@ -1661,6 +1674,19 @@ function runCommand(command, args, timeout) {
     status: result.status,
     stdout: result.stdout || '',
     stderr: result.stderr || (result.error ? result.error.message : ''),
+  };
+}
+
+function currentWorktreeFingerprint() {
+  const status = runCommand('git', ['status', '--short'], 45_000);
+  if (!status.ok) {
+    return { ok: false, status: status.status, stderr: status.stderr };
+  }
+  const statusLines = status.stdout.split(/\r?\n/).filter(Boolean);
+  return {
+    ok: true,
+    statusLines,
+    statusFingerprint: gitWorktreeFingerprint({ cwd: repoRoot, statusLines }),
   };
 }
 

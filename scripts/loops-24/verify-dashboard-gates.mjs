@@ -205,6 +205,9 @@ function expectedApprovalGates(item) {
     || /content-queue|wakeup|frontend|slice|handoff|worktree|wrangler-cache|local-review/.test(routingText)) {
     add('local-review');
   }
+  if (/waketorun=false|waketorun is disabled|sleeping-machine|sleeping machine|power-wake/.test(fullText)) {
+    add('power-wake-policy');
+  }
 
   return gates.length ? gates : ['review'];
 }

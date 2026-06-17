@@ -53,6 +53,11 @@ to local, review-ready artifacts:
 It stops at review gates for secrets, tokens, deploy approval, outbound sending,
 and broad frontend/artifact payloads.
 
+Before generating slice handoffs, auto-complete rechecks the current worktree
+fingerprint and refreshes the commit-boundary plan when the latest plan is stale.
+This keeps generated stage scripts tied to the exact files currently visible to
+Git.
+
 When auto-complete is enabled and manual gates are present, the runner writes the
 current dashboard first, verifies that dashboard's approval groups, then refreshes
 the owner approval bundle from the verified dashboard.
@@ -166,6 +171,9 @@ the markdown. It includes `summary`, `manualRedLines`, `waiting`,
 owner-bundle, or external monitor steps do not need to parse markdown text.
 Within `summary`, `nextApproval` means the `Today First` approval gate, while
 `largestApprovalGroup` identifies the largest grouped backlog gate.
+When the latest wakeup-health evidence has Windows `WakeToRun=false`, the
+dashboard also routes the wakeup waiting item to `power-wake-policy` so the
+daily dashboard and owner approval bundle show the same sleep-wakeup decision.
 
 Verify that manual-gated waiting items are mapped to the expected approval
 groups:
