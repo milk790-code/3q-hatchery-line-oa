@@ -957,7 +957,7 @@ async function runAutoCompletions(candidates) {
     const freshness = candidate?.evidence?.freshUntil
       ? ` freshUntil=${candidate.evidence.freshUntil} ageMinutes=${candidate?.evidence?.ageMinutes ?? '(unknown)'} limitMinutes=${candidate?.evidence?.reportFreshMinutes ?? '(unknown)'}`
       : '';
-    completions.push(blockedCompletion(
+    completions.push(completedEvidenceCompletion(
       'wakeup-health-ready',
       wakeToRunDisabled
         ? `Current wakeup health report already exists: ${candidate?.evidence?.reportPath || path.join(stateDir, 'wakeup-health')};${freshness}; WakeToRun is disabled, so sleeping-machine wakeups require owner approval.`
@@ -1440,6 +1440,21 @@ function blockedCompletion(label, reason, candidate = null) {
     firstSeenAt: candidate?.firstSeenAt || null,
     escalated,
     escalation: escalated ? (candidate?.escalation || `blocked_over_${blockerEscalateHours}h`) : null,
+    manualGate: candidate?.manualGate || inferManualGate(candidate || {}),
+    nextApproval: classifyApproval(label, candidate),
+    nextApprovals: classifyApprovalGates(label, candidate),
+  };
+}
+
+function completedEvidenceCompletion(label, summary, candidate = null) {
+  return {
+    label,
+    status: 'completed',
+    summary,
+    ageHours: Number(candidate?.ageHours || 0),
+    firstSeenAt: candidate?.firstSeenAt || null,
+    escalated: false,
+    escalation: null,
     manualGate: candidate?.manualGate || inferManualGate(candidate || {}),
     nextApproval: classifyApproval(label, candidate),
     nextApprovals: classifyApprovalGates(label, candidate),
