@@ -188,6 +188,14 @@ async function discoverWakeupHealth() {
   const latest = await readJson(path.join(stateDir, 'wakeup-health', 'latest.json'), null);
   const generatedAtMs = Date.parse(latest?.generatedAt || '');
   const nextRunAtMs = Date.parse(latest?.scheduledTask?.nextRunTime || '');
+  const reportFreshMinutes = firstPositiveNumber(
+    process.env.LOOPS_WAKEUP_REPORT_FRESH_MINUTES,
+    latest?.reportFreshMinutes,
+    65
+  );
+  const freshUntil = Number.isFinite(generatedAtMs)
+    ? new Date(generatedAtMs + reportFreshMinutes * 60_000).toISOString()
+    : null;
   const nextRunGraceMinutes = Number.parseFloat(process.env.LOOPS_WAKEUP_NEXT_RUN_GRACE_MINUTES || '5');
   const ageMinutes = Number.isFinite(generatedAtMs)
     ? Math.max(0, (Date.now() - generatedAtMs) / 60_000)
@@ -199,7 +207,7 @@ async function discoverWakeupHealth() {
     && latest?.scheduledTask?.found === true
     && nextRunAgeMinutes !== null
     && nextRunAgeMinutes > nextRunGraceMinutes;
-  const fresh = ageMinutes !== null && ageMinutes <= 60 && !scheduleEvidenceStale;
+  const fresh = ageMinutes !== null && ageMinutes <= reportFreshMinutes && !scheduleEvidenceStale;
   const unhealthy = latest?.health?.ok === false;
   const id = unhealthy ? 'wakeup-health-attention' : (fresh ? 'wakeup-health-ready' : 'wakeup-health-needed');
 
@@ -227,6 +235,8 @@ async function discoverWakeupHealth() {
     evidence: {
       reportPath: latest?.reportPath || null,
       generatedAt: latest?.generatedAt || null,
+      reportFreshMinutes,
+      freshUntil,
       ageMinutes: ageMinutes === null ? null : Math.round(ageMinutes * 10) / 10,
       scheduleEvidenceStale,
       nextRunAgeMinutes: nextRunAgeMinutes === null ? null : Math.round(nextRunAgeMinutes * 10) / 10,
@@ -941,11 +951,14 @@ async function runAutoCompletions(candidates) {
   } else if (ids.has('wakeup-health-ready')) {
     const candidate = byId.get('wakeup-health-ready');
     const wakeToRunDisabled = candidate?.evidence?.scheduledTask?.wakeToRun === false;
+    const freshness = candidate?.evidence?.freshUntil
+      ? ` freshUntil=${candidate.evidence.freshUntil} ageMinutes=${candidate?.evidence?.ageMinutes ?? '(unknown)'} limitMinutes=${candidate?.evidence?.reportFreshMinutes ?? '(unknown)'}`
+      : '';
     completions.push(blockedCompletion(
       'wakeup-health-ready',
       wakeToRunDisabled
-        ? `Current wakeup health report already exists: ${candidate?.evidence?.reportPath || path.join(stateDir, 'wakeup-health')}; WakeToRun is disabled, so sleeping-machine wakeups require owner approval.`
-        : `Current wakeup health report already exists: ${candidate?.evidence?.reportPath || path.join(stateDir, 'wakeup-health')}`,
+        ? `Current wakeup health report already exists: ${candidate?.evidence?.reportPath || path.join(stateDir, 'wakeup-health')};${freshness}; WakeToRun is disabled, so sleeping-machine wakeups require owner approval.`
+        : `Current wakeup health report already exists: ${candidate?.evidence?.reportPath || path.join(stateDir, 'wakeup-health')};${freshness}`,
       candidate
     ));
   }
@@ -2327,6 +2340,14 @@ function redactEvidence(value) {
     return out;
   }
   return value;
+}
+
+function firstPositiveNumber(...values) {
+  for (const value of values) {
+    const parsed = Number.parseFloat(value);
+    if (Number.isFinite(parsed) && parsed > 0) return parsed;
+  }
+  return 0;
 }
 
 function toStamp(date) {

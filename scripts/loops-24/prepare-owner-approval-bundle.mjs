@@ -102,6 +102,7 @@ if (ahead <= 0) prBlockers.push('no-ahead-commits');
 if (behind !== 0) prBlockers.push('branch-behind-upstream');
 const workerReady = worker?.summary?.status === 'ready-for-approval';
 const wakeupFresh = wakeupAgeMinutes !== null && wakeupAgeMinutes <= wakeupFreshMinutes && wakeupScheduleFresh;
+const wakeupFreshUntil = freshUntil(wakeupHealth?.generatedAt, wakeupFreshMinutes);
 const wakeupOk = wakeupHealth?.health?.ok === true && wakeupFresh;
 const wakeToRunEnabled = wakeupHealth?.scheduledTask?.platform === 'win32'
   ? wakeupHealth?.scheduledTask?.wakeToRun === true
@@ -134,7 +135,7 @@ const gates = [
     status: wakeupOk ? 'ready' : 'attention',
     ownerAction: 'Trust hourly automation only after the local wakeup-health report is fresh and green.',
     evidence: wakeupHealth
-      ? `ok=${wakeupHealth.health?.ok} fresh=${wakeupFresh} ageMinutes=${wakeupAgeMinutes === null ? '(unknown)' : round(wakeupAgeMinutes)} limitMinutes=${wakeupFreshMinutes} scheduleFresh=${wakeupScheduleFresh} nextRunAgeMinutes=${wakeupNextRunAgeMinutes === null ? '(n/a)' : round(wakeupNextRunAgeMinutes)} nextRunGraceMinutes=${wakeupNextRunGraceMinutes} report=${wakeupHealth.reportPath || '(missing)'}`
+      ? `ok=${wakeupHealth.health?.ok} fresh=${wakeupFresh} ageMinutes=${wakeupAgeMinutes === null ? '(unknown)' : round(wakeupAgeMinutes)} limitMinutes=${wakeupFreshMinutes} freshUntil=${wakeupFreshUntil || '(unknown)'} scheduleFresh=${wakeupScheduleFresh} nextRunAgeMinutes=${wakeupNextRunAgeMinutes === null ? '(n/a)' : round(wakeupNextRunAgeMinutes)} nextRunGraceMinutes=${wakeupNextRunGraceMinutes} report=${wakeupHealth.reportPath || '(missing)'}`
       : 'Missing wakeup-health report.',
   },
   {
@@ -253,6 +254,7 @@ const payload = {
     workerReady,
     wakeupOk,
     wakeupFresh,
+    wakeupFreshUntil,
     wakeupAgeMinutes: wakeupAgeMinutes === null ? null : round(wakeupAgeMinutes),
     wakeupScheduleFresh,
     wakeupNextRunAgeMinutes: wakeupNextRunAgeMinutes === null ? null : round(wakeupNextRunAgeMinutes),
@@ -453,6 +455,12 @@ function ageMinutes(value, relativeTo) {
   const timestamp = Date.parse(value || '');
   if (!Number.isFinite(timestamp)) return null;
   return Math.max(0, (relativeTo.getTime() - timestamp) / 60_000);
+}
+
+function freshUntil(value, freshMinutes) {
+  const timestamp = Date.parse(value || '');
+  if (!Number.isFinite(timestamp)) return null;
+  return new Date(timestamp + freshMinutes * 60_000).toISOString();
 }
 
 function scheduledTaskNextRunAgeMinutes(wakeupHealth, relativeTo) {

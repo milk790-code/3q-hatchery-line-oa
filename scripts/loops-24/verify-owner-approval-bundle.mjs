@@ -249,9 +249,13 @@ function verifyWakeupGate(bundle, wakeup, gate, failures) {
   const nextRunAge = scheduledTaskNextRunAgeMinutes(wakeup, relativeTo);
   const scheduleFresh = !isWakeupScheduleEvidenceStale(wakeup, relativeTo, nextRunGraceMinutes);
   const fresh = age !== null && age <= limit && scheduleFresh;
+  const expectedFreshUntil = freshUntil(wakeup?.generatedAt, limit);
   const ok = Boolean(wakeup?.health?.ok === true && fresh);
   if (bundle.summary?.wakeupOk !== ok) failures.push(`summary.wakeupOk expected ${ok} got ${bundle.summary?.wakeupOk}`);
   if (bundle.summary?.wakeupFresh !== fresh) failures.push(`summary.wakeupFresh expected ${fresh} got ${bundle.summary?.wakeupFresh}`);
+  if (bundle.summary?.wakeupFreshUntil !== expectedFreshUntil) {
+    failures.push(`summary.wakeupFreshUntil expected ${expectedFreshUntil} got ${bundle.summary?.wakeupFreshUntil}`);
+  }
   if (bundle.summary?.wakeupScheduleFresh !== scheduleFresh) failures.push(`summary.wakeupScheduleFresh expected ${scheduleFresh} got ${bundle.summary?.wakeupScheduleFresh}`);
   if (Number(bundle.summary?.wakeupNextRunGraceMinutes) !== nextRunGraceMinutes) {
     failures.push(`summary.wakeupNextRunGraceMinutes expected ${nextRunGraceMinutes} got ${bundle.summary?.wakeupNextRunGraceMinutes}`);
@@ -373,6 +377,12 @@ function ageMinutes(value, relativeTo) {
   const timestamp = Date.parse(value || '');
   if (!Number.isFinite(timestamp)) return null;
   return Math.max(0, (relativeTo.getTime() - timestamp) / 60_000);
+}
+
+function freshUntil(value, freshMinutes) {
+  const timestamp = Date.parse(value || '');
+  if (!Number.isFinite(timestamp)) return null;
+  return new Date(timestamp + freshMinutes * 60_000).toISOString();
 }
 
 function scheduledTaskNextRunAgeMinutes(wakeup, relativeTo) {

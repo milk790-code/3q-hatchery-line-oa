@@ -9,6 +9,7 @@ import { createHash } from 'node:crypto';
 const automationId = process.env.LOOPS_AUTOMATION_ID || 'loops-24';
 const taskName = process.env.LOOPS_TASK_NAME || 'LOOPS-24-3Q-Hatchery';
 const staleMinutes = numberFromEnv('LOOPS_WAKEUP_STALE_MINUTES', 90);
+const reportFreshMinutes = numberFromEnv('LOOPS_WAKEUP_REPORT_FRESH_MINUTES', 65);
 const lockStaleMinutes = numberFromEnv('LOOPS_LOCK_STALE_MINUTES', 65);
 const repoRoot = path.resolve(process.env.LOOPS_REPO_ROOT || process.cwd());
 const codexHome = process.env.CODEX_HOME
@@ -19,6 +20,7 @@ const statePath = path.join(stateDir, 'state.json');
 const lockPath = path.join(stateDir, 'lock.json');
 
 const now = new Date();
+const freshUntil = new Date(now.getTime() + reportFreshMinutes * 60_000);
 const stamp = now.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
 const state = await readJson(statePath, null);
 const runs = Array.isArray(state?.runs) ? state.runs : [];
@@ -83,11 +85,14 @@ const health = {
   checks,
   warnings,
   staleMinutes,
+  reportFreshMinutes,
   lockStaleMinutes,
 };
 
 const payload = {
   generatedAt: now.toISOString(),
+  reportFreshMinutes,
+  freshUntil: freshUntil.toISOString(),
   repoRoot,
   automationId,
   stateDir,
@@ -232,6 +237,8 @@ function renderMarkdown(data) {
     '# LOOPS Wakeup Health',
     '',
     `- generated_at: ${data.generatedAt}`,
+    `- report_fresh_minutes: ${data.reportFreshMinutes}`,
+    `- fresh_until: ${data.freshUntil}`,
     `- repo: ${data.repoRoot}`,
     `- automation_id: ${data.automationId}`,
     `- state_dir: ${data.stateDir}`,

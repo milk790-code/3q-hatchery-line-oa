@@ -250,6 +250,9 @@ a sleeping machine.
 
 The warning is intentionally report-only. LOOPS does not change Task Scheduler
 or power-management settings without explicit owner approval.
+Wakeup-health reports include `fresh_until`, derived from
+`LOOPS_WAKEUP_REPORT_FRESH_MINUTES` which defaults to 65 minutes. The runner and
+owner approval bundle use that same freshness window before trusting the report.
 The main runner also treats a wakeup-health report as stale when its recorded
 Windows `nextRunTime` is already past the configured grace window, even if the
 report file itself is still younger than the normal freshness window.
