@@ -32,6 +32,7 @@ const secrets = await readJson(path.join(stateDir, 'secret-gates', 'latest.json'
 const wakeup = await readJson(path.join(stateDir, 'wakeup-health', 'latest.json'), null);
 const boundary = await readJson(path.join(stateDir, 'commit-boundaries', 'latest.json'), null);
 const dirtyClassification = await readJson(path.join(stateDir, 'dirty-worktree', 'latest.json'), null);
+const dirtyReview = await readJson(path.join(stateDir, 'dirty-review-workbench', 'latest.json'), null);
 const frontend = await readJson(path.join(stateDir, 'frontend-slice-handoffs', 'latest.json'), null);
 const contentQueue = await readJson(path.join(stateDir, 'content-queue-reconciliations', 'latest.json'), null);
 const dashboard = await readJson(path.join(stateDir, 'dashboard', 'latest.json'), null);
@@ -85,6 +86,7 @@ const trackedStatusFingerprint = gitWorktreeFingerprint({ cwd: repoRoot, statusL
 const localInvestorPacketPaths = listLocalInvestorPacketPaths();
 const localScopeClean = stagedLines.length === 0 && unexpectedDirty.length === 0 && unexpectedUntracked.length === 0;
 const dirtyClassificationReport = dirtyClassification?.reportPath || null;
+const dirtyReviewReport = dirtyReview?.reportPath || null;
 
 const missingSecrets = Array.isArray(secrets?.summary?.missing) ? secrets.summary.missing : [];
 const workerCommands = Array.isArray(worker?.commands) ? worker.commands : [];
@@ -131,7 +133,7 @@ const gates = [
     ownerAction: 'Confirm the only remaining dirty paths are deploy-gated Worker slices and no unrelated untracked paths are present.',
     evidence: localScopeClean
       ? `Tracked dirty files are limited to: ${dirtyPaths.join(', ') || '(none)'}; untracked=(none).`
-      : `Unexpected dirty, untracked, or staged changes exist. staged=${stagedLines.join(', ') || '(none)'} unexpected=${unexpectedDirty.join(', ') || '(none)'} untracked=${unexpectedUntracked.join(', ') || '(none)'} dirtyReport=${dirtyClassificationReport || '(missing)'}`,
+      : `Unexpected dirty, untracked, or staged changes exist. staged=${stagedLines.join(', ') || '(none)'} unexpected=${unexpectedDirty.join(', ') || '(none)'} untracked=${unexpectedUntracked.join(', ') || '(none)'} dirtyReport=${dirtyClassificationReport || '(missing)'} dirtyReview=${dirtyReviewReport || '(missing)'}`,
   },
   ...(localInvestorPacketPaths.length ? [{
     id: 'investor_review',
@@ -246,6 +248,7 @@ const payload = {
     wakeupHealth: wakeupHealth?.reportPath || null,
     commitBoundaries: boundary?.reportPath || null,
     dirtyWorktree: dirtyClassificationReport,
+    dirtyReviewWorkbench: dirtyReviewReport,
     frontendHandoffs: frontend?.reportPath || null,
     contentQueue: contentQueue?.reportPath || null,
     dashboardGateVerification: dashboardGates?.reportPath || null,

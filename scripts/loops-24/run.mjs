@@ -1017,6 +1017,18 @@ async function runAutoCompletions(candidates) {
       ['scripts/loops-24/classify-dirty-worktree.mjs'],
       120_000
     ));
+    completions.push(runLocalStep(
+      'prepare-dirty-review-workbench',
+      'node',
+      ['scripts/loops-24/prepare-dirty-review-workbench.mjs'],
+      120_000
+    ));
+    completions.push(runLocalStep(
+      'verify-dirty-review-workbench',
+      'node',
+      ['scripts/loops-24/verify-dirty-review-workbench.mjs'],
+      120_000
+    ));
     if (dirty?.evidence?.sliceHandoffPath) {
       completions.push(blockedCompletion(
         'dirty-worktree',
@@ -1779,6 +1791,10 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     await readJson(path.join(stateDir, 'manual-send-review-verifications', 'latest.json'), null)
   );
   const dirtyClassification = summarizeDirtyClassificationArtifact(await readJson(path.join(stateDir, 'dirty-worktree', 'latest.json'), null));
+  const dirtyReviewWorkbench = summarizeDirtyReviewWorkbenchArtifact(
+    await readJson(path.join(stateDir, 'dirty-review-workbench', 'latest.json'), null),
+    await readJson(path.join(stateDir, 'dirty-review-workbench-verifications', 'latest.json'), null)
+  );
   const currentHead = currentGitHead();
   const ownerApprovalBundle = summarizeOwnerApprovalBundleArtifact(
     await readJson(path.join(stateDir, 'owner-approval-bundles', 'latest.json'), null),
@@ -1822,6 +1838,12 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     manualSendReviewProspectCount: manualSendReview.available ? Number(manualSendReview.summary?.prospectCount || 0) : null,
     manualSendReviewVerificationOk: manualSendReview.available ? manualSendReview.verificationOk : null,
     dirtyDeployCount: dirtyClassification.summary?.deploy || 0,
+    dirtyDebugArtifactCount: dirtyClassification.summary?.debugArtifacts || 0,
+    dirtyReviewWorkbenchStatus: dirtyReviewWorkbench.available ? dirtyReviewWorkbench.status : null,
+    dirtyReviewWorkbenchVerificationOk: dirtyReviewWorkbench.available ? dirtyReviewWorkbench.verificationOk : null,
+    dirtyReviewWorkbenchOwnerApprovalRequiredCount: dirtyReviewWorkbench.available
+      ? Number(dirtyReviewWorkbench.summary?.ownerApprovalRequiredCount || 0)
+      : null,
     ownerApprovalBundleStatus: ownerApprovalBundle.available ? ownerApprovalBundle.status : null,
     ownerApprovalBundleHead: ownerApprovalBundle.available ? ownerApprovalBundle.head : null,
     ownerApprovalBundleHeadCurrent: ownerApprovalBundle.available ? ownerApprovalBundle.headCurrent : null,
@@ -1864,6 +1886,7 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     materialFactory,
     manualSendReview,
     dirtyClassification,
+    dirtyReviewWorkbench,
     ownerApprovalBundle,
     approvalWorkbench,
     powerWakePolicy,
@@ -1942,6 +1965,10 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     '## Dirty Worktree Groups',
     '',
     ...renderDirtyClassification(payload.dirtyClassification),
+    '',
+    '## Dirty Review Workbench',
+    '',
+    ...renderDirtyReviewWorkbench(payload.dirtyReviewWorkbench),
     '',
     '## Lane Summary',
     '',
@@ -2552,6 +2579,27 @@ function summarizeDirtyClassificationArtifact(data) {
   };
 }
 
+function summarizeDirtyReviewWorkbenchArtifact(data, verification) {
+  if (!data) return { available: false, summary: null, reportPath: null };
+  return {
+    available: true,
+    generatedAt: data.generatedAt || null,
+    reportPath: data.reportPath || null,
+    jsonPath: data.jsonPath || null,
+    status: data.status || null,
+    sourceCurrent: data.sourceCurrent === true,
+    dirtyReportPath: data.dirtyReportPath || null,
+    verificationOk: verification?.ok === true,
+    verificationReportPath: verification?.reportPath || null,
+    statusFingerprint: data.statusFingerprint || null,
+    summary: {
+      ...(data.summary || {}),
+      verificationFailureCount: Number(verification?.summary?.failureCount || 0),
+      verificationWarningCount: Number(verification?.summary?.warningCount || 0),
+    },
+  };
+}
+
 function summarizeOwnerApprovalBundleArtifact(data, currentHead = '', relativeTo = new Date()) {
   if (!data) return { available: false, summary: null, reportPath: null };
   const summary = data.summary || {};
@@ -2727,7 +2775,27 @@ function renderDirtyClassification(data) {
     `- deploy: ${summary.deploy || 0}`,
     `- investor: ${summary.investor || 0}`,
     `- repo_hygiene: ${summary.repoHygiene || 0}`,
+    `- debug_artifacts: ${summary.debugArtifacts || 0}`,
     `- other: ${summary.other || 0}`,
+  ];
+}
+
+function renderDirtyReviewWorkbench(data) {
+  if (!data?.available) return ['- No dirty review workbench artifact yet.'];
+  const summary = data.summary || {};
+  return [
+    `- report: ${data.reportPath || '(missing)'}`,
+    `- verification_report: ${data.verificationReportPath || '(missing)'}`,
+    `- status: ${data.status || '(unknown)'}`,
+    `- source_current: ${data.sourceCurrent === true}`,
+    `- dirty_report: ${data.dirtyReportPath || '(missing)'}`,
+    `- deploy: ${summary.deploy || 0}`,
+    `- debug_artifacts: ${summary.debugArtifacts || 0}`,
+    `- other: ${summary.other || 0}`,
+    `- decision_options: ${summary.decisionOptionCount || 0}`,
+    `- owner_approval_required: ${summary.ownerApprovalRequiredCount || 0}`,
+    `- verification_ok: ${data.verificationOk === true}`,
+    `- verification_failures: ${summary.verificationFailureCount ?? 0}`,
   ];
 }
 
