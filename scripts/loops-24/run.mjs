@@ -829,12 +829,23 @@ async function runAutoCompletions(candidates) {
   }
 
   if (ids.has('github-local-pr-handoff-needed')) {
-    completions.push(runLocalStep(
+    const githubHandoffCompletion = runLocalStep(
       'prepare-github-handoff',
       'node',
       ['scripts/loops-24/prepare-github-handoff.mjs'],
       120_000
-    ));
+    );
+    completions.push(githubHandoffCompletion);
+    if (githubHandoffCompletion.status === 'completed'
+      && !ids.has('pr-readiness-needed')
+      && !ids.has('pr-readiness-ready')) {
+      completions.push(runLocalStep(
+        'prepare-pr-readiness',
+        'node',
+        ['scripts/loops-24/prepare-pr-readiness.mjs'],
+        120_000
+      ));
+    }
   } else if (ids.has('github-local-pr-handoff-ready')) {
     const candidate = byId.get('github-local-pr-handoff-ready');
     completions.push(blockedCompletion(

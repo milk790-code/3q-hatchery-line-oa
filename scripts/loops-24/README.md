@@ -57,6 +57,11 @@ When auto-complete is enabled and manual gates are present, the runner writes th
 current dashboard first, verifies that dashboard's approval groups, then refreshes
 the owner approval bundle from the verified dashboard.
 
+When the GitHub handoff is generated in the same run, auto-complete also prepares
+the matching PR readiness packet before building the owner bundle. The owner
+bundle treats stale PR readiness packets as attention items instead of approval
+ready evidence.
+
 Before escalating a manual gate, LOOPS also prepares a manual-gate adapter report.
 That report groups similar blockers into one shared taxonomy, lists safe automatic
 substitutes, and keeps only the true hard stops for owner approval. The same

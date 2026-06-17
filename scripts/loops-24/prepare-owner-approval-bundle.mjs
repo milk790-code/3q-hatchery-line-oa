@@ -57,7 +57,14 @@ const statusFingerprint = gitWorktreeFingerprint({ cwd: repoRoot, statusLines })
 
 const missingSecrets = Array.isArray(secrets?.summary?.missing) ? secrets.summary.missing : [];
 const workerCommands = Array.isArray(worker?.commands) ? worker.commands : [];
-const prReady = pr?.summary?.readyForApproval === true;
+const prCurrent = Boolean(pr?.branch === branch
+  && pr?.upstream === upstream
+  && pr?.head === head
+  && pr?.ahead === ahead
+  && pr?.behind === behind
+  && pr?.statusFingerprint === statusFingerprint
+  && pr?.githubHandoffPath === github?.reportPath);
+const prReady = pr?.summary?.readyForApproval === true && prCurrent;
 const workerReady = worker?.summary?.status === 'ready-for-approval';
 const wakeupOk = wakeup?.health?.ok === true;
 const localScopeClean = stagedLines.length === 0 && unexpectedDirty.length === 0;
@@ -90,9 +97,9 @@ const gates = [
     status: prReady && ahead > 0 && behind === 0 ? 'ready_for_approval' : 'attention',
     ownerAction: 'Approve GitHub write actions if you want the committed control-plane work published as a draft PR.',
     evidence: pr
-      ? `readyForApproval=${pr.summary?.readyForApproval} branch=${branch} upstream=${upstream || '(none)'} ahead=${ahead} behind=${behind} head=${head}`
+      ? `readyForApproval=${pr.summary?.readyForApproval} current=${prCurrent} packetHead=${pr.head || '(missing)'} currentHead=${head} packetAhead=${pr.ahead} currentAhead=${ahead} packetBehind=${pr.behind} currentBehind=${behind}`
       : 'Missing PR readiness packet.',
-    commands: github ? [
+    commands: prReady && github ? [
       `git push origin ${branch}`,
       `gh pr create --draft --title "${escapeDoubleQuoted(github.title || 'Add LOOPS 24 control plane and local automation guardrails')}" --body-file "${pr?.reportPath || github.reportPath}"`,
     ] : [],
