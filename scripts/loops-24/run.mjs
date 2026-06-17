@@ -1142,6 +1142,18 @@ async function runAutoCompletions(candidates) {
     ['scripts/loops-24/verify-account-binding-workbench.mjs'],
     120_000
   ));
+  completions.push(runLocalStep(
+    'prepare-material-factory',
+    'node',
+    ['scripts/loops-24/prepare-material-factory.mjs', '--from-inbox'],
+    120_000
+  ));
+  completions.push(runLocalStep(
+    'verify-material-factory',
+    'node',
+    ['scripts/loops-24/verify-material-factory.mjs'],
+    120_000
+  ));
 
   const outreachCandidate = candidates.find(candidate => candidate.id?.startsWith('cold-outreach-batch-'));
   if (outreachCandidate) {
@@ -1638,6 +1650,7 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
   const connectorHealth = summarizeConnectorHealthArtifact(await readJson(path.join(stateDir, 'connector-health', 'latest.json'), null));
   const secretChecklist = summarizeSecretChecklistArtifact(await readJson(path.join(stateDir, 'secret-checklists', 'latest.json'), null));
   const accountBindingWorkbench = summarizeAccountBindingWorkbenchArtifact(await readJson(path.join(stateDir, 'account-binding-workbench', 'latest.json'), null));
+  const materialFactory = summarizeMaterialFactoryArtifact(await readJson(path.join(stateDir, 'material-factory', 'latest.json'), null));
   const dirtyClassification = summarizeDirtyClassificationArtifact(await readJson(path.join(stateDir, 'dirty-worktree', 'latest.json'), null));
   const currentHead = currentGitHead();
   const ownerApprovalBundle = summarizeOwnerApprovalBundleArtifact(
@@ -1666,6 +1679,10 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     accountBindingAttentionCount: accountBindingWorkbench.summary?.attentionCount || 0,
     accountBindingNextBindingId: accountBindingWorkbench.summary?.nextBindingId || null,
     accountBindingNextBindingLabel: accountBindingWorkbench.summary?.nextBindingLabel || null,
+    materialFactoryStatus: materialFactory.summary?.status || null,
+    materialFactoryPackReady: materialFactory.summary?.packReady === true,
+    materialFactoryPendingIdeaCount: materialFactory.summary?.pendingIdeaCount || 0,
+    materialFactoryMissingToolCount: materialFactory.summary?.missingToolCount || 0,
     dirtyDeployCount: dirtyClassification.summary?.deploy || 0,
     ownerApprovalBundleStatus: ownerApprovalBundle.available ? ownerApprovalBundle.status : null,
     ownerApprovalBundleHead: ownerApprovalBundle.available ? ownerApprovalBundle.head : null,
@@ -1702,6 +1719,7 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     connectorHealth,
     secretChecklist,
     accountBindingWorkbench,
+    materialFactory,
     dirtyClassification,
     ownerApprovalBundle,
     approvalWorkbench,
@@ -1760,6 +1778,10 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     '## Account Binding Workbench',
     '',
     ...renderAccountBindingWorkbench(payload.accountBindingWorkbench),
+    '',
+    '## Material Factory',
+    '',
+    ...renderMaterialFactory(payload.materialFactory),
     '',
     '## Secret Checklist',
     '',
@@ -2325,6 +2347,20 @@ function summarizeAccountBindingWorkbenchArtifact(data) {
   };
 }
 
+function summarizeMaterialFactoryArtifact(data) {
+  if (!data) return { available: false, summary: null, reportPath: null };
+  return {
+    available: true,
+    generatedAt: data.generatedAt || null,
+    reportPath: data.reportPath || null,
+    inboxDir: data.inboxDir || null,
+    status: data.status || null,
+    materialPack: data.materialPack || null,
+    statusFingerprint: data.statusFingerprint || null,
+    summary: data.summary || null,
+  };
+}
+
 function summarizeDirtyClassificationArtifact(data) {
   if (!data) return { available: false, summary: null, reportPath: null };
   return {
@@ -2433,6 +2469,22 @@ function renderAccountBindingWorkbench(data) {
     `- manual_oauth_required: ${summary.manualOauthRequiredCount || 0}`,
     `- secret_missing: ${summary.secretMissingCount || 0}`,
     `- cli_missing: ${summary.cliMissingCount || 0}`,
+  ];
+}
+
+function renderMaterialFactory(data) {
+  if (!data?.available) return ['- No material factory artifact yet.'];
+  const summary = data.summary || {};
+  return [
+    `- report: ${data.reportPath || '(missing)'}`,
+    `- status: ${summary.status || data.status || '(unknown)'}`,
+    `- inbox: ${data.inboxDir || '(missing)'}`,
+    `- idea_present: ${summary.ideaPresent === true}`,
+    `- pack_ready: ${summary.packReady === true}`,
+    `- pack_dir: ${summary.packDir || '(none)'}`,
+    `- selected_local_assets: ${summary.selectedLocalAssetCount || 0}`,
+    `- storyboard_scenes: ${summary.storyboardSceneCount || 0}`,
+    `- missing_tools: ${summary.missingTools?.length ? summary.missingTools.join(', ') : '(none)'}`,
   ];
 }
 

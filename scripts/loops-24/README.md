@@ -51,6 +51,7 @@ to local, review-ready artifacts:
 - connector health reports that flag missing, failed, expired, timeout, skipped, or app-auth-unverified integrations
 - one-page local secret checklists derived from redacted secret gates
 - account binding workbenches that rank Codex app auth, CLI auth, browser sessions, and local secret gates without logging in or writing secrets
+- material factory packs that turn an idea text into a brief, script, storyboard, GPT-SoVITS voiceover text, Jianying assembly plan, and yt-dlp B-roll intake list
 - dirty worktree classification into deploy, investor, repo-hygiene, and other groups
 - content queue reconciliation reports
 - Wrangler cache audit reports
@@ -223,6 +224,8 @@ The dashboard also embeds compact summaries for connector health, local secret
 checklist status, account binding workbench status, and dirty worktree groups so
 the hourly loop can mark broken authorization or unsafe git scope without
 requiring a separate file hunt.
+It also embeds the latest material factory status so an idea text dropped into
+the local inbox becomes a review-ready material pack on the next safe-local loop.
 It also embeds the latest owner approval bundle status, head freshness,
 publish readiness, local scope cleanliness, wakeup freshness, wakeup freshness
 remaining minutes, and power-wake policy flag so owner decisions can be made
@@ -394,6 +397,58 @@ powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\check-connector-heal
 powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\prepare-account-binding-workbench.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\run.ps1 -OnlySafeLocal
 ```
+
+## Prepare material factory pack
+
+Turn a plain idea into a local material pack:
+
+- `brief.md`
+- `script.md`
+- `storyboard.json`
+- `voiceover-gpt-sovits.txt`
+- `jianying-assembly-plan.json`
+- `jianying-draft-scaffold.py`
+- `yt-dlp-broll-urls.txt`
+- `OWNER_RUN_COMMANDS.ps1`
+
+The material factory uses local repo assets first and only creates owner-run
+handoffs for yt-dlp, GPT-SoVITS, and Jianying. It does not download media, run
+voice inference, open Jianying, export video, post, send, push, deploy, or write
+secrets.
+
+Direct run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\prepare-material-factory.ps1 `
+  -Idea "Make a 45 second vertical video for a local bakery showing how 3Q turns one seasonal product idea into a LINE lead page." `
+  -Duration 45
+```
+
+Loop inbox flow:
+
+```powershell
+notepad "$env:USERPROFILE\.codex\automations\loops-24\material-ideas\inbox\new-idea.txt"
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\run.ps1 -OnlySafeLocal
+```
+
+Verify latest material factory artifact:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\verify-material-factory.ps1
+```
+
+Local tool integration notes:
+
+- `yt-dlp`: use installed `yt-dlp` when present; otherwise the factory detects
+  `%USERPROFILE%\Documents\yt-dlp-master.zip` as available source but does not
+  extract or install it automatically.
+- `Jianying`: the factory detects `JY_SKILL_ROOT` or
+  `%USERPROFILE%\Google 雲端硬碟\jianying-editor-skill-main.zip`, then emits a
+  project-local scaffold that can use `scripts/jy_wrapper.py` after owner setup.
+- `GPT-SoVITS`: set `GPT_SOVITS_ROOT` or `GPT_SOVITS_HOME` before owner-run
+  voice generation. The factory writes voiceover text only.
+- `ffmpeg`: required later for reliable audio/video conversion; missing ffmpeg
+  is reported as a tool gap, not installed automatically.
 
 ## Prepare manual gate adapter
 
