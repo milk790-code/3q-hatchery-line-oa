@@ -26,6 +26,7 @@ const approvalIndex = buildApprovalIndex(nextApproval);
 const portableJsonFindings = verifyPortableJsonSource(dashboardJsonSource);
 const findings = mergeFindings(
   portableJsonFindings,
+  verifyDashboardCommandProjectionSafety(dashboardJsonSource),
   verifyDashboardSchema(dashboard, waiting, nextApproval, approvalGroups),
   verifyConnectorHealthSummary(dashboard),
   verifyAccountBindingWorkbenchSummary(dashboard),
@@ -52,6 +53,7 @@ const payload = {
     connectorThreadAttentionCount: dashboard.connectorHealth?.summary?.threadAttentionCount ?? null,
     dirtyReviewWorkbenchDecisionOptionCount: dashboard.dirtyReviewWorkbench?.summary?.decisionOptionCount ?? null,
     approvalWorkbenchReadyCommandGateCount: dashboard.approvalWorkbench?.summary?.readyCommandGateCount ?? null,
+    commandProjectionSafetyChecked: true,
     failureCount: findings.failures.length,
     warningCount: findings.warnings.length,
   },
@@ -144,6 +146,26 @@ function verifyPortableJsonSource(source) {
   if (raw) {
     failures.push(`Dashboard JSON contains raw non-ASCII character ${raw.codePoint} at line ${raw.line}, column ${raw.column}; write escaped JSON so Windows PowerShell default Get-Content can pipe it to ConvertFrom-Json safely.`);
   }
+  return { failures, warnings };
+}
+
+function verifyDashboardCommandProjectionSafety(source) {
+  const failures = [];
+  const warnings = [];
+  const forbiddenFragments = [
+    'wrangler deploy',
+    'Push-Location',
+    'Pop-Location',
+    'gh pr create',
+    'git push origin',
+  ];
+
+  for (const fragment of forbiddenFragments) {
+    if (source.includes(fragment)) {
+      failures.push(`Dashboard JSON leaks raw approval command fragment: ${fragment}`);
+    }
+  }
+
   return { failures, warnings };
 }
 
@@ -491,6 +513,9 @@ function verifyApprovalWorkbenchSummary(dashboard) {
     if (!gate.id) failures.push('approvalWorkbench.readyCommands contains a gate without id.');
     if (gate.id && seen.has(gate.id)) failures.push(`approvalWorkbench.readyCommands duplicate id: ${gate.id}`);
     if (gate.id) seen.add(gate.id);
+    if (Object.prototype.hasOwnProperty.call(gate, 'commands')) {
+      failures.push(`approvalWorkbench.readyCommands ${id} must not include raw commands; expose commandCount only.`);
+    }
     if (gate.status !== 'ready_for_approval') {
       failures.push(`approvalWorkbench.readyCommands ${id} status expected ready_for_approval got ${gate.status}`);
     }
@@ -647,6 +672,7 @@ function renderMarkdown(payload) {
     `- approval_group_count: ${payload.summary.approvalGroupCount}`,
     `- dirty_review_decision_options: ${payload.summary.dirtyReviewWorkbenchDecisionOptionCount ?? '(unknown)'}`,
     `- approval_ready_command_gates: ${payload.summary.approvalWorkbenchReadyCommandGateCount ?? '(unknown)'}`,
+    `- command_projection_safety_checked: ${payload.summary.commandProjectionSafetyChecked === true}`,
     `- failure_count: ${payload.summary.failureCount}`,
     `- warning_count: ${payload.summary.warningCount}`,
     '',

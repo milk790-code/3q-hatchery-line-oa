@@ -165,6 +165,22 @@ function verifyDisplay({ dashboard, markdown, display }) {
     }
   }
 
+  const forbiddenCommandFragments = [
+    'wrangler deploy',
+    'Push-Location',
+    'Pop-Location',
+    'gh pr create',
+    'git push origin',
+  ];
+  for (const fragment of forbiddenCommandFragments) {
+    if (display.stdout.includes(fragment)) {
+      failures.push(`show-dashboard output leaks raw approval command fragment: ${fragment}`);
+    }
+    if (markdown.includes(fragment)) {
+      failures.push(`dashboard markdown leaks raw approval command fragment: ${fragment}`);
+    }
+  }
+
   if (dashboard.runId && !display.stdout.includes(dashboard.runId)) {
     failures.push(`show-dashboard output missing run_id ${dashboard.runId}`);
   }
