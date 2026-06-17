@@ -433,6 +433,13 @@ powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\record-thread-connec
   -RepoId "1238215247"
 ```
 
+Supported thread-side connector ids are `github_app`, `gmail_app`,
+`google_drive_app`, `slack_app`, `chrome_plugin`, and
+`computer_use_plugin`. Use `-Status attention` or `-Status failed` for a
+read-only Chrome or Computer Use diagnostic that still needs owner-side repair;
+do not use this record to approve UI actions, account permissions, sends,
+deploys, or GitHub writes.
+
 This artifact is stored under
 `%USERPROFILE%\.codex\automations\loops-24\thread-connector-verifications\`.
 It does not store OAuth tokens, secret values, private message bodies, or approve

@@ -1,6 +1,6 @@
 param(
   [Parameter(Mandatory = $true)]
-  [ValidateSet('github_app', 'gmail_app', 'google_drive_app', 'slack_app', 'chrome_plugin')]
+  [ValidateSet('github_app', 'gmail_app', 'google_drive_app', 'slack_app', 'chrome_plugin', 'computer_use_plugin')]
   [string]$Connector,
 
   [ValidateSet('ready', 'attention', 'failed')]
