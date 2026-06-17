@@ -96,6 +96,10 @@ wakeup-health report is missing, unhealthy, or older than
 `LOOPS_WAKEUP_REPORT_FRESH_MINUTES` (default 65 minutes), the bundle refreshes
 the local wakeup-health report and stays in attention until it is fresh and
 green.
+Freshness also checks Windows Task Scheduler timing evidence: if the report's
+recorded `nextRunTime` has already passed by more than
+`LOOPS_WAKEUP_NEXT_RUN_GRACE_MINUTES` (default 5 minutes), LOOPS refreshes the
+wakeup-health report before trusting it.
 
 It can also surface a `cold_outreach` candidate from
 `scripts/outreach.prospects.json`. That path creates review-ready draft work for
@@ -217,6 +221,9 @@ a sleeping machine.
 
 The warning is intentionally report-only. LOOPS does not change Task Scheduler
 or power-management settings without explicit owner approval.
+The main runner also treats a wakeup-health report as stale when its recorded
+Windows `nextRunTime` is already past the configured grace window, even if the
+report file itself is still younger than the normal freshness window.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\check-wakeup-health.ps1

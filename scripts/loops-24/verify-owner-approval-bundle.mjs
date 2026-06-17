@@ -198,11 +198,23 @@ function verifyPrGate(bundle, pr, gate, failures, warnings) {
 
 function verifyWakeupGate(bundle, wakeup, gate, failures) {
   const limit = Number.parseFloat(process.env.LOOPS_WAKEUP_REPORT_FRESH_MINUTES || '65');
-  const age = ageMinutes(wakeup?.generatedAt, new Date(bundle.generatedAt || Date.now()));
-  const fresh = age !== null && age <= limit;
+  const relativeTo = new Date(bundle.generatedAt || Date.now());
+  const nextRunGraceMinutes = Number.parseFloat(process.env.LOOPS_WAKEUP_NEXT_RUN_GRACE_MINUTES || '5');
+  const age = ageMinutes(wakeup?.generatedAt, relativeTo);
+  const nextRunAge = scheduledTaskNextRunAgeMinutes(wakeup, relativeTo);
+  const scheduleFresh = !isWakeupScheduleEvidenceStale(wakeup, relativeTo, nextRunGraceMinutes);
+  const fresh = age !== null && age <= limit && scheduleFresh;
   const ok = Boolean(wakeup?.health?.ok === true && fresh);
   if (bundle.summary?.wakeupOk !== ok) failures.push(`summary.wakeupOk expected ${ok} got ${bundle.summary?.wakeupOk}`);
   if (bundle.summary?.wakeupFresh !== fresh) failures.push(`summary.wakeupFresh expected ${fresh} got ${bundle.summary?.wakeupFresh}`);
+  if (bundle.summary?.wakeupScheduleFresh !== scheduleFresh) failures.push(`summary.wakeupScheduleFresh expected ${scheduleFresh} got ${bundle.summary?.wakeupScheduleFresh}`);
+  if (Number(bundle.summary?.wakeupNextRunGraceMinutes) !== nextRunGraceMinutes) {
+    failures.push(`summary.wakeupNextRunGraceMinutes expected ${nextRunGraceMinutes} got ${bundle.summary?.wakeupNextRunGraceMinutes}`);
+  }
+  const roundedNextRunAge = nextRunAge === null ? null : round(nextRunAge);
+  if (bundle.summary?.wakeupNextRunAgeMinutes !== roundedNextRunAge) {
+    failures.push(`summary.wakeupNextRunAgeMinutes expected ${roundedNextRunAge} got ${bundle.summary?.wakeupNextRunAgeMinutes}`);
+  }
   if (gate?.status !== (ok ? 'ready' : 'attention')) failures.push(`wakeup_health gate has unexpected status ${gate?.status}`);
   if (ok && bundle.artifacts?.wakeupHealth !== wakeup?.reportPath) {
     failures.push('wakeupHealth artifact does not match latest wakeup report path');
@@ -307,6 +319,22 @@ function ageMinutes(value, relativeTo) {
   const timestamp = Date.parse(value || '');
   if (!Number.isFinite(timestamp)) return null;
   return Math.max(0, (relativeTo.getTime() - timestamp) / 60_000);
+}
+
+function scheduledTaskNextRunAgeMinutes(wakeup, relativeTo) {
+  const timestamp = Date.parse(wakeup?.scheduledTask?.nextRunTime || '');
+  if (!Number.isFinite(timestamp)) return null;
+  return (relativeTo.getTime() - timestamp) / 60_000;
+}
+
+function isWakeupScheduleEvidenceStale(wakeup, relativeTo, graceMinutes) {
+  if (wakeup?.scheduledTask?.platform !== 'win32' || wakeup?.scheduledTask?.found !== true) return false;
+  const age = scheduledTaskNextRunAgeMinutes(wakeup, relativeTo);
+  return age !== null && age > graceMinutes;
+}
+
+function round(value) {
+  return value === null || value === undefined ? null : Math.round(Number(value) * 10) / 10;
 }
 
 function renderMarkdown(payload) {

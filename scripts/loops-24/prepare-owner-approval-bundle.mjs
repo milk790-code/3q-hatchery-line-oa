@@ -41,11 +41,16 @@ if (dashboard?.jsonPath && (!dashboardGates || dashboardGates.dashboardJsonPath 
 }
 let wakeupHealth = wakeup;
 const wakeupFreshMinutes = Number.parseFloat(process.env.LOOPS_WAKEUP_REPORT_FRESH_MINUTES || '65');
+const wakeupNextRunGraceMinutes = Number.parseFloat(process.env.LOOPS_WAKEUP_NEXT_RUN_GRACE_MINUTES || '5');
 let wakeupAgeMinutes = ageMinutes(wakeupHealth?.generatedAt, now);
-if (!wakeupHealth || wakeupHealth?.health?.ok !== true || wakeupAgeMinutes === null || wakeupAgeMinutes > wakeupFreshMinutes) {
+let wakeupNextRunAgeMinutes = scheduledTaskNextRunAgeMinutes(wakeupHealth, now);
+let wakeupScheduleFresh = !isWakeupScheduleEvidenceStale(wakeupHealth, now, wakeupNextRunGraceMinutes);
+if (!wakeupHealth || wakeupHealth?.health?.ok !== true || wakeupAgeMinutes === null || wakeupAgeMinutes > wakeupFreshMinutes || !wakeupScheduleFresh) {
   runNodeMaybe(['scripts/loops-24/check-wakeup-health.mjs']);
   wakeupHealth = await readJson(path.join(stateDir, 'wakeup-health', 'latest.json'), wakeupHealth);
   wakeupAgeMinutes = ageMinutes(wakeupHealth?.generatedAt, now);
+  wakeupNextRunAgeMinutes = scheduledTaskNextRunAgeMinutes(wakeupHealth, now);
+  wakeupScheduleFresh = !isWakeupScheduleEvidenceStale(wakeupHealth, now, wakeupNextRunGraceMinutes);
 }
 
 const branch = runGit(['branch', '--show-current']).trim();
@@ -74,7 +79,7 @@ const prCurrent = Boolean(pr?.branch === branch
   && pr?.githubHandoffPath === github?.reportPath);
 const prReady = pr?.summary?.readyForApproval === true && prCurrent;
 const workerReady = worker?.summary?.status === 'ready-for-approval';
-const wakeupFresh = wakeupAgeMinutes !== null && wakeupAgeMinutes <= wakeupFreshMinutes;
+const wakeupFresh = wakeupAgeMinutes !== null && wakeupAgeMinutes <= wakeupFreshMinutes && wakeupScheduleFresh;
 const wakeupOk = wakeupHealth?.health?.ok === true && wakeupFresh;
 const wakeToRunEnabled = wakeupHealth?.scheduledTask?.platform === 'win32'
   ? wakeupHealth?.scheduledTask?.wakeToRun === true
@@ -101,7 +106,7 @@ const gates = [
     status: wakeupOk ? 'ready' : 'attention',
     ownerAction: 'Trust hourly automation only after the local wakeup-health report is fresh and green.',
     evidence: wakeupHealth
-      ? `ok=${wakeupHealth.health?.ok} fresh=${wakeupFresh} ageMinutes=${wakeupAgeMinutes === null ? '(unknown)' : round(wakeupAgeMinutes)} limitMinutes=${wakeupFreshMinutes} report=${wakeupHealth.reportPath || '(missing)'}`
+      ? `ok=${wakeupHealth.health?.ok} fresh=${wakeupFresh} ageMinutes=${wakeupAgeMinutes === null ? '(unknown)' : round(wakeupAgeMinutes)} limitMinutes=${wakeupFreshMinutes} scheduleFresh=${wakeupScheduleFresh} nextRunAgeMinutes=${wakeupNextRunAgeMinutes === null ? '(n/a)' : round(wakeupNextRunAgeMinutes)} nextRunGraceMinutes=${wakeupNextRunGraceMinutes} report=${wakeupHealth.reportPath || '(missing)'}`
       : 'Missing wakeup-health report.',
   },
   {
@@ -212,6 +217,9 @@ const payload = {
     wakeupOk,
     wakeupFresh,
     wakeupAgeMinutes: wakeupAgeMinutes === null ? null : round(wakeupAgeMinutes),
+    wakeupScheduleFresh,
+    wakeupNextRunAgeMinutes: wakeupNextRunAgeMinutes === null ? null : round(wakeupNextRunAgeMinutes),
+    wakeupNextRunGraceMinutes,
     wakeToRunEnabled,
     powerWakeNeedsApproval,
     dashboardGatesReady,
@@ -389,6 +397,18 @@ function ageMinutes(value, relativeTo) {
   const timestamp = Date.parse(value || '');
   if (!Number.isFinite(timestamp)) return null;
   return Math.max(0, (relativeTo.getTime() - timestamp) / 60_000);
+}
+
+function scheduledTaskNextRunAgeMinutes(wakeupHealth, relativeTo) {
+  const timestamp = Date.parse(wakeupHealth?.scheduledTask?.nextRunTime || '');
+  if (!Number.isFinite(timestamp)) return null;
+  return (relativeTo.getTime() - timestamp) / 60_000;
+}
+
+function isWakeupScheduleEvidenceStale(wakeupHealth, relativeTo, graceMinutes) {
+  if (wakeupHealth?.scheduledTask?.platform !== 'win32' || wakeupHealth?.scheduledTask?.found !== true) return false;
+  const age = scheduledTaskNextRunAgeMinutes(wakeupHealth, relativeTo);
+  return age !== null && age > graceMinutes;
 }
 
 function round(value) {

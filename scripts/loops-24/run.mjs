@@ -185,10 +185,19 @@ async function discoverProjectState() {
 async function discoverWakeupHealth() {
   const latest = await readJson(path.join(stateDir, 'wakeup-health', 'latest.json'), null);
   const generatedAtMs = Date.parse(latest?.generatedAt || '');
+  const nextRunAtMs = Date.parse(latest?.scheduledTask?.nextRunTime || '');
+  const nextRunGraceMinutes = Number.parseFloat(process.env.LOOPS_WAKEUP_NEXT_RUN_GRACE_MINUTES || '5');
   const ageMinutes = Number.isFinite(generatedAtMs)
     ? Math.max(0, (Date.now() - generatedAtMs) / 60_000)
     : null;
-  const fresh = ageMinutes !== null && ageMinutes <= 60;
+  const nextRunAgeMinutes = Number.isFinite(nextRunAtMs)
+    ? (Date.now() - nextRunAtMs) / 60_000
+    : null;
+  const scheduleEvidenceStale = latest?.scheduledTask?.platform === 'win32'
+    && latest?.scheduledTask?.found === true
+    && nextRunAgeMinutes !== null
+    && nextRunAgeMinutes > nextRunGraceMinutes;
+  const fresh = ageMinutes !== null && ageMinutes <= 60 && !scheduleEvidenceStale;
   const unhealthy = latest?.health?.ok === false;
   const id = unhealthy ? 'wakeup-health-attention' : (fresh ? 'wakeup-health-ready' : 'wakeup-health-needed');
 
@@ -197,9 +206,9 @@ async function discoverWakeupHealth() {
     id,
     title: unhealthy
       ? 'Inspect LOOPS wakeup health warning'
-      : (fresh ? 'Review LOOPS wakeup health' : 'Check LOOPS wakeup health'),
-    value: unhealthy ? 0.82 : (fresh ? 0.28 : 0.52),
-    urgency: unhealthy ? 0.78 : (fresh ? 0.22 : 0.48),
+      : (fresh ? 'Review LOOPS wakeup health' : (scheduleEvidenceStale ? 'Refresh LOOPS wakeup health after scheduled run' : 'Check LOOPS wakeup health')),
+    value: unhealthy ? 0.82 : (fresh ? 0.28 : (scheduleEvidenceStale ? 0.62 : 0.52)),
+    urgency: unhealthy ? 0.78 : (fresh ? 0.22 : (scheduleEvidenceStale ? 0.58 : 0.48)),
     loopability: 0.86,
     freshness: fresh ? 0.72 : 0.42,
     risk: 0.08,
@@ -207,14 +216,19 @@ async function discoverWakeupHealth() {
       ? 'Review the latest wakeup health report before relying on hourly automation.'
       : (fresh
           ? 'Use the latest wakeup health report as the current local heartbeat evidence.'
-          : 'Generate a local wakeup health report covering Task Scheduler, locks, and recent LOOPS runs.'),
+          : (scheduleEvidenceStale
+              ? 'Refresh the wakeup health report because its recorded Task Scheduler nextRunTime has already passed.'
+              : 'Generate a local wakeup health report covering Task Scheduler, locks, and recent LOOPS runs.')),
     fingerprintSeed: latest
-      ? `${latest.statusFingerprint || ''}:${latest.generatedAt || ''}:${latest.health?.ok}`
+      ? `${latest.statusFingerprint || ''}:${latest.generatedAt || ''}:${latest.health?.ok}:${scheduleEvidenceStale}`
       : 'missing-wakeup-health',
     evidence: {
       reportPath: latest?.reportPath || null,
       generatedAt: latest?.generatedAt || null,
       ageMinutes: ageMinutes === null ? null : Math.round(ageMinutes * 10) / 10,
+      scheduleEvidenceStale,
+      nextRunAgeMinutes: nextRunAgeMinutes === null ? null : Math.round(nextRunAgeMinutes * 10) / 10,
+      nextRunGraceMinutes,
       health: latest?.health || null,
       scheduledTask: latest?.scheduledTask
           ? {
