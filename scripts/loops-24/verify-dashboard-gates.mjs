@@ -19,8 +19,12 @@ const stamp = now.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
 const dashboard = await readJson(dashboardJsonPath);
 const waiting = Array.isArray(dashboard.waiting) ? dashboard.waiting : [];
 const nextApproval = Array.isArray(dashboard.nextApproval) ? dashboard.nextApproval : [];
+const approvalGroups = Array.isArray(dashboard.approvalGroups) ? dashboard.approvalGroups : [];
 const approvalIndex = buildApprovalIndex(nextApproval);
-const findings = verifyWaitingItems(waiting, approvalIndex);
+const findings = mergeFindings(
+  verifyDashboardSchema(dashboard, waiting, nextApproval, approvalGroups),
+  verifyWaitingItems(waiting, approvalIndex),
+);
 const payload = {
   generatedAt: now.toISOString(),
   repoRoot,
@@ -98,6 +102,53 @@ function buildApprovalIndex(groups) {
   return index;
 }
 
+function verifyDashboardSchema(dashboard, waiting, nextApproval, approvalGroups) {
+  const failures = [];
+  const warnings = [];
+  const summary = dashboard.summary || {};
+
+  if (!dashboard.summary) {
+    failures.push('Dashboard JSON is missing summary.');
+  }
+  if (!Array.isArray(dashboard.manualRedLines) || dashboard.manualRedLines.length === 0) {
+    failures.push('Dashboard JSON is missing manualRedLines.');
+  }
+  if (!Array.isArray(dashboard.approvalGroups)) {
+    failures.push('Dashboard JSON is missing approvalGroups.');
+  }
+  if (approvalGroups.length !== nextApproval.length) {
+    failures.push(`approvalGroups length ${approvalGroups.length} does not match nextApproval length ${nextApproval.length}`);
+  }
+
+  const expected = {
+    completedCount: Array.isArray(dashboard.completed) ? dashboard.completed.length : 0,
+    blockedCount: Array.isArray(dashboard.blocked) ? dashboard.blocked.length : 0,
+    manualWaitCount: Array.isArray(dashboard.manualWaits) ? dashboard.manualWaits.length : 0,
+    waitingCount: waiting.length,
+    approvalGroupCount: nextApproval.length,
+    escalatedCount: Array.isArray(dashboard.escalatedBlockers) ? dashboard.escalatedBlockers.length : 0,
+    manualRedLineCount: Array.isArray(dashboard.manualRedLines) ? dashboard.manualRedLines.length : 0,
+  };
+
+  for (const [key, value] of Object.entries(expected)) {
+    if (summary[key] !== value) {
+      failures.push(`summary.${key} expected ${value} got ${summary[key]}`);
+    }
+  }
+  const expectedTopApproval = dashboard.loopos?.morningDecision?.nextApproval || nextApproval[0]?.approval || null;
+  if (summary.nextApproval !== expectedTopApproval) {
+    failures.push(`summary.nextApproval expected ${expectedTopApproval} got ${summary.nextApproval}`);
+  }
+  if (nextApproval.length && summary.largestApprovalGroup !== nextApproval[0]?.approval) {
+    failures.push(`summary.largestApprovalGroup expected ${nextApproval[0]?.approval} got ${summary.largestApprovalGroup}`);
+  }
+  if (!summary.topAction && dashboard.loopos?.morningDecision?.label) {
+    warnings.push('summary.topAction is missing while loopos.morningDecision exists.');
+  }
+
+  return { failures, warnings };
+}
+
 function verifyWaitingItems(items, approvalIndex) {
   const failures = [];
   const warnings = [];
@@ -127,6 +178,13 @@ function verifyWaitingItems(items, approvalIndex) {
   }
 
   return { failures, warnings };
+}
+
+function mergeFindings(...all) {
+  return {
+    failures: all.flatMap(item => item.failures || []),
+    warnings: all.flatMap(item => item.warnings || []),
+  };
 }
 
 function expectedApprovalGates(item) {

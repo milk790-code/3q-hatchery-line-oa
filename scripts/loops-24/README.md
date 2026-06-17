@@ -160,6 +160,13 @@ Blocked items older than `LOOPS_BLOCKER_ESCALATE_HOURS` are marked as
 The dashboard is intentionally not a generic analytics page. Its job is to let
 Hsuehyi decide the next approval or intervention within one minute.
 
+The dashboard JSON is a machine-readable monitoring contract, not just a copy of
+the markdown. It includes `summary`, `manualRedLines`, `waiting`,
+`approvalGroups`, and the compatibility alias `nextApproval` so later verifier,
+owner-bundle, or external monitor steps do not need to parse markdown text.
+Within `summary`, `nextApproval` means the `Today First` approval gate, while
+`largestApprovalGroup` identifies the largest grouped backlog gate.
+
 Verify that manual-gated waiting items are mapped to the expected approval
 groups:
 

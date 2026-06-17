@@ -1357,6 +1357,19 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
   const approvals = summarizeApprovals(waiting);
   const escalated = blocked.filter(item => item.escalated);
   const loopos = result.loopos || buildLooposSummary(candidates, autoCompletions, { registries: [], warnings: [] });
+  const summary = {
+    completedCount: completed.length,
+    blockedCount: blocked.length,
+    manualWaitCount: manualWaits.length,
+    waitingCount: waiting.length,
+    approvalGroupCount: approvals.length,
+    escalatedCount: escalated.length,
+    manualRedLineCount: manualRedLines.length,
+    topAction: loopos.morningDecision?.label || null,
+    topLane: loopos.morningDecision?.lane || null,
+    nextApproval: loopos.morningDecision?.nextApproval || approvals[0]?.approval || null,
+    largestApprovalGroup: approvals[0]?.approval || null,
+  };
 
   const payload = {
     generatedAt: new Date().toISOString(),
@@ -1369,10 +1382,13 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     onlySafeLocal,
     autoComplete: result.autoComplete,
     loopos,
+    summary,
+    manualRedLines,
     completed: completed.map(summarizeCompletion),
     blocked: blocked.map(summarizeCompletion),
     manualWaits: manualWaits.map(summarizeCompletion),
     waiting: waiting.map(summarizeCompletion),
+    approvalGroups: approvals,
     nextApproval: approvals,
     escalatedBlockers: escalated.map(summarizeCompletion),
   };
