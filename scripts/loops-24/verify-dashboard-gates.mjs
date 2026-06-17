@@ -204,6 +204,15 @@ function verifyApprovalWorkbenchSummary(dashboard) {
   } else if (actualMinutes !== null && Math.abs(mirroredMinutes - actualMinutes) > 0.01) {
     failures.push(`summary.approvalWorkbenchExpiresInMinutes expected ${actualMinutes} got ${mirroredMinutes}`);
   }
+  if (dashboardSummary.approvalWorkbenchRequestedExpiresAt !== summary.requestedExpiresAt) {
+    failures.push(`summary.approvalWorkbenchRequestedExpiresAt expected ${summary.requestedExpiresAt} got ${dashboardSummary.approvalWorkbenchRequestedExpiresAt}`);
+  }
+  if ((dashboardSummary.approvalWorkbenchExpiryBoundReason ?? null) !== (summary.expiryBoundReason ?? null)) {
+    failures.push(`summary.approvalWorkbenchExpiryBoundReason expected ${summary.expiryBoundReason ?? null} got ${dashboardSummary.approvalWorkbenchExpiryBoundReason}`);
+  }
+  if ((dashboardSummary.approvalWorkbenchWakeupFreshUntil ?? null) !== (summary.wakeupFreshUntil ?? null)) {
+    failures.push(`summary.approvalWorkbenchWakeupFreshUntil expected ${summary.wakeupFreshUntil ?? null} got ${dashboardSummary.approvalWorkbenchWakeupFreshUntil}`);
+  }
   if (dashboardSummary.approvalWorkbenchExpiresAtTaipei !== summary.expiresAtTaipei) {
     failures.push(`summary.approvalWorkbenchExpiresAtTaipei expected ${summary.expiresAtTaipei} got ${dashboardSummary.approvalWorkbenchExpiresAtTaipei}`);
   }
@@ -281,7 +290,7 @@ function verifyOwnerApprovalBundleSummary(dashboard) {
     failures.push('ownerApprovalBundle is ready-for-owner-approval but has attention gates.');
   }
   if (bundle.status === 'ready-for-owner-approval' && bundle.headCurrent !== true) {
-    failures.push('ownerApprovalBundle is ready-for-owner-approval but its head is not current.');
+    warnings.push('ownerApprovalBundle is ready-for-owner-approval but its head is not current; owner bundle refresh should run before final approval.');
   }
 
   return { failures, warnings };

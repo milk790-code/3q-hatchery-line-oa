@@ -18,20 +18,26 @@ const bundleJsonPath = path.resolve(args.bundleJson || path.join(stateDir, 'owne
 const approvalTtlMinutes = parsePositiveNumber(process.env.LOOPS_APPROVAL_WORKBENCH_TTL_MINUTES, 65);
 
 const now = new Date();
-const expiresAt = new Date(now.getTime() + approvalTtlMinutes * 60_000);
 const stamp = toStamp(now);
 const bundle = await readJson(bundleJsonPath);
+const requestedExpiresAt = new Date(now.getTime() + approvalTtlMinutes * 60_000);
+const expiry = boundExpiry(requestedExpiresAt, bundle.summary?.wakeupFreshUntil, now);
+const expiresAt = expiry.expiresAt;
 const verification = await refreshVerification(bundleJsonPath);
 const commandGates = (bundle.gates || []).filter(gate => Array.isArray(gate.commands) && gate.commands.length);
 const readyCommands = commandGates.filter(gate => gate.status === 'ready_for_approval');
 const blockedCommands = commandGates.filter(gate => gate.status !== 'ready_for_approval');
 const manualGates = (bundle.gates || []).filter(gate => ['manual_approval', 'manual_input', 'ready_for_approval'].includes(gate.status));
 const attentionGates = (bundle.gates || []).filter(gate => gate.status === 'attention');
+const expired = isExpired(expiresAt.toISOString());
 
 const payload = {
   generatedAt: now.toISOString(),
   approvalTtlMinutes,
+  requestedExpiresAt: requestedExpiresAt.toISOString(),
   expiresAt: expiresAt.toISOString(),
+  expiryBoundReason: expiry.reason,
+  wakeupFreshUntil: bundle.summary?.wakeupFreshUntil || null,
   repoRoot,
   stateDir,
   bundleJsonPath,
@@ -40,7 +46,7 @@ const payload = {
   reportPath: path.join(workbenchDir, `${stamp}-approval-workbench.md`),
   jsonPath: path.join(workbenchDir, `${stamp}-approval-workbench.json`),
   latestPath: path.join(workbenchDir, 'latest.json'),
-  status: verification?.ok === true && attentionGates.length === 0 ? 'ready-for-owner-decision' : 'attention',
+  status: 'attention',
   branch: bundle.branch || null,
   head: bundle.head || null,
   ahead: bundle.ahead ?? null,
@@ -48,23 +54,37 @@ const payload = {
   bundleStatus: bundle.summary?.status || null,
   bundleFingerprint: bundle.bundleFingerprint || null,
   verificationOk: verification?.ok === true,
-  readyCommands: readyCommands.map(toCommandGate),
+  readyCommands: expired ? [] : readyCommands.map(toCommandGate),
   blockedCommands: blockedCommands.map(toCommandGate),
   manualGates: manualGates.map(toGateSummary),
-  attentionGates: attentionGates.map(toGateSummary),
+  attentionGates: expired
+    ? [
+      ...attentionGates.map(toGateSummary),
+      {
+        id: 'approval_workbench_expired',
+        label: 'Regenerate approval workbench',
+        status: 'attention',
+        ownerAction: 'Regenerate the approval workbench before running any owner-approved command.',
+        evidence: `expiresAt=${expiresAt.toISOString()} boundReason=${expiry.reason || '(none)'}`,
+      },
+    ]
+    : attentionGates.map(toGateSummary),
   summary: {
     approvalTtlMinutes,
+    requestedExpiresAt: requestedExpiresAt.toISOString(),
     expiresAt: expiresAt.toISOString(),
-    readyCommandCount: readyCommands.reduce((count, gate) => count + gate.commands.length, 0),
+    expiryBoundReason: expiry.reason,
+    wakeupFreshUntil: bundle.summary?.wakeupFreshUntil || null,
+    readyCommandCount: expired ? 0 : readyCommands.reduce((count, gate) => count + gate.commands.length, 0),
     blockedCommandCount: blockedCommands.reduce((count, gate) => count + gate.commands.length, 0),
     manualGateCount: manualGates.length,
-    attentionGateCount: attentionGates.length,
+    attentionGateCount: expired ? attentionGates.length + 1 : attentionGates.length,
     prPublishReady: bundle.summary?.prPublishReady === true,
     workerReady: bundle.summary?.workerReady === true,
     localScopeClean: bundle.summary?.localScopeClean === true,
     localInvestorPacketCount: Number(bundle.summary?.localInvestorPacketCount || 0),
     verificationFailureCount: Number(verification?.summary?.failureCount || 0),
-    expired: false,
+    expired,
   },
   hardStops: [
     'Do not run these commands without explicit owner approval.',
@@ -74,6 +94,9 @@ const payload = {
     'Do not print or store secret values in LOOPS reports.',
   ],
 };
+payload.status = verification?.ok === true && payload.attentionGates.length === 0 && !expired
+  ? 'ready-for-owner-decision'
+  : 'attention';
 
 payload.projectionFingerprint = hash(JSON.stringify({
   bundleFingerprint: payload.bundleFingerprint,
@@ -87,11 +110,15 @@ payload.projectionFingerprint = hash(JSON.stringify({
 payload.statusFingerprint = hash(JSON.stringify({
   projectionFingerprint: payload.projectionFingerprint,
   approvalTtlMinutes: payload.approvalTtlMinutes,
+  requestedExpiresAt: payload.requestedExpiresAt,
   expiresAt: payload.expiresAt,
+  expiryBoundReason: payload.expiryBoundReason,
+  wakeupFreshUntil: payload.wakeupFreshUntil,
 }));
 
 const latest = await readJson(payload.latestPath, null);
 if (latest?.projectionFingerprint === payload.projectionFingerprint
+  && latest?.statusFingerprint === payload.statusFingerprint
   && !isExpired(latest.expiresAt)
   && latest?.reportPath
   && fssync.existsSync(latest.reportPath)) {
@@ -179,7 +206,10 @@ function renderMarkdown(payload) {
     '',
     `- generated_at: ${payload.generatedAt}`,
     `- approval_ttl_minutes: ${payload.approvalTtlMinutes}`,
+    `- requested_expires_at: ${payload.requestedExpiresAt}`,
     `- expires_at: ${payload.expiresAt}`,
+    `- expiry_bound_reason: ${payload.expiryBoundReason || '(none)'}`,
+    `- wakeup_fresh_until: ${payload.wakeupFreshUntil || '(unknown)'}`,
     `- projection_fingerprint: ${payload.projectionFingerprint}`,
     `- repo: ${payload.repoRoot}`,
     `- branch: ${payload.branch || '(unknown)'}`,
@@ -265,6 +295,20 @@ function parsePositiveNumber(value, fallback) {
 function isExpired(expiresAt) {
   const expiresMs = Date.parse(expiresAt || '');
   return Number.isFinite(expiresMs) && now.getTime() > expiresMs;
+}
+
+function boundExpiry(requestedExpiresAt, wakeupFreshUntil, relativeTo) {
+  const requestedMs = requestedExpiresAt.getTime();
+  const wakeupMs = Date.parse(wakeupFreshUntil || '');
+  const nowMs = relativeTo.getTime();
+  if (!Number.isFinite(wakeupMs)) return { expiresAt: requestedExpiresAt, reason: null };
+  if (wakeupMs <= requestedMs) {
+    return {
+      expiresAt: new Date(wakeupMs),
+      reason: wakeupMs <= nowMs ? 'wakeup_fresh_until_expired' : 'wakeup_fresh_until',
+    };
+  }
+  return { expiresAt: requestedExpiresAt, reason: null };
 }
 
 function hash(value) {

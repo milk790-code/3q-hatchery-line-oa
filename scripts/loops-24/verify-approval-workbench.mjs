@@ -95,16 +95,32 @@ function verifyWorkbench(workbench, bundle, ownerVerification) {
   const generatedMs = Date.parse(workbench.generatedAt || '');
   const expiresMs = Date.parse(workbench.expiresAt || '');
   const expired = Number.isFinite(expiresMs) && now.getTime() > expiresMs;
+  const requestedExpiresAt = Number.isFinite(approvalTtlMinutes) && approvalTtlMinutes > 0 && Number.isFinite(generatedMs)
+    ? new Date(generatedMs + approvalTtlMinutes * 60_000).toISOString()
+    : null;
+  const expectedExpiry = boundExpiry(requestedExpiresAt, bundle.summary?.wakeupFreshUntil, now);
   const commandGates = (bundle.gates || []).filter(gate => Array.isArray(gate.commands) && gate.commands.length);
-  const expectedReadyCommands = commandGates.filter(gate => gate.status === 'ready_for_approval').map(toCommandGate);
+  const expectedReadyCommands = expired ? [] : commandGates.filter(gate => gate.status === 'ready_for_approval').map(toCommandGate);
   const expectedBlockedCommands = commandGates.filter(gate => gate.status !== 'ready_for_approval').map(toCommandGate);
   const expectedManualGates = (bundle.gates || [])
     .filter(gate => ['manual_approval', 'manual_input', 'ready_for_approval'].includes(gate.status))
     .map(toGateSummary);
-  const expectedAttentionGates = (bundle.gates || [])
+  const bundleAttentionGates = (bundle.gates || [])
     .filter(gate => gate.status === 'attention')
     .map(toGateSummary);
-  const expectedStatus = ownerVerification?.ok === true && expectedAttentionGates.length === 0
+  const expectedAttentionGates = expired
+    ? [
+      ...bundleAttentionGates,
+      {
+        id: 'approval_workbench_expired',
+        label: 'Regenerate approval workbench',
+        status: 'attention',
+        ownerAction: 'Regenerate the approval workbench before running any owner-approved command.',
+        evidence: `expiresAt=${workbench.expiresAt} boundReason=${workbench.expiryBoundReason || '(none)'}`,
+      },
+    ]
+    : bundleAttentionGates;
+  const expectedStatus = ownerVerification?.ok === true && expectedAttentionGates.length === 0 && !expired
     ? 'ready-for-owner-decision'
     : 'attention';
 
@@ -128,12 +144,14 @@ function verifyWorkbench(workbench, bundle, ownerVerification) {
     failures.push(`expiresAt is not a valid timestamp: ${workbench.expiresAt}`);
   }
   if (Number.isFinite(approvalTtlMinutes) && approvalTtlMinutes > 0 && Number.isFinite(generatedMs)) {
-    requireEqual(
-      failures,
-      'expiresAt',
-      workbench.expiresAt,
-      new Date(generatedMs + approvalTtlMinutes * 60_000).toISOString(),
-    );
+    requireEqual(failures, 'requestedExpiresAt', workbench.requestedExpiresAt, requestedExpiresAt);
+    requireEqual(failures, 'summary.requestedExpiresAt', workbench.summary?.requestedExpiresAt, requestedExpiresAt);
+    requireEqual(failures, 'expiresAt', workbench.expiresAt, expectedExpiry.expiresAt);
+    requireEqual(failures, 'summary.expiresAt', workbench.summary?.expiresAt, expectedExpiry.expiresAt);
+    requireEqual(failures, 'expiryBoundReason', workbench.expiryBoundReason ?? null, expectedExpiry.reason);
+    requireEqual(failures, 'summary.expiryBoundReason', workbench.summary?.expiryBoundReason ?? null, expectedExpiry.reason);
+    requireEqual(failures, 'wakeupFreshUntil', workbench.wakeupFreshUntil ?? null, bundle.summary?.wakeupFreshUntil || null);
+    requireEqual(failures, 'summary.wakeupFreshUntil', workbench.summary?.wakeupFreshUntil ?? null, bundle.summary?.wakeupFreshUntil || null);
   }
   if (expired) {
     failures.push(`approval workbench expired at ${workbench.expiresAt}; regenerate before running approval commands`);
@@ -173,7 +191,10 @@ function verifyWorkbench(workbench, bundle, ownerVerification) {
   const expectedFingerprint = hash(JSON.stringify({
     projectionFingerprint: workbench.projectionFingerprint,
     approvalTtlMinutes: workbench.approvalTtlMinutes,
+    requestedExpiresAt: workbench.requestedExpiresAt,
     expiresAt: workbench.expiresAt,
+    expiryBoundReason: workbench.expiryBoundReason,
+    wakeupFreshUntil: workbench.wakeupFreshUntil,
   }));
   const expectedProjectionFingerprint = hash(JSON.stringify({
     bundleFingerprint: workbench.bundleFingerprint,
@@ -277,6 +298,20 @@ function toStamp(date) {
 function isExpired(expiresAt) {
   const expiresMs = Date.parse(expiresAt || '');
   return Number.isFinite(expiresMs) && now.getTime() > expiresMs;
+}
+
+function boundExpiry(requestedExpiresAt, wakeupFreshUntil) {
+  const requestedMs = Date.parse(requestedExpiresAt || '');
+  const wakeupMs = Date.parse(wakeupFreshUntil || '');
+  if (!Number.isFinite(requestedMs)) return { expiresAt: null, reason: null };
+  if (!Number.isFinite(wakeupMs)) return { expiresAt: new Date(requestedMs).toISOString(), reason: null };
+  if (wakeupMs <= requestedMs) {
+    return {
+      expiresAt: new Date(wakeupMs).toISOString(),
+      reason: wakeupMs <= now.getTime() ? 'wakeup_fresh_until_expired' : 'wakeup_fresh_until',
+    };
+  }
+  return { expiresAt: new Date(requestedMs).toISOString(), reason: null };
 }
 
 function hash(value) {

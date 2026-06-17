@@ -215,13 +215,14 @@ It also embeds the latest owner approval bundle status, head freshness,
 publish readiness, local scope cleanliness, wakeup freshness, wakeup freshness
 remaining minutes, and power-wake policy flag so owner decisions can be made
 from the dashboard without opening the full bundle first.
-It also embeds the latest approval workbench status, `expires_at`,
-`expires_at_taipei`, `expires_in_minutes`, expired flag, ready command count,
-manual gate count, attention gate count, and verifier failure count. This keeps
-cross-session approval handoffs honest: if the workbench expires, the dashboard
-shows that owner commands must be regenerated before use. The dashboard keeps
-UTC fields for machine checks and adds Taipei-time fields plus a remaining
-minutes value for owner review.
+It also embeds the latest approval workbench status, `requested_expires_at`,
+`expires_at`, `expires_at_taipei`, `expires_in_minutes`, `expiry_bound_reason`,
+`wakeup_fresh_until`, expired flag, ready command count, manual gate count,
+attention gate count, and verifier failure count. This keeps cross-session
+approval handoffs honest: if the workbench expires, the dashboard shows that
+owner commands must be regenerated before use. The dashboard keeps UTC fields
+for machine checks and adds Taipei-time fields plus a remaining minutes value
+for owner review.
 
 Verify that manual-gated waiting items are mapped to the expected approval
 groups:
@@ -241,8 +242,9 @@ It also checks each approval group's `count`, `displayLimit`, `displayedCount`,
 and `hiddenCount` so compact markdown output cannot silently obscure a larger
 approval backlog.
 It also recomputes approval workbench expiry from the dashboard generation time
-and fails if `expires_in_minutes`, the Taipei-time mirror, or the expired flag
-drift from the embedded workbench artifact.
+and fails if `expires_in_minutes`, the requested expiry, expiry bound reason,
+wakeup freshness bound, Taipei-time mirror, or the expired flag drift from the
+embedded workbench artifact.
 Before writing an owner approval bundle, the main runner refreshes the local
 GitHub handoff and PR readiness packet when they no longer match the current
 branch, head, ahead/behind counts, or tracked worktree fingerprint. This keeps
@@ -583,12 +585,14 @@ Latest approval workbench path:
 %USERPROFILE%\.codex\automations\loops-24\approval-workbench\latest.json
 ```
 
-Approval workbenches expire after 65 minutes by default. Override with
-`LOOPS_APPROVAL_WORKBENCH_TTL_MINUTES` only for local testing or a deliberately
-short owner review window. If `expires_at` has passed, regenerate the workbench
-before running any owner-approved command. The prepare step reuses the latest
-workbench only when its projection fingerprint still matches the latest owner
-bundle and the workbench has not expired.
+Approval workbenches request a 65-minute TTL by default, then cap `expires_at`
+to the owner bundle's `wakeupFreshUntil` when that wakeup-health evidence expires
+sooner. Override with `LOOPS_APPROVAL_WORKBENCH_TTL_MINUTES` only for local
+testing or a deliberately short owner review window. If `expires_at` has passed,
+regenerate the workbench before running any owner-approved command. The prepare
+step reuses the latest workbench only when its projection fingerprint and status
+fingerprint still match the latest owner bundle, and the workbench has not
+expired.
 
 Verify that the approval workbench is still a faithful projection of the latest
 owner bundle and owner-bundle verifier:
