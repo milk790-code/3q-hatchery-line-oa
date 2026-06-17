@@ -4,6 +4,7 @@ import path from 'node:path';
 import os from 'node:os';
 import process from 'node:process';
 import { createHash } from 'node:crypto';
+import { findFirstRawNonAscii } from './lib/portable-json.mjs';
 
 const automationId = process.env.LOOPS_AUTOMATION_ID || 'loops-24';
 const repoRoot = path.resolve(process.env.LOOPS_REPO_ROOT || process.cwd());
@@ -111,10 +112,9 @@ function parseJson(file, source) {
 function verifyPortableJsonSource(source) {
   const failures = [];
   const warnings = [];
-  const match = /[^\x00-\x7F]/u.exec(source);
-  if (match) {
-    const codePoint = match[0].codePointAt(0).toString(16).toUpperCase().padStart(4, '0');
-    failures.push(`Dashboard JSON contains raw non-ASCII character U+${codePoint}; write escaped JSON so Windows PowerShell default Get-Content can pipe it to ConvertFrom-Json safely.`);
+  const raw = findFirstRawNonAscii(source);
+  if (raw) {
+    failures.push(`Dashboard JSON contains raw non-ASCII character ${raw.codePoint} at line ${raw.line}, column ${raw.column}; write escaped JSON so Windows PowerShell default Get-Content can pipe it to ConvertFrom-Json safely.`);
   }
   return { failures, warnings };
 }

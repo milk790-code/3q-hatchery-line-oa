@@ -8,6 +8,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { previewColdOutreachCandidate } from '../lib/cold-outreach.mjs';
 import { previewGoogleBusinessProspectingCandidate } from '../lib/google-business-prospector.mjs';
 import { gitWorktreeFingerprint } from './lib/git-worktree-fingerprint.mjs';
+import { stringifyPortableJson } from './lib/portable-json.mjs';
 
 const automationId = process.env.LOOPS_AUTOMATION_ID || 'loops-24';
 const repoRoot = path.resolve(process.env.LOOPS_REPO_ROOT || process.cwd());
@@ -1330,6 +1331,18 @@ async function runPostDashboardAutoCompletions(candidates, autoCompletions, resu
     ];
   }
 
+  if (!next.some(item => item.label === 'audit-json-portability')) {
+    next = [
+      ...next,
+      runLocalStep(
+        'audit-json-portability',
+        'node',
+        ['scripts/loops-24/audit-json-portability.mjs'],
+        120_000
+      ),
+    ];
+  }
+
   return next;
 }
 
@@ -2290,21 +2303,6 @@ async function readJson(file, fallback) {
   } catch {
     return fallback;
   }
-}
-
-function stringifyPortableJson(value) {
-  return `${escapeNonAscii(JSON.stringify(value, null, 2))}\n`;
-}
-
-function escapeNonAscii(text) {
-  return text.replace(/[^\x00-\x7F]/gu, character => {
-    const codePoint = character.codePointAt(0);
-    if (codePoint <= 0xFFFF) return `\\u${codePoint.toString(16).padStart(4, '0')}`;
-    const offset = codePoint - 0x10000;
-    const high = 0xD800 + Math.floor(offset / 0x400);
-    const low = 0xDC00 + (offset % 0x400);
-    return `\\u${high.toString(16).padStart(4, '0')}\\u${low.toString(16).padStart(4, '0')}`;
-  });
 }
 
 async function readDirSafe(dir) {

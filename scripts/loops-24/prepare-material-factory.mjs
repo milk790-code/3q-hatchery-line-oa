@@ -6,6 +6,7 @@ import os from 'node:os';
 import process from 'node:process';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { stringifyPortableJson } from './lib/portable-json.mjs';
 
 const automationId = process.env.LOOPS_AUTOMATION_ID || 'loops-24';
 const repoRoot = path.resolve(process.env.LOOPS_REPO_ROOT || process.cwd());
@@ -66,8 +67,9 @@ payload.statusFingerprint = hash(JSON.stringify({
   materialPack: materialPack?.packFingerprint || null,
 }));
 
-await fs.writeFile(payload.jsonPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
-await fs.writeFile(payload.latestPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+const payloadJson = stringifyPortableJson(payload);
+await fs.writeFile(payload.jsonPath, payloadJson, 'utf8');
+await fs.writeFile(payload.latestPath, payloadJson, 'utf8');
 await fs.writeFile(payload.reportPath, `${renderMarkdown(payload)}\n`, 'utf8');
 
 console.log(JSON.stringify({

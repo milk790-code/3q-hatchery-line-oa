@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import fssync from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { stringifyPortableJson } from './lib/portable-json.mjs';
 
 const automationId = process.env.LOOPS_AUTOMATION_ID || 'loops-24';
 const repoRoot = path.resolve(process.env.LOOPS_REPO_ROOT || process.cwd());
@@ -109,9 +110,10 @@ const payload = {
   redLines: gateRules.map(rule => ({ gate: rule.gate, hardStop: rule.hardStop })),
 };
 
-await fs.writeFile(jsonPath, JSON.stringify(payload, null, 2));
-await fs.writeFile(reportPath, renderMarkdown(payload));
-await fs.copyFile(jsonPath, latestJsonPath);
+const payloadJson = stringifyPortableJson(payload);
+await fs.writeFile(jsonPath, payloadJson, 'utf8');
+await fs.writeFile(reportPath, `${renderMarkdown(payload)}\n`, 'utf8');
+await fs.writeFile(latestJsonPath, payloadJson, 'utf8');
 await fs.copyFile(reportPath, latestReportPath);
 
 console.log(JSON.stringify({

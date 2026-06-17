@@ -5,6 +5,7 @@ import path from 'node:path';
 import os from 'node:os';
 import process from 'node:process';
 import { createHash } from 'node:crypto';
+import { findFirstRawNonAscii, stringifyPortableJson } from './lib/portable-json.mjs';
 
 const automationId = process.env.LOOPS_AUTOMATION_ID || 'loops-24';
 const repoRoot = path.resolve(process.env.LOOPS_REPO_ROOT || process.cwd());
@@ -86,7 +87,9 @@ payload.statusFingerprint = hash(JSON.stringify({
 }));
 
 const latest = await readJson(payload.latestPath, null);
+const latestJsonIsPortable = await isPortableJsonFile(payload.latestPath);
 if (latest?.statusFingerprint === payload.statusFingerprint
+  && latestJsonIsPortable
   && latest?.reportPath
   && fssync.existsSync(latest.reportPath)) {
   console.log(JSON.stringify({
@@ -100,8 +103,9 @@ if (latest?.statusFingerprint === payload.statusFingerprint
 }
 
 await fs.mkdir(reviewDir, { recursive: true });
-await fs.writeFile(payload.jsonPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
-await fs.writeFile(payload.latestPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+const payloadJson = stringifyPortableJson(payload);
+await fs.writeFile(payload.jsonPath, payloadJson, 'utf8');
+await fs.writeFile(payload.latestPath, payloadJson, 'utf8');
 await fs.writeFile(payload.reportPath, `${renderMarkdown(payload)}\n`, 'utf8');
 
 console.log(JSON.stringify({
@@ -160,6 +164,15 @@ async function readCsv(file) {
   } catch (error) {
     if (error.code === 'ENOENT') return [];
     throw error;
+  }
+}
+
+async function isPortableJsonFile(file) {
+  try {
+    const source = await fs.readFile(file, 'utf8');
+    return !findFirstRawNonAscii(source);
+  } catch {
+    return false;
   }
 }
 
