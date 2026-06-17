@@ -755,20 +755,89 @@ function extractKeywords(text) {
     .map(item => item.trim())
     .filter(item => item.length >= 2);
   const stop = new Set(['this', 'that', 'with', 'into', 'from', 'make', 'video', '素材', '想法', '文字']);
+  const genericStop = new Set([
+    'a',
+    'an',
+    'and',
+    'are',
+    'as',
+    'at',
+    'be',
+    'before',
+    'by',
+    'can',
+    'do',
+    'for',
+    'from',
+    'get',
+    'how',
+    'into',
+    'it',
+    'its',
+    'keep',
+    'make',
+    'not',
+    'of',
+    'on',
+    'one',
+    'or',
+    'show',
+    'showing',
+    'that',
+    'the',
+    'then',
+    'this',
+    'to',
+    'turn',
+    'turns',
+    'with',
+    'video',
+    'visible',
+  ]);
   const counts = new Map();
   for (const word of words) {
     const lower = word.toLowerCase();
-    if (stop.has(lower)) continue;
+    if (stop.has(lower) || genericStop.has(lower)) continue;
     counts.set(lower, (counts.get(lower) || 0) + 1);
   }
   return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([word]) => word).slice(0, 10);
 }
 
 function titleFromText(text, keywords) {
+  const explicit = explicitTitleFromText(text);
+  if (explicit) return explicit;
+  if (/3q/i.test(text) && /line/i.test(text) && /lead/i.test(text) && /taichung|台中/i.test(text)) {
+    return '3Q LINE Lead Page Demo for Taichung Shops';
+  }
+  if (/line/i.test(text) && /lead/i.test(text) && /local shop|店家|商家/i.test(text)) {
+    return 'LINE Lead Page Demo for Local Shops';
+  }
   const first = splitSentences(text)[0] || text;
   const clean = first.replace(/[^\p{L}\p{N}\s-]/gu, '').trim();
   if (clean.length <= 36 && clean.length >= 4) return clean;
-  return keywords.length ? keywords.slice(0, 5).join(' ') : 'Idea Material Pack';
+  return keywords.length ? titleCase(keywords.slice(0, 5).join(' ')) : 'Idea Material Pack';
+}
+
+function explicitTitleFromText(text) {
+  const normalized = String(text || '').replace(/\r\n/g, '\n');
+  const markdownHeading = normalized.match(/^\s*#\s+(.+?)\s*$/m);
+  if (markdownHeading?.[1]) return cleanTitle(markdownHeading[1]);
+  const yamlTitle = normalized.match(/(?:^|\n)\s*title\s*:\s*["']?(.+?)["']?\s*(?:\n|$)/i);
+  if (yamlTitle?.[1]) return cleanTitle(yamlTitle[1]);
+  const labeledTitle = normalized.match(/(?:^|\n)\s*(?:headline|idea)\s*:\s*["']?(.+?)["']?\s*(?:\n|$)/i);
+  if (labeledTitle?.[1]) return cleanTitle(labeledTitle[1]);
+  return '';
+}
+
+function cleanTitle(value) {
+  return normalizeWhitespace(value)
+    .replace(/^["']|["']$/g, '')
+    .replace(/[.?!:;]+$/g, '')
+    .slice(0, 80);
+}
+
+function titleCase(value) {
+  return String(value || '').replace(/\b[a-z]/g, char => char.toUpperCase());
 }
 
 function buildHook(text, keywords) {
