@@ -83,6 +83,7 @@ async function main() {
       ...(await discoverProjectState(ctx)),
       ...(await discoverWakeupHealth(ctx)),
       ...(await discoverConnectorHealth(ctx)),
+      ...(await discoverInvestorPacket(ctx)),
       ...(await discoverGitState(ctx)),
       ...(await discoverGithubPublication(ctx)),
       ...(await discoverPrReadiness(ctx)),
@@ -286,6 +287,49 @@ async function discoverConnectorHealth() {
       onlySafeLocal: latest?.onlySafeLocal ?? null,
       summary: latest?.summary || null,
       authUnverifiedCount,
+    },
+  }];
+}
+
+async function discoverInvestorPacket() {
+  const untracked = runCommand('git', ['ls-files', '--others', '--exclude-standard', 'investor-packet'], 45_000);
+  const ignored = runCommand('git', ['ls-files', '--others', '--ignored', '--exclude-standard', 'investor-packet'], 45_000);
+  const paths = [...new Set([
+    ...(untracked.ok ? untracked.stdout.split(/\r?\n/).filter(Boolean) : []),
+    ...(ignored.ok ? ignored.stdout.split(/\r?\n/).filter(Boolean) : []),
+  ])].sort();
+
+  if (!paths.length) return [];
+
+  const sendReadyCount = paths.filter(item => item.includes('/SEND_READY/')).length;
+  const pdfCount = paths.filter(item => /\.pdf$/i.test(item)).length;
+  const emlCount = paths.filter(item => /\.eml$/i.test(item)).length;
+  const scriptCount = paths.filter(item => /\.ps1$/i.test(item)).length;
+
+  return [{
+    type: 'investor_packet',
+    lane: 'demo-sales',
+    id: 'investor-packet-review',
+    title: 'Review local investor packet',
+    value: 0.52,
+    urgency: sendReadyCount ? 0.62 : 0.42,
+    loopability: 0.48,
+    freshness: 0.78,
+    risk: 0.42,
+    manualGate: 'manual_investor_review',
+    expectedArtifact: 'investor-review packet handoff',
+    dedupPolicy: 'filesystem packet fingerprint; never send or publish automatically',
+    fingerprintSeed: paths.join('\n'),
+    action: 'Review the local investor packet before any staging, sharing, sending, publishing, or GitHub publication decision. Keep send-ready files manual-only.',
+    evidence: {
+      root: 'investor-packet/',
+      pathCount: paths.length,
+      sendReadyCount,
+      pdfCount,
+      emlCount,
+      scriptCount,
+      firstFiles: paths.slice(0, 12),
+      ignoredByGit: ignored.ok && ignored.stdout.trim().length > 0,
     },
   }];
 }
@@ -1265,6 +1309,9 @@ function classifyApprovalGates(label, candidate = null) {
       break;
     case 'manual_deploy_approval':
       addGate('deploy-approval');
+      break;
+    case 'manual_investor_review':
+      addGate('investor-review');
       break;
     case 'manual_create_only':
       addGate(/github|local-pr|\bpr\b|pull request|push|merge|issue/.test(text) ? 'push-and-pr-approval' : 'local-review');

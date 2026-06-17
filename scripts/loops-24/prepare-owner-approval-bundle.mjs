@@ -73,7 +73,7 @@ const unexpectedDirty = dirtyPaths.filter(file => !expectedDirtyDeployFiles.incl
 const unexpectedUntracked = untrackedPaths.filter(file => !expectedDirtyDeployFiles.includes(file));
 const statusFingerprint = gitWorktreeFingerprint({ cwd: repoRoot, statusLines });
 const trackedStatusFingerprint = gitWorktreeFingerprint({ cwd: repoRoot, statusLines: trackedDirtyLines });
-const investorPacketUntracked = unexpectedUntracked.filter(file => file.startsWith('investor-packet/'));
+const localInvestorPacketPaths = listLocalInvestorPacketPaths();
 const localScopeClean = stagedLines.length === 0 && unexpectedDirty.length === 0 && unexpectedUntracked.length === 0;
 
 const missingSecrets = Array.isArray(secrets?.summary?.missing) ? secrets.summary.missing : [];
@@ -121,12 +121,12 @@ const gates = [
       ? `Tracked dirty files are limited to: ${dirtyPaths.join(', ') || '(none)'}; untracked=(none).`
       : `Unexpected dirty, untracked, or staged changes exist. staged=${stagedLines.join(', ') || '(none)'} unexpected=${unexpectedDirty.join(', ') || '(none)'} untracked=${unexpectedUntracked.join(', ') || '(none)'}`,
   },
-  ...(investorPacketUntracked.length ? [{
+  ...(localInvestorPacketPaths.length ? [{
     id: 'investor_review',
     label: 'Review investor packet materials',
     status: 'manual_approval',
-    ownerAction: 'Review the investor packet separately before staging, sending, sharing, or publishing it.',
-    evidence: `untrackedInvestorPacketPaths=${investorPacketUntracked.length} root=investor-packet/`,
+    ownerAction: 'Review the local investor packet separately before staging, sending, sharing, publishing, or GitHub publication.',
+    evidence: `localInvestorPacketPaths=${localInvestorPacketPaths.length} root=investor-packet/ gitIgnored=true`,
   }] : []),
   {
     id: 'wakeup_health',
@@ -224,6 +224,7 @@ const payload = {
   expectedDirtyDeployFiles,
   unexpectedDirty,
   unexpectedUntracked,
+  localInvestorPacketPaths,
   staged: stagedLines,
   artifacts: {
     githubHandoff: github?.reportPath || null,
@@ -260,6 +261,7 @@ const payload = {
     powerWakeNeedsApproval,
     dashboardGatesReady,
     localScopeClean,
+    localInvestorPacketCount: localInvestorPacketPaths.length,
   },
 };
 
@@ -271,6 +273,7 @@ payload.bundleFingerprint = hash(JSON.stringify({
   behind,
   statusFingerprint,
   artifacts: payload.artifacts,
+  localInvestorPacketPaths,
   gates,
 }));
 
@@ -352,6 +355,10 @@ function renderMarkdown(payload) {
     '',
     ...(payload.untracked.length ? payload.untracked.map(item => `- \`${item}\``) : ['- none']),
     '',
+    '## Local Investor Packet Gate',
+    '',
+    ...(payload.localInvestorPacketPaths.length ? payload.localInvestorPacketPaths.map(item => `- \`${item}\``) : ['- none']),
+    '',
     '## Artifacts',
     '',
     ...Object.entries(payload.artifacts).map(([key, value]) => `- ${key}: ${value || '(missing)'}`),
@@ -424,6 +431,15 @@ function runNodeMaybe(args) {
     windowsHide: true,
     maxBuffer: 1024 * 1024 * 8,
   });
+}
+
+function listLocalInvestorPacketPaths() {
+  const untracked = runGitMaybe(['ls-files', '--others', '--exclude-standard', 'investor-packet']);
+  const ignored = runGitMaybe(['ls-files', '--others', '--ignored', '--exclude-standard', 'investor-packet']);
+  return [...new Set([
+    ...(untracked.ok ? untracked.stdout.split(/\r?\n/).filter(Boolean) : []),
+    ...(ignored.ok ? ignored.stdout.split(/\r?\n/).filter(Boolean) : []),
+  ])].sort();
 }
 
 function parseStatusLine(line) {

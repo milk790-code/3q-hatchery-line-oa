@@ -12,3 +12,6 @@ node_modules/
 # Local Codex/Claude runtime outputs
 .claude/launch.json
 scripts/.agents/
+
+# Local send-ready investor materials; review manually, do not commit by default.
+investor-packet/

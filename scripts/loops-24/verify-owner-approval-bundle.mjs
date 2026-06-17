@@ -119,6 +119,7 @@ function readCurrentGitContext() {
     trackedStatusFingerprint: gitWorktreeFingerprint({ cwd: repoRoot, statusLines: trackedDirtyLines }),
     dirtyPaths: trackedDirtyLines.map(parseStatusLine).map(item => item.path),
     untrackedPaths,
+    localInvestorPacketPaths: listLocalInvestorPacketPaths(),
     stagedLines,
   };
 }
@@ -154,7 +155,7 @@ function verifyBundle(bundle, context, related) {
   const expectedUnexpectedDirty = context.dirtyPaths.filter(file => !expectedDirtyDeployFiles.includes(file));
   const expectedUnexpectedUntracked = context.untrackedPaths.filter(file => !expectedDirtyDeployFiles.includes(file));
   const expectedGateIds = ['local_review', 'wakeup_health', 'power_wake_policy', 'dashboard_gate_verification', 'push_draft_pr', 'worker_deploy', 'secret_input', 'post_deploy_verification', 'manual_send'];
-  if (expectedUnexpectedUntracked.some(file => file.startsWith('investor-packet/'))) {
+  if (context.localInvestorPacketPaths.length) {
     expectedGateIds.push('investor_review');
   }
 
@@ -180,6 +181,15 @@ function verifyBundle(bundle, context, related) {
   }
   if (!arrayEqual(bundle.unexpectedUntracked || [], expectedUnexpectedUntracked)) {
     failures.push(`unexpectedUntracked expected ${expectedUnexpectedUntracked.join(', ') || '(none)'} got ${(bundle.unexpectedUntracked || []).join(', ') || '(none)'}`);
+  }
+  if (!arrayEqual(bundle.localInvestorPacketPaths || [], context.localInvestorPacketPaths)) {
+    failures.push(`localInvestorPacketPaths expected ${context.localInvestorPacketPaths.length} path(s) got ${(bundle.localInvestorPacketPaths || []).length}`);
+  }
+  if (Number(bundle.summary?.localInvestorPacketCount || 0) !== context.localInvestorPacketPaths.length) {
+    failures.push(`summary.localInvestorPacketCount expected ${context.localInvestorPacketPaths.length} got ${bundle.summary?.localInvestorPacketCount}`);
+  }
+  if (context.localInvestorPacketPaths.length && gateById.get('investor_review')?.status !== 'manual_approval') {
+    failures.push(`investor_review gate has unexpected status ${gateById.get('investor_review')?.status}`);
   }
   if (context.stagedLines.length) failures.push(`staged files present: ${context.stagedLines.join(', ')}`);
 
@@ -341,6 +351,15 @@ function runGitMaybe(args) {
     stdout: result.stdout || '',
     stderr: result.stderr || (result.error ? result.error.message : ''),
   };
+}
+
+function listLocalInvestorPacketPaths() {
+  const untracked = runGitMaybe(['ls-files', '--others', '--exclude-standard', 'investor-packet']);
+  const ignored = runGitMaybe(['ls-files', '--others', '--ignored', '--exclude-standard', 'investor-packet']);
+  return [...new Set([
+    ...(untracked.ok ? untracked.stdout.split(/\r?\n/).filter(Boolean) : []),
+    ...(ignored.ok ? ignored.stdout.split(/\r?\n/).filter(Boolean) : []),
+  ])].sort();
 }
 
 function parseStatusLine(line) {
