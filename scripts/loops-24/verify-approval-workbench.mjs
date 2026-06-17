@@ -32,6 +32,9 @@ const payload = {
   latestPath: path.join(verificationDir, 'latest.json'),
   ok: findings.failures.length === 0,
   summary: {
+    approvalTtlMinutes: Number.isFinite(Number(workbench.approvalTtlMinutes)) ? Number(workbench.approvalTtlMinutes) : null,
+    expiresAt: workbench.expiresAt || null,
+    expired: isExpired(workbench.expiresAt),
     readyCommandCount: workbench.summary?.readyCommandCount ?? null,
     manualGateCount: workbench.summary?.manualGateCount ?? null,
     attentionGateCount: workbench.summary?.attentionGateCount ?? null,
@@ -86,6 +89,10 @@ async function readJson(file, fallback) {
 function verifyWorkbench(workbench, bundle, ownerVerification) {
   const failures = [];
   const warnings = [];
+  const approvalTtlMinutes = Number(workbench.approvalTtlMinutes);
+  const generatedMs = Date.parse(workbench.generatedAt || '');
+  const expiresMs = Date.parse(workbench.expiresAt || '');
+  const expired = Number.isFinite(expiresMs) && now.getTime() > expiresMs;
   const commandGates = (bundle.gates || []).filter(gate => Array.isArray(gate.commands) && gate.commands.length);
   const expectedReadyCommands = commandGates.filter(gate => gate.status === 'ready_for_approval').map(toCommandGate);
   const expectedBlockedCommands = commandGates.filter(gate => gate.status !== 'ready_for_approval').map(toCommandGate);
@@ -109,6 +116,26 @@ function verifyWorkbench(workbench, bundle, ownerVerification) {
   requireEqual(failures, 'bundleStatus', workbench.bundleStatus, bundle.summary?.status || null);
   requireEqual(failures, 'verificationOk', workbench.verificationOk, ownerVerification?.ok === true);
   requireEqual(failures, 'status', workbench.status, expectedStatus);
+  if (!Number.isFinite(approvalTtlMinutes) || approvalTtlMinutes <= 0) {
+    failures.push(`approvalTtlMinutes must be a positive number, got ${workbench.approvalTtlMinutes}`);
+  }
+  if (!Number.isFinite(generatedMs)) {
+    failures.push(`generatedAt is not a valid timestamp: ${workbench.generatedAt}`);
+  }
+  if (!Number.isFinite(expiresMs)) {
+    failures.push(`expiresAt is not a valid timestamp: ${workbench.expiresAt}`);
+  }
+  if (Number.isFinite(approvalTtlMinutes) && approvalTtlMinutes > 0 && Number.isFinite(generatedMs)) {
+    requireEqual(
+      failures,
+      'expiresAt',
+      workbench.expiresAt,
+      new Date(generatedMs + approvalTtlMinutes * 60_000).toISOString(),
+    );
+  }
+  if (expired) {
+    failures.push(`approval workbench expired at ${workbench.expiresAt}; regenerate before running approval commands`);
+  }
 
   if (!arrayJsonEqual(workbench.readyCommands || [], expectedReadyCommands)) {
     failures.push('readyCommands do not match ready_for_approval command gates from owner bundle');
@@ -124,6 +151,8 @@ function verifyWorkbench(workbench, bundle, ownerVerification) {
   }
 
   const expectedSummary = {
+    approvalTtlMinutes,
+    expiresAt: workbench.expiresAt,
     readyCommandCount: expectedReadyCommands.reduce((count, gate) => count + gate.commands.length, 0),
     blockedCommandCount: expectedBlockedCommands.reduce((count, gate) => count + gate.commands.length, 0),
     manualGateCount: expectedManualGates.length,
@@ -133,6 +162,7 @@ function verifyWorkbench(workbench, bundle, ownerVerification) {
     localScopeClean: bundle.summary?.localScopeClean === true,
     localInvestorPacketCount: Number(bundle.summary?.localInvestorPacketCount || 0),
     verificationFailureCount: Number(ownerVerification?.summary?.failureCount || 0),
+    expired,
   };
   for (const [key, expected] of Object.entries(expectedSummary)) {
     requireEqual(failures, `summary.${key}`, workbench.summary?.[key], expected);
@@ -141,6 +171,8 @@ function verifyWorkbench(workbench, bundle, ownerVerification) {
   const expectedFingerprint = hash(JSON.stringify({
     bundleFingerprint: workbench.bundleFingerprint,
     verificationOk: workbench.verificationOk,
+    approvalTtlMinutes: workbench.approvalTtlMinutes,
+    expiresAt: workbench.expiresAt,
     readyCommands: workbench.readyCommands,
     blockedCommands: workbench.blockedCommands,
     manualGates: workbench.manualGates,
@@ -149,7 +181,7 @@ function verifyWorkbench(workbench, bundle, ownerVerification) {
   requireEqual(failures, 'statusFingerprint', workbench.statusFingerprint, expectedFingerprint);
 
   const hardStops = workbench.hardStops || [];
-  for (const phrase of ['explicit owner approval', 'Do not commit, send, share, or publish', 'Do not print or store secret values']) {
+  for (const phrase of ['explicit owner approval', 'expires_at', 'Do not commit, send, share, or publish', 'Do not print or store secret values']) {
     if (!hardStops.some(stop => String(stop).includes(phrase))) {
       failures.push(`hardStops missing phrase: ${phrase}`);
     }
@@ -204,6 +236,9 @@ function renderMarkdown(payload) {
     `- generated_at: ${payload.generatedAt}`,
     `- workbench_json: ${payload.workbenchJsonPath}`,
     `- bundle_json: ${payload.bundleJsonPath || '(missing)'}`,
+    `- approval_ttl_minutes: ${payload.summary.approvalTtlMinutes ?? '(missing)'}`,
+    `- expires_at: ${payload.summary.expiresAt || '(missing)'}`,
+    `- expired: ${payload.summary.expired}`,
     `- ok: ${payload.ok}`,
     `- failure_count: ${payload.summary.failureCount}`,
     `- warning_count: ${payload.summary.warningCount}`,
@@ -230,6 +265,11 @@ function renderMarkdown(payload) {
 
 function toStamp(date) {
   return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+}
+
+function isExpired(expiresAt) {
+  const expiresMs = Date.parse(expiresAt || '');
+  return Number.isFinite(expiresMs) && now.getTime() > expiresMs;
 }
 
 function hash(value) {

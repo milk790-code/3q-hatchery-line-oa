@@ -539,6 +539,11 @@ Latest approval workbench path:
 %USERPROFILE%\.codex\automations\loops-24\approval-workbench\latest.json
 ```
 
+Approval workbenches expire after 65 minutes by default. Override with
+`LOOPS_APPROVAL_WORKBENCH_TTL_MINUTES` only for local testing or a deliberately
+short owner review window. If `expires_at` has passed, regenerate the workbench
+before running any owner-approved command.
+
 Verify that the approval workbench is still a faithful projection of the latest
 owner bundle and owner-bundle verifier:
 

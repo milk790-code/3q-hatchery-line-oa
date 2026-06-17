@@ -15,8 +15,10 @@ const stateDir = path.resolve(process.env.LOOPS_STATE_DIR || path.join(codexHome
 const workbenchDir = path.join(stateDir, 'approval-workbench');
 const args = parseArgs(process.argv.slice(2));
 const bundleJsonPath = path.resolve(args.bundleJson || path.join(stateDir, 'owner-approval-bundles', 'latest.json'));
+const approvalTtlMinutes = parsePositiveNumber(process.env.LOOPS_APPROVAL_WORKBENCH_TTL_MINUTES, 65);
 
 const now = new Date();
+const expiresAt = new Date(now.getTime() + approvalTtlMinutes * 60_000);
 const stamp = toStamp(now);
 const bundle = await readJson(bundleJsonPath);
 const verification = await refreshVerification(bundleJsonPath);
@@ -28,6 +30,8 @@ const attentionGates = (bundle.gates || []).filter(gate => gate.status === 'atte
 
 const payload = {
   generatedAt: now.toISOString(),
+  approvalTtlMinutes,
+  expiresAt: expiresAt.toISOString(),
   repoRoot,
   stateDir,
   bundleJsonPath,
@@ -49,6 +53,8 @@ const payload = {
   manualGates: manualGates.map(toGateSummary),
   attentionGates: attentionGates.map(toGateSummary),
   summary: {
+    approvalTtlMinutes,
+    expiresAt: expiresAt.toISOString(),
     readyCommandCount: readyCommands.reduce((count, gate) => count + gate.commands.length, 0),
     blockedCommandCount: blockedCommands.reduce((count, gate) => count + gate.commands.length, 0),
     manualGateCount: manualGates.length,
@@ -58,9 +64,11 @@ const payload = {
     localScopeClean: bundle.summary?.localScopeClean === true,
     localInvestorPacketCount: Number(bundle.summary?.localInvestorPacketCount || 0),
     verificationFailureCount: Number(verification?.summary?.failureCount || 0),
+    expired: false,
   },
   hardStops: [
     'Do not run these commands without explicit owner approval.',
+    'Do not use this workbench after expires_at; rerun prepare-approval-workbench before approval commands.',
     'Do not combine GitHub publication, Worker deploy, secret input, protected verification, or outbound sending into one automatic batch.',
     'Do not commit, send, share, or publish local investor packet materials from this workbench.',
     'Do not print or store secret values in LOOPS reports.',
@@ -70,6 +78,8 @@ const payload = {
 payload.statusFingerprint = hash(JSON.stringify({
   bundleFingerprint: payload.bundleFingerprint,
   verificationOk: payload.verificationOk,
+  approvalTtlMinutes: payload.approvalTtlMinutes,
+  expiresAt: payload.expiresAt,
   readyCommands: payload.readyCommands,
   blockedCommands: payload.blockedCommands,
   manualGates: payload.manualGates,
@@ -163,6 +173,8 @@ function renderMarkdown(payload) {
     '# LOOPS Approval Workbench',
     '',
     `- generated_at: ${payload.generatedAt}`,
+    `- approval_ttl_minutes: ${payload.approvalTtlMinutes}`,
+    `- expires_at: ${payload.expiresAt}`,
     `- repo: ${payload.repoRoot}`,
     `- branch: ${payload.branch || '(unknown)'}`,
     `- head: ${payload.head || '(unknown)'}`,
@@ -237,6 +249,11 @@ function escapeCell(value) {
 
 function toStamp(date) {
   return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+}
+
+function parsePositiveNumber(value, fallback) {
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
 function hash(value) {
