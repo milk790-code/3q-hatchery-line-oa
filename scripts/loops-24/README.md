@@ -448,6 +448,18 @@ Latest approval bundle path:
 %USERPROFILE%\.codex\automations\loops-24\owner-approval-bundles\latest.json
 ```
 
+Verify that the latest owner approval bundle still matches the current branch,
+PR readiness packet, wakeup health, dashboard-gate report, and dirty-worktree
+scope:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\verify-owner-approval-bundle.ps1
+```
+
+The verifier reads local LOOPS JSON artifacts and git status only. It does not
+push, create PRs, deploy, call protected endpoints, write secrets, or send
+messages.
+
 ## Review Worker deploy slices
 
 Create a local-only review for current `deploy-approval` Worker groups from the
