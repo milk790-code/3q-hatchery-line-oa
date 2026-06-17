@@ -120,6 +120,13 @@ async function main() {
 
     await writeReport(result, scored, autoCompletions);
     await writeDashboard(result, scored, autoCompletions);
+    const postDashboardAutoCompletions = await runPostDashboardAutoCompletions(scored, autoCompletions, result, taskRegistry);
+    if (postDashboardAutoCompletions !== autoCompletions) {
+      autoCompletions = postDashboardAutoCompletions;
+      refreshResultSummaries(result, scored, autoCompletions, taskRegistry);
+      await writeReport(result, scored, autoCompletions);
+      await writeDashboard(result, scored, autoCompletions);
+    }
     await appendRunToState(result, scored, autoCompletions);
     console.log(JSON.stringify({
       ...result,
@@ -1011,7 +1018,7 @@ async function runAutoCompletions(candidates) {
     }
   }
 
-  const hasManualGateCandidates = candidates.some(candidate => (candidate.manualGate || inferManualGate(candidate)) !== 'none_read_only');
+  const hasManualGateCandidates = candidatesHaveManualGates(candidates);
 
   if (hasManualGateCandidates) {
     completions.push(runLocalStep(
@@ -1022,16 +1029,50 @@ async function runAutoCompletions(candidates) {
     ));
   }
 
-  if (hasManualGateCandidates || autoCompletionsNeedOwnerBundle(completions)) {
-    completions.push(runLocalStep(
-      'prepare-owner-approval-bundle',
-      'node',
-      ['scripts/loops-24/prepare-owner-approval-bundle.mjs'],
-      120_000
-    ));
+  return completions;
+}
+
+async function runPostDashboardAutoCompletions(candidates, autoCompletions, result, taskRegistry) {
+  if (!autoCompleteEnabled || !result.dashboardJsonPath) return autoCompletions;
+
+  let next = autoCompletions;
+  if (candidatesHaveManualGates(candidates) || autoCompletionsNeedOwnerBundle(next)) {
+    next = [
+      ...next,
+      runLocalStep(
+        'verify-dashboard-gates',
+        'node',
+        ['scripts/loops-24/verify-dashboard-gates.mjs', '--dashboard-json', result.dashboardJsonPath],
+        120_000
+      ),
+    ];
+    refreshResultSummaries(result, candidates, next, taskRegistry);
+    await writeReport(result, candidates, next);
+    await writeDashboard(result, candidates, next);
+
+    next = [
+      ...next,
+      runLocalStep(
+        'prepare-owner-approval-bundle',
+        'node',
+        ['scripts/loops-24/prepare-owner-approval-bundle.mjs'],
+        120_000
+      ),
+    ];
   }
 
-  return completions;
+  return next;
+}
+
+function candidatesHaveManualGates(candidates = []) {
+  return candidates.some(candidate => (candidate.manualGate || inferManualGate(candidate)) !== 'none_read_only');
+}
+
+function refreshResultSummaries(result, candidates, autoCompletions, taskRegistry) {
+  result.finishedAt = new Date().toISOString();
+  result.autoComplete = summarizeAutoCompletions(autoCompletions);
+  result.loopos = buildLooposSummary(candidates, autoCompletions, taskRegistry);
+  return result;
 }
 
 function autoCompletionsNeedOwnerBundle(completions) {

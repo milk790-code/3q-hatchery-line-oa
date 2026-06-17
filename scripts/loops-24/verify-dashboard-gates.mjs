@@ -130,19 +130,23 @@ function verifyWaitingItems(items, approvalIndex) {
 }
 
 function expectedApprovalGates(item) {
-  const text = `${item.label || ''} ${item.manualGate || ''} ${item.summary || ''}`.toLowerCase();
+  const routingText = `${item.label || ''} ${item.manualGate || ''}`.toLowerCase();
+  const fullText = `${routingText} ${item.summary || ''}`.toLowerCase();
   const gates = [];
   const add = gate => {
     if (gate && !gates.includes(gate)) gates.push(gate);
   };
 
-  if (item.manualGate === 'manual_secret_input' || /secret|token|api[_-]?key|manual_secret_input/.test(text)) add('secret-input');
-  if (item.manualGate === 'manual_send_only' || /manual_send_only|cold-outreach|outreach|sending/.test(text)) add('manual-send-approval');
-  if (item.manualGate === 'manual_deploy_approval' || /manual_deploy_approval|deploy|cron-status|worker/.test(text)) add('deploy-approval');
-  if (item.manualGate === 'manual_create_only' || /manual_create_only|github|local-pr|pr-readiness|pull request|push/.test(text)) {
-    add(/github|local-pr|pr-readiness|pull request|push/.test(text) ? 'push-and-pr-approval' : 'local-review');
+  if (item.manualGate === 'manual_secret_input' || /secret|token|api[_-]?key|manual_secret_input/.test(fullText)) add('secret-input');
+  if (item.manualGate === 'manual_send_only' || /manual_send_only|cold-outreach|outreach|sending/.test(fullText)) add('manual-send-approval');
+  if (item.manualGate === 'manual_deploy_approval' || /manual_deploy_approval|deploy|cron-status|worker/.test(fullText)) add('deploy-approval');
+  if (item.manualGate === 'manual_create_only' || /manual_create_only|github|local-pr|pr-readiness|pull request|push/.test(fullText)) {
+    add(/github|local-pr|pr-readiness|pull request|push/.test(fullText) ? 'push-and-pr-approval' : 'local-review');
   }
-  if (item.manualGate === 'manual_review_only' || /content-queue|worktree|handoff|local-review/.test(text)) add('local-review');
+  if (item.manualGate === 'manual_review_only'
+    || /content-queue|wakeup|frontend|slice|handoff|worktree|wrangler-cache|local-review/.test(routingText)) {
+    add('local-review');
+  }
 
   return gates.length ? gates : ['review'];
 }

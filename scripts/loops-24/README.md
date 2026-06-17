@@ -53,6 +53,10 @@ to local, review-ready artifacts:
 It stops at review gates for secrets, tokens, deploy approval, outbound sending,
 and broad frontend/artifact payloads.
 
+When auto-complete is enabled and manual gates are present, the runner writes the
+current dashboard first, verifies that dashboard's approval groups, then refreshes
+the owner approval bundle from the verified dashboard.
+
 Before escalating a manual gate, LOOPS also prepares a manual-gate adapter report.
 That report groups similar blockers into one shared taxonomy, lists safe automatic
 substitutes, and keeps only the true hard stops for owner approval. The same
