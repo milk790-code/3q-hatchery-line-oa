@@ -51,6 +51,7 @@ const payload = {
     accountBindingAttentionCount: dashboard.accountBindingWorkbench?.summary?.attentionCount ?? null,
     connectorThreadAttentionCount: dashboard.connectorHealth?.summary?.threadAttentionCount ?? null,
     dirtyReviewWorkbenchDecisionOptionCount: dashboard.dirtyReviewWorkbench?.summary?.decisionOptionCount ?? null,
+    approvalWorkbenchReadyCommandGateCount: dashboard.approvalWorkbench?.summary?.readyCommandGateCount ?? null,
     failureCount: findings.failures.length,
     warningCount: findings.warnings.length,
   },
@@ -88,6 +89,14 @@ const payload = {
           decisionOptionCount: dashboard.dirtyReviewWorkbench.summary?.decisionOptionCount ?? null,
           decisionOptionIds: dashboard.dirtyReviewWorkbench.summary?.decisionOptionIds ?? null,
           ownerApprovalRequiredCount: dashboard.dirtyReviewWorkbench.summary?.ownerApprovalRequiredCount ?? null,
+        }
+      : null,
+    approvalWorkbench: dashboard.approvalWorkbench
+      ? {
+          status: dashboard.approvalWorkbench.status ?? null,
+          readyCommandCount: dashboard.approvalWorkbench.summary?.readyCommandCount ?? null,
+          readyCommandGateCount: dashboard.approvalWorkbench.summary?.readyCommandGateCount ?? null,
+          readyCommandIds: dashboard.approvalWorkbench.summary?.readyCommandIds ?? null,
         }
       : null,
     failures: findings.failures,
@@ -450,6 +459,47 @@ function verifyApprovalWorkbenchSummary(dashboard) {
     failures.push('approvalWorkbench is expired but still marked ready-for-owner-decision.');
   }
 
+  const readyCommands = Array.isArray(workbench.readyCommands) ? workbench.readyCommands : [];
+  const readyCommandIds = readyCommands.map(gate => gate.id).filter(Boolean);
+  const summaryReadyCommandIds = Array.isArray(summary.readyCommandIds)
+    ? summary.readyCommandIds
+    : [];
+  const readyCommandGateCount = toFiniteNumber(summary.readyCommandGateCount);
+  const expectedReadyCommandCount = readyCommands.reduce((count, gate) => count + Number(gate.commandCount || 0), 0);
+
+  if (readyCommandGateCount === null) {
+    failures.push('approvalWorkbench.summary.readyCommandGateCount is missing or invalid.');
+  } else if (readyCommandGateCount !== readyCommands.length) {
+    failures.push(`approvalWorkbench.summary.readyCommandGateCount expected ${readyCommands.length} got ${summary.readyCommandGateCount}`);
+  }
+  if (JSON.stringify(summaryReadyCommandIds) !== JSON.stringify(readyCommandIds)) {
+    failures.push(`approvalWorkbench.summary.readyCommandIds expected ${readyCommandIds.join(', ') || '(none)'} got ${summaryReadyCommandIds.join(', ') || '(none)'}`);
+  }
+  if (Number(summary.readyCommandCount || 0) !== expectedReadyCommandCount) {
+    failures.push(`approvalWorkbench.summary.readyCommandCount expected ${expectedReadyCommandCount} got ${summary.readyCommandCount}`);
+  }
+  if (Number(dashboardSummary.approvalWorkbenchReadyCommandGateCount || 0) !== Number(summary.readyCommandGateCount || 0)) {
+    failures.push(`summary.approvalWorkbenchReadyCommandGateCount expected ${summary.readyCommandGateCount || 0} got ${dashboardSummary.approvalWorkbenchReadyCommandGateCount}`);
+  }
+  if (Number(dashboardSummary.approvalWorkbenchReadyCommandCount || 0) !== Number(summary.readyCommandCount || 0)) {
+    failures.push(`summary.approvalWorkbenchReadyCommandCount expected ${summary.readyCommandCount || 0} got ${dashboardSummary.approvalWorkbenchReadyCommandCount}`);
+  }
+
+  const seen = new Set();
+  for (const gate of readyCommands) {
+    const id = gate.id || '(unknown)';
+    if (!gate.id) failures.push('approvalWorkbench.readyCommands contains a gate without id.');
+    if (gate.id && seen.has(gate.id)) failures.push(`approvalWorkbench.readyCommands duplicate id: ${gate.id}`);
+    if (gate.id) seen.add(gate.id);
+    if (gate.status !== 'ready_for_approval') {
+      failures.push(`approvalWorkbench.readyCommands ${id} status expected ready_for_approval got ${gate.status}`);
+    }
+    if (gate.commandCount === undefined || !Number.isInteger(Number(gate.commandCount))) {
+      failures.push(`approvalWorkbench.readyCommands ${id} missing commandCount.`);
+    }
+    if (!gate.ownerAction) failures.push(`approvalWorkbench.readyCommands ${id} missing ownerAction.`);
+  }
+
   return { failures, warnings };
 }
 
@@ -596,6 +646,7 @@ function renderMarkdown(payload) {
     `- waiting_count: ${payload.summary.waitingCount}`,
     `- approval_group_count: ${payload.summary.approvalGroupCount}`,
     `- dirty_review_decision_options: ${payload.summary.dirtyReviewWorkbenchDecisionOptionCount ?? '(unknown)'}`,
+    `- approval_ready_command_gates: ${payload.summary.approvalWorkbenchReadyCommandGateCount ?? '(unknown)'}`,
     `- failure_count: ${payload.summary.failureCount}`,
     `- warning_count: ${payload.summary.warningCount}`,
     '',

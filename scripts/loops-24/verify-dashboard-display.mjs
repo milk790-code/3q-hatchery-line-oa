@@ -45,6 +45,7 @@ const payload = {
     checkedProspectNameCount: findings.checkedProspectNames.length,
     checkedThreadAttentionCount: findings.checkedThreadAttentionIds.length,
     checkedDirtyDecisionOptionCount: findings.checkedDirtyDecisionOptionIds.length,
+    checkedApprovalReadyCommandCount: findings.checkedApprovalReadyCommandIds.length,
     failureCount: findings.failures.length,
     warningCount: findings.warnings.length,
   },
@@ -205,6 +206,18 @@ function verifyDisplay({ dashboard, markdown, display }) {
     }
   }
 
+  const checkedApprovalReadyCommandIds = (dashboard.approvalWorkbench?.readyCommands || [])
+    .map(item => item.id)
+    .filter(Boolean);
+  if (checkedApprovalReadyCommandIds.length && !display.stdout.includes('- ready_command_details:')) {
+    failures.push('show-dashboard output missing approval workbench ready_command_details summary.');
+  }
+  for (const id of checkedApprovalReadyCommandIds) {
+    if (!display.stdout.includes(`${id}:`)) {
+      failures.push(`show-dashboard output missing approval ready command id: ${id}`);
+    }
+  }
+
   const markdownLineCount = markdown.split(/\r?\n/).length;
   const outputLineCount = display.stdout.split(/\r?\n/).length;
   if (outputLineCount < Math.max(20, Math.floor(markdownLineCount * 0.7))) {
@@ -218,6 +231,7 @@ function verifyDisplay({ dashboard, markdown, display }) {
     checkedProspectNames,
     checkedThreadAttentionIds,
     checkedDirtyDecisionOptionIds,
+    checkedApprovalReadyCommandIds,
   };
 }
 
@@ -236,6 +250,7 @@ function renderMarkdown(payload) {
     `- checked_prospect_names: ${payload.summary.checkedProspectNameCount}`,
     `- checked_thread_attention: ${payload.summary.checkedThreadAttentionCount}`,
     `- checked_dirty_decision_options: ${payload.summary.checkedDirtyDecisionOptionCount}`,
+    `- checked_approval_ready_commands: ${payload.summary.checkedApprovalReadyCommandCount}`,
     `- failures: ${payload.summary.failureCount}`,
     `- warnings: ${payload.summary.warningCount}`,
     '',

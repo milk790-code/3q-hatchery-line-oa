@@ -1878,6 +1878,7 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     approvalWorkbenchExpiryBoundReason: approvalWorkbench.available ? approvalWorkbench.summary?.expiryBoundReason : null,
     approvalWorkbenchWakeupFreshUntil: approvalWorkbench.available ? approvalWorkbench.summary?.wakeupFreshUntil : null,
     approvalWorkbenchReadyCommandCount: approvalWorkbench.available ? Number(approvalWorkbench.summary?.readyCommandCount || 0) : null,
+    approvalWorkbenchReadyCommandGateCount: approvalWorkbench.available ? Number(approvalWorkbench.summary?.readyCommandGateCount || 0) : null,
     approvalWorkbenchAttentionGateCount: approvalWorkbench.available ? Number(approvalWorkbench.summary?.attentionGateCount || 0) : null,
     powerWakePolicyStatus: powerWakePolicy.available ? powerWakePolicy.status : null,
     powerWakePolicyNeedsOwnerDecision: powerWakePolicy.available ? powerWakePolicy.summary?.needsOwnerDecision : null,
@@ -2709,6 +2710,7 @@ function summarizeApprovalWorkbenchArtifact(data, relativeTo = new Date()) {
   const expiresAtTaipei = formatTaipeiTime(expiresAt);
   const expiresInMinutes = minutesUntil(expiresAt, relativeTo);
   const expired = isTimestampExpired(expiresAt, relativeTo);
+  const readyCommands = summarizeApprovalCommandGates(data.readyCommands);
   return {
     available: true,
     generatedAt: data.generatedAt || null,
@@ -2717,14 +2719,29 @@ function summarizeApprovalWorkbenchArtifact(data, relativeTo = new Date()) {
     status: data.status || null,
     bundleFingerprint: data.bundleFingerprint || null,
     projectionFingerprint: data.projectionFingerprint || null,
+    readyCommands,
     summary: {
       ...(data.summary || {}),
       expiresAt,
       expiresAtTaipei,
       expiresInMinutes,
       expired,
+      readyCommandGateCount: readyCommands.length,
+      readyCommandIds: readyCommands.map(gate => gate.id).filter(Boolean),
     },
   };
+}
+
+function summarizeApprovalCommandGates(gates) {
+  if (!Array.isArray(gates)) return [];
+  return gates.map(gate => ({
+    id: gate?.id || null,
+    label: gate?.label || gate?.id || null,
+    status: gate?.status || null,
+    ownerAction: compactEvidenceText(gate?.ownerAction, 180),
+    evidence: compactEvidenceText(gate?.evidence, 160),
+    commandCount: Array.isArray(gate?.commands) ? gate.commands.length : 0,
+  }));
 }
 
 function summarizePowerWakePolicyArtifact(data, verification) {
@@ -2909,7 +2926,7 @@ function renderOwnerApprovalBundle(data) {
 function renderApprovalWorkbench(data) {
   if (!data?.available) return ['- No approval workbench artifact yet.'];
   const summary = data.summary || {};
-  return [
+  const lines = [
     `- report: ${data.reportPath || '(missing)'}`,
     `- status: ${data.status || '(unknown)'}`,
     `- requested_expires_at: ${summary.requestedExpiresAt || '(missing)'}`,
@@ -2920,10 +2937,19 @@ function renderApprovalWorkbench(data) {
     `- wakeup_fresh_until: ${summary.wakeupFreshUntil || '(unknown)'}`,
     `- expired: ${summary.expired === true}`,
     `- ready_commands: ${summary.readyCommandCount ?? 0}`,
+    `- ready_command_gates: ${summary.readyCommandGateCount ?? 0}`,
     `- manual_gates: ${summary.manualGateCount ?? 0}`,
     `- attention_gates: ${summary.attentionGateCount ?? 0}`,
     `- verification_failures: ${summary.verificationFailureCount ?? 0}`,
   ];
+  const readyCommands = Array.isArray(data.readyCommands) ? data.readyCommands : [];
+  if (readyCommands.length) {
+    lines.push('- ready_command_details:');
+    for (const gate of readyCommands) {
+      lines.push(`  - ${gate.id || '(unknown)'}: status=${gate.status || '(unknown)'} commands=${gate.commandCount || 0} action=${gate.ownerAction || '(none)'}`);
+    }
+  }
+  return lines;
 }
 
 function renderPowerWakePolicy(data) {
