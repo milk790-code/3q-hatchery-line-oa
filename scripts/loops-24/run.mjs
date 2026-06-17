@@ -1130,6 +1130,19 @@ async function runAutoCompletions(candidates) {
     ));
   }
 
+  completions.push(runLocalStep(
+    'prepare-account-binding-workbench',
+    'node',
+    ['scripts/loops-24/prepare-account-binding-workbench.mjs'],
+    120_000
+  ));
+  completions.push(runLocalStep(
+    'verify-account-binding-workbench',
+    'node',
+    ['scripts/loops-24/verify-account-binding-workbench.mjs'],
+    120_000
+  ));
+
   const outreachCandidate = candidates.find(candidate => candidate.id?.startsWith('cold-outreach-batch-'));
   if (outreachCandidate) {
     completions.push(runLocalStep('generate-cold-outreach-drafts', 'node', ['scripts/loops-24/generate-cold-outreach.mjs'], 120_000));
@@ -1624,6 +1637,7 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
   const loopos = result.loopos || buildLooposSummary(candidates, autoCompletions, { registries: [], warnings: [] });
   const connectorHealth = summarizeConnectorHealthArtifact(await readJson(path.join(stateDir, 'connector-health', 'latest.json'), null));
   const secretChecklist = summarizeSecretChecklistArtifact(await readJson(path.join(stateDir, 'secret-checklists', 'latest.json'), null));
+  const accountBindingWorkbench = summarizeAccountBindingWorkbenchArtifact(await readJson(path.join(stateDir, 'account-binding-workbench', 'latest.json'), null));
   const dirtyClassification = summarizeDirtyClassificationArtifact(await readJson(path.join(stateDir, 'dirty-worktree', 'latest.json'), null));
   const currentHead = currentGitHead();
   const ownerApprovalBundle = summarizeOwnerApprovalBundleArtifact(
@@ -1649,6 +1663,9 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     largestApprovalGroup: approvals[0]?.approval || null,
     connectorAttentionCount: connectorHealth.summary?.attentionCount || 0,
     missingSecretGateCount: secretChecklist.summary?.missingCount || 0,
+    accountBindingAttentionCount: accountBindingWorkbench.summary?.attentionCount || 0,
+    accountBindingNextBindingId: accountBindingWorkbench.summary?.nextBindingId || null,
+    accountBindingNextBindingLabel: accountBindingWorkbench.summary?.nextBindingLabel || null,
     dirtyDeployCount: dirtyClassification.summary?.deploy || 0,
     ownerApprovalBundleStatus: ownerApprovalBundle.available ? ownerApprovalBundle.status : null,
     ownerApprovalBundleHead: ownerApprovalBundle.available ? ownerApprovalBundle.head : null,
@@ -1684,6 +1701,7 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     loopos,
     connectorHealth,
     secretChecklist,
+    accountBindingWorkbench,
     dirtyClassification,
     ownerApprovalBundle,
     approvalWorkbench,
@@ -1738,6 +1756,10 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     '## Connector Health',
     '',
     ...renderConnectorHealth(payload.connectorHealth),
+    '',
+    '## Account Binding Workbench',
+    '',
+    ...renderAccountBindingWorkbench(payload.accountBindingWorkbench),
     '',
     '## Secret Checklist',
     '',
@@ -2290,6 +2312,19 @@ function summarizeSecretChecklistArtifact(data) {
   };
 }
 
+function summarizeAccountBindingWorkbenchArtifact(data) {
+  if (!data) return { available: false, summary: null, reportPath: null };
+  return {
+    available: true,
+    generatedAt: data.generatedAt || null,
+    reportPath: data.reportPath || null,
+    sourceConnectorHealthPath: data.sourceConnectorHealthPath || null,
+    sourceSecretChecklistPath: data.sourceSecretChecklistPath || null,
+    statusFingerprint: data.statusFingerprint || null,
+    summary: data.summary || null,
+  };
+}
+
 function summarizeDirtyClassificationArtifact(data) {
   if (!data) return { available: false, summary: null, reportPath: null };
   return {
@@ -2380,6 +2415,24 @@ function renderSecretChecklist(data) {
     `- source_secret_gates: ${data.sourceSecretGatesPath || '(missing)'}`,
     `- ready_for_runner_wrapper: ${summary.readyForWrapperCount || 0}/${summary.total || 0}`,
     `- missing: ${summary.missing?.length ? summary.missing.join(', ') : '(none)'}`,
+  ];
+}
+
+function renderAccountBindingWorkbench(data) {
+  if (!data?.available) return ['- No account binding workbench artifact yet.'];
+  const summary = data.summary || {};
+  return [
+    `- report: ${data.reportPath || '(missing)'}`,
+    `- source_connector_health: ${data.sourceConnectorHealthPath || '(missing)'}`,
+    `- source_secret_checklist: ${data.sourceSecretChecklistPath || '(missing)'}`,
+    `- ready: ${summary.readyCount || 0}/${summary.total || 0}`,
+    `- attention: ${summary.attentionCount || 0}`,
+    `- next_binding: ${summary.nextBindingLabel || '(none)'}`,
+    `- next_owner_action: ${summary.nextBindingOwnerAction || '(none)'}`,
+    `- top_revenue_unlock: ${summary.topRevenueUnlockLabel || '(none)'}`,
+    `- manual_oauth_required: ${summary.manualOauthRequiredCount || 0}`,
+    `- secret_missing: ${summary.secretMissingCount || 0}`,
+    `- cli_missing: ${summary.cliMissingCount || 0}`,
   ];
 }
 

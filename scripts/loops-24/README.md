@@ -50,6 +50,7 @@ to local, review-ready artifacts:
 - approval workbench TTL summaries embedded in the dashboard
 - connector health reports that flag missing, failed, expired, timeout, skipped, or app-auth-unverified integrations
 - one-page local secret checklists derived from redacted secret gates
+- account binding workbenches that rank Codex app auth, CLI auth, browser sessions, and local secret gates without logging in or writing secrets
 - dirty worktree classification into deploy, investor, repo-hygiene, and other groups
 - content queue reconciliation reports
 - Wrangler cache audit reports
@@ -209,8 +210,9 @@ When the latest owner approval bundle is for the current `HEAD` and contains an
 `investor-review` so investor packet decisions are visible without opening the
 full owner bundle.
 The dashboard also embeds compact summaries for connector health, local secret
-checklist status, and dirty worktree groups so the hourly loop can mark broken
-authorization or unsafe git scope without requiring a separate file hunt.
+checklist status, account binding workbench status, and dirty worktree groups so
+the hourly loop can mark broken authorization or unsafe git scope without
+requiring a separate file hunt.
 It also embeds the latest owner approval bundle status, head freshness,
 publish readiness, local scope cleanliness, wakeup freshness, wakeup freshness
 remaining minutes, and power-wake policy flag so owner decisions can be made
@@ -343,6 +345,41 @@ powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\check-secret-gates.p
 The checker exits `0` when every required gate is ready for the local runner
 wrapper, and exits non-zero when one or more gates are missing. It never prints secret
 values.
+
+## Prepare account binding workbench
+
+Create a local account-binding checklist that ranks what the owner should bind
+next across Codex app connectors, CLI tools, browser session state, and local
+secret gates. This workbench is intentionally non-mutating: it does not open
+browsers, log in, grant OAuth consent, install software, write secrets, deploy,
+push, or send messages.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\prepare-account-binding-workbench.ps1
+```
+
+Latest workbench path:
+
+```text
+%USERPROFILE%\.codex\automations\loops-24\account-binding-workbench\latest.json
+```
+
+Verify that the workbench keeps every binding action behind an owner-controlled
+manual gate and does not include deploy, push, send, delete, or secret-like
+commands:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\verify-account-binding-workbench.ps1
+```
+
+After the owner finishes any connector login or local secret input, refresh the
+safe-local status:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\check-connector-health.ps1 -OnlySafeLocal
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\prepare-account-binding-workbench.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\run.ps1 -OnlySafeLocal
+```
 
 ## Prepare manual gate adapter
 
