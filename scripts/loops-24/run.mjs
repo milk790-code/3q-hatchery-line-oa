@@ -1855,6 +1855,9 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     dirtyDebugArtifactCount: dirtyClassification.summary?.debugArtifacts || 0,
     dirtyReviewWorkbenchStatus: dirtyReviewWorkbench.available ? dirtyReviewWorkbench.status : null,
     dirtyReviewWorkbenchVerificationOk: dirtyReviewWorkbench.available ? dirtyReviewWorkbench.verificationOk : null,
+    dirtyReviewWorkbenchDecisionOptionCount: dirtyReviewWorkbench.available
+      ? Number(dirtyReviewWorkbench.summary?.decisionOptionCount || 0)
+      : null,
     dirtyReviewWorkbenchOwnerApprovalRequiredCount: dirtyReviewWorkbench.available
       ? Number(dirtyReviewWorkbench.summary?.ownerApprovalRequiredCount || 0)
       : null,
@@ -2628,6 +2631,9 @@ function summarizeDirtyClassificationArtifact(data) {
 
 function summarizeDirtyReviewWorkbenchArtifact(data, verification) {
   if (!data) return { available: false, summary: null, reportPath: null };
+  const rawDecisionOptions = Array.isArray(data.decisionOptions) ? data.decisionOptions : [];
+  const decisionOptions = summarizeDirtyReviewDecisionOptions(rawDecisionOptions);
+  const decisionOptionIds = rawDecisionOptions.map(option => option?.id).filter(Boolean);
   return {
     available: true,
     generatedAt: data.generatedAt || null,
@@ -2639,12 +2645,28 @@ function summarizeDirtyReviewWorkbenchArtifact(data, verification) {
     verificationOk: verification?.ok === true,
     verificationReportPath: verification?.reportPath || null,
     statusFingerprint: data.statusFingerprint || null,
+    decisionOptions,
     summary: {
       ...(data.summary || {}),
+      decisionOptionCount: rawDecisionOptions.length,
+      decisionOptionIds,
+      ownerApprovalRequiredCount: rawDecisionOptions.filter(option => option?.status === 'owner_approval_required').length,
       verificationFailureCount: Number(verification?.summary?.failureCount || 0),
       verificationWarningCount: Number(verification?.summary?.warningCount || 0),
     },
   };
+}
+
+function summarizeDirtyReviewDecisionOptions(options) {
+  if (!Array.isArray(options)) return [];
+  return options.map(option => ({
+    id: option?.id || null,
+    label: option?.label || option?.id || null,
+    status: option?.status || null,
+    ownerAction: compactEvidenceText(option?.ownerAction, 180),
+    commandCount: Array.isArray(option?.commands) ? option.commands.length : 0,
+    affectedPathCount: Array.isArray(option?.affectedPaths) ? option.affectedPaths.length : 0,
+  }));
 }
 
 function summarizeOwnerApprovalBundleArtifact(data, currentHead = '', relativeTo = new Date()) {
@@ -2836,7 +2858,7 @@ function renderDirtyClassification(data) {
 function renderDirtyReviewWorkbench(data) {
   if (!data?.available) return ['- No dirty review workbench artifact yet.'];
   const summary = data.summary || {};
-  return [
+  const lines = [
     `- report: ${data.reportPath || '(missing)'}`,
     `- verification_report: ${data.verificationReportPath || '(missing)'}`,
     `- status: ${data.status || '(unknown)'}`,
@@ -2850,6 +2872,14 @@ function renderDirtyReviewWorkbench(data) {
     `- verification_ok: ${data.verificationOk === true}`,
     `- verification_failures: ${summary.verificationFailureCount ?? 0}`,
   ];
+  const decisionOptions = Array.isArray(data.decisionOptions) ? data.decisionOptions : [];
+  if (decisionOptions.length) {
+    lines.push('- decision_option_details:');
+    for (const option of decisionOptions) {
+      lines.push(`  - ${option.id || '(unknown)'}: status=${option.status || '(unknown)'} commands=${option.commandCount || 0} affected_paths=${option.affectedPathCount || 0} action=${option.ownerAction || '(none)'}`);
+    }
+  }
+  return lines;
 }
 
 function renderOwnerApprovalBundle(data) {

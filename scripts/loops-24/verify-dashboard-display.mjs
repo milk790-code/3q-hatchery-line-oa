@@ -44,6 +44,7 @@ const payload = {
     requiredSectionCount: findings.requiredSections.length,
     checkedProspectNameCount: findings.checkedProspectNames.length,
     checkedThreadAttentionCount: findings.checkedThreadAttentionIds.length,
+    checkedDirtyDecisionOptionCount: findings.checkedDirtyDecisionOptionIds.length,
     failureCount: findings.failures.length,
     warningCount: findings.warnings.length,
   },
@@ -192,13 +193,32 @@ function verifyDisplay({ dashboard, markdown, display }) {
     }
   }
 
+  const checkedDirtyDecisionOptionIds = (dashboard.dirtyReviewWorkbench?.decisionOptions || [])
+    .map(item => item.id)
+    .filter(Boolean);
+  if (checkedDirtyDecisionOptionIds.length && !display.stdout.includes('- decision_option_details:')) {
+    failures.push('show-dashboard output missing dirty review decision_option_details summary.');
+  }
+  for (const id of checkedDirtyDecisionOptionIds) {
+    if (!display.stdout.includes(`${id}:`)) {
+      failures.push(`show-dashboard output missing dirty review decision option id: ${id}`);
+    }
+  }
+
   const markdownLineCount = markdown.split(/\r?\n/).length;
   const outputLineCount = display.stdout.split(/\r?\n/).length;
   if (outputLineCount < Math.max(20, Math.floor(markdownLineCount * 0.7))) {
     warnings.push(`show-dashboard output line count ${outputLineCount} is much smaller than markdown line count ${markdownLineCount}`);
   }
 
-  return { failures, warnings, requiredSections, checkedProspectNames, checkedThreadAttentionIds };
+  return {
+    failures,
+    warnings,
+    requiredSections,
+    checkedProspectNames,
+    checkedThreadAttentionIds,
+    checkedDirtyDecisionOptionIds,
+  };
 }
 
 function renderMarkdown(payload) {
@@ -215,6 +235,7 @@ function renderMarkdown(payload) {
     `- stderr_bytes: ${payload.summary.stderrBytes}`,
     `- checked_prospect_names: ${payload.summary.checkedProspectNameCount}`,
     `- checked_thread_attention: ${payload.summary.checkedThreadAttentionCount}`,
+    `- checked_dirty_decision_options: ${payload.summary.checkedDirtyDecisionOptionCount}`,
     `- failures: ${payload.summary.failureCount}`,
     `- warnings: ${payload.summary.warningCount}`,
     '',

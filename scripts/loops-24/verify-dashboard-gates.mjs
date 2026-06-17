@@ -29,6 +29,7 @@ const findings = mergeFindings(
   verifyDashboardSchema(dashboard, waiting, nextApproval, approvalGroups),
   verifyConnectorHealthSummary(dashboard),
   verifyAccountBindingWorkbenchSummary(dashboard),
+  verifyDirtyReviewWorkbenchSummary(dashboard),
   verifyOwnerApprovalBundleSummary(dashboard),
   verifyApprovalWorkbenchSummary(dashboard),
   verifyWaitingItems(waiting, approvalIndex),
@@ -49,6 +50,7 @@ const payload = {
     dashboardJsonAsciiPortable: portableJsonFindings.failures.length === 0,
     accountBindingAttentionCount: dashboard.accountBindingWorkbench?.summary?.attentionCount ?? null,
     connectorThreadAttentionCount: dashboard.connectorHealth?.summary?.threadAttentionCount ?? null,
+    dirtyReviewWorkbenchDecisionOptionCount: dashboard.dirtyReviewWorkbench?.summary?.decisionOptionCount ?? null,
     failureCount: findings.failures.length,
     warningCount: findings.warnings.length,
   },
@@ -78,6 +80,14 @@ const payload = {
           attentionCount: dashboard.connectorHealth.summary?.attentionCount ?? null,
           threadAttentionCount: dashboard.connectorHealth.summary?.threadAttentionCount ?? null,
           threadAttentionIds: dashboard.connectorHealth.summary?.threadAttentionIds ?? null,
+        }
+      : null,
+    dirtyReviewWorkbench: dashboard.dirtyReviewWorkbench
+      ? {
+          status: dashboard.dirtyReviewWorkbench.status ?? null,
+          decisionOptionCount: dashboard.dirtyReviewWorkbench.summary?.decisionOptionCount ?? null,
+          decisionOptionIds: dashboard.dirtyReviewWorkbench.summary?.decisionOptionIds ?? null,
+          ownerApprovalRequiredCount: dashboard.dirtyReviewWorkbench.summary?.ownerApprovalRequiredCount ?? null,
         }
       : null,
     failures: findings.failures,
@@ -321,6 +331,68 @@ function verifyAccountBindingWorkbenchSummary(dashboard) {
   return { failures, warnings };
 }
 
+function verifyDirtyReviewWorkbenchSummary(dashboard) {
+  const failures = [];
+  const warnings = [];
+  const workbench = dashboard.dirtyReviewWorkbench;
+  const dashboardSummary = dashboard.summary || {};
+
+  if (!workbench || workbench.available === false) {
+    warnings.push('Dashboard has no dirtyReviewWorkbench artifact summary to verify.');
+    return { failures, warnings };
+  }
+
+  const summary = workbench.summary || {};
+  const options = Array.isArray(workbench.decisionOptions) ? workbench.decisionOptions : [];
+  const optionIds = options.map(option => option.id).filter(Boolean);
+  const summaryOptionIds = Array.isArray(summary.decisionOptionIds)
+    ? summary.decisionOptionIds
+    : [];
+  const optionCount = Number(summary.decisionOptionCount);
+  const ownerApprovalRequiredCount = Number(summary.ownerApprovalRequiredCount);
+  const expectedOwnerApprovalRequired = options.filter(option => option.status === 'owner_approval_required').length;
+
+  if (!Number.isFinite(optionCount)) {
+    failures.push('dirtyReviewWorkbench.summary.decisionOptionCount is missing or invalid.');
+  } else if (optionCount !== options.length) {
+    failures.push(`dirtyReviewWorkbench.summary.decisionOptionCount expected ${options.length} got ${summary.decisionOptionCount}`);
+  }
+  if (JSON.stringify(summaryOptionIds) !== JSON.stringify(optionIds)) {
+    failures.push(`dirtyReviewWorkbench.summary.decisionOptionIds expected ${optionIds.join(', ') || '(none)'} got ${summaryOptionIds.join(', ') || '(none)'}`);
+  }
+  if (!Number.isFinite(ownerApprovalRequiredCount)) {
+    failures.push('dirtyReviewWorkbench.summary.ownerApprovalRequiredCount is missing or invalid.');
+  } else if (ownerApprovalRequiredCount !== expectedOwnerApprovalRequired) {
+    failures.push(`dirtyReviewWorkbench.summary.ownerApprovalRequiredCount expected ${expectedOwnerApprovalRequired} got ${summary.ownerApprovalRequiredCount}`);
+  }
+  if (Number(dashboardSummary.dirtyReviewWorkbenchDecisionOptionCount || 0) !== Number(summary.decisionOptionCount || 0)) {
+    failures.push(`summary.dirtyReviewWorkbenchDecisionOptionCount expected ${summary.decisionOptionCount || 0} got ${dashboardSummary.dirtyReviewWorkbenchDecisionOptionCount}`);
+  }
+  if (Number(dashboardSummary.dirtyReviewWorkbenchOwnerApprovalRequiredCount || 0) !== Number(summary.ownerApprovalRequiredCount || 0)) {
+    failures.push(`summary.dirtyReviewWorkbenchOwnerApprovalRequiredCount expected ${summary.ownerApprovalRequiredCount || 0} got ${dashboardSummary.dirtyReviewWorkbenchOwnerApprovalRequiredCount}`);
+  }
+
+  const seen = new Set();
+  for (const option of options) {
+    const id = option.id || '(unknown)';
+    if (!option.id) failures.push('dirtyReviewWorkbench.decisionOptions contains an option without id.');
+    if (option.id && seen.has(option.id)) failures.push(`dirtyReviewWorkbench.decisionOptions duplicate id: ${option.id}`);
+    if (option.id) seen.add(option.id);
+    if (!option.status) failures.push(`dirtyReviewWorkbench.decisionOptions ${id} missing status.`);
+    if (option.commandCount === undefined || !Number.isInteger(Number(option.commandCount))) {
+      failures.push(`dirtyReviewWorkbench.decisionOptions ${id} missing commandCount.`);
+    }
+    if (option.affectedPathCount === undefined || !Number.isInteger(Number(option.affectedPathCount))) {
+      failures.push(`dirtyReviewWorkbench.decisionOptions ${id} missing affectedPathCount.`);
+    }
+    if (option.status === 'owner_approval_required' && !option.ownerAction) {
+      failures.push(`dirtyReviewWorkbench.decisionOptions ${id} owner_approval_required missing ownerAction.`);
+    }
+  }
+
+  return { failures, warnings };
+}
+
 function verifyApprovalWorkbenchSummary(dashboard) {
   const failures = [];
   const warnings = [];
@@ -523,6 +595,7 @@ function renderMarkdown(payload) {
     `- ok: ${payload.ok}`,
     `- waiting_count: ${payload.summary.waitingCount}`,
     `- approval_group_count: ${payload.summary.approvalGroupCount}`,
+    `- dirty_review_decision_options: ${payload.summary.dirtyReviewWorkbenchDecisionOptionCount ?? '(unknown)'}`,
     `- failure_count: ${payload.summary.failureCount}`,
     `- warning_count: ${payload.summary.warningCount}`,
     '',
