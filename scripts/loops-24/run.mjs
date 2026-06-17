@@ -1220,6 +1220,12 @@ async function runPostDashboardAutoCompletions(candidates, autoCompletions, resu
         ['scripts/loops-24/prepare-approval-workbench.mjs'],
         120_000
       ),
+      runLocalStep(
+        'verify-approval-workbench',
+        'node',
+        ['scripts/loops-24/verify-approval-workbench.mjs'],
+        120_000
+      ),
     ];
   }
 

@@ -539,6 +539,17 @@ Latest approval workbench path:
 %USERPROFILE%\.codex\automations\loops-24\approval-workbench\latest.json
 ```
 
+Verify that the approval workbench is still a faithful projection of the latest
+owner bundle and owner-bundle verifier:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\verify-approval-workbench.ps1
+```
+
+The workbench verifier reads local JSON artifacts only. It does not run approval
+commands, push, create a PR, deploy, call protected endpoints, write secrets, or
+send messages.
+
 When Windows `WakeToRun` is disabled, the owner bundle includes a
 `power_wake_policy` gate. That gate asks whether hourly LOOPS should wake a
 sleeping machine, but it never exposes or runs a Task Scheduler command.
