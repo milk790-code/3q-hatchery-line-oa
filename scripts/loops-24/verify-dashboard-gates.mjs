@@ -27,6 +27,7 @@ const portableJsonFindings = verifyPortableJsonSource(dashboardJsonSource);
 const findings = mergeFindings(
   portableJsonFindings,
   verifyDashboardSchema(dashboard, waiting, nextApproval, approvalGroups),
+  verifyConnectorHealthSummary(dashboard),
   verifyAccountBindingWorkbenchSummary(dashboard),
   verifyOwnerApprovalBundleSummary(dashboard),
   verifyApprovalWorkbenchSummary(dashboard),
@@ -47,6 +48,7 @@ const payload = {
     approvalGroupCount: nextApproval.length,
     dashboardJsonAsciiPortable: portableJsonFindings.failures.length === 0,
     accountBindingAttentionCount: dashboard.accountBindingWorkbench?.summary?.attentionCount ?? null,
+    connectorThreadAttentionCount: dashboard.connectorHealth?.summary?.threadAttentionCount ?? null,
     failureCount: findings.failures.length,
     warningCount: findings.warnings.length,
   },
@@ -69,6 +71,13 @@ const payload = {
           attentionCount: dashboard.accountBindingWorkbench.summary?.attentionCount ?? null,
           nextBindingId: dashboard.accountBindingWorkbench.summary?.nextBindingId ?? null,
           nextBindingLabel: dashboard.accountBindingWorkbench.summary?.nextBindingLabel ?? null,
+        }
+      : null,
+    connectorHealth: dashboard.connectorHealth
+      ? {
+          attentionCount: dashboard.connectorHealth.summary?.attentionCount ?? null,
+          threadAttentionCount: dashboard.connectorHealth.summary?.threadAttentionCount ?? null,
+          threadAttentionIds: dashboard.connectorHealth.summary?.threadAttentionIds ?? null,
         }
       : null,
     failures: findings.failures,
@@ -192,6 +201,49 @@ function verifyDashboardSchema(dashboard, waiting, nextApproval, approvalGroups)
   }
   if (!summary.topAction && dashboard.loopos?.morningDecision?.label) {
     warnings.push('summary.topAction is missing while loopos.morningDecision exists.');
+  }
+
+  return { failures, warnings };
+}
+
+function verifyConnectorHealthSummary(dashboard) {
+  const failures = [];
+  const warnings = [];
+  const connectorHealth = dashboard.connectorHealth;
+  const dashboardSummary = dashboard.summary || {};
+
+  if (!connectorHealth || connectorHealth.available === false) {
+    warnings.push('Dashboard has no connectorHealth artifact summary to verify.');
+    return { failures, warnings };
+  }
+
+  const summary = connectorHealth.summary || {};
+  const threadAttention = Array.isArray(connectorHealth.threadAttention)
+    ? connectorHealth.threadAttention
+    : [];
+  const threadAttentionIds = threadAttention.map(item => item.id).filter(Boolean);
+  const summaryThreadAttentionIds = Array.isArray(summary.threadAttentionIds)
+    ? summary.threadAttentionIds
+    : [];
+
+  if (Number(summary.threadAttentionCount || 0) !== threadAttention.length) {
+    failures.push(`connectorHealth.summary.threadAttentionCount expected ${threadAttention.length} got ${summary.threadAttentionCount}`);
+  }
+  if (JSON.stringify(summaryThreadAttentionIds) !== JSON.stringify(threadAttentionIds)) {
+    failures.push(`connectorHealth.summary.threadAttentionIds expected ${threadAttentionIds.join(', ') || '(none)'} got ${summaryThreadAttentionIds.join(', ') || '(none)'}`);
+  }
+  if (Number(dashboardSummary.connectorThreadAttentionCount || 0) !== Number(summary.threadAttentionCount || 0)) {
+    failures.push(`summary.connectorThreadAttentionCount expected ${summary.threadAttentionCount || 0} got ${dashboardSummary.connectorThreadAttentionCount}`);
+  }
+
+  for (const item of threadAttention) {
+    const id = item.id || '(unknown)';
+    if (!['attention', 'failed'].includes(item.threadStatus)) {
+      failures.push(`connectorHealth.threadAttention ${id} threadStatus expected attention/failed got ${item.threadStatus}`);
+    }
+    if (!item.checkedAt) failures.push(`connectorHealth.threadAttention ${id} missing checkedAt.`);
+    if (!item.probe) failures.push(`connectorHealth.threadAttention ${id} missing probe.`);
+    if (!item.evidence) failures.push(`connectorHealth.threadAttention ${id} missing evidence.`);
   }
 
   return { failures, warnings };

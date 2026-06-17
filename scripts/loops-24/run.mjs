@@ -1835,6 +1835,7 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     nextApproval: loopos.morningDecision?.nextApproval || approvals[0]?.approval || null,
     largestApprovalGroup: approvals[0]?.approval || null,
     connectorAttentionCount: connectorHealth.summary?.attentionCount || 0,
+    connectorThreadAttentionCount: connectorHealth.summary?.threadAttentionCount || 0,
     missingSecretGateCount: secretChecklist.summary?.missingCount || 0,
     secretChecklistVerificationOk: secretChecklist.available ? secretChecklist.verificationOk : null,
     secretChecklistVerificationFailureCount: secretChecklist.available ? secretChecklist.summary?.verificationFailureCount : null,
@@ -2507,13 +2508,45 @@ function summarizeApprovals(blocked) {
 
 function summarizeConnectorHealthArtifact(data) {
   if (!data) return { available: false, summary: null, reportPath: null };
+  const threadAttention = summarizeConnectorThreadAttention(data.connectors);
   return {
     available: true,
     generatedAt: data.generatedAt || null,
     reportPath: data.reportPath || null,
     onlySafeLocal: Boolean(data.onlySafeLocal),
-    summary: data.summary || null,
+    summary: {
+      ...(data.summary || {}),
+      threadAttentionCount: threadAttention.length,
+      threadAttentionIds: threadAttention.map(item => item.id),
+    },
+    threadAttention,
   };
+}
+
+function summarizeConnectorThreadAttention(connectors) {
+  if (!Array.isArray(connectors)) return [];
+  return connectors
+    .filter(item => item?.threadVerification && ['attention', 'failed'].includes(item.threadVerification.status))
+    .map(item => ({
+      id: item.id,
+      label: item.label || item.id,
+      status: item.status || null,
+      threadStatus: item.threadVerification.status,
+      checkedAt: item.threadVerification.checkedAt || null,
+      expiresAt: item.threadVerification.expiresAt || null,
+      probe: compactEvidenceText(item.threadVerification.probe, 96),
+      evidence: compactEvidenceText(item.threadVerification.evidence, 180),
+      reportPath: item.threadVerification.reportPath || null,
+    }));
+}
+
+function compactEvidenceText(value, maxLength) {
+  const text = String(value || '')
+    .replace(/\s+/g, ' ')
+    .replace(/[A-Za-z0-9_./+=-]{40,}/g, '[redacted-long-token]')
+    .trim();
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, Math.max(0, maxLength - 3)).trimEnd()}...`;
 }
 
 function summarizeSecretChecklistArtifact(data, verification) {
@@ -2698,7 +2731,7 @@ function summarizePowerWakePolicyArtifact(data, verification) {
 function renderConnectorHealth(data) {
   if (!data?.available) return ['- No connector health artifact yet.'];
   const summary = data.summary || {};
-  return [
+  const lines = [
     `- report: ${data.reportPath || '(missing)'}`,
     `- ready: ${summary.readyCount || 0}/${summary.total || 0}`,
     `- attention: ${summary.attentionCount || 0}`,
@@ -2706,6 +2739,12 @@ function renderConnectorHealth(data) {
     `- failed_or_expired: ${summary.failedIds?.length ? summary.failedIds.join(', ') : '(none)'}`,
     `- app_auth_unverified: ${summary.authUnverifiedIds?.length ? summary.authUnverifiedIds.join(', ') : '(none)'}`,
   ];
+  const threadAttention = Array.isArray(data.threadAttention) ? data.threadAttention : [];
+  lines.push(`- thread_attention: ${threadAttention.length ? threadAttention.map(item => `${item.id}(${item.threadStatus})`).join(', ') : '(none)'}`);
+  for (const item of threadAttention) {
+    lines.push(`  - ${item.id}: status=${item.status || '(unknown)'} checked_at=${item.checkedAt || '(unknown)'} probe=${item.probe || '(none)'} evidence=${item.evidence || '(none)'}`);
+  }
+  return lines;
 }
 
 function renderSecretChecklist(data) {

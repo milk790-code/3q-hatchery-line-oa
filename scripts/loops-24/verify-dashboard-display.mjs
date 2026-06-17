@@ -43,6 +43,7 @@ const payload = {
     stderrBytes: Buffer.byteLength(display.stderr, 'utf8'),
     requiredSectionCount: findings.requiredSections.length,
     checkedProspectNameCount: findings.checkedProspectNames.length,
+    checkedThreadAttentionCount: findings.checkedThreadAttentionIds.length,
     failureCount: findings.failures.length,
     warningCount: findings.warnings.length,
   },
@@ -179,13 +180,25 @@ function verifyDisplay({ dashboard, markdown, display }) {
     }
   }
 
+  const checkedThreadAttentionIds = (dashboard.connectorHealth?.threadAttention || [])
+    .map(item => item.id)
+    .filter(Boolean);
+  if (checkedThreadAttentionIds.length && !display.stdout.includes('- thread_attention:')) {
+    failures.push('show-dashboard output missing connector thread_attention summary.');
+  }
+  for (const id of checkedThreadAttentionIds) {
+    if (!display.stdout.includes(`${id}(`) && !display.stdout.includes(`${id}:`)) {
+      failures.push(`show-dashboard output missing thread attention connector id: ${id}`);
+    }
+  }
+
   const markdownLineCount = markdown.split(/\r?\n/).length;
   const outputLineCount = display.stdout.split(/\r?\n/).length;
   if (outputLineCount < Math.max(20, Math.floor(markdownLineCount * 0.7))) {
     warnings.push(`show-dashboard output line count ${outputLineCount} is much smaller than markdown line count ${markdownLineCount}`);
   }
 
-  return { failures, warnings, requiredSections, checkedProspectNames };
+  return { failures, warnings, requiredSections, checkedProspectNames, checkedThreadAttentionIds };
 }
 
 function renderMarkdown(payload) {
@@ -201,6 +214,7 @@ function renderMarkdown(payload) {
     `- stdout_bytes: ${payload.summary.stdoutBytes}`,
     `- stderr_bytes: ${payload.summary.stderrBytes}`,
     `- checked_prospect_names: ${payload.summary.checkedProspectNameCount}`,
+    `- checked_thread_attention: ${payload.summary.checkedThreadAttentionCount}`,
     `- failures: ${payload.summary.failureCount}`,
     `- warnings: ${payload.summary.warningCount}`,
     '',
