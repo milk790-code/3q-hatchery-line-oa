@@ -209,11 +209,12 @@ The dashboard also embeds compact summaries for connector health, local secret
 checklist status, and dirty worktree groups so the hourly loop can mark broken
 authorization or unsafe git scope without requiring a separate file hunt.
 It also embeds the latest approval workbench status, `expires_at`,
-`expires_at_taipei`, expired flag, ready command count, manual gate count,
-attention gate count, and verifier failure count. This keeps cross-session
-approval handoffs honest: if the workbench expires, the dashboard shows that
-owner commands must be regenerated before use. The dashboard keeps UTC fields
-for machine checks and adds Taipei-time fields for owner review.
+`expires_at_taipei`, `expires_in_minutes`, expired flag, ready command count,
+manual gate count, attention gate count, and verifier failure count. This keeps
+cross-session approval handoffs honest: if the workbench expires, the dashboard
+shows that owner commands must be regenerated before use. The dashboard keeps
+UTC fields for machine checks and adds Taipei-time fields plus a remaining
+minutes value for owner review.
 
 Verify that manual-gated waiting items are mapped to the expected approval
 groups:

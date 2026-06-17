@@ -1561,6 +1561,7 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     dirtyDeployCount: dirtyClassification.summary?.deploy || 0,
     approvalWorkbenchExpired: approvalWorkbench.available ? approvalWorkbench.summary?.expired : null,
     approvalWorkbenchExpiresAtTaipei: approvalWorkbench.available ? approvalWorkbench.summary?.expiresAtTaipei : null,
+    approvalWorkbenchExpiresInMinutes: approvalWorkbench.available ? approvalWorkbench.summary?.expiresInMinutes : null,
     approvalWorkbenchReadyCommandCount: approvalWorkbench.available ? Number(approvalWorkbench.summary?.readyCommandCount || 0) : null,
     approvalWorkbenchAttentionGateCount: approvalWorkbench.available ? Number(approvalWorkbench.summary?.attentionGateCount || 0) : null,
   };
@@ -2180,6 +2181,7 @@ function summarizeApprovalWorkbenchArtifact(data, relativeTo = new Date()) {
   if (!data) return { available: false, summary: null, reportPath: null };
   const expiresAt = data.expiresAt || data.summary?.expiresAt || null;
   const expiresAtTaipei = formatTaipeiTime(expiresAt);
+  const expiresInMinutes = minutesUntil(expiresAt, relativeTo);
   const expired = isTimestampExpired(expiresAt, relativeTo);
   return {
     available: true,
@@ -2193,6 +2195,7 @@ function summarizeApprovalWorkbenchArtifact(data, relativeTo = new Date()) {
       ...(data.summary || {}),
       expiresAt,
       expiresAtTaipei,
+      expiresInMinutes,
       expired,
     },
   };
@@ -2242,6 +2245,7 @@ function renderApprovalWorkbench(data) {
     `- status: ${data.status || '(unknown)'}`,
     `- expires_at: ${summary.expiresAt || '(missing)'}`,
     `- expires_at_taipei: ${summary.expiresAtTaipei || '(unknown)'}`,
+    `- expires_in_minutes: ${summary.expiresInMinutes ?? '(unknown)'}`,
     `- expired: ${summary.expired === true}`,
     `- ready_commands: ${summary.readyCommandCount ?? 0}`,
     `- manual_gates: ${summary.manualGateCount ?? 0}`,
@@ -2332,6 +2336,12 @@ function isTimestampExpired(value, relativeTo = new Date()) {
   const timestamp = Date.parse(value || '');
   if (!Number.isFinite(timestamp)) return null;
   return timestamp <= relativeTo.getTime();
+}
+
+function minutesUntil(value, relativeTo = new Date()) {
+  const timestamp = Date.parse(value || '');
+  if (!Number.isFinite(timestamp)) return null;
+  return round((timestamp - relativeTo.getTime()) / 60_000);
 }
 
 function formatTaipeiTime(value) {
