@@ -1269,6 +1269,14 @@ async function runPostDashboardAutoCompletions(candidates, autoCompletions, resu
     await writeReport(result, candidates, next);
     await writeDashboard(result, candidates, next);
 
+    const workerApprovalRefresh = await ensureWorkerDeployApprovalPacketsCurrent(next);
+    if (workerApprovalRefresh.length) {
+      next = [...next, ...workerApprovalRefresh];
+      refreshResultSummaries(result, candidates, next, taskRegistry);
+      await writeReport(result, candidates, next);
+      await writeDashboard(result, candidates, next);
+    }
+
     next = [
       ...next,
       runLocalStep(
@@ -1311,6 +1319,71 @@ async function runPostDashboardAutoCompletions(candidates, autoCompletions, resu
   }
 
   return next;
+}
+
+async function ensureWorkerDeployApprovalPacketsCurrent(completions = []) {
+  const labels = new Set((completions || []).map(item => item.label));
+  const current = currentWorktreeFingerprint();
+  if (!current.ok) return [];
+
+  const steps = [];
+  let boundary = await readJson(path.join(stateDir, 'commit-boundaries', 'latest.json'), null);
+  if (boundary?.statusFingerprint !== current.statusFingerprint) {
+    const boundaryStep = runLocalStep(
+      'plan-commit-boundaries',
+      'node',
+      ['scripts/loops-24/plan-commit-boundaries.mjs'],
+      120_000
+    );
+    steps.push(boundaryStep);
+    if (boundaryStep.status !== 'completed') return steps;
+    boundary = await readJson(path.join(stateDir, 'commit-boundaries', 'latest.json'), null);
+  }
+
+  const deployGroups = Array.isArray(boundary?.groups)
+    ? boundary.groups.filter(group => group.gate === 'deploy-approval')
+    : [];
+  if (deployGroups.length === 0) return steps;
+
+  let workerReview = await readJson(path.join(stateDir, 'worker-deploy-reviews', 'latest.json'), null);
+  if (!labels.has('review:worker_deploy_slices') && workerReview?.statusFingerprint !== current.statusFingerprint) {
+    const reviewStep = runLocalStep(
+      'review:worker_deploy_slices',
+      'node',
+      ['scripts/loops-24/review-worker-deploy-slices.mjs'],
+      120_000
+    );
+    steps.push(reviewStep);
+    if (reviewStep.status !== 'completed') return steps;
+    workerReview = await readJson(path.join(stateDir, 'worker-deploy-reviews', 'latest.json'), null);
+  }
+
+  let checklist = await readJson(path.join(stateDir, 'worker-deploy-checklists', 'latest.json'), null);
+  if (!labels.has('prepare-worker-deploy-checklist')
+    && (checklist?.statusFingerprint !== current.statusFingerprint || checklist?.workerReviewPath !== workerReview?.reportPath)) {
+    const checklistStep = runLocalStep(
+      'prepare-worker-deploy-checklist',
+      'node',
+      ['scripts/loops-24/prepare-worker-deploy-checklist.mjs'],
+      120_000
+    );
+    steps.push(checklistStep);
+    if (checklistStep.status !== 'completed') return steps;
+    checklist = await readJson(path.join(stateDir, 'worker-deploy-checklists', 'latest.json'), null);
+  }
+
+  const verification = await readJson(path.join(stateDir, 'worker-deploy-checklist-verifications', 'latest.json'), null);
+  if (!labels.has('verify-worker-deploy-checklist')
+    && (verification?.ok !== true || verification?.checklistJsonPath !== checklist?.jsonPath)) {
+    steps.push(runLocalStep(
+      'verify-worker-deploy-checklist',
+      'node',
+      ['scripts/loops-24/verify-worker-deploy-checklist.mjs'],
+      120_000
+    ));
+  }
+
+  return steps;
 }
 
 async function ensureGithubApprovalPacketsCurrent(completions = []) {
