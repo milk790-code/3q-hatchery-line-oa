@@ -23,6 +23,7 @@ const approvalGroups = Array.isArray(dashboard.approvalGroups) ? dashboard.appro
 const approvalIndex = buildApprovalIndex(nextApproval);
 const findings = mergeFindings(
   verifyDashboardSchema(dashboard, waiting, nextApproval, approvalGroups),
+  verifyApprovalWorkbenchSummary(dashboard),
   verifyWaitingItems(waiting, approvalIndex),
 );
 const payload = {
@@ -149,6 +150,57 @@ function verifyDashboardSchema(dashboard, waiting, nextApproval, approvalGroups)
   return { failures, warnings };
 }
 
+function verifyApprovalWorkbenchSummary(dashboard) {
+  const failures = [];
+  const warnings = [];
+  const workbench = dashboard.approvalWorkbench;
+  const dashboardSummary = dashboard.summary || {};
+
+  if (!workbench || workbench.available === false) {
+    warnings.push('Dashboard has no approvalWorkbench artifact summary to verify.');
+    return { failures, warnings };
+  }
+
+  const summary = workbench.summary || {};
+  const relativeTo = dashboard.generatedAt || dashboard.generatedAtTaipei;
+  const expectedMinutes = minutesUntil(summary.expiresAt, relativeTo);
+  const actualMinutes = toFiniteNumber(summary.expiresInMinutes);
+  const mirroredMinutes = toFiniteNumber(dashboardSummary.approvalWorkbenchExpiresInMinutes);
+
+  if (!summary.expiresAt || expectedMinutes === null) {
+    failures.push('approvalWorkbench.summary.expiresAt is missing or invalid.');
+  }
+  if (!summary.expiresAtTaipei) {
+    failures.push('approvalWorkbench.summary.expiresAtTaipei is missing.');
+  }
+  if (actualMinutes === null) {
+    failures.push('approvalWorkbench.summary.expiresInMinutes is missing or invalid.');
+  } else if (expectedMinutes !== null && Math.abs(actualMinutes - expectedMinutes) > 0.01) {
+    failures.push(`approvalWorkbench.summary.expiresInMinutes expected ${expectedMinutes} got ${actualMinutes}`);
+  }
+  if (mirroredMinutes === null) {
+    failures.push('summary.approvalWorkbenchExpiresInMinutes is missing or invalid.');
+  } else if (actualMinutes !== null && Math.abs(mirroredMinutes - actualMinutes) > 0.01) {
+    failures.push(`summary.approvalWorkbenchExpiresInMinutes expected ${actualMinutes} got ${mirroredMinutes}`);
+  }
+  if (dashboardSummary.approvalWorkbenchExpiresAtTaipei !== summary.expiresAtTaipei) {
+    failures.push(`summary.approvalWorkbenchExpiresAtTaipei expected ${summary.expiresAtTaipei} got ${dashboardSummary.approvalWorkbenchExpiresAtTaipei}`);
+  }
+
+  const expectedExpired = isTimestampExpired(summary.expiresAt, relativeTo);
+  if (expectedExpired !== null && summary.expired !== expectedExpired) {
+    failures.push(`approvalWorkbench.summary.expired expected ${expectedExpired} got ${summary.expired}`);
+  }
+  if (dashboardSummary.approvalWorkbenchExpired !== summary.expired) {
+    failures.push(`summary.approvalWorkbenchExpired expected ${summary.expired} got ${dashboardSummary.approvalWorkbenchExpired}`);
+  }
+  if (summary.expired === true && workbench.status === 'ready-for-owner-decision') {
+    failures.push('approvalWorkbench is expired but still marked ready-for-owner-decision.');
+  }
+
+  return { failures, warnings };
+}
+
 function verifyWaitingItems(items, approvalIndex) {
   const failures = [];
   const warnings = [];
@@ -254,4 +306,27 @@ function renderMarkdown(payload) {
 
 function hash(value) {
   return createHash('sha256').update(value).digest('hex').slice(0, 16);
+}
+
+function minutesUntil(value, relativeTo) {
+  const timestamp = Date.parse(value || '');
+  const reference = Date.parse(relativeTo || '');
+  if (!Number.isFinite(timestamp) || !Number.isFinite(reference)) return null;
+  return round((timestamp - reference) / 60_000);
+}
+
+function isTimestampExpired(value, relativeTo) {
+  const timestamp = Date.parse(value || '');
+  const reference = Date.parse(relativeTo || '');
+  if (!Number.isFinite(timestamp) || !Number.isFinite(reference)) return null;
+  return timestamp <= reference;
+}
+
+function toFiniteNumber(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+}
+
+function round(value) {
+  return Math.round(value * 1000) / 1000;
 }

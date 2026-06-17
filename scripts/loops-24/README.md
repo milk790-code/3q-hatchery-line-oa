@@ -226,6 +226,9 @@ powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\verify-dashboard-gat
 The verifier reads only the local dashboard JSON and writes a local report under
 the automation state directory. It does not push, create a PR, deploy, call
 protected endpoints, write secrets, or send messages.
+It also recomputes approval workbench expiry from the dashboard generation time
+and fails if `expires_in_minutes`, the Taipei-time mirror, or the expired flag
+drift from the embedded workbench artifact.
 
 The morning decision is derived from the selected candidates, lane priority, risk
 signals, and manual gates. Task registry metadata is read from:
