@@ -146,15 +146,19 @@ console.log(JSON.stringify({
 }, null, 2));
 
 function summarizeGroup(group) {
+  const wranglerChecks = (group.wranglerChecks || []).length
+    ? group.wranglerChecks
+    : inferredWranglerChecksForGroup(group);
   return {
     id: group.id,
     title: group.title,
     ok: Boolean(group.ok),
     paths: (group.paths || []).map(item => item.path),
-    wranglerConfigs: (group.wranglerChecks || []).map(item => ({
+    wranglerConfigs: wranglerChecks.map(item => ({
       path: item.path,
       name: item.name,
       ok: item.ok,
+      inferred: Boolean(item.inferred),
       crons: item.crons || [],
       bindings: item.bindings || [],
     })),
@@ -162,7 +166,10 @@ function summarizeGroup(group) {
 }
 
 function deployCommandsForGroup(group) {
-  return (group.wranglerChecks || []).map(item => {
+  const wranglerChecks = (group.wranglerChecks || []).length
+    ? group.wranglerChecks
+    : inferredWranglerChecksForGroup(group);
+  return wranglerChecks.map(item => {
     const dir = path.dirname(item.path).replaceAll('\\', '/');
     return {
       group: group.id,
@@ -172,6 +179,23 @@ function deployCommandsForGroup(group) {
       postDeployChecks: postDeployChecks(group.id),
     };
   });
+}
+
+function inferredWranglerChecksForGroup(group) {
+  const knownConfigs = {
+    webhook_cron_outcome: 'webhook/wrangler.toml',
+    social_publisher_worker: 'workers/social-publisher/wrangler.toml',
+  };
+  const configPath = knownConfigs[group.id];
+  if (!configPath) return [];
+  const absolutePath = path.join(repoRoot, configPath);
+  if (!fssync.existsSync(absolutePath)) return [];
+  return [{
+    path: configPath,
+    name: group.id,
+    ok: true,
+    inferred: true,
+  }];
 }
 
 function postDeployChecks(groupId) {

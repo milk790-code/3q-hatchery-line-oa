@@ -774,7 +774,8 @@ powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\prepare-worker-deplo
 ```
 
 The checklist includes inferred deploy commands and post-deploy verification
-steps, but it does not run `wrangler deploy` or call protected endpoints.
+steps, including known Worker config fallbacks when only `worker.js` is dirty,
+but it does not run `wrangler deploy` or call protected endpoints.
 
 ## Review frontend/artifact payload
 
