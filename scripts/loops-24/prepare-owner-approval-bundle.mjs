@@ -31,6 +31,7 @@ const worker = await readJson(path.join(stateDir, 'worker-deploy-checklists', 'l
 const secrets = await readJson(path.join(stateDir, 'secret-gates', 'latest.json'), null);
 const wakeup = await readJson(path.join(stateDir, 'wakeup-health', 'latest.json'), null);
 const boundary = await readJson(path.join(stateDir, 'commit-boundaries', 'latest.json'), null);
+const dirtyClassification = await readJson(path.join(stateDir, 'dirty-worktree', 'latest.json'), null);
 const frontend = await readJson(path.join(stateDir, 'frontend-slice-handoffs', 'latest.json'), null);
 const contentQueue = await readJson(path.join(stateDir, 'content-queue-reconciliations', 'latest.json'), null);
 const dashboard = await readJson(path.join(stateDir, 'dashboard', 'latest.json'), null);
@@ -83,6 +84,7 @@ const statusFingerprint = gitWorktreeFingerprint({ cwd: repoRoot, statusLines })
 const trackedStatusFingerprint = gitWorktreeFingerprint({ cwd: repoRoot, statusLines: trackedDirtyLines });
 const localInvestorPacketPaths = listLocalInvestorPacketPaths();
 const localScopeClean = stagedLines.length === 0 && unexpectedDirty.length === 0 && unexpectedUntracked.length === 0;
+const dirtyClassificationReport = dirtyClassification?.reportPath || null;
 
 const missingSecrets = Array.isArray(secrets?.summary?.missing) ? secrets.summary.missing : [];
 const workerCommands = Array.isArray(worker?.commands) ? worker.commands : [];
@@ -129,7 +131,7 @@ const gates = [
     ownerAction: 'Confirm the only remaining dirty paths are deploy-gated Worker slices and no unrelated untracked paths are present.',
     evidence: localScopeClean
       ? `Tracked dirty files are limited to: ${dirtyPaths.join(', ') || '(none)'}; untracked=(none).`
-      : `Unexpected dirty, untracked, or staged changes exist. staged=${stagedLines.join(', ') || '(none)'} unexpected=${unexpectedDirty.join(', ') || '(none)'} untracked=${unexpectedUntracked.join(', ') || '(none)'}`,
+      : `Unexpected dirty, untracked, or staged changes exist. staged=${stagedLines.join(', ') || '(none)'} unexpected=${unexpectedDirty.join(', ') || '(none)'} untracked=${unexpectedUntracked.join(', ') || '(none)'} dirtyReport=${dirtyClassificationReport || '(missing)'}`,
   },
   ...(localInvestorPacketPaths.length ? [{
     id: 'investor_review',
@@ -243,6 +245,7 @@ const payload = {
     secretGates: secrets?.reportPath || null,
     wakeupHealth: wakeupHealth?.reportPath || null,
     commitBoundaries: boundary?.reportPath || null,
+    dirtyWorktree: dirtyClassificationReport,
     frontendHandoffs: frontend?.reportPath || null,
     contentQueue: contentQueue?.reportPath || null,
     dashboardGateVerification: dashboardGates?.reportPath || null,
@@ -342,7 +345,7 @@ function renderMarkdown(payload) {
     '## What This Bundle Lets The Owner Decide',
     '',
     '- Publish the committed control-plane work as a draft PR.',
-    '- Review whether the four dirty Worker deploy files should be staged, committed, or deployed later.',
+    '- Review whether deploy-gated Worker paths and local debug artifacts should be staged, committed, restored, or deployed later.',
     '- Decide whether Windows should wake from sleep for hourly LOOPS runs.',
     '- Add missing secrets only in the local machine environment.',
     '- Keep all outreach and public publishing manual-send only.',
@@ -350,7 +353,7 @@ function renderMarkdown(payload) {
     '## What This Does Not Approve',
     '',
     '- It does not authorize `git push`, PR creation, merge, deploy, secret writes, protected endpoint calls, public posting, or outbound sends.',
-    '- It does not include the dirty Worker files in a PR unless the owner separately approves staging/committing those files.',
+    '- It does not include dirty deploy or debug-artifact paths in a PR unless the owner separately approves staging/committing those files.',
     '- It does not change Windows Task Scheduler or power-management settings.',
     '- It does not store or print secret values.',
     '',
@@ -392,7 +395,7 @@ function renderMarkdown(payload) {
     '',
     '## Recommended Approval Order',
     '',
-    '1. Review this bundle and the four dirty Worker deploy files.',
+    '1. Review this bundle, the dirty worktree classification, and any deploy/debug artifact paths.',
     '2. If you approve GitHub publication, run the Push And Draft PR commands.',
     '3. If you approve Worker deploy, first decide whether to commit the Worker slice or deploy from the dirty worktree, then run the Worker Deploy commands.',
     '4. Add missing secrets only in the local secret file or shell environment.',

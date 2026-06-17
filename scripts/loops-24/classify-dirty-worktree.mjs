@@ -36,6 +36,7 @@ const payload = {
     deploy: groups.deploy.records.length,
     investor: groups.investor.records.length,
     repoHygiene: groups.repo_hygiene.records.length,
+    debugArtifacts: groups.debug_artifacts.records.length,
     other: groups.other.records.length,
   },
   groups: Object.values(groups).map(group => ({
@@ -84,6 +85,13 @@ function classify(inputRecords) {
       recommendation: 'Safe to review locally; commit separately from deploy and investor materials after verification.',
       records: [],
     },
+    debug_artifacts: {
+      id: 'debug-artifacts',
+      title: 'Debug / deploy evidence artifacts',
+      gate: 'local-review',
+      recommendation: 'Review separately; if intentional, commit as cleanup, otherwise restore before PR publication or deploy approval.',
+      records: [],
+    },
     other: {
       id: 'other',
       title: 'Other changed paths',
@@ -97,6 +105,7 @@ function classify(inputRecords) {
     if (isDeployPath(record.path)) groups.deploy.records.push(record);
     else if (record.path.startsWith('investor-packet/')) groups.investor.records.push(record);
     else if (isRepoHygienePath(record.path)) groups.repo_hygiene.records.push(record);
+    else if (isDebugArtifactPath(record.path)) groups.debug_artifacts.records.push(record);
     else groups.other.records.push(record);
   }
   return groups;
@@ -125,6 +134,10 @@ function isRepoHygienePath(pathName) {
     || pathName.startsWith('.claude/');
 }
 
+function isDebugArtifactPath(pathName) {
+  return pathName.startsWith('_debug/');
+}
+
 function renderMarkdown(payload) {
   const lines = [
     '# LOOPS Dirty Worktree Classification',
@@ -139,6 +152,7 @@ function renderMarkdown(payload) {
     `- deploy: ${payload.summary.deploy}`,
     `- investor: ${payload.summary.investor}`,
     `- repo_hygiene: ${payload.summary.repoHygiene}`,
+    `- debug_artifacts: ${payload.summary.debugArtifacts}`,
     `- other: ${payload.summary.other}`,
     '',
     '## Groups',
@@ -166,6 +180,7 @@ function renderMarkdown(payload) {
   lines.push('');
   lines.push('- Do not stage deploy paths until deploy approval exists.');
   lines.push('- Do not send, share, or publish investor paths without explicit investor-review approval.');
+  lines.push('- Do not mix debug artifact cleanup with deploy, PR publication, or investor materials.');
   lines.push('- Keep repo-hygiene changes separate from deploy and investor slices.');
   return lines.join('\n');
 }
