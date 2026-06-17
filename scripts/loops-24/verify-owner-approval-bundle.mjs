@@ -144,6 +144,7 @@ function verifyBundle(bundle, context, related) {
   requireEqual(failures, 'branch', bundle.branch, context.branch);
   requireEqual(failures, 'upstream', bundle.upstream || '', context.upstream || '');
   requireEqual(failures, 'head', bundle.head, context.head);
+  requireEqual(failures, 'headCurrent', bundle.headCurrent, bundle.head === context.head);
   requireEqual(failures, 'ahead', Number(bundle.ahead), context.ahead);
   requireEqual(failures, 'behind', Number(bundle.behind), context.behind);
   requireEqual(failures, 'statusFingerprint', bundle.statusFingerprint, context.statusFingerprint);
