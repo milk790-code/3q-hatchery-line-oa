@@ -1060,6 +1060,12 @@ async function runAutoCompletions(candidates) {
           ['scripts/loops-24/prepare-worker-deploy-checklist.mjs'],
           120_000
         ));
+        completions.push(runLocalStep(
+          'verify-worker-deploy-checklist',
+          'node',
+          ['scripts/loops-24/verify-worker-deploy-checklist.mjs'],
+          120_000
+        ));
       }
       for (const group of groups) {
         if (group.gate === 'large-payload-review') {

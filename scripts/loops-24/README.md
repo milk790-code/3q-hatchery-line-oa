@@ -777,6 +777,17 @@ The checklist includes inferred deploy commands and post-deploy verification
 steps, including known Worker config fallbacks when only `worker.js` is dirty,
 but it does not run `wrangler deploy` or call protected endpoints.
 
+Verify the latest Worker deploy checklist:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\verify-worker-deploy-checklist.ps1
+```
+
+The verifier checks that ready-for-approval checklists have current Worker
+review evidence, zero attention checks, allowlisted deploy commands, and
+post-deploy verification notes. It does not run `wrangler deploy` or call
+protected endpoints.
+
 ## Review frontend/artifact payload
 
 Create a read-only inventory for the large frontend/artifact group from the
