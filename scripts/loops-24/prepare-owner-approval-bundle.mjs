@@ -65,7 +65,12 @@ const statusLines = runGit(['status', '--short']).split(/\r?\n/).filter(Boolean)
 const trackedDirtyLines = runGit(['status', '--short', '--untracked-files=no']).split(/\r?\n/).filter(Boolean);
 const stagedLines = runGit(['diff', '--cached', '--name-only']).split(/\r?\n/).filter(Boolean);
 const dirtyPaths = trackedDirtyLines.map(parseStatusLine).map(item => item.path);
+const untrackedPaths = statusLines
+  .map(parseStatusLine)
+  .filter(item => item.status === '??')
+  .map(item => item.path);
 const unexpectedDirty = dirtyPaths.filter(file => !expectedDirtyDeployFiles.includes(file));
+const unexpectedUntracked = untrackedPaths.filter(file => !expectedDirtyDeployFiles.includes(file));
 const statusFingerprint = gitWorktreeFingerprint({ cwd: repoRoot, statusLines });
 
 const missingSecrets = Array.isArray(secrets?.summary?.missing) ? secrets.summary.missing : [];
@@ -85,7 +90,7 @@ const wakeToRunEnabled = wakeupHealth?.scheduledTask?.platform === 'win32'
   ? wakeupHealth?.scheduledTask?.wakeToRun === true
   : null;
 const powerWakeNeedsApproval = wakeToRunEnabled === false;
-const localScopeClean = stagedLines.length === 0 && unexpectedDirty.length === 0;
+const localScopeClean = stagedLines.length === 0 && unexpectedDirty.length === 0 && unexpectedUntracked.length === 0;
 const dashboardGatesReady = Boolean(dashboard?.jsonPath
   && dashboardGates?.ok === true
   && dashboardGates?.dashboardJsonPath === dashboard.jsonPath);
@@ -95,10 +100,10 @@ const gates = [
     id: 'local_review',
     label: 'Review local dirty scope',
     status: localScopeClean ? 'ready' : 'attention',
-    ownerAction: 'Confirm the only remaining dirty files are deploy-gated Worker slices.',
+    ownerAction: 'Confirm the only remaining dirty paths are deploy-gated Worker slices and no unrelated untracked paths are present.',
     evidence: localScopeClean
-      ? `Tracked dirty files are limited to: ${dirtyPaths.join(', ') || '(none)'}.`
-      : `Unexpected dirty files or staged changes exist. staged=${stagedLines.join(', ') || '(none)'} unexpected=${unexpectedDirty.join(', ') || '(none)'}`,
+      ? `Tracked dirty files are limited to: ${dirtyPaths.join(', ') || '(none)'}; untracked=(none).`
+      : `Unexpected dirty, untracked, or staged changes exist. staged=${stagedLines.join(', ') || '(none)'} unexpected=${unexpectedDirty.join(', ') || '(none)'} untracked=${unexpectedUntracked.join(', ') || '(none)'}`,
   },
   {
     id: 'wakeup_health',
@@ -191,8 +196,10 @@ const payload = {
   behind,
   statusFingerprint,
   dirtyTracked: trackedDirtyLines,
+  untracked: untrackedPaths,
   expectedDirtyDeployFiles,
   unexpectedDirty,
+  unexpectedUntracked,
   staged: stagedLines,
   artifacts: {
     githubHandoff: github?.reportPath || null,
@@ -311,6 +318,10 @@ function renderMarkdown(payload) {
     '## Current Dirty Tracked Worktree',
     '',
     ...(payload.dirtyTracked.length ? payload.dirtyTracked.map(item => `- \`${item}\``) : ['- none']),
+    '',
+    '## Current Untracked Worktree',
+    '',
+    ...(payload.untracked.length ? payload.untracked.map(item => `- \`${item}\``) : ['- none']),
     '',
     '## Artifacts',
     '',

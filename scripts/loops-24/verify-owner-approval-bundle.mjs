@@ -105,6 +105,10 @@ function readCurrentGitContext() {
   const statusLines = runGit(['status', '--short']).split(/\r?\n/).filter(Boolean);
   const trackedDirtyLines = runGit(['status', '--short', '--untracked-files=no']).split(/\r?\n/).filter(Boolean);
   const stagedLines = runGit(['diff', '--cached', '--name-only']).split(/\r?\n/).filter(Boolean);
+  const untrackedPaths = statusLines
+    .map(parseStatusLine)
+    .filter(item => item.status === '??')
+    .map(item => item.path);
   return {
     branch,
     upstream,
@@ -113,6 +117,7 @@ function readCurrentGitContext() {
     ahead: Number.parseInt(counts[1] || '0', 10),
     statusFingerprint: gitWorktreeFingerprint({ cwd: repoRoot, statusLines }),
     dirtyPaths: trackedDirtyLines.map(parseStatusLine).map(item => item.path),
+    untrackedPaths,
     stagedLines,
   };
 }
@@ -147,11 +152,27 @@ function verifyBundle(bundle, context, related) {
     if (!gateById.has(id)) failures.push(`missing gate ${id}`);
   }
 
+  const expectedDirtyDeployFiles = Array.isArray(bundle.expectedDirtyDeployFiles) ? bundle.expectedDirtyDeployFiles : [];
+  const expectedUnexpectedDirty = context.dirtyPaths.filter(file => !expectedDirtyDeployFiles.includes(file));
+  const expectedUnexpectedUntracked = context.untrackedPaths.filter(file => !expectedDirtyDeployFiles.includes(file));
   const localScopeClean = Boolean(!context.stagedLines.length
     && arrayEqual(bundle.dirtyTracked || [], context.dirtyPaths.map(file => ` M ${file}`))
-    && !(bundle.unexpectedDirty || []).length);
+    && arrayEqual(bundle.untracked || [], context.untrackedPaths)
+    && arrayEqual(bundle.unexpectedDirty || [], expectedUnexpectedDirty)
+    && arrayEqual(bundle.unexpectedUntracked || [], expectedUnexpectedUntracked)
+    && expectedUnexpectedDirty.length === 0
+    && expectedUnexpectedUntracked.length === 0);
   if (bundle.summary?.localScopeClean !== localScopeClean) {
     failures.push(`summary.localScopeClean expected ${localScopeClean} got ${bundle.summary?.localScopeClean}`);
+  }
+  if (!arrayEqual(bundle.untracked || [], context.untrackedPaths)) {
+    failures.push(`untracked paths expected ${context.untrackedPaths.join(', ') || '(none)'} got ${(bundle.untracked || []).join(', ') || '(none)'}`);
+  }
+  if (!arrayEqual(bundle.unexpectedDirty || [], expectedUnexpectedDirty)) {
+    failures.push(`unexpectedDirty expected ${expectedUnexpectedDirty.join(', ') || '(none)'} got ${(bundle.unexpectedDirty || []).join(', ') || '(none)'}`);
+  }
+  if (!arrayEqual(bundle.unexpectedUntracked || [], expectedUnexpectedUntracked)) {
+    failures.push(`unexpectedUntracked expected ${expectedUnexpectedUntracked.join(', ') || '(none)'} got ${(bundle.unexpectedUntracked || []).join(', ') || '(none)'}`);
   }
   if (context.stagedLines.length) failures.push(`staged files present: ${context.stagedLines.join(', ')}`);
 
