@@ -1906,7 +1906,8 @@ async function summarizeOwnerGateWaits() {
   const bundle = await readJson(path.join(stateDir, 'owner-approval-bundles', 'latest.json'), null);
   if (!bundle) return [];
 
-  const currentHead = runGitMaybe(['rev-parse', '--short', 'HEAD']).stdout.trim();
+  const head = runCommand('git', ['rev-parse', '--short', 'HEAD'], 45_000);
+  const currentHead = head.ok ? head.stdout.trim() : '';
   if (!currentHead || bundle.head !== currentHead) return [];
 
   return (bundle.gates || [])
