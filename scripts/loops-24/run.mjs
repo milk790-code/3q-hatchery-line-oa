@@ -966,6 +966,14 @@ async function runAutoCompletions(candidates) {
       candidate
     ));
   }
+  if (ids.has('wakeup-health-needed') || ids.has('wakeup-health-attention') || ids.has('wakeup-health-ready')) {
+    completions.push(runLocalStep(
+      'verify-wakeup-health',
+      'node',
+      ['scripts/loops-24/verify-wakeup-health.mjs'],
+      120_000
+    ));
+  }
 
   if (ids.has('github-local-pr-handoff-needed')) {
     const githubHandoffCompletion = runLocalStep(
@@ -1298,6 +1306,12 @@ async function runPostDashboardAutoCompletions(candidates, autoCompletions, resu
         ['scripts/loops-24/prepare-owner-approval-bundle.mjs'],
         120_000
       ),
+      ...(next.some(item => item.label === 'verify-wakeup-health') ? [] : [runLocalStep(
+        'verify-wakeup-health',
+        'node',
+        ['scripts/loops-24/verify-wakeup-health.mjs'],
+        120_000
+      )]),
       runLocalStep(
         'verify-owner-approval-bundle',
         'node',

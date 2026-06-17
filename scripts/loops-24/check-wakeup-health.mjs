@@ -109,8 +109,38 @@ const health = {
   },
 };
 
+const wakeToRunEnabled = task?.platform === 'win32'
+  ? task?.wakeToRun === true
+  : null;
+const summary = {
+  status: health.ok ? 'ready' : 'attention',
+  ok: health.ok,
+  warningCount: warnings.length,
+  latestSuccessFresh: checks.latestSuccessFresh,
+  latestSuccessAt: latestSuccess?.finishedAt || latestSuccess?.startedAt || null,
+  latestSuccessAgeMinutes: health.diagnostics.latestSuccessAgeMinutes,
+  latestRunAt: latestRun?.finishedAt || latestRun?.startedAt || null,
+  latestRunAgeMinutes: health.diagnostics.latestRunAgeMinutes,
+  lockPresent: Boolean(lock),
+  lockAgeMinutes: health.diagnostics.lockAgeMinutes,
+  scheduledTaskFound: task?.found ?? null,
+  scheduledTaskState: task?.state || null,
+  scheduledTaskNextRunTime: task?.nextRunTime || null,
+  scheduledTaskNextRunInMinutes: health.diagnostics.scheduledTaskNextRunInMinutes,
+  scheduledTaskHourlyTrigger: checks.scheduledTaskHourlyTrigger,
+  scheduledTaskSafeLocalRunner: checks.scheduledTaskSafeLocalRunner,
+  scheduledTaskOverlapGuard: checks.scheduledTaskOverlapGuard,
+  scheduledTaskExecutionLimitMinutes: health.diagnostics.scheduledTaskExecutionLimitMinutes,
+  scheduledTaskCatchUpEnabled: checks.scheduledTaskCatchUpEnabled,
+  wakeToRunEnabled,
+  powerWakeNeedsApproval: wakeToRunEnabled === false,
+  reportFreshMinutes,
+  freshUntil: freshUntil.toISOString(),
+};
+
 const payload = {
   generatedAt: now.toISOString(),
+  status: summary.status,
   reportFreshMinutes,
   freshUntil: freshUntil.toISOString(),
   repoRoot,
@@ -134,6 +164,7 @@ const payload = {
   } : { exists: false },
   scheduledTask: task,
   health,
+  summary,
 };
 
 payload.statusFingerprint = hash(JSON.stringify({
@@ -142,6 +173,7 @@ payload.statusFingerprint = hash(JSON.stringify({
   latestSuccessRunId: latestSuccess?.runId || null,
   lock: payload.lock,
   health,
+  summary,
 }));
 
 await fs.mkdir(healthDir, { recursive: true });
@@ -266,8 +298,25 @@ function renderMarkdown(data) {
     `- state_dir: ${data.stateDir}`,
     `- task_name: ${data.taskName}`,
     `- status_fingerprint: ${data.statusFingerprint}`,
+    `- status: ${data.status}`,
     `- overall_ok: ${data.health.ok}`,
     `- warning_count: ${data.health.warnings?.length || 0}`,
+    '',
+    '## Summary',
+    '',
+    `- latest_success_fresh: ${data.summary.latestSuccessFresh}`,
+    `- latest_success_at: ${data.summary.latestSuccessAt || '(unknown)'}`,
+    `- latest_success_age_minutes: ${data.summary.latestSuccessAgeMinutes === null ? '(null)' : data.summary.latestSuccessAgeMinutes}`,
+    `- scheduled_task_found: ${data.summary.scheduledTaskFound}`,
+    `- scheduled_task_state: ${data.summary.scheduledTaskState || '(unknown)'}`,
+    `- scheduled_task_next_run_time: ${data.summary.scheduledTaskNextRunTime || '(unknown)'}`,
+    `- scheduled_task_next_run_in_minutes: ${data.summary.scheduledTaskNextRunInMinutes === null ? '(null)' : data.summary.scheduledTaskNextRunInMinutes}`,
+    `- scheduled_task_safe_local_runner: ${data.summary.scheduledTaskSafeLocalRunner}`,
+    `- scheduled_task_hourly_trigger: ${data.summary.scheduledTaskHourlyTrigger}`,
+    `- scheduled_task_overlap_guard: ${data.summary.scheduledTaskOverlapGuard}`,
+    `- scheduled_task_catch_up_enabled: ${data.summary.scheduledTaskCatchUpEnabled}`,
+    `- wake_to_run_enabled: ${data.summary.wakeToRunEnabled}`,
+    `- power_wake_needs_approval: ${data.summary.powerWakeNeedsApproval}`,
     '',
     '## Checks',
     '',
