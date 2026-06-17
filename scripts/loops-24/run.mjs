@@ -1917,7 +1917,7 @@ async function summarizeOwnerGateWaits() {
       label: `owner-gate:${gate.id}`,
       status: 'waiting',
       lane: 'demo-sales',
-      summary: `${gate.ownerAction || 'Owner approval required.'} Evidence: ${gate.evidence || '(none)'}`,
+      summary: `Review the investor packet separately before external use. Evidence: ${gate.evidence || '(none)'}`,
       ageHours: 0,
       firstSeenAt: null,
       escalated: false,
