@@ -23,6 +23,7 @@ const approvalGroups = Array.isArray(dashboard.approvalGroups) ? dashboard.appro
 const approvalIndex = buildApprovalIndex(nextApproval);
 const findings = mergeFindings(
   verifyDashboardSchema(dashboard, waiting, nextApproval, approvalGroups),
+  verifyOwnerApprovalBundleSummary(dashboard),
   verifyApprovalWorkbenchSummary(dashboard),
   verifyWaitingItems(waiting, approvalIndex),
 );
@@ -196,6 +197,57 @@ function verifyApprovalWorkbenchSummary(dashboard) {
   }
   if (summary.expired === true && workbench.status === 'ready-for-owner-decision') {
     failures.push('approvalWorkbench is expired but still marked ready-for-owner-decision.');
+  }
+
+  return { failures, warnings };
+}
+
+function verifyOwnerApprovalBundleSummary(dashboard) {
+  const failures = [];
+  const warnings = [];
+  const bundle = dashboard.ownerApprovalBundle;
+  const dashboardSummary = dashboard.summary || {};
+
+  if (!bundle || bundle.available === false) {
+    warnings.push('Dashboard has no ownerApprovalBundle artifact summary to verify.');
+    return { failures, warnings };
+  }
+
+  const summary = bundle.summary || {};
+  const attentionCount = Number(summary.attentionCount || 0);
+
+  if (dashboardSummary.ownerApprovalBundleStatus !== bundle.status) {
+    failures.push(`summary.ownerApprovalBundleStatus expected ${bundle.status} got ${dashboardSummary.ownerApprovalBundleStatus}`);
+  }
+  if (dashboardSummary.ownerApprovalBundleHead !== bundle.head) {
+    failures.push(`summary.ownerApprovalBundleHead expected ${bundle.head} got ${dashboardSummary.ownerApprovalBundleHead}`);
+  }
+  if (dashboardSummary.ownerApprovalBundleHeadCurrent !== bundle.headCurrent) {
+    failures.push(`summary.ownerApprovalBundleHeadCurrent expected ${bundle.headCurrent} got ${dashboardSummary.ownerApprovalBundleHeadCurrent}`);
+  }
+  if (Number(dashboardSummary.ownerApprovalBundleAttentionCount || 0) !== attentionCount) {
+    failures.push(`summary.ownerApprovalBundleAttentionCount expected ${attentionCount} got ${dashboardSummary.ownerApprovalBundleAttentionCount}`);
+  }
+  if (dashboardSummary.ownerApprovalBundlePrPublishReady !== summary.prPublishReady) {
+    failures.push(`summary.ownerApprovalBundlePrPublishReady expected ${summary.prPublishReady} got ${dashboardSummary.ownerApprovalBundlePrPublishReady}`);
+  }
+  if (dashboardSummary.ownerApprovalBundleLocalScopeClean !== summary.localScopeClean) {
+    failures.push(`summary.ownerApprovalBundleLocalScopeClean expected ${summary.localScopeClean} got ${dashboardSummary.ownerApprovalBundleLocalScopeClean}`);
+  }
+  if (dashboardSummary.ownerApprovalBundleWakeupFresh !== summary.wakeupFresh) {
+    failures.push(`summary.ownerApprovalBundleWakeupFresh expected ${summary.wakeupFresh} got ${dashboardSummary.ownerApprovalBundleWakeupFresh}`);
+  }
+  if (dashboardSummary.ownerApprovalBundleWakeupFreshUntil !== summary.wakeupFreshUntil) {
+    failures.push(`summary.ownerApprovalBundleWakeupFreshUntil expected ${summary.wakeupFreshUntil} got ${dashboardSummary.ownerApprovalBundleWakeupFreshUntil}`);
+  }
+  if (dashboardSummary.ownerApprovalBundlePowerWakeNeedsApproval !== summary.powerWakeNeedsApproval) {
+    failures.push(`summary.ownerApprovalBundlePowerWakeNeedsApproval expected ${summary.powerWakeNeedsApproval} got ${dashboardSummary.ownerApprovalBundlePowerWakeNeedsApproval}`);
+  }
+  if (bundle.status === 'ready-for-owner-approval' && attentionCount > 0) {
+    failures.push('ownerApprovalBundle is ready-for-owner-approval but has attention gates.');
+  }
+  if (bundle.status === 'ready-for-owner-approval' && bundle.headCurrent !== true) {
+    failures.push('ownerApprovalBundle is ready-for-owner-approval but its head is not current.');
   }
 
   return { failures, warnings };

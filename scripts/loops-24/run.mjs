@@ -1540,6 +1540,11 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
   const connectorHealth = summarizeConnectorHealthArtifact(await readJson(path.join(stateDir, 'connector-health', 'latest.json'), null));
   const secretChecklist = summarizeSecretChecklistArtifact(await readJson(path.join(stateDir, 'secret-checklists', 'latest.json'), null));
   const dirtyClassification = summarizeDirtyClassificationArtifact(await readJson(path.join(stateDir, 'dirty-worktree', 'latest.json'), null));
+  const currentHead = currentGitHead();
+  const ownerApprovalBundle = summarizeOwnerApprovalBundleArtifact(
+    await readJson(path.join(stateDir, 'owner-approval-bundles', 'latest.json'), null),
+    currentHead
+  );
   const approvalWorkbench = summarizeApprovalWorkbenchArtifact(
     await readJson(path.join(stateDir, 'approval-workbench', 'latest.json'), null),
     generatedAt
@@ -1559,6 +1564,15 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     connectorAttentionCount: connectorHealth.summary?.attentionCount || 0,
     missingSecretGateCount: secretChecklist.summary?.missingCount || 0,
     dirtyDeployCount: dirtyClassification.summary?.deploy || 0,
+    ownerApprovalBundleStatus: ownerApprovalBundle.available ? ownerApprovalBundle.status : null,
+    ownerApprovalBundleHead: ownerApprovalBundle.available ? ownerApprovalBundle.head : null,
+    ownerApprovalBundleHeadCurrent: ownerApprovalBundle.available ? ownerApprovalBundle.headCurrent : null,
+    ownerApprovalBundleAttentionCount: ownerApprovalBundle.available ? Number(ownerApprovalBundle.summary?.attentionCount || 0) : null,
+    ownerApprovalBundlePrPublishReady: ownerApprovalBundle.available ? ownerApprovalBundle.summary?.prPublishReady : null,
+    ownerApprovalBundleLocalScopeClean: ownerApprovalBundle.available ? ownerApprovalBundle.summary?.localScopeClean : null,
+    ownerApprovalBundleWakeupFresh: ownerApprovalBundle.available ? ownerApprovalBundle.summary?.wakeupFresh : null,
+    ownerApprovalBundleWakeupFreshUntil: ownerApprovalBundle.available ? ownerApprovalBundle.summary?.wakeupFreshUntil : null,
+    ownerApprovalBundlePowerWakeNeedsApproval: ownerApprovalBundle.available ? ownerApprovalBundle.summary?.powerWakeNeedsApproval : null,
     approvalWorkbenchExpired: approvalWorkbench.available ? approvalWorkbench.summary?.expired : null,
     approvalWorkbenchExpiresAtTaipei: approvalWorkbench.available ? approvalWorkbench.summary?.expiresAtTaipei : null,
     approvalWorkbenchExpiresInMinutes: approvalWorkbench.available ? approvalWorkbench.summary?.expiresInMinutes : null,
@@ -1581,6 +1595,7 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     connectorHealth,
     secretChecklist,
     dirtyClassification,
+    ownerApprovalBundle,
     approvalWorkbench,
     summary,
     manualRedLines,
@@ -1621,6 +1636,10 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     '## Next Approval Gate',
     '',
     ...renderApprovalList(payload.nextApproval),
+    '',
+    '## Owner Approval Bundle',
+    '',
+    ...renderOwnerApprovalBundle(payload.ownerApprovalBundle),
     '',
     '## Owner Approval Workbench',
     '',
@@ -2104,8 +2123,7 @@ async function summarizeOwnerGateWaits() {
   const bundle = await readJson(path.join(stateDir, 'owner-approval-bundles', 'latest.json'), null);
   if (!bundle) return [];
 
-  const head = runCommand('git', ['rev-parse', '--short', 'HEAD'], 45_000);
-  const currentHead = head.ok ? head.stdout.trim() : '';
+  const currentHead = currentGitHead();
   if (!currentHead || bundle.head !== currentHead) return [];
 
   return (bundle.gates || [])
@@ -2124,6 +2142,11 @@ async function summarizeOwnerGateWaits() {
       nextApproval: 'investor-review',
       nextApprovals: ['investor-review'],
     }));
+}
+
+function currentGitHead() {
+  const head = runCommand('git', ['rev-parse', '--short', 'HEAD'], 45_000);
+  return head.ok ? head.stdout.trim() : '';
 }
 
 function summarizeApprovals(blocked) {
@@ -2174,6 +2197,38 @@ function summarizeDirtyClassificationArtifact(data) {
     reportPath: data.reportPath || null,
     statusFingerprint: data.statusFingerprint || null,
     summary: data.summary || null,
+  };
+}
+
+function summarizeOwnerApprovalBundleArtifact(data, currentHead = '') {
+  if (!data) return { available: false, summary: null, reportPath: null };
+  const summary = data.summary || {};
+  const head = data.head || null;
+  return {
+    available: true,
+    generatedAt: data.generatedAt || null,
+    reportPath: data.reportPath || null,
+    jsonPath: data.jsonPath || null,
+    status: summary.status || data.status || null,
+    head,
+    headCurrent: Boolean(currentHead && head === currentHead),
+    ahead: data.ahead ?? null,
+    behind: data.behind ?? null,
+    bundleFingerprint: data.bundleFingerprint || null,
+    summary: {
+      status: summary.status || data.status || null,
+      readyGateCount: Number(summary.readyGateCount || 0),
+      attentionCount: Number(summary.attentionCount || 0),
+      manualApprovalCount: Number(summary.manualApprovalCount || 0),
+      manualInputCount: Number(summary.manualInputCount || 0),
+      prPublishReady: summary.prPublishReady ?? null,
+      workerReady: summary.workerReady ?? null,
+      wakeupFresh: summary.wakeupFresh ?? null,
+      wakeupFreshUntil: summary.wakeupFreshUntil || null,
+      powerWakeNeedsApproval: summary.powerWakeNeedsApproval ?? null,
+      localScopeClean: summary.localScopeClean ?? null,
+      localInvestorPacketCount: Number(summary.localInvestorPacketCount || 0),
+    },
   };
 }
 
@@ -2234,6 +2289,29 @@ function renderDirtyClassification(data) {
     `- investor: ${summary.investor || 0}`,
     `- repo_hygiene: ${summary.repoHygiene || 0}`,
     `- other: ${summary.other || 0}`,
+  ];
+}
+
+function renderOwnerApprovalBundle(data) {
+  if (!data?.available) return ['- No owner approval bundle artifact yet.'];
+  const summary = data.summary || {};
+  return [
+    `- report: ${data.reportPath || '(missing)'}`,
+    `- status: ${data.status || '(unknown)'}`,
+    `- head: ${data.head || '(missing)'}`,
+    `- head_current: ${data.headCurrent === true}`,
+    `- ahead: ${data.ahead ?? '(unknown)'}`,
+    `- behind: ${data.behind ?? '(unknown)'}`,
+    `- ready_gates: ${summary.readyGateCount ?? 0}`,
+    `- attention: ${summary.attentionCount ?? 0}`,
+    `- manual_approval: ${summary.manualApprovalCount ?? 0}`,
+    `- manual_input: ${summary.manualInputCount ?? 0}`,
+    `- pr_publish_ready: ${summary.prPublishReady === true}`,
+    `- worker_ready: ${summary.workerReady === true}`,
+    `- local_scope_clean: ${summary.localScopeClean === true}`,
+    `- wakeup_fresh: ${summary.wakeupFresh === true}`,
+    `- wakeup_fresh_until: ${summary.wakeupFreshUntil || '(unknown)'}`,
+    `- power_wake_needs_approval: ${summary.powerWakeNeedsApproval === true}`,
   ];
 }
 
