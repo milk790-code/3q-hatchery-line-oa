@@ -1976,9 +1976,10 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     '',
   ];
 
+  const dashboardJson = stringifyPortableJson(payload);
   await fs.mkdir(dashboardDir, { recursive: true });
-  await fs.writeFile(jsonPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
-  await fs.writeFile(latestPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+  await fs.writeFile(jsonPath, dashboardJson, 'utf8');
+  await fs.writeFile(latestPath, dashboardJson, 'utf8');
   await fs.writeFile(reportPath, `${lines.join('\n')}\n`, 'utf8');
   await fs.writeFile(latestMarkdownPath, `${lines.join('\n')}\n`, 'utf8');
 
@@ -2289,6 +2290,21 @@ async function readJson(file, fallback) {
   } catch {
     return fallback;
   }
+}
+
+function stringifyPortableJson(value) {
+  return `${escapeNonAscii(JSON.stringify(value, null, 2))}\n`;
+}
+
+function escapeNonAscii(text) {
+  return text.replace(/[^\x00-\x7F]/gu, character => {
+    const codePoint = character.codePointAt(0);
+    if (codePoint <= 0xFFFF) return `\\u${codePoint.toString(16).padStart(4, '0')}`;
+    const offset = codePoint - 0x10000;
+    const high = 0xD800 + Math.floor(offset / 0x400);
+    const low = 0xDC00 + (offset % 0x400);
+    return `\\u${high.toString(16).padStart(4, '0')}\\u${low.toString(16).padStart(4, '0')}`;
+  });
 }
 
 async function readDirSafe(dir) {

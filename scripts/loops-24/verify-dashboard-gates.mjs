@@ -16,12 +16,15 @@ const verificationDir = path.join(stateDir, 'dashboard-verifications');
 const now = new Date();
 const stamp = now.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
 
-const dashboard = await readJson(dashboardJsonPath);
+const dashboardJsonSource = await fs.readFile(dashboardJsonPath, 'utf8');
+const dashboard = parseJson(dashboardJsonPath, dashboardJsonSource);
 const waiting = Array.isArray(dashboard.waiting) ? dashboard.waiting : [];
 const nextApproval = Array.isArray(dashboard.nextApproval) ? dashboard.nextApproval : [];
 const approvalGroups = Array.isArray(dashboard.approvalGroups) ? dashboard.approvalGroups : [];
 const approvalIndex = buildApprovalIndex(nextApproval);
+const portableJsonFindings = verifyPortableJsonSource(dashboardJsonSource);
 const findings = mergeFindings(
+  portableJsonFindings,
   verifyDashboardSchema(dashboard, waiting, nextApproval, approvalGroups),
   verifyAccountBindingWorkbenchSummary(dashboard),
   verifyOwnerApprovalBundleSummary(dashboard),
@@ -41,6 +44,7 @@ const payload = {
   summary: {
     waitingCount: waiting.length,
     approvalGroupCount: nextApproval.length,
+    dashboardJsonAsciiPortable: portableJsonFindings.failures.length === 0,
     accountBindingAttentionCount: dashboard.accountBindingWorkbench?.summary?.attentionCount ?? null,
     failureCount: findings.failures.length,
     warningCount: findings.warnings.length,
@@ -96,12 +100,23 @@ function parseArgs(argv) {
   return parsed;
 }
 
-async function readJson(file) {
+function parseJson(file, source) {
   try {
-    return JSON.parse(await fs.readFile(file, 'utf8'));
+    return JSON.parse(source);
   } catch (error) {
     throw new Error(`Unable to read dashboard JSON at ${file}: ${error.message}`);
   }
+}
+
+function verifyPortableJsonSource(source) {
+  const failures = [];
+  const warnings = [];
+  const match = /[^\x00-\x7F]/u.exec(source);
+  if (match) {
+    const codePoint = match[0].codePointAt(0).toString(16).toUpperCase().padStart(4, '0');
+    failures.push(`Dashboard JSON contains raw non-ASCII character U+${codePoint}; write escaped JSON so Windows PowerShell default Get-Content can pipe it to ConvertFrom-Json safely.`);
+  }
+  return { failures, warnings };
 }
 
 function buildApprovalIndex(groups) {
