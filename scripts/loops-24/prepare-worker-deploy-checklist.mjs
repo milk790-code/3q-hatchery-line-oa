@@ -34,6 +34,8 @@ const secretGatesReady = secretGates
   ? missingSecrets.length === 0
   : false;
 const groups = Array.isArray(workerReview.groups) ? workerReview.groups : [];
+const deployCommands = groups.flatMap(deployCommandsForGroup);
+const deployCommandsReady = deployCommands.length > 0;
 const now = new Date();
 const stamp = toStamp(now);
 
@@ -66,8 +68,10 @@ const checks = [
   },
   {
     id: 'deploy_approval',
-    status: 'manual_approval',
-    detail: 'Wrangler deploy is intentionally not run by this checklist.',
+    status: deployCommandsReady ? 'manual_approval' : 'attention',
+    detail: deployCommandsReady
+      ? 'Wrangler deploy is intentionally not run by this checklist.'
+      : 'No deploy commands were inferred from the latest Worker review.',
   },
   {
     id: 'post_deploy_verification',
@@ -86,13 +90,13 @@ const payload = {
   latestPath: path.join(checklistDir, 'latest.json'),
   workerReviewPath: workerReview.reportPath || null,
   secretGatesPath: secretGates?.reportPath || null,
-  status: reviewIsCurrent && allLocalChecksPass ? 'ready-for-approval' : 'attention',
+  status: reviewIsCurrent && allLocalChecksPass && deployCommandsReady ? 'ready-for-approval' : 'attention',
   deployApprovalRequired: true,
   manualGateFindings,
   manualGateTypes,
   groups: groups.map(summarizeGroup),
   checks,
-  commands: groups.flatMap(deployCommandsForGroup),
+  commands: deployCommands,
 };
 
 payload.summary = {

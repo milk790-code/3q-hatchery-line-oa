@@ -86,6 +86,7 @@ const localScopeClean = stagedLines.length === 0 && unexpectedDirty.length === 0
 
 const missingSecrets = Array.isArray(secrets?.summary?.missing) ? secrets.summary.missing : [];
 const workerCommands = Array.isArray(worker?.commands) ? worker.commands : [];
+const workerDeployCommands = workerCommands.map(item => item.command).filter(Boolean);
 const prRefCurrent = Boolean(pr?.branch === branch
   && pr?.upstream === upstream
   && pr?.head === head
@@ -108,7 +109,7 @@ if (!pr) {
 if (!localScopeClean) prBlockers.push('local-scope-not-clean');
 if (ahead <= 0) prBlockers.push('no-ahead-commits');
 if (behind !== 0) prBlockers.push('branch-behind-upstream');
-const workerReady = worker?.summary?.status === 'ready-for-approval';
+const workerReady = worker?.summary?.status === 'ready-for-approval' && workerDeployCommands.length > 0;
 const wakeupFresh = wakeupAgeMinutes !== null && wakeupAgeMinutes <= wakeupFreshMinutes && wakeupScheduleFresh;
 const wakeupFreshUntil = freshUntil(wakeupHealth?.generatedAt, wakeupFreshMinutes);
 const wakeupOk = wakeupHealth?.health?.ok === true && wakeupFresh;
@@ -185,9 +186,9 @@ const gates = [
     status: workerReady ? 'ready_for_approval' : 'attention',
     ownerAction: 'Approve deploy-gated Worker changes only after reviewing the four dirty Worker files.',
     evidence: worker
-      ? `status=${worker.summary?.status} attention=${worker.summary?.attentionCount} manualApproval=${worker.summary?.manualApprovalCount} manualInput=${worker.summary?.manualInputCount}`
+      ? `status=${worker.summary?.status} commands=${workerDeployCommands.length} attention=${worker.summary?.attentionCount} manualApproval=${worker.summary?.manualApprovalCount} manualInput=${worker.summary?.manualInputCount}`
       : 'Missing Worker deploy checklist.',
-    commands: workerCommands.map(item => item.command),
+    commands: workerDeployCommands,
   },
   {
     id: 'secret_input',
