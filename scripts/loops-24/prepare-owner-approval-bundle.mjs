@@ -39,6 +39,14 @@ if (dashboard?.jsonPath && (!dashboardGates || dashboardGates.dashboardJsonPath 
   runNodeMaybe(['scripts/loops-24/verify-dashboard-gates.mjs', '--dashboard-json', dashboard.jsonPath]);
   dashboardGates = await readJson(path.join(stateDir, 'dashboard-verifications', 'latest.json'), null);
 }
+let wakeupHealth = wakeup;
+const wakeupFreshMinutes = Number.parseFloat(process.env.LOOPS_WAKEUP_REPORT_FRESH_MINUTES || '65');
+let wakeupAgeMinutes = ageMinutes(wakeupHealth?.generatedAt, now);
+if (!wakeupHealth || wakeupHealth?.health?.ok !== true || wakeupAgeMinutes === null || wakeupAgeMinutes > wakeupFreshMinutes) {
+  runNodeMaybe(['scripts/loops-24/check-wakeup-health.mjs']);
+  wakeupHealth = await readJson(path.join(stateDir, 'wakeup-health', 'latest.json'), wakeupHealth);
+  wakeupAgeMinutes = ageMinutes(wakeupHealth?.generatedAt, now);
+}
 
 const branch = runGit(['branch', '--show-current']).trim();
 const upstream = runGitMaybe(['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}']).stdout.trim();
@@ -66,7 +74,8 @@ const prCurrent = Boolean(pr?.branch === branch
   && pr?.githubHandoffPath === github?.reportPath);
 const prReady = pr?.summary?.readyForApproval === true && prCurrent;
 const workerReady = worker?.summary?.status === 'ready-for-approval';
-const wakeupOk = wakeup?.health?.ok === true;
+const wakeupFresh = wakeupAgeMinutes !== null && wakeupAgeMinutes <= wakeupFreshMinutes;
+const wakeupOk = wakeupHealth?.health?.ok === true && wakeupFresh;
 const localScopeClean = stagedLines.length === 0 && unexpectedDirty.length === 0;
 const dashboardGatesReady = Boolean(dashboard?.jsonPath
   && dashboardGates?.ok === true
@@ -81,6 +90,15 @@ const gates = [
     evidence: localScopeClean
       ? `Tracked dirty files are limited to: ${dirtyPaths.join(', ') || '(none)'}.`
       : `Unexpected dirty files or staged changes exist. staged=${stagedLines.join(', ') || '(none)'} unexpected=${unexpectedDirty.join(', ') || '(none)'}`,
+  },
+  {
+    id: 'wakeup_health',
+    label: 'Verify hourly wakeup health',
+    status: wakeupOk ? 'ready' : 'attention',
+    ownerAction: 'Trust hourly automation only after the local wakeup-health report is fresh and green.',
+    evidence: wakeupHealth
+      ? `ok=${wakeupHealth.health?.ok} fresh=${wakeupFresh} ageMinutes=${wakeupAgeMinutes === null ? '(unknown)' : round(wakeupAgeMinutes)} limitMinutes=${wakeupFreshMinutes} report=${wakeupHealth.reportPath || '(missing)'}`
+      : 'Missing wakeup-health report.',
   },
   {
     id: 'dashboard_gate_verification',
@@ -161,7 +179,7 @@ const payload = {
     prReadiness: pr?.reportPath || null,
     workerDeployChecklist: worker?.reportPath || null,
     secretGates: secrets?.reportPath || null,
-    wakeupHealth: wakeup?.reportPath || null,
+    wakeupHealth: wakeupHealth?.reportPath || null,
     commitBoundaries: boundary?.reportPath || null,
     frontendHandoffs: frontend?.reportPath || null,
     contentQueue: contentQueue?.reportPath || null,
@@ -177,6 +195,8 @@ const payload = {
     prReady,
     workerReady,
     wakeupOk,
+    wakeupFresh,
+    wakeupAgeMinutes: wakeupAgeMinutes === null ? null : round(wakeupAgeMinutes),
     dashboardGatesReady,
     localScopeClean,
   },
@@ -343,6 +363,16 @@ function parseStatusLine(line) {
   const pathPart = raw.slice(3).trim();
   const renamed = pathPart.includes(' -> ') ? pathPart.split(' -> ').pop() : pathPart;
   return { status: raw.slice(0, 2), path: renamed.replace(/^"|"$/g, '') };
+}
+
+function ageMinutes(value, relativeTo) {
+  const timestamp = Date.parse(value || '');
+  if (!Number.isFinite(timestamp)) return null;
+  return Math.max(0, (relativeTo.getTime() - timestamp) / 60_000);
+}
+
+function round(value) {
+  return value === null || value === undefined ? null : Math.round(Number(value) * 10) / 10;
 }
 
 function toStamp(date) {

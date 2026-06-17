@@ -86,6 +86,12 @@ gate verification, and manual-send gates into one local decision page. It does
 not run `git push`, create a pull request, deploy, call protected endpoints,
 write secrets, or send messages.
 
+The owner bundle treats wakeup health as an approval gate. If the latest
+wakeup-health report is missing, unhealthy, or older than
+`LOOPS_WAKEUP_REPORT_FRESH_MINUTES` (default 65 minutes), the bundle refreshes
+the local wakeup-health report and stays in attention until it is fresh and
+green.
+
 It can also surface a `cold_outreach` candidate from
 `scripts/outreach.prospects.json`. That path creates review-ready draft work for
 the hourly runner, but outbound LINE/IG/email sending remains manual.
