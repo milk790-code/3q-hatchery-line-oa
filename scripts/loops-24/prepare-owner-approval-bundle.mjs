@@ -42,15 +42,23 @@ if (dashboard?.jsonPath && (!dashboardGates || dashboardGates.dashboardJsonPath 
 let wakeupHealth = wakeup;
 const wakeupFreshMinutes = Number.parseFloat(process.env.LOOPS_WAKEUP_REPORT_FRESH_MINUTES || '65');
 const wakeupNextRunGraceMinutes = Number.parseFloat(process.env.LOOPS_WAKEUP_NEXT_RUN_GRACE_MINUTES || '5');
+const wakeupMinReviewWindowMinutes = Number.parseFloat(process.env.LOOPS_WAKEUP_MIN_REVIEW_WINDOW_MINUTES || '30');
 let wakeupAgeMinutes = ageMinutes(wakeupHealth?.generatedAt, now);
 let wakeupNextRunAgeMinutes = scheduledTaskNextRunAgeMinutes(wakeupHealth, now);
 let wakeupScheduleFresh = !isWakeupScheduleEvidenceStale(wakeupHealth, now, wakeupNextRunGraceMinutes);
-if (!wakeupHealth || wakeupHealth?.health?.ok !== true || wakeupAgeMinutes === null || wakeupAgeMinutes > wakeupFreshMinutes || !wakeupScheduleFresh) {
+let wakeupFreshRemainingMinutes = freshRemainingMinutes(wakeupAgeMinutes, wakeupFreshMinutes);
+if (!wakeupHealth
+  || wakeupHealth?.health?.ok !== true
+  || wakeupAgeMinutes === null
+  || wakeupAgeMinutes > wakeupFreshMinutes
+  || !wakeupScheduleFresh
+  || (wakeupFreshRemainingMinutes !== null && wakeupFreshRemainingMinutes < wakeupMinReviewWindowMinutes)) {
   runNodeMaybe(['scripts/loops-24/check-wakeup-health.mjs']);
   wakeupHealth = await readJson(path.join(stateDir, 'wakeup-health', 'latest.json'), wakeupHealth);
   wakeupAgeMinutes = ageMinutes(wakeupHealth?.generatedAt, now);
   wakeupNextRunAgeMinutes = scheduledTaskNextRunAgeMinutes(wakeupHealth, now);
   wakeupScheduleFresh = !isWakeupScheduleEvidenceStale(wakeupHealth, now, wakeupNextRunGraceMinutes);
+  wakeupFreshRemainingMinutes = freshRemainingMinutes(wakeupAgeMinutes, wakeupFreshMinutes);
 }
 
 const branch = runGit(['branch', '--show-current']).trim();
@@ -135,7 +143,7 @@ const gates = [
     status: wakeupOk ? 'ready' : 'attention',
     ownerAction: 'Trust hourly automation only after the local wakeup-health report is fresh and green.',
     evidence: wakeupHealth
-      ? `ok=${wakeupHealth.health?.ok} fresh=${wakeupFresh} ageMinutes=${wakeupAgeMinutes === null ? '(unknown)' : round(wakeupAgeMinutes)} limitMinutes=${wakeupFreshMinutes} freshUntil=${wakeupFreshUntil || '(unknown)'} scheduleFresh=${wakeupScheduleFresh} nextRunAgeMinutes=${wakeupNextRunAgeMinutes === null ? '(n/a)' : round(wakeupNextRunAgeMinutes)} nextRunGraceMinutes=${wakeupNextRunGraceMinutes} report=${wakeupHealth.reportPath || '(missing)'}`
+      ? `ok=${wakeupHealth.health?.ok} fresh=${wakeupFresh} ageMinutes=${wakeupAgeMinutes === null ? '(unknown)' : round(wakeupAgeMinutes)} limitMinutes=${wakeupFreshMinutes} freshRemainingMinutes=${wakeupFreshRemainingMinutes === null ? '(unknown)' : round(wakeupFreshRemainingMinutes)} minReviewWindowMinutes=${wakeupMinReviewWindowMinutes} freshUntil=${wakeupFreshUntil || '(unknown)'} scheduleFresh=${wakeupScheduleFresh} nextRunAgeMinutes=${wakeupNextRunAgeMinutes === null ? '(n/a)' : round(wakeupNextRunAgeMinutes)} nextRunGraceMinutes=${wakeupNextRunGraceMinutes} report=${wakeupHealth.reportPath || '(missing)'}`
       : 'Missing wakeup-health report.',
   },
   {
@@ -256,6 +264,8 @@ const payload = {
     wakeupFresh,
     wakeupFreshUntil,
     wakeupAgeMinutes: wakeupAgeMinutes === null ? null : round(wakeupAgeMinutes),
+    wakeupFreshRemainingMinutes: wakeupFreshRemainingMinutes === null ? null : round(wakeupFreshRemainingMinutes),
+    wakeupMinReviewWindowMinutes,
     wakeupScheduleFresh,
     wakeupNextRunAgeMinutes: wakeupNextRunAgeMinutes === null ? null : round(wakeupNextRunAgeMinutes),
     wakeupNextRunGraceMinutes,
@@ -461,6 +471,11 @@ function freshUntil(value, freshMinutes) {
   const timestamp = Date.parse(value || '');
   if (!Number.isFinite(timestamp)) return null;
   return new Date(timestamp + freshMinutes * 60_000).toISOString();
+}
+
+function freshRemainingMinutes(age, freshMinutes) {
+  if (age === null || age === undefined || !Number.isFinite(Number(age))) return null;
+  return Math.max(0, Number(freshMinutes) - Number(age));
 }
 
 function scheduledTaskNextRunAgeMinutes(wakeupHealth, relativeTo) {

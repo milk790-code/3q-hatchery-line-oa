@@ -250,11 +250,19 @@ function verifyWakeupGate(bundle, wakeup, gate, failures) {
   const scheduleFresh = !isWakeupScheduleEvidenceStale(wakeup, relativeTo, nextRunGraceMinutes);
   const fresh = age !== null && age <= limit && scheduleFresh;
   const expectedFreshUntil = freshUntil(wakeup?.generatedAt, limit);
+  const expectedFreshRemaining = freshRemainingMinutes(age, limit);
+  const expectedMinReviewWindow = Number.parseFloat(process.env.LOOPS_WAKEUP_MIN_REVIEW_WINDOW_MINUTES || '30');
   const ok = Boolean(wakeup?.health?.ok === true && fresh);
   if (bundle.summary?.wakeupOk !== ok) failures.push(`summary.wakeupOk expected ${ok} got ${bundle.summary?.wakeupOk}`);
   if (bundle.summary?.wakeupFresh !== fresh) failures.push(`summary.wakeupFresh expected ${fresh} got ${bundle.summary?.wakeupFresh}`);
   if (bundle.summary?.wakeupFreshUntil !== expectedFreshUntil) {
     failures.push(`summary.wakeupFreshUntil expected ${expectedFreshUntil} got ${bundle.summary?.wakeupFreshUntil}`);
+  }
+  if (bundle.summary?.wakeupFreshRemainingMinutes !== (expectedFreshRemaining === null ? null : round(expectedFreshRemaining))) {
+    failures.push(`summary.wakeupFreshRemainingMinutes expected ${expectedFreshRemaining === null ? null : round(expectedFreshRemaining)} got ${bundle.summary?.wakeupFreshRemainingMinutes}`);
+  }
+  if (Number(bundle.summary?.wakeupMinReviewWindowMinutes) !== expectedMinReviewWindow) {
+    failures.push(`summary.wakeupMinReviewWindowMinutes expected ${expectedMinReviewWindow} got ${bundle.summary?.wakeupMinReviewWindowMinutes}`);
   }
   if (bundle.summary?.wakeupScheduleFresh !== scheduleFresh) failures.push(`summary.wakeupScheduleFresh expected ${scheduleFresh} got ${bundle.summary?.wakeupScheduleFresh}`);
   if (Number(bundle.summary?.wakeupNextRunGraceMinutes) !== nextRunGraceMinutes) {
@@ -383,6 +391,11 @@ function freshUntil(value, freshMinutes) {
   const timestamp = Date.parse(value || '');
   if (!Number.isFinite(timestamp)) return null;
   return new Date(timestamp + freshMinutes * 60_000).toISOString();
+}
+
+function freshRemainingMinutes(age, freshMinutes) {
+  if (age === null || age === undefined || !Number.isFinite(Number(age))) return null;
+  return Math.max(0, Number(freshMinutes) - Number(age));
 }
 
 function scheduledTaskNextRunAgeMinutes(wakeup, relativeTo) {
