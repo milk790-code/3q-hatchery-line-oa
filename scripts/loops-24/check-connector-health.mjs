@@ -19,6 +19,7 @@ const onlySafeLocal = process.argv.includes('--only-safe-local') || truthy(proce
 const now = new Date();
 const stamp = toStamp(now);
 const localSecretText = await readText(secretsLocalPath);
+const threadConnectorVerification = await readJson(path.join(stateDir, 'thread-connector-verifications', 'latest.json'), null);
 
 const connectors = [
   inspectCodexPlugin({
@@ -110,6 +111,7 @@ const payload = {
     commandPresent: item.commandPresent,
     probeStatus: item.probeStatus,
     variables: item.variables,
+    threadVerification: item.threadVerification,
   })))),
   summary,
   connectors,
@@ -130,15 +132,32 @@ console.log(JSON.stringify({
 
 function inspectCodexPlugin({ id, label, pluginPath, authNote }) {
   const installed = fssync.existsSync(pluginPath);
+  const verification = freshThreadVerification(id);
+  const status = installed
+    ? (verification?.status === 'ready' ? 'ready_thread_verified' : 'installed_auth_unverified')
+    : 'missing_plugin';
   return {
     id,
     label,
     kind: 'codex_app_plugin',
     installed,
-    status: installed ? 'installed_auth_unverified' : 'missing_plugin',
+    status,
     attention: !installed,
-    authNote,
+    authNote: verification?.status === 'ready'
+      ? `Thread-side read-only verification is fresh until ${verification.expiresAt}.`
+      : authNote,
     pluginPath,
+    threadVerification: verification
+      ? {
+        status: verification.status,
+        checkedAt: verification.checkedAt,
+        expiresAt: verification.expiresAt,
+        source: verification.source,
+        probe: verification.probe,
+        evidence: verification.evidence,
+        reportPath: threadConnectorVerification?.reportPath || null,
+      }
+      : null,
   };
 }
 
@@ -228,7 +247,7 @@ function summarize(items) {
   const missing = items.filter(item => ['missing_plugin', 'missing_cli', 'missing_secret'].includes(item.status));
   const failed = items.filter(item => /failed|expired|timeout/.test(item.status));
   const unverified = items.filter(item => item.status === 'installed_auth_unverified');
-  const ready = items.filter(item => item.status === 'ready' || item.status === 'ready_for_runner_wrapper');
+  const ready = items.filter(item => ['ready', 'ready_for_runner_wrapper', 'ready_thread_verified'].includes(item.status));
   return {
     total: items.length,
     readyCount: ready.length,
@@ -278,6 +297,14 @@ function renderMarkdown(data) {
   lines.push('- In only-safe-local mode, CLI probes that may touch external services are skipped and shown as `probe_skipped_safe_local`.');
   lines.push('- Failed, expired, missing, or timeout statuses should become LoopOS approval gates before any deploy or outbound workflow.');
   return lines.join('\n');
+}
+
+function freshThreadVerification(id) {
+  const verification = threadConnectorVerification?.connectors?.[id];
+  if (!verification) return null;
+  if (new Date(verification.expiresAt) <= now) return null;
+  if (!['ready', 'attention', 'failed'].includes(verification.status)) return null;
+  return verification;
 }
 
 function runCommand(command, args, timeout) {
@@ -341,6 +368,16 @@ async function readText(filePath) {
     return await fs.readFile(filePath, 'utf8');
   } catch (error) {
     if (error.code === 'ENOENT') return null;
+    throw error;
+  }
+}
+
+async function readJson(filePath, fallback) {
+  try {
+    return JSON.parse(await fs.readFile(filePath, 'utf8'));
+  } catch (error) {
+    if (arguments.length > 1 && error.code === 'ENOENT') return fallback;
+    if (arguments.length > 1) return fallback;
     throw error;
   }
 }

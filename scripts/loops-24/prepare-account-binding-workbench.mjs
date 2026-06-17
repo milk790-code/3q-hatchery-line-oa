@@ -297,7 +297,7 @@ function makeItem(spec, healthById, checklistById, secretsExamplePath) {
   const health = spec.sourceIds.map(id => healthById.get(id)).find(Boolean) || null;
   const checklist = spec.sourceIds.map(id => checklistById.get(id)).find(Boolean) || null;
   const status = deriveStatus(spec, health, checklist);
-  const attention = !['ready', 'ready_for_runner_wrapper', 'cli_present_unprobed'].includes(status);
+  const attention = !['ready', 'ready_for_runner_wrapper', 'ready_thread_verified', 'cli_present_unprobed'].includes(status);
   return {
     id: spec.id,
     label: spec.label,
@@ -320,6 +320,7 @@ function makeItem(spec, healthById, checklistById, secretsExamplePath) {
     commandPresent: health?.commandPresent ?? null,
     probeStatus: health?.probeStatus || null,
     installed: health?.installed ?? null,
+    threadVerification: health?.threadVerification || null,
     secretStatus: checklist?.status || null,
     runnerWrapperReady: checklist?.runnerWrapperReady ?? null,
     acceptedEnvNames: checklist?.acceptedEnvNames || health?.alternatives || [],
@@ -335,6 +336,7 @@ function deriveStatus(spec, health, checklist) {
     return 'secret_missing';
   }
   if (spec.category === 'codex_app_auth') {
+    if (health?.status === 'ready_thread_verified') return 'ready_thread_verified';
     if (health?.status === 'missing_plugin') return 'plugin_missing';
     return 'manual_oauth_required';
   }

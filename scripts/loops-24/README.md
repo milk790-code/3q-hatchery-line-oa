@@ -48,7 +48,7 @@ to local, review-ready artifacts:
 - approval workbenches that list owner-approved commands without running them
 - a compact completed / blocked / next approval dashboard
 - approval workbench TTL summaries embedded in the dashboard
-- connector health reports that flag missing, failed, expired, timeout, skipped, or app-auth-unverified integrations
+- connector health reports that flag missing, failed, expired, timeout, skipped, app-auth-unverified, or thread-verified integrations
 - one-page local secret checklists derived from redacted secret gates
 - account binding workbenches that rank Codex app auth, CLI auth, browser sessions, and local secret gates without logging in or writing secrets
 - material factory packs that turn an idea text into a brief, script, storyboard, GPT-SoVITS voiceover text, Jianying assembly plan, and yt-dlp B-roll intake list
@@ -418,6 +418,25 @@ powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\check-connector-heal
 powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\prepare-account-binding-workbench.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\run.ps1 -OnlySafeLocal
 ```
+
+Codex app connectors can only be verified from an active Codex thread. After a
+thread-side read-only connector check succeeds, record a redacted local evidence
+artifact so the next safe-local run can mark that connector as
+`ready_thread_verified` until the TTL expires:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\record-thread-connector-verification.ps1 `
+  -Connector github_app `
+  -Probe "GitHub profile and repository metadata read" `
+  -Evidence "GitHub connector read-only profile/repo probe succeeded" `
+  -RepoFullName "milk790-code/3q-hatchery-line-oa" `
+  -RepoId "1238215247"
+```
+
+This artifact is stored under
+`%USERPROFILE%\.codex\automations\loops-24\thread-connector-verifications\`.
+It does not store OAuth tokens, secret values, private message bodies, or approve
+GitHub writes, deploys, sends, permission changes, or production mutations.
 
 ## Prepare material factory pack
 
