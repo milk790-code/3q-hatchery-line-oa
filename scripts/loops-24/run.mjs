@@ -103,6 +103,8 @@ async function main() {
     if (autoCompleteEnabled) {
       autoCompletions = await runAutoCompletions(scored);
     }
+    const dirtyRefresh = await ensureDirtyClassificationCurrent();
+    if (dirtyRefresh) autoCompletions = [...autoCompletions, dirtyRefresh];
 
     result = {
       runId,
@@ -1874,6 +1876,19 @@ function currentWorktreeFingerprint() {
     statusLines,
     statusFingerprint: gitWorktreeFingerprint({ cwd: repoRoot, statusLines }),
   };
+}
+
+async function ensureDirtyClassificationCurrent() {
+  const current = currentWorktreeFingerprint();
+  if (!current.ok) return null;
+  const latest = await readJson(path.join(stateDir, 'dirty-worktree', 'latest.json'), null);
+  if (latest?.statusFingerprint === current.statusFingerprint) return null;
+  return runLocalStep(
+    'classify-dirty-worktree',
+    'node',
+    ['scripts/loops-24/classify-dirty-worktree.mjs'],
+    120_000
+  );
 }
 
 function isProcessAlive(pid) {

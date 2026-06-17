@@ -466,6 +466,17 @@ LOOPS edits separate from the broad staged payload before any deploy or commit.
 powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\snapshot-worktree.ps1
 ```
 
+## Classify dirty worktree
+
+Create a read-only deploy / investor / repo-hygiene / other grouping report for
+the current git status. Dashboard generation refreshes this report when its
+stored status fingerprint no longer matches the current worktree, so the
+dashboard does not keep showing stale dirty counts after a clean commit.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\classify-dirty-worktree.ps1
+```
+
 ## Plan commit boundaries
 
 Create a read-only grouping report for the current dirty worktree. This is the
