@@ -72,6 +72,7 @@ const untrackedPaths = statusLines
 const unexpectedDirty = dirtyPaths.filter(file => !expectedDirtyDeployFiles.includes(file));
 const unexpectedUntracked = untrackedPaths.filter(file => !expectedDirtyDeployFiles.includes(file));
 const statusFingerprint = gitWorktreeFingerprint({ cwd: repoRoot, statusLines });
+const investorPacketUntracked = unexpectedUntracked.filter(file => file.startsWith('investor-packet/'));
 
 const missingSecrets = Array.isArray(secrets?.summary?.missing) ? secrets.summary.missing : [];
 const workerCommands = Array.isArray(worker?.commands) ? worker.commands : [];
@@ -105,6 +106,13 @@ const gates = [
       ? `Tracked dirty files are limited to: ${dirtyPaths.join(', ') || '(none)'}; untracked=(none).`
       : `Unexpected dirty, untracked, or staged changes exist. staged=${stagedLines.join(', ') || '(none)'} unexpected=${unexpectedDirty.join(', ') || '(none)'} untracked=${unexpectedUntracked.join(', ') || '(none)'}`,
   },
+  ...(investorPacketUntracked.length ? [{
+    id: 'investor_review',
+    label: 'Review investor packet materials',
+    status: 'manual_approval',
+    ownerAction: 'Review the investor packet separately before staging, sending, sharing, or publishing it.',
+    evidence: `untrackedInvestorPacketPaths=${investorPacketUntracked.length} root=investor-packet/`,
+  }] : []),
   {
     id: 'wakeup_health',
     label: 'Verify hourly wakeup health',

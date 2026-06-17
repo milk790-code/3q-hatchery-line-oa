@@ -148,13 +148,18 @@ function verifyBundle(bundle, context, related) {
   requireEqual(failures, 'summary.manualApprovalCount', Number(bundle.summary?.manualApprovalCount), expectedManualApprovalCount);
   requireEqual(failures, 'summary.manualInputCount', Number(bundle.summary?.manualInputCount), expectedManualInputCount);
 
-  for (const id of ['local_review', 'wakeup_health', 'power_wake_policy', 'dashboard_gate_verification', 'push_draft_pr', 'worker_deploy', 'secret_input', 'post_deploy_verification', 'manual_send']) {
-    if (!gateById.has(id)) failures.push(`missing gate ${id}`);
-  }
-
   const expectedDirtyDeployFiles = Array.isArray(bundle.expectedDirtyDeployFiles) ? bundle.expectedDirtyDeployFiles : [];
   const expectedUnexpectedDirty = context.dirtyPaths.filter(file => !expectedDirtyDeployFiles.includes(file));
   const expectedUnexpectedUntracked = context.untrackedPaths.filter(file => !expectedDirtyDeployFiles.includes(file));
+  const expectedGateIds = ['local_review', 'wakeup_health', 'power_wake_policy', 'dashboard_gate_verification', 'push_draft_pr', 'worker_deploy', 'secret_input', 'post_deploy_verification', 'manual_send'];
+  if (expectedUnexpectedUntracked.some(file => file.startsWith('investor-packet/'))) {
+    expectedGateIds.push('investor_review');
+  }
+
+  for (const id of expectedGateIds) {
+    if (!gateById.has(id)) failures.push(`missing gate ${id}`);
+  }
+
   const localScopeClean = Boolean(!context.stagedLines.length
     && arrayEqual(bundle.dirtyTracked || [], context.dirtyPaths.map(file => ` M ${file}`))
     && arrayEqual(bundle.untracked || [], context.untrackedPaths)
@@ -281,7 +286,7 @@ function verifyManualCommands(bundle, gateById, failures) {
   if (deployGate?.status === 'ready_for_approval' && !(deployGate.commands || []).length) {
     failures.push('worker_deploy gate is ready_for_approval but has no commands');
   }
-  for (const id of ['power_wake_policy', 'secret_input', 'post_deploy_verification', 'manual_send']) {
+  for (const id of ['power_wake_policy', 'investor_review', 'secret_input', 'post_deploy_verification', 'manual_send']) {
     if ((gateById.get(id)?.commands || []).length) {
       failures.push(`${id} gate must not expose executable commands`);
     }
