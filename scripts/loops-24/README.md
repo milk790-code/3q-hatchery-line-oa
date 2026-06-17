@@ -107,6 +107,12 @@ recorded `nextRunTime` has already passed by more than
 `LOOPS_WAKEUP_NEXT_RUN_GRACE_MINUTES` (default 5 minutes), LOOPS refreshes the
 wakeup-health report before trusting it.
 
+The owner bundle splits PR publication readiness into separate booleans:
+`prPacketReady`, `prRefCurrent`, `prFingerprintCurrent`, `prHandoffCurrent`,
+`localScopeClean`, and `prPublishReady`. A PR packet can be internally ready
+while `prPublishReady=false` because local scope still contains unrelated
+untracked files such as investor packet materials.
+
 It can also surface a `cold_outreach` candidate from
 `scripts/outreach.prospects.json`. That path creates review-ready draft work for
 the hourly runner, but outbound LINE/IG/email sending remains manual.

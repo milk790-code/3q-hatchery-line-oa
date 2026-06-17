@@ -181,7 +181,7 @@ function verifyBundle(bundle, context, related) {
   }
   if (context.stagedLines.length) failures.push(`staged files present: ${context.stagedLines.join(', ')}`);
 
-  verifyPrGate(bundle, related.pr, gateById.get('push_draft_pr'), failures, warnings);
+  verifyPrGate(bundle, related.pr, gateById.get('push_draft_pr'), localScopeClean, failures, warnings);
   verifyWakeupGate(bundle, related.wakeup, gateById.get('wakeup_health'), failures);
   verifyPowerWakeGate(bundle, related.wakeup, gateById.get('power_wake_policy'), failures);
   verifyDashboardGate(bundle, related.dashboard, related.dashboardGates, gateById.get('dashboard_gate_verification'), failures);
@@ -190,23 +190,30 @@ function verifyBundle(bundle, context, related) {
   return { failures, warnings };
 }
 
-function verifyPrGate(bundle, pr, gate, failures, warnings) {
-  const prCurrent = Boolean(pr
+function verifyPrGate(bundle, pr, gate, localScopeClean, failures, warnings) {
+  const prRefCurrent = Boolean(pr
     && pr.branch === bundle.branch
     && pr.upstream === bundle.upstream
     && pr.head === bundle.head
     && pr.ahead === bundle.ahead
-    && pr.behind === bundle.behind
-    && pr.statusFingerprint === bundle.statusFingerprint
-    && pr.githubHandoffPath === bundle.artifacts?.githubHandoff);
-  const prReady = Boolean(pr?.summary?.readyForApproval === true && prCurrent);
+    && pr.behind === bundle.behind);
+  const prFingerprintCurrent = Boolean(pr && pr.statusFingerprint === bundle.statusFingerprint);
+  const prHandoffCurrent = Boolean(pr && pr.githubHandoffPath === bundle.artifacts?.githubHandoff);
+  const prPacketReady = Boolean(pr?.summary?.readyForApproval === true && prRefCurrent && prHandoffCurrent);
+  const prReady = Boolean(prPacketReady && prFingerprintCurrent && localScopeClean);
+  const prPublishReady = Boolean(prReady && bundle.ahead > 0 && bundle.behind === 0);
+  requireEqual(failures, 'summary.prPacketReady', bundle.summary?.prPacketReady, prPacketReady);
+  requireEqual(failures, 'summary.prRefCurrent', bundle.summary?.prRefCurrent, prRefCurrent);
+  requireEqual(failures, 'summary.prFingerprintCurrent', bundle.summary?.prFingerprintCurrent, prFingerprintCurrent);
+  requireEqual(failures, 'summary.prHandoffCurrent', bundle.summary?.prHandoffCurrent, prHandoffCurrent);
+  requireEqual(failures, 'summary.prPublishReady', bundle.summary?.prPublishReady, prPublishReady);
   if (bundle.summary?.prReady !== prReady) {
     failures.push(`summary.prReady expected ${prReady} got ${bundle.summary?.prReady}`);
   }
-  if (gate?.status !== (prReady && bundle.ahead > 0 && bundle.behind === 0 ? 'ready_for_approval' : 'attention')) {
+  if (gate?.status !== (prPublishReady ? 'ready_for_approval' : 'attention')) {
     failures.push(`push_draft_pr gate has unexpected status ${gate?.status}`);
   }
-  if (prReady) {
+  if (prPublishReady) {
     const bodyFile = pr.reportPath || '';
     const commands = gate?.commands || [];
     if (!commands.some(command => command === `git push origin ${bundle.branch}`)) {

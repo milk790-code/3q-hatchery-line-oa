@@ -73,17 +73,32 @@ const unexpectedDirty = dirtyPaths.filter(file => !expectedDirtyDeployFiles.incl
 const unexpectedUntracked = untrackedPaths.filter(file => !expectedDirtyDeployFiles.includes(file));
 const statusFingerprint = gitWorktreeFingerprint({ cwd: repoRoot, statusLines });
 const investorPacketUntracked = unexpectedUntracked.filter(file => file.startsWith('investor-packet/'));
+const localScopeClean = stagedLines.length === 0 && unexpectedDirty.length === 0 && unexpectedUntracked.length === 0;
 
 const missingSecrets = Array.isArray(secrets?.summary?.missing) ? secrets.summary.missing : [];
 const workerCommands = Array.isArray(worker?.commands) ? worker.commands : [];
-const prCurrent = Boolean(pr?.branch === branch
+const prRefCurrent = Boolean(pr?.branch === branch
   && pr?.upstream === upstream
   && pr?.head === head
   && pr?.ahead === ahead
-  && pr?.behind === behind
-  && pr?.statusFingerprint === statusFingerprint
-  && pr?.githubHandoffPath === github?.reportPath);
-const prReady = pr?.summary?.readyForApproval === true && prCurrent;
+  && pr?.behind === behind);
+const prFingerprintCurrent = Boolean(pr && pr.statusFingerprint === statusFingerprint);
+const prHandoffCurrent = Boolean(pr && pr.githubHandoffPath === github?.reportPath);
+const prPacketReady = Boolean(pr?.summary?.readyForApproval === true && prRefCurrent && prHandoffCurrent);
+const prReady = prPacketReady && prFingerprintCurrent && localScopeClean;
+const prPublishReady = prReady && ahead > 0 && behind === 0;
+const prBlockers = [];
+if (!pr) {
+  prBlockers.push('missing-pr-readiness');
+} else {
+  if (pr.summary?.readyForApproval !== true) prBlockers.push('pr-readiness-attention');
+  if (!prRefCurrent) prBlockers.push('branch-or-counts-stale');
+  if (!prHandoffCurrent) prBlockers.push('github-handoff-stale');
+  if (!prFingerprintCurrent) prBlockers.push('worktree-fingerprint-drift');
+}
+if (!localScopeClean) prBlockers.push('local-scope-not-clean');
+if (ahead <= 0) prBlockers.push('no-ahead-commits');
+if (behind !== 0) prBlockers.push('branch-behind-upstream');
 const workerReady = worker?.summary?.status === 'ready-for-approval';
 const wakeupFresh = wakeupAgeMinutes !== null && wakeupAgeMinutes <= wakeupFreshMinutes && wakeupScheduleFresh;
 const wakeupOk = wakeupHealth?.health?.ok === true && wakeupFresh;
@@ -91,7 +106,6 @@ const wakeToRunEnabled = wakeupHealth?.scheduledTask?.platform === 'win32'
   ? wakeupHealth?.scheduledTask?.wakeToRun === true
   : null;
 const powerWakeNeedsApproval = wakeToRunEnabled === false;
-const localScopeClean = stagedLines.length === 0 && unexpectedDirty.length === 0 && unexpectedUntracked.length === 0;
 const dashboardGatesReady = Boolean(dashboard?.jsonPath
   && dashboardGates?.ok === true
   && dashboardGates?.dashboardJsonPath === dashboard.jsonPath);
@@ -145,12 +159,12 @@ const gates = [
   {
     id: 'push_draft_pr',
     label: 'Push branch and open draft PR',
-    status: prReady && ahead > 0 && behind === 0 ? 'ready_for_approval' : 'attention',
+    status: prPublishReady ? 'ready_for_approval' : 'attention',
     ownerAction: 'Approve GitHub write actions if you want the committed control-plane work published as a draft PR.',
     evidence: pr
-      ? `readyForApproval=${pr.summary?.readyForApproval} current=${prCurrent} packetHead=${pr.head || '(missing)'} currentHead=${head} packetAhead=${pr.ahead} currentAhead=${ahead} packetBehind=${pr.behind} currentBehind=${behind}`
+      ? `readyForApproval=${pr.summary?.readyForApproval} refCurrent=${prRefCurrent} fingerprintCurrent=${prFingerprintCurrent} handoffCurrent=${prHandoffCurrent} localScopeClean=${localScopeClean} publishReady=${prPublishReady} blockers=${prBlockers.join('|') || '(none)'} packetHead=${pr.head || '(missing)'} currentHead=${head} packetAhead=${pr.ahead} currentAhead=${ahead} packetBehind=${pr.behind} currentBehind=${behind}`
       : 'Missing PR readiness packet.',
-    commands: prReady && github ? [
+    commands: prPublishReady && github ? [
       `git push origin ${branch}`,
       `gh pr create --draft --title "${escapeDoubleQuoted(github.title || 'Add LOOPS 24 control plane and local automation guardrails')}" --body-file "${pr?.reportPath || github.reportPath}"`,
     ] : [],
@@ -228,6 +242,11 @@ const payload = {
     manualApprovalCount: gates.filter(gate => gate.status === 'manual_approval' || gate.status === 'ready_for_approval').length,
     manualInputCount: gates.filter(gate => gate.status === 'manual_input').length,
     prReady,
+    prPacketReady,
+    prRefCurrent,
+    prFingerprintCurrent,
+    prHandoffCurrent,
+    prPublishReady,
     workerReady,
     wakeupOk,
     wakeupFresh,
