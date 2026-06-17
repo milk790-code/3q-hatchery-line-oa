@@ -1202,6 +1202,14 @@ async function runPostDashboardAutoCompletions(candidates, autoCompletions, resu
 
   let next = autoCompletions;
   if (candidatesHaveManualGates(candidates) || autoCompletionsNeedOwnerBundle(next)) {
+    const githubApprovalRefresh = await ensureGithubApprovalPacketsCurrent(next);
+    if (githubApprovalRefresh.length) {
+      next = [...next, ...githubApprovalRefresh];
+      refreshResultSummaries(result, candidates, next, taskRegistry);
+      await writeReport(result, candidates, next);
+      await writeDashboard(result, candidates, next);
+    }
+
     next = [
       ...next,
       runLocalStep(
@@ -1247,6 +1255,38 @@ async function runPostDashboardAutoCompletions(candidates, autoCompletions, resu
   return next;
 }
 
+async function ensureGithubApprovalPacketsCurrent(completions = []) {
+  const labels = new Set((completions || []).map(item => item.label));
+  const current = currentGitPublicationSnapshot();
+  if (!current.publishNeeded) return [];
+
+  const steps = [];
+  let github = await readJson(path.join(stateDir, 'github-handoffs', 'latest.json'), null);
+  if (!labels.has('prepare-github-handoff') && !githubHandoffCurrent(github, current)) {
+    const handoff = runLocalStep(
+      'prepare-github-handoff',
+      'node',
+      ['scripts/loops-24/prepare-github-handoff.mjs'],
+      120_000
+    );
+    steps.push(handoff);
+    if (handoff.status !== 'completed') return steps;
+    github = await readJson(path.join(stateDir, 'github-handoffs', 'latest.json'), null);
+  }
+
+  const pr = await readJson(path.join(stateDir, 'pr-readiness', 'latest.json'), null);
+  if (!labels.has('prepare-pr-readiness') && githubHandoffCurrent(github, current) && !prReadinessCurrent(pr, current)) {
+    steps.push(runLocalStep(
+      'prepare-pr-readiness',
+      'node',
+      ['scripts/loops-24/prepare-pr-readiness.mjs'],
+      120_000
+    ));
+  }
+
+  return steps;
+}
+
 function candidatesHaveManualGates(candidates = []) {
   return candidates.some(candidate => (candidate.manualGate || inferManualGate(candidate)) !== 'none_read_only');
 }
@@ -1265,6 +1305,50 @@ function autoCompletionsNeedOwnerBundle(completions) {
     || item.label === 'prepare-github-handoff'
     || item.label === 'prepare-secret-gates'
     || item.label === 'prepare-secret-checklist');
+}
+
+function currentGitPublicationSnapshot() {
+  const branch = runCommand('git', ['branch', '--show-current'], 45_000);
+  const upstream = runCommand('git', ['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'], 45_000);
+  const head = runCommand('git', ['rev-parse', '--short', 'HEAD'], 45_000);
+  if (!branch.ok || !upstream.ok || !head.ok) return { publishNeeded: false };
+
+  const counts = runCommand('git', ['rev-list', '--left-right', '--count', `${upstream.stdout.trim()}...HEAD`], 45_000);
+  if (!counts.ok) return { publishNeeded: false };
+  const [behindRaw, aheadRaw] = counts.stdout.trim().split(/\s+/);
+  const status = runCommand('git', ['status', '--short', '--untracked-files=no'], 45_000);
+  const statusLines = status.ok ? status.stdout.split(/\r?\n/).filter(Boolean) : [];
+  const ahead = Number.parseInt(aheadRaw || '0', 10);
+  const behind = Number.parseInt(behindRaw || '0', 10);
+  return {
+    publishNeeded: ahead > 0,
+    branch: branch.stdout.trim(),
+    upstream: upstream.stdout.trim(),
+    head: head.stdout.trim(),
+    ahead,
+    behind,
+    statusFingerprint: gitWorktreeFingerprint({ cwd: repoRoot, statusLines }),
+  };
+}
+
+function githubHandoffCurrent(handoff, current) {
+  return Boolean(handoff
+    && handoff.branch === current.branch
+    && handoff.upstream === current.upstream
+    && handoff.head === current.head
+    && Number(handoff.ahead) === current.ahead
+    && Number(handoff.behind) === current.behind
+    && handoff.statusFingerprint === current.statusFingerprint);
+}
+
+function prReadinessCurrent(pr, current) {
+  return Boolean(pr
+    && pr.branch === current.branch
+    && pr.upstream === current.upstream
+    && pr.head === current.head
+    && Number(pr.ahead) === current.ahead
+    && Number(pr.behind) === current.behind
+    && pr.statusFingerprint === current.statusFingerprint);
 }
 
 function runLocalStep(label, command, args, timeout) {

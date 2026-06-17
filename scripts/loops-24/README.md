@@ -237,6 +237,11 @@ remaining minutes from the dashboard generation time.
 It also recomputes approval workbench expiry from the dashboard generation time
 and fails if `expires_in_minutes`, the Taipei-time mirror, or the expired flag
 drift from the embedded workbench artifact.
+Before writing an owner approval bundle, the main runner refreshes the local
+GitHub handoff and PR readiness packet when they no longer match the current
+branch, head, ahead/behind counts, or tracked worktree fingerprint. This keeps
+the owner bundle from getting stuck in `push_draft_pr` attention immediately
+after a local commit, while still stopping before any GitHub write.
 
 The morning decision is derived from the selected candidates, lane priority, risk
 signals, and manual gates. Task registry metadata is read from:
