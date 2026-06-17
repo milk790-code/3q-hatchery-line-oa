@@ -45,6 +45,7 @@ to local, review-ready artifacts:
 - GitHub local PR handoffs for branches that are ahead of upstream
 - Worker deploy-ready checklists
 - owner approval bundles
+- approval workbenches that list owner-approved commands without running them
 - a compact completed / blocked / next approval dashboard
 - connector health reports that flag missing, failed, expired, timeout, skipped, or app-auth-unverified integrations
 - one-page local secret checklists derived from redacted secret gates
@@ -522,6 +523,21 @@ powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\verify-owner-approva
 The verifier reads local LOOPS JSON artifacts and git status only. It does not
 push, create PRs, deploy, call protected endpoints, write secrets, or send
 messages.
+
+Create a local approval workbench after the owner bundle is verified. It lists
+ready commands and manual gates for owner review, but still does not execute
+`git push`, create PRs, deploy, write secrets, call protected endpoints, or send
+messages:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\prepare-approval-workbench.ps1
+```
+
+Latest approval workbench path:
+
+```text
+%USERPROFILE%\.codex\automations\loops-24\approval-workbench\latest.json
+```
 
 When Windows `WakeToRun` is disabled, the owner bundle includes a
 `power_wake_policy` gate. That gate asks whether hourly LOOPS should wake a

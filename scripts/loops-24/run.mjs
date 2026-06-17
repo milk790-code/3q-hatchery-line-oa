@@ -1214,6 +1214,12 @@ async function runPostDashboardAutoCompletions(candidates, autoCompletions, resu
         ['scripts/loops-24/verify-owner-approval-bundle.mjs'],
         120_000
       ),
+      runLocalStep(
+        'prepare-approval-workbench',
+        'node',
+        ['scripts/loops-24/prepare-approval-workbench.mjs'],
+        120_000
+      ),
     ];
   }
 
