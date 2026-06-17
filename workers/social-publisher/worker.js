@@ -117,6 +117,229 @@ const DEFAULT_TOPIC_TAGS = {
   general:  '品牌行銷',
 };
 
+const AUTOFILL_MIN_PENDING = 7;
+const AUTOFILL_BATCH_SIZE = 5;
+const AUTOFILL_CAMPAIGN = 'auto-refill';
+const AUTOFILL_LAST_IDS_KEY = 'content_autofill:last_draft_ids';
+const AUTOFILL_BRIEFS = [
+  { industry: '美髮店', pain: '設計師作品很多，但陌生客只看到價格表。', angle: '把髮型案例變成可預約的入口。' },
+  { industry: '健身教練', pain: '限動很勤勞，真正想報名的人卻不知道下一步。', angle: '把成果照、課程與 LINE 諮詢串成一條路。' },
+  { industry: '早餐店', pain: '每天排隊的人很多，Google 上卻像沒有存在過。', angle: '用菜單頁和常客故事承接附近搜尋。' },
+  { industry: '餐車', pain: '今天在哪裡賣，客人常常找不到。', angle: '把出車地點、招牌品項與預訂入口集中。' },
+  { industry: '民宿', pain: '房型照片分散在平台，品牌記憶都留給 OTA。', angle: '做一頁能說故事、能導訂房的房型入口。' },
+  { industry: '機車行', pain: '保養技術靠口碑，但新客搜尋時只看到地址。', angle: '用維修案例建立信任，再導 LINE 預約。' },
+  { industry: '花店', pain: '作品很漂亮，但節日檔期前沒有固定承接頁。', angle: '把花禮情境、價格帶與預訂時間整理清楚。' },
+  { industry: '補習班', pain: '家長看很多廣告，最後還是不知道適不適合孩子。', angle: '用課程成果與試聽流程降低第一次詢問門檻。' },
+  { industry: '牙醫診所', pain: '專業感很強，病人卻只記得怕痛和價格不透明。', angle: '用療程說明與初診流程建立安心感。' },
+  { industry: '寵物美容', pain: '作品照很可愛，但預約規則常常講不清楚。', angle: '把服務項目、注意事項與 LINE 預約放在同一頁。' },
+];
+const AUTOFILL_PLATFORMS = ['facebook', 'facebook', 'facebook', 'instagram', 'instagram'];
+
+function taipeiDayKey(date = new Date()) {
+  return new Date(date.getTime() + 8 * 3600 * 1000).toISOString().slice(0, 10);
+}
+
+function simpleHash(input) {
+  let h = 0;
+  for (let i = 0; i < input.length; i++) h = ((h << 5) - h + input.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+function contentSlug(text) {
+  return String(text || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\u4e00-\u9fff]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48) || 'post';
+}
+
+function buildTrackUrl(platform, brief, sequence) {
+  const content = `${taipeiDayKey()}-${platform}-${sequence}-${contentSlug(brief.industry)}`;
+  const params = new URLSearchParams({
+    utm_source: platform,
+    utm_medium: 'post',
+    utm_campaign: AUTOFILL_CAMPAIGN,
+    utm_content: content,
+  });
+  return `https://3q-hatchery-webhook.milk790.workers.dev/track?${params.toString()}`;
+}
+
+function fallbackAutofillCaption(brief, platform, url) {
+  const lines = platform === 'instagram'
+    ? [
+      `${brief.industry}最吃虧的地方，常常不是產品不夠好。`,
+      `是陌生客滑到你時，不知道該怎麼開始。`,
+      '',
+      brief.pain,
+      brief.angle,
+      '',
+      `3Q 可以先幫你把第一個承接頁做出來，讓客人從看見到詢問只差一步。`,
+      '',
+      `揭露：本文由 3Q 內容補給機產生初稿，發布前由負責人審稿。`,
+      url,
+      '',
+      '#品牌孵化 #在地店家 #數位獲客',
+    ]
+    : [
+      `${brief.industry}不是沒有客人。`,
+      `很多時候，是客人看見你之後，不知道下一步要做什麼。`,
+      '',
+      brief.pain,
+      '',
+      `我們會先看一件事：陌生客從貼文、Google 或朋友推薦進來時，有沒有一個清楚的地方可以理解你、信任你、聯絡你。`,
+      '',
+      brief.angle,
+      '',
+      `揭露：本文由 3Q 內容補給機產生初稿，發布前由負責人審稿。`,
+      url,
+    ];
+  return lines.join('\n');
+}
+
+async function generateAutofillCaption(brief, platform, url, env) {
+  if (!env.AI) return fallbackAutofillCaption(brief, platform, url);
+  const prompt = [
+    '你是 3Q Hatchery 的內容補給機，幫台灣在地小店寫獲客貼文初稿。',
+    '請用繁體中文，台灣用語，不要浮誇，不要承諾保證成效。',
+    '格式要求：',
+    '- 開頭 2 行是痛點 hook。',
+    '- 中段指出一個老闆會點頭的營運問題。',
+    '- 結尾放清楚 CTA 與追蹤連結。',
+    '- 必須包含揭露句：「揭露：本文由 3Q 內容補給機產生初稿，發布前由負責人審稿。」',
+    platform === 'instagram' ? '- Instagram 150 字內，可加 3 個 hashtag。' : '- Facebook 220 字內，不要 hashtag 海。',
+    '',
+    `行業：${brief.industry}`,
+    `痛點：${brief.pain}`,
+    `角度：${brief.angle}`,
+    `CTA 連結：${url}`,
+  ].join('\n');
+
+  try {
+    const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct-fast', {
+      messages: [
+        { role: 'system', content: '只輸出貼文正文，不要解釋，不要 Markdown code block。' },
+        { role: 'user', content: prompt },
+      ],
+      max_tokens: 420,
+    });
+    const text = (result?.response || '').trim();
+    if (!text || !text.includes('揭露：')) return fallbackAutofillCaption(brief, platform, url);
+    return text.slice(0, 1200);
+  } catch (err) {
+    console.error('autofill caption failed:', err.message);
+    return fallbackAutofillCaption(brief, platform, url);
+  }
+}
+
+async function pushOwnerPreview(env, drafts) {
+  const ownerId = env.OWNER_USER_ID || env.ADMIN_LINE_USER_ID;
+  if (!ownerId || !env.LINE_CHANNEL_ACCESS_TOKEN || drafts.length === 0) {
+    return { skipped: 'missing LINE owner push env' };
+  }
+  const lines = [
+    '內容補給機產生新草稿',
+    '',
+    '回「發」：放行這批草稿',
+    '回「發 123 124」：只放行指定 id',
+    '',
+    ...drafts.map(d => `#${d.id} ${d.platform}｜${d.industry}\n${d.caption.slice(0, 80).replace(/\s+/g, ' ')}...`),
+  ];
+  const res = await fetch('https://api.line.me/v2/bot/message/push', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ to: ownerId, messages: [{ type: 'text', text: lines.join('\n') }] }),
+  });
+  return { ok: res.ok, status: res.status };
+}
+
+async function runContentAutofill(env, force = false) {
+  if (!env.CRM) return { skipped: 'D1 not bound' };
+  if (!env.SESSION) return { skipped: 'KV not bound; daily lock unavailable' };
+
+  const day = taipeiDayKey();
+  const lockKey = `content_autofill:ran:${day}`;
+  if (!force && await env.SESSION.get(lockKey)) return { skipped: 'already ran today' };
+
+  const pending = await env.CRM.prepare(
+    "SELECT COUNT(*) AS n FROM content_queue WHERE status = 'pending'"
+  ).first();
+  const pendingCount = pending?.n || 0;
+  if (!force && pendingCount >= AUTOFILL_MIN_PENDING) {
+    await env.SESSION.put(lockKey, JSON.stringify({ skipped: 'enough pending', pendingCount }), { expirationTtl: 36 * 3600 });
+    return { skipped: 'enough pending', pendingCount };
+  }
+
+  const seed = simpleHash(`${day}:${pendingCount}`);
+  const drafts = [];
+  for (let i = 0; i < AUTOFILL_BATCH_SIZE; i++) {
+    const brief = AUTOFILL_BRIEFS[(seed + i) % AUTOFILL_BRIEFS.length];
+    const platform = AUTOFILL_PLATFORMS[i % AUTOFILL_PLATFORMS.length];
+    const trackUrl = buildTrackUrl(platform, brief, i + 1);
+    const caption = await generateAutofillCaption(brief, platform, trackUrl, env);
+    const captionSeed = JSON.stringify({ type: 'industry_pain', industry: brief.industry, pain: brief.pain, angle: brief.angle, trackUrl });
+    const r = await env.CRM.prepare(
+      "INSERT INTO content_queue (platform, image_url, caption_seed, caption, topic_tag, scheduled_at, status, source_oa) VALUES (?, ?, ?, ?, ?, ?, 'draft', ?)"
+    ).bind(platform, null, captionSeed, caption, null, null, '3q-hatchery').run();
+    drafts.push({ id: r.meta?.last_row_id, platform, industry: brief.industry, caption });
+  }
+
+  const ids = drafts.map(d => d.id).filter(Boolean);
+  await Promise.all([
+    env.SESSION.put(lockKey, JSON.stringify({ generated: ids, pendingCount }), { expirationTtl: 36 * 3600 }),
+    env.SESSION.put(AUTOFILL_LAST_IDS_KEY, JSON.stringify(ids), { expirationTtl: 7 * 24 * 3600 }),
+  ]);
+  const ownerPush = await pushOwnerPreview(env, drafts).catch(err => ({ error: err.message }));
+  return { ok: true, generated: ids, pendingCount, ownerPush };
+}
+
+async function approveDrafts(env, ids = [], limit = AUTOFILL_BATCH_SIZE) {
+  if (!env.CRM) return { ok: false, error: 'D1 not bound' };
+  let targetIds = ids.map(id => parseInt(id, 10)).filter(Boolean);
+  if (targetIds.length === 0 && env.SESSION) {
+    const raw = await env.SESSION.get(AUTOFILL_LAST_IDS_KEY);
+    if (raw) targetIds = JSON.parse(raw).map(id => parseInt(id, 10)).filter(Boolean);
+  }
+  if (targetIds.length === 0) {
+    const rows = await env.CRM.prepare(
+      "SELECT id FROM content_queue WHERE status = 'draft' ORDER BY id ASC LIMIT ?"
+    ).bind(Math.min(limit, 20)).all();
+    targetIds = (rows.results || []).map(r => r.id);
+  }
+
+  const approved = [];
+  for (const id of targetIds) {
+    const r = await env.CRM.prepare(
+      "UPDATE content_queue SET status = 'pending', error_msg = NULL WHERE id = ? AND status = 'draft'"
+    ).bind(id).run();
+    if ((r.meta?.changes || 0) > 0) approved.push(id);
+  }
+  return { ok: true, approved };
+}
+
+async function socialStats(env, days = 14) {
+  if (!env.CRM) return { ok: false, error: 'D1 not bound' };
+  const since = `-${Math.max(1, Math.min(days, 365))} days`;
+  const [byContent, byCampaign, bySource] = await Promise.all([
+    env.CRM.prepare(
+      "SELECT COALESCE(utm_campaign,'(none)') AS utm_campaign, COALESCE(utm_content,'(none)') AS utm_content, event_type, COUNT(*) AS n, MIN(created_at) AS first_seen, MAX(created_at) AS last_seen FROM social_events WHERE created_at >= datetime('now', ?) GROUP BY utm_campaign, utm_content, event_type ORDER BY n DESC LIMIT 100"
+    ).bind(since).all(),
+    env.CRM.prepare(
+      "SELECT COALESCE(utm_campaign,'(none)') AS utm_campaign, event_type, COUNT(*) AS n FROM social_events WHERE created_at >= datetime('now', ?) GROUP BY utm_campaign, event_type ORDER BY n DESC LIMIT 100"
+    ).bind(since).all(),
+    env.CRM.prepare(
+      "SELECT COALESCE(utm_source,'(none)') AS utm_source, event_type, COUNT(*) AS n FROM social_events WHERE created_at >= datetime('now', ?) GROUP BY utm_source, event_type ORDER BY n DESC LIMIT 100"
+    ).bind(since).all(),
+  ]);
+  return {
+    ok: true,
+    days,
+    attribution_note: 'This endpoint groups actual social_events rows. For 3Q, visit rows are the trusted UTM signal.',
+    by_content: byContent.results || [],
+    by_campaign: byCampaign.results || [],
+    by_source: bySource.results || [],
+  };
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // AI caption generation (Workers AI)
 // ─────────────────────────────────────────────────────────────────────────
@@ -556,10 +779,11 @@ export default {
   async scheduled(controller, env, ctx) {
     console.log(`[social-publisher] cron triggered: ${controller.cron}`);
     ctx.waitUntil(
-      runPublishLoop(env)
-        .then(r => console.log('[social-publisher] done:', JSON.stringify(r)))
-        .then(() => refreshTokensIfNeeded(env))
-        .catch(err => console.error('[social-publisher] error:', err.message))
+      Promise.allSettled([
+        runPublishLoop(env).then(r => console.log('[social-publisher] publish:', JSON.stringify(r))),
+        runContentAutofill(env).then(r => console.log('[social-publisher] autofill:', JSON.stringify(r))),
+        refreshTokensIfNeeded(env),
+      ]).catch(err => console.error('[social-publisher] error:', err.message))
     );
   },
 
@@ -568,6 +792,10 @@ export default {
     const CORS = { 'Access-Control-Allow-Origin': '*' };
     const json = (data, status = 200) =>
       new Response(JSON.stringify(data, null, 2), { status, headers: { 'Content-Type': 'application/json', ...CORS } });
+
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { status: 204, headers: { ...CORS, 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization' } });
+    }
 
     // Health check
     if (url.pathname === '/health') {
@@ -588,6 +816,7 @@ export default {
           crm_d1:     Boolean(env.CRM),
           ai:         Boolean(env.AI),
           auto_refresh: Boolean(env.THREADS_APP_SECRET),
+          owner_push: Boolean(env.LINE_CHANNEL_ACCESS_TOKEN && (env.OWNER_USER_ID || env.ADMIN_LINE_USER_ID)),
         },
       });
     }
@@ -629,6 +858,78 @@ export default {
       const body = await request.json().catch(() => ({}));
       const caption = await generateCaption(body.seed || '', body.platform || 'threads', env);
       return json({ ok: true, caption });
+    }
+
+    // Content autofill: POST /autofill?token=TRIGGER_TOKEN[&force=1]
+    if (url.pathname === '/autofill' && request.method === 'POST') {
+      const auth = request.headers.get('Authorization') || '';
+      const tok  = auth.startsWith('Bearer ') ? auth.slice(7) : url.searchParams.get('token');
+      if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return json({ ok: false, error: 'forbidden' }, 403);
+      const result = await runContentAutofill(env, url.searchParams.get('force') === '1');
+      return json(result);
+    }
+
+    // Approve draft rows: POST /queue/approve?token=TRIGGER_TOKEN&ids=1,2
+    if (url.pathname === '/queue/approve' && request.method === 'POST') {
+      const auth = request.headers.get('Authorization') || '';
+      const tok  = auth.startsWith('Bearer ') ? auth.slice(7) : url.searchParams.get('token');
+      if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return json({ ok: false, error: 'forbidden' }, 403);
+      const body = await request.json().catch(() => ({}));
+      const ids = body.ids || (url.searchParams.get('ids') || '').split(',');
+      const result = await approveDrafts(env, Array.isArray(ids) ? ids : String(ids).split(','));
+      return json(result);
+    }
+
+    // UTM stats: GET /admin/stats?key=TRIGGER_TOKEN&days=14
+    if (url.pathname === '/admin/stats' && request.method === 'GET') {
+      const auth = request.headers.get('Authorization') || '';
+      const tok  = auth.startsWith('Bearer ') ? auth.slice(7) : (url.searchParams.get('key') || url.searchParams.get('token'));
+      if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return json({ ok: false, error: 'forbidden' }, 403);
+      const days = parseInt(url.searchParams.get('days') || '14', 10);
+      return json(await socialStats(env, Number.isFinite(days) ? days : 14));
+    }
+
+    // Add to content queue: POST /queue/add (token-protected)
+    if (url.pathname === '/queue/add' && request.method === 'POST') {
+      const auth = request.headers.get('Authorization') || '';
+      const tok  = auth.startsWith('Bearer ') ? auth.slice(7) : url.searchParams.get('token');
+      if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return json({ ok: false, error: 'forbidden' }, 403);
+      if (!env.CRM) return json({ ok: false, error: 'D1 not bound' });
+      const b = await request.json().catch(() => ({}));
+      const platform = (b.platform || '').trim();
+      if (!platform) return json({ ok: false, error: 'platform required' }, 400);
+      const r = await env.CRM.prepare(
+        "INSERT INTO content_queue (platform, image_url, caption_seed, caption, topic_tag, scheduled_at, status, source_oa) VALUES (?,?,?,?,?,?,?, ?)"
+      ).bind(platform, b.image_url || null, b.caption_seed || null, b.caption || null, b.topic_tag || null, b.scheduled_at || null, b.status || 'pending', b.source_oa || '3q-hatchery').run();
+      return json({ ok: true, id: r.meta && r.meta.last_row_id });
+    }
+
+    // Soft-delete a queue row: POST /queue/del?id= (token-protected)
+    if (url.pathname === '/queue/del' && request.method === 'POST') {
+      const auth = request.headers.get('Authorization') || '';
+      const tok  = auth.startsWith('Bearer ') ? auth.slice(7) : url.searchParams.get('token');
+      if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return json({ ok: false, error: 'forbidden' }, 403);
+      if (!env.CRM) return json({ ok: false, error: 'D1 not bound' });
+      const id = parseInt(url.searchParams.get('id') || '0', 10);
+      if (!id) return json({ ok: false, error: 'id required' }, 400);
+      const result = await env.CRM.prepare(
+        "UPDATE content_queue SET status = 'deleted', scheduled_at = NULL, error_msg = 'soft-deleted by admin queue control' WHERE id = ?"
+      ).bind(id).run();
+      return json({ ok: true, soft_deleted: id, changes: result.meta?.changes || 0 });
+    }
+    if (url.pathname === '/queue/del') {
+      return json({ ok: false, error: 'method not allowed' }, 405);
+    }
+
+    // List queue: GET /queue/list?token=
+    if (url.pathname === '/queue/list') {
+      const tok = url.searchParams.get('token');
+      if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return json({ ok: false, error: 'forbidden' }, 403);
+      if (!env.CRM) return json({ ok: false, error: 'D1 not bound' });
+      const rows = await env.CRM.prepare(
+        "SELECT id, platform, substr(coalesce(caption,caption_seed,''),1,80) AS preview, scheduled_at, status, error_msg FROM content_queue ORDER BY id DESC LIMIT 50"
+      ).all();
+      return json({ ok: true, rows: rows.results });
     }
 
     return json({ service: '3q-social-publisher', ok: true, version: '1.0' });

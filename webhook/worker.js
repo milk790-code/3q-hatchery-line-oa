@@ -504,6 +504,7 @@ async function updateInquiryStatus(uid, status, env) {
       await Promise.allSettled([
         checkAndGrantReferralReward(uid, env),
         sendReferralInvite(uid, env),
+        decrementSeat(env),
       ]);
     }
     if (status === 'contacted') await updateMemberTier(uid, 'inquired', env);
@@ -543,6 +544,163 @@ async function saveSocialEvent(data, env) {
     return result?.meta?.last_row_id || null;
   } catch (err) {
     console.error('saveSocialEvent failed:', err.message);
+    return null;
+  }
+}
+
+const SALES_STATE_PREFIX = 'sales:';
+const CONTENT_AUTOFILL_LAST_IDS_KEY = 'content_autofill:last_draft_ids';
+
+function contactSignal(text) {
+  const t = String(text || '');
+  return /09\d{8}|line\s*id|LINE\s*ID|@[\w.-]{3,}|[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}|聯絡|電話|手機|加我|預約/i.test(t);
+}
+
+function heuristicCompletion(userText, prior = {}) {
+  const text = String(userText || '');
+  let score = Number(prior.completion || 0);
+  if (/價格|報價|多少錢|預算|方案|月費/.test(text)) score = Math.max(score, 45);
+  if (/預約|諮詢|想聊|方便|時段|合作/.test(text)) score = Math.max(score, 60);
+  if (/我的店|我是做|我們是|行業|店名|品牌/.test(text)) score = Math.max(score, 50);
+  if (contactSignal(text)) score = Math.max(score, 82);
+  return Math.min(100, score);
+}
+
+function parseAiState(raw) {
+  const text = String(raw || '');
+  const match = text.match(/\[STATE\]\s*(\{[\s\S]*?\})\s*$/);
+  if (!match) return { reply: text, state: null };
+  try {
+    return {
+      reply: text.slice(0, match.index).trim(),
+      state: JSON.parse(match[1]),
+    };
+  } catch {
+    return { reply: text.replace(/\[STATE\][\s\S]*$/, '').trim(), state: null };
+  }
+}
+
+async function getSalesState(uid, env) {
+  if (!env.SESSION || !uid) return {};
+  try {
+    const raw = await env.SESSION.get(`${SALES_STATE_PREFIX}${uid}`);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+async function saveSalesState(uid, state, env) {
+  if (!env.SESSION || !uid) return;
+  await env.SESSION.put(`${SALES_STATE_PREFIX}${uid}`, JSON.stringify(state), { expirationTtl: 60 * 60 * 24 * 30 });
+}
+
+async function recordSalesIntentInquiry(uid, sales, lastUserText, env) {
+  if (!env.CRM) return null;
+  try {
+    const result = await env.CRM.prepare(
+      'INSERT INTO inquiries (user_id, service, budget, timeline, free_text, lead_score, source_oa, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+    ).bind(
+      uid || 'unknown',
+      'ai-handoff',
+      sales.completion >= 85 ? 'high' : 'mid',
+      null,
+      [sales.profile, sales.pain, lastUserText].filter(Boolean).join('\n').slice(0, 900),
+      sales.completion >= 85 ? 'hot' : 'warm',
+      '3q-hatchery',
+      'new',
+    ).run();
+    return result?.meta?.last_row_id || null;
+  } catch (err) {
+    console.error('recordSalesIntentInquiry failed:', err.message);
+    return null;
+  }
+}
+
+function salesHandoffText(uid, sales, lastUserText) {
+  return [
+    '3Q AI 接待交接包',
+    `客人：${uid}`,
+    `完成度：${sales.completion || 0}%`,
+    `輪廓：${sales.profile || '-'}`,
+    `痛點：${sales.pain || '-'}`,
+    `上一步：${sales.last_move || '-'}`,
+    `原因：${sales.handoff_reason || (sales.contact ? '客人留下聯絡訊號' : '完成度達交接門檻')}`,
+    '',
+    `最近訊息：${String(lastUserText || '').slice(0, 300)}`,
+    '',
+    '建議：打開 LINE OA 後台接手，先確認行業、需求與下一步時段。',
+  ].join('\n');
+}
+
+async function updateSalesIntent(uid, userText, aiReply, aiState, env) {
+  if (!uid) return null;
+  const prior = await getSalesState(uid, env);
+  const detectedContact = Boolean(prior.contact || contactSignal(userText));
+  const completion = Math.max(
+    heuristicCompletion(userText, prior),
+    Number(aiState?.completion || 0),
+    Number(prior.completion || 0),
+  );
+  const next = {
+    ...prior,
+    completion,
+    profile: aiState?.profile || prior.profile || '',
+    pain: aiState?.pain || prior.pain || '',
+    last_move: aiState?.last_move || prior.last_move || '',
+    needs_principal: Boolean(aiState?.needs_principal || prior.needs_principal),
+    handoff_reason: aiState?.handoff_reason || prior.handoff_reason || '',
+    contact: detectedContact,
+    last_user_text: String(userText || '').slice(0, 500),
+    last_ai_reply: String(aiReply || '').slice(0, 500),
+    updatedAt: new Date().toISOString(),
+  };
+
+  const shouldHandoff = completion >= 70 || detectedContact || next.needs_principal;
+  if (shouldHandoff && !prior.alerted) {
+    next.alerted = true;
+    next.inquiry_id = await recordSalesIntentInquiry(uid, next, userText, env);
+    await pushOwnerText(salesHandoffText(uid, next, userText), env).catch(err => console.error('sales owner push failed:', err.message));
+  }
+
+  await saveSalesState(uid, next, env);
+  return next;
+}
+
+async function approveContentDraftsFromOwner(uid, text, env) {
+  const ownerId = env.OWNER_USER_ID || env.ADMIN_LINE_USER_ID;
+  if (!ownerId || uid !== ownerId) return null;
+  const trimmed = String(text || '').trim();
+  if (!/^發(?:\s|$)/.test(trimmed)) return null;
+  if (!env.CRM) return { ok: false, error: 'D1 not bound' };
+
+  let ids = trimmed.split(/\s+/).slice(1).map(v => parseInt(v, 10)).filter(Boolean);
+  if (ids.length === 0 && env.SESSION) {
+    const raw = await env.SESSION.get(CONTENT_AUTOFILL_LAST_IDS_KEY);
+    if (raw) ids = JSON.parse(raw).map(v => parseInt(v, 10)).filter(Boolean);
+  }
+  if (ids.length === 0) {
+    const rows = await env.CRM.prepare("SELECT id FROM content_queue WHERE status = 'draft' ORDER BY id ASC LIMIT 5").all();
+    ids = (rows.results || []).map(r => r.id);
+  }
+
+  const approved = [];
+  for (const id of ids) {
+    const r = await env.CRM.prepare("UPDATE content_queue SET status = 'pending', error_msg = NULL WHERE id = ? AND status = 'draft'").bind(id).run();
+    if ((r.meta?.changes || 0) > 0) approved.push(id);
+  }
+  return { ok: true, approved };
+}
+
+async function savePendingRedeem(uid, messageId, env) {
+  if (!env.CRM) return null;
+  try {
+    const result = await env.CRM.prepare(
+      'INSERT INTO pending_redeem (user_id, message_id, source_oa, status) VALUES (?, ?, ?, ?)'
+    ).bind(uid || 'unknown', messageId || null, '3q-hatchery', 'pending').run();
+    return result?.meta?.last_row_id || null;
+  } catch (err) {
+    console.error('savePendingRedeem failed:', err.message);
     return null;
   }
 }
@@ -662,6 +820,34 @@ function tokensMatch(a, b) {
   let diff = 0;
   for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
   return diff === 0;
+}
+
+function adminTokenFrom(request, url) {
+  const auth = request.headers.get('Authorization') || '';
+  return auth.startsWith('Bearer ')
+    ? auth.slice(7)
+    : (url.searchParams.get('key') || url.searchParams.get('token') || '');
+}
+
+function jsonResponse(data, status = 200) {
+  return new Response(JSON.stringify(data, null, 2), {
+    status,
+    headers: { 'Content-Type': 'application/json', ...CORS },
+  });
+}
+
+async function pushLineText(to, text, env) {
+  if (!to || !text || !env.LINE_CHANNEL_ACCESS_TOKEN) return { ok: false, skipped: 'missing LINE push env' };
+  const res = await fetch('https://api.line.me/v2/bot/message/push', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ to, messages: [{ type: 'text', text }] }),
+  });
+  return { ok: res.ok, status: res.status };
+}
+
+async function pushOwnerText(text, env) {
+  return pushLineText(env.OWNER_USER_ID || env.ADMIN_LINE_USER_ID, text, env);
 }
 
 async function statsHandler(env) {
@@ -786,12 +972,13 @@ async function runFollowUps(env) {
 }
 
 async function runWeeklyDigest(env) {
-  if (!env.CRM || !env.OWNER_USER_ID || !env.LINE_CHANNEL_ACCESS_TOKEN) {
+  if (!env.CRM || !(env.OWNER_USER_ID || env.ADMIN_LINE_USER_ID) || !env.LINE_CHANNEL_ACCESS_TOKEN) {
     return { skipped: 'missing env' };
   }
   try {
     const since = "datetime('now', '-7 days')";
-    const [inq, cmp, rev, hot, warm, cold, won] = await Promise.all([
+    const sinceIso = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
+    const [inq, cmp, rev, hot, warm, cold, won, utm, contacts] = await Promise.all([
       env.CRM.prepare(`SELECT COUNT(*) AS n FROM inquiries WHERE created_at >= ${since}`).first(),
       env.CRM.prepare(`SELECT COUNT(*) AS n FROM campaigns WHERE created_at >= ${since}`).first(),
       env.CRM.prepare(`SELECT COALESCE(SUM(price), 0) AS r FROM campaigns WHERE created_at >= ${since}`).first(),
@@ -799,36 +986,50 @@ async function runWeeklyDigest(env) {
       env.CRM.prepare(`SELECT COUNT(*) AS n FROM inquiries WHERE lead_score = 'warm' AND created_at >= ${since}`).first(),
       env.CRM.prepare(`SELECT COUNT(*) AS n FROM inquiries WHERE lead_score = 'cold' AND created_at >= ${since}`).first(),
       env.CRM.prepare(`SELECT COUNT(*) AS n FROM inquiries WHERE status = 'won' AND created_at >= ${since}`).first(),
+      env.CRM.prepare(
+        "SELECT COALESCE(utm_campaign,'(none)') AS campaign, COALESCE(utm_content,'(none)') AS content, COUNT(*) AS n FROM social_events WHERE created_at >= datetime('now', '-7 days') AND event_type IN ('visit','click') GROUP BY campaign, content ORDER BY n DESC LIMIT 8"
+      ).all(),
+      env.CRM.prepare(
+        "SELECT user_id, free_text, created_at FROM inquiries WHERE created_at >= datetime('now', '-7 days') AND (lead_score IN ('hot','warm') OR free_text LIKE '%09%' OR free_text LIKE '%LINE%') ORDER BY id DESC LIMIT 8"
+      ).all(),
     ]);
     const slots = await getCampaignSlots(env);
     const total_slots = slots.tier1.length + slots.tier2.length + slots.tier3.length;
     const subs = await getSubscribers(env);
+    const salesStates = await listRecentSalesStates(env, sinceIso);
+    const seat = await getSeatState(env);
+    const newMembers = await countNewMembers(env, sinceIso);
     const text = [
-      '📊 3Q 週報 (本週)',
+      '3Q 自動引流週戰報',
+      `區間：近 7 天（產生於 ${new Date(Date.now() + 8 * 3600000).toISOString().slice(0, 16).replace('T', ' ')} TW）`,
+      '',
+      `新好友：${newMembers} 人`,
+      `訂閱名單：${subs.length} 人`,
+      `AI 對話：${salesStates.total} 位`,
+      `70%+ 意向：${salesStates.hot} 位`,
+      `留聯絡訊號：${salesStates.contacts} 位`,
       '',
       `新諮詢：${inq?.n || 0} 筆`,
-      `  🔥 熱：${hot?.n || 0}  ⚡ 暖：${warm?.n || 0}  🌱 冷：${cold?.n || 0}`,
-      `  🎉 本週成交：${won?.n || 0} 筆`,
-      '',
+      `熱/暖/冷：${hot?.n || 0}/${warm?.n || 0}/${cold?.n || 0}`,
+      `本週成交：${won?.n || 0} 筆`,
       `新報名：${cmp?.n || 0} 位`,
       `本週收入：NT$ ${(rev?.r || 0).toLocaleString()}`,
       '',
       `招募進度：${total_slots}/30 位`,
-      `  · 100元梯：${slots.tier1.length}/10`,
-      `  · 200元梯：${slots.tier2.length}/10`,
-      `  · 300元梯：${slots.tier3.length}/10`,
+      `掘計畫席位：剩 ${seat.left}/${seat.total} 席`,
       '',
-      `訂閱人數：${subs.length} 人`,
+      'UTM 前段流量：',
+      ...((utm.results || []).length ? utm.results.map(r => `- ${r.campaign}/${r.content}: ${r.n}`) : ['- 本週沒有 social_events']),
+      '',
+      '留聯絡/高意向清單：',
+      ...((contacts.results || []).length ? contacts.results.map(r => `- ${r.user_id}: ${String(r.free_text || '').slice(0, 60).replace(/\s+/g, ' ')}`) : ['- 本週沒有新清單']),
       '',
       'Dashboard: https://milk790-code.github.io/3q-hatchery-line-oa/ui_kits/dashboard/',
     ].join('\n');
 
-    await fetch('https://api.line.me/v2/bot/message/push', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ to: env.OWNER_USER_ID, messages: [{ type: 'text', text }] }),
-    });
-    return { inq: inq?.n, cmp: cmp?.n, rev: rev?.r };
+    await pushOwnerText(text, env);
+    await archiveWeeklyReport(text, env);
+    return { inq: inq?.n, cmp: cmp?.n, rev: rev?.r, aiHot: salesStates.hot, newMembers };
   } catch (err) {
     console.error('Weekly digest failed:', err.message);
     return { error: err.message };
@@ -863,6 +1064,352 @@ async function runSeasonalPush(env) {
     }
   }
   return { sent, total: subscribers.length, month };
+}
+
+async function listKvJson(env, prefix, limit = 1000) {
+  if (!env.SESSION) return [];
+  const out = [];
+  let cursor = undefined;
+  do {
+    const page = await env.SESSION.list({ prefix, cursor });
+    for (const key of (page.keys || [])) {
+      if (out.length >= limit) return out;
+      const raw = await env.SESSION.get(key.name);
+      if (!raw) continue;
+      try { out.push({ key: key.name, value: JSON.parse(raw) }); } catch {}
+    }
+    cursor = page.cursor;
+    if (page.list_complete) break;
+  } while (cursor);
+  return out;
+}
+
+async function listRecentSalesStates(env, sinceIso) {
+  const rows = await listKvJson(env, SALES_STATE_PREFIX, 1000);
+  const states = rows.map(r => r.value).filter(v => !sinceIso || String(v.updatedAt || '') >= sinceIso);
+  return {
+    total: states.length,
+    hot: states.filter(s => Number(s.completion || 0) >= 70).length,
+    contacts: states.filter(s => s.contact).length,
+    rows: states.slice(0, 20),
+  };
+}
+
+async function countNewMembers(env, sinceIso) {
+  const rows = await listKvJson(env, 'member:', 1000);
+  const sinceDay = String(sinceIso || '').slice(0, 10);
+  return rows
+    .filter(r => r.key !== 'member:next_num')
+    .filter(r => !sinceDay || String(r.value.joinDate || '') >= sinceDay)
+    .length;
+}
+
+async function archiveWeeklyReport(reportMd, env) {
+  const key = `weekly:${new Date(Date.now() + 8 * 3600000).toISOString().slice(0, 10)}`;
+  if (env.SESSION) {
+    await Promise.all([
+      env.SESSION.put('weekly_report:last', reportMd, { expirationTtl: 60 * 60 * 24 * 60 }),
+      env.SESSION.put(`weekly_report:${key}`, reportMd, { expirationTtl: 60 * 60 * 24 * 180 }),
+    ]).catch(err => console.error('weekly KV archive failed:', err.message));
+  }
+  if (env.CRM) {
+    await env.CRM.prepare(
+      'INSERT OR REPLACE INTO weekly_reports (report_key, report_md) VALUES (?, ?)'
+    ).bind(key, reportMd).run().catch(err => console.error('weekly D1 archive failed:', err.message));
+  }
+  return key;
+}
+
+const SEAT_KEY = 'seat:launch-plan';
+const SEAT_DEFAULT_TOTAL = 5;
+const SEAT_DEFAULT_LEFT = 2;
+
+async function getSeatState(env) {
+  if (!env.SESSION) return { left: SEAT_DEFAULT_LEFT, total: SEAT_DEFAULT_TOTAL, source: 'default' };
+  const raw = await env.SESSION.get(SEAT_KEY);
+  if (!raw) return { left: SEAT_DEFAULT_LEFT, total: SEAT_DEFAULT_TOTAL, source: 'default' };
+  try {
+    const parsed = JSON.parse(raw);
+    return {
+      left: Math.max(0, Number(parsed.left ?? SEAT_DEFAULT_LEFT)),
+      total: Math.max(1, Number(parsed.total ?? SEAT_DEFAULT_TOTAL)),
+      updatedAt: parsed.updatedAt || null,
+      source: 'kv',
+    };
+  } catch {
+    const left = Math.max(0, parseInt(raw, 10) || SEAT_DEFAULT_LEFT);
+    return { left, total: SEAT_DEFAULT_TOTAL, source: 'kv' };
+  }
+}
+
+async function setSeatLeft(env, left, total = null) {
+  if (!env.SESSION) return { ok: false, error: 'KV not bound' };
+  const current = await getSeatState(env);
+  const next = {
+    left: Math.max(0, parseInt(left, 10)),
+    total: Math.max(1, parseInt(total || current.total || SEAT_DEFAULT_TOTAL, 10)),
+    updatedAt: new Date().toISOString(),
+  };
+  next.left = Math.min(next.left, next.total);
+  await env.SESSION.put(SEAT_KEY, JSON.stringify(next));
+  return { ok: true, ...next };
+}
+
+async function decrementSeat(env) {
+  const current = await getSeatState(env);
+  return setSeatLeft(env, Math.max(0, current.left - 1), current.total);
+}
+
+async function seatHandler(request, url, env) {
+  const n = url.searchParams.get('n');
+  const total = url.searchParams.get('total');
+  if (n !== null || total !== null) {
+    if (!tokensMatch(adminTokenFrom(request, url), env.TRIGGER_TOKEN)) return jsonResponse({ ok: false, error: 'forbidden' }, 403);
+    return jsonResponse(await setSeatLeft(env, n ?? (await getSeatState(env)).left, total));
+  }
+  return jsonResponse({ ok: true, ...(await getSeatState(env)) });
+}
+
+const BROADCAST_PRESET_PREFIX = 'broadcast:preset:';
+const BROADCAST_SCHEDULE_PREFIX = 'broadcast:schedule:';
+
+async function readJsonOrText(request) {
+  const raw = await request.text();
+  if (!raw) return {};
+  try { return JSON.parse(raw); } catch { return { text: raw }; }
+}
+
+function normalizeBroadcastMessages(input) {
+  if (Array.isArray(input?.messages) && input.messages.length > 0) return input.messages.slice(0, 5);
+  const text = String(input?.text || input?.message || '').trim();
+  if (!text) return [];
+  return [{ type: 'text', text: text.slice(0, 4900) }];
+}
+
+function toIsoOrNull(value) {
+  if (!value) return null;
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? null : d.toISOString();
+}
+
+async function getBroadcastPreset(env, preset) {
+  if (!env.SESSION) return null;
+  const raw = await env.SESSION.get(`${BROADCAST_PRESET_PREFIX}${preset}`);
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+async function sendBroadcastMessages(env, recipients, messages) {
+  if (!env.LINE_CHANNEL_ACCESS_TOKEN) return { ok: false, error: 'LINE token not set' };
+  let sent = 0;
+  const failures = [];
+  for (const uid of recipients) {
+    try {
+      const res = await fetch('https://api.line.me/v2/bot/message/push', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: uid, messages }),
+      });
+      if (res.ok) sent++;
+      else failures.push({ uid, status: res.status });
+    } catch (err) {
+      failures.push({ uid, error: err.message });
+    }
+  }
+  return { ok: failures.length === 0, sent, total: recipients.length, failures: failures.slice(0, 10) };
+}
+
+async function scheduleBroadcast(env, preset, messages, scheduledAt) {
+  if (!env.SESSION) return { ok: false, error: 'KV not bound' };
+  const id = crypto.randomUUID();
+  const payload = { id, preset, messages, scheduledAt, status: 'pending', createdAt: new Date().toISOString() };
+  await env.SESSION.put(`${BROADCAST_SCHEDULE_PREFIX}${id}`, JSON.stringify(payload), { expirationTtl: 60 * 60 * 24 * 90 });
+  return { ok: true, id, scheduledAt };
+}
+
+async function runDueBroadcasts(env) {
+  if (!env.SESSION) return { skipped: 'KV not bound' };
+  const now = new Date().toISOString();
+  const schedules = await listKvJson(env, BROADCAST_SCHEDULE_PREFIX, 200);
+  const due = schedules.filter(item => item.value.status === 'pending' && item.value.scheduledAt <= now);
+  const results = [];
+  for (const item of due) {
+    const recipients = await getSubscribers(env);
+    const sent = await sendBroadcastMessages(env, recipients, item.value.messages || []);
+    const next = { ...item.value, status: sent.ok ? 'sent' : 'error', sentAt: new Date().toISOString(), result: sent };
+    await env.SESSION.put(item.key, JSON.stringify(next), { expirationTtl: 60 * 60 * 24 * 90 });
+    results.push({ id: item.value.id, ...sent });
+  }
+  return { due: due.length, results };
+}
+
+async function broadcastHandler(request, url, env) {
+  if (!env.SESSION) return jsonResponse({ ok: false, error: 'KV not bound' }, 500);
+  const action = url.searchParams.get('action') || url.searchParams.get('mode') || (url.searchParams.get('list') ? 'list' : 'preview');
+  const preset = url.searchParams.get('preset') || 'default';
+  const mutatingActions = new Set(['save', 'schedule', 'test', 'fire']);
+
+  if (action === 'list') {
+    const rows = await listKvJson(env, BROADCAST_PRESET_PREFIX, 200);
+    const schedules = await listKvJson(env, BROADCAST_SCHEDULE_PREFIX, 200);
+    return jsonResponse({
+      ok: true,
+      presets: rows.map(r => ({ preset: r.key.slice(BROADCAST_PRESET_PREFIX.length), updatedAt: r.value.updatedAt })),
+      schedules: schedules.map(r => r.value),
+    });
+  }
+
+  const body = request.method === 'POST' ? await readJsonOrText(request) : {};
+  if (mutatingActions.has(action) && request.method !== 'POST') {
+    return jsonResponse({ ok: false, error: 'POST required for broadcast mutations' }, 405);
+  }
+  if (action === 'save') {
+    const messages = normalizeBroadcastMessages(body);
+    if (messages.length === 0) return jsonResponse({ ok: false, error: 'text or messages required' }, 400);
+    const payload = { preset, messages, updatedAt: new Date().toISOString() };
+    await env.SESSION.put(`${BROADCAST_PRESET_PREFIX}${preset}`, JSON.stringify(payload));
+    return jsonResponse({ ok: true, preset, messages });
+  }
+
+  const stored = await getBroadcastPreset(env, preset);
+  const messages = normalizeBroadcastMessages(body).length ? normalizeBroadcastMessages(body) : (stored?.messages || []);
+  if (messages.length === 0) return jsonResponse({ ok: false, error: 'preset not found or empty message' }, 404);
+
+  const schedule = url.searchParams.get('schedule') || body.schedule;
+  const scheduleIso = toIsoOrNull(schedule);
+  const confirm = String(url.searchParams.get('confirm') || body.confirm || '').toUpperCase();
+  if (schedule && !scheduleIso) return jsonResponse({ ok: false, error: 'invalid schedule ISO time' }, 400);
+  if ((action === 'schedule' || action === 'fire') && scheduleIso && scheduleIso > new Date().toISOString()) {
+    if (confirm !== 'SCHEDULE') return jsonResponse({ ok: false, error: 'confirm=SCHEDULE required' }, 400);
+    return jsonResponse(await scheduleBroadcast(env, preset, messages, scheduleIso));
+  }
+
+  const recipients = await getSubscribers(env);
+  if (action === 'preview') return jsonResponse({ ok: true, preset, recipients: recipients.length, messages });
+  if (action === 'test') return jsonResponse(await sendBroadcastMessages(env, [env.OWNER_USER_ID || env.ADMIN_LINE_USER_ID].filter(Boolean), messages));
+  if (action === 'fire') {
+    if (confirm !== 'SEND') return jsonResponse({ ok: false, error: 'confirm=SEND required' }, 400);
+    return jsonResponse(await sendBroadcastMessages(env, recipients, messages));
+  }
+  return jsonResponse({ ok: false, error: 'invalid action' }, 400);
+}
+
+async function runHourlyOps(env) {
+  const [followUps, broadcasts] = await Promise.allSettled([
+    runFollowUps(env),
+    runDueBroadcasts(env),
+  ]);
+  return {
+    followUps: followUps.status === 'fulfilled' ? followUps.value : { error: followUps.reason?.message || String(followUps.reason) },
+    broadcasts: broadcasts.status === 'fulfilled' ? broadcasts.value : { error: broadcasts.reason?.message || String(broadcasts.reason) },
+  };
+}
+
+const CRON_OUTCOME_TTL_SECONDS = 60 * 60 * 24 * 30;
+const CRON_BRANCHES = {
+  '5 * * * *': { name: 'hourly_ops', run: runHourlyOps },
+  '0 13 * * 1': { name: 'weekly_digest', run: runWeeklyDigest },
+  '0 1 1 3,6,9,12 *': { name: 'seasonal_push', run: runSeasonalPush },
+};
+
+function cronBindings(env) {
+  return {
+    kv: Boolean(env.SESSION),
+    d1: Boolean(env.CRM),
+    lineToken: Boolean(env.LINE_CHANNEL_ACCESS_TOKEN),
+    owner: Boolean(env.OWNER_USER_ID),
+  };
+}
+
+function safeJsonValue(value) {
+  try {
+    JSON.stringify(value);
+    return value;
+  } catch {
+    return String(value);
+  }
+}
+
+function cronResultStatus(result, caughtError) {
+  if (caughtError || result?.error) return 'error';
+  if (result?.skipped) return 'skipped';
+  return 'success';
+}
+
+async function recordCronOutcome(env, outcome) {
+  if (!env.SESSION) return { ok: false, error: 'KV not bound' };
+
+  const payload = JSON.stringify(outcome);
+  const opts = { expirationTtl: CRON_OUTCOME_TTL_SECONDS };
+  try {
+    await Promise.all([
+      env.SESSION.put('cron:last', payload, opts),
+      env.SESSION.put(`cron:last:${outcome.branch}`, payload, opts),
+    ]);
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: err?.message || String(err) };
+  }
+}
+
+async function runScheduledBranch(event, env) {
+  const startedAt = new Date();
+  const branch = CRON_BRANCHES[event.cron] || null;
+  let result = null;
+  let caughtError = null;
+
+  try {
+    result = branch ? await branch.run(env) : { skipped: 'unmapped cron' };
+  } catch (err) {
+    caughtError = err;
+    result = { error: err?.message || String(err) };
+  }
+
+  const outcome = {
+    cron: event.cron,
+    branch: branch?.name || 'unmapped',
+    status: cronResultStatus(result, caughtError),
+    startedAt: startedAt.toISOString(),
+    finishedAt: new Date().toISOString(),
+    durationMs: Date.now() - startedAt.getTime(),
+    bindings: cronBindings(env),
+    result: safeJsonValue(result),
+  };
+  const kvWrite = await recordCronOutcome(env, outcome);
+
+  console.log(JSON.stringify({
+    message: 'webhook cron outcome',
+    ...outcome,
+    kvWriteOk: kvWrite.ok,
+    kvWriteError: kvWrite.error || null,
+  }));
+}
+
+async function cronStatusHandler(env) {
+  if (!env.SESSION) {
+    return new Response(JSON.stringify({ ok: false, error: 'KV not bound' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', ...CORS },
+    });
+  }
+
+  const keys = ['cron:last', ...Object.values(CRON_BRANCHES).map(branch => `cron:last:${branch.name}`)];
+  const entries = await Promise.all(keys.map(async key => {
+    const raw = await env.SESSION.get(key);
+    if (!raw) return [key, null];
+    try {
+      return [key, JSON.parse(raw)];
+    } catch {
+      return [key, { parseError: true, raw }];
+    }
+  }));
+
+  return new Response(JSON.stringify({
+    ok: true,
+    statuses: Object.fromEntries(entries),
+  }), {
+    headers: { 'Content-Type': 'application/json', ...CORS },
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -1001,6 +1548,28 @@ export default {
       const tok = auth.startsWith('Bearer ') ? auth.slice(7) : null;
       if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return new Response('forbidden', { status: 403 });
       return await csvExportHandler(url.searchParams.get('table') || 'inquiries', env);
+    }
+
+    if (url.pathname === '/api/cron-status' && request.method === 'GET') {
+      const auth = request.headers.get('Authorization') || '';
+      const tok = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+      if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return new Response('forbidden', { status: 403 });
+      return await cronStatusHandler(env);
+    }
+
+    if (url.pathname === '/admin/broadcast') {
+      if (!tokensMatch(adminTokenFrom(request, url), env.TRIGGER_TOKEN)) return jsonResponse({ ok: false, error: 'forbidden' }, 403);
+      return await broadcastHandler(request, url, env);
+    }
+
+    if (url.pathname === '/admin/seat' && request.method === 'GET') {
+      return await seatHandler(request, url, env);
+    }
+
+    if (url.pathname === '/admin/weekly-report' && request.method === 'GET') {
+      if (!tokensMatch(adminTokenFrom(request, url), env.TRIGGER_TOKEN)) return jsonResponse({ ok: false, error: 'forbidden' }, 403);
+      const raw = env.SESSION ? await env.SESSION.get('weekly_report:last') : null;
+      return jsonResponse({ ok: Boolean(raw), report_md: raw || null });
     }
 
     // v4: GET /api/member/:userId — cross-bot member lookup
@@ -1185,16 +1754,7 @@ export default {
   },
 
   async scheduled(event, env, ctx) {
-    if (event.cron === '5 * * * *') {
-      ctx.waitUntil(runFollowUps(env).then(r => console.log('Follow-up ran:', JSON.stringify(r))));
-    }
-    if (event.cron === '0 13 * * 1') {
-      ctx.waitUntil(runWeeklyDigest(env).then(r => console.log('Weekly digest:', JSON.stringify(r))));
-    }
-    // Seasonal push: 1st of Mar / Jun / Sep / Dec at 09:00 TW (01:00 UTC)
-    if (event.cron === '0 1 1 3,6,9,12 *') {
-      ctx.waitUntil(runSeasonalPush(env).then(r => console.log('Seasonal push:', JSON.stringify(r))));
-    }
+    ctx.waitUntil(runScheduledBranch(event, env));
   },
 };
 
@@ -1252,6 +1812,22 @@ async function handleEvent(ev, env) {
     if (MENU[d]) return MENU[d]();
   }
 
+  if (ev.type === 'message' && ev.message?.type === 'image') {
+    const redeemId = await savePendingRedeem(uid, ev.message.id, env);
+    await pushOwnerText([
+      '兌獎待核對',
+      `客人：${uid}`,
+      `D1 pending_redeem id：${redeemId || '-'}`,
+      `LINE message id：${ev.message.id || '-'}`,
+      '',
+      '建議：到 LINE OA 後台打開此客人聊天，核對截圖後安排出貨。',
+    ].join('\n'), env).catch(() => {});
+    return replyMsg(ev.replyToken, [{
+      type: 'text',
+      text: '收到，負責人核對後出貨。\n\n如果你有訂單資料，也可以直接補傳姓名、電話、寄送方式。',
+    }], env);
+  }
+
   if (ev.type === 'message' && ev.message?.type === 'text') {
     const text = ev.message.text || '';
 
@@ -1276,6 +1852,16 @@ async function handleEvent(ev, env) {
       return replyMsg(ev.replyToken, [{
         type: 'text',
         text: '已取消訂閱。\n\n如果之後想重新加入，傳「訂閱」即可。',
+      }], env);
+    }
+
+    const draftApproval = await approveContentDraftsFromOwner(uid, text, env);
+    if (draftApproval) {
+      return replyMsg(ev.replyToken, [{
+        type: 'text',
+        text: draftApproval.ok
+          ? `已放行 content_queue 草稿：${draftApproval.approved.length ? draftApproval.approved.join(', ') : '沒有可放行草稿'}`
+          : `放行失敗：${draftApproval.error}`,
       }], env);
     }
 
@@ -1661,6 +2247,7 @@ async function handleIntent(userText, replyToken, env, uid) {
   } else {
     // 沒命中關鍵字 → 超級業務 AI 客服接手;AI 不可用/限流才退回 AWAY_TEXT
     const ai = await aiFallback(userText, env, uid);
+    if (!ai) await updateSalesIntent(uid, userText, AWAY_TEXT, null, env);
     msgs.push({ type: 'text', text: ai || AWAY_TEXT });
   }
   return replyMsg(replyToken, msgs, env);
@@ -1697,15 +2284,23 @@ async function aiFallback(userText, env, uid) {
       '掘計畫是什麼:我們免費幫你的店做一個官網,做給你看,喜歡再合作,每個行業只收一位。',
       '你的目標:讓對方說出他的行業,再請他私訊「貢丸＋你的行業」或加 LINE @121lkspe。',
       '每次只給一個明確的下一步。',
+      '',
+      '回覆最後必須加一段後端標記，不要解釋：',
+      '[STATE]{"completion":0-100,"profile":"一句客戶輪廓","pain":"目前挖到的痛點","last_move":"本輪推進動作","needs_principal":false,"handoff_reason":""}',
+      'completion 達 70 或客人留下聯絡方式時，needs_principal 可設 true。',
     ].join('\n');
+    const prior = await getSalesState(uid, env);
     const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct-fast', {
       messages: [
         { role: 'system', content: SYSTEM },
-        { role: 'user', content: userText },
+        { role: 'user', content: `既有狀態：${JSON.stringify(prior)}\n\n客人訊息：${userText}` },
       ],
       max_tokens: 220,
     });
-    return sanitizeAIReply(result?.response || '');
+    const parsed = parseAiState(result?.response || '');
+    const reply = sanitizeAIReply(parsed.reply || '');
+    await updateSalesIntent(uid, userText, reply, parsed.state, env);
+    return reply;
   } catch (err) {
     console.error('AI fallback failed:', err?.message);
     return null;
