@@ -5,7 +5,8 @@ param(
   [string]$Format,
   [int]$Duration,
   [switch]$FromInbox,
-  [switch]$Demo
+  [switch]$Demo,
+  [switch]$Force
 )
 
 $ErrorActionPreference = 'Stop'
@@ -34,6 +35,9 @@ try {
   }
   if ($Demo) {
     $runnerArgs += '--demo'
+  }
+  if ($Force) {
+    $runnerArgs += '--force'
   }
   node (Join-Path $PSScriptRoot 'prepare-material-factory.mjs') @runnerArgs
   exit $LASTEXITCODE

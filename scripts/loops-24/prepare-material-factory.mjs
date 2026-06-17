@@ -45,14 +45,18 @@ const basePayload = {
 };
 
 let materialPack = null;
+let reuse = null;
 if (ideaSource.text) {
-  materialPack = await buildMaterialPack(ideaSource, toolHealth);
+  const plannedPack = await planMaterialPack(ideaSource, toolHealth);
+  reuse = args.force ? null : await findReusablePack(plannedPack, ideaSource);
+  materialPack = reuse?.materialPack || await writeMaterialPack(plannedPack);
 }
 
 const payload = {
   ...basePayload,
   materialPack,
-  summary: summarize(basePayload, materialPack),
+  reuse,
+  summary: summarize(basePayload, materialPack, reuse),
 };
 payload.statusFingerprint = hash(JSON.stringify({
   status: payload.status,
@@ -72,6 +76,7 @@ console.log(JSON.stringify({
   reportPath: payload.reportPath,
   jsonPath: payload.jsonPath,
   packDir: materialPack?.packDir || null,
+  reusedPack: Boolean(reuse),
   summary: payload.summary,
 }, null, 2));
 
@@ -95,6 +100,8 @@ function parseArgs(argv) {
     } else if (arg === '--duration') {
       parsed.duration = Number.parseInt(argv[index + 1] || '', 10);
       index += 1;
+    } else if (arg === '--force') {
+      parsed.force = true;
     }
   }
   return parsed;
@@ -163,6 +170,15 @@ async function listPendingIdeas() {
   }
 }
 
+async function readJson(file, fallback) {
+  try {
+    return JSON.parse(await fs.readFile(file, 'utf8'));
+  } catch {
+    if (arguments.length > 1) return fallback;
+    throw new Error(`Unable to read JSON at ${file}`);
+  }
+}
+
 function inspectToolHealth() {
   const home = os.homedir();
   const googleDriveName = `Google \u96f2\u7aef\u786c\u789f`;
@@ -211,10 +227,9 @@ function inspectToolHealth() {
   };
 }
 
-async function buildMaterialPack(idea, toolHealth) {
+async function planMaterialPack(idea, toolHealth) {
   const slug = slugify(idea.text).slice(0, 48) || 'idea';
   const packDir = path.join(factoryDir, `${stamp}-${slug}`);
-  await fs.mkdir(packDir, { recursive: true });
   const analysis = analyzeIdea(idea.text, idea.durationSeconds);
   const assets = await selectLocalAssets(analysis);
   const storyboard = buildStoryboard(analysis, assets, idea);
@@ -232,15 +247,6 @@ async function buildMaterialPack(idea, toolHealth) {
     ownerCommands: path.join(packDir, 'OWNER_RUN_COMMANDS.ps1'),
     manifest: path.join(packDir, 'manifest.json'),
   };
-
-  await fs.writeFile(paths.brief, renderBrief(analysis, assets, idea, toolHealth), 'utf8');
-  await fs.writeFile(paths.script, renderScript(analysis, storyboard, voiceover), 'utf8');
-  await fs.writeFile(paths.storyboard, `${JSON.stringify(storyboard, null, 2)}\n`, 'utf8');
-  await fs.writeFile(paths.voiceover, `${voiceover.fullText}\n`, 'utf8');
-  await fs.writeFile(paths.jianyingPlan, `${JSON.stringify(jianyingPlan, null, 2)}\n`, 'utf8');
-  await fs.writeFile(paths.jianyingScaffold, renderJianyingScaffold(jianyingPlan), 'utf8');
-  await fs.writeFile(paths.ytDlpUrls, renderYtDlpUrls(ytDlpPlan), 'utf8');
-  await fs.writeFile(paths.ownerCommands, renderOwnerCommands(paths, toolHealth), 'utf8');
 
   const manifest = {
     generatedAt: now.toISOString(),
@@ -262,20 +268,93 @@ async function buildMaterialPack(idea, toolHealth) {
     assets,
     toolSummary: toolHealth.summary,
   }));
+
+  return {
+    packDir,
+    analysis,
+    assets,
+    storyboard,
+    voiceover,
+    jianyingPlan,
+    ytDlpPlan,
+    paths,
+    manifest,
+  };
+}
+
+async function writeMaterialPack(plan) {
+  const {
+    packDir,
+    analysis,
+    assets,
+    storyboard,
+    voiceover,
+    jianyingPlan,
+    ytDlpPlan,
+    paths,
+    manifest,
+  } = plan;
+
+  await fs.mkdir(packDir, { recursive: true });
+  await fs.writeFile(paths.brief, renderBrief(analysis, assets, manifest.idea, toolHealth), 'utf8');
+  await fs.writeFile(paths.script, renderScript(analysis, storyboard, voiceover), 'utf8');
+  await fs.writeFile(paths.storyboard, `${JSON.stringify(storyboard, null, 2)}\n`, 'utf8');
+  await fs.writeFile(paths.voiceover, `${voiceover.fullText}\n`, 'utf8');
+  await fs.writeFile(paths.jianyingPlan, `${JSON.stringify(jianyingPlan, null, 2)}\n`, 'utf8');
+  await fs.writeFile(paths.jianyingScaffold, renderJianyingScaffold(jianyingPlan), 'utf8');
+  await fs.writeFile(paths.ytDlpUrls, renderYtDlpUrls(ytDlpPlan), 'utf8');
+  await fs.writeFile(paths.ownerCommands, renderOwnerCommands(paths, toolHealth), 'utf8');
   await fs.writeFile(paths.manifest, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
 
   return {
     packDir,
     packFingerprint: manifest.packFingerprint,
     title: analysis.title,
-    format: idea.format,
-    durationSeconds: idea.durationSeconds,
+    format: manifest.idea.format,
+    durationSeconds: manifest.idea.durationSeconds,
     files: paths,
     selectedLocalAssetCount: assets.length,
     storyboardSceneCount: storyboard.scenes.length,
     ownerCommandsPath: paths.ownerCommands,
     nextOwnerActions: nextOwnerActions(toolHealth),
   };
+}
+
+async function findReusablePack(plannedPack, idea) {
+  const latest = await readJson(path.join(factoryDir, 'latest.json'), null);
+  if (!latest?.materialPack || latest.status !== 'material-pack-ready') return null;
+  if (latest.ideaSource?.textHash !== idea.textHash) return null;
+  if (latest.ideaSource?.format !== idea.format) return null;
+  if (Number(latest.ideaSource?.durationSeconds || 0) !== Number(idea.durationSeconds || 0)) return null;
+  if (latest.materialPack.packFingerprint !== plannedPack.manifest.packFingerprint) return null;
+  if (!materialPackFilesExist(latest.materialPack)) return null;
+
+  return {
+    sourceReportPath: latest.reportPath || null,
+    sourceJsonPath: latest.jsonPath || null,
+    materialPack: {
+      ...latest.materialPack,
+      reused: true,
+      reusedAt: now.toISOString(),
+    },
+  };
+}
+
+function materialPackFilesExist(pack) {
+  if (!pack?.packDir || !fssync.existsSync(pack.packDir)) return false;
+  const files = pack.files || {};
+  const required = [
+    'brief',
+    'script',
+    'storyboard',
+    'voiceover',
+    'jianyingPlan',
+    'jianyingScaffold',
+    'ytDlpUrls',
+    'ownerCommands',
+    'manifest',
+  ];
+  return required.every(key => files[key] && fssync.existsSync(files[key]));
 }
 
 function analyzeIdea(text, durationSeconds) {
@@ -598,6 +677,7 @@ function renderMarkdown(payload) {
     `- selected_local_assets: ${payload.materialPack?.selectedLocalAssetCount ?? 0}`,
     `- storyboard_scenes: ${payload.materialPack?.storyboardSceneCount ?? 0}`,
     `- missing_tools: ${payload.summary.missingTools.length ? payload.summary.missingTools.join(', ') : '(none)'}`,
+    `- reused_pack: ${payload.summary.reusedPack}`,
     '',
   ];
   if (!payload.ideaSource.text) {
@@ -619,6 +699,7 @@ function renderMarkdown(payload) {
     lines.push(`- voiceover: ${payload.materialPack.files.voiceover}`);
     lines.push(`- jianying_plan: ${payload.materialPack.files.jianyingPlan}`);
     lines.push(`- owner_commands: ${payload.materialPack.ownerCommandsPath}`);
+    if (payload.reuse?.sourceReportPath) lines.push(`- reused_from: ${payload.reuse.sourceReportPath}`);
     lines.push('');
     lines.push('## Next Owner Actions', '');
     for (const action of payload.materialPack.nextOwnerActions) lines.push(`- ${action}`);
@@ -629,7 +710,7 @@ function renderMarkdown(payload) {
   return lines.join('\n');
 }
 
-function summarize(base, pack) {
+function summarize(base, pack, reuse = null) {
   return {
     ideaPresent: Boolean(base.ideaSource.text),
     packReady: Boolean(pack),
@@ -642,6 +723,8 @@ function summarize(base, pack) {
     gptSovitsAvailable: base.toolHealth.summary.gptSovitsAvailable,
     ffmpegAvailable: base.toolHealth.summary.ffmpegAvailable,
     packDir: pack?.packDir || null,
+    reusedPack: Boolean(reuse),
+    reusedFromReportPath: reuse?.sourceReportPath || null,
     selectedLocalAssetCount: pack?.selectedLocalAssetCount || 0,
     storyboardSceneCount: pack?.storyboardSceneCount || 0,
   };

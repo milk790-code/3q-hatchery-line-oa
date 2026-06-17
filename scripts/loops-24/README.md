@@ -415,6 +415,11 @@ The material factory uses local repo assets first and only creates owner-run
 handoffs for yt-dlp, GPT-SoVITS, and Jianying. It does not download media, run
 voice inference, open Jianying, export video, post, send, push, deploy, or write
 secrets.
+When the newest inbox idea, format, duration, tool health, and selected local
+assets match an existing pack, the factory reuses that pack instead of creating
+a duplicate timestamped pack on every hourly loop. Use `-Force` only when you
+intentionally want to regenerate the same idea after reviewing the previous
+pack.
 
 Direct run:
 
