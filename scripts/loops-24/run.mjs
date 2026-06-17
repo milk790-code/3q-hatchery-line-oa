@@ -1560,12 +1560,14 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     missingSecretGateCount: secretChecklist.summary?.missingCount || 0,
     dirtyDeployCount: dirtyClassification.summary?.deploy || 0,
     approvalWorkbenchExpired: approvalWorkbench.available ? approvalWorkbench.summary?.expired : null,
+    approvalWorkbenchExpiresAtTaipei: approvalWorkbench.available ? approvalWorkbench.summary?.expiresAtTaipei : null,
     approvalWorkbenchReadyCommandCount: approvalWorkbench.available ? Number(approvalWorkbench.summary?.readyCommandCount || 0) : null,
     approvalWorkbenchAttentionGateCount: approvalWorkbench.available ? Number(approvalWorkbench.summary?.attentionGateCount || 0) : null,
   };
 
   const payload = {
     generatedAt: generatedAt.toISOString(),
+    generatedAtTaipei: formatTaipeiTime(generatedAt),
     runId: result.runId,
     status: result.status,
     reportPath,
@@ -1595,6 +1597,7 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     '# LoopOS Morning Decision Dashboard',
     '',
     `- updated_at: ${payload.generatedAt}`,
+    `- updated_at_taipei: ${payload.generatedAtTaipei || '(unknown)'}`,
     `- run_id: ${payload.runId}`,
     `- only_safe_local: ${onlySafeLocal ? 'enabled' : 'disabled'}`,
     '',
@@ -2176,6 +2179,7 @@ function summarizeDirtyClassificationArtifact(data) {
 function summarizeApprovalWorkbenchArtifact(data, relativeTo = new Date()) {
   if (!data) return { available: false, summary: null, reportPath: null };
   const expiresAt = data.expiresAt || data.summary?.expiresAt || null;
+  const expiresAtTaipei = formatTaipeiTime(expiresAt);
   const expired = isTimestampExpired(expiresAt, relativeTo);
   return {
     available: true,
@@ -2188,6 +2192,7 @@ function summarizeApprovalWorkbenchArtifact(data, relativeTo = new Date()) {
     summary: {
       ...(data.summary || {}),
       expiresAt,
+      expiresAtTaipei,
       expired,
     },
   };
@@ -2236,6 +2241,7 @@ function renderApprovalWorkbench(data) {
     `- report: ${data.reportPath || '(missing)'}`,
     `- status: ${data.status || '(unknown)'}`,
     `- expires_at: ${summary.expiresAt || '(missing)'}`,
+    `- expires_at_taipei: ${summary.expiresAtTaipei || '(unknown)'}`,
     `- expired: ${summary.expired === true}`,
     `- ready_commands: ${summary.readyCommandCount ?? 0}`,
     `- manual_gates: ${summary.manualGateCount ?? 0}`,
@@ -2326,6 +2332,18 @@ function isTimestampExpired(value, relativeTo = new Date()) {
   const timestamp = Date.parse(value || '');
   if (!Number.isFinite(timestamp)) return null;
   return timestamp <= relativeTo.getTime();
+}
+
+function formatTaipeiTime(value) {
+  const timestamp = value instanceof Date ? value.getTime() : Date.parse(value || '');
+  if (!Number.isFinite(timestamp)) return null;
+  const taipei = new Date(timestamp + 8 * 60 * 60 * 1000);
+  const pad = number => String(number).padStart(2, '0');
+  return [
+    `${taipei.getUTCFullYear()}-${pad(taipei.getUTCMonth() + 1)}-${pad(taipei.getUTCDate())}`,
+    `${pad(taipei.getUTCHours())}:${pad(taipei.getUTCMinutes())}:${pad(taipei.getUTCSeconds())}`,
+    '+08:00',
+  ].join(' ');
 }
 
 function minutes(value) {
