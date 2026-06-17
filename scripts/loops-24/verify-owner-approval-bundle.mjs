@@ -15,6 +15,7 @@ const stateDir = path.resolve(process.env.LOOPS_STATE_DIR || path.join(codexHome
 const args = parseArgs(process.argv.slice(2));
 const bundleJsonPath = path.resolve(args.bundleJson || path.join(stateDir, 'owner-approval-bundles', 'latest.json'));
 const verificationDir = path.join(stateDir, 'owner-approval-verifications');
+const gitTimeoutMs = Number.parseInt(process.env.LOOPS_GIT_TIMEOUT_MS || '30000', 10);
 const now = new Date();
 const stamp = toStamp(now);
 
@@ -346,9 +347,10 @@ function runGit(args) {
     encoding: 'utf8',
     windowsHide: true,
     maxBuffer: 1024 * 1024 * 8,
+    timeout: gitTimeoutMs,
   });
   if (result.status !== 0) {
-    throw new Error(`git ${args.join(' ')} failed: ${result.stderr || result.error?.message || result.stdout}`);
+    throw new Error(`git ${args.join(' ')} failed: ${result.stderr || result.error?.message || result.stdout || result.signal || 'unknown error'}`);
   }
   return result.stdout || '';
 }
@@ -359,6 +361,7 @@ function runGitMaybe(args) {
     encoding: 'utf8',
     windowsHide: true,
     maxBuffer: 1024 * 1024 * 8,
+    timeout: gitTimeoutMs,
   });
   return {
     ok: result.status === 0,

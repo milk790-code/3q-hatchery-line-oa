@@ -246,8 +246,8 @@ groups:
 powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\verify-dashboard-gates.ps1
 ```
 
-The verifier reads only the local dashboard JSON and writes a local report under
-the automation state directory. It does not push, create a PR, deploy, call
+The gate verifier reads only the local dashboard JSON and writes a local report
+under the automation state directory. It does not push, create a PR, deploy, call
 protected endpoints, write secrets, or send messages.
 It checks that the owner approval bundle summary mirrors the embedded bundle
 artifact and fails if a supposedly ready bundle has attention gates or is not
@@ -264,6 +264,19 @@ It also verifies the embedded account binding workbench summary and fails when
 the dashboard mirror for attention count or next binding drifts from the
 workbench artifact, or when the workbench status/category totals no longer add
 up to the embedded summary total.
+
+Verify that the human-facing dashboard command can still render the latest
+dashboard without JSON parser warnings, UTF-8 display corruption, or missing
+owner-facing sections:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\verify-dashboard-display.ps1
+```
+
+The display verifier runs `show-dashboard.ps1 -NoSnapshotCheck`, checks required
+sections, confirms the current run ID and manual-send prospect names render, and
+writes a local-only report under `dashboard-display-verifications/`. Safe-local
+runs execute it automatically after `verify-dashboard-gates`.
 Before writing an owner approval bundle, the main runner refreshes the local
 GitHub handoff and PR readiness packet when they no longer match the current
 branch, head, ahead/behind counts, or tracked worktree fingerprint. This keeps

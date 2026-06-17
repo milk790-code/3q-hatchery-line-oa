@@ -2,6 +2,8 @@ import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 
+const gitTimeoutMs = Number.parseInt(process.env.LOOPS_GIT_TIMEOUT_MS || '30000', 10);
+
 export function gitWorktreeFingerprint({ cwd, statusLines = [], includeUntracked }) {
   const cachedDiff = runGit(['diff', '--cached', '--no-ext-diff', '--binary'], cwd);
   const worktreeDiff = runGit(['diff', '--no-ext-diff', '--binary'], cwd);
@@ -25,9 +27,10 @@ function runGit(args, cwd) {
     encoding: 'utf8',
     windowsHide: true,
     maxBuffer: 1024 * 1024 * 32,
+    timeout: gitTimeoutMs,
   });
   if (result.status !== 0) {
-    throw new Error(`git ${args.join(' ')} failed: ${result.stderr || result.error?.message || result.stdout}`);
+    throw new Error(`git ${args.join(' ')} failed: ${result.stderr || result.error?.message || result.stdout || result.signal || 'unknown error'}`);
   }
   return result.stdout || '';
 }
@@ -64,11 +67,12 @@ function runGitBuffer(args, cwd) {
     encoding: 'buffer',
     windowsHide: true,
     maxBuffer: 1024 * 1024 * 32,
+    timeout: gitTimeoutMs,
   });
   if (result.status !== 0) {
     const stderr = result.stderr ? result.stderr.toString('utf8') : '';
     const stdout = result.stdout ? result.stdout.toString('utf8') : '';
-    throw new Error(`git ${args.join(' ')} failed: ${stderr || result.error?.message || stdout}`);
+    throw new Error(`git ${args.join(' ')} failed: ${stderr || result.error?.message || stdout || result.signal || 'unknown error'}`);
   }
   return result.stdout || Buffer.alloc(0);
 }

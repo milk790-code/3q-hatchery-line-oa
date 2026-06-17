@@ -1252,6 +1252,12 @@ async function runPostDashboardAutoCompletions(candidates, autoCompletions, resu
         ['scripts/loops-24/verify-dashboard-gates.mjs', '--dashboard-json', result.dashboardJsonPath],
         120_000
       ),
+      runLocalStep(
+        'verify-dashboard-display',
+        'node',
+        ['scripts/loops-24/verify-dashboard-display.mjs', '--dashboard-json', result.dashboardJsonPath],
+        120_000
+      ),
     ];
     refreshResultSummaries(result, candidates, next, taskRegistry);
     await writeReport(result, candidates, next);
