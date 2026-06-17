@@ -121,6 +121,26 @@ function verifyDashboardSchema(dashboard, waiting, nextApproval, approvalGroups)
   if (approvalGroups.length !== nextApproval.length) {
     failures.push(`approvalGroups length ${approvalGroups.length} does not match nextApproval length ${nextApproval.length}`);
   }
+  for (const group of approvalGroups) {
+    const approval = group?.approval || '(unknown)';
+    const items = Array.isArray(group?.items) ? group.items : [];
+    const count = Number(group?.count);
+    const displayLimit = Number(group?.displayLimit);
+    const displayedCount = Number(group?.displayedCount);
+    const hiddenCount = Number(group?.hiddenCount);
+    if (count !== items.length) {
+      failures.push(`approval group ${approval} count expected ${items.length} got ${group?.count}`);
+    }
+    if (!Number.isInteger(displayLimit) || displayLimit < 0) {
+      failures.push(`approval group ${approval} displayLimit is missing or invalid.`);
+    }
+    if (!Number.isInteger(displayedCount) || displayedCount !== Math.min(items.length, Math.max(0, displayLimit || 0))) {
+      failures.push(`approval group ${approval} displayedCount expected ${Math.min(items.length, Math.max(0, displayLimit || 0))} got ${group?.displayedCount}`);
+    }
+    if (!Number.isInteger(hiddenCount) || hiddenCount !== Math.max(0, items.length - Math.min(items.length, Math.max(0, displayLimit || 0)))) {
+      failures.push(`approval group ${approval} hiddenCount expected ${Math.max(0, items.length - Math.min(items.length, Math.max(0, displayLimit || 0)))} got ${group?.hiddenCount}`);
+    }
+  }
 
   const expected = {
     completedCount: Array.isArray(dashboard.completed) ? dashboard.completed.length : 0,

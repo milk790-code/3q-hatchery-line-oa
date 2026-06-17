@@ -15,6 +15,7 @@ const runId = randomUUID();
 const startedAt = new Date();
 const lockTtlMs = minutes(process.env.LOOPS_LOCK_TTL_MINUTES || 55);
 const maxCandidates = Number.parseInt(process.env.LOOPS_MAX_CANDIDATES || '8', 10);
+const approvalGroupDisplayLimit = Number.parseInt(process.env.LOOPS_APPROVAL_GROUP_DISPLAY_LIMIT || '4', 10);
 const defaultSocialPublisherUrl = 'https://3q-social-publisher.milk790.workers.dev';
 const argv = new Set(process.argv.slice(2));
 const autoCompleteEnabled = !argv.has('--report-only')
@@ -2247,10 +2248,21 @@ function summarizeApprovals(blocked) {
       groups.set(key, group);
     }
   }
-  return Array.from(groups.values()).sort((a, b) => {
-    if (b.escalated !== a.escalated) return b.escalated - a.escalated;
-    return b.count - a.count;
-  });
+  return Array.from(groups.values())
+    .map(group => {
+      const displayLimit = Math.max(0, approvalGroupDisplayLimit || 0);
+      const displayedCount = Math.min(group.items.length, displayLimit);
+      return {
+        ...group,
+        displayLimit,
+        displayedCount,
+        hiddenCount: Math.max(0, group.items.length - displayedCount),
+      };
+    })
+    .sort((a, b) => {
+      if (b.escalated !== a.escalated) return b.escalated - a.escalated;
+      return b.count - a.count;
+    });
 }
 
 function summarizeConnectorHealthArtifact(data) {
@@ -2436,9 +2448,16 @@ function renderApprovalList(groups) {
   for (const group of groups) {
     const escalation = group.escalated ? ` escalated=${group.escalated}` : '';
     lines.push(`- ${group.approval}: ${group.count} waiting${escalation}`);
-    for (const item of group.items.slice(0, 4)) {
+    const displayLimit = Number.isFinite(Number(group.displayLimit))
+      ? Number(group.displayLimit)
+      : approvalGroupDisplayLimit;
+    for (const item of group.items.slice(0, Math.max(0, displayLimit))) {
       const marker = item.escalated ? ' ESCALATED' : '';
       lines.push(`  - ${item.label}${marker}`);
+    }
+    const hiddenCount = Number(group.hiddenCount || 0);
+    if (hiddenCount > 0) {
+      lines.push(`  - ... ${hiddenCount} more waiting item(s) hidden; see dashboard JSON waiting[] for full list.`);
     }
   }
   return lines;

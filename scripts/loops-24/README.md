@@ -198,6 +198,9 @@ the markdown. It includes `summary`, `manualRedLines`, `waiting`,
 owner-bundle, or external monitor steps do not need to parse markdown text.
 Within `summary`, `nextApproval` means the `Today First` approval gate, while
 `largestApprovalGroup` identifies the largest grouped backlog gate.
+Each approval group keeps the full `items` list in JSON and records
+`displayLimit`, `displayedCount`, and `hiddenCount` so the markdown can show a
+compact owner-facing list without hiding the fact that more items exist.
 When the latest wakeup-health evidence has Windows `WakeToRun=false`, the
 dashboard also routes the wakeup waiting item to `power-wake-policy` so the
 daily dashboard and owner approval bundle show the same sleep-wakeup decision.
@@ -234,6 +237,9 @@ It checks that the owner approval bundle summary mirrors the embedded bundle
 artifact and fails if a supposedly ready bundle has attention gates or is not
 for the current head. It also recomputes the owner bundle wakeup freshness
 remaining minutes from the dashboard generation time.
+It also checks each approval group's `count`, `displayLimit`, `displayedCount`,
+and `hiddenCount` so compact markdown output cannot silently obscure a larger
+approval backlog.
 It also recomputes approval workbench expiry from the dashboard generation time
 and fails if `expires_in_minutes`, the Taipei-time mirror, or the expired flag
 drift from the embedded workbench artifact.
