@@ -187,6 +187,16 @@ Latest dashboard path:
 %USERPROFILE%\.codex\automations\loops-24\dashboard\latest.md
 ```
 
+`show-dashboard.ps1` also checks the machine-readable dashboard JSON before it
+prints the markdown. If a newer owner approval bundle, approval workbench, or
+account binding workbench exists than the artifact embedded in the dashboard
+snapshot, it prints a local warning and the refresh command to run before
+trusting owner-approved commands. It also recomputes approval workbench expiry
+and the owner approval wakeup freshness window against the current clock, so an
+old dashboard cannot keep showing approval commands as usable after their TTL
+has passed. Use `-NoSnapshotCheck` only when another script needs the raw
+dashboard markdown without the human-facing warning banner.
+
 Blocked items older than `LOOPS_BLOCKER_ESCALATE_HOURS` are marked as
 `ESCALATED` in the dashboard and run report.
 
