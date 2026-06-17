@@ -542,7 +542,9 @@ Latest approval workbench path:
 Approval workbenches expire after 65 minutes by default. Override with
 `LOOPS_APPROVAL_WORKBENCH_TTL_MINUTES` only for local testing or a deliberately
 short owner review window. If `expires_at` has passed, regenerate the workbench
-before running any owner-approved command.
+before running any owner-approved command. The prepare step reuses the latest
+workbench only when its projection fingerprint still matches the latest owner
+bundle and the workbench has not expired.
 
 Verify that the approval workbench is still a faithful projection of the latest
 owner bundle and owner-bundle verifier:

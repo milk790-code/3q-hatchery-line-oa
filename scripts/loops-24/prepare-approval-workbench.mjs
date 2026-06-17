@@ -75,19 +75,24 @@ const payload = {
   ],
 };
 
-payload.statusFingerprint = hash(JSON.stringify({
+payload.projectionFingerprint = hash(JSON.stringify({
   bundleFingerprint: payload.bundleFingerprint,
   verificationOk: payload.verificationOk,
-  approvalTtlMinutes: payload.approvalTtlMinutes,
-  expiresAt: payload.expiresAt,
   readyCommands: payload.readyCommands,
   blockedCommands: payload.blockedCommands,
   manualGates: payload.manualGates,
   attentionGates: payload.attentionGates,
 }));
 
+payload.statusFingerprint = hash(JSON.stringify({
+  projectionFingerprint: payload.projectionFingerprint,
+  approvalTtlMinutes: payload.approvalTtlMinutes,
+  expiresAt: payload.expiresAt,
+}));
+
 const latest = await readJson(payload.latestPath, null);
-if (latest?.statusFingerprint === payload.statusFingerprint
+if (latest?.projectionFingerprint === payload.projectionFingerprint
+  && !isExpired(latest.expiresAt)
   && latest?.reportPath
   && fssync.existsSync(latest.reportPath)) {
   console.log(JSON.stringify({
@@ -175,6 +180,7 @@ function renderMarkdown(payload) {
     `- generated_at: ${payload.generatedAt}`,
     `- approval_ttl_minutes: ${payload.approvalTtlMinutes}`,
     `- expires_at: ${payload.expiresAt}`,
+    `- projection_fingerprint: ${payload.projectionFingerprint}`,
     `- repo: ${payload.repoRoot}`,
     `- branch: ${payload.branch || '(unknown)'}`,
     `- head: ${payload.head || '(unknown)'}`,
@@ -254,6 +260,11 @@ function toStamp(date) {
 function parsePositiveNumber(value, fallback) {
   const parsed = Number.parseFloat(value);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function isExpired(expiresAt) {
+  const expiresMs = Date.parse(expiresAt || '');
+  return Number.isFinite(expiresMs) && now.getTime() > expiresMs;
 }
 
 function hash(value) {

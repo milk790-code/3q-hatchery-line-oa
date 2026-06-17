@@ -35,6 +35,7 @@ const payload = {
     approvalTtlMinutes: Number.isFinite(Number(workbench.approvalTtlMinutes)) ? Number(workbench.approvalTtlMinutes) : null,
     expiresAt: workbench.expiresAt || null,
     expired: isExpired(workbench.expiresAt),
+    projectionFingerprint: workbench.projectionFingerprint || null,
     readyCommandCount: workbench.summary?.readyCommandCount ?? null,
     manualGateCount: workbench.summary?.manualGateCount ?? null,
     attentionGateCount: workbench.summary?.attentionGateCount ?? null,
@@ -44,6 +45,7 @@ const payload = {
   findings,
   statusFingerprint: hash(JSON.stringify({
     workbenchFingerprint: workbench.statusFingerprint || null,
+    projectionFingerprint: workbench.projectionFingerprint || null,
     bundleFingerprint: bundle.bundleFingerprint || null,
     readyCommands: workbench.readyCommands || [],
     manualGates: workbench.manualGates || [],
@@ -169,15 +171,19 @@ function verifyWorkbench(workbench, bundle, ownerVerification) {
   }
 
   const expectedFingerprint = hash(JSON.stringify({
-    bundleFingerprint: workbench.bundleFingerprint,
-    verificationOk: workbench.verificationOk,
+    projectionFingerprint: workbench.projectionFingerprint,
     approvalTtlMinutes: workbench.approvalTtlMinutes,
     expiresAt: workbench.expiresAt,
+  }));
+  const expectedProjectionFingerprint = hash(JSON.stringify({
+    bundleFingerprint: workbench.bundleFingerprint,
+    verificationOk: workbench.verificationOk,
     readyCommands: workbench.readyCommands,
     blockedCommands: workbench.blockedCommands,
     manualGates: workbench.manualGates,
     attentionGates: workbench.attentionGates,
   }));
+  requireEqual(failures, 'projectionFingerprint', workbench.projectionFingerprint, expectedProjectionFingerprint);
   requireEqual(failures, 'statusFingerprint', workbench.statusFingerprint, expectedFingerprint);
 
   const hardStops = workbench.hardStops || [];
@@ -239,6 +245,7 @@ function renderMarkdown(payload) {
     `- approval_ttl_minutes: ${payload.summary.approvalTtlMinutes ?? '(missing)'}`,
     `- expires_at: ${payload.summary.expiresAt || '(missing)'}`,
     `- expired: ${payload.summary.expired}`,
+    `- projection_fingerprint: ${payload.summary.projectionFingerprint || '(missing)'}`,
     `- ok: ${payload.ok}`,
     `- failure_count: ${payload.summary.failureCount}`,
     `- warning_count: ${payload.summary.warningCount}`,
