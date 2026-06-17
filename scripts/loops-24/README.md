@@ -558,6 +558,12 @@ Every generated contact is still `manual_send_only`: verify the listing, use
 only public business contact channels, and log the result before sending another
 touch.
 
+When drafts are already cooling down, the safe-local loop prepares
+`manual-send-reviews/latest.json` and verifies it with
+`verify-manual-send-review.mjs`. This review lists prospect metadata and local
+artifact paths only; it does not duplicate full send-ready message text, update
+the tracker, or send anything.
+
 ## Install Windows hourly wakeup
 
 Register a current-user Task Scheduler job. It starts once after a short delay,

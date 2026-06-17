@@ -1178,6 +1178,8 @@ async function runAutoCompletions(candidates) {
     } else if (candidate.id === 'project-state-base64') {
       completions.push(blockedCompletion(candidate.id, 'Project-state normalization edits a tracked file and needs local review first.', candidate));
     } else if (candidate.id === 'cold-outreach-cooldown-active') {
+      completions.push(runLocalStep('prepare-manual-send-review', 'node', ['scripts/loops-24/prepare-manual-send-review.mjs'], 120_000));
+      completions.push(runLocalStep('verify-manual-send-review', 'node', ['scripts/loops-24/verify-manual-send-review.mjs'], 120_000));
       completions.push(blockedCompletion(candidate.id, 'Outreach drafts already exist or prospects are cooling down; sending remains manual.', candidate));
     } else if (candidate.id === 'cold-outreach-needs-prospects') {
       completions.push(blockedCompletion(candidate.id, 'Needs fresh reviewed prospects before drafts can be generated.', candidate));
@@ -1672,6 +1674,10 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
   );
   const accountBindingWorkbench = summarizeAccountBindingWorkbenchArtifact(await readJson(path.join(stateDir, 'account-binding-workbench', 'latest.json'), null));
   const materialFactory = summarizeMaterialFactoryArtifact(await readJson(path.join(stateDir, 'material-factory', 'latest.json'), null));
+  const manualSendReview = summarizeManualSendReviewArtifact(
+    await readJson(path.join(stateDir, 'manual-send-reviews', 'latest.json'), null),
+    await readJson(path.join(stateDir, 'manual-send-review-verifications', 'latest.json'), null)
+  );
   const dirtyClassification = summarizeDirtyClassificationArtifact(await readJson(path.join(stateDir, 'dirty-worktree', 'latest.json'), null));
   const currentHead = currentGitHead();
   const ownerApprovalBundle = summarizeOwnerApprovalBundleArtifact(
@@ -1711,6 +1717,10 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     materialFactoryReusedPack: materialFactory.summary?.reusedPack === true,
     materialFactoryPendingIdeaCount: materialFactory.summary?.pendingIdeaCount || 0,
     materialFactoryMissingToolCount: materialFactory.summary?.missingToolCount || 0,
+    manualSendReviewStatus: manualSendReview.available ? manualSendReview.status : null,
+    manualSendReviewReadyCount: manualSendReview.available ? Number(manualSendReview.summary?.readyForOwnerReviewCount || 0) : null,
+    manualSendReviewProspectCount: manualSendReview.available ? Number(manualSendReview.summary?.prospectCount || 0) : null,
+    manualSendReviewVerificationOk: manualSendReview.available ? manualSendReview.verificationOk : null,
     dirtyDeployCount: dirtyClassification.summary?.deploy || 0,
     ownerApprovalBundleStatus: ownerApprovalBundle.available ? ownerApprovalBundle.status : null,
     ownerApprovalBundleHead: ownerApprovalBundle.available ? ownerApprovalBundle.head : null,
@@ -1752,6 +1762,7 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     secretChecklist,
     accountBindingWorkbench,
     materialFactory,
+    manualSendReview,
     dirtyClassification,
     ownerApprovalBundle,
     approvalWorkbench,
@@ -1819,6 +1830,10 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     '## Material Factory',
     '',
     ...renderMaterialFactory(payload.materialFactory),
+    '',
+    '## Manual Send Review',
+    '',
+    ...renderManualSendReview(payload.manualSendReview),
     '',
     '## Secret Checklist',
     '',
@@ -2404,6 +2419,28 @@ function summarizeMaterialFactoryArtifact(data) {
   };
 }
 
+function summarizeManualSendReviewArtifact(data, verification) {
+  if (!data) return { available: false, summary: null, reportPath: null };
+  return {
+    available: true,
+    generatedAt: data.generatedAt || null,
+    reportPath: data.reportPath || null,
+    jsonPath: data.jsonPath || null,
+    status: data.status || null,
+    sendGate: data.sendGate || null,
+    sourcePaths: data.sourcePaths || null,
+    verificationOk: verification?.ok === true,
+    verificationReportPath: verification?.reportPath || null,
+    prospects: Array.isArray(data.prospects) ? data.prospects.slice(0, 5) : [],
+    statusFingerprint: data.statusFingerprint || null,
+    summary: {
+      ...(data.summary || {}),
+      verificationFailureCount: Number(verification?.summary?.failureCount || 0),
+      verificationWarningCount: Number(verification?.summary?.warningCount || 0),
+    },
+  };
+}
+
 function summarizeDirtyClassificationArtifact(data) {
   if (!data) return { available: false, summary: null, reportPath: null };
   return {
@@ -2557,6 +2594,29 @@ function renderMaterialFactory(data) {
     `- storyboard_scenes: ${summary.storyboardSceneCount || 0}`,
     `- missing_tools: ${summary.missingTools?.length ? summary.missingTools.join(', ') : '(none)'}`,
   ];
+}
+
+function renderManualSendReview(data) {
+  if (!data?.available) return ['- No manual send review artifact yet.'];
+  const summary = data.summary || {};
+  const lines = [
+    `- report: ${data.reportPath || '(missing)'}`,
+    `- verification_report: ${data.verificationReportPath || '(missing)'}`,
+    `- status: ${data.status || '(unknown)'}`,
+    `- send_gate: ${data.sendGate || '(unknown)'}`,
+    `- ready_for_owner_review: ${summary.readyForOwnerReviewCount || 0}/${summary.prospectCount || 0}`,
+    `- sent_count: ${summary.sentCount || 0}`,
+    `- verification_ok: ${data.verificationOk === true}`,
+    `- verification_failures: ${summary.verificationFailureCount ?? 0}`,
+    `- local_cockpit: ${data.sourcePaths?.cockpit || '(missing)'}`,
+  ];
+  if (data.prospects?.length) {
+    lines.push('- prospects:');
+    for (const prospect of data.prospects) {
+      lines.push(`  - ${prospect.priority || '?'} ${prospect.name || prospect.id}: ${prospect.status || '(unknown)'} ${prospect.channel || ''} ${prospect.price || ''}`);
+    }
+  }
+  return lines;
 }
 
 function renderDirtyClassification(data) {
