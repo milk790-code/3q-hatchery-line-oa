@@ -72,6 +72,7 @@ const untrackedPaths = statusLines
 const unexpectedDirty = dirtyPaths.filter(file => !expectedDirtyDeployFiles.includes(file));
 const unexpectedUntracked = untrackedPaths.filter(file => !expectedDirtyDeployFiles.includes(file));
 const statusFingerprint = gitWorktreeFingerprint({ cwd: repoRoot, statusLines });
+const trackedStatusFingerprint = gitWorktreeFingerprint({ cwd: repoRoot, statusLines: trackedDirtyLines });
 const investorPacketUntracked = unexpectedUntracked.filter(file => file.startsWith('investor-packet/'));
 const localScopeClean = stagedLines.length === 0 && unexpectedDirty.length === 0 && unexpectedUntracked.length === 0;
 
@@ -82,7 +83,7 @@ const prRefCurrent = Boolean(pr?.branch === branch
   && pr?.head === head
   && pr?.ahead === ahead
   && pr?.behind === behind);
-const prFingerprintCurrent = Boolean(pr && pr.statusFingerprint === statusFingerprint);
+const prFingerprintCurrent = Boolean(pr && pr.statusFingerprint === trackedStatusFingerprint);
 const prHandoffCurrent = Boolean(pr && pr.githubHandoffPath === github?.reportPath);
 const prPacketReady = Boolean(pr?.summary?.readyForApproval === true && prRefCurrent && prHandoffCurrent);
 const prReady = prPacketReady && prFingerprintCurrent && localScopeClean;
@@ -217,6 +218,7 @@ const payload = {
   ahead,
   behind,
   statusFingerprint,
+  trackedStatusFingerprint,
   dirtyTracked: trackedDirtyLines,
   untracked: untrackedPaths,
   expectedDirtyDeployFiles,

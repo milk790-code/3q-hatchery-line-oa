@@ -112,6 +112,9 @@ The owner bundle splits PR publication readiness into separate booleans:
 `localScopeClean`, and `prPublishReady`. A PR packet can be internally ready
 while `prPublishReady=false` because local scope still contains unrelated
 untracked files such as investor packet materials.
+`prFingerprintCurrent` compares against the tracked dirty fingerprint used by
+the PR readiness packet; untracked paths are handled separately by
+`localScopeClean`.
 
 It can also surface a `cold_outreach` candidate from
 `scripts/outreach.prospects.json`. That path creates review-ready draft work for

@@ -116,6 +116,7 @@ function readCurrentGitContext() {
     behind: Number.parseInt(counts[0] || '0', 10),
     ahead: Number.parseInt(counts[1] || '0', 10),
     statusFingerprint: gitWorktreeFingerprint({ cwd: repoRoot, statusLines }),
+    trackedStatusFingerprint: gitWorktreeFingerprint({ cwd: repoRoot, statusLines: trackedDirtyLines }),
     dirtyPaths: trackedDirtyLines.map(parseStatusLine).map(item => item.path),
     untrackedPaths,
     stagedLines,
@@ -142,6 +143,7 @@ function verifyBundle(bundle, context, related) {
   requireEqual(failures, 'ahead', Number(bundle.ahead), context.ahead);
   requireEqual(failures, 'behind', Number(bundle.behind), context.behind);
   requireEqual(failures, 'statusFingerprint', bundle.statusFingerprint, context.statusFingerprint);
+  requireEqual(failures, 'trackedStatusFingerprint', bundle.trackedStatusFingerprint, context.trackedStatusFingerprint);
   requireEqual(failures, 'summary.status', bundle.summary?.status, expectedSummaryStatus);
   requireEqual(failures, 'summary.readyGateCount', Number(bundle.summary?.readyGateCount), expectedReadyGateCount);
   requireEqual(failures, 'summary.attentionCount', Number(bundle.summary?.attentionCount), expectedAttentionCount);
@@ -197,7 +199,7 @@ function verifyPrGate(bundle, pr, gate, localScopeClean, failures, warnings) {
     && pr.head === bundle.head
     && pr.ahead === bundle.ahead
     && pr.behind === bundle.behind);
-  const prFingerprintCurrent = Boolean(pr && pr.statusFingerprint === bundle.statusFingerprint);
+  const prFingerprintCurrent = Boolean(pr && pr.statusFingerprint === bundle.trackedStatusFingerprint);
   const prHandoffCurrent = Boolean(pr && pr.githubHandoffPath === bundle.artifacts?.githubHandoff);
   const prPacketReady = Boolean(pr?.summary?.readyForApproval === true && prRefCurrent && prHandoffCurrent);
   const prReady = Boolean(prPacketReady && prFingerprintCurrent && localScopeClean);
