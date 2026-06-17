@@ -16,6 +16,50 @@ const factoryJsonPath = path.resolve(args.factoryJson || path.join(stateDir, 'ma
 const verificationDir = path.join(stateDir, 'material-factory-verifications');
 const now = new Date();
 const stamp = toStamp(now);
+const BAD_TITLE_PHRASES = [
+  'for one or idea',
+  'one or idea',
+  'for one',
+];
+const GENERIC_TITLE_WORDS = new Set([
+  'a',
+  'an',
+  'and',
+  'are',
+  'as',
+  'at',
+  'be',
+  'before',
+  'by',
+  'can',
+  'do',
+  'for',
+  'from',
+  'get',
+  'how',
+  'into',
+  'it',
+  'its',
+  'keep',
+  'make',
+  'not',
+  'of',
+  'on',
+  'one',
+  'or',
+  'show',
+  'showing',
+  'that',
+  'the',
+  'then',
+  'this',
+  'to',
+  'turn',
+  'turns',
+  'with',
+  'video',
+  'visible',
+]);
 
 const factory = await readJson(factoryJsonPath);
 const findings = await verifyFactory(factory);
@@ -85,9 +129,16 @@ async function verifyFactory(factory) {
   if (factory.status !== 'material-pack-ready') failures.push(`unexpected status: ${factory.status}`);
   const pack = factory.materialPack;
   if (!pack?.packDir || !fssync.existsSync(pack.packDir)) failures.push('materialPack.packDir missing or not found');
+  verifyTitleQuality(failures, warnings, factory, pack);
   const files = pack?.files || {};
   for (const [key, filePath] of Object.entries(files)) {
     if (!fssync.existsSync(filePath)) failures.push(`missing material file ${key}: ${filePath}`);
+  }
+  if (files.manifest) {
+    const manifest = await readJson(files.manifest, null);
+    if (manifest?.analysis?.title && pack?.title && manifest.analysis.title !== pack.title) {
+      failures.push(`materialPack.title does not match manifest analysis title: ${pack.title}`);
+    }
   }
   if (files.storyboard) {
     const storyboard = await readJson(files.storyboard, null);
@@ -105,6 +156,44 @@ async function verifyFactory(factory) {
     warnings.push('yt-dlp command is not commented; verify owner-run intent.');
   }
   return { failures, warnings };
+}
+
+function verifyTitleQuality(failures, warnings, factory, pack) {
+  const title = String(pack?.title || '').trim();
+  if (!title) {
+    failures.push('materialPack.title is required');
+    return;
+  }
+  if (title.length < 8) failures.push(`materialPack.title is too short: ${title}`);
+  if (title.length > 96) warnings.push(`materialPack.title is long; review manually: ${title}`);
+
+  const words = titleWords(title);
+  const meaningful = words.filter(word => !GENERIC_TITLE_WORDS.has(word));
+  if (words.length >= 3 && meaningful.length < 2) {
+    failures.push(`materialPack.title has too few meaningful words: ${title}`);
+  }
+
+  const normalized = words.join(' ');
+  for (const phrase of BAD_TITLE_PHRASES) {
+    if (normalized.includes(phrase)) failures.push(`materialPack.title contains low-quality phrase: ${phrase}`);
+  }
+
+  const ideaText = String(factory.ideaSource?.text || '');
+  if (/3q/i.test(ideaText) && !/\b3q\b/i.test(title)) {
+    warnings.push('idea mentions 3Q but materialPack.title does not');
+  }
+  if (/line/i.test(ideaText) && !/\bline\b/i.test(title)) {
+    warnings.push('idea mentions LINE but materialPack.title does not');
+  }
+}
+
+function titleWords(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
 }
 
 async function readJson(file, fallback) {
