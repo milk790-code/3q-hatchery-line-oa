@@ -197,6 +197,16 @@ Task Scheduler when running on Windows, recent LOOPS run state, and stale lock
 signals. It does not start a run, modify the scheduled task, push, deploy, or
 write secrets.
 
+On Windows, the health report also verifies the scheduled task points at this
+repo's `scripts\loops-24\run.ps1`, keeps `-OnlySafeLocal` enabled by default,
+uses this repo as the working directory, repeats every hour, ignores overlapping
+instances, has a bounded execution time limit, and has catch-up enabled with
+`StartWhenAvailable`.
+
+If `WakeToRun` is disabled, the report emits a non-blocking warning: LOOPS can
+catch up when Windows becomes available, but the task is not guaranteed to wake
+a sleeping machine.
+
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\check-wakeup-health.ps1
 ```

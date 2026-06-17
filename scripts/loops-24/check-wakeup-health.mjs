@@ -33,6 +33,12 @@ const nextRunInMinutes = minutesUntil(task?.nextRunTime, now);
 const taskState = String(task?.state || '');
 const taskLastResult = Number(task?.lastTaskResult);
 const taskCurrentlyRunning = taskState === 'Running' && taskLastResult === 267009;
+const taskIntervalMinutes = parseIsoDurationMinutes(task?.hourlyTrigger?.repetitionInterval);
+const taskExecutionLimitMinutes = parseIsoDurationMinutes(task?.executionTimeLimit);
+const expectedRunnerPath = path.join(repoRoot, 'scripts', 'loops-24', 'run.ps1').toLowerCase();
+const taskAction = task?.action || {};
+const taskArguments = String(taskAction.arguments || '').toLowerCase();
+const taskWorkingDirectory = String(taskAction.workingDirectory || '').toLowerCase();
 
 const checks = {
   stateFileExists: Boolean(state),
@@ -47,11 +53,35 @@ const checks = {
   scheduledTaskNextRunPlausible: task.platform === 'win32'
     ? Boolean(task.found && (nextRunInMinutes === null || nextRunInMinutes > -10))
     : null,
+  scheduledTaskSafeLocalRunner: task.platform === 'win32'
+    ? Boolean(task.found
+      && taskArguments.includes(expectedRunnerPath)
+      && taskArguments.includes('-onlysafelocal')
+      && taskWorkingDirectory === repoRoot.toLowerCase())
+    : null,
+  scheduledTaskHourlyTrigger: task.platform === 'win32'
+    ? Boolean(task.found && taskIntervalMinutes === 60)
+    : null,
+  scheduledTaskOverlapGuard: task.platform === 'win32'
+    ? Boolean(task.found && task.multipleInstances === 'IgnoreNew')
+    : null,
+  scheduledTaskExecutionLimitBounded: task.platform === 'win32'
+    ? Boolean(task.found && taskExecutionLimitMinutes !== null && taskExecutionLimitMinutes <= 45)
+    : null,
+  scheduledTaskCatchUpEnabled: task.platform === 'win32'
+    ? Boolean(task.found && task.startWhenAvailable === true)
+    : null,
 };
+
+const warnings = [];
+if (task.platform === 'win32' && task.found && task.wakeToRun !== true) {
+  warnings.push('scheduledTaskWakeToRun is disabled; hourly wakeups run when Windows is awake or catches up after availability, but may not wake a sleeping machine.');
+}
 
 const health = {
   ok: Object.values(checks).every(value => value === true || value === null),
   checks,
+  warnings,
   staleMinutes,
   lockStaleMinutes,
 };
@@ -122,6 +152,8 @@ if (-not $task) {
   exit 0
 }
 $info = Get-ScheduledTaskInfo -TaskName $taskName
+$action = @($task.Actions)[0]
+$hourlyTrigger = @($task.Triggers | Where-Object { $_.Repetition.Interval -eq 'PT1H' } | Select-Object -First 1)[0]
 [pscustomobject]@{
   platform = 'win32'
   found = $true
@@ -134,6 +166,21 @@ $info = Get-ScheduledTaskInfo -TaskName $taskName
   executionTimeLimit = [string]$task.Settings.ExecutionTimeLimit
   multipleInstances = [string]$task.Settings.MultipleInstances
   startWhenAvailable = [bool]$task.Settings.StartWhenAvailable
+  stopIfGoingOnBatteries = [bool]$task.Settings.StopIfGoingOnBatteries
+  disallowStartIfOnBatteries = [bool]$task.Settings.DisallowStartIfOnBatteries
+  wakeToRun = [bool]$task.Settings.WakeToRun
+  action = if ($null -eq $action) { $null } else { [pscustomobject]@{
+    execute = [string]$action.Execute
+    arguments = [string]$action.Arguments
+    workingDirectory = [string]$action.WorkingDirectory
+  } }
+  hourlyTrigger = if ($null -eq $hourlyTrigger) { $null } else { [pscustomobject]@{
+    enabled = [bool]$hourlyTrigger.Enabled
+    startBoundary = [string]$hourlyTrigger.StartBoundary
+    endBoundary = [string]$hourlyTrigger.EndBoundary
+    repetitionInterval = [string]$hourlyTrigger.Repetition.Interval
+    repetitionDuration = [string]$hourlyTrigger.Repetition.Duration
+  } }
 } | ConvertTo-Json -Depth 8
 `;
 
@@ -191,6 +238,7 @@ function renderMarkdown(data) {
     `- task_name: ${data.taskName}`,
     `- status_fingerprint: ${data.statusFingerprint}`,
     `- overall_ok: ${data.health.ok}`,
+    `- warning_count: ${data.health.warnings?.length || 0}`,
     '',
     '## Checks',
     '',
@@ -198,6 +246,13 @@ function renderMarkdown(data) {
 
   for (const [name, value] of Object.entries(data.health.checks)) {
     lines.push(`- ${name}: ${value}`);
+  }
+
+  lines.push('', '## Warnings', '');
+  if (data.health.warnings?.length) {
+    for (const warning of data.health.warnings) lines.push(`- ${warning}`);
+  } else {
+    lines.push('- None.');
   }
 
   lines.push('');
@@ -255,6 +310,16 @@ function minutesUntil(value, base) {
   const timestamp = Date.parse(value || '');
   if (!Number.isFinite(timestamp)) return null;
   return (timestamp - base.getTime()) / 60_000;
+}
+
+function parseIsoDurationMinutes(value) {
+  const text = String(value || '');
+  const match = text.match(/^P(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)$/);
+  if (!match) return null;
+  const hours = Number(match[1] || 0);
+  const minutes = Number(match[2] || 0);
+  const seconds = Number(match[3] || 0);
+  return hours * 60 + minutes + seconds / 60;
 }
 
 function numberFromEnv(name, fallback) {
