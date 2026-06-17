@@ -169,6 +169,9 @@ function renderMarkdown(payload) {
   lines.push('- This handoff does not push, deploy, merge, or publish.');
   lines.push('- Do not include Worker deploy slices in this commit unless the gate says local-review.');
   lines.push('- Do not add API keys, tokens, or secrets to any staged file.');
+  if (payload.group.gate === 'investor-review') {
+    lines.push('- Do not send, share, or publish investor materials from this handoff.');
+  }
   return lines.join('\n');
 }
 
@@ -219,6 +222,8 @@ function prDraftFor(group, paths) {
     '## Deployment',
     group.gate === 'deploy-approval'
       ? '- Deployment requires explicit approval. This PR should not auto-deploy.'
+      : group.gate === 'investor-review'
+        ? '- Investor sharing/email sending requires explicit approval outside this handoff.'
       : '- No production deployment required for this slice.',
   ].join('\n');
 }

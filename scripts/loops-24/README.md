@@ -49,9 +49,10 @@ to local, review-ready artifacts:
 - content queue reconciliation reports
 - Wrangler cache audit reports
 - cold outreach drafts only when prospects are eligible
+- investor packet slice handoffs that stay behind investor-review
 
 It stops at review gates for secrets, tokens, deploy approval, outbound sending,
-and broad frontend/artifact payloads.
+investor materials, and broad frontend/artifact payloads.
 
 Before generating slice handoffs, auto-complete rechecks the current worktree
 fingerprint and refreshes the commit-boundary plan when the latest plan is stale.
@@ -90,6 +91,11 @@ PR readiness, Worker deploy checklist, secret gates, wakeup health, dashboard
 gate verification, and manual-send gates into one local decision page. It does
 not run `git push`, create a pull request, deploy, call protected endpoints,
 write secrets, or send messages.
+
+Investor packet materials under `investor-packet/` are classified as their own
+`investor-review` slice. LOOPS may prepare a local handoff, but it must not stage,
+send, share, publish, or mix those materials with LOOPS or Worker changes without
+explicit approval.
 
 The owner bundle treats wakeup health as an approval gate. If the latest
 wakeup-health report is missing, unhealthy, or older than

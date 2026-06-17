@@ -1179,6 +1179,10 @@ function classifyApprovalGates(label, candidate = null) {
     if (gate && !gates.includes(gate)) gates.push(gate);
   };
 
+  if (/investor|fundraising|taiwania|pitch[-_ ]?deck|data[-_ ]?room|investor[-_ ]?packet/.test(text)) {
+    addGate('investor-review');
+  }
+
   switch (candidate?.manualGate || inferManualGate(candidate || {})) {
     case 'manual_secret_input':
       addGate('secret-input');
@@ -1825,12 +1829,13 @@ function inferLane(item = {}) {
   if (/draft|manual_send|cold_outreach|cold-outreach|send-only/.test(text)) return 'outreach-draft';
   if (/google|prospect|lead|revenue|cash|sales/.test(text)) return 'revenue';
   if (/deploy|worker|wrangler|cloudflare|cron|webhook|secret|social-publisher|health|queue|content/.test(text)) return 'deployment';
-  if (/demo|record|showcase|script/.test(text)) return 'demo-sales';
+  if (/investor|fundraising|pitch|data-room|demo|record|showcase|script/.test(text)) return 'demo-sales';
   return 'repo-hygiene';
 }
 
 function inferManualGate(item = {}) {
   const text = `${item.manualGate || ''} ${item.label || ''} ${item.id || ''} ${item.type || ''} ${item.action || ''} ${item.title || ''}`.toLowerCase();
+  if (/investor|fundraising|taiwania|pitch[-_ ]?deck|data[-_ ]?room|investor[-_ ]?packet/.test(text)) return 'manual_review_only';
   if (/secret|token|api-key|api_key|password/.test(text)) return 'manual_secret_input';
   if (/send|outreach|line|ig|email|bulk|publish/.test(text)) return 'manual_send_only';
   if (/deploy|wrangler|production|worker|cron/.test(text)) return 'manual_deploy_approval';
@@ -1845,6 +1850,7 @@ function inferExpectedArtifact(item = {}) {
   if (/secret|token|api-key|api_key|password|places api key|google_maps_api_key|google_places_api_key/.test(text)) return 'redacted secret-gate handoff';
   if (/deploy|worker|wrangler/.test(text)) return 'deploy-ready checklist';
   if (/github|\bpr\b|local-pr|pull request|push|issue/.test(text)) return 'local GitHub handoff draft';
+  if (/investor|fundraising|taiwania|pitch[-_ ]?deck|data[-_ ]?room|investor[-_ ]?packet/.test(text)) return 'investor-review packet handoff';
   if (/outreach|prospect|cold|send/.test(text)) return 'manual-review outreach draft';
   if (/worktree|commit|slice/.test(text)) return 'snapshot and commit boundary plan';
   if (/health|cron|queue|content/.test(text)) return 'local health or reconciliation report';
@@ -1859,7 +1865,7 @@ function inferDedupPolicy(item = {}) {
 
 function requiresManualGate(task = {}) {
   const text = `${task.taskType || ''} ${task.sourceId || ''} ${task.manualGate || ''} ${task.expectedArtifact || ''}`.toLowerCase();
-  return /outreach|send|github|issue|pr|push|deploy|worker|secret|token|publish/.test(text);
+  return /investor|fundraising|taiwania|pitch[-_ ]?deck|data[-_ ]?room|outreach|send|github|issue|pr|push|deploy|worker|secret|token|publish/.test(text);
 }
 
 function summarizeManualWaits(candidates, autoCompletions = []) {

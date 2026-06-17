@@ -114,6 +114,13 @@ function buildGroups(inputRecords) {
       match: pathName => pathName === 'PROJECT-STATE.md',
     },
     {
+      id: 'investor_packet',
+      title: 'Investor packet materials',
+      gate: 'investor-review',
+      recommendation: 'Review separately with Hsuehyi before staging. Do not send, share, or publish investor materials without explicit approval.',
+      match: pathName => pathName.startsWith('investor-packet/'),
+    },
+    {
       id: 'frontend_artifacts',
       title: 'Frontend/art portfolio artifacts',
       gate: 'large-payload-review',
@@ -176,7 +183,8 @@ function renderMarkdown(payload) {
     '1. Commit LOOPS control-plane changes by themselves after review.',
     '2. Commit content queue / manifest baseline separately after reconciliation stays clean.',
     '3. Hold webhook and social-publisher Worker changes until deploy approval and required tokens are available.',
-    '4. Split the large frontend/artifacts payload into its own review path; do not mix it with automation or Worker changes.',
+    '4. Hold investor packet materials for dedicated investor-review; do not mix them with LOOPS, Worker changes, or outbound sends.',
+    '5. Split the large frontend/artifacts payload into its own review path; do not mix it with automation or Worker changes.',
     '',
     '## Groups',
     '',
@@ -203,6 +211,7 @@ function renderMarkdown(payload) {
   lines.push('');
   lines.push('- Do not deploy Workers from this worktree until the Worker slices are reviewed separately.');
   lines.push('- Do not add secrets to repo files. Use environment variables or platform secret stores only.');
+  lines.push('- Do not send, share, or publish investor packet materials without explicit approval.');
   lines.push('- Do not push the broad frontend/artifacts payload until it has its own preview/review path.');
   return lines.join('\n');
 }

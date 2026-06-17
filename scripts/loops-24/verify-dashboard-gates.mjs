@@ -198,6 +198,7 @@ function expectedApprovalGates(item) {
   if (item.manualGate === 'manual_secret_input' || /secret|token|api[_-]?key|manual_secret_input/.test(fullText)) add('secret-input');
   if (item.manualGate === 'manual_send_only' || /manual_send_only|cold-outreach|outreach|sending/.test(fullText)) add('manual-send-approval');
   if (item.manualGate === 'manual_deploy_approval' || /manual_deploy_approval|deploy|cron-status|worker/.test(fullText)) add('deploy-approval');
+  if (/investor|fundraising|taiwania|pitch[-_ ]?deck|data[-_ ]?room|investor[-_ ]?packet/.test(fullText)) add('investor-review');
   if (item.manualGate === 'manual_create_only' || /manual_create_only|github|local-pr|pr-readiness|pull request|push/.test(fullText)) {
     add(/github|local-pr|pr-readiness|pull request|push/.test(fullText) ? 'push-and-pr-approval' : 'local-review');
   }
