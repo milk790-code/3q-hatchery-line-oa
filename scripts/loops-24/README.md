@@ -356,6 +356,11 @@ The handoff is written under the automation state directory and records only
 readiness booleans. It does not execute `secrets.local.ps1`, print values, write
 secrets, or call protected live endpoints.
 
+The safe-local runner also verifies the one-page checklist with
+`verify-secret-checklist.mjs`. That verifier checks source fingerprints, wrapper
+paths, and report text, but does not read, print, write, or validate real secret
+values.
+
 One-click local checker:
 
 ```powershell

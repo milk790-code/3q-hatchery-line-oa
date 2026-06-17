@@ -1128,6 +1128,12 @@ async function runAutoCompletions(candidates) {
       ['scripts/loops-24/prepare-secret-checklist.mjs'],
       120_000
     ));
+    completions.push(runLocalStep(
+      'verify-secret-checklist',
+      'node',
+      ['scripts/loops-24/verify-secret-checklist.mjs'],
+      120_000
+    ));
   }
 
   completions.push(runLocalStep(
@@ -1660,7 +1666,10 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
   const escalated = blocked.filter(item => item.escalated);
   const loopos = result.loopos || buildLooposSummary(candidates, autoCompletions, { registries: [], warnings: [] });
   const connectorHealth = summarizeConnectorHealthArtifact(await readJson(path.join(stateDir, 'connector-health', 'latest.json'), null));
-  const secretChecklist = summarizeSecretChecklistArtifact(await readJson(path.join(stateDir, 'secret-checklists', 'latest.json'), null));
+  const secretChecklist = summarizeSecretChecklistArtifact(
+    await readJson(path.join(stateDir, 'secret-checklists', 'latest.json'), null),
+    await readJson(path.join(stateDir, 'secret-checklist-verifications', 'latest.json'), null)
+  );
   const accountBindingWorkbench = summarizeAccountBindingWorkbenchArtifact(await readJson(path.join(stateDir, 'account-binding-workbench', 'latest.json'), null));
   const materialFactory = summarizeMaterialFactoryArtifact(await readJson(path.join(stateDir, 'material-factory', 'latest.json'), null));
   const dirtyClassification = summarizeDirtyClassificationArtifact(await readJson(path.join(stateDir, 'dirty-worktree', 'latest.json'), null));
@@ -1692,6 +1701,8 @@ async function writeDashboard(result, candidates, autoCompletions = []) {
     largestApprovalGroup: approvals[0]?.approval || null,
     connectorAttentionCount: connectorHealth.summary?.attentionCount || 0,
     missingSecretGateCount: secretChecklist.summary?.missingCount || 0,
+    secretChecklistVerificationOk: secretChecklist.available ? secretChecklist.verificationOk : null,
+    secretChecklistVerificationFailureCount: secretChecklist.available ? secretChecklist.summary?.verificationFailureCount : null,
     accountBindingAttentionCount: accountBindingWorkbench.summary?.attentionCount || 0,
     accountBindingNextBindingId: accountBindingWorkbench.summary?.nextBindingId || null,
     accountBindingNextBindingLabel: accountBindingWorkbench.summary?.nextBindingLabel || null,
@@ -2349,14 +2360,20 @@ function summarizeConnectorHealthArtifact(data) {
   };
 }
 
-function summarizeSecretChecklistArtifact(data) {
+function summarizeSecretChecklistArtifact(data, verification) {
   if (!data) return { available: false, summary: null, reportPath: null };
   return {
     available: true,
     generatedAt: data.generatedAt || null,
     reportPath: data.reportPath || null,
     sourceSecretGatesPath: data.sourceSecretGatesPath || null,
-    summary: data.summary || null,
+    verificationOk: verification?.ok === true,
+    verificationReportPath: verification?.reportPath || null,
+    summary: {
+      ...(data.summary || {}),
+      verificationFailureCount: Number(verification?.summary?.failureCount || 0),
+      verificationWarningCount: Number(verification?.summary?.warningCount || 0),
+    },
   };
 }
 
@@ -2497,9 +2514,13 @@ function renderSecretChecklist(data) {
   const summary = data.summary || {};
   return [
     `- report: ${data.reportPath || '(missing)'}`,
+    `- verification_report: ${data.verificationReportPath || '(missing)'}`,
     `- source_secret_gates: ${data.sourceSecretGatesPath || '(missing)'}`,
     `- ready_for_runner_wrapper: ${summary.readyForWrapperCount || 0}/${summary.total || 0}`,
     `- missing: ${summary.missing?.length ? summary.missing.join(', ') : '(none)'}`,
+    `- verification_ok: ${data.verificationOk === true}`,
+    `- verification_failures: ${summary.verificationFailureCount ?? 0}`,
+    `- verification_warnings: ${summary.verificationWarningCount ?? 0}`,
   ];
 }
 
