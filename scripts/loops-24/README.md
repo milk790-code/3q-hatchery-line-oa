@@ -293,7 +293,10 @@ On Windows, the health report also verifies the scheduled task points at this
 repo's `scripts\loops-24\run.ps1`, keeps `-OnlySafeLocal` enabled by default,
 uses this repo as the working directory, repeats every hour, ignores overlapping
 instances, has a bounded execution time limit, and has catch-up enabled with
-`StartWhenAvailable`.
+`StartWhenAvailable`. It also fails the health check when Task Scheduler reports
+missed runs or when the recorded `nextRunTime` has drifted outside the accepted
+window (`LOOPS_WAKEUP_NEXT_RUN_GRACE_MINUTES`, default 5 minutes in the past;
+`LOOPS_WAKEUP_NEXT_RUN_MAX_FUTURE_MINUTES`, default 75 minutes in the future).
 
 If `WakeToRun` is disabled, the report emits a non-blocking warning: LOOPS can
 catch up when Windows becomes available, but the task is not guaranteed to wake

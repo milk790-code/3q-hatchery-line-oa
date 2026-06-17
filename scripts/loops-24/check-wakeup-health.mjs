@@ -10,6 +10,8 @@ const automationId = process.env.LOOPS_AUTOMATION_ID || 'loops-24';
 const taskName = process.env.LOOPS_TASK_NAME || 'LOOPS-24-3Q-Hatchery';
 const staleMinutes = numberFromEnv('LOOPS_WAKEUP_STALE_MINUTES', 90);
 const reportFreshMinutes = numberFromEnv('LOOPS_WAKEUP_REPORT_FRESH_MINUTES', 65);
+const nextRunGraceMinutes = numberFromEnv('LOOPS_WAKEUP_NEXT_RUN_GRACE_MINUTES', 5);
+const nextRunMaxFutureMinutes = numberFromEnv('LOOPS_WAKEUP_NEXT_RUN_MAX_FUTURE_MINUTES', 75);
 const lockStaleMinutes = numberFromEnv('LOOPS_LOCK_STALE_MINUTES', 65);
 const repoRoot = path.resolve(process.env.LOOPS_REPO_ROOT || process.cwd());
 const codexHome = process.env.CODEX_HOME
@@ -53,7 +55,13 @@ const checks = {
     ? Boolean(task.found && (taskLastResult === 0 || taskCurrentlyRunning))
     : null,
   scheduledTaskNextRunPlausible: task.platform === 'win32'
-    ? Boolean(task.found && (nextRunInMinutes === null || nextRunInMinutes > -10))
+    ? Boolean(task.found
+      && nextRunInMinutes !== null
+      && nextRunInMinutes >= -nextRunGraceMinutes
+      && nextRunInMinutes <= nextRunMaxFutureMinutes)
+    : null,
+  scheduledTaskNoMissedRuns: task.platform === 'win32'
+    ? Boolean(task.found && Number(task.numberOfMissedRuns || 0) === 0)
     : null,
   scheduledTaskSafeLocalRunner: task.platform === 'win32'
     ? Boolean(task.found
@@ -86,7 +94,19 @@ const health = {
   warnings,
   staleMinutes,
   reportFreshMinutes,
+  nextRunGraceMinutes,
+  nextRunMaxFutureMinutes,
   lockStaleMinutes,
+  diagnostics: {
+    latestRunAgeMinutes: round(latestRunAgeMinutes),
+    latestSuccessAgeMinutes: round(latestSuccessAgeMinutes),
+    lockAgeMinutes: round(lockAgeMinutes),
+    scheduledTaskNextRunInMinutes: round(nextRunInMinutes),
+    scheduledTaskIntervalMinutes: round(taskIntervalMinutes),
+    scheduledTaskExecutionLimitMinutes: round(taskExecutionLimitMinutes),
+    scheduledTaskLastTaskResult: Number.isFinite(taskLastResult) ? taskLastResult : null,
+    scheduledTaskNumberOfMissedRuns: Number(task?.numberOfMissedRuns || 0),
+  },
 };
 
 const payload = {
@@ -239,6 +259,8 @@ function renderMarkdown(data) {
     `- generated_at: ${data.generatedAt}`,
     `- report_fresh_minutes: ${data.reportFreshMinutes}`,
     `- fresh_until: ${data.freshUntil}`,
+    `- next_run_grace_minutes: ${data.health.nextRunGraceMinutes}`,
+    `- next_run_max_future_minutes: ${data.health.nextRunMaxFutureMinutes}`,
     `- repo: ${data.repoRoot}`,
     `- automation_id: ${data.automationId}`,
     `- state_dir: ${data.stateDir}`,
@@ -253,6 +275,11 @@ function renderMarkdown(data) {
 
   for (const [name, value] of Object.entries(data.health.checks)) {
     lines.push(`- ${name}: ${value}`);
+  }
+
+  lines.push('', '## Diagnostics', '');
+  for (const [name, value] of Object.entries(data.health.diagnostics || {})) {
+    lines.push(`- ${name}: ${value === null ? '(null)' : value}`);
   }
 
   lines.push('', '## Warnings', '');
