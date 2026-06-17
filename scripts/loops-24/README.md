@@ -609,7 +609,8 @@ powershell -ExecutionPolicy Bypass -File .\scripts\loops-24\verify-owner-approva
 
 The verifier reads local LOOPS JSON artifacts and git status only. It does not
 push, create PRs, deploy, call protected endpoints, write secrets, or send
-messages.
+messages. The verification JSON also records the owner bundle fingerprint so
+downstream approval workbenches can prove which bundle was verified.
 
 Create a local approval workbench after the owner bundle is verified. It lists
 ready commands and manual gates for owner review, but still does not execute
@@ -633,7 +634,9 @@ testing or a deliberately short owner review window. If `expires_at` has passed,
 regenerate the workbench before running any owner-approved command. The prepare
 step reuses the latest workbench only when its projection fingerprint and status
 fingerprint still match the latest owner bundle, and the workbench has not
-expired.
+expired. The prepare step refreshes the owner-bundle verifier first and records
+the verifier report path, bundle JSON path, and bundle fingerprint; a mismatched
+or missing verifier keeps the workbench in `attention`.
 
 Verify that the approval workbench is still a faithful projection of the latest
 owner bundle and owner-bundle verifier:

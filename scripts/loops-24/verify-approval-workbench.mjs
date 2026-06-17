@@ -120,19 +120,25 @@ function verifyWorkbench(workbench, bundle, ownerVerification) {
       },
     ]
     : bundleAttentionGates;
-  const expectedStatus = ownerVerification?.ok === true && expectedAttentionGates.length === 0 && !expired
+  const verificationMismatch = ownerVerificationMismatch(ownerVerification, bundle, workbench.bundleJsonPath);
+  const expectedVerificationOk = ownerVerification?.ok === true && !verificationMismatch;
+  const expectedStatus = expectedVerificationOk && expectedAttentionGates.length === 0 && !expired
     ? 'ready-for-owner-decision'
     : 'attention';
 
   requireEqual(failures, 'repoRoot', workbench.repoRoot, repoRoot);
   requireEqual(failures, 'stateDir', workbench.stateDir, stateDir);
   requireEqual(failures, 'bundleFingerprint', workbench.bundleFingerprint, bundle.bundleFingerprint || null);
+  requireEqual(failures, 'verificationPath', workbench.verificationPath, ownerVerification?.reportPath || null);
+  requireEqual(failures, 'verificationBundleFingerprint', workbench.verificationBundleFingerprint ?? null, ownerVerification?.bundleFingerprint || null);
+  requireEqual(failures, 'verificationBundleJsonPath', workbench.verificationBundleJsonPath ?? null, ownerVerification?.bundleJsonPath || null);
+  requireEqual(failures, 'verificationMismatch', workbench.verificationMismatch ?? null, verificationMismatch);
   requireEqual(failures, 'branch', workbench.branch, bundle.branch || null);
   requireEqual(failures, 'head', workbench.head, bundle.head || null);
   requireEqual(failures, 'ahead', Number(workbench.ahead), Number(bundle.ahead));
   requireEqual(failures, 'behind', Number(workbench.behind), Number(bundle.behind));
   requireEqual(failures, 'bundleStatus', workbench.bundleStatus, bundle.summary?.status || null);
-  requireEqual(failures, 'verificationOk', workbench.verificationOk, ownerVerification?.ok === true);
+  requireEqual(failures, 'verificationOk', workbench.verificationOk, expectedVerificationOk);
   requireEqual(failures, 'status', workbench.status, expectedStatus);
   if (!Number.isFinite(approvalTtlMinutes) || approvalTtlMinutes <= 0) {
     failures.push(`approvalTtlMinutes must be a positive number, got ${workbench.approvalTtlMinutes}`);
@@ -181,7 +187,7 @@ function verifyWorkbench(workbench, bundle, ownerVerification) {
     workerReady: bundle.summary?.workerReady === true,
     localScopeClean: bundle.summary?.localScopeClean === true,
     localInvestorPacketCount: Number(bundle.summary?.localInvestorPacketCount || 0),
-    verificationFailureCount: Number(ownerVerification?.summary?.failureCount || 0),
+    verificationFailureCount: Number(ownerVerification?.summary?.failureCount || 0) + (verificationMismatch ? 1 : 0),
     expired,
   };
   for (const [key, expected] of Object.entries(expectedSummary)) {
@@ -199,6 +205,7 @@ function verifyWorkbench(workbench, bundle, ownerVerification) {
   const expectedProjectionFingerprint = hash(JSON.stringify({
     bundleFingerprint: workbench.bundleFingerprint,
     verificationOk: workbench.verificationOk,
+    verificationBundleFingerprint: workbench.verificationBundleFingerprint,
     readyCommands: workbench.readyCommands,
     blockedCommands: workbench.blockedCommands,
     manualGates: workbench.manualGates,
@@ -246,6 +253,15 @@ function toGateSummary(gate) {
     ownerAction: gate.ownerAction,
     evidence: gate.evidence,
   };
+}
+
+function ownerVerificationMismatch(ownerVerification, bundle, bundleJsonPath) {
+  if (!ownerVerification) return 'owner_verification_missing';
+  if (ownerVerification.bundleJsonPath !== bundleJsonPath) return 'owner_verification_bundle_path_mismatch';
+  if ((ownerVerification.bundleFingerprint || null) !== (bundle.bundleFingerprint || null)) {
+    return 'owner_verification_bundle_fingerprint_mismatch';
+  }
+  return null;
 }
 
 function requireEqual(failures, label, actual, expected) {

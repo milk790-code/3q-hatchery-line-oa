@@ -23,7 +23,7 @@ const bundle = await readJson(bundleJsonPath);
 const requestedExpiresAt = new Date(now.getTime() + approvalTtlMinutes * 60_000);
 const expiry = boundExpiry(requestedExpiresAt, bundle.summary?.wakeupFreshUntil, now);
 const expiresAt = expiry.expiresAt;
-const verification = await refreshVerification(bundleJsonPath);
+const verification = await refreshVerification(bundleJsonPath, bundle);
 const commandGates = (bundle.gates || []).filter(gate => Array.isArray(gate.commands) && gate.commands.length);
 const readyCommands = commandGates.filter(gate => gate.status === 'ready_for_approval');
 const blockedCommands = commandGates.filter(gate => gate.status !== 'ready_for_approval');
@@ -54,6 +54,9 @@ const payload = {
   bundleStatus: bundle.summary?.status || null,
   bundleFingerprint: bundle.bundleFingerprint || null,
   verificationOk: verification?.ok === true,
+  verificationBundleFingerprint: verification?.bundleFingerprint || null,
+  verificationBundleJsonPath: verification?.bundleJsonPath || null,
+  verificationMismatch: verification?.mismatch || null,
   readyCommands: expired ? [] : readyCommands.map(toCommandGate),
   blockedCommands: blockedCommands.map(toCommandGate),
   manualGates: manualGates.map(toGateSummary),
@@ -83,7 +86,7 @@ const payload = {
     workerReady: bundle.summary?.workerReady === true,
     localScopeClean: bundle.summary?.localScopeClean === true,
     localInvestorPacketCount: Number(bundle.summary?.localInvestorPacketCount || 0),
-    verificationFailureCount: Number(verification?.summary?.failureCount || 0),
+    verificationFailureCount: Number(verification?.summary?.failureCount || 0) + (verification?.mismatch ? 1 : 0),
     expired,
   },
   hardStops: [
@@ -94,13 +97,14 @@ const payload = {
     'Do not print or store secret values in LOOPS reports.',
   ],
 };
-payload.status = verification?.ok === true && payload.attentionGates.length === 0 && !expired
+payload.status = verification?.ok === true && !verification?.mismatch && payload.attentionGates.length === 0 && !expired
   ? 'ready-for-owner-decision'
   : 'attention';
 
 payload.projectionFingerprint = hash(JSON.stringify({
   bundleFingerprint: payload.bundleFingerprint,
   verificationOk: payload.verificationOk,
+  verificationBundleFingerprint: payload.verificationBundleFingerprint,
   readyCommands: payload.readyCommands,
   blockedCommands: payload.blockedCommands,
   manualGates: payload.manualGates,
@@ -156,9 +160,52 @@ function parseArgs(argv) {
   return parsed;
 }
 
-async function refreshVerification(bundlePath) {
-  runNodeMaybe(['scripts/loops-24/verify-owner-approval-bundle.mjs', '--bundle-json', bundlePath]);
-  return readJson(path.join(stateDir, 'owner-approval-verifications', 'latest.json'), null);
+async function refreshVerification(bundlePath, bundle) {
+  const resolvedBundlePath = path.resolve(bundlePath);
+  const result = runNodeMaybe(['scripts/loops-24/verify-owner-approval-bundle.mjs', '--bundle-json', resolvedBundlePath]);
+  const verification = await readJson(path.join(stateDir, 'owner-approval-verifications', 'latest.json'), null);
+  if (!verification) {
+    return {
+      ok: false,
+      reportPath: null,
+      bundleJsonPath: resolvedBundlePath,
+      bundleFingerprint: null,
+      summary: { failureCount: 1 },
+      mismatch: result.status === 0 ? 'owner_verification_missing' : 'owner_verification_command_failed',
+    };
+  }
+  const mismatch = ownerVerificationMismatch(verification, resolvedBundlePath, bundle);
+  if (mismatch) {
+    return {
+      ...verification,
+      ok: false,
+      mismatch,
+      summary: {
+        ...(verification.summary || {}),
+        failureCount: Number(verification.summary?.failureCount || 0),
+      },
+    };
+  }
+  if (result.status !== 0 && verification.ok === true) {
+    return {
+      ...verification,
+      ok: false,
+      mismatch: 'owner_verification_command_failed_after_write',
+      summary: {
+        ...(verification.summary || {}),
+        failureCount: Number(verification.summary?.failureCount || 0),
+      },
+    };
+  }
+  return verification;
+}
+
+function ownerVerificationMismatch(verification, bundlePath, bundle) {
+  if (verification.bundleJsonPath !== bundlePath) return 'owner_verification_bundle_path_mismatch';
+  if ((verification.bundleFingerprint || null) !== (bundle.bundleFingerprint || null)) {
+    return 'owner_verification_bundle_fingerprint_mismatch';
+  }
+  return null;
 }
 
 async function readJson(file, fallback) {
@@ -219,6 +266,8 @@ function renderMarkdown(payload) {
     `- status: ${payload.status}`,
     `- owner_bundle: ${payload.bundleReportPath || '(missing)'}`,
     `- owner_verification: ${payload.verificationPath || '(missing)'}`,
+    `- owner_verification_bundle_fingerprint: ${payload.verificationBundleFingerprint || '(missing)'}`,
+    `- owner_verification_mismatch: ${payload.verificationMismatch || '(none)'}`,
     '',
     '## BLUF',
     '',
