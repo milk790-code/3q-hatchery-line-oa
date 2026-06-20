@@ -775,6 +775,254 @@ function tokensMatch(a, b) {
 // Main export
 // ─────────────────────────────────────────────────────────────────────────
 
+function renderPublisherToolHtml() {
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3Q LOOP Publisher</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --ink: #1b1f24;
+      --muted: #657080;
+      --line: #d8dee6;
+      --accent: #0f766e;
+      --danger: #b42318;
+      --warn: #b45309;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #111418; --panel: #181d23; --ink: #f3f5f7; --muted: #a9b3c1; --line: #2f3742; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); }
+    header { padding: 22px clamp(16px, 4vw, 42px); border-bottom: 1px solid var(--line); background: var(--panel); }
+    h1 { margin: 0; font-size: clamp(24px, 4vw, 36px); letter-spacing: 0; }
+    header p { margin: 8px 0 0; max-width: 780px; color: var(--muted); line-height: 1.5; }
+    main { display: grid; gap: 16px; padding: 18px clamp(16px, 4vw, 42px) 34px; grid-template-columns: minmax(260px, 360px) 1fr; }
+    section, aside { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; }
+    h2 { margin: 0 0 12px; font-size: 18px; }
+    label { display: block; margin: 10px 0 5px; color: var(--muted); font-size: 13px; }
+    input, textarea, select, button { width: 100%; min-height: 40px; border: 1px solid var(--line); border-radius: 6px; padding: 9px 10px; font: inherit; background: transparent; color: var(--ink); }
+    textarea { min-height: 108px; resize: vertical; }
+    button { cursor: pointer; border-color: transparent; background: var(--accent); color: white; font-weight: 700; }
+    button.secondary { background: transparent; color: var(--ink); border-color: var(--line); }
+    button.danger { background: var(--danger); }
+    button.warn { background: var(--warn); }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+    .grid { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .stack { display: grid; gap: 12px; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .toolbar > * { width: auto; }
+    .status { border: 1px solid var(--line); border-radius: 8px; padding: 10px; color: var(--muted); white-space: pre-wrap; overflow-wrap: anywhere; }
+    .ok { color: var(--accent); }
+    .bad { color: var(--danger); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-weight: 700; }
+    code { overflow-wrap: anywhere; }
+    .wide { grid-column: 1 / -1; }
+    .hint { color: var(--muted); font-size: 13px; line-height: 1.45; }
+    @media (max-width: 900px) { main { grid-template-columns: 1fr; } .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>3Q LOOP Publisher</h1>
+    <p>Public control surface for the social publisher Worker. Queue, preview, approve, autofill, stats, and publish actions require the local trigger token.</p>
+  </header>
+  <main>
+    <aside class="stack">
+      <section>
+        <h2>Access</h2>
+        <label for="token">Trigger token</label>
+        <input id="token" type="password" autocomplete="off" placeholder="Stored only in this browser tab">
+        <div class="toolbar" style="margin-top:10px">
+          <button id="saveToken" type="button">Use token</button>
+          <button id="clearToken" type="button" class="secondary">Clear</button>
+        </div>
+        <p class="hint">The token is sent as an Authorization header and saved in sessionStorage only.</p>
+      </section>
+      <section>
+        <h2>Health</h2>
+        <button id="health" type="button" class="secondary">Check /health</button>
+        <div id="healthOut" class="status" style="margin-top:10px">Not checked.</div>
+      </section>
+    </aside>
+    <section class="stack">
+      <h2>Queue</h2>
+      <div class="toolbar">
+        <button id="loadQueue" type="button">Load queue</button>
+        <input id="approveIds" placeholder="IDs: 12,13" style="min-width:180px">
+        <button id="approveIdsBtn" type="button" class="warn">Approve IDs</button>
+      </div>
+      <div id="queueOut" class="status">Queue not loaded.</div>
+      <div style="overflow:auto">
+        <table>
+          <thead><tr><th>ID</th><th>Platform</th><th>Status</th><th>Schedule</th><th>Preview</th><th>Action</th></tr></thead>
+          <tbody id="queueRows"></tbody>
+        </table>
+      </div>
+    </section>
+    <section>
+      <h2>Add Draft</h2>
+      <div class="grid">
+        <div>
+          <label for="platform">Platform</label>
+          <select id="platform">
+            <option value="threads">threads</option>
+            <option value="instagram">instagram</option>
+            <option value="facebook">facebook</option>
+            <option value="tiktok">tiktok</option>
+            <option value="google_biz">google_biz</option>
+          </select>
+        </div>
+        <div>
+          <label for="status">Initial status</label>
+          <select id="status">
+            <option value="draft">draft</option>
+            <option value="pending">pending</option>
+          </select>
+        </div>
+      </div>
+      <label for="imageUrl">Image URL</label>
+      <input id="imageUrl" placeholder="https://...">
+      <label for="scheduledAt">Scheduled at ISO time</label>
+      <input id="scheduledAt" placeholder="2026-06-18T01:30:00.000Z">
+      <label for="caption">Caption</label>
+      <textarea id="caption" placeholder="Paste ready caption here"></textarea>
+      <label for="captionSeed">Caption seed</label>
+      <textarea id="captionSeed" placeholder="Optional seed or brief for AI caption"></textarea>
+      <button id="addDraft" type="button">Add to queue</button>
+      <div id="addOut" class="status" style="margin-top:10px"></div>
+    </section>
+    <section class="stack">
+      <h2>Generate</h2>
+      <label for="previewSeed">Caption seed</label>
+      <textarea id="previewSeed" placeholder="Audience, offer, angle, call to action"></textarea>
+      <button id="previewCaption" type="button">Preview caption</button>
+      <div id="previewOut" class="status"></div>
+      <button id="autofill" type="button" class="secondary">Run autofill</button>
+      <label><input id="autofillForce" type="checkbox" style="width:auto; min-height:auto"> force daily autofill</label>
+      <div id="autofillOut" class="status"></div>
+    </section>
+    <section class="wide stack">
+      <h2>Publish Gate</h2>
+      <p class="hint">This calls the live publish loop. It requires the token and typing PUBLISH before the button will run.</p>
+      <div class="grid">
+        <select id="publishPlatform">
+          <option value="">all platforms</option>
+          <option value="threads">threads</option>
+          <option value="instagram">instagram</option>
+          <option value="facebook">facebook</option>
+          <option value="tiktok">tiktok</option>
+          <option value="google_biz">google_biz</option>
+        </select>
+        <input id="publishConfirm" placeholder="Type PUBLISH">
+      </div>
+      <button id="publish" type="button" class="danger">Run publish loop</button>
+      <div id="publishOut" class="status"></div>
+    </section>
+    <section class="wide stack">
+      <h2>Stats</h2>
+      <div class="toolbar">
+        <input id="statsDays" value="14" inputmode="numeric" style="width:90px">
+        <button id="stats" type="button" class="secondary">Load stats</button>
+      </div>
+      <div id="statsOut" class="status"></div>
+    </section>
+  </main>
+  <script>
+    const $ = id => document.getElementById(id);
+    const out = (id, value, ok = true) => {
+      const el = $(id);
+      el.className = 'status ' + (ok ? 'ok' : 'bad');
+      el.textContent = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
+    };
+    const esc = value => String(value ?? '').replace(/[&<>"]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]));
+    const tokenInput = $('token');
+    tokenInput.value = sessionStorage.getItem('socialPublisherToken') || '';
+    $('saveToken').onclick = () => {
+      sessionStorage.setItem('socialPublisherToken', tokenInput.value.trim());
+      out('healthOut', 'Token stored for this tab.');
+    };
+    $('clearToken').onclick = () => {
+      tokenInput.value = '';
+      sessionStorage.removeItem('socialPublisherToken');
+      out('healthOut', 'Token cleared.');
+    };
+    function token() {
+      return tokenInput.value.trim() || sessionStorage.getItem('socialPublisherToken') || '';
+    }
+    async function api(path, options = {}) {
+      const headers = { ...(options.headers || {}) };
+      const tok = token();
+      if (tok) headers.Authorization = 'Bearer ' + tok;
+      if (options.body && !headers['Content-Type']) headers['Content-Type'] = 'application/json';
+      const res = await fetch(path, { ...options, headers });
+      const text = await res.text();
+      let data;
+      try { data = JSON.parse(text); } catch { data = text; }
+      if (!res.ok) throw Object.assign(new Error('HTTP ' + res.status), { data });
+      return data;
+    }
+    async function run(id, fn) {
+      try { out(id, await fn()); } catch (err) { out(id, err.data || err.message, false); }
+    }
+    $('health').onclick = () => run('healthOut', () => api('/health'));
+    $('loadQueue').onclick = () => loadQueue();
+    async function loadQueue() {
+      return run('queueOut', async () => {
+        const data = await api('/queue/list');
+        const rows = data.rows || [];
+        $('queueRows').innerHTML = rows.map(row => '<tr><td><code>' + esc(row.id) + '</code></td><td>' + esc(row.platform) + '</td><td>' + esc(row.status) + '</td><td>' + esc(row.scheduled_at) + '</td><td>' + esc(row.preview) + '</td><td><button class="secondary" data-approve="' + esc(row.id) + '">Approve</button><button class="danger" data-del="' + esc(row.id) + '">Delete</button></td></tr>').join('');
+        document.querySelectorAll('[data-approve]').forEach(btn => btn.onclick = () => approve(btn.dataset.approve));
+        document.querySelectorAll('[data-del]').forEach(btn => btn.onclick = () => softDelete(btn.dataset.del));
+        return data;
+      });
+    }
+    async function approve(ids) {
+      await run('queueOut', () => api('/queue/approve', { method: 'POST', body: JSON.stringify({ ids: String(ids).split(',').map(s => s.trim()).filter(Boolean) }) }));
+      await loadQueue();
+    }
+    async function softDelete(id) {
+      if (!confirm('Soft-delete queue row #' + id + '?')) return;
+      await run('queueOut', () => api('/queue/del?id=' + encodeURIComponent(id), { method: 'POST' }));
+      await loadQueue();
+    }
+    $('approveIdsBtn').onclick = () => approve($('approveIds').value);
+    $('addDraft').onclick = () => run('addOut', () => api('/queue/add', {
+      method: 'POST',
+      body: JSON.stringify({
+        platform: $('platform').value,
+        status: $('status').value,
+        image_url: $('imageUrl').value.trim() || null,
+        scheduled_at: $('scheduledAt').value.trim() || null,
+        caption: $('caption').value.trim() || null,
+        caption_seed: $('captionSeed').value.trim() || null,
+        source_oa: 'loop-public-tool'
+      })
+    }));
+    $('previewCaption').onclick = () => run('previewOut', () => api('/preview-caption', {
+      method: 'POST',
+      body: JSON.stringify({ platform: $('platform').value, seed: $('previewSeed').value })
+    }));
+    $('autofill').onclick = () => run('autofillOut', () => api('/autofill' + ($('autofillForce').checked ? '?force=1' : ''), { method: 'POST' }));
+    $('publish').onclick = () => run('publishOut', () => {
+      if ($('publishConfirm').value !== 'PUBLISH') throw new Error('Type PUBLISH first.');
+      const platform = $('publishPlatform').value;
+      return api('/publish' + (platform ? '?platform=' + encodeURIComponent(platform) : ''), { method: 'POST' });
+    });
+    $('stats').onclick = () => run('statsOut', () => api('/admin/stats?days=' + encodeURIComponent($('statsDays').value || '14')));
+    $('health').click();
+  </script>
+</body>
+</html>`;
+}
+
 export default {
   async scheduled(controller, env, ctx) {
     console.log(`[social-publisher] cron triggered: ${controller.cron}`);
@@ -795,6 +1043,19 @@ export default {
 
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: { ...CORS, 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization' } });
+    }
+
+    if (request.method === 'GET' && (url.pathname === '/' || url.pathname === '/tool')) {
+      return new Response(renderPublisherToolHtml(), {
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+          'Cache-Control': 'no-store',
+          'Content-Security-Policy': "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+          'X-Content-Type-Options': 'nosniff',
+          'Referrer-Policy': 'no-referrer',
+          ...CORS,
+        },
+      });
     }
 
     // Health check
@@ -923,7 +1184,8 @@ export default {
 
     // List queue: GET /queue/list?token=
     if (url.pathname === '/queue/list') {
-      const tok = url.searchParams.get('token');
+      const auth = request.headers.get('Authorization') || '';
+      const tok  = auth.startsWith('Bearer ') ? auth.slice(7) : url.searchParams.get('token');
       if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return json({ ok: false, error: 'forbidden' }, 403);
       if (!env.CRM) return json({ ok: false, error: 'D1 not bound' });
       const rows = await env.CRM.prepare(
