@@ -12,6 +12,9 @@ PNG_BASE_URL = "https://milk790-code.github.io/3q-hatchery-line-oa/assets/export
 # v3.7 referral: OA basic id (@…) for prefilled-message deep links + site base for share links
 LINE_BASIC_ID = "@121Ikspe"
 SITE_BASE_URL = "https://milk790-code.github.io/3q-hatchery-line-oa/"
+RICHMENU_NEW = "richmenu-c32900aebf831cc653ec1d7b4788b389"
+RICHMENU_INQUIRED = "richmenu-f3d737b3dc01aa12be33aa318670f162"
+RICHMENU_CONVERTED = "richmenu-385546ae9b36ded170e18b0f895970e9"
 
 # Cron triggers (declarative — keep ALL; deploy replaces the dashboard set)
 #   5 * * * *           follow-ups (hourly)
@@ -31,3 +34,6 @@ id = "20a68b10afc84764ba770b64f0f33f30"
 binding = "CRM"
 database_name = "3q-hatchery-crm"
 database_id = "e54671b1-d15e-4552-babf-cef367267568"
+
+[ai]
+binding = "AI"

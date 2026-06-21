@@ -40,7 +40,7 @@ binding = "AI"
 #   04:00 UTC = 12:00 TW  (Wednesday lunch peak)
 #   12:30 UTC = 20:30 TW  (evening light content)
 # 具名日與 deploy.yml 對齊:CF cron 為 Quartz 式(1=SUN),數字 2-4 實為週一~週三
-[[triggers.crons]]
+[triggers]
 crons = [
   "0 1 * * TUE-THU",
   "0 4 * * WED",

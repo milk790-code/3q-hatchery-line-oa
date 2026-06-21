@@ -10,7 +10,7 @@ PNG_BASE_URL = "https://milk790-code.github.io/3q-hatchery-line-oa/assets/export
 #   OWNER_LINE_USER_ID
 #   TRIGGER_TOKEN   (for manual /push?token=... HTTP trigger)
 
-[[triggers.crons]]
+[triggers]
 crons = [
   "30 23 * * *",
   "30 4 * * *",

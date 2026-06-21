@@ -1,6 +1,6 @@
 // Local harness for worker.js — no network, no real bindings.
 // Run: node workers/social-publisher/worker.test.mjs
-// Covers the v2.3 fixes: /queue/add dedup, daily-seed pending guard,
+// Covers the v2.6 fixes: /queue/add dedup, daily-seed pending guard,
 // token:fb:page_token fallback, IG refresh via fb_exchange_token + missing-expires.
 import assert from 'node:assert/strict';
 import worker from './worker.js';
@@ -90,7 +90,12 @@ async function runScheduled(env) {
 
   const r2 = await (await worker.fetch(addReq(post), env)).json();
   assert.equal(r2.added, 0, 't1: identical pending add must not insert');
-  assert.deepEqual(r2.skipped, [{ index: 0, duplicate_of: id }], 't1: skipped reports the duplicate id');
+  assert.deepEqual(r2.skipped, [{
+    index: 0,
+    reason: 'duplicate_pending_row',
+    duplicate_of: id,
+    duplicate_fields: ['platform', 'caption', 'caption_seed', 'image_url', 'link_url', 'scheduled_at'],
+  }], 't1: skipped reports the duplicate id and duplicate fields');
   assert.equal(r2.ok, true, 't1: dedup skip is not an error');
 
   const r3 = await (await worker.fetch(addReq({ ...post, caption: '[t1] different' }), env)).json();
@@ -132,7 +137,7 @@ async function runScheduled(env) {
     FB_PAGE_ID: '1006044165915714',
   };
   const health = await (await worker.fetch(new Request('https://x/health'), env)).json();
-  assert.equal(health.version, '2.3', 't3: version bumped');
+  assert.equal(health.version, '2.6', 't3: version bumped');
   assert.equal(health.configured.facebook, true, 't3: fb configured via page_token KV key');
   assert.equal(health.configured.threads, false, 't3: threads still unconfigured');
   console.log('T3 fb page_token fallback ✓');
@@ -160,4 +165,4 @@ async function runScheduled(env) {
   console.log('T4 IG refresh ✓');
 }
 
-console.log('\nAll social-publisher v2.3 harness tests passed.');
+console.log('\nAll social-publisher v2.6 harness tests passed.');

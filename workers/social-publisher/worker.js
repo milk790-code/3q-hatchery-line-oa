@@ -1079,6 +1079,6 @@ export default {
       return json({ ok: true, caption });
     }
 
-    return json({ service: '3q-social-publisher', ok: true, version: '2.3' });
+    return json({ service: '3q-social-publisher', ok: true, version: '2.6' });
   },
 };
