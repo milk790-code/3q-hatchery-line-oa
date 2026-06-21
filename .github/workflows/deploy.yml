@@ -545,12 +545,20 @@ jobs:
           TRIGGER_TOKEN: ${{ secrets.TRIGGER_TOKEN }}
         run: |
           set -euo pipefail
-          sleep 5
-          health=$(curl -fsS --max-time 15 "$SOCIAL_URL/health")
-          echo "$health" | jq .
-          ver=$(echo "$health" | jq -r '.version')
           want=$(grep -oE "version: '[0-9.]+'" workers/social-publisher/worker.js | head -1 | grep -oE "[0-9.]+")
-          [ "$ver" = "$want" ] || { echo "::error::Live version $ver != repo version $want"; exit 1; }
+          # Retry up to 6× (max ~60s) for CF propagation
+          for attempt in 1 2 3 4 5 6; do
+            sleep 10
+            health=$(curl -fsS --max-time 15 "$SOCIAL_URL/health" 2>/dev/null || echo '{}')
+            ver=$(echo "$health" | jq -r '.version // empty' 2>/dev/null || echo "")
+            if [ "$ver" = "$want" ]; then break; fi
+            echo "::warning::attempt $attempt: live=$ver want=$want — waiting…"
+            if [ "$attempt" = "6" ]; then
+              echo "$health" | jq . || true
+              echo "::error::Live version $ver != repo version $want after 6 attempts"; exit 1
+            fi
+          done
+          echo "$health" | jq .
 
           # E2E dedup: add → identical add must be skipped → cleanup.
           # Far-future scheduled_at keeps the cron loop away from the probe row.
