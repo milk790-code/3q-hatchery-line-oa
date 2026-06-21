@@ -1,0 +1,29 @@
+name: js-syntax
+
+# 純語法把關（node --check）。刻意不在 main 觸發 → 不與部署 / 安全門互動。
+on:
+  push:
+    branches-ignore: ["main"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  node-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Syntax-check all JS (no deploy, no secrets)
+        run: |
+          set -e
+          found=0
+          while IFS= read -r f; do
+            found=1
+            node --check "$f"
+            echo "ok: $f"
+          done < <(find . -path ./.git -prune -o -name '*.js' -print)
+          if [ "$found" = 0 ]; then echo "no .js files found"; fi
