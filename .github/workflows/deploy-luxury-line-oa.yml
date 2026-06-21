@@ -1,0 +1,146 @@
+name: Deploy Luxury LINE OA
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'luxury-line-oa/src/index.js'
+      - 'luxury-line-oa/wrangler.toml'
+      - 'assets/luxury/richmenu_luxury.png'
+      - '.github/workflows/deploy-luxury-line-oa.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      WORKER_NAME: luxury-line-oa
+      KV_ID: d986024268764cfb9c68f0e886731367
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set CF account ID
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          [ -n "$CF_ACCOUNT_ID" ] || { echo "::error::CF_ACCOUNT_ID empty"; exit 1; }
+          echo "CF_ACCOUNT_ID=$CF_ACCOUNT_ID" >> $GITHUB_ENV
+
+      - name: Deploy (3-tier inherit-safe secrets)
+        env:
+          CF_TOKEN:              ${{ secrets.CF_API_TOKEN }}
+          LUXURY_LINE_SECRET:    ${{ secrets.LUXURY_LINE_SECRET }}
+          LUXURY_LINE_TOKEN:     ${{ secrets.LUXURY_LINE_TOKEN }}
+          LUXURY_ADMIN_KEY:      ${{ secrets.LUXURY_ADMIN_KEY }}
+        run: |
+          set -euo pipefail
+
+          existing=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/settings" \
+            | jq -c '[.result.bindings[]? | select(.type=="secret_text") | .name]' || echo '[]')
+          [ "$existing" = "null" ] && existing='[]'
+          echo "::notice::Existing secret bindings: $existing"
+
+          secrets_json=$(jq -n --argjson existing "$existing" '
+            [
+              {name:"LINE_CHANNEL_SECRET",       val:(env.LUXURY_LINE_SECRET  // "")},
+              {name:"LINE_CHANNEL_ACCESS_TOKEN",  val:(env.LUXURY_LINE_TOKEN   // "")},
+              {name:"ADMIN_KEY",                  val:(env.LUXURY_ADMIN_KEY    // "")}
+            ]
+            | map(
+                if .val != "" then {name:.name, type:"secret_text", text:.val}
+                elif ([.name] | inside($existing)) then {name:.name, type:"inherit"}
+                else empty
+                end
+              )')
+
+          jq -n --argjson secrets "$secrets_json" --arg kv "$KV_ID" '
+            {
+              main_module: "index.js",
+              compatibility_date: "2024-12-18",
+              compatibility_flags: ["nodejs_compat"],
+              bindings: ([ {name:"KV", type:"kv_namespace", namespace_id:$kv} ] + $secrets)
+            }' > /tmp/meta.json
+
+          jq '(.bindings[] | select(.type=="secret_text") | .text) = "***"' /tmp/meta.json
+
+          resp=$(curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -F "metadata=@/tmp/meta.json;type=application/json" \
+            -F "index.js=@luxury-line-oa/src/index.js;type=application/javascript+module")
+          echo "$resp" | jq -e '.success == true' > /dev/null || { echo "$resp" | jq -c '.errors'; exit 1; }
+          echo "::notice::luxury-line-oa deployed (etag=$(echo "$resp" | jq -r '.result.etag'))"
+
+      - name: Enable workers.dev subdomain
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/subdomain" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"enabled": true}' | jq -e '.success == true' > /dev/null
+          SUB=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/subdomain" \
+            | jq -r '.result.subdomain')
+          echo "WORKER_URL=https://${WORKER_NAME}.${SUB}.workers.dev" >> $GITHUB_ENV
+          echo "::notice::Worker URL: https://${WORKER_NAME}.${SUB}.workers.dev"
+
+      - name: Smoke test /health (retry up to 6×)
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3 4 5 6; do
+            sleep 10
+            health=$(curl -fsS --max-time 15 "$WORKER_URL/health" 2>/dev/null || echo '{}')
+            ok=$(echo "$health" | jq -r '.ok // false' 2>/dev/null || echo "false")
+            if [ "$ok" = "true" ]; then
+              echo "$health" | jq .
+              echo "::notice::luxury-line-oa healthy at $WORKER_URL"
+              break
+            fi
+            echo "::warning::attempt $attempt: not ready yet — $health"
+            if [ "$attempt" = "6" ]; then
+              echo "::error::Worker not healthy after 6 attempts (60s)"; exit 1
+            fi
+          done
+
+      - name: Set LINE webhook (only if token secret present)
+        continue-on-error: true
+        env:
+          LUXURY_LINE_TOKEN: ${{ secrets.LUXURY_LINE_TOKEN }}
+        run: |
+          if [ -z "${LUXURY_LINE_TOKEN:-}" ]; then
+            echo "::warning::LUXURY_LINE_TOKEN not set — skipping webhook auto-set"
+            exit 0
+          fi
+          curl -sS -f -X PUT https://api.line.me/v2/bot/channel/webhook/endpoint \
+            -H "Authorization: Bearer $LUXURY_LINE_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"endpoint\":\"$WORKER_URL\"}"
+          curl -sS -X POST https://api.line.me/v2/bot/channel/webhook/test \
+            -H "Authorization: Bearer $LUXURY_LINE_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"endpoint\":\"$WORKER_URL\"}" | jq .
+          echo "::notice::LINE webhook set to $WORKER_URL"
+
+      - name: Deploy summary
+        run: |
+          echo "## 精品私圈 luxury-line-oa deployed" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Worker URL | \`$WORKER_URL\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| KV | \`$KV_ID\` (cdg-kv shared) |" >> $GITHUB_STEP_SUMMARY
+          echo "| LINE ID | \`@186vktox\` |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Required GitHub Secrets (Settings → Secrets → Actions)" >> $GITHUB_STEP_SUMMARY
+          echo "- \`LUXURY_LINE_SECRET\` — LINE Developers Console → Channel secret" >> $GITHUB_STEP_SUMMARY
+          echo "- \`LUXURY_LINE_TOKEN\`  — LINE Developers Console → Channel access token (long-lived)" >> $GITHUB_STEP_SUMMARY
+          echo "- \`LUXURY_ADMIN_KEY\`   — any random string for /admin/* endpoints" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Post-deploy manual steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Verify LINE webhook: LINE Developers Console → Messaging API → Verify" >> $GITHUB_STEP_SUMMARY
+          echo "2. Deploy Rich Menu: \`POST $WORKER_URL/admin/deploy-richmenu -H 'X-Admin-Key: <key>'\`" >> $GITHUB_STEP_SUMMARY
+          echo "3. Mark brand active in D1: \`UPDATE brands SET status='active' WHERE brand_id='luxury'\`" >> $GITHUB_STEP_SUMMARY
