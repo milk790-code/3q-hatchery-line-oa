@@ -1531,7 +1531,9 @@ export default {
           if (cur >= 12) return J({ reply: '稍等一下再問我好嗎，你也可以直接加 LINE @121lkspe。' });
           await env.SESSION.put(rlk, String(cur + 1), { expirationTtl: 60 });
         }
-        const reply = await callClaude(env, isSanzhi ? BRAIN_SANZHI : BRAIN_3Q, msgs, { model: 'claude-sonnet-4-6', maxTokens: 400 });
+        const reply = isSanzhi
+          ? await callClaude(env, BRAIN_SANZHI, msgs, { model: 'claude-sonnet-4-6', maxTokens: 400 })
+          : await callClaudeWithTools(env, BRAIN_3Q, msgs, CRM_TOOLS, makeCrmToolExecutor(env, ip), { model: 'claude-sonnet-4-6', maxTokens: 500 });
         return J({ reply: reply || (isSanzhi ? '這題我幫你留給學誼回,你直接在對接區或LINE留言就好,他會批次回覆你。' : '想聊更快可以加我們 LINE：@121lkspe，或私訊「貢丸＋你的行業」，我幫你看怎麼開始。') });
       }
     }
@@ -2194,6 +2196,104 @@ async function callClaude(env, systemPrompt, messages, opts = {}) {
   } catch (e) { console.error('callClaude', e?.message); return null; }
 }
 
+// ─────────────────────────────────────────────────────────────────────────
+// Claude MCP-style tool use — agentic loop (tool_use → execute → tool_result)
+// ─────────────────────────────────────────────────────────────────────────
+
+const CRM_TOOLS = [
+  {
+    name: 'query_crm',
+    description: '查詢此使用者在 CRM 中的歷史諮詢紀錄（服務類型、預算、進度），用於了解客戶背景後給出更精準的回覆。',
+    input_schema: {
+      type: 'object',
+      properties: {
+        userId: { type: 'string', description: 'LINE userId' },
+      },
+      required: ['userId'],
+    },
+  },
+  {
+    name: 'match_subsidies',
+    description: '根據業種與創業階段，從政府補助目錄中找出最相關方案，供顧問推薦給客戶。',
+    input_schema: {
+      type: 'object',
+      properties: {
+        stage: { type: 'string', enum: ['idea', 'pre', 'new', 'mid', 'mature'], description: '創業階段' },
+        bizType: { type: 'string', enum: ['food', 'retail', 'car', 'tech', 'other'], description: '行業類型' },
+      },
+      required: [],
+    },
+  },
+];
+
+function makeCrmToolExecutor(env, uid) {
+  return async function execTool(name, input) {
+    if (name === 'query_crm') {
+      if (!env.CRM) return { records: [], note: 'CRM 未啟用' };
+      try {
+        const rows = await env.CRM
+          .prepare('SELECT service, budget, timeline, lead_score, created_at FROM inquiries WHERE user_id = ? ORDER BY id DESC LIMIT 3')
+          .bind(input.userId || uid || 'unknown')
+          .all();
+        return { records: rows.results || [] };
+      } catch (e) {
+        return { records: [], error: e.message };
+      }
+    }
+    if (name === 'match_subsidies') {
+      const matches = SUB_CATALOG.filter(s => {
+        if (input.stage && !s.elig.stages.includes(input.stage)) return false;
+        if (input.bizType && s.elig.biz !== 'any' && !s.elig.biz.includes(input.bizType)) return false;
+        return true;
+      }).slice(0, 4).map(s => ({ name: s.name, hook: s.hook, cap: s.cap, type: s.type }));
+      return { subsidies: matches };
+    }
+    return { error: `未知工具: ${name}` };
+  };
+}
+
+async function callClaudeWithTools(env, systemPrompt, messages, tools, toolExecutor, opts = {}) {
+  if (!env.ANTHROPIC_API_KEY) return null;
+  const model = opts.model || 'claude-sonnet-4-6';
+  const maxTokens = opts.maxTokens || 500;
+  const currentMsgs = [...messages];
+  for (let round = 0; round < 5; round++) {
+    try {
+      const body = {
+        model,
+        max_tokens: maxTokens,
+        system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
+        messages: currentMsgs.slice(-12),
+      };
+      if (tools && tools.length) body.tools = tools;
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': env.ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) { console.error('anthropic tools', res.status, await res.text().catch(() => '')); return null; }
+      const data = await res.json();
+      const content = data.content || [];
+      if (data.stop_reason !== 'tool_use') {
+        return sanitizeAIReply(content.filter(c => c.type === 'text').map(c => c.text).join('\n'));
+      }
+      currentMsgs.push({ role: 'assistant', content });
+      const toolResults = [];
+      for (const block of content) {
+        if (block.type !== 'tool_use') continue;
+        const result = await toolExecutor(block.name, block.input);
+        toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: JSON.stringify(result) });
+      }
+      currentMsgs.push({ role: 'user', content: toolResults });
+    } catch (e) { console.error('callClaudeWithTools', e?.message); return null; }
+  }
+  return null;
+}
+
 async function aiFallback(userText, env, uid) {
   if (!env.AI && !env.ANTHROPIC_API_KEY) return null;
   if (env.SESSION && uid) {
@@ -2203,8 +2303,13 @@ async function aiFallback(userText, env, uid) {
     await env.SESSION.put(key, String(cur + 1), { expirationTtl: 60 });
   }
   try {
-    // 先試 Claude(八法則腦);沒 key 或失敗 → 退回 Llama
-    const claudeReply = await callClaude(env, BRAIN_3Q, [{ role: 'user', content: userText }], { model: 'claude-sonnet-4-6', maxTokens: 400 });
+    // 先試 Claude(八法則腦 + CRM/補助工具);沒 key 或失敗 → 退回 Llama
+    const claudeReply = await callClaudeWithTools(
+      env, BRAIN_3Q,
+      [{ role: 'user', content: userText }],
+      CRM_TOOLS, makeCrmToolExecutor(env, uid),
+      { model: 'claude-sonnet-4-6', maxTokens: 500 },
+    );
     if (claudeReply) return claudeReply;
     const SYSTEM = '你是 3Q 貢丸·台灣在地品牌孵化所的客服助理。回應台灣繁體中文，最多 80 字。\n\n3Q 提供 3 個服務：\n1. 好物・好照 — 產品攝影 + 介紹文，500 元起\n2. 客製行銷 — 季度規劃，從現階段往前 3 個月\n3. 諮詢 — 30 分鐘免費，先聊聊再決定\n\n本月活動：好物・好照限時招募，前 10 位 100 元，名額剩 X 位。傳「+1」可看。\n\n用戶問什麼，你判斷最接近哪個服務，回答 2-3 句話，結尾建議他傳的關鍵字（例如：「回覆『+1』」「點選圖文選單『好物・好照』」）。語氣親切但不要過度熱情，跟用戶平等對話。';
     const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct-fast', {
