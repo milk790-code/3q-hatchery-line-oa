@@ -258,11 +258,18 @@ export default {
       return new Response(`${BRAND_NAME} LINE OA — OK`, { headers: { "content-type": "text/plain" } });
     }
 
+    if (!env.LINE_CHANNEL_SECRET) {
+      return new Response("LINE channel secret missing", { status: 503 });
+    }
+    if (!env.LINE_CHANNEL_ACCESS_TOKEN) {
+      return new Response("LINE channel access token missing", { status: 503 });
+    }
+
     const rawBody = await request.text();
     const sig = request.headers.get("x-line-signature") || "";
 
     // 簽名驗證
-    const valid = await verifySignature(rawBody, sig, env.LINE_CHANNEL_SECRET || "");
+    const valid = await verifySignature(rawBody, sig, env.LINE_CHANNEL_SECRET);
     if (!valid) return new Response("Unauthorized", { status: 401 });
 
     let body;
