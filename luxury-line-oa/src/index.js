@@ -204,8 +204,11 @@ async function setupRichMenu(env) {
 
 // ── Admin: 手動觸發 Rich Menu 部署 ─────────────────────
 async function handleAdmin(request, env, pathname) {
+  if (!env.ADMIN_KEY) {
+    return new Response(JSON.stringify({ error: "admin not configured" }), { status: 503 });
+  }
   const adminKey = request.headers.get("X-Admin-Key") || "";
-  if (adminKey !== (env.ADMIN_KEY || "")) {
+  if (adminKey !== env.ADMIN_KEY) {
     return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401 });
   }
   if (pathname === "/admin/deploy-richmenu" && request.method === "POST") {
