@@ -24,6 +24,7 @@ from linebot.v3.exceptions import InvalidSignatureError
 from linebot.v3.messaging import (
     Configuration, ApiClient, MessagingApi,
     ReplyMessageRequest, TextMessage,
+    QuickReply, QuickReplyItem, MessageAction,
 )
 from linebot.v3.webhooks import (
     MessageEvent, TextMessageContent, FollowEvent,
@@ -150,7 +151,7 @@ def handle_follow(event):
         "回覆「行銷」聽客製化網路行銷\n\n"
         "或直接回覆「諮詢」聊聊你的品牌\n"
         "找真人回覆「客服」"
-    ))
+    ), _quick_menu())
 
 
 @handler.add(MessageEvent, message=TextMessageContent)
@@ -162,11 +163,11 @@ def handle_text_message(event):
     text = _normalize(event.message.text or "")
 
     if not text:
-        _reply(event, _menu())
+        _reply(event, _menu(), _quick_menu())
         return
 
     if len(text) > 500:
-        _reply(event, "訊息有點長 我可能看不完\n\n請用簡短關鍵字:\n回覆「諮詢」「500」「行銷」「客服」")
+        _reply(event, "訊息有點長 我可能看不完\n\n請用簡短關鍵字:\n回覆「諮詢」「500」「行銷」「客服」", _quick_menu())
         return
 
     uid = getattr(getattr(event, "source", None), "user_id", None)
@@ -202,20 +203,34 @@ def handle_text_message(event):
             inv = res["invitee"]
             reply += f"\n\n你的{inv['reward']}已備好\n禮遇碼:{inv['code']}"
 
-    _reply(event, reply)
+    _reply(event, reply, _quick_menu())
 
 
 # ══════════════════════════════════════════════
 # 工具
 # ══════════════════════════════════════════════
 
-def _reply(event, text: str):
+# 主選單快速回覆鍵(顯示在輸入框上方,可直接點按,免打字)
+QUICK_MENU_ITEMS = [
+    ("諮詢", "諮詢"), ("500 生圖", "500"), ("客製行銷", "行銷"),
+    ("約諮詢", "約諮詢"), ("查進度", "進度"), ("真人客服", "客服"),
+]
+
+
+def _quick_menu() -> QuickReply:
+    return QuickReply(items=[
+        QuickReplyItem(action=MessageAction(label=label, text=text))
+        for label, text in QUICK_MENU_ITEMS
+    ])
+
+
+def _reply(event, text: str, quick_reply: QuickReply | None = None):
     try:
         with ApiClient(configuration) as api:
             MessagingApi(api).reply_message_with_http_info(
                 ReplyMessageRequest(
                     reply_token=event.reply_token,
-                    messages=[TextMessage(text=text)],
+                    messages=[TextMessage(text=text, quick_reply=quick_reply)],
                 )
             )
     except Exception as e:
@@ -300,7 +315,7 @@ def route(text: str) -> str:
     # 4. 500 生圖
     if "500" in text or "生圖" in text or text == "1":
         return (
-            "500 元生圖方案*"
+            "500 元生圖方案\n\n"
             "流程:\n"
             "1. 填十題探尋表(5 分鐘)\n"
             "2. 我們後台轉譯為視覺需求\n"
@@ -316,7 +331,7 @@ def route(text: str) -> str:
     # 5. 客製行銷
     if _has_any(text, KW_PRODUCT_2) or text == "2":
         return (
-            "客製化網路行銷方案*"
+            "客製化網路行銷方案\n\n"
             "我們做的:\n"
             "品牌命名 / 包裝設計\n"
             "電商上架 / 行銷投放\n"
