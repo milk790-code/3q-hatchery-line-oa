@@ -1,6 +1,10 @@
 // 3Q HATCHERY LINE OA — 超級業務AI種子 v4(會自我進化的成交大腦)
 // 與 pop-line-oa 同一個種子基因組,換 3Q 彈藥庫。
 // ⚠ 先不切 LINE webhook URL;現有 3q-hatchery-webhook v3.7 照常跑,學誼測滿意再切(可逆)。
+// v1.6：接綠界 ECPay outcome 回填（飛輪的眼睛）
+//   POST /webhook/ecpay/:brand  ← ECPay 付款通知（驗 CheckMacValue SHA256）
+//   POST /admin/outcome-flag?key=…  ← 標退貨/客訴
+//   KV keys: cfg:{brand}_ecpay_hashkey / cfg:{brand}_ecpay_hashiv
 
 // ═══ 模型三層路由 v1：小事 Haiku、日常 Sonnet、成交時刻 Fable（錯升不錯降）═══
 const MODELS = {
@@ -216,7 +220,81 @@ async function ensureTables(env) {
     // 陌開 CRM:PROSPECTS.md 名單入庫(pool=A 汽美耗材/B 新店官網/C 市集攤主;list_no=清單編號)
     await env.CRM.prepare("CREATE TABLE IF NOT EXISTS prospects (id INTEGER PRIMARY KEY AUTOINCREMENT, pool TEXT NOT NULL, list_no INTEGER NOT NULL, name TEXT NOT NULL, district TEXT, online_status TEXT, why TEXT, confidence INTEGER DEFAULT 1, batch INTEGER, status TEXT NOT NULL DEFAULT 'new', note TEXT, contacted_at TEXT, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')), UNIQUE(pool, list_no))").run();
     await env.CRM.prepare("CREATE INDEX IF NOT EXISTS idx_prospects_status ON prospects(status, confidence)").run();
+    // v1.6 飛輪眼睛：ECPay 成交回填表（表已存在時 IF NOT EXISTS 安全跳過）
+    await env.CRM.prepare("CREATE TABLE IF NOT EXISTS outcomes (id INTEGER PRIMARY KEY AUTOINCREMENT, brand TEXT NOT NULL, merchant_trade_no TEXT NOT NULL UNIQUE, trade_no TEXT, amount INTEGER DEFAULT 0, status TEXT DEFAULT 'paid', flag TEXT, flag_note TEXT, raw_params TEXT, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')))").run();
+    await env.CRM.prepare("CREATE TABLE IF NOT EXISTS processed_callbacks (id INTEGER PRIMARY KEY AUTOINCREMENT, dup_key TEXT NOT NULL UNIQUE, brand TEXT, created_at TEXT DEFAULT (datetime('now')))").run();
   } catch (e) { console.error('[3q-line] tables', e.message); }
+}
+
+// ═══ v1.6 ECPay 回填（飛輪的眼睛）═══
+
+async function sha256Hex(str) {
+  const enc = new TextEncoder();
+  const buf = await crypto.subtle.digest('SHA-256', enc.encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// ECPay CheckMacValue 驗證（SHA256 版，沿用 pop-ecpay 已驗證演算法）
+async function verifyECPayMac(params, hashKey, hashIV) {
+  const { CheckMacValue, ...rest } = params;
+  if (!CheckMacValue || !hashKey || !hashIV) return false;
+  const sorted = Object.keys(rest).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+  const raw = 'HashKey=' + hashKey + '&' + sorted.map(k => k + '=' + (rest[k] ?? '')).join('&') + '&HashIV=' + hashIV;
+  // ECPay 規定：URL encode → lowercase → 還原不需轉義的安全字元
+  const encoded = encodeURIComponent(raw).toLowerCase()
+    .replace(/%20/g, '+')
+    .replace(/%21/g, '!')
+    .replace(/%27/g, "'")
+    .replace(/%28/g, '(')
+    .replace(/%29/g, ')')
+    .replace(/%2a/g, '*')
+    .replace(/%2d/g, '-')
+    .replace(/%2e/g, '.')
+    .replace(/%5f/g, '_');
+  const computed = (await sha256Hex(encoded)).toUpperCase();
+  return computed === CheckMacValue.toUpperCase();
+}
+
+async function handleECPayWebhook(request, env, brand) {
+  const body = await request.text();
+  const params = Object.fromEntries(new URLSearchParams(body));
+
+  const hashKey = (await env.SESSION?.get('cfg:' + brand + '_ecpay_hashkey') || '').trim();
+  const hashIV  = (await env.SESSION?.get('cfg:' + brand + '_ecpay_hashiv') || '').trim();
+  if (!hashKey || !hashIV) {
+    console.error('[ecpay] 未設定 KV cfg:' + brand + '_ecpay_hashkey/_hashiv');
+    return new Response('1|OK', { status: 200 }); // 告知 ECPay 收到，內部 skip
+  }
+
+  const valid = await verifyECPayMac(params, hashKey, hashIV);
+  if (!valid) return new Response('0|CheckMacValue error', { status: 200 });
+
+  const merchantTradeNo = (params.MerchantTradeNo || '').trim();
+  const tradeNo = (params.TradeNo || '').trim();
+  const amount = parseInt(params.TradeAmt || '0', 10) || 0;
+  const paid = params.RtnCode === '1';
+  const status = paid ? 'paid' : 'failed';
+
+  if (!merchantTradeNo || !env.CRM) return new Response('1|OK', { status: 200 });
+
+  await ensureTables(env);
+
+  // 冪等去重：同一 brand:MerchantTradeNo:TradeNo 只處理一次
+  const dupKey = brand + ':' + merchantTradeNo + ':' + tradeNo;
+  const dup = await env.CRM.prepare('SELECT id FROM processed_callbacks WHERE dup_key=?').bind(dupKey).first().catch(() => null);
+  if (dup) return new Response('1|OK', { status: 200 });
+
+  // 寫 outcomes（UPSERT）
+  await env.CRM.prepare(
+    "INSERT INTO outcomes (brand, merchant_trade_no, trade_no, amount, status, raw_params, created_at, updated_at) VALUES (?,?,?,?,?,?,datetime('now'),datetime('now')) ON CONFLICT(merchant_trade_no) DO UPDATE SET trade_no=excluded.trade_no, amount=excluded.amount, status=excluded.status, raw_params=excluded.raw_params, updated_at=datetime('now')"
+  ).bind(brand, merchantTradeNo, tradeNo, amount, status, JSON.stringify(params)).run().catch(e => console.error('[ecpay] outcomes write', e.message));
+
+  // 寫 processed_callbacks（冪等鎖）
+  await env.CRM.prepare(
+    "INSERT OR IGNORE INTO processed_callbacks (dup_key, brand, created_at) VALUES (?,?,datetime('now'))"
+  ).bind(dupKey, brand).run().catch(e => console.error('[ecpay] processed_callbacks write', e.message));
+
+  return new Response('1|OK', { status: 200 });
 }
 
 async function loadInsights(env) {
@@ -447,14 +525,37 @@ export default {
       const c = await env.CRM.prepare('SELECT COUNT(*) n FROM prospects').first();
       return new Response(JSON.stringify({ ok: true, imported, skipped, total: c?.n || 0 }), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
     }
+    // v1.6 ECPay 付款通知 /webhook/ecpay/:brand（POST，ECPay 直打）
+    if (url.pathname.startsWith('/webhook/ecpay/') && request.method === 'POST') {
+      const brand = url.pathname.split('/')[3] || '';
+      if (!brand) return new Response('0|missing brand', { status: 200 });
+      return handleECPayWebhook(request, env, brand);
+    }
+
+    // v1.6 /admin/outcome-flag：標退貨 / 客訴
+    if (url.pathname === '/admin/outcome-flag' && request.method === 'POST') {
+      if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
+      if (!env.CRM) return new Response(JSON.stringify({ ok: false, note: '無 D1' }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+      let body;
+      try { body = await request.json(); } catch (_) { return new Response(JSON.stringify({ ok: false, note: 'body 要是 JSON' }), { status: 400, headers: { 'Content-Type': 'application/json' } }); }
+      const { merchant_trade_no, flag, note } = body || {};
+      if (!merchant_trade_no || !flag) return new Response(JSON.stringify({ ok: false, note: '缺 merchant_trade_no 或 flag' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+      const VALID_FLAGS = ['refund', 'complaint', 'ok', 'pending'];
+      if (!VALID_FLAGS.includes(flag)) return new Response(JSON.stringify({ ok: false, note: 'flag 只接受: ' + VALID_FLAGS.join('/') }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+      const res = await env.CRM.prepare("UPDATE outcomes SET flag=?, flag_note=?, updated_at=datetime('now') WHERE merchant_trade_no=?").bind(flag, note || null, merchant_trade_no).run().catch(e => ({ error: e.message }));
+      if (res.error) return new Response(JSON.stringify({ ok: false, note: res.error }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+      return new Response(JSON.stringify({ ok: true, merchant_trade_no, flag, rows_updated: res.meta?.changes || 0 }), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+    }
+
     if (url.pathname === '/health') {
       const cfg = await getCfg(env);
-      let insights = 0, prospects = 0;
+      let insights = 0, prospects = 0, outcomes = 0;
       if (env.CRM) {
         try { const r = await env.CRM.prepare("SELECT COUNT(*) n FROM q3_seed_insights").first(); insights = r?.n || 0; } catch (_) {}
         try { const r = await env.CRM.prepare("SELECT COUNT(*) n FROM prospects").first(); prospects = r?.n || 0; } catch (_) {}
+        try { const r = await env.CRM.prepare("SELECT COUNT(*) n FROM outcomes").first(); outcomes = r?.n || 0; } catch (_) {}
       }
-      return new Response(JSON.stringify({ ok: true, worker: '3q-line-oa', seed: SEED_VER, secret: !!cfg.lineSecret, token: !!cfg.lineToken, ai: cfg.anthropicKey ? 'claude-sonnet-4-6' : 'workers-ai-70b', owner: !!cfg.ownerId, crm: !!env.CRM, evolved_insights: insights, prospects }), { headers: { 'Content-Type': 'application/json' } });
+      return new Response(JSON.stringify({ ok: true, worker: '3q-line-oa', worker_ver: 'v1.6', seed: SEED_VER, secret: !!cfg.lineSecret, token: !!cfg.lineToken, ai: cfg.anthropicKey ? 'claude-sonnet-4-6' : 'workers-ai-70b', owner: !!cfg.ownerId, crm: !!env.CRM, evolved_insights: insights, prospects, outcomes }), { headers: { 'Content-Type': 'application/json' } });
     }
     if (url.pathname === '/webhook' && request.method === 'POST') {
       const cfg = await getCfg(env);
