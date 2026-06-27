@@ -18,6 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       OUTREACH_URL: https://3q-outreach.milk790.workers.dev
+      OUTREACH_ADMIN_KEY: ${{ secrets.OUTREACH_ADMIN_KEY }}
     steps:
       - uses: actions/checkout@v4
       - name: Verify bridge mapping (17 checks against PROSPECTS.md)
