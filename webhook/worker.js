@@ -1315,6 +1315,9 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname === '/api/stats' && request.method === 'GET') {
+      const auth = request.headers.get('Authorization') || '';
+      const tok = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+      if (!tokensMatch(tok, env.TRIGGER_TOKEN)) return new Response('forbidden', { status: 403 });
       return await statsHandler(env);
     }
 

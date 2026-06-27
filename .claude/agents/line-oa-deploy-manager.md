@@ -10,12 +10,12 @@ tools: Bash, Read, WebFetch
 ## 四個貼入點說明(2026-06-13 線上核實)
 
 **貼入點 1 — 3q-line-oa(最重要,3Q OA 現役主力)**
-- 設定頁:https://3q-line-oa.milk790.workers.dev/setup?key=3q-setup-8m4w2r(⚠ 必帶 ?key= 參數,否則 403)
+- 設定頁:https://3q-line-oa.milk790.workers.dev/setup?key=<在Cloudflare設定的SETUP_KEY>(⚠ 必帶 ?key= 參數,否則 403)
 - 只填 Anthropic API Key 欄;LINE Secret/Token 兩欄留空(留空=不動,webhook 不會被切)
 - 驗收:/health 應顯示 "ai":"claude-sonnet-4-6"(不再是 workers-ai-70b)
 
 **貼入點 2 — pop-line-oa(v4 預備機)**
-- 設定頁:https://pop-line-oa.milk790.workers.dev/setup?key=pop-setup-7h3k9q
+- 設定頁:https://pop-line-oa.milk790.workers.dev/setup?key=<在Cloudflare設定的SETUP_KEY>
 - 兩種模式:僅升級大腦(只填 Anthropic 欄)或全面切換(三欄全填)
 - ⚠ 填了 LINE Token 按儲存的瞬間,POP 的 webhook 即時切到這台(現役 pop-monster-webhook 被切走);可逆:LINE Developers 後台改回 endpoint
 - 驗收:/health 確認 secret/token/ai 三欄

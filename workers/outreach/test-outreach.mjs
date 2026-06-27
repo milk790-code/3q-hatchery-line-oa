@@ -68,8 +68,8 @@ ok(cNoIg.opener.includes('市集') && !cNoIg.opener.includes('從 IG'), '⑩ 無
 // ⑪ /admin/import 帶 src → upsert SQL(重匯不疊加、不動 status);不帶 src → 純 INSERT(舊行為)
 const sqls = [];
 const stub = { prepare(sql) { sqls.push(sql); const o = { bind: () => o, run: async () => ({}), all: async () => ({ results: [] }), first: async () => null }; return o; } };
-const env11 = { CRM: stub, SESSION: null };
-const req = (leads) => new Request('https://x/admin/import?key=outr-9k3v7p-2026', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ leads }) });
+const env11 = { CRM: stub, SESSION: null, ADMIN_KEY: 'test-admin-key' };
+const req = (leads) => new Request('https://x/admin/import?key=test-admin-key', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ leads }) });
 const r11 = await worker.fetch(req([{ name: '測試店', pool: 'A', area: '台中', src: 'A#1' }, { name: '無src店', pool: 'B', area: '台中' }]), env11, { waitUntil() {} });
 const j11 = await r11.json();
 ok(j11.ok && j11.imported === 2, '⑪ import 回 200 且 2 筆', JSON.stringify(j11).slice(0, 80));

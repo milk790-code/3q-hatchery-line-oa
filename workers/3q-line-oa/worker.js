@@ -24,10 +24,17 @@ function pickModel(history) {
 }
 const CLAUDE_MODEL = MODELS.chat; // 舊引用點安全預設
 const AI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
-const SETUP_KEY = '3q-setup-8m4w2r';
+let SETUP_KEY = '';  // 由 env.SETUP_KEY 注入（fetch 開頭，未設用隨機值 fail-closed）
 const LINE_ID = '@121lkspe';
 const SITE = 'https://3q-art-portfolio.milk790.workers.dev';
-const SEED_VER = 'v4.4';
+const SEED_VER = 'v4.5';
+const CHECKOUT_URL = 'https://cdg-core-eyes.milk790.workers.dev';
+const PAY_INTENT_RX = /(下訂|成交|怎麼付|怎麼刷|怎樣付|如何付|我要付|付款|多少錢|幾錢|要繳多少)/;
+// 伺服器端固定價格表(單位:元)。金額一律以此為準,忽略前端 query 的 amount,防竄改。
+const PRICE_TABLE = {
+  '3q-starter': { name: '3Q 孵化所入門啟動包', price: 1280 },
+};
+const DEFAULT_SKU = '3q-starter';
 
 // ═══════════ 超級業務AI種子 · 基因組 v4(三線通用,只換 BRAND 與彈藥庫) ═══════════
 const SEED_GENOME = `你是「{{BRAND}}」的首席成交顧問,不是客服、不是推銷員——你是來訪者的軍師。
@@ -106,13 +113,25 @@ async function getCfg(env) {
   };
 }
 
+// 定值時間字串比較:長度檢查 + XOR 累加,不提早 return,避免時序側信道
+function constantTimeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
 async function verifyLineSignature(body, sig, secret) {
   if (!sig || !secret) return false;
-  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-  const mac = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(body));
-  const b64 = btoa(String.fromCharCode(...new Uint8Array(mac)));
-  return b64 === sig;
+  try {
+    const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret),
+      { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+    const mac = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(body));
+    const b64 = btoa(String.fromCharCode(...new Uint8Array(mac)));
+    return constantTimeEqual(b64, sig);
+  } catch (_) {
+    return false; // crypto 出錯一律拒絕(fail-closed)
+  }
 }
 
 async function callBrain(history, env, cfg, systemPrompt, maxTokens) {
@@ -461,6 +480,7 @@ async function handleSetup(req, env, url) {
 
 export default {
   async fetch(request, env, ctx) {
+    SETUP_KEY = env.SETUP_KEY || crypto.randomUUID();
     const url = new URL(request.url);
     if (url.pathname === '/setup') return handleSetup(request, env, url);
     if (url.pathname === '/admin/evolve') { const cfg = await getCfg(env); return handleEvolve(env, cfg, url); }
@@ -556,6 +576,22 @@ export default {
         try { const r = await env.CRM.prepare("SELECT COUNT(*) n FROM outcomes").first(); outcomes = r?.n || 0; } catch (_) {}
       }
       return new Response(JSON.stringify({ ok: true, worker: '3q-line-oa', worker_ver: 'v1.6', seed: SEED_VER, secret: !!cfg.lineSecret, token: !!cfg.lineToken, ai: cfg.anthropicKey ? 'claude-sonnet-4-6' : 'workers-ai-70b', owner: !!cfg.ownerId, crm: !!env.CRM, evolved_insights: insights, prospects, outcomes }), { headers: { 'Content-Type': 'application/json' } });
+    }
+    if (url.pathname === '/pay') {
+      const brand = url.searchParams.get('brand') || '3q';
+      let sku = url.searchParams.get('sku') || DEFAULT_SKU;
+      // 未知 sku 退回預設商品;金額一律取伺服器固定價,忽略前端傳入的 amount,防竄改
+      if (!Object.hasOwn(PRICE_TABLE, sku)) sku = DEFAULT_SKU;
+      const product = PRICE_TABLE[sku];
+      const amount = product.price;
+      const lineUserId = url.searchParams.get('ref') || '';
+      const upstream = await fetch(CHECKOUT_URL + '/api/checkout', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ brand, sku, items: [{ name: product.name, sku, price: amount, qty: 1 }], line_user_id: lineUserId, client_back_url: SITE + '/?paid=1' }),
+      });
+      const html = await upstream.text();
+      return new Response(html, { status: upstream.status, headers: { 'content-type': 'text/html; charset=utf-8' } });
     }
     if (url.pathname === '/webhook' && request.method === 'POST') {
       const cfg = await getCfg(env);

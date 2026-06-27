@@ -24,7 +24,7 @@ function pickModel(history) {
 }
 const CLAUDE_MODEL = MODELS.chat; // 舊引用點安全預設
 const AI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
-const SETUP_KEY = 'pop-setup-7h3k9q';
+let SETUP_KEY = '';  // 由 env.SETUP_KEY 注入（fetch 開頭，未設用隨機值 fail-closed）
 const LINE_ID = '@150tiznd';
 const SHOPEE = 'https://shopee.tw/milk790';
 const SEED_VER = 'v4.4.0';
@@ -141,13 +141,25 @@ async function getCfg(env) {
   };
 }
 
+// 定值時間字串比較:長度檢查 + XOR 累加,不提早 return,避免時序側信道
+function constantTimeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
 async function verifyLineSignature(body, sig, secret) {
   if (!sig || !secret) return false;
-  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-  const mac = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(body));
-  const b64 = btoa(String.fromCharCode(...new Uint8Array(mac)));
-  return b64 === sig;
+  try {
+    const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret),
+      { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+    const mac = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(body));
+    const b64 = btoa(String.fromCharCode(...new Uint8Array(mac)));
+    return constantTimeEqual(b64, sig);
+  } catch (_) {
+    return false; // crypto 出錯一律拒絕(fail-closed)
+  }
 }
 
 // 大腦:有 anthropic key 用 Sonnet,否則 Workers AI 70B。systemPrompt 動態(含進化記憶)。
@@ -397,6 +409,7 @@ async function handleSetup(req, env, url) {
 
 export default {
   async fetch(request, env, ctx) {
+    SETUP_KEY = env.SETUP_KEY || crypto.randomUUID();
     const url = new URL(request.url);
     if (url.pathname === '/setup') return handleSetup(request, env, url);
     if (url.pathname === '/admin/evolve') { const cfg = await getCfg(env); return handleEvolve(env, cfg, url); }

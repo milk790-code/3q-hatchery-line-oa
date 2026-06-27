@@ -48,12 +48,12 @@ jobs:
           echo '::error::worker /health 無 prospects 欄位(陌開 CRM 版未部署),不匯入'; exit 1
 
       - name: Import(upsert by (pool,list_no),不動 status/note)
-        run: node scripts/prospects-import.mjs --post "$LINE_OA_URL" --key 3q-setup-8m4w2r
+        run: node scripts/prospects-import.mjs --post "$LINE_OA_URL" --key ${{ secrets.SETUP_KEY }}
 
       - name: Verify counts
         run: |
           set -euo pipefail
-          total=$(curl -sm10 "$LINE_OA_URL/admin/prospects?key=3q-setup-8m4w2r&limit=1" | jq -r '.total')
+          total=$(curl -sm10 "$LINE_OA_URL/admin/prospects?key=${{ secrets.SETUP_KEY }}&limit=1" | jq -r '.total')
           {
             echo "## Prospects sync"
             echo "- PROSPECTS.md 解析:${LOCAL_N} 筆"

@@ -103,6 +103,7 @@ function syncDashboard_(cfg) {
   let resp;
   try {
     resp = UrlFetchApp.fetch(cfg.workerUrl + '/api/stats', {
+      headers: { 'Authorization': 'Bearer ' + cfg.token },
       muteHttpExceptions: true,
     });
   } catch (e) {

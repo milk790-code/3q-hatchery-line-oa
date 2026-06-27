@@ -11,6 +11,11 @@ on:
           - 'test_to_owner'
           - 'broadcast_to_all'
           - 'skip'
+      confirm_broadcast:
+        description: 'Type BROADCAST to confirm a real broadcast_to_all (ignored otherwise)'
+        type: string
+        required: true
+        default: ''
 
 jobs:
   apply:
@@ -86,8 +91,15 @@ jobs:
           LINE_TOKEN:    ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
           OWNER_USER_ID: ${{ secrets.OWNER_USER_ID }}
           MODE: ${{ inputs.broadcast }}
+          CONFIRM: ${{ inputs.confirm_broadcast }}
         run: |
           set -euo pipefail
+
+          # 全體廣播是不可逆且消耗 LINE 配額的動作:必須在 confirm_broadcast 欄位手動打 BROADCAST 才放行
+          if [ "$MODE" = "broadcast_to_all" ] && [ "$CONFIRM" != "BROADCAST" ]; then
+            echo "::error::broadcast_to_all 需在 confirm_broadcast 欄位輸入 BROADCAST 才會執行(目前輸入:'$CONFIRM')。已中止,未送出任何訊息。"
+            exit 1
+          fi
 
           # Build message payload
           cat > /tmp/messages.json <<JSON

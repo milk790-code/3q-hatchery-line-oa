@@ -71,12 +71,14 @@ function pickModel(messages) {
   return MODELS.chat;
 }
 var CLAUDE_MODEL = "claude-sonnet-4-6";
-var SETUP_KEY = "tdg-setup-9k2m7x";
+let SETUP_KEY = '';  // 由 env.SETUP_KEY 注入（fetch/scheduled 開頭，未設用隨機值 fail-closed）
 var worker_default = {
   async scheduled(event, env, ctx) {
+    SETUP_KEY = env.SETUP_KEY || crypto.randomUUID();
     ctx.waitUntil(handleCron(env));
   },
   async fetch(request, env, ctx) {
+    SETUP_KEY = env.SETUP_KEY || crypto.randomUUID();
     const url = new URL(request.url);
     if (url.pathname === "/setup") return handleSetup(request, env, url);
     if (url.pathname === "/health") {
@@ -577,12 +579,23 @@ async function lineApi(url, payload, cfg) {
   if (!res.ok) console.error("line api", res.status, await res.text());
 }
 __name(lineApi, "lineApi");
+function constantTimeEqual(a, b) {
+  if (typeof a !== "string" || typeof b !== "string" || a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+__name(constantTimeEqual, "constantTimeEqual");
 async function verifyLineSignature(body, signature, secret) {
   if (!signature || !secret) return false;
-  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
-  const mac = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(body));
-  const expected = btoa(String.fromCharCode(...new Uint8Array(mac)));
-  return expected === signature;
+  try {
+    const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+    const mac = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(body));
+    const expected = btoa(String.fromCharCode(...new Uint8Array(mac)));
+    return constantTimeEqual(expected, signature);
+  } catch (_) {
+    return false;
+  }
 }
 __name(verifyLineSignature, "verifyLineSignature");
 function sanitize(text) {
