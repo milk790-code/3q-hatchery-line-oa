@@ -1,6 +1,6 @@
 name: Deploy All Microsites (orchestrator)
 
-# One-button matrix fan-out for the 9 brand microsites in this monorepo.
+# One-button matrix fan-out for the 13 brand microsites in this monorepo.
 # - workflow_dispatch: run on demand (input "sites" = "all" or comma list)
 # - schedule: weekly full rebuild, Mon 08:00 Taiwan (00:00 UTC)
 # Safety: GITHUB_TOKEN cannot trigger other workflows (GitHub anti-recursion),
@@ -26,8 +26,11 @@ jobs:
   fan-out:
     runs-on: ubuntu-latest
     env:
-      # ai-subsidy FIRST (art-portfolio binds its service), then the rest.
+      # deploy.yml FIRST (webhook + social-publisher infra), then ai-subsidy (art-portfolio depends on it).
       ALL_SITES: >-
+        deploy.yml
+        deploy-3q-line-oa.yml
+        deploy-3q-site.yml
         deploy-ai-subsidy.yml
         deploy-art-portfolio.yml
         deploy-fukubukuro.yml
@@ -36,6 +39,7 @@ jobs:
         deploy-pop-line-oa.yml
         deploy-outreach.yml
         deploy-sanzhi-pages.yml
+        deploy-luxury-line-oa.yml
         renovation-deploy.yml
     steps:
       - name: Resolve target list
