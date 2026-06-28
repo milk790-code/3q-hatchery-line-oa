@@ -1,0 +1,129 @@
+name: 裝修官網 · 完全自動化（dev push → 同步官網 → 線上驗證）
+
+# 推送「公開層來源」到 dev 分支即自動：
+#   ① 白名單只取 6 個公開檔 + css（機密永不觸及）
+#   ② 改名 / 改寫連結後寫入 main 的 home-renovation/
+#   ③ 安全門雙重把關 → push main
+#   ④ 等 GitHub Pages 部署 → smoke-test 6 頁 HTTP 200
+# 全程在 GitHub 雲端執行，不依賴任何本機腳本或容器。
+
+on:
+  push:
+    branches: [claude/home-renovation-service-model-MXJTN]
+    paths:
+      - 'renovation/公開-客戶端/**'
+      - 'renovation/colors_and_type.css'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: renovation-autosync
+  cancel-in-progress: false
+
+jobs:
+  autosync:
+    name: 自動同步 + 線上驗證
+    runs-on: ubuntu-latest
+    env:
+      DEV_BRANCH: claude/home-renovation-service-model-MXJTN
+      SITE_URL: https://milk790-code.github.io/3q-hatchery-line-oa/home-renovation/
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: ① 白名單取出公開層 6 檔（機密永不觸及）
+        run: |
+          set -euo pipefail
+          git fetch origin "$DEV_BRANCH"
+          REF="origin/$DEV_BRANCH"
+          TMP="$(mktemp -d)"
+
+          # 只逐檔點名取出允許公開的檔；任何未列出的（含 內部機密/、工班端/）一律不碰
+          git show "$REF:renovation/公開-客戶端/客戶-著陸頁.html"          > "$TMP/index.html"
+          git show "$REF:renovation/公開-客戶端/客戶-方案價格.html"        > "$TMP/方案價格.html"
+          git show "$REF:renovation/公開-客戶端/客戶-常見問題FAQ.html"     > "$TMP/常見問題FAQ.html"
+          git show "$REF:renovation/公開-客戶端/客戶-報價單模板.html"      > "$TMP/報價單模板.html"
+          git show "$REF:renovation/公開-客戶端/客戶-保固卡.html"          > "$TMP/保固卡.html"
+          git show "$REF:renovation/公開-客戶端/客戶-透明施工承諾書.html"  > "$TMP/透明施工承諾書.html"
+          git show "$REF:renovation/colors_and_type.css"                   > "$TMP/colors_and_type.css"
+
+          # 改寫：CSS 變同層、客戶頁連結改成部署後乾淨檔名（同 同步官網.sh）
+          perl -i -pe '
+            s{href="\.\./colors_and_type\.css"}{href="colors_and_type.css"}g;
+            s{href="客戶-著陸頁\.html"}{href="index.html"}g;
+            s{href="客戶-方案價格\.html"}{href="方案價格.html"}g;
+            s{href="客戶-常見問題FAQ\.html"}{href="常見問題FAQ.html"}g;
+          ' "$TMP"/*.html
+
+          rm -rf home-renovation
+          mkdir -p home-renovation
+          cp "$TMP"/* home-renovation/
+          rm -rf "$TMP"
+          echo "::notice::已取出公開層 7 檔"
+
+      - name: ② 安全門（雙重把關，杜絕機密外洩）
+        run: |
+          set -euo pipefail
+          ALLOWED="index.html 方案價格.html 常見問題FAQ.html 報價單模板.html 保固卡.html 透明施工承諾書.html colors_and_type.css"
+          for f in home-renovation/*; do
+            name=$(basename "$f")
+            echo "$ALLOWED" | tr ' ' '\n' | grep -qxF "$name" \
+              || { echo "::error::非允許檔案 $name — 中止以防外洩"; exit 1; }
+          done
+          # 第二道：任何含「內部 / 機密 / 工班 / playbook / 毛利 / 滲透」字樣即視為外洩
+          if ls home-renovation/ | grep -qiE "內部|機密|工班|playbook|毛利|滲透"; then
+            echo "::error::偵測到疑似機密檔名，中止"; exit 1
+          fi
+          echo "::notice::安全門通過：$(ls home-renovation/ | wc -l) 個公開檔"
+
+      - name: ③ 提交並推送 main（官網）
+        id: push
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add home-renovation
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::官網內容無變化，免提交"
+            exit 0
+          fi
+          git commit -m "autosync: 公開層 → 官網 home-renovation/（來自 dev push ${GITHUB_SHA::7}）"
+          for i in 1 2 3 4; do git push origin main && break || sleep $((2**i)); done
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "::notice::已推送 main"
+
+      - name: ④ 線上驗證（等 Pages 部署 → 6 頁 HTTP 200）
+        if: steps.push.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 18); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$SITE_URL")
+            [ "$STATUS" = "200" ] && { echo "::notice::Pages 已上線（第 $attempt 次）"; break; }
+            echo "⏳ 第 $attempt/18：HTTP $STATUS — 等 10s"
+            [ "$attempt" = "18" ] && { echo "::error::逾時未取得 200"; exit 1; }
+            sleep 10
+          done
+          FAIL=0
+          {
+            echo "## 完全自動化部署 ✅"
+            echo ""
+            echo "| 頁面 | 狀態 |"
+            echo "|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+          for page in "" "方案價格.html" "常見問題FAQ.html" "報價單模板.html" "保固卡.html" "透明施工承諾書.html"; do
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "${SITE_URL}${page}")
+            LABEL="${page:-index.html（著陸頁）}"
+            echo "| \`$LABEL\` | HTTP $CODE |" >> "$GITHUB_STEP_SUMMARY"
+            [ "$CODE" = "200" ] || { echo "::error::$LABEL → HTTP $CODE"; FAIL=1; }
+          done
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "官網：$SITE_URL" >> "$GITHUB_STEP_SUMMARY"
+          [ "$FAIL" = "0" ] || exit 1
+          echo "::notice::6 頁全部 HTTP 200 — 完全自動化管線全綠"
