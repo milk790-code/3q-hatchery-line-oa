@@ -9,7 +9,7 @@
 // 部署:.github/workflows/deploy-outreach.yml(API PUT + cron schedules)
 
 const VER = 'v1.1';
-const ADMIN_KEY = 'outr-9k3v7p-2026';
+const getAdminKey = (env) => (env && env.ADMIN_KEY) || 'outr-9k3v7p-2026';
 const LINE_ADD_URL = 'https://lin.ee/UKKodJj';   // 3Q OA 加好友
 const DAILY_QUOTA = 15;
 
@@ -161,7 +161,7 @@ async function runDaily(env, dryRun) {
   await ensureTables(env);
   const out = { picked: 0, d3: 0, d7: 0, autoDead: 0, remaining: 0 };
   const msgs = [];
-  const boardUrl = (env.SELF_URL || 'https://3q-outreach.milk790.workers.dev') + '/admin/board?key=' + ADMIN_KEY;
+  const boardUrl = (env.SELF_URL || 'https://3q-outreach.milk790.workers.dev') + '/admin/board?key=' + getAdminKey(env);
 
   const pick = await env.CRM.prepare("SELECT * FROM outreach_leads WHERE status='new' ORDER BY batch, id LIMIT ?").bind(DAILY_QUOTA).all();
   const todays = pick.results || [];
@@ -318,7 +318,8 @@ export default {
     }
 
     if (!url.pathname.startsWith('/admin/')) return new Response('3q-outreach ' + VER, { status: 200 });
-    if (url.searchParams.get('key') !== ADMIN_KEY) return new Response('forbidden', { status: 403 });
+    const __ak = getAdminKey(env);
+    if (!__ak || url.searchParams.get('key') !== __ak) return new Response('forbidden', { status: 403 });
     if (!env.CRM) return json({ ok: false, err: 'no CRM binding' }, 503);
 
     // 名單匯入:POST JSON {leads:[{name,pool,batch,ig,store_type,founded_year,area,biz,stage,note}]} 或直接陣列
@@ -359,7 +360,7 @@ export default {
       const groups = {};
       (r.results || []).forEach((l) => { (groups[l.status] = groups[l.status] || []).push(l); });
       if (groups.dead) groups.dead = groups.dead.slice(0, 10);
-      return new Response(boardHTML(groups, ADMIN_KEY), { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+      return new Response(boardHTML(groups, __ak), { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
     }
 
     if (url.pathname === '/admin/mark' && request.method === 'POST') return handleMark(env, url);
