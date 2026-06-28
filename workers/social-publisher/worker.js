@@ -1,6 +1,12 @@
-// 3Q Hatchery — Social Publisher Worker v2.6
+// 3Q Hatchery — Social Publisher Worker v2.7
 // Auto-posts to Threads, Instagram, Facebook Page, TikTok, Google Business Profile
 // Tokens stored in SESSION KV and auto-refreshed every 50 days — no manual renewal.
+//
+// v2.7 (2026-06-28):
+//   - exchangeCodeAndStore: IG long-lived exchange now uses fb_exchange_token grant
+//     (th_exchange_token only works on graph.threads.net; was silently failing for IG)
+//   - exchangeCodeAndStore: IG /me endpoint bumped to v21.0 (was v1.0)
+//   - New endpoint: POST /queue/retry[?platform=X] — resets failed rows to pending
 //
 // v2.6 (2026-06-17):
 //   - /queue/list gains filters, status counts, overdue counts, and a read-only
@@ -133,13 +139,17 @@ async function exchangeCodeAndStore(code, platform, redirectUri, env) {
   if (!shortData.access_token) throw new Error(`Code exchange failed: ${JSON.stringify(shortData)}`);
 
   // Step 2: long-lived token (60 days)
-  const longResp = await fetch(`https://${host}/access_token?grant_type=th_exchange_token&client_id=${appId}&client_secret=${appSecret}&access_token=${shortData.access_token}`);
+  // Threads uses th_exchange_token on graph.threads.net;
+  // IG/FB uses fb_exchange_token on graph.facebook.com.
+  const grantType = platform === 'threads' ? 'th_exchange_token' : 'fb_exchange_token';
+  const longResp = await fetch(`https://${host}/access_token?grant_type=${grantType}&client_id=${appId}&client_secret=${appSecret}&access_token=${shortData.access_token}`);
   const longData = await longResp.json();
   const finalToken = longData.access_token || shortData.access_token;
   const expiresIn  = longData.expires_in  || shortData.expires_in || 5184000;
 
-  // Step 3: user ID
-  const meResp = await fetch(`https://${host}/v1.0/me?access_token=${finalToken}`);
+  // Step 3: user ID — Threads API is /v1.0, Facebook Graph API is /v21.0
+  const meVersion = platform === 'threads' ? 'v1.0' : 'v21.0';
+  const meResp = await fetch(`https://${host}/${meVersion}/me?access_token=${finalToken}`);
   const meData = await meResp.json();
   if (!meData.id) throw new Error(`Could not get user ID: ${JSON.stringify(meData)}`);
 
@@ -874,7 +884,7 @@ export default {
       return json({
         ok: true,
         worker: '3q-social-publisher',
-        version: '2.6',
+        version: '2.7',
         platforms: Object.keys(DAILY_LIMITS),
         configured: {
           threads:    Boolean(threadsToken),
@@ -968,6 +978,17 @@ export default {
       ).bind(id).run();
       const deleted = r.meta?.changes ?? 0;
       return json({ ok: deleted > 0, deleted, ...(deleted === 0 ? { error: 'not found or already published' } : {}) });
+    }
+
+    // Retry failed posts: POST /queue/retry[?platform=X] (TRIGGER_TOKEN protected)
+    if (url.pathname === '/queue/retry' && request.method === 'POST') {
+      if (!requireToken()) return new Response('forbidden', { status: 403 });
+      if (!env.CRM) return json({ ok: false, error: 'D1 not bound' }, 500);
+      const platform = url.searchParams.get('platform') || null;
+      const r = platform
+        ? await env.CRM.prepare("UPDATE content_queue SET status='pending', error_msg=NULL WHERE status='failed' AND platform=?").bind(platform).run()
+        : await env.CRM.prepare("UPDATE content_queue SET status='pending', error_msg=NULL WHERE status='failed'").run();
+      return json({ ok: true, retried: r.meta?.changes ?? 0, platform: platform || 'all' });
     }
 
     // FB Group semi-auto: GET /fbgroup/today — paste-ready content for the admin
@@ -1079,6 +1100,6 @@ export default {
       return json({ ok: true, caption });
     }
 
-    return json({ service: '3q-social-publisher', ok: true, version: '2.6' });
+    return json({ service: '3q-social-publisher', ok: true, version: '2.7' });
   },
 };
