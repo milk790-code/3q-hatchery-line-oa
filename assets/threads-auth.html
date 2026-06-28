@@ -12,11 +12,12 @@ h2{font-size:1.4rem;margin-bottom:4px}
 .btn{display:inline-block;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:1rem;cursor:pointer;border:none;color:#fff}
 .btn-blue{background:#0095f6}.btn-blue:hover{background:#0081d6}
 .btn-gray{background:#333}.btn-gray:hover{background:#444}
-code{background:#2a2a2a;padding:12px 16px;border-radius:8px;display:block;word-break:break-all;font-size:.85rem;color:#7ef77e;margin:12px 0;cursor:pointer;user-select:all}
 .success{color:#7ef77e;font-weight:600}
 .error{color:#f77e7e}
 .warn{color:#f7c97e;font-size:.85rem;margin-top:8px}
 .badge{display:inline-block;background:#1a3a1a;color:#7ef77e;padding:2px 8px;border-radius:4px;font-size:.75rem;margin-left:6px}
+.spinner{display:inline-block;width:20px;height:20px;border:3px solid #333;border-top-color:#7ef77e;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -25,50 +26,67 @@ code{background:#2a2a2a;padding:12px 16px;border-radius:8px;display:block;word-b
 
 <div id="auth-section">
   <div class="card">
-    <b>Threads + Instagram</b> <span class="badge">Meta 同一授權</span>
-    <p style="margin:12px 0 16px;color:#aaa;font-size:.9rem">點下方按鈕，用你的 Threads/IG 帳號授權。授權後頁面自動顯示授權碼。</p>
-    <a id="authBtn" href="#" class="btn btn-blue">&#x1F517; 立即授權 Threads + IG</a>
-    <p class="warn">授權後頁面會自動跳回並顯示授權碼</p>
+    <b>Threads</b> <span class="badge">3q-threads-publisher</span>
+    <p style="margin:12px 0 16px;color:#aaa;font-size:.9rem">點下方按鈕，用你的 Threads 帳號授權。授權後系統自動完成設定，無需任何額外操作。</p>
+    <a id="authBtn" href="#" class="btn btn-blue">&#x1F517; 立即授權 Threads</a>
+    <p class="warn">授權後頁面自動跳回並完成設定（約 3 秒）</p>
   </div>
 </div>
 
-<div id="code-section" class="card" style="display:none">
-  <p class="success">&#x2705; 授權成功！複製授權碼：</p>
-  <code id="codeDisplay" onclick="copyCode(this)">載入中...</code>
-  <p class="warn">點一下自動複製 &nbsp;·&nbsp; 此碼只能用一次，立即貼到 GitHub workflow</p>
-  <br>
-  <a href="https://github.com/milk790-code/3q-hatchery-line-oa/actions/workflows/threads-token-setup.yml" class="btn btn-blue" target="_blank">&#x27A1;&#xFE0F; 前往 GitHub Actions 執行 workflow</a>
+<div id="processing-section" class="card" style="display:none">
+  <p><span class="spinner"></span><b>正在完成授權設定…</b></p>
+  <p style="color:#888;font-size:.9rem;margin-top:8px">正在交換 token 並寫入系統，請稍候</p>
+</div>
+
+<div id="success-section" class="card" style="display:none">
+  <p class="success">&#x2705; 授權完成！系統已開始自動發文</p>
+  <p style="color:#aaa;font-size:.9rem;margin-top:8px">
+    平台：<span id="successPlatform"></span><br>
+    User ID：<span id="successUserId"></span><br>
+    發文時間：週二~四 09:00 · 週三 12:00 · 每日 20:30（台北）
+  </p>
+  <p class="warn" style="margin-top:16px">可關閉此頁面</p>
 </div>
 
 <div id="error-section" class="card" style="display:none">
-  <p class="error">&#x274C; 授權失敗：<span id="errorMsg"></span></p>
-  <button onclick="location.reload()" class="btn btn-gray">重試</button>
+  <p class="error">&#x274C; 設定失敗：<span id="errorMsg"></span></p>
+  <button onclick="location.href=location.pathname" class="btn btn-gray" style="margin-top:12px">重新授權</button>
 </div>
 
 <script>
-const APP_ID   = '3114808732061005'; // Threads 專屬編號(app 3q-threads-publisher)
-const REDIRECT = 'https://milk790-code.github.io/3q-hatchery-line-oa/assets/threads-auth.html';
-const SCOPE    = 'threads_basic,threads_content_publish';
-const authUrl  = `https://www.threads.com/oauth/authorize?client_id=${APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT)}&scope=${SCOPE}&response_type=code`;
+const APP_ID     = '3114808732061005'; // Threads 專屬編號(app 3q-threads-publisher)
+const REDIRECT   = 'https://milk790-code.github.io/3q-hatchery-line-oa/assets/threads-auth.html';
+const WORKER_URL = 'https://3q-social-publisher.milk790.workers.dev';
+const SCOPE      = 'threads_basic,threads_content_publish';
+const authUrl    = `https://www.threads.com/oauth/authorize?client_id=${APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT)}&scope=${SCOPE}&response_type=code`;
 document.getElementById('authBtn').href = authUrl;
 
-function copyCode(el) {
-  navigator.clipboard.writeText(el.innerText).then(() => {
-    el.style.background = '#1a3a1a';
-    el.title = '已複製';
+const params = new URLSearchParams(location.search);
+const code       = params.get('code');
+const err        = params.get('error_description') || params.get('error');
+const setupOk    = params.get('setup_ok');
+const setupError = params.get('setup_error');
+
+function show(id) {
+  ['auth-section','processing-section','success-section','error-section'].forEach(s => {
+    document.getElementById(s).style.display = s === id ? 'block' : 'none';
   });
 }
 
-const params = new URLSearchParams(location.search);
-const code   = params.get('code');
-const err    = params.get('error_description') || params.get('error');
-if (code) {
-  document.getElementById('auth-section').style.display = 'none';
-  document.getElementById('code-section').style.display  = 'block';
-  document.getElementById('codeDisplay').innerText = code;
+if (setupOk) {
+  show('success-section');
+  document.getElementById('successPlatform').innerText = params.get('platform') || 'threads';
+  document.getElementById('successUserId').innerText   = params.get('user_id')  || '—';
+} else if (setupError) {
+  show('error-section');
+  document.getElementById('errorMsg').innerText = setupError;
+} else if (code) {
+  // Got auth code from Threads — redirect through worker to exchange automatically
+  show('processing-section');
+  const initUrl = `${WORKER_URL}/oauth/init?platform=threads&code=${encodeURIComponent(code)}`;
+  setTimeout(() => { location.href = initUrl; }, 400);
 } else if (err) {
-  document.getElementById('auth-section').style.display  = 'none';
-  document.getElementById('error-section').style.display = 'block';
+  show('error-section');
   document.getElementById('errorMsg').innerText = err;
 }
 </script>

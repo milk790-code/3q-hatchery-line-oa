@@ -1061,6 +1061,26 @@ export default {
       return json({ ok: true, results });
     }
 
+    // Public OAuth init: GET /oauth/init?platform=threads&code=AUTH_CODE
+    // Called by threads-auth.html after Meta redirects back with the auth code.
+    // No TRIGGER_TOKEN needed — security comes from the one-time code + THREADS_APP_SECRET
+    // (server-side only; the browser never sees the secret or the final token).
+    if (url.pathname === '/oauth/init' && request.method === 'GET') {
+      const platform  = url.searchParams.get('platform') || 'threads';
+      const code      = url.searchParams.get('code');
+      const returnUrl = 'https://milk790-code.github.io/3q-hatchery-line-oa/assets/threads-auth.html';
+      if (!code) return Response.redirect(`${returnUrl}?setup_error=${encodeURIComponent('code missing')}`, 302);
+      try {
+        const result = await exchangeCodeAndStore(code, platform, returnUrl, env);
+        return Response.redirect(
+          `${returnUrl}?setup_ok=1&platform=${encodeURIComponent(platform)}&user_id=${encodeURIComponent(result.user_id)}`,
+          302
+        );
+      } catch (err) {
+        return Response.redirect(`${returnUrl}?setup_error=${encodeURIComponent(err.message)}`, 302);
+      }
+    }
+
     // OAuth callback: POST /oauth/callback (TRIGGER_TOKEN protected)
     // Body: { platform: "threads"|"ig", code: "...", redirect_uri: "..." }
     if (url.pathname === '/oauth/callback' && request.method === 'POST') {
