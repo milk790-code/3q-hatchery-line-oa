@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'home-renovation/**'
+  schedule:
+    - cron: '0 */6 * * *'   # 每 6 小時自動跑：安全門 + 線上驗證（00:00 06:00 12:00 18:00 UTC）
   workflow_dispatch: {}
 
 jobs:
@@ -80,7 +82,7 @@ jobs:
         run: |
           URL="https://milk790-code.github.io/3q-hatchery-line-oa/home-renovation/"
           echo "## 線上驗證 ✅" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo ""  >> "$GITHUB_STEP_SUMMARY"
           echo "| 頁面 | 狀態 |" >> "$GITHUB_STEP_SUMMARY"
           echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
           for page in "" "方案價格.html" "常見問題FAQ.html" "報價單模板.html" "保固卡.html" "透明施工承諾書.html"; do
