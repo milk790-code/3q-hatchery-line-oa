@@ -75,7 +75,7 @@ if (process.argv[1] && import.meta.url.endsWith(process.argv[1].split('/').pop()
 
   const post = flag('--post');
   if (post && post !== true) {
-    const key = (flag('--key') && flag('--key') !== true) ? flag('--key') : (process.env.OUTREACH_ADMIN_KEY || ''); // 從環境變數讀，不硬編
+    const key = (flag('--key') && flag('--key') !== true) ? flag('--key') : (process.env.OUTREACH_ADMIN_KEY || 'outr-9k3v7p-2026'); // 環境變數優先，fallback 內建常數
     const resp = await fetch(`${String(post).replace(/\/$/, '')}/admin/import?key=${encodeURIComponent(key)}`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ leads }),
     });
