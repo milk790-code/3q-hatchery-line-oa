@@ -292,6 +292,10 @@ const CHAT_CSS = `
 const PAGE_FUNNEL = `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
 <title>你的店,被找到了嗎|3Q 台灣在地品牌孵化所</title>
+<meta property="og:title" content="3Q 台灣在地品牌孵化所">
+<meta property="og:description" content="官網/影片/修圖 免費體驗，AI 幫你的店被看見。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://3q-sales-ai.milk790.workers.dev">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0c0f14;color:#e8edf5;font-family:"Noto Sans TC",system-ui,sans-serif;line-height:1.7}

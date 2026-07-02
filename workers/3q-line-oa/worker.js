@@ -608,6 +608,6 @@ export default {
       })());
       return new Response('ok');
     }
-    return new Response('3q hatchery line bot (seed ' + SEED_VER + '). /setup?key=... to configure.', { status: 200 });
+    return new Response('3q hatchery line bot (seed ' + SEED_VER + ')', { status: 200 });
   },
 };

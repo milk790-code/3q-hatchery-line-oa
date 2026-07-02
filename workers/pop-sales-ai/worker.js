@@ -180,6 +180,10 @@ const CHAT_CSS = `
 const PAGE_FUNNEL = `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
 <title>叁無 × 重新定義汽美|泡泡怪獸 POP MONSTER</title>
+<meta property="og:title" content="泡泡怪獸 POP MONSTER">
+<meta property="og:description" content="叁無配方重新定義汽美，AI 選購問答直接告訴你該用哪罐。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://pop-sales-ai.milk790.workers.dev">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0a0a0c;color:#f0ead8;font-family:"Noto Sans TC",system-ui,sans-serif;line-height:1.7}
