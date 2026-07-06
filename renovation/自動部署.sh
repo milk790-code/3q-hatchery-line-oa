@@ -10,7 +10,7 @@
 # 用法：
 #   bash renovation/自動部署.sh                 # 自動帶預設 commit 訊息
 #   bash renovation/自動部署.sh "我的更新說明"   # 自訂 commit 訊息
-#   SKIP_SITE=1 bash renovation/自動部署.sh      # 只更新資料中心，不碰官網
+#   FORCE_SITE=1 bash renovation/自動部署.sh     # 本機直推官網（預設交給雲端 autosync）
 # ─────────────────────────────────────────────────────────────────────────────
 set -uo pipefail
 
@@ -49,11 +49,15 @@ else
 fi
 
 # ── ③ 同步公開層到官網 ────────────────────────────────────────────────────────
-if [ "${SKIP_SITE:-}" = "1" ]; then
-  c_step "③ 同步官網（已用 SKIP_SITE 略過）"
-else
-  c_step "③ 同步公開層到官網"
+# 雲端 autosync（.github/workflows/renovation-autosync.yml）會在 push dev 後
+# 自動同步公開層到 main 並線上驗證，本機不再直推 main（部分環境無權限）。
+if [ "${FORCE_SITE:-}" = "1" ]; then
+  c_step "③ 同步公開層到官網（FORCE_SITE=1 本機直推）"
   bash renovation/同步官網.sh -y
+else
+  c_step "③ 同步官網 → 交給雲端 autosync"
+  c_info "push dev 已觸發 GitHub Actions 自動同步＋線上驗證（若步驟②有變更公開層）。"
+  c_info "查看：https://github.com/milk790-code/3q-hatchery-line-oa/actions"
 fi
 
 c_step "全部完成 🎉"

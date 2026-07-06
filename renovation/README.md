@@ -63,7 +63,18 @@ renovation/
 **https://milk790-code.github.io/3q-hatchery-line-oa/home-renovation/**
 
 > 部署位置在 `main` 分支的 `home-renovation/` 資料夾（檔名改為 `index.html` 等乾淨網址）。
-> 本資料夾的 `公開-客戶端/` 是**原始來源**；要改官網文案，改這裡再同步上去即可。
+> 本資料夾的 `公開-客戶端/` 是**原始來源**。
+
+### 🔁 完全自動化（改完推 dev 即上線，什麼都不用手動）
+
+```
+改 公開-客戶端/ → git push（dev 分支）
+   ↓ GitHub Actions 雲端自動（renovation-autosync.yml）
+白名單只取 6 公開檔 → 安全門雙重把關 → 推 main → 線上驗證 6 頁 HTTP 200
+```
+
+另有 `renovation-deploy.yml` 每 6 小時 cron 自動跑安全門＋線上健康檢查。
+機密層（`內部機密/`、`工班端/`）**永遠不會**被任何自動化碰到——同步採逐檔白名單點名。
 
 ---
 
