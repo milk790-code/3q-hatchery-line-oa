@@ -44,7 +44,7 @@ jobs:
             && echo "::notice::3q-outreach OK" \
             || echo "::warning::3q-outreach /health unexpected response"
 
-      - name: Probe 3q-social-publisher (社群佇列)
+      - name: Probe 3q-social-publisher (社群佇列 + token 狀態)
         continue-on-error: true
         run: |
           resp=$(curl -sS --max-time 15 "https://3q-social-publisher.milk790.workers.dev/health" || echo '{}')
@@ -52,6 +52,13 @@ jobs:
           [ -n "$ver" ] \
             && echo "::notice::3q-social-publisher OK (v$ver)" \
             || echo "::warning::3q-social-publisher /health no version field"
+          # Surface platform token expiry so we know when auth renewal is needed
+          fb=$(echo "$resp" | jq -r '.configured.facebook // false')
+          th=$(echo "$resp" | jq -r '.configured.threads  // false')
+          ig=$(echo "$resp" | jq -r '.configured.instagram // false')
+          [ "$fb" = "true" ] && echo "::notice::FB token OK" || echo "::warning::FB token missing/expired — run fb-token-setup.yml"
+          [ "$th" = "true" ] && echo "::notice::Threads token OK" || echo "::warning::Threads token missing — visit threads-auth.html to re-auth"
+          [ "$ig" = "true" ] && echo "::notice::IG token OK" || echo "::notice::IG token not set"
 
       - name: Probe 3q-ai-subsidy (AI補助媒合 v2.0)
         continue-on-error: true
@@ -61,6 +68,64 @@ jobs:
           echo "$resp" | jq -e '.ok == true' > /dev/null \
             && echo "::notice::3q-ai-subsidy OK" \
             || echo "::warning::3q-ai-subsidy /health returned ok!=true"
+
+      - name: Probe pop-line-oa (POP LINE OA bot)
+        continue-on-error: true
+        run: |
+          resp=$(curl -sS --max-time 15 "https://pop-line-oa.milk790.workers.dev/health" || echo '{}')
+          echo "$resp" | jq -e '.ok == true or .prospects != null' > /dev/null \
+            && echo "::notice::pop-line-oa OK" \
+            || echo "::warning::pop-line-oa /health unexpected response"
+
+      - name: Probe 3q-fukubukuro-push (福袋推播)
+        continue-on-error: true
+        run: |
+          code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 "https://3q-fukubukuro-push.milk790.workers.dev/health" || echo "000")
+          [ "$code" = "200" ] \
+            && echo "::notice::3q-fukubukuro-push OK (HTTP 200)" \
+            || echo "::warning::3q-fukubukuro-push returned HTTP $code"
+
+      - name: Probe tudigong-line-oa (土地公 LINE OA)
+        continue-on-error: true
+        run: |
+          code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 "https://tudigong-line-oa.milk790.workers.dev/health" || echo "000")
+          [ "$code" = "200" ] \
+            && echo "::notice::tudigong-line-oa OK (HTTP 200)" \
+            || echo "::warning::tudigong-line-oa returned HTTP $code"
+
+      - name: Probe sales-ai workers (3 brands)
+        continue-on-error: true
+        run: |
+          for w in 3q-sales-ai pop-sales-ai tudigong-sales-ai; do
+            resp=$(curl -sS --max-time 15 "https://${w}.milk790.workers.dev/health" || echo '{}')
+            echo "$resp" | jq -e '.ok == true' > /dev/null \
+              && echo "::notice::${w} OK" \
+              || echo "::warning::${w} /health unexpected response"
+          done
+
+      - name: Probe 3q-art-portfolio
+        continue-on-error: true
+        run: |
+          code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 "https://3q-art-portfolio.milk790.workers.dev/health" || echo "000")
+          [ "$code" = "200" ] \
+            && echo "::notice::3q-art-portfolio OK (HTTP 200)" \
+            || echo "::warning::3q-art-portfolio returned HTTP $code"
+
+      - name: Probe luxury-line-oa (精品私圈)
+        continue-on-error: true
+        run: |
+          code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 "https://luxury-line-oa.milk790.workers.dev/health" || echo "000")
+          [ "$code" = "200" ] \
+            && echo "::notice::luxury-line-oa OK (HTTP 200)" \
+            || echo "::warning::luxury-line-oa returned HTTP $code"
+
+      - name: Probe sanzhi-3q (Pages 三芝工班入口)
+        continue-on-error: true
+        run: |
+          code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 "https://sanzhi-3q.pages.dev/" || echo "000")
+          [ "$code" = "200" ] \
+            && echo "::notice::sanzhi-3q.pages.dev OK (HTTP 200)" \
+            || echo "::warning::sanzhi-3q.pages.dev returned HTTP $code"
 
       - name: Probe Pages PNG (rich menu asset)
         run: |
@@ -81,6 +146,13 @@ jobs:
           echo "| 3q-line-oa | (見日誌) |" >> $GITHUB_STEP_SUMMARY
           echo "| 3q-site | (見日誌) |" >> $GITHUB_STEP_SUMMARY
           echo "| 3q-outreach | (見日誌) |" >> $GITHUB_STEP_SUMMARY
-          echo "| 3q-social-publisher | (見日誌) |" >> $GITHUB_STEP_SUMMARY
+          echo "| 3q-social-publisher | (見日誌 + token 狀態) |" >> $GITHUB_STEP_SUMMARY
           echo "| 3q-ai-subsidy | (見日誌) |" >> $GITHUB_STEP_SUMMARY
+          echo "| pop-line-oa | (見日誌) |" >> $GITHUB_STEP_SUMMARY
+          echo "| 3q-fukubukuro-push | (見日誌) |" >> $GITHUB_STEP_SUMMARY
+          echo "| tudigong-line-oa | (見日誌) |" >> $GITHUB_STEP_SUMMARY
+          echo "| 3q/pop/tudigong-sales-ai | (見日誌) |" >> $GITHUB_STEP_SUMMARY
+          echo "| 3q-art-portfolio | (見日誌) |" >> $GITHUB_STEP_SUMMARY
+          echo "| luxury-line-oa | (見日誌) |" >> $GITHUB_STEP_SUMMARY
+          echo "| sanzhi-3q Pages | (見日誌) |" >> $GITHUB_STEP_SUMMARY
           echo "| Pages PNG | (見日誌) |" >> $GITHUB_STEP_SUMMARY
