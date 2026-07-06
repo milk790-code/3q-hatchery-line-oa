@@ -228,6 +228,14 @@ jobs:
             -H "Content-Type: application/json" \
             -d '{"sql":"ALTER TABLE content_queue ADD COLUMN link_url TEXT"}' \
             | jq -r '"content_queue.link_url: " + (.success | tostring) + " " + (.errors[0].message // "")'
+
+          # migration 009: platform_post_id — stores the returned post/media ID after publish
+          curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CRM_D1_ID}/query" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"sql":"ALTER TABLE content_queue ADD COLUMN platform_post_id TEXT"}' \
+            | jq -r '"content_queue.platform_post_id: " + (.success | tostring) + " " + (.errors[0].message // "")'
           echo "::notice::content_queue table ready"
 
       - name: Deploy Worker
