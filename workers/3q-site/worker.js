@@ -941,26 +941,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 <script type="text/babel">
 const { Button, Badge } = window.DesignSystem_8e9232;
 
-const inputStyle = {
-  width: '100%', padding: '12px 16px',
-  border: '1.5px solid var(--line)', borderRadius: 'var(--radius-md)',
-  background: 'var(--paper)', fontFamily: 'var(--font-sans)',
-  fontSize: 15, color: 'var(--ink)', outline: 'none',
-};
-
-function Field({ label, placeholder, textarea }) {
-  return (
-    <label style={{ display: 'block' }}>
-      <span style={{ display: 'block', fontSize: 13, fontWeight: 700, color: 'var(--ink2)', marginBottom: 8, letterSpacing: .5 }}>{label}</span>
-      {textarea
-        ? <textarea rows="4" placeholder={placeholder} style={{ ...inputStyle, resize: 'vertical' }}></textarea>
-        : <input type="text" placeholder={placeholder} style={inputStyle} />}
-    </label>
-  );
-}
-
 function App() {
-  const [sent, setSent] = React.useState(false);
   return (
     <div>
       <SiteNav active="contact" />
@@ -991,31 +972,18 @@ function App() {
               <Badge variant="brand" dot>中小企業主</Badge>
               <h2 className="h3" style={{ marginTop: 16, marginBottom: 10 }}>預約免費補助健檢</h2>
               <p className="body2" style={{ fontSize: 14.5, marginBottom: 24 }}>
-                留下基本資料，我們先比對好你的條件再開始談——不浪費你的半小時。
+                為避免網頁保存個資，預約改由你主動開啟 LINE，再由客服接手。
               </p>
-              {sent ? (
-                <div style={{
-                  padding: '36px 20px', textAlign: 'center', position: 'relative',
-                  background: 'var(--cream)', borderRadius: 'var(--radius-lg)',
-                  border: '1.5px dashed var(--border-strong)',
-                }}>
-                  <span className="stamp stamp--yes" style={{ position: 'absolute', top: -14, right: 24, background: 'var(--cream)', fontSize: 14 }}>收件</span>
-                  <div className="h3" style={{ fontSize: 18, color: 'var(--lavd)' }}>收到了。</div>
-                  <p className="caption" style={{ marginTop: 8 }}>我們會在一個工作天內回覆你。</p>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-                  <Field label="怎麼稱呼你" placeholder="姓名或暱稱" />
-                  <Field label="事業體名稱" placeholder="公司、商號或品牌名" />
-                  <Field label="聯絡方式" placeholder="LINE ID、Email 或電話" />
-                  <Field textarea label="想解決什麼" placeholder="例如：想申請台中 SBIR，不知道題目怎麼定" />
-                  <Button variant="primary" onClick={() => setSent(true)}>送出，預約健檢</Button>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center', marginTop: 2 }}>
-                    <span className="caption">不想填表？</span>
-                    <Button variant="text" size="sm" href="https://lin.ee/VZvs7sj" target="_blank">直接加 LINE 聊 →</Button>
-                  </div>
-                </div>
-              )}
+              <div data-growth-contact-mode="line-only" style={{
+                display: 'flex', flexDirection: 'column', gap: 16,
+                padding: '28px 22px', background: 'var(--cream)',
+                borderRadius: 'var(--radius-lg)', border: '1px solid var(--line)',
+              }}>
+                <div className="h3" style={{ fontSize: 18, color: 'var(--lavd)' }}>改用 LINE 完成預約</div>
+                <p className="caption">本站不在網頁收集姓名、電話、Email 或 LINE ID，也不顯示未送出的成功訊息。</p>
+                <Button variant="primary" href="https://lin.ee/VZvs7sj" target="_blank">加 LINE 預約免費補助健檢 →</Button>
+                <div className="caption">開啟 LINE 後由你主動傳訊；本頁不會自動送出任何資料。</div>
+              </div>
             </div>
           </Reveal>
 
@@ -3045,9 +3013,55 @@ __ds_ns.StatBadge = __ds_scope.StatBadge;
 }
 ` }
 };
+function injectGrowthLoopTelemetry(body, env) {
+  const collector = String(env.GROWTH_LOOP_COLLECTOR_URL || '').replace(/\/+$/, '');
+  if (!collector || !body.includes('</body>')) return body;
+  const collectorLiteral = JSON.stringify(collector).replaceAll('<', '\u003c');
+  const script = `<script data-growth-loop-telemetry>
+(() => {
+  const collector = ${collectorLiteral};
+  const params = new URLSearchParams(location.search);
+  const storageKey = '3q_growth_loop_sid';
+  let storedSid = null;
+  try { storedSid = sessionStorage.getItem(storageKey); } catch {}
+  let sid = params.get('sid') || storedSid;
+  if (!sid) {
+    sid = crypto.randomUUID ? crypto.randomUUID() : Date.now() + '-' + Math.random().toString(36).slice(2);
+    try { sessionStorage.setItem(storageKey, sid); } catch {}
+  }
+  const send = (eventType) => {
+    const payload = {
+      asset_id: 'champion-3q-line-v0',
+      variant_id: params.get('variant_id'),
+      content_id: params.get('content_id'),
+      session_id: sid,
+      source: params.get('utm_source') || '3q_site',
+      medium: params.get('utm_medium') || 'champion_page',
+      campaign: params.get('utm_campaign'),
+      event_type: eventType,
+      url: location.origin + location.pathname,
+      metadata_json: { integration: '3q_site_champion_v1', page: location.pathname }
+    };
+    fetch(collector + '/e', {
+      method: 'POST', mode: 'cors', credentials: 'omit', keepalive: true,
+      headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload)
+    }).catch(() => {});
+  };
+  send('page_view');
+  document.addEventListener('click', (event) => {
+    const target = event.target;
+    const link = target && typeof target.closest === 'function' ? target.closest('a[href^="https://lin.ee/"]') : null;
+    if (link) send('cta_click');
+  }, { capture: true });
+})();
+</script>`;
+  return body.replace('</body>', script + '</body>');
+}
+
 export default {
-  async fetch(request) {
+  async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === '/growth-loop/status') return new Response(JSON.stringify({ok:true,mode:'champion_integration_candidate',collector_configured:Boolean(env.GROWTH_LOOP_COLLECTOR_URL),external_effects:false}),{headers:{'Content-Type':'application/json','Cache-Control':'no-store'}});
     if (url.pathname === '/robots.txt') return new Response('User-agent: *\nAllow: /\nSitemap: https://3q-site.milk790.workers.dev/sitemap.xml\n', { headers: { 'Content-Type': 'text/plain' } });
     if (url.pathname === '/sitemap.xml') return new Response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://3q-site.milk790.workers.dev/</loc></url><url><loc>https://3q-site.milk790.workers.dev/assess</loc></url><url><loc>https://3q-site.milk790.workers.dev/contact</loc></url></urlset>', { headers: { 'Content-Type': 'application/xml' } });
     if (url.pathname === '/health') return new Response(JSON.stringify({ok:true,worker:'3q-site',ver:'v1.2',pages:Object.keys(FILES).filter(k=>k.endsWith('.html')).length}),{headers:{'Content-Type':'application/json'}});
@@ -3056,6 +3070,8 @@ export default {
     if (!FILES[p] && FILES[p + '.html']) p = p + '.html';
     const f = FILES[p];
     if (!f) return Response.redirect(url.origin + '/', 302);
-    return new Response(f.body, { headers: { 'Content-Type': f.ct, 'Cache-Control': 'public, max-age=300' } });
+    const body = f.ct.startsWith('text/html') ? injectGrowthLoopTelemetry(f.body, env) : f.body;
+    const cacheControl = f.ct.startsWith('text/html') ? 'no-store' : 'public, max-age=300';
+    return new Response(body, { headers: { 'Content-Type': f.ct, 'Cache-Control': cacheControl } });
   },
 };
