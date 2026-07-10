@@ -43,7 +43,8 @@ jobs:
             { main_module:"worker.js", compatibility_date:"2024-12-01",
               bindings: ([ {name:"SESSION",type:"kv_namespace",namespace_id:$kv},
                            {name:"CRM",type:"d1",id:$d1},
-                           {name:"AI",type:"ai"} ] + $secrets) }' > /tmp/meta.json
+                           {name:"AI",type:"ai"},
+                           {name:"DELAY_DO",type:"durable_object_namespace",class_name:"DelayReplyDO"} ] + $secrets) }' > /tmp/meta.json
           resp=$(curl -sS -X PUT \
             "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}" \
             -H "Authorization: Bearer $CF_TOKEN" \
