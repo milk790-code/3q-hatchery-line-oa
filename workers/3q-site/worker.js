@@ -3031,7 +3031,7 @@ function injectGrowthLoopTelemetry(body, env) {
   const tokenPattern = /^[A-Za-z0-9][A-Za-z0-9._~:-]{0,79}$/;
   const uuidV4Pattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   const emailLikePattern = /[A-Z0-9._%+-]+(?:@|%40)[A-Z0-9.-]+[.][A-Z]{2,}/i;
-  const phoneLikePattern = /(?:[+]?886[ ._~:()-]?)?0?9(?:[ ._~:()-]?[0-9]){8}|0[2-8](?:[ ._~:()-]?[0-9]){7,8}/;
+  const phoneLikePattern = /[+]?[0-9][0-9 ._~:()-]{5,23}[0-9]/g;
   const containsPiiLike = (value) => {
     const candidates = [value];
     let decoded = value;
@@ -3043,7 +3043,15 @@ function injectGrowthLoopTelemetry(body, env) {
         decoded = next;
       } catch { break; }
     }
-    return candidates.some((candidate) => emailLikePattern.test(candidate) || phoneLikePattern.test(candidate));
+    return candidates.some((candidate) => {
+      const phoneCandidates = candidate.match(phoneLikePattern) || [];
+      const containsPhoneLike = phoneCandidates.some((phoneCandidate) => {
+        const digitCount = phoneCandidate.replace(/[^0-9]/g, '').length;
+        const hasPhoneSeparator = /[+ ._~:()-]/.test(phoneCandidate);
+        return digitCount >= 7 && digitCount <= 15 && (hasPhoneSeparator || digitCount >= 10);
+      });
+      return emailLikePattern.test(candidate) || containsPhoneLike;
+    });
   };
   const safeToken = (value) => {
     if (typeof value !== 'string') return null;
