@@ -66,11 +66,11 @@ async function callBrain(history, env) {
       body: JSON.stringify({ model: pickModel(history), max_tokens: 700,
         system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }], messages: history }),
     });
-    if (!resp.ok && [400, 403, 404, 429].includes(resp.status)) {
+    if (!resp.ok && [400, 403, 404].includes(resp.status)) {
       console.error('anthropic', resp.status, '-> fallback opus-4-8');
       resp = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: HDRS, body: JSON.stringify({ model: 'claude-opus-4-8', max_tokens: 700, system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }], messages: history }) });
       }
-    if (resp.ok) { const d = await resp.json(); return d.content?.[0]?.text || ''; }
+    if (resp.ok) { const d = await resp.json(); return d.content?.find(b => b.type === 'text')?.text || ''; }
     console.error('[pop-sales-ai] anthropic error', resp.status);
   }
   if (env.AI) {
@@ -125,7 +125,8 @@ export default {
       if (!body || typeof body.message !== 'string' || !body.message.trim()) return json({ ok: false, error: 'message required' }, 400);
       const sid = (typeof body.sid === 'string' && /^[\w-]{8,64}$/.test(body.sid)) ? body.sid : crypto.randomUUID();
       if (env.SESSION) {
-        const rl = `rl:popai:${sid}:${Math.floor(Date.now() / 60000)}`;
+        const rlIp = request.headers.get('CF-Connecting-IP') || 'noip';
+        const rl = `rl:popai:${rlIp}:${Math.floor(Date.now() / 60000)}`;
         const n = parseInt(await env.SESSION.get(rl) || '0', 10);
         if (n >= 8) return json({ ok: false, reply: '訊息有點快,稍等我一下。' }, 429);
         await env.SESSION.put(rl, String(n + 1), { expirationTtl: 120 });

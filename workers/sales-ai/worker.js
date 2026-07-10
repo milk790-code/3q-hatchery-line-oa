@@ -121,13 +121,13 @@ async function callBrain(history, env) {
         messages: history,
       }),
     });
-    if (!resp.ok && [400, 403, 404, 429].includes(resp.status)) {
+    if (!resp.ok && [400, 403, 404].includes(resp.status)) {
       console.error('anthropic', resp.status, '-> fallback opus-4-8');
       resp = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: HDRS, body: JSON.stringify({ model: 'claude-opus-4-8', max_tokens: 700, system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }], messages: history }) });
       }
     if (resp.ok) {
       const data = await resp.json();
-      return data.content?.[0]?.text || '';
+      return data.content?.find(b => b.type === 'text')?.text || '';
     }
     console.error('[sales-ai] anthropic error', resp.status);
   }
@@ -215,7 +215,8 @@ export default {
       const sid = (typeof body.sid === 'string' && /^[\w-]{8,64}$/.test(body.sid)) ? body.sid : crypto.randomUUID();
 
       if (env.SESSION) {
-        const rlKey = `rl:salesai:${sid}:${Math.floor(Date.now() / 60000)}`;
+        const rlIp = request.headers.get('CF-Connecting-IP') || 'noip';
+        const rlKey = `rl:salesai:${rlIp}:${Math.floor(Date.now() / 60000)}`;
         const n = parseInt(await env.SESSION.get(rlKey) || '0', 10);
         if (n >= 8) return json({ ok: false, error: 'slow down', reply: '訊息有點快,稍等我一下,馬上回您。' }, 429);
         await env.SESSION.put(rlKey, String(n + 1), { expirationTtl: 120 });
