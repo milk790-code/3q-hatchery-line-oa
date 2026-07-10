@@ -1,0 +1,13 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "3q-site-growth-loop-integration-candidate",
+  "main": "./generated/worker.candidate.js",
+  "compatibility_date": "2026-07-09",
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "vars": {
+    "GROWTH_LOOP_COLLECTOR_URL": "https://3q-growth-loop-candidate.milk790.workers.dev"
+  }
+}

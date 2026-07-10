@@ -1,0 +1,83 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:47:56.637Z",
+  "mode": "champion_github_handoff_local_only",
+  "status": "integration_already_merged_followup_repairs_only",
+  "integration_already_merged": true,
+  "repository": {
+    "slug": "milk790-code/3q-hatchery-line-oa",
+    "url": "https://github.com/milk790-code/3q-hatchery-line-oa.git",
+    "base_branch": "main",
+    "source_path": "workers/3q-site/worker.js",
+    "deployment_workflow_path": ".github/workflows/deploy-3q-site.yml"
+  },
+  "local_branch": {
+    "name": "codex/3q-growth-loop-champion-v1",
+    "commit": "9b6fd00c082f2b67d6cde159e61dc6c407d02ea0",
+    "parent_commit": "355981c978bdb1c93a29bb89ae700fda7b41cac0",
+    "source_lock_base_commit": "f86faa7356ac7962d9b429951b67c742370271c0",
+    "worker_commit": null,
+    "workflow_commit": null,
+    "commit_count": 0,
+    "commits": [],
+    "worktree": "/Users/mac/Documents/Codex/control-center/worktrees/3q-site-growth-loop-champion-v1",
+    "changed_paths": [
+      ".github/workflows/deploy-3q-line-oa.yml",
+      ".github/workflows/deploy-fleet-sentinel.yml",
+      ".github/workflows/deploy-pop-line-oa.yml",
+      ".github/workflows/deploy-tudigong.yml",
+      "brands/popmonster.json",
+      "workers/3q-line-oa/worker.js",
+      "workers/fleet-sentinel/worker.js",
+      "workers/outreach/worker.js",
+      "workers/pop-line-oa/worker.js",
+      "workers/pop-sales-ai/worker.js",
+      "workers/sales-ai/worker.js",
+      "workers/tudigong-sales-ai/worker.js",
+      "workers/tudigong/worker.js"
+    ]
+  },
+  "remote_branch": {
+    "present": true,
+    "commit": "9b6fd00c082f2b67d6cde159e61dc6c407d02ea0",
+    "state": "up_to_date_with_local",
+    "local_ahead_count": 0
+  },
+  "pull_request": {
+    "title": "3Q site: persist privacy-safe Growth Loop telemetry",
+    "body_file": "champion_github_pr_body.md",
+    "draft_required": true,
+    "merge_permitted": false
+  },
+  "blockers_after_pr": [
+    "Dedicated D1 exists, but this handoff performed no remote table query and has no owner evidence for schema migration.",
+    "A collector binding is live, but its deployment and migration provenance still require owner evidence.",
+    "Any future 3q-site deploy or redeploy remains a separate owner gate."
+  ],
+  "checks": {
+    "repository_known": true,
+    "local_branch_ready": true,
+    "branch_name_locked": true,
+    "commit_matches_release": true,
+    "changed_paths_scoped": true,
+    "candidate_sha_matches_commit": true,
+    "worktree_clean": true,
+    "source_worktree_unchanged": true,
+    "remote_branch_matches_reviewed_history": true,
+    "release_preflight_ok": true,
+    "d1_remote_schema_evidence_accounted_for": true
+  },
+  "external_effect": false,
+  "data_lp_events_write_performed": false,
+  "remote_branch_write_observed_before_this_run": true,
+  "git_push_performed": false,
+  "github_pr_created": false,
+  "github_push_or_pr_performed": false,
+  "production_deploy_performed": false,
+  "public_link_change_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

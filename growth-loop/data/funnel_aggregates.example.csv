@@ -1,0 +1,11 @@
+date,asset_id,event_type,count,source,medium,campaign,content_id,variant_id,quality_score
+2026-07-08,challenger-week0-cta-text-v1,link_click,12,manual_review,growth_loop,week0-cta-text,week0-post-001,cta-v1-diagnostic,
+2026-07-08,challenger-week0-cta-text-v1,page_view,10,manual_review,growth_loop,week0-cta-text,week0-post-001,cta-v1-diagnostic,
+2026-07-08,challenger-week0-cta-text-v1,cta_click,4,manual_review,growth_loop,week0-cta-text,week0-post-001,cta-v1-diagnostic,
+2026-07-08,challenger-week0-cta-text-v1,line_add,2,manual_review,growth_loop,week0-cta-text,week0-post-001,cta-v1-diagnostic,
+2026-07-08,challenger-week0-cta-text-v1,lead_submit,1,manual_review,growth_loop,week0-cta-text,week0-post-001,cta-v1-diagnostic,
+2026-07-08,challenger-week0-cta-text-v1,deal,1,manual_review,growth_loop,week0-cta-text,week0-post-001,cta-v1-diagnostic,
+2026-07-08,challenger-week0-cta-text-v1,quality_flag,1,manual_review,growth_loop,week0-cta-text,week0-post-001,cta-v1-diagnostic,1
+2026-07-08,challenger-week0-cta-text-v1,link_click,8,manual_review,growth_loop,week0-cta-text,week0-post-002,cta-v2-audit,
+2026-07-08,challenger-week0-cta-text-v1,page_view,7,manual_review,growth_loop,week0-cta-text,week0-post-002,cta-v2-audit,
+2026-07-08,challenger-week0-cta-text-v1,cta_click,2,manual_review,growth_loop,week0-cta-text,week0-post-002,cta-v2-audit,

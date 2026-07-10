@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:48:28.267Z",
+  "week_start": "2026-06-29",
+  "week_end": "2026-07-05",
+  "archive_dir": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/archive/2026-06-29/20260710T214828267Z",
+  "manifest_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/archive/2026-06-29/20260710T214828267Z/manifest.json",
+  "files_archived": 326,
+  "expected_files": 326,
+  "missing_files": [],
+  "immutable_snapshot": true,
+  "external_effect": false,
+  "production_deploy_performed": false,
+  "public_link_change_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

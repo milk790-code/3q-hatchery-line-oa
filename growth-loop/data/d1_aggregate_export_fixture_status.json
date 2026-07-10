@@ -1,0 +1,51 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:44:05.529Z",
+  "mode": "d1_aggregate_export_fixture_dry_run",
+  "scenario_count": 2,
+  "scenarios": [
+    {
+      "id": "missing_allow_remote_blocks_before_query",
+      "ok": true,
+      "exit_code": 2,
+      "query_performed": false,
+      "remote_read_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "fixture_wrangler_proves_aggregate_only_export",
+      "ok": true,
+      "exit_code": 0,
+      "aggregate_rows_read": 3,
+      "rows_exported": 6,
+      "output_has_forbidden_fields": false,
+      "sql_has_forbidden_fields": false,
+      "aggregate_sql_present": true,
+      "experiment_campaign_scoped": true,
+      "completed_week_scoped": true,
+      "truncation_sentinel_requested": true,
+      "deterministic_ids": true,
+      "real_remote_cli_performed": false,
+      "remote_read_performed": false,
+      "customer_data_read_performed": false,
+      "project_real_events_write_performed": false,
+      "external_effect": false
+    }
+  ],
+  "fixture_wrangler_used": true,
+  "real_remote_cli_performed": false,
+  "remote_read_performed": false,
+  "raw_event_rows_read_performed": false,
+  "customer_data_read_performed": false,
+  "customer_data_mutation_performed": false,
+  "project_real_events_write_performed": false,
+  "external_effect": false,
+  "production_deploy_performed": false,
+  "public_link_change_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

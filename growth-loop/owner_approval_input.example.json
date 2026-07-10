@@ -1,0 +1,37 @@
+{
+  "generated_at": "2026-07-10T21:48:21.505Z",
+  "purpose": "Copy this file to owner_approval_input.json only after the owner approves specific external gates. Keep secrets out of this file.",
+  "approvals": [
+    {
+      "gate_id": "remote_d1_create_and_migrate",
+      "approved_by": "OWNER_NAME",
+      "approved_at": "2026-07-10T21:48:21.505Z",
+      "cloudflare_account_alias": "OWNER_APPROVED_ACCOUNT_ALIAS",
+      "d1_database_name": "3q-growth-loop-candidate",
+      "d1_database_id": "deb85e19-95fd-4611-8710-9cb6ea6dc7ff"
+    },
+    {
+      "gate_id": "candidate_worker_production_deploy",
+      "approved_by": "OWNER_NAME",
+      "approved_at": "2026-07-10T21:48:21.505Z",
+      "worker_name": "3q-growth-loop-candidate",
+      "worker_url": "https://OWNER_APPROVED_WORKER_URL",
+      "rollback_plan": "Use Cloudflare dashboard rollback or redeploy previous approved revision."
+    },
+    {
+      "gate_id": "public_ab_small_traffic_link",
+      "approved_by": "OWNER_NAME",
+      "approved_at": "2026-07-10T21:48:21.505Z",
+      "champion_url": "https://OWNER_APPROVED_CURRENT_CHAMPION_URL",
+      "public_surface": "OWNER_APPROVED_SMALL_TRAFFIC_SURFACE",
+      "rollback_url": "https://OWNER_APPROVED_PREVIOUS_PUBLIC_URL"
+    },
+    {
+      "gate_id": "github_repo_branch_pr",
+      "approved_by": "OWNER_NAME",
+      "approved_at": "2026-07-10T21:48:21.505Z",
+      "repo_url": "https://github.com/milk790-code/3q-hatchery-line-oa.git",
+      "branch_name": "codex/3q-growth-loop-champion-v1"
+    }
+  ]
+}

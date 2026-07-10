@@ -1,0 +1,59 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:45:36.460Z",
+  "mode": "owner_quality_review_form",
+  "status": "waiting_for_sample_rate_candidate_local_form_ready",
+  "form_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/owner_quality_review_form.html",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/owner_quality_review_form_status.json",
+  "owner_filled_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/owner_quality_review.filled.json",
+  "owner_filled_exists": false,
+  "owner_sample_gate_status": "waiting_for_owner_sample_gate_counts",
+  "owner_quality_review_status": "waiting_for_sample_rate_candidate",
+  "sample_rate_win_candidate": false,
+  "required_owner_fields": [
+    "reviewer",
+    "pii_checked",
+    "evidence_ref",
+    "lead_rate_retention_vs_champion",
+    "close_rate_retention_vs_champion",
+    "spam_flag_rate"
+  ],
+  "optional_owner_fields": [
+    "low_quality_flag_count",
+    "notes"
+  ],
+  "download_filename": "owner_quality_review.filled.json",
+  "review_download_filename": "owner_quality_review_form.review.json",
+  "thresholds": {
+    "min_lead_rate_retention_vs_champion": 0.8,
+    "min_close_rate_retention_vs_champion": 0.8,
+    "max_spam_flag_rate": 0.05,
+    "blocked_metadata_keys": [
+      "phone",
+      "email",
+      "line_user_id",
+      "customer_name",
+      "address",
+      "payment",
+      "card"
+    ]
+  },
+  "browser_only": true,
+  "browser_persistence": false,
+  "form_action": "none",
+  "network_calls_performed": false,
+  "live_input_files_created": false,
+  "real_events_unchanged": true,
+  "data_lp_events_write_performed": false,
+  "approval_queue_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "promotion_performed": false
+}

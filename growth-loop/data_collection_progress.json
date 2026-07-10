@@ -1,0 +1,481 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:44:53.826Z",
+  "mode": "data_collection_progress",
+  "status": "waiting_for_p0_sample_gate_counts",
+  "week": {
+    "start": "2026-06-29",
+    "end": "2026-07-05",
+    "startUtc": "2026-06-28T16:00:00.000Z",
+    "endUtc": "2026-07-05T15:59:59.999Z"
+  },
+  "current_round": {
+    "changed_variable": "cta_text",
+    "one_variable_rule": [
+      "hook",
+      "offer",
+      "visual_claim",
+      "cta_text"
+    ]
+  },
+  "sample_progress": {
+    "min_visits": 100,
+    "min_cta_clicks": 20,
+    "min_line_adds": 5,
+    "min_test_days": 3,
+    "preferred_test_days": 7,
+    "current_visits": 0,
+    "current_cta_clicks": 0,
+    "current_line_adds": 0,
+    "current_test_days": 0,
+    "gaps": {
+      "visits": 100,
+      "cta_clicks": 20,
+      "line_adds": 5,
+      "test_days": 3
+    },
+    "sample_threshold_met": false
+  },
+  "sample_threshold_met": false,
+  "sample_rate_win_candidate": false,
+  "owner_sample_gate_status": "waiting_for_owner_sample_gate_counts",
+  "source_compile_status": "waiting_for_filled_counts",
+  "real_data_intake_status": "no_real_input_files",
+  "total_task_count": 42,
+  "filled_task_count": 0,
+  "pending_task_count": 42,
+  "p0_task_count": 18,
+  "p0_filled_count": 0,
+  "p0_pending_count": 18,
+  "p1_task_count": 24,
+  "p1_filled_count": 0,
+  "p1_pending_count": 24,
+  "p0_link_count": 6,
+  "source_group_count": 2,
+  "filled_ledgers": {
+    "source_capture_ledger": {
+      "path": "data/source_capture/source_capture_ledger.filled.csv",
+      "exists": false,
+      "total_rows": 0,
+      "filled_rows": 0,
+      "valid_reviewed_rows": 0
+    },
+    "sample_gate_ledger": {
+      "path": "data/source_capture/sample_gate_ledger.filled.csv",
+      "exists": false,
+      "total_rows": 0,
+      "filled_rows": 0,
+      "valid_reviewed_rows": 0
+    }
+  },
+  "event_type_progress": [
+    {
+      "event_type": "link_click",
+      "stage_label": "連結點擊",
+      "sample_gate_key": null,
+      "priority": "P1_funnel_completeness",
+      "total": 6,
+      "filled": 0,
+      "pending": 6,
+      "completion_rate": 0,
+      "source_surfaces": [
+        "社群平台連結點擊報表 / remote D1 link_click"
+      ],
+      "target_live_files": [
+        "data/funnel_aggregates.csv"
+      ],
+      "external_effect": false
+    },
+    {
+      "event_type": "page_view",
+      "stage_label": "落地頁瀏覽",
+      "sample_gate_key": "visits",
+      "priority": "P0_sample_gate",
+      "total": 6,
+      "filled": 0,
+      "pending": 6,
+      "completion_rate": 0,
+      "source_surfaces": [
+        "candidate Worker D1 / landing page analytics"
+      ],
+      "target_live_files": [
+        "data/funnel_aggregates.csv"
+      ],
+      "external_effect": false
+    },
+    {
+      "event_type": "cta_click",
+      "stage_label": "CTA 點擊",
+      "sample_gate_key": "cta_clicks",
+      "priority": "P0_sample_gate",
+      "total": 6,
+      "filled": 0,
+      "pending": 6,
+      "completion_rate": 0,
+      "source_surfaces": [
+        "candidate Worker D1 / landing page analytics"
+      ],
+      "target_live_files": [
+        "data/funnel_aggregates.csv"
+      ],
+      "external_effect": false
+    },
+    {
+      "event_type": "line_add",
+      "stage_label": "LINE 進線 / 加好友",
+      "sample_gate_key": "line_adds",
+      "priority": "P0_sample_gate",
+      "total": 6,
+      "filled": 0,
+      "pending": 6,
+      "completion_rate": 0,
+      "source_surfaces": [
+        "LINE OA 管理後台 / inbound customer-service aggregate"
+      ],
+      "target_live_files": [
+        "data/manual_conversions.csv"
+      ],
+      "external_effect": false
+    },
+    {
+      "event_type": "lead_submit",
+      "stage_label": "留資",
+      "sample_gate_key": null,
+      "priority": "P1_funnel_completeness",
+      "total": 6,
+      "filled": 0,
+      "pending": 6,
+      "completion_rate": 0,
+      "source_surfaces": [
+        "LINE 客服手動分桶 / lead qualification aggregate"
+      ],
+      "target_live_files": [
+        "data/manual_conversions.csv"
+      ],
+      "external_effect": false
+    },
+    {
+      "event_type": "deal",
+      "stage_label": "成交",
+      "sample_gate_key": null,
+      "priority": "P1_funnel_completeness",
+      "total": 6,
+      "filled": 0,
+      "pending": 6,
+      "completion_rate": 0,
+      "source_surfaces": [
+        "owner-confirmed aggregate deal log"
+      ],
+      "target_live_files": [
+        "data/manual_conversions.csv"
+      ],
+      "external_effect": false
+    },
+    {
+      "event_type": "quality_flag",
+      "stage_label": "品質 / 垃圾訊號",
+      "sample_gate_key": null,
+      "priority": "P1_funnel_completeness",
+      "total": 6,
+      "filled": 0,
+      "pending": 6,
+      "completion_rate": 0,
+      "source_surfaces": [
+        "LINE 客服手動分桶 / quality aggregate"
+      ],
+      "target_live_files": [
+        "data/manual_conversions.csv"
+      ],
+      "external_effect": false
+    }
+  ],
+  "source_surface_progress": [
+    {
+      "source_surface": "社群平台連結點擊報表 / remote D1 link_click",
+      "total": 6,
+      "filled": 0,
+      "pending": 6,
+      "p0_pending": 0,
+      "completion_rate": 0,
+      "event_types": [
+        "link_click"
+      ],
+      "target_live_files": [
+        "data/funnel_aggregates.csv"
+      ],
+      "external_effect": false
+    },
+    {
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "total": 12,
+      "filled": 0,
+      "pending": 12,
+      "p0_pending": 12,
+      "completion_rate": 0,
+      "event_types": [
+        "page_view",
+        "cta_click"
+      ],
+      "target_live_files": [
+        "data/funnel_aggregates.csv"
+      ],
+      "external_effect": false
+    },
+    {
+      "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+      "total": 6,
+      "filled": 0,
+      "pending": 6,
+      "p0_pending": 6,
+      "completion_rate": 0,
+      "event_types": [
+        "line_add"
+      ],
+      "target_live_files": [
+        "data/manual_conversions.csv"
+      ],
+      "external_effect": false
+    },
+    {
+      "source_surface": "LINE 客服手動分桶 / lead qualification aggregate",
+      "total": 6,
+      "filled": 0,
+      "pending": 6,
+      "p0_pending": 0,
+      "completion_rate": 0,
+      "event_types": [
+        "lead_submit"
+      ],
+      "target_live_files": [
+        "data/manual_conversions.csv"
+      ],
+      "external_effect": false
+    },
+    {
+      "source_surface": "owner-confirmed aggregate deal log",
+      "total": 6,
+      "filled": 0,
+      "pending": 6,
+      "p0_pending": 0,
+      "completion_rate": 0,
+      "event_types": [
+        "deal"
+      ],
+      "target_live_files": [
+        "data/manual_conversions.csv"
+      ],
+      "external_effect": false
+    },
+    {
+      "source_surface": "LINE 客服手動分桶 / quality aggregate",
+      "total": 6,
+      "filled": 0,
+      "pending": 6,
+      "p0_pending": 0,
+      "completion_rate": 0,
+      "event_types": [
+        "quality_flag"
+      ],
+      "target_live_files": [
+        "data/manual_conversions.csv"
+      ],
+      "external_effect": false
+    }
+  ],
+  "next_owner_inputs": [
+    {
+      "tracking_link_id": "track-champion-3q-line-v0",
+      "role": "champion",
+      "event_type": "page_view",
+      "stage_label": "落地頁瀏覽",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "target_live_file": "data/funnel_aggregates.csv",
+      "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+      "required_fields": [
+        "capture_date",
+        "aggregate_count",
+        "evidence_ref",
+        "reviewer",
+        "pii_checked"
+      ],
+      "evidence_rule": "只記 aggregate page views；不要存 IP、User-Agent、個人識別。",
+      "external_effect": false
+    },
+    {
+      "tracking_link_id": "track-champion-3q-line-v0",
+      "role": "champion",
+      "event_type": "cta_click",
+      "stage_label": "CTA 點擊",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "target_live_file": "data/funnel_aggregates.csv",
+      "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+      "required_fields": [
+        "capture_date",
+        "aggregate_count",
+        "evidence_ref",
+        "reviewer",
+        "pii_checked"
+      ],
+      "evidence_rule": "只記 aggregate CTA clicks；不要存個別 session 明細。",
+      "external_effect": false
+    },
+    {
+      "tracking_link_id": "track-champion-3q-line-v0",
+      "role": "champion",
+      "event_type": "line_add",
+      "stage_label": "LINE 進線 / 加好友",
+      "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+      "target_live_file": "data/manual_conversions.csv",
+      "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+      "required_fields": [
+        "capture_date",
+        "aggregate_count",
+        "evidence_ref",
+        "reviewer",
+        "pii_checked"
+      ],
+      "evidence_rule": "只記新增數或進線數；不要貼 LINE user id、暱稱、聊天內容。",
+      "external_effect": false
+    },
+    {
+      "tracking_link_id": "track-challenger-week0-cta-text-v1",
+      "role": "challenger",
+      "event_type": "page_view",
+      "stage_label": "落地頁瀏覽",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "target_live_file": "data/funnel_aggregates.csv",
+      "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+      "required_fields": [
+        "capture_date",
+        "aggregate_count",
+        "evidence_ref",
+        "reviewer",
+        "pii_checked"
+      ],
+      "evidence_rule": "只記 aggregate page views；不要存 IP、User-Agent、個人識別。",
+      "external_effect": false
+    },
+    {
+      "tracking_link_id": "track-challenger-week0-cta-text-v1",
+      "role": "challenger",
+      "event_type": "cta_click",
+      "stage_label": "CTA 點擊",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "target_live_file": "data/funnel_aggregates.csv",
+      "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+      "required_fields": [
+        "capture_date",
+        "aggregate_count",
+        "evidence_ref",
+        "reviewer",
+        "pii_checked"
+      ],
+      "evidence_rule": "只記 aggregate CTA clicks；不要存個別 session 明細。",
+      "external_effect": false
+    },
+    {
+      "tracking_link_id": "track-challenger-week0-cta-text-v1",
+      "role": "challenger",
+      "event_type": "line_add",
+      "stage_label": "LINE 進線 / 加好友",
+      "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+      "target_live_file": "data/manual_conversions.csv",
+      "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+      "required_fields": [
+        "capture_date",
+        "aggregate_count",
+        "evidence_ref",
+        "reviewer",
+        "pii_checked"
+      ],
+      "evidence_rule": "只記新增數或進線數；不要貼 LINE user id、暱稱、聊天內容。",
+      "external_effect": false
+    },
+    {
+      "tracking_link_id": "track-challenger-week0-cta-text-v1-line",
+      "role": "line_cta",
+      "event_type": "page_view",
+      "stage_label": "落地頁瀏覽",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "target_live_file": "data/funnel_aggregates.csv",
+      "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+      "required_fields": [
+        "capture_date",
+        "aggregate_count",
+        "evidence_ref",
+        "reviewer",
+        "pii_checked"
+      ],
+      "evidence_rule": "只記 aggregate page views；不要存 IP、User-Agent、個人識別。",
+      "external_effect": false
+    },
+    {
+      "tracking_link_id": "track-challenger-week0-cta-text-v1-line",
+      "role": "line_cta",
+      "event_type": "cta_click",
+      "stage_label": "CTA 點擊",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "target_live_file": "data/funnel_aggregates.csv",
+      "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+      "required_fields": [
+        "capture_date",
+        "aggregate_count",
+        "evidence_ref",
+        "reviewer",
+        "pii_checked"
+      ],
+      "evidence_rule": "只記 aggregate CTA clicks；不要存個別 session 明細。",
+      "external_effect": false
+    },
+    {
+      "tracking_link_id": "track-challenger-week0-cta-text-v1-line",
+      "role": "line_cta",
+      "event_type": "line_add",
+      "stage_label": "LINE 進線 / 加好友",
+      "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+      "target_live_file": "data/manual_conversions.csv",
+      "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+      "required_fields": [
+        "capture_date",
+        "aggregate_count",
+        "evidence_ref",
+        "reviewer",
+        "pii_checked"
+      ],
+      "evidence_rule": "只記新增數或進線數；不要貼 LINE user id、暱稱、聊天內容。",
+      "external_effect": false
+    }
+  ],
+  "fallback_owner_inputs": [],
+  "owner_paths": {
+    "progress_report": "data_collection_progress.md",
+    "progress_json": "data_collection_progress.json",
+    "progress_status": "data/data_collection_progress_status.json",
+    "sample_gate_form": "sample_gate_owner_form.html",
+    "sample_gate_worksheet": "sample_gate_owner_worksheet.md",
+    "source_capture_ledger_template": "data/source_capture/source_capture_ledger.fill-template.csv",
+    "source_capture_ledger_filled": "data/source_capture/source_capture_ledger.filled.csv",
+    "sample_gate_ledger_template": "data/source_capture/sample_gate_ledger.fill-template.csv",
+    "sample_gate_ledger_filled": "data/source_capture/sample_gate_ledger.filled.csv"
+  },
+  "safety_rules": [
+    "Aggregate counts only.",
+    "Do not paste phone, email, LINE user ID, customer name, chat text, payment data, private notes, order IDs, refund details, or customer-level exports.",
+    "Evidence refs should be local screenshot/export references or source labels, not raw customer rows.",
+    "This progress check reads local artifacts only; it does not create live CSVs, append data/lp_events.jsonl, deploy, post, push LINE, change public links, mutate customer data, process payments, push GitHub, create PRs, or delete data."
+  ],
+  "real_events_before": 0,
+  "real_events_after": 0,
+  "real_events_unchanged": true,
+  "live_input_files_created": false,
+  "data_lp_events_write_performed": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "external_effect": false
+}

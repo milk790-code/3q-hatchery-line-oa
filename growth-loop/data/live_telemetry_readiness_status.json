@@ -1,0 +1,82 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:47:40.780Z",
+  "mode": "live_telemetry_chain_readiness",
+  "status": "live_chain_observed_owner_provenance_and_schema_evidence_required",
+  "snapshot_checked_at": "2026-07-10T21:43:37.059Z",
+  "live_refresh": {
+    "requested": false,
+    "ok": false,
+    "error": null
+  },
+  "candidate_worker": {
+    "name": "3q-growth-loop-candidate",
+    "expected_origin": "https://3q-growth-loop-candidate.milk790.workers.dev",
+    "deployment_observed": true,
+    "deployment_id": "5073984b-bcc0-40f1-a331-daaadd741071",
+    "version_id": "133d27b0-36e5-41e8-96ec-b55925b7b30a",
+    "deployed_at": "2026-07-10T14:07:46.119142Z",
+    "health_ok": true,
+    "security_contract": "origin-pii-v2",
+    "expected_security_contract": "origin-pii-v2",
+    "security_contract_ok": true,
+    "page_ok": true,
+    "operation_mode": "verify_existing_candidate_deployment",
+    "deploy_required": false,
+    "redeploy_required": false,
+    "owner_provenance_evidence_valid": false
+  },
+  "champion": {
+    "worker_name": "3q-site",
+    "live_origin": "https://3q-site.milk790.workers.dev",
+    "page_ok": true,
+    "collector_configured": true,
+    "observed_collector_origin": "https://3q-growth-loop-candidate.milk790.workers.dev",
+    "collector_origin_matches": true,
+    "page_view_marker": true,
+    "cta_click_marker": true,
+    "line_add_marker": false,
+    "privacy_event_contract_ok": true
+  },
+  "d1": {
+    "database_name": "3q-growth-loop-candidate",
+    "database_id": "deb85e19-95fd-4611-8710-9cb6ea6dc7ff",
+    "exact_target_ready": true,
+    "inventory_reported_num_tables": 0,
+    "inventory_reported_file_size": 90112,
+    "inventory_table_count_authoritative": false,
+    "schema_absence_inferred_from_inventory": false,
+    "schema_evidence_valid": false,
+    "recurring_aggregate_read_approved": false
+  },
+  "decisions": {
+    "observed_live_chain_ready_for_owner_evidence": true,
+    "live_ingest_readiness_proven": false,
+    "weekly_aggregate_read_authorized": false,
+    "candidate_worker_deploy_required": false,
+    "candidate_worker_redeploy_required": false,
+    "next_safe_action": "The live collector chain is observed. Verify existing Candidate Worker provenance and remote schema through the owner gate; do not redeploy or infer schema state from metadata."
+  },
+  "outputs": {
+    "status": "data/live_telemetry_readiness_status.json",
+    "report": "live_telemetry_readiness.md",
+    "snapshot": "data/live_telemetry_observation_snapshot.json"
+  },
+  "external_read_performed": false,
+  "remote_table_query_performed": false,
+  "raw_event_rows_read_performed": false,
+  "customer_data_read_performed": false,
+  "data_lp_events_write_performed": false,
+  "event_post_performed": false,
+  "external_effect": false,
+  "remote_d1_migration_performed": false,
+  "production_deploy_performed": false,
+  "public_link_change_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Read-only metadata and public GET observation. A shallow health 200 or D1 inventory num_tables value never proves remote schema readiness; owner evidence remains required."
+}

@@ -1,0 +1,955 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:47:33.755Z",
+  "mode": "post_gate_verification_fixture_dry_run",
+  "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB",
+  "scenario_count": 9,
+  "local_fixture_commands_executed": true,
+  "owner_gate_evidence_fixture_executed": true,
+  "post_gate_verification_fixture_executed": true,
+  "execution_performed": false,
+  "external_effect": false,
+  "remote_d1_create_performed": false,
+  "remote_d1_migration_performed": false,
+  "production_deploy_performed": false,
+  "public_link_change_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "scenarios": [
+    {
+      "id": "waiting_for_owner_evidence_stays_plan_only",
+      "ok": true,
+      "owner_evidence_command": "node scripts/owner-gate-evidence.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/waiting_for_owner_evidence_stays_plan_only/owner_gate_evidence.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/waiting_for_owner_evidence_stays_plan_only/owner_gate_evidence_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/waiting_for_owner_evidence_stays_plan_only/owner_gate_evidence.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/waiting_for_owner_evidence_stays_plan_only/owner_gate_evidence.example.json",
+      "post_gate_command": "node scripts/post-gate-verification.mjs --owner-evidence=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/waiting_for_owner_evidence_stays_plan_only/owner_gate_evidence_status.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/waiting_for_owner_evidence_stays_plan_only/post_gate_verification_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/waiting_for_owner_evidence_stays_plan_only/post_gate_verification.md",
+      "owner_evidence_exit_code": 0,
+      "post_gate_exit_code": 0,
+      "owner_evidence_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/waiting_for_owner_evidence_stays_plan_only/owner_gate_evidence_status.json",
+      "post_gate_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/waiting_for_owner_evidence_stays_plan_only/post_gate_verification_status.json",
+      "post_gate_report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/waiting_for_owner_evidence_stays_plan_only/post_gate_verification.md",
+      "owner_evidence_status": "waiting_for_owner_evidence",
+      "post_gate_status": "waiting_for_owner_evidence",
+      "ready_gate_count": 0,
+      "non_manual_gate_count": 4,
+      "no_network_read_performed": true,
+      "no_remote_cli_performed": true,
+      "no_actual_evidence_values_persisted": true,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": false,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate."
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+            "remote_d1_evidence_ready:remote D1 evidence must be ready before Worker post-gate verification"
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+            "candidate_worker_evidence_ready:candidate Worker evidence must be ready before public A/B verification"
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate."
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "manual_only": true,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "manual_only_no_automation",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+            "manual_only_acknowledged_by_policy:formal posts, LINE push, payment, customer data, and deletion remain outside automation",
+            "manual_only_gate_no_automated_post_verification"
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        }
+      ]
+    },
+    {
+      "id": "remote_d1_evidence_ready_only",
+      "ok": true,
+      "owner_evidence_command": "node scripts/owner-gate-evidence.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/remote_d1_evidence_ready_only/owner_gate_evidence.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/remote_d1_evidence_ready_only/owner_gate_evidence_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/remote_d1_evidence_ready_only/owner_gate_evidence.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/remote_d1_evidence_ready_only/owner_gate_evidence.example.json",
+      "post_gate_command": "node scripts/post-gate-verification.mjs --owner-evidence=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/remote_d1_evidence_ready_only/owner_gate_evidence_status.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/remote_d1_evidence_ready_only/post_gate_verification_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/remote_d1_evidence_ready_only/post_gate_verification.md",
+      "owner_evidence_exit_code": 0,
+      "post_gate_exit_code": 0,
+      "owner_evidence_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/remote_d1_evidence_ready_only/owner_gate_evidence_status.json",
+      "post_gate_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/remote_d1_evidence_ready_only/post_gate_verification_status.json",
+      "post_gate_report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/remote_d1_evidence_ready_only/post_gate_verification.md",
+      "owner_evidence_status": "partial_owner_evidence_validated",
+      "post_gate_status": "partial_post_gate_verification_plan_ready",
+      "ready_gate_count": 1,
+      "non_manual_gate_count": 4,
+      "no_network_read_performed": true,
+      "no_remote_cli_performed": true,
+      "no_actual_evidence_values_persisted": true,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "manual_only": false,
+          "owner_evidence_detected": true,
+          "owner_evidence_valid": true,
+          "recurring_aggregate_read_approved": true,
+          "post_gate_verification_ready": true,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": true,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate."
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+            "candidate_worker_evidence_ready:candidate Worker evidence must be ready before public A/B verification"
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate."
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "manual_only": true,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "manual_only_no_automation",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+            "manual_only_acknowledged_by_policy:formal posts, LINE push, payment, customer data, and deletion remain outside automation",
+            "manual_only_gate_no_automated_post_verification"
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        }
+      ]
+    },
+    {
+      "id": "remote_d1_without_recurring_read_approval_allows_schema_plan_only",
+      "ok": true,
+      "owner_evidence_command": "node scripts/owner-gate-evidence.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/remote_d1_without_recurring_read_approval_allows_schema_plan_only/owner_gate_evidence.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/remote_d1_without_recurring_read_approval_allows_schema_plan_only/owner_gate_evidence_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/remote_d1_without_recurring_read_approval_allows_schema_plan_only/owner_gate_evidence.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/remote_d1_without_recurring_read_approval_allows_schema_plan_only/owner_gate_evidence.example.json",
+      "post_gate_command": "node scripts/post-gate-verification.mjs --owner-evidence=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/remote_d1_without_recurring_read_approval_allows_schema_plan_only/owner_gate_evidence_status.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/remote_d1_without_recurring_read_approval_allows_schema_plan_only/post_gate_verification_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/remote_d1_without_recurring_read_approval_allows_schema_plan_only/post_gate_verification.md",
+      "owner_evidence_exit_code": 0,
+      "post_gate_exit_code": 0,
+      "owner_evidence_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/remote_d1_without_recurring_read_approval_allows_schema_plan_only/owner_gate_evidence_status.json",
+      "post_gate_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/remote_d1_without_recurring_read_approval_allows_schema_plan_only/post_gate_verification_status.json",
+      "post_gate_report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/remote_d1_without_recurring_read_approval_allows_schema_plan_only/post_gate_verification.md",
+      "owner_evidence_status": "partial_owner_evidence_validated",
+      "post_gate_status": "partial_post_gate_verification_plan_ready",
+      "ready_gate_count": 1,
+      "non_manual_gate_count": 4,
+      "no_network_read_performed": true,
+      "no_remote_cli_performed": true,
+      "no_actual_evidence_values_persisted": true,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "manual_only": false,
+          "owner_evidence_detected": true,
+          "owner_evidence_valid": true,
+          "recurring_aggregate_read_approved": false,
+          "post_gate_verification_ready": true,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": true,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate."
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+            "candidate_worker_evidence_ready:candidate Worker evidence must be ready before public A/B verification"
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate."
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "manual_only": true,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "manual_only_no_automation",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+            "manual_only_acknowledged_by_policy:formal posts, LINE push, payment, customer data, and deletion remain outside automation",
+            "manual_only_gate_no_automated_post_verification"
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        }
+      ]
+    },
+    {
+      "id": "worker_evidence_requires_remote_d1_ready",
+      "ok": true,
+      "owner_evidence_command": "node scripts/owner-gate-evidence.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/worker_evidence_requires_remote_d1_ready/owner_gate_evidence.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/worker_evidence_requires_remote_d1_ready/owner_gate_evidence_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/worker_evidence_requires_remote_d1_ready/owner_gate_evidence.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/worker_evidence_requires_remote_d1_ready/owner_gate_evidence.example.json",
+      "post_gate_command": "node scripts/post-gate-verification.mjs --owner-evidence=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/worker_evidence_requires_remote_d1_ready/owner_gate_evidence_status.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/worker_evidence_requires_remote_d1_ready/post_gate_verification_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/worker_evidence_requires_remote_d1_ready/post_gate_verification.md",
+      "owner_evidence_exit_code": 0,
+      "post_gate_exit_code": 0,
+      "owner_evidence_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/worker_evidence_requires_remote_d1_ready/owner_gate_evidence_status.json",
+      "post_gate_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/worker_evidence_requires_remote_d1_ready/post_gate_verification_status.json",
+      "post_gate_report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/worker_evidence_requires_remote_d1_ready/post_gate_verification.md",
+      "owner_evidence_status": "partial_owner_evidence_validated",
+      "post_gate_status": "owner_evidence_detected_no_post_gate_verification_ready",
+      "ready_gate_count": 0,
+      "non_manual_gate_count": 4,
+      "no_network_read_performed": true,
+      "no_remote_cli_performed": true,
+      "no_actual_evidence_values_persisted": true,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": false,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate."
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "manual_only": false,
+          "owner_evidence_detected": true,
+          "owner_evidence_valid": true,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "remote_d1_evidence_ready:remote D1 evidence must be ready before Worker post-gate verification"
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate."
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate."
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "manual_only": true,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "manual_only_no_automation",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+            "manual_only_acknowledged_by_policy:formal posts, LINE push, payment, customer data, and deletion remain outside automation",
+            "manual_only_gate_no_automated_post_verification"
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        }
+      ]
+    },
+    {
+      "id": "public_ab_requires_worker_evidence_ready",
+      "ok": true,
+      "owner_evidence_command": "node scripts/owner-gate-evidence.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/public_ab_requires_worker_evidence_ready/owner_gate_evidence.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/public_ab_requires_worker_evidence_ready/owner_gate_evidence_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/public_ab_requires_worker_evidence_ready/owner_gate_evidence.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/public_ab_requires_worker_evidence_ready/owner_gate_evidence.example.json",
+      "post_gate_command": "node scripts/post-gate-verification.mjs --owner-evidence=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/public_ab_requires_worker_evidence_ready/owner_gate_evidence_status.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/public_ab_requires_worker_evidence_ready/post_gate_verification_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/public_ab_requires_worker_evidence_ready/post_gate_verification.md",
+      "owner_evidence_exit_code": 0,
+      "post_gate_exit_code": 0,
+      "owner_evidence_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/public_ab_requires_worker_evidence_ready/owner_gate_evidence_status.json",
+      "post_gate_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/public_ab_requires_worker_evidence_ready/post_gate_verification_status.json",
+      "post_gate_report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/public_ab_requires_worker_evidence_ready/post_gate_verification.md",
+      "owner_evidence_status": "partial_owner_evidence_validated",
+      "post_gate_status": "partial_post_gate_verification_plan_ready",
+      "ready_gate_count": 1,
+      "non_manual_gate_count": 4,
+      "no_network_read_performed": true,
+      "no_remote_cli_performed": true,
+      "no_actual_evidence_values_persisted": true,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "manual_only": false,
+          "owner_evidence_detected": true,
+          "owner_evidence_valid": true,
+          "recurring_aggregate_read_approved": true,
+          "post_gate_verification_ready": true,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": true,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate."
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "manual_only": false,
+          "owner_evidence_detected": true,
+          "owner_evidence_valid": true,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "candidate_worker_evidence_ready:candidate Worker evidence must be ready before public A/B verification"
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate."
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "manual_only": true,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "manual_only_no_automation",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+            "manual_only_acknowledged_by_policy:formal posts, LINE push, payment, customer data, and deletion remain outside automation",
+            "manual_only_gate_no_automated_post_verification"
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        }
+      ]
+    },
+    {
+      "id": "github_evidence_ready_plan_only",
+      "ok": true,
+      "owner_evidence_command": "node scripts/owner-gate-evidence.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/github_evidence_ready_plan_only/owner_gate_evidence.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/github_evidence_ready_plan_only/owner_gate_evidence_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/github_evidence_ready_plan_only/owner_gate_evidence.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/github_evidence_ready_plan_only/owner_gate_evidence.example.json",
+      "post_gate_command": "node scripts/post-gate-verification.mjs --owner-evidence=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/github_evidence_ready_plan_only/owner_gate_evidence_status.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/github_evidence_ready_plan_only/post_gate_verification_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/github_evidence_ready_plan_only/post_gate_verification.md",
+      "owner_evidence_exit_code": 0,
+      "post_gate_exit_code": 0,
+      "owner_evidence_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/github_evidence_ready_plan_only/owner_gate_evidence_status.json",
+      "post_gate_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/github_evidence_ready_plan_only/post_gate_verification_status.json",
+      "post_gate_report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/github_evidence_ready_plan_only/post_gate_verification.md",
+      "owner_evidence_status": "partial_owner_evidence_validated",
+      "post_gate_status": "partial_post_gate_verification_plan_ready",
+      "ready_gate_count": 1,
+      "non_manual_gate_count": 4,
+      "no_network_read_performed": true,
+      "no_remote_cli_performed": true,
+      "no_actual_evidence_values_persisted": true,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": false,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate."
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+            "remote_d1_evidence_ready:remote D1 evidence must be ready before Worker post-gate verification"
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+            "candidate_worker_evidence_ready:candidate Worker evidence must be ready before public A/B verification"
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "manual_only": false,
+          "owner_evidence_detected": true,
+          "owner_evidence_valid": true,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": true,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": true,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "manual_only": true,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "manual_only_no_automation",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+            "manual_only_acknowledged_by_policy:formal posts, LINE push, payment, customer data, and deletion remain outside automation",
+            "manual_only_gate_no_automated_post_verification"
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        }
+      ]
+    },
+    {
+      "id": "all_non_manual_evidence_ready_plan_only",
+      "ok": true,
+      "owner_evidence_command": "node scripts/owner-gate-evidence.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/all_non_manual_evidence_ready_plan_only/owner_gate_evidence.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/all_non_manual_evidence_ready_plan_only/owner_gate_evidence_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/all_non_manual_evidence_ready_plan_only/owner_gate_evidence.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/all_non_manual_evidence_ready_plan_only/owner_gate_evidence.example.json",
+      "post_gate_command": "node scripts/post-gate-verification.mjs --owner-evidence=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/all_non_manual_evidence_ready_plan_only/owner_gate_evidence_status.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/all_non_manual_evidence_ready_plan_only/post_gate_verification_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/all_non_manual_evidence_ready_plan_only/post_gate_verification.md",
+      "owner_evidence_exit_code": 0,
+      "post_gate_exit_code": 0,
+      "owner_evidence_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/all_non_manual_evidence_ready_plan_only/owner_gate_evidence_status.json",
+      "post_gate_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/all_non_manual_evidence_ready_plan_only/post_gate_verification_status.json",
+      "post_gate_report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/all_non_manual_evidence_ready_plan_only/post_gate_verification.md",
+      "owner_evidence_status": "owner_evidence_validated_ready_for_post_gate_verification",
+      "post_gate_status": "post_gate_verification_plan_ready",
+      "ready_gate_count": 4,
+      "non_manual_gate_count": 4,
+      "no_network_read_performed": true,
+      "no_remote_cli_performed": true,
+      "no_actual_evidence_values_persisted": true,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "manual_only": false,
+          "owner_evidence_detected": true,
+          "owner_evidence_valid": true,
+          "recurring_aggregate_read_approved": true,
+          "post_gate_verification_ready": true,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": true,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "manual_only": false,
+          "owner_evidence_detected": true,
+          "owner_evidence_valid": true,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": true,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": true,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "manual_only": false,
+          "owner_evidence_detected": true,
+          "owner_evidence_valid": true,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": true,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": true,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "manual_only": false,
+          "owner_evidence_detected": true,
+          "owner_evidence_valid": true,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": true,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": true,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "manual_only": true,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "manual_only_no_automation",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+            "manual_only_acknowledged_by_policy:formal posts, LINE push, payment, customer data, and deletion remain outside automation",
+            "manual_only_gate_no_automated_post_verification"
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        }
+      ]
+    },
+    {
+      "id": "manual_only_acknowledgement_never_opens_post_gate",
+      "ok": true,
+      "owner_evidence_command": "node scripts/owner-gate-evidence.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/manual_only_acknowledgement_never_opens_post_gate/owner_gate_evidence.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/manual_only_acknowledgement_never_opens_post_gate/owner_gate_evidence_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/manual_only_acknowledgement_never_opens_post_gate/owner_gate_evidence.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/manual_only_acknowledgement_never_opens_post_gate/owner_gate_evidence.example.json",
+      "post_gate_command": "node scripts/post-gate-verification.mjs --owner-evidence=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/manual_only_acknowledgement_never_opens_post_gate/owner_gate_evidence_status.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/manual_only_acknowledgement_never_opens_post_gate/post_gate_verification_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/manual_only_acknowledgement_never_opens_post_gate/post_gate_verification.md",
+      "owner_evidence_exit_code": 0,
+      "post_gate_exit_code": 0,
+      "owner_evidence_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/manual_only_acknowledgement_never_opens_post_gate/owner_gate_evidence_status.json",
+      "post_gate_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/manual_only_acknowledgement_never_opens_post_gate/post_gate_verification_status.json",
+      "post_gate_report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/manual_only_acknowledgement_never_opens_post_gate/post_gate_verification.md",
+      "owner_evidence_status": "owner_evidence_detected_no_gate_ready",
+      "post_gate_status": "owner_evidence_detected_no_post_gate_verification_ready",
+      "ready_gate_count": 0,
+      "non_manual_gate_count": 4,
+      "no_network_read_performed": true,
+      "no_remote_cli_performed": true,
+      "no_actual_evidence_values_persisted": true,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": false,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate."
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+            "remote_d1_evidence_ready:remote D1 evidence must be ready before Worker post-gate verification"
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+            "candidate_worker_evidence_ready:candidate Worker evidence must be ready before public A/B verification"
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate."
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "manual_only": true,
+          "owner_evidence_detected": true,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "manual_only_no_automation",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_evidence_detected_no_gate_ready",
+            "manual_only_acknowledged_by_policy:formal posts, LINE push, payment, customer data, and deletion remain outside automation",
+            "manual_only_gate_no_automated_post_verification"
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        }
+      ]
+    },
+    {
+      "id": "invalid_owner_evidence_blocks_post_verify",
+      "ok": true,
+      "owner_evidence_command": "node scripts/owner-gate-evidence.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/invalid_owner_evidence_blocks_post_verify/owner_gate_evidence.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/invalid_owner_evidence_blocks_post_verify/owner_gate_evidence_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/invalid_owner_evidence_blocks_post_verify/owner_gate_evidence.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/invalid_owner_evidence_blocks_post_verify/owner_gate_evidence.example.json",
+      "post_gate_command": "node scripts/post-gate-verification.mjs --owner-evidence=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/invalid_owner_evidence_blocks_post_verify/owner_gate_evidence_status.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/invalid_owner_evidence_blocks_post_verify/post_gate_verification_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/invalid_owner_evidence_blocks_post_verify/post_gate_verification.md",
+      "owner_evidence_exit_code": 1,
+      "post_gate_exit_code": 1,
+      "owner_evidence_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/invalid_owner_evidence_blocks_post_verify/owner_gate_evidence_status.json",
+      "post_gate_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/invalid_owner_evidence_blocks_post_verify/post_gate_verification_status.json",
+      "post_gate_report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-post-gate-fixtures-Muh4lB/invalid_owner_evidence_blocks_post_verify/post_gate_verification.md",
+      "owner_evidence_status": "blocked_invalid_owner_evidence",
+      "post_gate_status": "blocked_invalid_owner_evidence",
+      "ready_gate_count": 0,
+      "non_manual_gate_count": 4,
+      "no_network_read_performed": true,
+      "no_remote_cli_performed": true,
+      "no_actual_evidence_values_persisted": true,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": false,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate."
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "manual_only": false,
+          "owner_evidence_detected": true,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:unknown_fields=customer_email",
+            "remote_d1_evidence_ready:remote D1 evidence must be ready before Worker post-gate verification"
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+            "candidate_worker_evidence_ready:candidate Worker evidence must be ready before public A/B verification"
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "manual_only": false,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate."
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "manual_only": true,
+          "owner_evidence_detected": false,
+          "owner_evidence_valid": false,
+          "recurring_aggregate_read_approved": null,
+          "post_gate_verification_ready": false,
+          "safe_to_run_automatically": false,
+          "read_only_followup_required": false,
+          "execution_policy": "manual_only_no_automation",
+          "blocked_reasons": [
+            "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+            "manual_only_acknowledged_by_policy:formal posts, LINE push, payment, customer data, and deletion remain outside automation",
+            "manual_only_gate_no_automated_post_verification"
+          ],
+          "external_effect": false,
+          "execution_performed": false
+        }
+      ]
+    }
+  ],
+  "note": "Fixture-only post-gate verification contract. It uses temporary owner evidence statuses and never performs network reads, remote CLI, deploy, GitHub writes, public link changes, LINE actions, payments, customer-data mutation, or deletion."
+}

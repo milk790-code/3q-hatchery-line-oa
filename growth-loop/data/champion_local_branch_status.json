@@ -1,0 +1,106 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:46:53.679Z",
+  "mode": "champion_local_feature_branch_review",
+  "status": "integration_already_merged_at_source_lock",
+  "source_lock": {
+    "repository": "milk790-code/3q-hatchery-line-oa",
+    "repo_path": "/Users/mac/Documents/GitHub/3q-hatchery-line-oa",
+    "commit": "f86faa7356ac7962d9b429951b67c742370271c0",
+    "source_path": "workers/3q-site/worker.js",
+    "origin_main_commit": "f86faa7356ac7962d9b429951b67c742370271c0",
+    "integration_already_merged": true
+  },
+  "local_branch": {
+    "name": "codex/3q-growth-loop-champion-v1",
+    "commit": "9b6fd00c082f2b67d6cde159e61dc6c407d02ea0",
+    "parent_commit": "355981c978bdb1c93a29bb89ae700fda7b41cac0",
+    "commit_subject": "fix(3q-site): reject international phone-like attribution",
+    "source_lock_base_commit": "f86faa7356ac7962d9b429951b67c742370271c0",
+    "worker_commit": null,
+    "worker_commit_parent": null,
+    "worker_hardening_commits": [],
+    "workflow_commit": null,
+    "commit_count": 0,
+    "commits": [],
+    "worktree": "/Users/mac/Documents/Codex/control-center/worktrees/3q-site-growth-loop-champion-v1",
+    "changed_paths": [
+      ".github/workflows/deploy-3q-line-oa.yml",
+      ".github/workflows/deploy-fleet-sentinel.yml",
+      ".github/workflows/deploy-pop-line-oa.yml",
+      ".github/workflows/deploy-tudigong.yml",
+      "brands/popmonster.json",
+      "workers/3q-line-oa/worker.js",
+      "workers/fleet-sentinel/worker.js",
+      "workers/outreach/worker.js",
+      "workers/pop-line-oa/worker.js",
+      "workers/pop-sales-ai/worker.js",
+      "workers/sales-ai/worker.js",
+      "workers/tudigong-sales-ai/worker.js",
+      "workers/tudigong/worker.js"
+    ],
+    "committed_source_sha256": "d63f07cc8f6fe0944cf9c7279eb4ed2abe4b3b6e1e7d05c4cd87425beb26542a",
+    "candidate_sha256": "d63f07cc8f6fe0944cf9c7279eb4ed2abe4b3b6e1e7d05c4cd87425beb26542a"
+  },
+  "checks": {
+    "branch_present": true,
+    "worktree_registered": true,
+    "worktree_branch_matches": true,
+    "branch_descends_from_source_lock": true,
+    "commit_stack_scoped": true,
+    "no_merge_commits": true,
+    "worker_commit_parent_matches_source_lock": true,
+    "committed_source_matches_candidate": true,
+    "changed_paths_scoped": true,
+    "worker_commit_subject_matches": true,
+    "deployment_workflow_change_valid": true,
+    "worktree_clean": true,
+    "source_working_tree_unchanged": true,
+    "remote_branch_matches_reviewed_history": true
+  },
+  "actions_this_run": {
+    "prepare_requested": false,
+    "branch_created": false,
+    "worktree_created": false,
+    "local_commit_created": false
+  },
+  "remote_observation": {
+    "checked_at": "2026-07-10T14:12:29.298Z",
+    "branch_present": true,
+    "commit": "9b6fd00c082f2b67d6cde159e61dc6c407d02ea0",
+    "read_performed": true,
+    "state": "up_to_date_with_local",
+    "local_ahead_count": 0
+  },
+  "source_status_before": [
+    "?? .wrangler/",
+    "?? luxury-line-oa/.wrangler/",
+    "?? webhook/.wrangler/",
+    "?? workers/social-publisher/.wrangler/"
+  ],
+  "source_status_after": [
+    "?? .wrangler/",
+    "?? luxury-line-oa/.wrangler/",
+    "?? webhook/.wrangler/",
+    "?? workers/social-publisher/.wrangler/"
+  ],
+  "outputs": {
+    "report": "champion_local_branch.md",
+    "status": "data/champion_local_branch_status.json"
+  },
+  "external_read_performed": false,
+  "external_github_write_observed_before_this_run": true,
+  "local_git_metadata_write_performed": false,
+  "local_commit_performed": false,
+  "git_push_performed": false,
+  "github_push_or_pr_performed": false,
+  "external_effect": false,
+  "data_lp_events_write_performed": false,
+  "production_deploy_performed": false,
+  "public_link_change_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

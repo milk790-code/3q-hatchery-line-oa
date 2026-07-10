@@ -1,0 +1,726 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:45:22.659Z",
+  "mode": "sample_gate_owner_form_fixture_dry_run",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/sample_gate_owner_form_fixture_status.json",
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/sample_gate_owner_form_fixture_report.md",
+  "template_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/source_capture/sample_gate_ledger.fill-template.csv",
+  "form_status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/sample_gate_owner_form_status.json",
+  "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-owner-form-fixtures-n5st4a",
+  "template_rows": 18,
+  "form_status": "ready_local_browser_fill",
+  "form_download_filename": "sample_gate_ledger.filled.csv",
+  "scenario_count": 3,
+  "scenario_ids": [
+    "form_export_sample_insufficient_keeps_collecting",
+    "form_export_ready_queues_owner_review",
+    "form_export_sensitive_evidence_blocked"
+  ],
+  "scenarios": [
+    {
+      "id": "form_export_sample_insufficient_keeps_collecting",
+      "ok": true,
+      "description": "A browser-downloaded CSV fills every row, but challenger visits stay under min_visits, so the champion and current variable remain unchanged.",
+      "expected": {
+        "compileExit": 0,
+        "compileStatus": "owner_preview_ready",
+        "ownerExit": 0,
+        "ownerStatus": "sample_insufficient_keep_champion",
+        "ownerDecision": "continue_collecting_sample_gate_counts",
+        "sample_threshold_met": false,
+        "sample_rate_win_candidate": false,
+        "owner_review_required": false
+      },
+      "assertions": [
+        {
+          "name": "compile_exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "compile_status_written",
+          "ok": true,
+          "expected": "compile status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "compile_status",
+          "ok": true,
+          "expected": "owner_preview_ready",
+          "actual": "owner_preview_ready",
+          "external_effect": false
+        },
+        {
+          "name": "owner_exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "owner_status_written",
+          "ok": true,
+          "expected": "owner compact status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "owner_full_written",
+          "ok": true,
+          "expected": "owner full status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "owner_status",
+          "ok": true,
+          "expected": "sample_insufficient_keep_champion",
+          "actual": "sample_insufficient_keep_champion",
+          "external_effect": false
+        },
+        {
+          "name": "owner_decision",
+          "ok": true,
+          "expected": "continue_collecting_sample_gate_counts",
+          "actual": "continue_collecting_sample_gate_counts",
+          "external_effect": false
+        },
+        {
+          "name": "sample_threshold_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "sample_rate_win_candidate",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "quality_not_evaluated",
+          "ok": true,
+          "expected": "not_evaluated_from_sample_gate",
+          "actual": "not_evaluated_from_sample_gate",
+          "external_effect": false
+        },
+        {
+          "name": "no_final_win_rule",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_promotion",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "compile_no_live_input",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_no_live_input",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "compile_no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "compile_no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "compile_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "owner_ok",
+          "ok": true,
+          "expected": true,
+          "actual": "true:true",
+          "external_effect": false
+        },
+        {
+          "name": "all_rows_filled",
+          "ok": true,
+          "expected": "18:0",
+          "actual": "18:0",
+          "external_effect": false
+        }
+      ],
+      "compile_exit_code": 0,
+      "compile_status": "owner_preview_ready",
+      "compile_ok": true,
+      "compile_issue_count": 0,
+      "compile_filled_rows": 18,
+      "compile_funnel_rows": 13,
+      "compile_manual_rows": 5,
+      "owner_exit_code": 0,
+      "owner_status": "sample_insufficient_keep_champion",
+      "owner_ok": true,
+      "owner_decision": "continue_collecting_sample_gate_counts",
+      "owner_issue_count": 0,
+      "filled_rows": 18,
+      "pending_rows": 0,
+      "sample_threshold_met": false,
+      "sample_rate_win_candidate": false,
+      "challenger_win_rule_met": false,
+      "quality_guard_status": "not_evaluated_from_sample_gate",
+      "owner_review_required": false,
+      "promotion_performed": false,
+      "challenger_gaps": {
+        "visits": 1,
+        "cta_clicks": 0,
+        "line_adds": 0,
+        "test_days": 0
+      },
+      "compile_data_lp_events_write_performed": false,
+      "owner_data_lp_events_write_performed": false,
+      "data_lp_events_write_performed": false,
+      "live_input_files_created": false,
+      "real_event_write_performed": false,
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "production_deploy_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false,
+      "temp_files": {
+        "input_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-owner-form-fixtures-n5st4a/form_export_sample_insufficient_keeps_collecting/sample_gate_ledger.filled.csv",
+        "compile_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-owner-form-fixtures-n5st4a/form_export_sample_insufficient_keeps_collecting/compile_status.json",
+        "compile_report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-owner-form-fixtures-n5st4a/form_export_sample_insufficient_keeps_collecting/compile_report.md",
+        "owner_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-owner-form-fixtures-n5st4a/form_export_sample_insufficient_keeps_collecting/owner_status.compact.json",
+        "owner_json_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-owner-form-fixtures-n5st4a/form_export_sample_insufficient_keeps_collecting/owner_status.json",
+        "owner_report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-owner-form-fixtures-n5st4a/form_export_sample_insufficient_keeps_collecting/owner_report.md"
+      }
+    },
+    {
+      "id": "form_export_ready_queues_owner_review",
+      "ok": true,
+      "description": "A browser-downloaded CSV clears sample thresholds and beats champion rate, but it only queues owner quality review and never promotes.",
+      "expected": {
+        "compileExit": 0,
+        "compileStatus": "owner_preview_ready",
+        "ownerExit": 0,
+        "ownerStatus": "sample_rate_win_needs_quality_review",
+        "ownerDecision": "queue_owner_quality_review_no_auto_promotion",
+        "sample_threshold_met": true,
+        "sample_rate_win_candidate": true,
+        "owner_review_required": true
+      },
+      "assertions": [
+        {
+          "name": "compile_exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "compile_status_written",
+          "ok": true,
+          "expected": "compile status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "compile_status",
+          "ok": true,
+          "expected": "owner_preview_ready",
+          "actual": "owner_preview_ready",
+          "external_effect": false
+        },
+        {
+          "name": "owner_exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "owner_status_written",
+          "ok": true,
+          "expected": "owner compact status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "owner_full_written",
+          "ok": true,
+          "expected": "owner full status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "owner_status",
+          "ok": true,
+          "expected": "sample_rate_win_needs_quality_review",
+          "actual": "sample_rate_win_needs_quality_review",
+          "external_effect": false
+        },
+        {
+          "name": "owner_decision",
+          "ok": true,
+          "expected": "queue_owner_quality_review_no_auto_promotion",
+          "actual": "queue_owner_quality_review_no_auto_promotion",
+          "external_effect": false
+        },
+        {
+          "name": "sample_threshold_met",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "sample_rate_win_candidate",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "quality_not_evaluated",
+          "ok": true,
+          "expected": "not_evaluated_from_sample_gate",
+          "actual": "not_evaluated_from_sample_gate",
+          "external_effect": false
+        },
+        {
+          "name": "no_final_win_rule",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_promotion",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "compile_no_live_input",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_no_live_input",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "compile_no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "compile_no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "compile_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "owner_ok",
+          "ok": true,
+          "expected": true,
+          "actual": "true:true",
+          "external_effect": false
+        },
+        {
+          "name": "all_rows_filled",
+          "ok": true,
+          "expected": "18:0",
+          "actual": "18:0",
+          "external_effect": false
+        }
+      ],
+      "compile_exit_code": 0,
+      "compile_status": "owner_preview_ready",
+      "compile_ok": true,
+      "compile_issue_count": 0,
+      "compile_filled_rows": 18,
+      "compile_funnel_rows": 13,
+      "compile_manual_rows": 5,
+      "owner_exit_code": 0,
+      "owner_status": "sample_rate_win_needs_quality_review",
+      "owner_ok": true,
+      "owner_decision": "queue_owner_quality_review_no_auto_promotion",
+      "owner_issue_count": 0,
+      "filled_rows": 18,
+      "pending_rows": 0,
+      "sample_threshold_met": true,
+      "sample_rate_win_candidate": true,
+      "challenger_win_rule_met": false,
+      "quality_guard_status": "not_evaluated_from_sample_gate",
+      "owner_review_required": true,
+      "promotion_performed": false,
+      "challenger_gaps": {
+        "visits": 0,
+        "cta_clicks": 0,
+        "line_adds": 0,
+        "test_days": 0
+      },
+      "compile_data_lp_events_write_performed": false,
+      "owner_data_lp_events_write_performed": false,
+      "data_lp_events_write_performed": false,
+      "live_input_files_created": false,
+      "real_event_write_performed": false,
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "production_deploy_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false,
+      "temp_files": {
+        "input_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-owner-form-fixtures-n5st4a/form_export_ready_queues_owner_review/sample_gate_ledger.filled.csv",
+        "compile_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-owner-form-fixtures-n5st4a/form_export_ready_queues_owner_review/compile_status.json",
+        "compile_report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-owner-form-fixtures-n5st4a/form_export_ready_queues_owner_review/compile_report.md",
+        "owner_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-owner-form-fixtures-n5st4a/form_export_ready_queues_owner_review/owner_status.compact.json",
+        "owner_json_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-owner-form-fixtures-n5st4a/form_export_ready_queues_owner_review/owner_status.json",
+        "owner_report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-owner-form-fixtures-n5st4a/form_export_ready_queues_owner_review/owner_report.md"
+      }
+    },
+    {
+      "id": "form_export_sensitive_evidence_blocked",
+      "ok": true,
+      "description": "Sensitive-looking evidence in the browser-downloaded CSV blocks both compile and owner sample-gate status.",
+      "expected": {
+        "compileExit": 1,
+        "compileStatus": "blocked_invalid_filled_ledger",
+        "ownerExit": 1,
+        "ownerStatus": "blocked_invalid_owner_sample_gate",
+        "ownerDecision": "fix_owner_sample_gate_ledger",
+        "sample_threshold_met": false,
+        "sample_rate_win_candidate": false,
+        "owner_review_required": false,
+        "issue_count_positive": true
+      },
+      "assertions": [
+        {
+          "name": "compile_exit_code",
+          "ok": true,
+          "expected": 1,
+          "actual": 1,
+          "external_effect": false
+        },
+        {
+          "name": "compile_status_written",
+          "ok": true,
+          "expected": "compile status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "compile_status",
+          "ok": true,
+          "expected": "blocked_invalid_filled_ledger",
+          "actual": "blocked_invalid_filled_ledger",
+          "external_effect": false
+        },
+        {
+          "name": "owner_exit_code",
+          "ok": true,
+          "expected": 1,
+          "actual": 1,
+          "external_effect": false
+        },
+        {
+          "name": "owner_status_written",
+          "ok": true,
+          "expected": "owner compact status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "owner_full_written",
+          "ok": true,
+          "expected": "owner full status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "owner_status",
+          "ok": true,
+          "expected": "blocked_invalid_owner_sample_gate",
+          "actual": "blocked_invalid_owner_sample_gate",
+          "external_effect": false
+        },
+        {
+          "name": "owner_decision",
+          "ok": true,
+          "expected": "fix_owner_sample_gate_ledger",
+          "actual": "fix_owner_sample_gate_ledger",
+          "external_effect": false
+        },
+        {
+          "name": "sample_threshold_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "sample_rate_win_candidate",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "quality_not_evaluated",
+          "ok": true,
+          "expected": "not_evaluated_from_sample_gate",
+          "actual": "not_evaluated_from_sample_gate",
+          "external_effect": false
+        },
+        {
+          "name": "no_final_win_rule",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_promotion",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "compile_no_live_input",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_no_live_input",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "compile_no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "compile_no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "compile_blocked",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_blocked",
+          "ok": true,
+          "expected": false,
+          "actual": "false:false",
+          "external_effect": false
+        },
+        {
+          "name": "compile_issue_count_positive",
+          "ok": true,
+          "expected": ">0",
+          "actual": 18,
+          "external_effect": false
+        },
+        {
+          "name": "owner_issue_count_positive",
+          "ok": true,
+          "expected": ">0",
+          "actual": 18,
+          "external_effect": false
+        }
+      ],
+      "compile_exit_code": 1,
+      "compile_status": "blocked_invalid_filled_ledger",
+      "compile_ok": false,
+      "compile_issue_count": 18,
+      "compile_filled_rows": 0,
+      "compile_funnel_rows": 0,
+      "compile_manual_rows": 0,
+      "owner_exit_code": 1,
+      "owner_status": "blocked_invalid_owner_sample_gate",
+      "owner_ok": false,
+      "owner_decision": "fix_owner_sample_gate_ledger",
+      "owner_issue_count": 18,
+      "filled_rows": 0,
+      "pending_rows": 0,
+      "sample_threshold_met": false,
+      "sample_rate_win_candidate": false,
+      "challenger_win_rule_met": false,
+      "quality_guard_status": "not_evaluated_from_sample_gate",
+      "owner_review_required": false,
+      "promotion_performed": false,
+      "challenger_gaps": {
+        "visits": 100,
+        "cta_clicks": 20,
+        "line_adds": 5,
+        "test_days": 3
+      },
+      "compile_data_lp_events_write_performed": false,
+      "owner_data_lp_events_write_performed": false,
+      "data_lp_events_write_performed": false,
+      "live_input_files_created": false,
+      "real_event_write_performed": false,
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "production_deploy_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false,
+      "temp_files": {
+        "input_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-owner-form-fixtures-n5st4a/form_export_sensitive_evidence_blocked/sample_gate_ledger.filled.csv",
+        "compile_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-owner-form-fixtures-n5st4a/form_export_sensitive_evidence_blocked/compile_status.json",
+        "compile_report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-owner-form-fixtures-n5st4a/form_export_sensitive_evidence_blocked/compile_report.md",
+        "owner_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-owner-form-fixtures-n5st4a/form_export_sensitive_evidence_blocked/owner_status.compact.json",
+        "owner_json_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-owner-form-fixtures-n5st4a/form_export_sensitive_evidence_blocked/owner_status.json",
+        "owner_report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-owner-form-fixtures-n5st4a/form_export_sensitive_evidence_blocked/owner_report.md"
+      }
+    }
+  ],
+  "local_fixture_commands_executed": true,
+  "form_export_replay_executed": true,
+  "source_capture_compile_commands_executed": true,
+  "owner_sample_gate_commands_executed": true,
+  "real_events_unchanged": true,
+  "execution_performed": false,
+  "live_input_files_created": false,
+  "real_event_write_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Fixture-only replay of the browser form download. It writes temporary sample_gate_ledger.filled.csv files, then verifies source compile and owner sample-gate status without creating live input CSVs, appending data/lp_events.jsonl, promoting a challenger, changing public links, deploying, posting, pushing LINE, mutating customer data, touching payments, or deleting data."
+}

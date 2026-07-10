@@ -1,0 +1,212 @@
+{
+  "generated_at": "2026-07-10T21:45:56.412Z",
+  "mode": "line_inbound_local_playbook",
+  "status": "ready_local_review",
+  "operator": "Angelia 3Q Growth Loop Operator",
+  "round": {
+    "round_id": "week0-cta-text",
+    "changed_variable": "cta_text",
+    "one_variable_rule_ok": true,
+    "hypothesis": "A concrete 48h diagnostic CTA will produce more LINE adds than a broad free-service CTA without reducing lead quality."
+  },
+  "policy": {
+    "inbound_only": true,
+    "manual_reply_only": true,
+    "no_line_push": true,
+    "no_formal_post": true,
+    "no_customer_data_storage": true,
+    "no_raw_chat_export": true,
+    "aggregate_or_pseudonymous_only": true,
+    "no_payment_action": true,
+    "no_delete_action": true,
+    "external_effect": false,
+    "line_push_performed": false,
+    "customer_data_mutation_performed": false,
+    "payment_action_performed": false,
+    "delete_action_performed": false
+  },
+  "source_assets": {
+    "champion_asset_id": "champion-3q-line-v0",
+    "challenger_asset_id": "challenger-week0-cta-text-v1",
+    "line_url": "https://lin.ee/VZvs7sj",
+    "changed_variable": "cta_text"
+  },
+  "qualification_buckets": [
+    {
+      "field": "funnel_block_bucket",
+      "prompt": "目前最像哪一段卡住：有點擊沒進 LINE / 進 LINE 不留資 / 留資不成交 / 還不確定。",
+      "allowed_values": [
+        "click_no_line",
+        "line_no_lead",
+        "lead_no_deal",
+        "unknown"
+      ],
+      "local_storage": "bucket_only_optional"
+    },
+    {
+      "field": "business_type_bucket",
+      "prompt": "你的服務比較像：在地服務 / 電商 / 課程顧問 / B2B / 其他。",
+      "allowed_values": [
+        "local_service",
+        "ecommerce",
+        "course_consulting",
+        "b2b",
+        "other"
+      ],
+      "local_storage": "bucket_only_optional"
+    },
+    {
+      "field": "traffic_bucket_7d",
+      "prompt": "近 7 天大概點擊量：0-99 / 100-499 / 500+ / 不確定。",
+      "allowed_values": [
+        "0_99",
+        "100_499",
+        "500_plus",
+        "unknown"
+      ],
+      "local_storage": "bucket_only_optional"
+    }
+  ],
+  "blocked_local_fields": [
+    "phone",
+    "email",
+    "line_user_id",
+    "customer_name",
+    "address",
+    "payment",
+    "card",
+    "message",
+    "conversation",
+    "private_note"
+  ],
+  "stages": [
+    {
+      "stage": "line_add",
+      "event_type": "line_add",
+      "trigger": "User voluntarily adds LINE or sends the first inbound message after seeing a draft or candidate page.",
+      "operator_goal": "Acknowledge the inbound lead and keep the local metric as an aggregate LINE-add count.",
+      "reply_template": "我先幫你抓漏斗斷點。你不用重做整站，先回覆目前最像哪一段卡住：有點擊沒進 LINE / 進 LINE 不留資 / 留資不成交 / 還不確定。",
+      "requested_fields": [
+        "funnel_block_bucket"
+      ],
+      "local_recording": "Add one aggregate line_add count for the matching asset_id. Do not store chat text or personal identifiers.",
+      "csv_example": {
+        "date": "2026-07-08",
+        "asset_id": "challenger-week0-cta-text-v1",
+        "event_type": "line_add",
+        "count": "1",
+        "source": "line_inbound_manual",
+        "medium": "line",
+        "campaign": "week0-cta-text",
+        "content_id": "week0-cta-text-line-inbound",
+        "variant_id": "challenger-week0-cta-text-v1",
+        "quality_score": ""
+      }
+    },
+    {
+      "stage": "lead_submit",
+      "event_type": "lead_submit",
+      "trigger": "User gives enough business context for a diagnostic follow-up inside the inbound LINE thread.",
+      "operator_goal": "Count a lead only when the user shares a business-type bucket and current funnel block bucket.",
+      "reply_template": "收到。我會用 48h 成交診斷看三件事：入口、CTA、LINE 後續。請用選項回：在地服務 / 電商 / 課程顧問 / B2B / 其他，還有近 7 天點擊量大概 0-99 / 100-499 / 500+ / 不確定。",
+      "requested_fields": [
+        "business_type_bucket",
+        "traffic_bucket_7d"
+      ],
+      "local_recording": "Add one aggregate lead_submit count only after business context is sufficient. Do not copy the conversation into local files.",
+      "csv_example": {
+        "date": "2026-07-08",
+        "asset_id": "challenger-week0-cta-text-v1",
+        "event_type": "lead_submit",
+        "count": "1",
+        "source": "line_inbound_manual",
+        "medium": "line",
+        "campaign": "week0-cta-text",
+        "content_id": "week0-cta-text-lead-qualified",
+        "variant_id": "challenger-week0-cta-text-v1",
+        "quality_score": ""
+      }
+    },
+    {
+      "stage": "deal",
+      "event_type": "deal",
+      "trigger": "Owner manually confirms a paid or committed conversion after separate review.",
+      "operator_goal": "Record only an aggregate deal count after the owner confirms the outcome.",
+      "reply_template": "這一步不自動成交、不收款、不改客戶資料。成交狀態只由學誼人工確認後，回填 aggregate deal count。",
+      "requested_fields": [],
+      "local_recording": "Add one aggregate deal count only after owner confirmation. Never process ECPay or payment actions here.",
+      "csv_example": {
+        "date": "2026-07-08",
+        "asset_id": "challenger-week0-cta-text-v1",
+        "event_type": "deal",
+        "count": "1",
+        "source": "line_inbound_manual",
+        "medium": "line",
+        "campaign": "week0-cta-text",
+        "content_id": "week0-cta-text-owner-confirmed-deal",
+        "variant_id": "challenger-week0-cta-text-v1",
+        "quality_score": ""
+      }
+    },
+    {
+      "stage": "quality_flag",
+      "event_type": "quality_flag",
+      "trigger": "Inbound thread is spam, irrelevant, duplicate, or lower-quality than the champion baseline.",
+      "operator_goal": "Protect no_quality_regression without storing raw chat content.",
+      "reply_template": "若這筆進線明顯不相關，只記 aggregate quality_flag，不保存對話內容。",
+      "requested_fields": [
+        "quality_score_bucket"
+      ],
+      "local_recording": "Add aggregate quality_flag with quality_score only. Do not store the reason text if it contains customer details.",
+      "csv_example": {
+        "date": "2026-07-08",
+        "asset_id": "challenger-week0-cta-text-v1",
+        "event_type": "quality_flag",
+        "count": "1",
+        "source": "line_inbound_manual",
+        "medium": "line",
+        "campaign": "week0-cta-text",
+        "content_id": "week0-cta-text-quality-guard",
+        "variant_id": "challenger-week0-cta-text-v1",
+        "quality_score": "0.25"
+      }
+    }
+  ],
+  "manual_conversion_contract": {
+    "artifact": "data/manual_conversions.example.csv",
+    "preview_command": "npm run import:manual:preview",
+    "apply_command": "npm run import:manual:apply",
+    "allowed_columns": [
+      "date",
+      "asset_id",
+      "event_type",
+      "count",
+      "source",
+      "medium",
+      "campaign",
+      "content_id",
+      "variant_id",
+      "quality_score"
+    ],
+    "allowed_event_types": [
+      "line_add",
+      "lead_submit",
+      "deal",
+      "quality_flag"
+    ],
+    "default_mode": "preview_only",
+    "apply_gate": "local_apply_requires_explicit_command_and_review"
+  },
+  "outputs": {
+    "playbook_json": "line_inbound_playbook.json",
+    "playbook_md": "line_inbound_playbook.md",
+    "fixture_status": "data/line_inbound_fixture_status.json",
+    "fixture_report": "line_inbound_fixture_report.md"
+  },
+  "external_effect": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

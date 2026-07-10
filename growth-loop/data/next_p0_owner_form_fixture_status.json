@@ -1,0 +1,322 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:45:08.335Z",
+  "mode": "next_p0_owner_form_fixture_dry_run",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/next_p0_owner_form_fixture_status.json",
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/next_p0_owner_form_fixture_report.md",
+  "next_p0_inputs_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/next_p0_owner_inputs.json",
+  "form_html_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/next_p0_owner_form.html",
+  "form_status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/next_p0_owner_form_status.json",
+  "row_count": 9,
+  "expected_row_count": 9,
+  "scenario_count": 4,
+  "scenario_ids": [
+    "html_contains_all_focused_inputs",
+    "no_network_or_browser_persistence",
+    "exports_aggregate_only_review_contract",
+    "red_line_flags_false"
+  ],
+  "scenarios": [
+    {
+      "id": "html_contains_all_focused_inputs",
+      "ok": true,
+      "assertions": [
+        {
+          "name": "row_count_matches",
+          "ok": true,
+          "expected": 9,
+          "actual": 9,
+          "external_effect": false
+        },
+        {
+          "name": "has_expected_title",
+          "ok": true,
+          "expected": "title present",
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "has_all_tracking_links",
+          "ok": true,
+          "expected": "all tracking_link_id values",
+          "actual": "checked",
+          "external_effect": false
+        },
+        {
+          "name": "has_all_event_types",
+          "ok": true,
+          "expected": "all event_type values",
+          "actual": "checked",
+          "external_effect": false
+        },
+        {
+          "name": "has_download_names",
+          "ok": true,
+          "expected": "focused download names",
+          "actual": "checked",
+          "external_effect": false
+        }
+      ],
+      "external_effect": false,
+      "live_input_files_created": false,
+      "data_lp_events_write_performed": false,
+      "public_link_change_performed": false,
+      "production_deploy_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false
+    },
+    {
+      "id": "no_network_or_browser_persistence",
+      "ok": true,
+      "assertions": [
+        {
+          "name": "no_fetch",
+          "ok": true,
+          "expected": "no fetch",
+          "actual": "checked",
+          "external_effect": false
+        },
+        {
+          "name": "no_xhr",
+          "ok": true,
+          "expected": "no XMLHttpRequest",
+          "actual": "checked",
+          "external_effect": false
+        },
+        {
+          "name": "no_send_beacon",
+          "ok": true,
+          "expected": "no sendBeacon",
+          "actual": "checked",
+          "external_effect": false
+        },
+        {
+          "name": "no_external_links",
+          "ok": true,
+          "expected": "no external href",
+          "actual": "checked",
+          "external_effect": false
+        },
+        {
+          "name": "no_local_storage",
+          "ok": true,
+          "expected": "no browser storage",
+          "actual": "checked",
+          "external_effect": false
+        },
+        {
+          "name": "status_browser_only",
+          "ok": true,
+          "expected": "browser only and no persistence",
+          "actual": "true:false",
+          "external_effect": false
+        },
+        {
+          "name": "status_no_network",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        }
+      ],
+      "external_effect": false,
+      "live_input_files_created": false,
+      "data_lp_events_write_performed": false,
+      "public_link_change_performed": false,
+      "production_deploy_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false
+    },
+    {
+      "id": "exports_aggregate_only_review_contract",
+      "ok": true,
+      "assertions": [
+        {
+          "name": "mode",
+          "ok": true,
+          "expected": "next_p0_owner_form",
+          "actual": "next_p0_owner_form",
+          "external_effect": false
+        },
+        {
+          "name": "status_ready",
+          "ok": true,
+          "expected": "ready_local_next_p0_owner_form",
+          "actual": "ready_local_next_p0_owner_form",
+          "external_effect": false
+        },
+        {
+          "name": "download_filename",
+          "ok": true,
+          "expected": "next_p0_owner_inputs.filled.csv",
+          "actual": "next_p0_owner_inputs.filled.csv",
+          "external_effect": false
+        },
+        {
+          "name": "json_download_filename",
+          "ok": true,
+          "expected": "next_p0_owner_inputs.review.json",
+          "actual": "next_p0_owner_inputs.review.json",
+          "external_effect": false
+        },
+        {
+          "name": "headers",
+          "ok": true,
+          "expected": "rank,capture_date,role,tracking_link_id,event_type,stage_label,source_surface,target_live_file,aggregate_count,evidence_ref,reviewer,pii_checked",
+          "actual": "rank,capture_date,role,tracking_link_id,event_type,stage_label,source_surface,target_live_file,aggregate_count,evidence_ref,reviewer,pii_checked",
+          "external_effect": false
+        },
+        {
+          "name": "contract_mentions_not_live",
+          "ok": true,
+          "expected": "not live input contract",
+          "actual": "Focused owner-reviewed aggregate-count download only. It is not a live input CSV and does not stage or apply data.",
+          "external_effect": false
+        }
+      ],
+      "external_effect": false,
+      "live_input_files_created": false,
+      "data_lp_events_write_performed": false,
+      "public_link_change_performed": false,
+      "production_deploy_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false
+    },
+    {
+      "id": "red_line_flags_false",
+      "ok": true,
+      "assertions": [
+        {
+          "name": "live_input_files_created",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "data_lp_events_write_performed",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "public_link_change_performed",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "production_deploy_performed",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "github_push_or_pr_performed",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "formal_post_performed",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "line_push_performed",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "customer_data_mutation_performed",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "payment_action_performed",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "delete_action_performed",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "fixture_no_live_input",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "fixture_no_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        }
+      ],
+      "external_effect": false,
+      "live_input_files_created": false,
+      "data_lp_events_write_performed": false,
+      "public_link_change_performed": false,
+      "production_deploy_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false
+    }
+  ],
+  "browser_form_static_checks_executed": true,
+  "export_contract_verified": true,
+  "local_fixture_commands_executed": true,
+  "real_events_unchanged": true,
+  "live_input_files_created": false,
+  "data_lp_events_write_performed": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "external_effect": false,
+  "note": "Static fixture for the focused Next P0 owner form. It verifies the browser-only HTML and export contract without creating live inputs, appending data/lp_events.jsonl, staging owner data, posting, deploying, pushing GitHub, pushing LINE, mutating customer data, touching payments, or deleting data."
+}

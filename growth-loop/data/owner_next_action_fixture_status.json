@@ -1,0 +1,655 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:45:52.238Z",
+  "mode": "owner_next_action_fixture",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/owner_next_action_fixture_status.json",
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/owner_next_action_fixture_report.md",
+  "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-next-action-fixtures-EVM11M",
+  "scenario_count": 6,
+  "scenario_ids": [
+    "waiting_counts_prioritizes_full_p0_batch_handoff",
+    "staged_next_p0_prompts_real_data_preview",
+    "real_data_preview_ready_prompts_owner_apply_review",
+    "real_data_input_attention_blocks_apply",
+    "partial_quick_counts_keep_collect_action",
+    "invalid_p0_counts_prioritize_fix_card"
+  ],
+  "scenarios": [
+    {
+      "id": "waiting_counts_prioritizes_full_p0_batch_handoff",
+      "ok": true,
+      "checks": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0
+        },
+        {
+          "name": "card_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "compact_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "primary_action_id",
+          "ok": true,
+          "expected": "collect_owner_sample_gate_counts",
+          "actual": "collect_owner_sample_gate_counts"
+        },
+        {
+          "name": "primary_action_status",
+          "ok": true,
+          "expected": "waiting_for_owner_sample_gate_counts",
+          "actual": "waiting_for_owner_sample_gate_counts"
+        },
+        {
+          "name": "primary_action_command",
+          "ok": true,
+          "expected": "open sample_gate_batch_handoff.md",
+          "actual": "open sample_gate_batch_handoff.md"
+        },
+        {
+          "name": "compact_primary_command",
+          "ok": true,
+          "expected": "open sample_gate_batch_handoff.md",
+          "actual": "open sample_gate_batch_handoff.md"
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "sample_gate_batch_all_p0_row_count",
+          "ok": true,
+          "expected": 18,
+          "actual": 18
+        },
+        {
+          "name": "sample_gate_batch_focused_batch_row_count",
+          "ok": true,
+          "expected": 9,
+          "actual": 9
+        },
+        {
+          "name": "sample_gate_batch_remaining_batch_row_count",
+          "ok": true,
+          "expected": 9,
+          "actual": 9
+        },
+        {
+          "name": "sample_gate_batch_full_coverage_ready",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "next_actions_len",
+          "ok": true,
+          "expected": 3,
+          "actual": 3
+        },
+        {
+          "name": "next_action_prepare_public_ab_metadata",
+          "ok": true,
+          "expected": true,
+          "actual": "collect_owner_sample_gate_counts,prepare_public_ab_metadata,check_owner_download_intake"
+        },
+        {
+          "name": "no_data_write",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        }
+      ],
+      "exit_code": 0,
+      "primary_action_id": "collect_owner_sample_gate_counts",
+      "primary_action_command": "open sample_gate_batch_handoff.md",
+      "next_action_ids": [
+        "collect_owner_sample_gate_counts",
+        "prepare_public_ab_metadata",
+        "check_owner_download_intake"
+      ],
+      "owner_review_required": false,
+      "public_ab_metadata_status": "capture_or_fix_non_secret_metadata",
+      "real_data_intake_status": "no_real_input_files",
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "scenario_root": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-next-action-fixtures-EVM11M/waiting_counts_prioritizes_full_p0_batch_handoff",
+      "stdout_bytes": 5041,
+      "stderr_bytes": 0
+    },
+    {
+      "id": "staged_next_p0_prompts_real_data_preview",
+      "ok": true,
+      "checks": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0
+        },
+        {
+          "name": "card_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "compact_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "primary_action_id",
+          "ok": true,
+          "expected": "preview_staged_real_data_inputs",
+          "actual": "preview_staged_real_data_inputs"
+        },
+        {
+          "name": "primary_action_command",
+          "ok": true,
+          "expected": "npm run real-data:intake",
+          "actual": "npm run real-data:intake"
+        },
+        {
+          "name": "compact_primary_command",
+          "ok": true,
+          "expected": "npm run real-data:intake",
+          "actual": "npm run real-data:intake"
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "next_actions_len",
+          "ok": true,
+          "expected": 3,
+          "actual": 3
+        },
+        {
+          "name": "next_action_prepare_public_ab_metadata",
+          "ok": true,
+          "expected": true,
+          "actual": "preview_staged_real_data_inputs,prepare_public_ab_metadata,review_sample_gate_status"
+        },
+        {
+          "name": "no_data_write",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        }
+      ],
+      "exit_code": 0,
+      "primary_action_id": "preview_staged_real_data_inputs",
+      "primary_action_command": "npm run real-data:intake",
+      "next_action_ids": [
+        "preview_staged_real_data_inputs",
+        "prepare_public_ab_metadata",
+        "review_sample_gate_status"
+      ],
+      "owner_review_required": false,
+      "public_ab_metadata_status": "capture_or_fix_non_secret_metadata",
+      "real_data_intake_status": "no_real_input_files",
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "scenario_root": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-next-action-fixtures-EVM11M/staged_next_p0_prompts_real_data_preview",
+      "stdout_bytes": 5040,
+      "stderr_bytes": 0
+    },
+    {
+      "id": "real_data_preview_ready_prompts_owner_apply_review",
+      "ok": true,
+      "checks": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0
+        },
+        {
+          "name": "card_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "compact_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "primary_action_id",
+          "ok": true,
+          "expected": "review_real_data_apply",
+          "actual": "review_real_data_apply"
+        },
+        {
+          "name": "primary_action_command",
+          "ok": true,
+          "expected": "open real_data_intake_plan.md",
+          "actual": "open real_data_intake_plan.md"
+        },
+        {
+          "name": "compact_primary_command",
+          "ok": true,
+          "expected": "open real_data_intake_plan.md",
+          "actual": "open real_data_intake_plan.md"
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "next_actions_len",
+          "ok": true,
+          "expected": 3,
+          "actual": 3
+        },
+        {
+          "name": "next_action_prepare_public_ab_metadata",
+          "ok": true,
+          "expected": true,
+          "actual": "review_real_data_apply,prepare_public_ab_metadata,review_sample_gate_status"
+        },
+        {
+          "name": "no_data_write",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        }
+      ],
+      "exit_code": 0,
+      "primary_action_id": "review_real_data_apply",
+      "primary_action_command": "open real_data_intake_plan.md",
+      "next_action_ids": [
+        "review_real_data_apply",
+        "prepare_public_ab_metadata",
+        "review_sample_gate_status"
+      ],
+      "owner_review_required": true,
+      "public_ab_metadata_status": "capture_or_fix_non_secret_metadata",
+      "real_data_intake_status": "preview_ready_owner_apply_required",
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "scenario_root": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-next-action-fixtures-EVM11M/real_data_preview_ready_prompts_owner_apply_review",
+      "stdout_bytes": 5029,
+      "stderr_bytes": 0
+    },
+    {
+      "id": "real_data_input_attention_blocks_apply",
+      "ok": true,
+      "checks": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0
+        },
+        {
+          "name": "card_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "compact_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "primary_action_id",
+          "ok": true,
+          "expected": "fix_real_data_input_preview",
+          "actual": "fix_real_data_input_preview"
+        },
+        {
+          "name": "primary_action_command",
+          "ok": true,
+          "expected": "npm run real-data:intake",
+          "actual": "npm run real-data:intake"
+        },
+        {
+          "name": "compact_primary_command",
+          "ok": true,
+          "expected": "npm run real-data:intake",
+          "actual": "npm run real-data:intake"
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "next_actions_len",
+          "ok": true,
+          "expected": 3,
+          "actual": 3
+        },
+        {
+          "name": "next_action_prepare_public_ab_metadata",
+          "ok": true,
+          "expected": true,
+          "actual": "fix_real_data_input_preview,prepare_public_ab_metadata,review_sample_gate_status"
+        },
+        {
+          "name": "no_data_write",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        }
+      ],
+      "exit_code": 0,
+      "primary_action_id": "fix_real_data_input_preview",
+      "primary_action_command": "npm run real-data:intake",
+      "next_action_ids": [
+        "fix_real_data_input_preview",
+        "prepare_public_ab_metadata",
+        "review_sample_gate_status"
+      ],
+      "owner_review_required": false,
+      "public_ab_metadata_status": "capture_or_fix_non_secret_metadata",
+      "real_data_intake_status": "input_attention_required",
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "scenario_root": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-next-action-fixtures-EVM11M/real_data_input_attention_blocks_apply",
+      "stdout_bytes": 5018,
+      "stderr_bytes": 0
+    },
+    {
+      "id": "partial_quick_counts_keep_collect_action",
+      "ok": true,
+      "checks": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0
+        },
+        {
+          "name": "card_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "compact_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "primary_action_id",
+          "ok": true,
+          "expected": "collect_owner_sample_gate_counts",
+          "actual": "collect_owner_sample_gate_counts"
+        },
+        {
+          "name": "primary_action_status",
+          "ok": true,
+          "expected": "partial_quick_counts_waiting",
+          "actual": "partial_quick_counts_waiting"
+        },
+        {
+          "name": "primary_action_command",
+          "ok": true,
+          "expected": "open data/next_p0_quick_capture/next_p0_owner_inputs.counts-paste-template.txt",
+          "actual": "open data/next_p0_quick_capture/next_p0_owner_inputs.counts-paste-template.txt"
+        },
+        {
+          "name": "compact_primary_command",
+          "ok": true,
+          "expected": "open data/next_p0_quick_capture/next_p0_owner_inputs.counts-paste-template.txt",
+          "actual": "open data/next_p0_quick_capture/next_p0_owner_inputs.counts-paste-template.txt"
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "quick_partial_waiting",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "quick_filled_rank_count",
+          "ok": true,
+          "expected": 3,
+          "actual": 3
+        },
+        {
+          "name": "quick_missing_rank_count",
+          "ok": true,
+          "expected": 6,
+          "actual": 6
+        },
+        {
+          "name": "sample_gate_batch_all_p0_row_count",
+          "ok": true,
+          "expected": 18,
+          "actual": 18
+        },
+        {
+          "name": "sample_gate_batch_focused_batch_row_count",
+          "ok": true,
+          "expected": 9,
+          "actual": 9
+        },
+        {
+          "name": "sample_gate_batch_remaining_batch_row_count",
+          "ok": true,
+          "expected": 9,
+          "actual": 9
+        },
+        {
+          "name": "sample_gate_batch_full_coverage_ready",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "next_actions_len",
+          "ok": true,
+          "expected": 3,
+          "actual": 3
+        },
+        {
+          "name": "next_action_prepare_public_ab_metadata",
+          "ok": true,
+          "expected": true,
+          "actual": "collect_owner_sample_gate_counts,prepare_public_ab_metadata,check_owner_download_intake"
+        },
+        {
+          "name": "no_data_write",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        }
+      ],
+      "exit_code": 0,
+      "primary_action_id": "collect_owner_sample_gate_counts",
+      "primary_action_command": "open data/next_p0_quick_capture/next_p0_owner_inputs.counts-paste-template.txt",
+      "next_action_ids": [
+        "collect_owner_sample_gate_counts",
+        "prepare_public_ab_metadata",
+        "check_owner_download_intake"
+      ],
+      "owner_review_required": false,
+      "public_ab_metadata_status": "capture_or_fix_non_secret_metadata",
+      "real_data_intake_status": "no_real_input_files",
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "scenario_root": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-next-action-fixtures-EVM11M/partial_quick_counts_keep_collect_action",
+      "stdout_bytes": 5082,
+      "stderr_bytes": 0
+    },
+    {
+      "id": "invalid_p0_counts_prioritize_fix_card",
+      "ok": true,
+      "checks": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0
+        },
+        {
+          "name": "card_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "compact_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "primary_action_id",
+          "ok": true,
+          "expected": "fix_invalid_p0_counts",
+          "actual": "fix_invalid_p0_counts"
+        },
+        {
+          "name": "primary_action_status",
+          "ok": true,
+          "expected": "blocked_invalid_p0_counts",
+          "actual": "blocked_invalid_p0_counts"
+        },
+        {
+          "name": "primary_action_command",
+          "ok": true,
+          "expected": "open p0_counts_preflight.md",
+          "actual": "open p0_counts_preflight.md"
+        },
+        {
+          "name": "compact_primary_command",
+          "ok": true,
+          "expected": "open p0_counts_preflight.md",
+          "actual": "open p0_counts_preflight.md"
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "p0_counts_preflight_status",
+          "ok": true,
+          "expected": "blocked_invalid_p0_counts",
+          "actual": "blocked_invalid_p0_counts"
+        },
+        {
+          "name": "p0_counts_preflight_issue_count",
+          "ok": true,
+          "expected": 1,
+          "actual": 1
+        },
+        {
+          "name": "next_actions_len",
+          "ok": true,
+          "expected": 3,
+          "actual": 3
+        },
+        {
+          "name": "next_action_prepare_public_ab_metadata",
+          "ok": true,
+          "expected": true,
+          "actual": "fix_invalid_p0_counts,prepare_public_ab_metadata,review_sample_gate_status"
+        },
+        {
+          "name": "no_data_write",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        }
+      ],
+      "exit_code": 0,
+      "primary_action_id": "fix_invalid_p0_counts",
+      "primary_action_command": "open p0_counts_preflight.md",
+      "next_action_ids": [
+        "fix_invalid_p0_counts",
+        "prepare_public_ab_metadata",
+        "review_sample_gate_status"
+      ],
+      "owner_review_required": false,
+      "public_ab_metadata_status": "capture_or_fix_non_secret_metadata",
+      "real_data_intake_status": "no_real_input_files",
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "scenario_root": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-next-action-fixtures-EVM11M/invalid_p0_counts_prioritize_fix_card",
+      "stdout_bytes": 4991,
+      "stderr_bytes": 0
+    }
+  ],
+  "live_project_write_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Fixture-only owner next-action routing guard. It runs the action card against temporary roots and never stages project files, appends events, deploys, posts, pushes LINE/GitHub, mutates customer data, touches payments, or deletes data."
+}

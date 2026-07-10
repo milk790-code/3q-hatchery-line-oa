@@ -1,0 +1,175 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:47:26.640Z",
+  "mode": "owner_approval_form_fixture_dry_run",
+  "scenario_count": 4,
+  "scenarios": [
+    {
+      "id": "form_static_contract",
+      "ok": true,
+      "checks": [
+        {
+          "name": "mode",
+          "ok": true,
+          "message": "form mode must match",
+          "external_effect": false
+        },
+        {
+          "name": "gate_count",
+          "ok": true,
+          "message": "form must expose four automatable owner-gated metadata blocks",
+          "external_effect": false
+        },
+        {
+          "name": "no_form_submit",
+          "ok": true,
+          "message": "form must not submit",
+          "external_effect": false
+        },
+        {
+          "name": "no_network_api",
+          "ok": true,
+          "message": "form must not call network APIs",
+          "external_effect": false
+        },
+        {
+          "name": "json_download",
+          "ok": true,
+          "message": "form must download owner approval input JSON",
+          "external_effect": false
+        }
+      ],
+      "external_effect": false
+    },
+    {
+      "id": "form_export_valid_github_plan_only",
+      "ok": true,
+      "exit_code": 0,
+      "ready_gate_count": 1,
+      "status": "owner_approval_detected_plan_only",
+      "sensitive_approval_detected": false,
+      "external_effect": false,
+      "github_push_or_pr_performed": false,
+      "production_deploy_performed": false,
+      "public_link_change_performed": false,
+      "live_input_files_created": false,
+      "stdout_bytes": 7757,
+      "stderr_bytes": 0
+    },
+    {
+      "id": "form_export_placeholder_blocked",
+      "ok": true,
+      "exit_code": 0,
+      "ready_gate_count": 0,
+      "status": "prepared_but_blocked",
+      "sensitive_approval_detected": false,
+      "external_effect": false,
+      "github_push_or_pr_performed": false,
+      "production_deploy_performed": false,
+      "public_link_change_performed": false,
+      "live_input_files_created": false,
+      "stdout_bytes": 7335,
+      "stderr_bytes": 0
+    },
+    {
+      "id": "form_export_sensitive_value_blocked",
+      "ok": true,
+      "exit_code": 0,
+      "ready_gate_count": 0,
+      "status": "prepared_but_blocked",
+      "sensitive_approval_detected": true,
+      "external_effect": false,
+      "github_push_or_pr_performed": false,
+      "production_deploy_performed": false,
+      "public_link_change_performed": false,
+      "live_input_files_created": false,
+      "stdout_bytes": 7953,
+      "stderr_bytes": 0
+    }
+  ],
+  "contract_checks": [
+    {
+      "name": "form_status_ok",
+      "ok": true,
+      "message": "form status must be ok",
+      "external_effect": false
+    },
+    {
+      "name": "browser_only",
+      "ok": true,
+      "message": "form must be browser-only",
+      "external_effect": false
+    },
+    {
+      "name": "no_network",
+      "ok": true,
+      "message": "form must not perform network calls",
+      "external_effect": false
+    },
+    {
+      "name": "no_live_input",
+      "ok": true,
+      "message": "form must not create live input files",
+      "external_effect": false
+    },
+    {
+      "name": "no_approval_write",
+      "ok": true,
+      "message": "form must not write owner_approval_input.json",
+      "external_effect": false
+    },
+    {
+      "name": "download_filename",
+      "ok": true,
+      "message": "download filename must match owner approval input",
+      "external_effect": false
+    },
+    {
+      "name": "manual_gate_excluded",
+      "ok": true,
+      "message": "manual-only gate must stay excluded from the form",
+      "external_effect": false
+    },
+    {
+      "name": "html_no_fetch",
+      "ok": true,
+      "message": "form HTML must not call fetch",
+      "external_effect": false
+    },
+    {
+      "name": "html_no_xhr",
+      "ok": true,
+      "message": "form HTML must not call XHR or sendBeacon",
+      "external_effect": false
+    },
+    {
+      "name": "html_action_none",
+      "ok": true,
+      "message": "form action must be none",
+      "external_effect": false
+    },
+    {
+      "name": "html_external_false",
+      "ok": true,
+      "message": "form must mark no external effect",
+      "external_effect": false
+    }
+  ],
+  "form_export_replay_executed": true,
+  "approval_resume_commands_executed": true,
+  "live_input_files_created": false,
+  "approval_input_write_performed": false,
+  "execution_performed": false,
+  "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-approval-form-noCngF",
+  "external_effect": false,
+  "data_lp_events_write_performed": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Fixture-only owner approval form guard. Uses temporary owner_approval_input shaped files and never writes live owner approval input or performs external actions."
+}

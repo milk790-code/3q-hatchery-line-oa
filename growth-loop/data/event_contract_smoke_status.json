@@ -1,0 +1,315 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:46:41.923Z",
+  "started_at": "2026-07-10T21:46:26.486Z",
+  "duration_ms": 15437,
+  "mode": "isolated_local_event_contract_smoke",
+  "base_url": "http://127.0.0.1:60543",
+  "isolated_state_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-event-smoke-mpR2kE",
+  "log_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/logs/event-contract-smoke-20260710T214626Z.log",
+  "inserted_events": [
+    {
+      "event_type": "page_view",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "event_id_present": true
+    },
+    {
+      "event_type": "cta_click",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "event_id_present": true
+    }
+  ],
+  "blocked_public_events": [
+    {
+      "event_type": "link_click",
+      "ok": false,
+      "status": 400,
+      "error": "event_type_not_allowed_public",
+      "event_id_present": false
+    },
+    {
+      "event_type": "line_add",
+      "ok": false,
+      "status": 400,
+      "error": "event_type_not_allowed_public",
+      "event_id_present": false
+    },
+    {
+      "event_type": "lead_submit",
+      "ok": false,
+      "status": 400,
+      "error": "event_type_not_allowed_public",
+      "event_id_present": false
+    },
+    {
+      "event_type": "deal",
+      "ok": false,
+      "status": 400,
+      "error": "event_type_not_allowed_public",
+      "event_id_present": false
+    },
+    {
+      "event_type": "quality_flag",
+      "ok": false,
+      "status": 400,
+      "error": "event_type_not_allowed_public",
+      "event_id_present": false
+    }
+  ],
+  "event_type_counts": {
+    "cta_click": 1,
+    "page_view": 1
+  },
+  "sensitive_rows_written": 0,
+  "sensitive_rejection": {
+    "ok": true,
+    "status": 400,
+    "error": "blocked_metadata_key"
+  },
+  "invalid_event_rejection": {
+    "ok": true,
+    "status": 400,
+    "error": "invalid_event_type"
+  },
+  "sensitive_token_rejection": {
+    "ok": true,
+    "status": 400,
+    "error": "invalid_session_id"
+  },
+  "phone_campaign_rejection": {
+    "ok": true,
+    "status": 400,
+    "error": "invalid_campaign"
+  },
+  "embedded_phone_session_rejection": {
+    "ok": true,
+    "status": 400,
+    "error": "invalid_session_id"
+  },
+  "numeric_phone_metadata_rejection": {
+    "ok": true,
+    "status": 400,
+    "error": "invalid_metadata_value"
+  },
+  "url_path_pii_rejection": {
+    "ok": true,
+    "status": 400,
+    "error": "invalid_url"
+  },
+  "public_event_field_rejection": {
+    "ok": true,
+    "status": 400,
+    "error": "public_event_fields_not_allowed"
+  },
+  "body_limit": {
+    "declared_length_rejected": true,
+    "chunked_stream_rejected": true
+  },
+  "redirect_attribution": {
+    "ok": true,
+    "status": 302,
+    "location": "https://3q-growth-loop-candidate.milk790.workers.dev/candidate?utm_source=local&utm_medium=event_contract_smoke&utm_campaign=event-contract-redirect-smoke&content_id=event-contract-redirect-content&variant_id=event-contract-redirect-variant&sid=00000000-0000-4000-8000-000000000002&asset_id=challenger-week0-cta-text-v1",
+    "observed": {
+      "asset_id": "challenger-week0-cta-text-v1",
+      "content_id": "event-contract-redirect-content",
+      "variant_id": "event-contract-redirect-variant",
+      "sid": "00000000-0000-4000-8000-000000000002",
+      "utm_source": "local",
+      "utm_medium": "event_contract_smoke",
+      "utm_campaign": "event-contract-redirect-smoke"
+    },
+    "expected": {
+      "asset_id": "challenger-week0-cta-text-v1",
+      "content_id": "event-contract-redirect-content",
+      "variant_id": "event-contract-redirect-variant",
+      "sid": "00000000-0000-4000-8000-000000000002",
+      "utm_source": "local",
+      "utm_medium": "event_contract_smoke",
+      "utm_campaign": "event-contract-redirect-smoke"
+    },
+    "external_effect": false
+  },
+  "ab_redirect_attribution": {
+    "ok": true,
+    "status": 302,
+    "bucket": 4,
+    "location": "https://3q-growth-loop-candidate.milk790.workers.dev/candidate?utm_source=local&utm_medium=event_contract_smoke&utm_campaign=event-contract-ab-smoke&content_id=event-contract-ab-content&variant_id=ab-week0-cta-text-001%3Achallenger&sid=00000000-0000-4000-8000-000000000000&asset_id=challenger-week0-cta-text-v1",
+    "observed": {
+      "asset_id": "challenger-week0-cta-text-v1",
+      "content_id": "event-contract-ab-content",
+      "variant_id": "ab-week0-cta-text-001:challenger",
+      "sid": "00000000-0000-4000-8000-000000000000",
+      "utm_source": "local",
+      "utm_medium": "event_contract_smoke",
+      "utm_campaign": "event-contract-ab-smoke"
+    },
+    "expected": {
+      "asset_id": "challenger-week0-cta-text-v1",
+      "content_id": "event-contract-ab-content",
+      "variant_id": "ab-week0-cta-text-001:challenger",
+      "sid": "00000000-0000-4000-8000-000000000000",
+      "utm_source": "local",
+      "utm_medium": "event_contract_smoke",
+      "utm_campaign": "event-contract-ab-smoke"
+    },
+    "external_effect": false
+  },
+  "invalid_ab_sid_rejection": {
+    "ok": true,
+    "sid": "not-a-uuid",
+    "status": 400,
+    "error": "invalid_session_id"
+  },
+  "embedded_phone_ab_sid_rejection": {
+    "ok": true,
+    "sid": "sid-0912345678",
+    "status": 400,
+    "error": "invalid_session_id"
+  },
+  "cors_contract": {
+    "ok": true,
+    "allowed_origin": "https://3q-site.milk790.workers.dev",
+    "denied_origin": "https://example.invalid",
+    "preflight": {
+      "status": 204,
+      "allow_origin": "https://3q-site.milk790.workers.dev",
+      "allow_methods": "POST, OPTIONS",
+      "vary": "Origin"
+    },
+    "allowed_post": {
+      "status": 200,
+      "body": {
+        "ok": true,
+        "event_id": "626e3f2a-f66b-4864-badd-36743d462268"
+      },
+      "headers": {
+        "allow_origin": "https://3q-site.milk790.workers.dev",
+        "vary": "Origin"
+      }
+    },
+    "denied_post": {
+      "status": 403,
+      "body": {
+        "ok": false,
+        "error": "origin_not_allowed"
+      },
+      "headers": {
+        "allow_origin": null,
+        "vary": null
+      }
+    },
+    "missing_origin_post": {
+      "status": 403,
+      "body": {
+        "ok": false,
+        "error": "origin_not_allowed"
+      },
+      "headers": {
+        "allow_origin": null,
+        "vary": null
+      }
+    },
+    "allowed_event_rows": 1,
+    "denied_event_rows": 0,
+    "external_effect": false
+  },
+  "scheduled_trigger": {
+    "ok": true,
+    "status": 200,
+    "body_bytes": 2
+  },
+  "scheduled_quality_regression": {
+    "ok": true,
+    "rows": [
+      {
+        "asset_id": "challenger-week0-cta-text-v1",
+        "link_clicks": 120,
+        "visits": 120,
+        "cta_clicks": 30,
+        "line_adds": 17,
+        "line_add_rate": 0.1417,
+        "sample_threshold_met": 1,
+        "no_quality_regression": 0,
+        "decision": "reject_quality_regression",
+        "metadata_json": "{\"source\":\"scheduled_candidate_worker\",\"role\":\"challenger\",\"quality_flags\":10,\"low_quality_flags\":2,\"spam_flag_rate\":0.2,\"quality_regression_reasons\":[\"spam_flag_rate_above_limit\",\"close_rate_retention_below_champion\"],\"lead_rate_retention_vs_champion\":0.9412,\"close_rate_retention_vs_champion\":0.7501}",
+        "metadata": {
+          "source": "scheduled_candidate_worker",
+          "role": "challenger",
+          "quality_flags": 10,
+          "low_quality_flags": 2,
+          "spam_flag_rate": 0.2,
+          "quality_regression_reasons": [
+            "spam_flag_rate_above_limit",
+            "close_rate_retention_below_champion"
+          ],
+          "lead_rate_retention_vs_champion": 0.9412,
+          "close_rate_retention_vs_champion": 0.7501
+        }
+      },
+      {
+        "asset_id": "champion-3q-line-v0",
+        "link_clicks": 120,
+        "visits": 120,
+        "cta_clicks": 30,
+        "line_adds": 12,
+        "line_add_rate": 0.1,
+        "sample_threshold_met": 1,
+        "no_quality_regression": 1,
+        "decision": "keep_champion_until_challenger_beats_rule",
+        "metadata_json": "{\"source\":\"scheduled_candidate_worker\",\"role\":\"champion\",\"quality_flags\":0,\"low_quality_flags\":0,\"spam_flag_rate\":0,\"quality_regression_reasons\":[],\"lead_rate_retention_vs_champion\":null,\"close_rate_retention_vs_champion\":null}",
+        "metadata": {
+          "source": "scheduled_candidate_worker",
+          "role": "champion",
+          "quality_flags": 0,
+          "low_quality_flags": 0,
+          "spam_flag_rate": 0,
+          "quality_regression_reasons": [],
+          "lead_rate_retention_vs_champion": null,
+          "close_rate_retention_vs_champion": null
+        }
+      }
+    ],
+    "challenger": {
+      "asset_id": "challenger-week0-cta-text-v1",
+      "link_clicks": 120,
+      "visits": 120,
+      "cta_clicks": 30,
+      "line_adds": 17,
+      "line_add_rate": 0.1417,
+      "sample_threshold_met": 1,
+      "no_quality_regression": 0,
+      "decision": "reject_quality_regression",
+      "metadata_json": "{\"source\":\"scheduled_candidate_worker\",\"role\":\"challenger\",\"quality_flags\":10,\"low_quality_flags\":2,\"spam_flag_rate\":0.2,\"quality_regression_reasons\":[\"spam_flag_rate_above_limit\",\"close_rate_retention_below_champion\"],\"lead_rate_retention_vs_champion\":0.9412,\"close_rate_retention_vs_champion\":0.7501}",
+      "metadata": {
+        "source": "scheduled_candidate_worker",
+        "role": "challenger",
+        "quality_flags": 10,
+        "low_quality_flags": 2,
+        "spam_flag_rate": 0.2,
+        "quality_regression_reasons": [
+          "spam_flag_rate_above_limit",
+          "close_rate_retention_below_champion"
+        ],
+        "lead_rate_retention_vs_champion": 0.9412,
+        "close_rate_retention_vs_champion": 0.7501
+      }
+    }
+  },
+  "isolated_fixture_event_write_performed": true,
+  "real_event_write_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Writes synthetic events only into an isolated temporary local D1 state. It does not write data/lp_events.jsonl or any remote D1."
+}

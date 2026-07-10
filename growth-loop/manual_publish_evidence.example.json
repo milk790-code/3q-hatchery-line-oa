@@ -1,0 +1,21 @@
+{
+  "generated_at": "2026-07-10T21:46:02.217Z",
+  "mode": "manual_publish_evidence_example",
+  "instructions": [
+    "Copy this file to manual_publish_evidence.json only after the owner manually publishes exactly one reviewed packet.",
+    "Do not include customer names, phone, email, LINE user IDs, chat text, order IDs, payment data, private notes, tokens, or secrets.",
+    "This evidence is local-only. The runner will not fetch post URLs, publish, schedule, push LINE, change public links, deploy, or write real events."
+  ],
+  "evidence": [
+    {
+      "packet_id": "manual-publish-01-week0-post-001-cta-v1-diagnostic",
+      "published_at": "2026-07-11T09:00:00+08:00",
+      "surface": "Facebook Page manual post",
+      "post_ref": "owner-visible post URL or local screenshot reference",
+      "reviewer": "Angelia",
+      "manual_publish_confirmed": true,
+      "pii_checked": true,
+      "published_packet_only": true
+    }
+  ]
+}

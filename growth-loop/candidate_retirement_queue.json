@@ -1,0 +1,37 @@
+{
+  "generated_at": "2026-07-10T21:48:20.571Z",
+  "week": {
+    "start": "2026-06-29",
+    "end": "2026-07-05",
+    "startUtc": "2026-06-28T16:00:00.000Z",
+    "endUtc": "2026-07-05T15:59:59.999Z"
+  },
+  "status": "no_retirement_sample_insufficient_or_not_needed",
+  "champion_asset_id": "champion-3q-line-v0",
+  "ab_test_id": "ab-week0-cta-text-001",
+  "changed_variable": "cta_text",
+  "policy": {
+    "no_data_delete": true,
+    "no_primary_link_change": true,
+    "no_champion_promotion": true,
+    "local_rotation_only": true
+  },
+  "summary": {
+    "candidates_observed": 1,
+    "retirement_ready": 0,
+    "keep_testing": 1,
+    "promotion_reviews": 0
+  },
+  "items": [
+    {
+      "asset_id": "challenger-week0-cta-text-v1",
+      "role": "challenger",
+      "status": "keep_testing_sample_insufficient",
+      "recommended_action": "keep_in_candidate_rotation",
+      "retirement_ready": false,
+      "external_effect": false,
+      "reason": "sample_threshold_met=false; visits=0, cta_clicks=0, line_adds=0, test_days=0",
+      "human_gate": null
+    }
+  ]
+}

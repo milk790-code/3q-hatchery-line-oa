@@ -1,0 +1,100 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:46:14.016Z",
+  "started_at": "2026-07-10T21:46:11.001Z",
+  "duration_ms": 3015,
+  "mode": "local_browser_smoke",
+  "base_url": "http://127.0.0.1:8787",
+  "health_timeout_ms": 90000,
+  "server_started": true,
+  "log_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/logs/browser-smoke-20260710T214611Z.log",
+  "checks": [
+    {
+      "name": "health",
+      "ok": true,
+      "status_code": 200,
+      "evidence": {
+        "service": "3q-growth-loop-candidate",
+        "environment": "candidate",
+        "external_effects": false,
+        "human_gates": [
+          "production_deploy",
+          "primary_link_change",
+          "formal_post",
+          "line_push",
+          "payment",
+          "customer_data_mutation"
+        ]
+      },
+      "external_effect": false
+    },
+    {
+      "name": "candidate_page",
+      "ok": true,
+      "status_code": 200,
+      "evidence": {
+        "contains_offer": true,
+        "contains_cta": true,
+        "contains_asset_id": true
+      },
+      "external_effect": false
+    },
+    {
+      "name": "candidate_attribution_script",
+      "ok": true,
+      "status_code": 200,
+      "evidence": {
+        "markers_present": {
+          "variant_id: params.get(\"variant_id\")": true,
+          "content_id: params.get(\"content_id\")": true,
+          "session_id: params.get(\"sid\")": true,
+          "source: params.get(\"utm_source\")": true,
+          "medium: params.get(\"utm_medium\")": true,
+          "campaign: params.get(\"utm_campaign\")": true,
+          "sendCandidateEvent(\"page_view\")": true,
+          "sendCandidateEvent(\"cta_click\")": true
+        }
+      },
+      "external_effect": false
+    },
+    {
+      "name": "ab_status",
+      "ok": true,
+      "status_code": 200,
+      "evidence": {
+        "allocation": {
+          "champion": 90,
+          "challenger": 10
+        },
+        "champion_url": "https://3q-site.milk790.workers.dev/",
+        "champion_url_ready": true,
+        "public_link_change_performed": false,
+        "production_deploy_performed": false,
+        "human_gate": "Do not place /ab/:testId in public traffic until owner approves the exact URL, traffic share, duration, and rollback path."
+      },
+      "external_effect": false
+    },
+    {
+      "name": "ab_champion_target_ready",
+      "ok": true,
+      "status_code": 200,
+      "evidence": {
+        "champion_url": "https://3q-site.milk790.workers.dev/",
+        "champion_url_ready": true,
+        "external_effects": false,
+        "human_gate": "Do not place /ab/:testId in public traffic until owner approves the exact URL, traffic share, duration, and rollback path."
+      },
+      "external_effect": false
+    }
+  ],
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "event_write_performed": false,
+  "note": "Local browser-route smoke only. Does not click LINE CTA, publish, deploy, change public links, mutate customer data, process payments, or delete data."
+}

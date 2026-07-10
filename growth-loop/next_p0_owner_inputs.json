@@ -1,0 +1,271 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:44:53.826Z",
+  "mode": "next_p0_owner_inputs",
+  "status": "waiting_for_p0_owner_inputs",
+  "source_progress_status": "waiting_for_p0_sample_gate_counts",
+  "week": {
+    "start": "2026-06-29",
+    "end": "2026-07-05",
+    "startUtc": "2026-06-28T16:00:00.000Z",
+    "endUtc": "2026-07-05T15:59:59.999Z"
+  },
+  "current_round": {
+    "changed_variable": "cta_text",
+    "one_variable_rule": [
+      "hook",
+      "offer",
+      "visual_claim",
+      "cta_text"
+    ]
+  },
+  "current_input_count": 9,
+  "p0_pending_count": 18,
+  "p1_pending_count": 24,
+  "total_pending_count": 42,
+  "sample_threshold_met": false,
+  "owner_sample_gate_status": "waiting_for_owner_sample_gate_counts",
+  "owner_fill_paths": [
+    "data/source_capture/source_capture_ledger.filled.csv"
+  ],
+  "recommended_open_command": "open next_p0_owner_form.html",
+  "recommended_review_artifacts": [
+    "next_p0_owner_inputs.md",
+    "next_p0_owner_form.html",
+    "sample_gate_owner_form.html",
+    "sample_gate_owner_worksheet.md",
+    "data_collection_progress.md",
+    "sample_gate_collection_plan.md"
+  ],
+  "source_groups": [
+    {
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "input_count": 6,
+      "event_types": [
+        "page_view",
+        "cta_click"
+      ],
+      "target_live_files": [
+        "data/funnel_aggregates.csv"
+      ],
+      "owner_fill_paths": [
+        "data/source_capture/source_capture_ledger.filled.csv"
+      ],
+      "external_effect": false
+    },
+    {
+      "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+      "input_count": 3,
+      "event_types": [
+        "line_add"
+      ],
+      "target_live_files": [
+        "data/manual_conversions.csv"
+      ],
+      "owner_fill_paths": [
+        "data/source_capture/source_capture_ledger.filled.csv"
+      ],
+      "external_effect": false
+    }
+  ],
+  "inputs": [
+    {
+      "rank": 1,
+      "tracking_link_id": "track-champion-3q-line-v0",
+      "role": "champion",
+      "event_type": "page_view",
+      "stage_label": "落地頁瀏覽",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "target_live_file": "data/funnel_aggregates.csv",
+      "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+      "required_fields": [
+        "capture_date",
+        "aggregate_count",
+        "evidence_ref",
+        "reviewer",
+        "pii_checked"
+      ],
+      "evidence_rule": "只記 aggregate page views；不要存 IP、User-Agent、個人識別。",
+      "external_effect": false,
+      "owner_action": "Fill aggregate_count plus evidence_ref only after reviewing source totals. Keep pii_checked=yes only when no customer-level data is included."
+    },
+    {
+      "rank": 2,
+      "tracking_link_id": "track-champion-3q-line-v0",
+      "role": "champion",
+      "event_type": "cta_click",
+      "stage_label": "CTA 點擊",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "target_live_file": "data/funnel_aggregates.csv",
+      "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+      "required_fields": [
+        "capture_date",
+        "aggregate_count",
+        "evidence_ref",
+        "reviewer",
+        "pii_checked"
+      ],
+      "evidence_rule": "只記 aggregate CTA clicks；不要存個別 session 明細。",
+      "external_effect": false,
+      "owner_action": "Fill aggregate_count plus evidence_ref only after reviewing source totals. Keep pii_checked=yes only when no customer-level data is included."
+    },
+    {
+      "rank": 3,
+      "tracking_link_id": "track-champion-3q-line-v0",
+      "role": "champion",
+      "event_type": "line_add",
+      "stage_label": "LINE 進線 / 加好友",
+      "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+      "target_live_file": "data/manual_conversions.csv",
+      "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+      "required_fields": [
+        "capture_date",
+        "aggregate_count",
+        "evidence_ref",
+        "reviewer",
+        "pii_checked"
+      ],
+      "evidence_rule": "只記新增數或進線數；不要貼 LINE user id、暱稱、聊天內容。",
+      "external_effect": false,
+      "owner_action": "Fill aggregate_count plus evidence_ref only after reviewing source totals. Keep pii_checked=yes only when no customer-level data is included."
+    },
+    {
+      "rank": 4,
+      "tracking_link_id": "track-challenger-week0-cta-text-v1",
+      "role": "challenger",
+      "event_type": "page_view",
+      "stage_label": "落地頁瀏覽",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "target_live_file": "data/funnel_aggregates.csv",
+      "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+      "required_fields": [
+        "capture_date",
+        "aggregate_count",
+        "evidence_ref",
+        "reviewer",
+        "pii_checked"
+      ],
+      "evidence_rule": "只記 aggregate page views；不要存 IP、User-Agent、個人識別。",
+      "external_effect": false,
+      "owner_action": "Fill aggregate_count plus evidence_ref only after reviewing source totals. Keep pii_checked=yes only when no customer-level data is included."
+    },
+    {
+      "rank": 5,
+      "tracking_link_id": "track-challenger-week0-cta-text-v1",
+      "role": "challenger",
+      "event_type": "cta_click",
+      "stage_label": "CTA 點擊",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "target_live_file": "data/funnel_aggregates.csv",
+      "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+      "required_fields": [
+        "capture_date",
+        "aggregate_count",
+        "evidence_ref",
+        "reviewer",
+        "pii_checked"
+      ],
+      "evidence_rule": "只記 aggregate CTA clicks；不要存個別 session 明細。",
+      "external_effect": false,
+      "owner_action": "Fill aggregate_count plus evidence_ref only after reviewing source totals. Keep pii_checked=yes only when no customer-level data is included."
+    },
+    {
+      "rank": 6,
+      "tracking_link_id": "track-challenger-week0-cta-text-v1",
+      "role": "challenger",
+      "event_type": "line_add",
+      "stage_label": "LINE 進線 / 加好友",
+      "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+      "target_live_file": "data/manual_conversions.csv",
+      "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+      "required_fields": [
+        "capture_date",
+        "aggregate_count",
+        "evidence_ref",
+        "reviewer",
+        "pii_checked"
+      ],
+      "evidence_rule": "只記新增數或進線數；不要貼 LINE user id、暱稱、聊天內容。",
+      "external_effect": false,
+      "owner_action": "Fill aggregate_count plus evidence_ref only after reviewing source totals. Keep pii_checked=yes only when no customer-level data is included."
+    },
+    {
+      "rank": 7,
+      "tracking_link_id": "track-challenger-week0-cta-text-v1-line",
+      "role": "line_cta",
+      "event_type": "page_view",
+      "stage_label": "落地頁瀏覽",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "target_live_file": "data/funnel_aggregates.csv",
+      "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+      "required_fields": [
+        "capture_date",
+        "aggregate_count",
+        "evidence_ref",
+        "reviewer",
+        "pii_checked"
+      ],
+      "evidence_rule": "只記 aggregate page views；不要存 IP、User-Agent、個人識別。",
+      "external_effect": false,
+      "owner_action": "Fill aggregate_count plus evidence_ref only after reviewing source totals. Keep pii_checked=yes only when no customer-level data is included."
+    },
+    {
+      "rank": 8,
+      "tracking_link_id": "track-challenger-week0-cta-text-v1-line",
+      "role": "line_cta",
+      "event_type": "cta_click",
+      "stage_label": "CTA 點擊",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "target_live_file": "data/funnel_aggregates.csv",
+      "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+      "required_fields": [
+        "capture_date",
+        "aggregate_count",
+        "evidence_ref",
+        "reviewer",
+        "pii_checked"
+      ],
+      "evidence_rule": "只記 aggregate CTA clicks；不要存個別 session 明細。",
+      "external_effect": false,
+      "owner_action": "Fill aggregate_count plus evidence_ref only after reviewing source totals. Keep pii_checked=yes only when no customer-level data is included."
+    },
+    {
+      "rank": 9,
+      "tracking_link_id": "track-challenger-week0-cta-text-v1-line",
+      "role": "line_cta",
+      "event_type": "line_add",
+      "stage_label": "LINE 進線 / 加好友",
+      "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+      "target_live_file": "data/manual_conversions.csv",
+      "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+      "required_fields": [
+        "capture_date",
+        "aggregate_count",
+        "evidence_ref",
+        "reviewer",
+        "pii_checked"
+      ],
+      "evidence_rule": "只記新增數或進線數；不要貼 LINE user id、暱稱、聊天內容。",
+      "external_effect": false,
+      "owner_action": "Fill aggregate_count plus evidence_ref only after reviewing source totals. Keep pii_checked=yes only when no customer-level data is included."
+    }
+  ],
+  "safety_rules": [
+    "Aggregate counts only.",
+    "Do not paste phone, email, LINE user ID, customer name, chat text, payment data, private notes, order IDs, refund details, or customer-level exports.",
+    "Evidence refs should be local screenshot/export references or source labels, not raw customer rows.",
+    "This progress check reads local artifacts only; it does not create live CSVs, append data/lp_events.jsonl, deploy, post, push LINE, change public links, mutate customer data, process payments, push GitHub, create PRs, or delete data."
+  ],
+  "real_events_unchanged": true,
+  "live_input_files_created": false,
+  "data_lp_events_write_performed": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "external_effect": false
+}

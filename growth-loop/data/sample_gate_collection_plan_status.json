@@ -1,0 +1,36 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:44:51.068Z",
+  "mode": "sample_gate_collection_plan",
+  "status": "waiting_for_sample_gate_counts",
+  "plan_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/sample_gate_collection_plan.json",
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/sample_gate_collection_plan.md",
+  "p0_task_count": 18,
+  "p0_link_count": 6,
+  "sample_stage_count": 3,
+  "required_event_types": [
+    "page_view",
+    "cta_click",
+    "line_add"
+  ],
+  "global_sample_gaps": {
+    "visits": 100,
+    "cta_clicks": 20,
+    "line_adds": 5,
+    "test_days": 3
+  },
+  "filled_ledger_exists": false,
+  "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+  "real_events_unchanged": true,
+  "live_input_files_created": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

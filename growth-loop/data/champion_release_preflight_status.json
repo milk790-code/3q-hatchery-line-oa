@@ -1,0 +1,239 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:47:41.794Z",
+  "mode": "clean_archive_champion_release_preflight_local_only",
+  "status": "prepared_but_blocked_production_prerequisites",
+  "source": {
+    "repository": "milk790-code/3q-hatchery-line-oa",
+    "repo_path": "/Users/mac/Documents/GitHub/3q-hatchery-line-oa",
+    "repo_present": true,
+    "ref": "origin/main",
+    "mode": "git_ref_pinned",
+    "commit": "f86faa7356ac7962d9b429951b67c742370271c0",
+    "observed_ref_commit": "f86faa7356ac7962d9b429951b67c742370271c0",
+    "ref_advanced": false,
+    "lock_commit_is_ancestor": true,
+    "ancestry_verified": true,
+    "expected_lock_tuple_verified": true,
+    "ref_file_matches_lock": true,
+    "path": "workers/3q-site/worker.js",
+    "blob_sha": "c9ffd646fd88750b6170fa1aa8ac2acd91c6f5a1",
+    "sha256": "d63f07cc8f6fe0944cf9c7279eb4ed2abe4b3b6e1e7d05c4cd87425beb26542a",
+    "source_status_before": [
+      "?? .wrangler/",
+      "?? luxury-line-oa/.wrangler/",
+      "?? webhook/.wrangler/",
+      "?? workers/social-publisher/.wrangler/"
+    ],
+    "source_status_after": [
+      "?? .wrangler/",
+      "?? luxury-line-oa/.wrangler/",
+      "?? webhook/.wrangler/",
+      "?? workers/social-publisher/.wrangler/"
+    ],
+    "source_repository_unchanged": true
+  },
+  "candidate": {
+    "worker": "integrations/3q-site/generated/worker.candidate.js",
+    "patch": "integrations/3q-site/generated/worker.candidate.patch",
+    "generated_sha256": "d63f07cc8f6fe0944cf9c7279eb4ed2abe4b3b6e1e7d05c4cd87425beb26542a",
+    "patched_sha256": "d63f07cc8f6fe0944cf9c7279eb4ed2abe4b3b6e1e7d05c4cd87425beb26542a",
+    "byte_identical_after_patch": true
+  },
+  "local_branch": {
+    "ok": true,
+    "status": "integration_already_merged_at_source_lock",
+    "name": "codex/3q-growth-loop-champion-v1",
+    "commit": "9b6fd00c082f2b67d6cde159e61dc6c407d02ea0",
+    "parent_commit": "355981c978bdb1c93a29bb89ae700fda7b41cac0",
+    "source_lock_base_commit": "f86faa7356ac7962d9b429951b67c742370271c0",
+    "worker_commit": null,
+    "workflow_commit": null,
+    "commit_count": 0,
+    "commits": [],
+    "changed_paths": [
+      ".github/workflows/deploy-3q-line-oa.yml",
+      ".github/workflows/deploy-fleet-sentinel.yml",
+      ".github/workflows/deploy-pop-line-oa.yml",
+      ".github/workflows/deploy-tudigong.yml",
+      "brands/popmonster.json",
+      "workers/3q-line-oa/worker.js",
+      "workers/fleet-sentinel/worker.js",
+      "workers/outreach/worker.js",
+      "workers/pop-line-oa/worker.js",
+      "workers/pop-sales-ai/worker.js",
+      "workers/sales-ai/worker.js",
+      "workers/tudigong-sales-ai/worker.js",
+      "workers/tudigong/worker.js"
+    ],
+    "remote_branch_observed": true,
+    "remote_commit": "9b6fd00c082f2b67d6cde159e61dc6c407d02ea0",
+    "remote_state": "up_to_date_with_local",
+    "local_ahead_count": 0,
+    "github_push_or_pr_performed": false
+  },
+  "collector_readiness": {
+    "ok": true,
+    "status": "dedicated_d1_bound_owner_migration_review_required",
+    "inventory_checked_at": "2026-07-10T21:43:33.424Z",
+    "dedicated_database_present": true,
+    "configured_id_is_placeholder": false,
+    "remote_table_query_performed": false,
+    "resource_create_performed": false,
+    "remote_schema_migration_performed": false,
+    "candidate_deployment_observed": true,
+    "candidate_deploy_required": false,
+    "observed_live_chain_ready_for_owner_evidence": true,
+    "live_ingest_readiness_proven": false
+  },
+  "checks": {
+    "exact_source_commit": true,
+    "expected_lock_tuple_verified": true,
+    "source_ref_pinned_once": true,
+    "source_ref_descends_from_lock": true,
+    "source_ref_target_matches_lock": true,
+    "exact_source_blob": true,
+    "exact_source_sha256": true,
+    "candidate_build_status_ok": true,
+    "candidate_source_lock_matches": true,
+    "isolated_two_worker_smoke_ok": true,
+    "patch_check_ok": true,
+    "patch_apply_ok": true,
+    "patched_source_matches_generated_candidate": true,
+    "node_syntax_ok": true,
+    "wrangler_dry_run_ok": true,
+    "wrangler_bundle_created": true,
+    "production_command_template_dry_run_ok": true,
+    "source_repository_unchanged": true,
+    "local_feature_commit_ready": true,
+    "d1_readiness_monitor_ok": true,
+    "live_telemetry_readiness_monitor_ok": true
+  },
+  "patch_validation": {
+    "check_exit_code": 0,
+    "apply_exit_code": 0,
+    "clean_archive_only": true
+  },
+  "syntax_check": {
+    "ok": true,
+    "exit_code": 0
+  },
+  "worker_dry_run": {
+    "ok": true,
+    "exit_code": 0,
+    "wrangler_version": "4.108.0",
+    "compatibility_date": "2024-12-01",
+    "total_upload_line": "Total Upload: 156.04 KiB / gzip: 42.58 KiB",
+    "bundle_files": [
+      {
+        "path": "README.md",
+        "bytes": 126,
+        "sha256": "a4c8deea5bf2d1edcec01b1ea4a71bd2ccb7bde62b25cba343be3822e8ef1412"
+      },
+      {
+        "path": "worker.js",
+        "bytes": 159784,
+        "sha256": "2a8aab6e357c7d1d9cf295e1fecba0cb02036a354a80205214bc5ee6c9c458d4"
+      },
+      {
+        "path": "worker.js.map",
+        "bytes": 182072,
+        "sha256": "82afb9c9bd5e5ab4b19a4d251e85d8ad1da6d39a9567e6513698c87f35aa1115"
+      }
+    ]
+  },
+  "production_command_template_dry_run": {
+    "ok": true,
+    "exit_code": 0,
+    "upload_performed": false,
+    "total_upload_line": "Total Upload: 156.04 KiB / gzip: 42.58 KiB",
+    "bundle_files": [
+      {
+        "path": "README.md",
+        "bytes": 108,
+        "sha256": "5aa40bf0634498c6211ecf44b8f8a0dd52663e7706047eeb8875f6321ea216fa"
+      },
+      {
+        "path": "worker.js",
+        "bytes": 159784,
+        "sha256": "2a8aab6e357c7d1d9cf295e1fecba0cb02036a354a80205214bc5ee6c9c458d4"
+      },
+      {
+        "path": "worker.js.map",
+        "bytes": 182092,
+        "sha256": "ded3a592c25a3c7f0d01e32321af0354d399fedcffd861e3ada8bcf0fe21eec6"
+      }
+    ]
+  },
+  "live_snapshot": {
+    "present": true,
+    "ok": true,
+    "checked_at": "2026-07-10T14:39:57.325Z",
+    "age_hours": 7.13,
+    "refreshed_this_run": false,
+    "worker_name": "3q-site",
+    "deployed_version_id": "de2997a0-6a6a-4780-9e24-e65774dc3f1a",
+    "compatibility_date": "2024-12-01",
+    "contact_repair_live": true,
+    "collector_configured": true
+  },
+  "release_gates": [
+    {
+      "id": "review_champion_patch",
+      "risk_tier": "T1",
+      "status": "local_feature_commit_ready_for_owner_review",
+      "reason": "Review local head 9b6fd00c082f2b67d6cde159e61dc6c407d02ea0; the full stack is scoped to .github/workflows/deploy-3q-line-oa.yml, .github/workflows/deploy-fleet-sentinel.yml, .github/workflows/deploy-pop-line-oa.yml, .github/workflows/deploy-tudigong.yml, brands/popmonster.json, workers/3q-line-oa/worker.js, workers/fleet-sentinel/worker.js, workers/outreach/worker.js, workers/pop-line-oa/worker.js, workers/pop-sales-ai/worker.js, workers/sales-ai/worker.js, workers/tudigong-sales-ai/worker.js, workers/tudigong/worker.js. Remote state is up_to_date_with_local; this preflight performed no GitHub write."
+    },
+    {
+      "id": "provision_production_collector",
+      "risk_tier": "T3",
+      "status": "existing_collector_observed_owner_provenance_and_schema_evidence_required",
+      "reason": "Candidate deployment 5073984b-bcc0-40f1-a331-daaadd741071 / version 133d27b0-36e5-41e8-96ec-b55925b7b30a is observed healthy, security-current, and wired to the Champion. No redeploy is currently required, but owner provenance and remote schema evidence are still missing."
+    },
+    {
+      "id": "approve_champion_production_deploy",
+      "risk_tier": "T3",
+      "status": "blocked_owner_approval_required",
+      "reason": "A live integration may already be observable, but its provenance is not owner evidence. Any deploy or redeploy still requires patch review, current rollback confirmation, and explicit approval."
+    },
+    {
+      "id": "approve_github_branch_push_or_pr",
+      "risk_tier": "T2",
+      "status": "blocked_owner_approval_required",
+      "reason": "The remote branch is a reviewed ancestor (up_to_date_with_local) and local is ahead by 0; updating it or opening a PR remains an external GitHub write."
+    }
+  ],
+  "rollback": {
+    "target_version_id": "de2997a0-6a6a-4780-9e24-e65774dc3f1a",
+    "command_requires_owner_approval": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/node_modules/.bin/wrangler rollback de2997a0-6a6a-4780-9e24-e65774dc3f1a --name 3q-site -m \"Rollback champion Growth Loop integration\"",
+    "source_restore_reference": "f86faa7356ac7962d9b429951b67c742370271c0",
+    "note": "Re-read live deployments immediately before deploy. If the active version changed, regenerate this packet before using rollback."
+  },
+  "outputs": {
+    "report": "champion_release_preflight.md",
+    "status": "data/champion_release_preflight_status.json",
+    "live_snapshot": "data/champion_live_deployment_snapshot.json",
+    "live_telemetry_report": "live_telemetry_readiness.md",
+    "live_telemetry_status": "data/live_telemetry_readiness_status.json",
+    "owner_packet_json": "champion_release_owner_packet.json",
+    "owner_packet_markdown": "champion_release_owner_packet.md",
+    "local_branch_report": "champion_local_branch.md",
+    "local_branch_status": "data/champion_local_branch_status.json",
+    "d1_readiness_report": "cloudflare_d1_readiness.md",
+    "d1_readiness_status": "data/cloudflare_d1_readiness_status.json"
+  },
+  "external_read_performed_this_run": false,
+  "external_effect": false,
+  "data_lp_events_write_performed": false,
+  "source_repo_write_performed": false,
+  "production_deploy_performed": false,
+  "public_link_change_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_read_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "temporary_files_removed": true
+}

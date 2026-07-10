@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:44:17.943Z",
+  "mode": "isolated_local_champion_source_lock_fixtures",
+  "cases": [
+    {
+      "id": "exact_lock_passes",
+      "ok": true
+    },
+    {
+      "id": "descendant_with_same_target_passes",
+      "ok": true
+    },
+    {
+      "id": "annotated_ref_is_pinned_to_commit",
+      "ok": true
+    },
+    {
+      "id": "ref_advances_between_checks_with_same_target_passes",
+      "ok": true
+    },
+    {
+      "id": "blob_match_with_sha_mismatch_fails",
+      "ok": true
+    },
+    {
+      "id": "missing_repo_fallback_is_unverified_and_blocked",
+      "ok": true
+    },
+    {
+      "id": "descendant_target_drift_fails",
+      "ok": true
+    },
+    {
+      "id": "non_ancestor_with_same_target_fails",
+      "ok": true
+    }
+  ],
+  "external_effect": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "delete_action_performed": false
+}

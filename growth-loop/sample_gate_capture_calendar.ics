@@ -1,0 +1,32 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Angelia 3Q Growth Loop//Sample Gate Capture Calendar//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:3Q Growth Loop Sample Gate
+X-WR-TIMEZONE:Asia/Taipei
+BEGIN:VEVENT
+UID:week0_capture_open@3q-growth-loop.local
+DTSTAMP:20260710T214515Z
+DTSTART;VALUE=DATE:20260629
+DTEND;VALUE=DATE:20260630
+SUMMARY:Open Week 0 P0 aggregate capture
+DESCRIPTION:Confirm the current one-variable round\, review the focused Next P0 rows\, and start collecting aggregate counts.\\nCommand: open next_p0_owner_form.html\\nArtifact: next_p0_owner_form.html\\nOwner gate: Collect aggregate counts only\; do not export customer rows.\\nExternal effect: no
+END:VEVENT
+BEGIN:VEVENT
+UID:minimum_sample_check_day3@3q-growth-loop.local
+DTSTAMP:20260710T214515Z
+DTSTART;VALUE=DATE:20260701
+DTEND;VALUE=DATE:20260702
+SUMMARY:Day 3 minimum sample check
+DESCRIPTION:Check whether min_visits=100\, min_cta_clicks=20\, min_line_adds=5\, and min_test_days=3 are met before any winner review.\\nCommand: npm run data:progress && npm run next-p0:intake && npm run owner:next-action\\nArtifact: owner_next_action.md\\nOwner gate: If a valid focused CSV exists\, staging still requires --stage --confirm-owner-reviewed.\\nExternal effect: no
+END:VEVENT
+BEGIN:VEVENT
+UID:preferred_sample_check_day7@3q-growth-loop.local
+DTSTAMP:20260710T214515Z
+DTSTART;VALUE=DATE:20260705
+DTEND;VALUE=DATE:20260706
+SUMMARY:Day 7 preferred weekly review
+DESCRIPTION:Run the full local weekly loop\, refresh scores\, archive evidence\, and review the approval queue without external actions.\\nCommand: npm run weekly:local\\nArtifact: weekly_report.md\\nOwner gate: Review approval_queue.json before any public route\, deploy\, GitHub\, post\, or LINE action.\\nExternal effect: no
+END:VEVENT
+END:VCALENDAR

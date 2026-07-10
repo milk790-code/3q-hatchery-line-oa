@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="zh-Hant-TW" data-external-effect="false" data-network="none">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>3Q Growth Loop North Star Outcome Form</title>
+  <style>
+    :root {
+      --ink: #17211b;
+      --muted: #66736c;
+      --line: #d9dfd9;
+      --paper: #f7f8f4;
+      --panel: #ffffff;
+      --panel2: #eef2ec;
+      --green: #2f6d52;
+      --amber: #875b17;
+      --red: #8b2e2e;
+      --blue: #315f7d;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--paper); color: var(--ink); font-family: var(--sans); }
+    body { margin: 0; min-width: 320px; }
+    .shell { max-width: 1500px; margin: 0 auto; padding: 24px; }
+    h1 { margin: 0 0 8px; font-size: 28px; line-height: 1.1; letter-spacing: 0; }
+    p { margin: 0; color: var(--muted); line-height: 1.55; }
+    .top {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+      gap: 16px;
+      padding-bottom: 18px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel);
+      overflow: hidden;
+    }
+    .panel header {
+      background: var(--panel2);
+      border-bottom: 1px solid var(--line);
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+    .panel h2 { margin: 0; font-size: 14px; letter-spacing: 0; }
+    .body { padding: 14px; }
+    .facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .fact { min-width: 0; }
+    .label { display: block; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+    .value { display: block; font-family: var(--mono); font-size: 12px; overflow-wrap: anywhere; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
+    button {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 6px;
+      padding: 9px 11px;
+      font: 600 13px var(--sans);
+      cursor: pointer;
+    }
+    button.primary { background: var(--green); color: #fff; border-color: var(--green); }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    .status {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 6px;
+      padding: 9px 11px;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .status.ok { border-color: color-mix(in srgb, var(--green) 36%, var(--line)); color: var(--green); }
+    .status.bad { border-color: color-mix(in srgb, var(--red) 36%, var(--line)); color: var(--red); }
+    .scroll { overflow: auto; border: 1px solid var(--line); border-radius: 6px; }
+    table { width: 100%; border-collapse: collapse; min-width: 1480px; background: #fff; }
+    th, td { border-bottom: 1px solid var(--line); padding: 8px; text-align: left; vertical-align: top; }
+    th { position: sticky; top: 0; z-index: 2; background: var(--panel2); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+    td { font-size: 12px; line-height: 1.35; }
+    .mono { font-family: var(--mono); }
+    input[type="text"], input[type="date"], input[type="number"] {
+      width: 100%;
+      min-width: 118px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 7px 8px;
+      font: 12px var(--sans);
+      background: #fff;
+    }
+    input[type="checkbox"] { width: 18px; height: 18px; }
+    tr.invalid { background: #fff7f7; }
+    .issues { margin-top: 12px; color: var(--red); font-family: var(--mono); font-size: 12px; white-space: pre-wrap; }
+    .rules { display: grid; gap: 8px; margin: 0; padding-left: 18px; color: var(--muted); line-height: 1.5; }
+    .badge { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 4px 8px; font: 11px var(--mono); background: #fff; }
+    @media (max-width: 860px) {
+      .shell { padding: 16px; }
+      .top { grid-template-columns: 1fr; }
+      .facts { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="top">
+      <div>
+        <h1>3Q Growth Loop North Star Outcome Form</h1>
+        <p>BLUF: Fill the 24 aggregate-only P1 outcome rows, validate locally, then download <span class="mono">source_capture_ledger.filled.csv</span>. This page has no network calls, no external links, no browser storage, and no event writes.</p>
+      </div>
+      <aside class="panel">
+        <header>
+          <h2>Local Contract</h2>
+          <span class="badge">external=false</span>
+        </header>
+        <div class="body facts">
+          <div class="fact"><span class="label">Generated</span><span class="value">2026-07-10T21:44:56.680Z</span></div>
+          <div class="fact"><span class="label">Rows</span><span class="value">24</span></div>
+          <div class="fact"><span class="label">Events</span><span class="value">link_click, lead_submit, deal, quality_flag</span></div>
+          <div class="fact"><span class="label">Owner path</span><span class="value">data/source_capture/source_capture_ledger.filled.csv</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="panel">
+      <header>
+        <h2>Fill Rows</h2>
+        <span id="status" class="status">not validated</span>
+      </header>
+      <div class="body">
+        <div class="toolbar">
+          <button type="button" class="primary" id="validate">Validate</button>
+          <button type="button" id="downloadCsv" disabled>Download CSV</button>
+          <button type="button" id="downloadJson" disabled>Download Review JSON</button>
+          <button type="button" id="clear">Clear owner fields</button>
+        </div>
+        <div class="scroll">
+          <form id="ownerForm" novalidate>
+            <table>
+              <thead>
+                <tr>
+                  <th>CSV row</th>
+                  <th>event</th>
+                  <th>asset</th>
+                  <th>content</th>
+                  <th>variant</th>
+                  <th>tracking link</th>
+                  <th>target</th>
+                  <th>source</th>
+                  <th>capture date</th>
+                  <th>aggregate count</th>
+                  <th>quality score</th>
+                  <th>evidence ref</th>
+                  <th>reviewer</th>
+                  <th>PII checked</th>
+                </tr>
+              </thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </form>
+        </div>
+        <div id="issues" class="issues" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:14px">
+      <header>
+        <h2>Hard Rules</h2>
+        <span class="badge">aggregate only</span>
+      </header>
+      <div class="body">
+        <ul class="rules">
+          <li>Do not paste phone, email, LINE user ID, customer name, chat text, order ID, payment/refund ID, IP, User-Agent, or private notes.</li>
+          <li>The page only builds a downloadable CSV. It does not create <span class="mono">data/source_capture/source_capture_ledger.filled.csv</span> by itself.</li>
+          <li>After review, place the downloaded CSV at <span class="mono">data/source_capture/source_capture_ledger.filled.csv</span>, then run <span class="mono">npm run north-star:outcome-preflight</span>.</li>
+          <li>These rows complete the North Star funnel after link click: LINE inbound, lead, deal, and quality regression evidence stay owner-reviewed.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <script id="rows-data" type="application/json">[{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"link_click","stage_label":"連結點擊","asset_id":"champion-3q-line-v0","content_id":"2026-06-29-champion","variant_id":"champion-3q-line-v0","tracking_link_id":"track-champion-3q-line-v0","tracking_url":"http://127.0.0.1:8787/r/champion-3q-line-v0?to=champion&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=champion-3q-line-v0&content_id=2026-06-29-champion","source_surface":"社群平台連結點擊報表 / remote D1 link_click","source_metric":"link clicks by content_id / variant_id","target_template":"data/real_data_input_pack/funnel_aggregates.fill-template.csv","target_live_file":"data/funnel_aggregates.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記 aggregate count 與報表截圖/匯出檔路徑；不要貼使用者名單。","row_number":2,"outcome_group":"Click denominator","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"lead_submit","stage_label":"留資","asset_id":"champion-3q-line-v0","content_id":"2026-06-29-champion","variant_id":"champion-3q-line-v0","tracking_link_id":"track-champion-3q-line-v0","tracking_url":"http://127.0.0.1:8787/r/champion-3q-line-v0?to=champion&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=champion-3q-line-v0&content_id=2026-06-29-champion","source_surface":"LINE 客服手動分桶 / lead qualification aggregate","source_metric":"lead_submit aggregate count","target_template":"data/real_data_input_pack/funnel_aggregates.fill-template.csv","target_live_file":"data/funnel_aggregates.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記合格留資數；不要貼姓名、電話、email、公司私密資料。","row_number":6,"outcome_group":"Revenue outcome","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"deal","stage_label":"成交","asset_id":"champion-3q-line-v0","content_id":"2026-06-29-champion","variant_id":"champion-3q-line-v0","tracking_link_id":"track-champion-3q-line-v0","tracking_url":"http://127.0.0.1:8787/r/champion-3q-line-v0?to=champion&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=champion-3q-line-v0&content_id=2026-06-29-champion","source_surface":"owner-confirmed aggregate deal log","source_metric":"deal aggregate count","target_template":"data/real_data_input_pack/funnel_aggregates.fill-template.csv","target_live_file":"data/funnel_aggregates.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記成交筆數與金額桶；不要貼付款資訊、ECPay 訂單或退款資料。","row_number":7,"outcome_group":"Revenue outcome","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"quality_flag","stage_label":"品質 / 垃圾訊號","asset_id":"champion-3q-line-v0","content_id":"2026-06-29-champion","variant_id":"champion-3q-line-v0","tracking_link_id":"track-champion-3q-line-v0","tracking_url":"http://127.0.0.1:8787/r/champion-3q-line-v0?to=champion&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=champion-3q-line-v0&content_id=2026-06-29-champion","source_surface":"LINE 客服手動分桶 / quality aggregate","source_metric":"quality_flag count and optional aggregate quality_score","target_template":"data/real_data_input_pack/funnel_aggregates.fill-template.csv","target_live_file":"data/funnel_aggregates.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記品質旗標數；不要貼對話原文或客戶資料。","row_number":8,"outcome_group":"Quality regression guard","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"link_click","stage_label":"連結點擊","asset_id":"challenger-week0-cta-text-v1","content_id":"2026-06-29-challenger","variant_id":"challenger-week0-cta-text-v1","tracking_link_id":"track-challenger-week0-cta-text-v1","tracking_url":"http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=challenger-week0-cta-text-v1&content_id=2026-06-29-challenger","source_surface":"社群平台連結點擊報表 / remote D1 link_click","source_metric":"link clicks by content_id / variant_id","target_template":"data/real_data_input_pack/funnel_aggregates.fill-template.csv","target_live_file":"data/funnel_aggregates.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記 aggregate count 與報表截圖/匯出檔路徑；不要貼使用者名單。","row_number":9,"outcome_group":"Click denominator","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"lead_submit","stage_label":"留資","asset_id":"challenger-week0-cta-text-v1","content_id":"2026-06-29-challenger","variant_id":"challenger-week0-cta-text-v1","tracking_link_id":"track-challenger-week0-cta-text-v1","tracking_url":"http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=challenger-week0-cta-text-v1&content_id=2026-06-29-challenger","source_surface":"LINE 客服手動分桶 / lead qualification aggregate","source_metric":"lead_submit aggregate count","target_template":"data/real_data_input_pack/manual_conversions.fill-template.csv","target_live_file":"data/manual_conversions.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記合格留資數；不要貼姓名、電話、email、公司私密資料。","row_number":13,"outcome_group":"Revenue outcome","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"deal","stage_label":"成交","asset_id":"challenger-week0-cta-text-v1","content_id":"2026-06-29-challenger","variant_id":"challenger-week0-cta-text-v1","tracking_link_id":"track-challenger-week0-cta-text-v1","tracking_url":"http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=challenger-week0-cta-text-v1&content_id=2026-06-29-challenger","source_surface":"owner-confirmed aggregate deal log","source_metric":"deal aggregate count","target_template":"data/real_data_input_pack/manual_conversions.fill-template.csv","target_live_file":"data/manual_conversions.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記成交筆數與金額桶；不要貼付款資訊、ECPay 訂單或退款資料。","row_number":14,"outcome_group":"Revenue outcome","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"quality_flag","stage_label":"品質 / 垃圾訊號","asset_id":"challenger-week0-cta-text-v1","content_id":"2026-06-29-challenger","variant_id":"challenger-week0-cta-text-v1","tracking_link_id":"track-challenger-week0-cta-text-v1","tracking_url":"http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=challenger-week0-cta-text-v1&content_id=2026-06-29-challenger","source_surface":"LINE 客服手動分桶 / quality aggregate","source_metric":"quality_flag count and optional aggregate quality_score","target_template":"data/real_data_input_pack/manual_conversions.fill-template.csv","target_live_file":"data/manual_conversions.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記品質旗標數；不要貼對話原文或客戶資料。","row_number":15,"outcome_group":"Quality regression guard","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"link_click","stage_label":"連結點擊","asset_id":"challenger-week0-cta-text-v1","content_id":"2026-06-29-line-cta","variant_id":"challenger-week0-cta-text-v1-line","tracking_link_id":"track-challenger-week0-cta-text-v1-line","tracking_url":"http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=line&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=challenger-week0-cta-text-v1-line&content_id=2026-06-29-line-cta","source_surface":"社群平台連結點擊報表 / remote D1 link_click","source_metric":"link clicks by content_id / variant_id","target_template":"data/real_data_input_pack/funnel_aggregates.fill-template.csv","target_live_file":"data/funnel_aggregates.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記 aggregate count 與報表截圖/匯出檔路徑；不要貼使用者名單。","row_number":16,"outcome_group":"Click denominator","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"lead_submit","stage_label":"留資","asset_id":"challenger-week0-cta-text-v1","content_id":"2026-06-29-line-cta","variant_id":"challenger-week0-cta-text-v1-line","tracking_link_id":"track-challenger-week0-cta-text-v1-line","tracking_url":"http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=line&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=challenger-week0-cta-text-v1-line&content_id=2026-06-29-line-cta","source_surface":"LINE 客服手動分桶 / lead qualification aggregate","source_metric":"lead_submit aggregate count","target_template":"data/real_data_input_pack/manual_conversions.fill-template.csv","target_live_file":"data/manual_conversions.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記合格留資數；不要貼姓名、電話、email、公司私密資料。","row_number":20,"outcome_group":"Revenue outcome","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"deal","stage_label":"成交","asset_id":"challenger-week0-cta-text-v1","content_id":"2026-06-29-line-cta","variant_id":"challenger-week0-cta-text-v1-line","tracking_link_id":"track-challenger-week0-cta-text-v1-line","tracking_url":"http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=line&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=challenger-week0-cta-text-v1-line&content_id=2026-06-29-line-cta","source_surface":"owner-confirmed aggregate deal log","source_metric":"deal aggregate count","target_template":"data/real_data_input_pack/manual_conversions.fill-template.csv","target_live_file":"data/manual_conversions.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記成交筆數與金額桶；不要貼付款資訊、ECPay 訂單或退款資料。","row_number":21,"outcome_group":"Revenue outcome","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"quality_flag","stage_label":"品質 / 垃圾訊號","asset_id":"challenger-week0-cta-text-v1","content_id":"2026-06-29-line-cta","variant_id":"challenger-week0-cta-text-v1-line","tracking_link_id":"track-challenger-week0-cta-text-v1-line","tracking_url":"http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=line&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=challenger-week0-cta-text-v1-line&content_id=2026-06-29-line-cta","source_surface":"LINE 客服手動分桶 / quality aggregate","source_metric":"quality_flag count and optional aggregate quality_score","target_template":"data/real_data_input_pack/manual_conversions.fill-template.csv","target_live_file":"data/manual_conversions.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記品質旗標數；不要貼對話原文或客戶資料。","row_number":22,"outcome_group":"Quality regression guard","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"link_click","stage_label":"連結點擊","asset_id":"challenger-week0-cta-text-v1","content_id":"week0-post-001","variant_id":"cta-v1-diagnostic","tracking_link_id":"post-week0-post-001-cta-v1-diagnostic","tracking_url":"http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=cta-v1-diagnostic&content_id=week0-post-001","source_surface":"社群平台連結點擊報表 / remote D1 link_click","source_metric":"link clicks by content_id / variant_id","target_template":"data/real_data_input_pack/funnel_aggregates.fill-template.csv","target_live_file":"data/funnel_aggregates.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記 aggregate count 與報表截圖/匯出檔路徑；不要貼使用者名單。","row_number":23,"outcome_group":"Click denominator","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"lead_submit","stage_label":"留資","asset_id":"challenger-week0-cta-text-v1","content_id":"week0-post-001","variant_id":"cta-v1-diagnostic","tracking_link_id":"post-week0-post-001-cta-v1-diagnostic","tracking_url":"http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=cta-v1-diagnostic&content_id=week0-post-001","source_surface":"LINE 客服手動分桶 / lead qualification aggregate","source_metric":"lead_submit aggregate count","target_template":"data/real_data_input_pack/manual_conversions.fill-template.csv","target_live_file":"data/manual_conversions.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記合格留資數；不要貼姓名、電話、email、公司私密資料。","row_number":27,"outcome_group":"Revenue outcome","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"deal","stage_label":"成交","asset_id":"challenger-week0-cta-text-v1","content_id":"week0-post-001","variant_id":"cta-v1-diagnostic","tracking_link_id":"post-week0-post-001-cta-v1-diagnostic","tracking_url":"http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=cta-v1-diagnostic&content_id=week0-post-001","source_surface":"owner-confirmed aggregate deal log","source_metric":"deal aggregate count","target_template":"data/real_data_input_pack/manual_conversions.fill-template.csv","target_live_file":"data/manual_conversions.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記成交筆數與金額桶；不要貼付款資訊、ECPay 訂單或退款資料。","row_number":28,"outcome_group":"Revenue outcome","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"quality_flag","stage_label":"品質 / 垃圾訊號","asset_id":"challenger-week0-cta-text-v1","content_id":"week0-post-001","variant_id":"cta-v1-diagnostic","tracking_link_id":"post-week0-post-001-cta-v1-diagnostic","tracking_url":"http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=cta-v1-diagnostic&content_id=week0-post-001","source_surface":"LINE 客服手動分桶 / quality aggregate","source_metric":"quality_flag count and optional aggregate quality_score","target_template":"data/real_data_input_pack/manual_conversions.fill-template.csv","target_live_file":"data/manual_conversions.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記品質旗標數；不要貼對話原文或客戶資料。","row_number":29,"outcome_group":"Quality regression guard","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"link_click","stage_label":"連結點擊","asset_id":"challenger-week0-cta-text-v1","content_id":"week0-post-002","variant_id":"cta-v2-audit","tracking_link_id":"post-week0-post-002-cta-v2-audit","tracking_url":"http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=cta-v2-audit&content_id=week0-post-002","source_surface":"社群平台連結點擊報表 / remote D1 link_click","source_metric":"link clicks by content_id / variant_id","target_template":"data/real_data_input_pack/funnel_aggregates.fill-template.csv","target_live_file":"data/funnel_aggregates.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記 aggregate count 與報表截圖/匯出檔路徑；不要貼使用者名單。","row_number":30,"outcome_group":"Click denominator","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"lead_submit","stage_label":"留資","asset_id":"challenger-week0-cta-text-v1","content_id":"week0-post-002","variant_id":"cta-v2-audit","tracking_link_id":"post-week0-post-002-cta-v2-audit","tracking_url":"http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=cta-v2-audit&content_id=week0-post-002","source_surface":"LINE 客服手動分桶 / lead qualification aggregate","source_metric":"lead_submit aggregate count","target_template":"data/real_data_input_pack/manual_conversions.fill-template.csv","target_live_file":"data/manual_conversions.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記合格留資數；不要貼姓名、電話、email、公司私密資料。","row_number":34,"outcome_group":"Revenue outcome","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"deal","stage_label":"成交","asset_id":"challenger-week0-cta-text-v1","content_id":"week0-post-002","variant_id":"cta-v2-audit","tracking_link_id":"post-week0-post-002-cta-v2-audit","tracking_url":"http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=cta-v2-audit&content_id=week0-post-002","source_surface":"owner-confirmed aggregate deal log","source_metric":"deal aggregate count","target_template":"data/real_data_input_pack/manual_conversions.fill-template.csv","target_live_file":"data/manual_conversions.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記成交筆數與金額桶；不要貼付款資訊、ECPay 訂單或退款資料。","row_number":35,"outcome_group":"Revenue outcome","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"quality_flag","stage_label":"品質 / 垃圾訊號","asset_id":"challenger-week0-cta-text-v1","content_id":"week0-post-002","variant_id":"cta-v2-audit","tracking_link_id":"post-week0-post-002-cta-v2-audit","tracking_url":"http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=cta-v2-audit&content_id=week0-post-002","source_surface":"LINE 客服手動分桶 / quality aggregate","source_metric":"quality_flag count and optional aggregate quality_score","target_template":"data/real_data_input_pack/manual_conversions.fill-template.csv","target_live_file":"data/manual_conversions.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記品質旗標數；不要貼對話原文或客戶資料。","row_number":36,"outcome_group":"Quality regression guard","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"link_click","stage_label":"連結點擊","asset_id":"challenger-week0-cta-text-v1","content_id":"week0-post-003","variant_id":"cta-v3-sample","tracking_link_id":"post-week0-post-003-cta-v3-sample","tracking_url":"http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=cta-v3-sample&content_id=week0-post-003","source_surface":"社群平台連結點擊報表 / remote D1 link_click","source_metric":"link clicks by content_id / variant_id","target_template":"data/real_data_input_pack/funnel_aggregates.fill-template.csv","target_live_file":"data/funnel_aggregates.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記 aggregate count 與報表截圖/匯出檔路徑；不要貼使用者名單。","row_number":37,"outcome_group":"Click denominator","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"lead_submit","stage_label":"留資","asset_id":"challenger-week0-cta-text-v1","content_id":"week0-post-003","variant_id":"cta-v3-sample","tracking_link_id":"post-week0-post-003-cta-v3-sample","tracking_url":"http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=cta-v3-sample&content_id=week0-post-003","source_surface":"LINE 客服手動分桶 / lead qualification aggregate","source_metric":"lead_submit aggregate count","target_template":"data/real_data_input_pack/manual_conversions.fill-template.csv","target_live_file":"data/manual_conversions.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記合格留資數；不要貼姓名、電話、email、公司私密資料。","row_number":41,"outcome_group":"Revenue outcome","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"deal","stage_label":"成交","asset_id":"challenger-week0-cta-text-v1","content_id":"week0-post-003","variant_id":"cta-v3-sample","tracking_link_id":"post-week0-post-003-cta-v3-sample","tracking_url":"http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=cta-v3-sample&content_id=week0-post-003","source_surface":"owner-confirmed aggregate deal log","source_metric":"deal aggregate count","target_template":"data/real_data_input_pack/manual_conversions.fill-template.csv","target_live_file":"data/manual_conversions.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記成交筆數與金額桶；不要貼付款資訊、ECPay 訂單或退款資料。","row_number":42,"outcome_group":"Revenue outcome","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."},{"week_start":"2026-06-29","week_end":"2026-07-05","capture_date":"","stage":"quality_flag","stage_label":"品質 / 垃圾訊號","asset_id":"challenger-week0-cta-text-v1","content_id":"week0-post-003","variant_id":"cta-v3-sample","tracking_link_id":"post-week0-post-003-cta-v3-sample","tracking_url":"http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=cta-v3-sample&content_id=week0-post-003","source_surface":"LINE 客服手動分桶 / quality aggregate","source_metric":"quality_flag count and optional aggregate quality_score","target_template":"data/real_data_input_pack/manual_conversions.fill-template.csv","target_live_file":"data/manual_conversions.csv","aggregate_count":"","quality_score":"","evidence_ref":"","reviewer":"","pii_checked":"","notes":"只記品質旗標數；不要貼對話原文或客戶資料。","row_number":43,"outcome_group":"Quality regression guard","pii_rule":"Aggregate only. Do not paste names, phone, email, LINE IDs, chat text, order IDs, payment/refund IDs, customer rows, IPs, User-Agent strings, or private notes."}]</script>
+  <script id="headers-data" type="application/json">["week_start","week_end","capture_date","stage","stage_label","asset_id","content_id","variant_id","tracking_link_id","tracking_url","source_surface","source_metric","target_template","target_live_file","aggregate_count","quality_score","evidence_ref","reviewer","pii_checked","notes"]</script>
+  <script id="status-data" type="application/json">{"ok":true,"generated_at":"2026-07-10T21:44:56.680Z","mode":"north_star_outcome_form_local_browser_only","status":"ready_local_browser_fill","form_path":"/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/north_star_outcome_form.html","status_path":"/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/north_star_outcome_form_status.json","template_path":"/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/source_capture/source_capture_ledger.fill-template.csv","owner_filled_path":"/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/source_capture/source_capture_ledger.filled.csv","owner_filled_exists":false,"row_count":24,"event_types":["link_click","lead_submit","deal","quality_flag"],"link_count":6,"target_live_files":["data/funnel_aggregates.csv","data/manual_conversions.csv"],"required_owner_fields":["capture_date","aggregate_count","evidence_ref","reviewer","pii_checked"],"optional_owner_fields":["quality_score"],"download_filename":"source_capture_ledger.filled.csv","output_filename":"source_capture_ledger.filled.csv","json_download_filename":"north_star_outcome_form.review.json","browser_only":true,"browser_persistence":false,"form_action":"none","network_calls_performed":false,"live_input_files_created":false,"real_events_unchanged":true,"data_lp_events_write_performed":false,"external_effect":false,"public_link_change_performed":false,"production_deploy_performed":false,"github_push_or_pr_performed":false,"formal_post_performed":false,"line_push_performed":false,"customer_data_mutation_performed":false,"payment_action_performed":false,"delete_action_performed":false}</script>
+  <script>
+    "use strict";
+
+    const rows = JSON.parse(document.getElementById("rows-data").textContent);
+    const headers = JSON.parse(document.getElementById("headers-data").textContent);
+    const contract = JSON.parse(document.getElementById("status-data").textContent);
+    const body = document.getElementById("rows");
+    const issues = document.getElementById("issues");
+    const statusEl = document.getElementById("status");
+    const downloadCsv = document.getElementById("downloadCsv");
+    const downloadJson = document.getElementById("downloadJson");
+    const sensitivePattern = /(@|\b09\d{8}\b|\b\d{4}[- ]?\d{3}[- ]?\d{3}\b|line\s*id|user\s*id|uid|order\s*id|payment|refund|ip\s*address|user-agent|電話|手機|信箱|暱稱|姓名|聊天|訂單|付款|退款)/i;
+
+    function render() {
+      body.innerHTML = "";
+      rows.forEach((row, index) => {
+        const tr = document.createElement("tr");
+        tr.dataset.index = String(index);
+        tr.innerHTML = [
+          cell(row.row_number, "mono"),
+          cell(row.stage_label + "<br><span class='mono'>" + escapeHtml(row.stage) + "</span><br>" + escapeHtml(row.outcome_group)),
+          cell(row.asset_id, "mono"),
+          cell(row.content_id, "mono"),
+          cell(row.variant_id, "mono"),
+          cell(row.tracking_link_id + "<br>" + escapeHtml(row.pii_rule), "mono"),
+          cell(row.target_live_file, "mono"),
+          cell(row.source_surface + "<br><span class='mono'>" + escapeHtml(row.source_metric) + "</span>"),
+          inputCell(index, "capture_date", "date"),
+          inputCell(index, "aggregate_count", "number", "0"),
+          inputCell(index, "quality_score", "number", "0"),
+          inputCell(index, "evidence_ref", "text"),
+          inputCell(index, "reviewer", "text"),
+          checkboxCell(index, "pii_checked"),
+        ].join("");
+        body.appendChild(tr);
+      });
+    }
+
+    function cell(value, className = "") {
+      return "<td" + (className ? " class='" + className + "'" : "") + ">" + escapeHtml(String(value ?? "")) + "</td>";
+    }
+
+    function inputCell(index, name, type, min) {
+      const id = name + "-" + index;
+      return "<td><input id='" + id + "' data-index='" + index + "' data-name='" + name + "' type='" + type + "'" + (min !== undefined ? " min='" + min + "'" : "") + "></td>";
+    }
+
+    function checkboxCell(index, name) {
+      const id = name + "-" + index;
+      return "<td><input id='" + id + "' data-index='" + index + "' data-name='" + name + "' type='checkbox'></td>";
+    }
+
+    function collect() {
+      const out = rows.map((row) => ({ ...row }));
+      document.querySelectorAll("[data-index][data-name]").forEach((input) => {
+        const index = Number(input.dataset.index);
+        const name = input.dataset.name;
+        out[index][name] = input.type === "checkbox" ? (input.checked ? "yes" : "") : input.value.trim();
+      });
+      return out;
+    }
+
+    function validate() {
+      const out = collect();
+      const found = [];
+      document.querySelectorAll("tbody tr").forEach((tr) => tr.classList.remove("invalid"));
+
+      out.forEach((row, index) => {
+        const rowIssues = [];
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(row.capture_date ?? "")) rowIssues.push("capture_date");
+        if (!/^(0|[1-9]\d*)$/.test(row.aggregate_count ?? "")) rowIssues.push("aggregate_count");
+        if ((row.evidence_ref ?? "").length < 3 || sensitivePattern.test(row.evidence_ref ?? "")) rowIssues.push("evidence_ref");
+        if ((row.reviewer ?? "").length < 1 || sensitivePattern.test(row.reviewer ?? "")) rowIssues.push("reviewer");
+        if (!["yes", "true", "checked", "ok", "1"].includes(String(row.pii_checked ?? "").toLowerCase())) rowIssues.push("pii_checked");
+        if ((row.quality_score ?? "").trim() && row.stage !== "quality_flag") rowIssues.push("quality_score");
+        if ((row.quality_score ?? "").trim() && !/^(0(\.\d+)?|1(\.0+)?)$/.test(row.quality_score)) rowIssues.push("quality_score");
+
+        if (rowIssues.length > 0) {
+          found.push("CSV row " + row.row_number + ": " + rowIssues.join(", "));
+          const tr = document.querySelector("tr[data-index='" + index + "']");
+          if (tr) tr.classList.add("invalid");
+        }
+      });
+
+      const ok = found.length === 0;
+      issues.textContent = ok ? "" : found.join("\n");
+      statusEl.textContent = ok ? "valid / ready to download" : found.length + " issue(s)";
+      statusEl.className = "status " + (ok ? "ok" : "bad");
+      downloadCsv.disabled = !ok;
+      downloadJson.disabled = !ok;
+      return { ok, rows: out, issues: found };
+    }
+
+    function toCsv(rowsToExport) {
+      const byKey = new Map(rowsToExport.map((row) => [row.tracking_link_id + "::" + row.stage, row]));
+      const lines = [headers.map(csvCell).join(",")];
+      rows.forEach((row) => {
+        const exportRow = byKey.get(row.tracking_link_id + "::" + row.stage) ?? row;
+        lines.push(headers.map((header) => csvCell(exportRow[header] ?? "")).join(","));
+      });
+      return lines.join("\n") + "\n";
+    }
+
+    function csvCell(value) {
+      const stringValue = String(value ?? "");
+      if (/[",\n\r]/.test(stringValue)) {
+        return '"' + stringValue.replaceAll('"', '""') + '"';
+      }
+      return stringValue;
+    }
+
+    function download(filename, text, type) {
+      const blob = new Blob([text], { type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById("validate").addEventListener("click", validate);
+    downloadCsv.addEventListener("click", () => {
+      const result = validate();
+      if (!result.ok) return;
+      download(contract.download_filename, toCsv(result.rows), "text/csv;charset=utf-8");
+    });
+    downloadJson.addEventListener("click", () => {
+      const result = validate();
+      if (!result.ok) return;
+      download(contract.json_download_filename, JSON.stringify({
+        generated_at: new Date().toISOString(),
+        mode: "north_star_outcome_form_review",
+        row_count: result.rows.length,
+        event_types: contract.event_types,
+        external_effect: false,
+        data_lp_events_write_performed: false,
+        rows: result.rows,
+      }, null, 2) + "\n", "application/json");
+    });
+    document.getElementById("clear").addEventListener("click", () => {
+      document.querySelectorAll("[data-index][data-name]").forEach((input) => {
+        if (input.type === "checkbox") input.checked = false;
+        else input.value = "";
+      });
+      downloadCsv.disabled = true;
+      downloadJson.disabled = true;
+      statusEl.textContent = "not validated";
+      statusEl.className = "status";
+      issues.textContent = "";
+      document.querySelectorAll("tbody tr").forEach((tr) => tr.classList.remove("invalid"));
+    });
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    render();
+  </script>
+</body>
+</html>

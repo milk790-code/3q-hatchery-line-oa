@@ -1,0 +1,238 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:44:15.041Z",
+  "mode": "source_readiness_monitor",
+  "status": "waiting_for_real_data",
+  "week": {
+    "start": "2026-07-06",
+    "end": "2026-07-12"
+  },
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/source_readiness_status.json",
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/source_readiness.md",
+  "real_events_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/lp_events.jsonl",
+  "real_event_rows": 0,
+  "event_counts": {},
+  "asset_counts": {},
+  "sample_progress": {
+    "min_visits": 100,
+    "min_cta_clicks": 20,
+    "min_line_adds": 5,
+    "min_test_days": 3,
+    "preferred_test_days": 7,
+    "current_visits": 0,
+    "current_cta_clicks": 0,
+    "current_line_adds": 0,
+    "current_test_days": 0,
+    "gaps": {
+      "visits": 100,
+      "cta_clicks": 20,
+      "line_adds": 5,
+      "test_days": 3
+    },
+    "sample_threshold_met": false
+  },
+  "scoring_allowed": true,
+  "ready_for_public_iteration_decision": false,
+  "champion_url_ready": true,
+  "source_inputs": {
+    "d1_sync": {
+      "ok": true,
+      "scope": "local",
+      "rows_exported": 0,
+      "output_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/lp_events.d1-local.jsonl"
+    },
+    "event_quality": {
+      "ok": true,
+      "scoring_allowed": true,
+      "issue_count": 0,
+      "data_lp_events_write_performed": false
+    },
+    "input_pack": {
+      "ok": true,
+      "status": "template_ready",
+      "template_count": 2,
+      "live_input_files_created": false,
+      "data_lp_events_write_performed": false
+    },
+    "intake": {
+      "ok": true,
+      "status": "no_real_input_files",
+      "ready_apply_count": 0,
+      "missing_input_count": 2,
+      "data_lp_events_write_performed": false
+    },
+    "live_inputs": [
+      {
+        "source_id": "funnel_aggregates",
+        "path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/funnel_aggregates.csv",
+        "exists": false
+      },
+      {
+        "source_id": "manual_conversions",
+        "path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/manual_conversions.csv",
+        "exists": false
+      }
+    ]
+  },
+  "stages": [
+    {
+      "id": "link_click",
+      "label": "Post link clicks",
+      "current_real_events": 0,
+      "preferred_sources": [
+        "remote_d1_lp_events",
+        "full_funnel_aggregate_csv"
+      ],
+      "live_input_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/funnel_aggregates.csv",
+      "live_input_exists": false,
+      "ready_for_decision": false,
+      "status": "waiting_for_aggregate_input",
+      "next_action": "Fill the matching template in data/real_data_input_pack/ with aggregate counts.",
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "page_view",
+      "label": "Landing page views",
+      "current_real_events": 0,
+      "preferred_sources": [
+        "remote_d1_lp_events",
+        "full_funnel_aggregate_csv"
+      ],
+      "live_input_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/funnel_aggregates.csv",
+      "live_input_exists": false,
+      "ready_for_decision": false,
+      "status": "waiting_for_aggregate_input",
+      "next_action": "Fill the matching template in data/real_data_input_pack/ with aggregate counts.",
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "cta_click",
+      "label": "Landing page CTA clicks",
+      "current_real_events": 0,
+      "preferred_sources": [
+        "remote_d1_lp_events",
+        "full_funnel_aggregate_csv"
+      ],
+      "live_input_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/funnel_aggregates.csv",
+      "live_input_exists": false,
+      "ready_for_decision": false,
+      "status": "waiting_for_aggregate_input",
+      "next_action": "Fill the matching template in data/real_data_input_pack/ with aggregate counts.",
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "line_add",
+      "label": "LINE inbound adds",
+      "current_real_events": 0,
+      "preferred_sources": [
+        "remote_d1_lp_events",
+        "manual_conversion_csv",
+        "full_funnel_aggregate_csv"
+      ],
+      "live_input_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/manual_conversions.csv",
+      "live_input_exists": false,
+      "ready_for_decision": false,
+      "status": "waiting_for_aggregate_input",
+      "next_action": "Fill the matching template in data/real_data_input_pack/ with aggregate counts.",
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "lead_submit",
+      "label": "Lead submissions",
+      "current_real_events": 0,
+      "preferred_sources": [
+        "manual_conversion_csv",
+        "remote_d1_lp_events",
+        "full_funnel_aggregate_csv"
+      ],
+      "live_input_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/manual_conversions.csv",
+      "live_input_exists": false,
+      "ready_for_decision": false,
+      "status": "waiting_for_aggregate_input",
+      "next_action": "Fill the matching template in data/real_data_input_pack/ with aggregate counts.",
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "deal",
+      "label": "Closed deals",
+      "current_real_events": 0,
+      "preferred_sources": [
+        "manual_conversion_csv",
+        "remote_d1_lp_events",
+        "full_funnel_aggregate_csv"
+      ],
+      "live_input_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/manual_conversions.csv",
+      "live_input_exists": false,
+      "ready_for_decision": false,
+      "status": "waiting_for_aggregate_input",
+      "next_action": "Fill the matching template in data/real_data_input_pack/ with aggregate counts.",
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "quality_flag",
+      "label": "Quality / spam flags",
+      "current_real_events": 0,
+      "preferred_sources": [
+        "manual_conversion_csv",
+        "remote_d1_lp_events",
+        "full_funnel_aggregate_csv"
+      ],
+      "live_input_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/manual_conversions.csv",
+      "live_input_exists": false,
+      "ready_for_decision": false,
+      "status": "waiting_for_aggregate_input",
+      "next_action": "Fill the matching template in data/real_data_input_pack/ with aggregate counts.",
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    }
+  ],
+  "missing_stage_count": 7,
+  "missing_stages": [
+    "link_click",
+    "page_view",
+    "cta_click",
+    "line_add",
+    "lead_submit",
+    "deal",
+    "quality_flag"
+  ],
+  "next_local_actions": [
+    {
+      "id": "fill_real_data_input_pack",
+      "command": "npm run real-data:pack",
+      "status": "ready",
+      "note": "Use the generated fill templates to enter aggregate counts only."
+    },
+    {
+      "id": "copy_reviewed_csvs",
+      "command": "cp data/real_data_input_pack/funnel_aggregates.fill-template.csv data/funnel_aggregates.csv && cp data/real_data_input_pack/manual_conversions.fill-template.csv data/manual_conversions.csv",
+      "status": "owner_review_required",
+      "note": "Run only after reviewed aggregate counts are filled. Do not paste customer-level data."
+    },
+    {
+      "id": "preview_real_data",
+      "command": "npm run real-data:intake",
+      "status": "ready_after_live_csvs_exist",
+      "note": "Preview first; apply commands remain owner-gated."
+    }
+  ],
+  "owner_review_required": true,
+  "apply_performed": false,
+  "append_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

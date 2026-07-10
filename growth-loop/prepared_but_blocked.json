@@ -1,0 +1,139 @@
+{
+  "generated_at": "2026-07-10T21:48:20.571Z",
+  "status": "prepared_but_blocked",
+  "blocked_actions_from_config": [
+    "formal_social_post",
+    "change_primary_bio_link",
+    "promote_challenger_to_champion",
+    "line_broadcast_or_push",
+    "ecpay_payment_or_refund",
+    "customer_data_mutation",
+    "production_deploy",
+    "data_delete"
+  ],
+  "data_evidence_gates": [
+    {
+      "id": "p0_sample_gate_evidence",
+      "status": "unmet",
+      "blocking_completion": true,
+      "observed": {
+        "p0_pending_count": 18,
+        "sample_threshold_met": false
+      },
+      "required": "All P0 aggregate-count tasks are reviewed and the visit / CTA / LINE-add / test-day sample gate is met.",
+      "prepared_artifact": "next_p0_owner_form.html",
+      "next_action": "Fill and review aggregate-only P0 counts; do not use customer-level data.",
+      "external_effect": false,
+      "data_lp_events_write_performed": false
+    },
+    {
+      "id": "p1_outcome_quality_evidence",
+      "status": "unmet",
+      "blocking_completion": true,
+      "observed": {
+        "p1_pending_count": 24
+      },
+      "required": "All P1 LINE-add, lead, deal, and quality outcome counts are reviewed, including explicit zeroes.",
+      "prepared_artifact": "north_star_outcome_form.html",
+      "next_action": "Fill aggregate-only P1 outcomes and quality flags; keep customer identities outside the engine.",
+      "external_effect": false,
+      "data_lp_events_write_performed": false
+    },
+    {
+      "id": "trusted_scoring_input",
+      "status": "unmet",
+      "blocking_completion": true,
+      "observed": {
+        "scoring_allowed_now": false,
+        "trusted_scoring_source_count": 0,
+        "real_event_rows": 0
+      },
+      "required": "At least one trusted scoring source contributes real, privacy-safe events that pass the source-trust gate.",
+      "prepared_artifact": "source_trust_matrix.md",
+      "next_action": "Compile reviewed aggregate inputs, preview them, and apply only after the explicit real-data gate.",
+      "external_effect": false,
+      "data_lp_events_write_performed": false
+    }
+  ],
+  "items": [
+    {
+      "id": "blocked-d1-remote-schema-review",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "action": "verify_existing_cloudflare_d1_and_apply_schema",
+      "operation_mode": "verify_existing_d1_then_migrate_schema",
+      "resource_create_required": false,
+      "blocked_by": "Read-only Cloudflare inventory confirms the exact dedicated Growth Loop D1 now exists and matches wrangler.jsonc, but no table query or remote schema migration has been approved or performed.",
+      "prepared_artifact": "schema/d1-week0.sql",
+      "supporting_artifact": "d1_schema_contract.md",
+      "readiness_artifact": "cloudflare_d1_readiness.md",
+      "config_guard_artifact": "approved_d1_config.md",
+      "resume_when": "Owner confirms the observed database provenance, explicitly approves remote migration, and records recurring_aggregate_read_approved=true only if weekly grouped-count reads are allowed after reviewing local_schema_idempotency_and_constraints_verified; local config guard remains prepared_but_blocked_owner_d1_approval_or_inventory."
+    },
+    {
+      "id": "blocked-worker-live-provenance-review",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "action": "confirm_existing_candidate_worker_provenance",
+      "operation_mode": "verify_existing_candidate_deployment",
+      "resource_deploy_required": false,
+      "blocked_by": "Read-only observation confirms Candidate deployment 5073984b-bcc0-40f1-a331-daaadd741071 / version 133d27b0-36e5-41e8-96ec-b55925b7b30a is healthy and wired to the Champion, but owner provenance evidence is not recorded. A redeploy is not currently required.",
+      "prepared_artifact": "live_telemetry_readiness.md",
+      "supporting_artifact": "worker.ts",
+      "resume_when": "Owner confirms the observed Worker name, URL, deployment/version reference, health result, and rollback reference in owner_gate_evidence.json. Redeploy only if the observed version is rejected."
+    },
+    {
+      "id": "blocked-champion-live-provenance-review",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "action": "confirm_champion_live_contract_provenance_before_redeploy",
+      "live_contract_observed": true,
+      "blocked_by": "The LINE-only Champion contract is observable live, but deployment provenance is not owner evidence and any redeploy remains a production action.",
+      "prepared_artifact": "champion_integration_candidate.md",
+      "supporting_artifact": "champion_integration_smoke.md",
+      "release_artifact": "champion_release_owner_packet.md",
+      "local_commit_artifact": "champion_local_branch.md",
+      "resume_when": "Owner confirms the current live deployment provenance, reviews the prepared local Champion commit and release packet, and separately approves any redeploy target and rollback plan."
+    },
+    {
+      "id": "blocked-primary-link-change",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "action": "change_primary_social_or_bio_link",
+      "blocked_by": "Primary link changes affect public acquisition flow.",
+      "prepared_artifact": "ab_test_status.json",
+      "resume_when": "Owner approves exact URL, traffic share, and duration."
+    },
+    {
+      "id": "blocked-formal-posting",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "action": "formal_social_post_or_line_push",
+      "blocked_by": "External posting and LINE push remain human-only.",
+      "prepared_artifact": "weekly_report.md",
+      "resume_when": "Owner opens the platform and manually confirms Publish, Send, Broadcast, or Schedule."
+    },
+    {
+      "id": "blocked-github-publish",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "action": "github_push_or_pr_creation",
+      "blocked_by": "The Champion feature commit and exact draft PR packet are prepared locally (integration_already_merged_followup_repairs_only), but branch push / PR creation is an external GitHub write; the engine bundle remains a separate local-only handoff.",
+      "prepared_artifact": "champion_github_handoff.md",
+      "supporting_artifact": "champion_local_branch.md",
+      "release_artifact": "champion_release_owner_packet.md",
+      "engine_bundle_artifact": "github_handoff.md",
+      "resume_when": "Owner reviews the exact commit and PR body, then explicitly approves branch push or draft PR creation. Merge and deploy remain blocked."
+    },
+    {
+      "id": "blocked-owner-launch-sequence",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "action": "execute_owner_approved_launch_sequence",
+      "blocked_by": "The launch sequence combines remote D1, production Worker, public A/B route, and GitHub publishing decisions.",
+      "prepared_artifact": "owner_approval_pack.md",
+      "resume_when": "Owner explicitly approves the individual external gates in owner_approval_pack.md."
+    },
+    {
+      "id": "blocked-customer-and-payment",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "action": "customer_data_or_ecpay_payment_mutation",
+      "blocked_by": "Customer data, payments, refunds, and ECPay are hard red lines.",
+      "prepared_artifact": null,
+      "resume_when": "Owner gives a separate, explicit instruction for a reviewed manual operation."
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-07-11T04:30:00+08:00",
+  "repository": "milk790-code/3q-hatchery-line-oa",
+  "pr": 74,
+  "merge_commit": "f86faa7356ac7962d9b429951b67c742370271c0",
+  "actions": {
+    "run_url": "https://github.com/milk790-code/3q-hatchery-line-oa/actions/runs/29119691581",
+    "head_sha": "f86faa7356ac7962d9b429951b67c742370271c0",
+    "conclusion": "failure",
+    "content_upload_succeeded": true,
+    "failure_visibility": "original workflow hid the failing jq/test stage; repair workflow adds named stage diagnostics without shell tracing secrets"
+  },
+  "live_base_url": "https://3q-site.milk790.workers.dev",
+  "contract": {
+    "expected": {
+      "worker": "3q-site",
+      "build": "growth-loop-telemetry-v2",
+      "collector_url": "https://3q-growth-loop-candidate.milk790.workers.dev"
+    },
+    "observed": {
+      "health": {"ok": true, "worker": "3q-site", "build": "growth-loop-telemetry-v2"},
+      "growth_loop_status": {"ok": true, "collector_configured": true, "collector_origin": "https://3q-growth-loop-candidate.milk790.workers.dev", "collector_url_matches_expected": true, "build": "growth-loop-telemetry-v2"}
+    }
+  },
+  "cloudflare": {
+    "current_version": "d156aab2-aaf6-42cb-bd72-b4e2bb2e2a32",
+    "current_version_number": 6,
+    "rollback_version": "de2997a0-6a6a-4780-9e24-e65774dc3f1a",
+    "rollback_version_number": 5,
+    "binding_name": "GROWTH_LOOP_COLLECTOR_URL",
+    "binding_before": "https://3q-growth-loop-candidate.milk790.workers.dev",
+    "binding_after": "https://3q-growth-loop-candidate.milk790.workers.dev",
+    "token_permissions_verified": ["Workers Scripts Read", "Workers Scripts Write", "Account Settings Read"]
+  },
+  "phase_1_complete": false,
+  "phase_1_blocker": "Actions run is not green; rerun would mutate production and requires owner approval"
+}

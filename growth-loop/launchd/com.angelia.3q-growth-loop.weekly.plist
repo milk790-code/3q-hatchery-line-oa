@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.angelia.3q-growth-loop.weekly</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>-lc</string>
+    <string>export PATH="/Users/mac/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"; cd /Users/mac/Documents/Codex/control-center/3q-growth-loop &amp;&amp; npm run weekly:local</string>
+  </array>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Weekday</key>
+    <integer>0</integer>
+    <key>Hour</key>
+    <integer>0</integer>
+    <key>Minute</key>
+    <integer>10</integer>
+  </dict>
+  <key>StandardOutPath</key>
+  <string>/Users/mac/Library/Logs/Angelia/3q-growth-loop/weekly-runner.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/mac/Library/Logs/Angelia/3q-growth-loop/weekly-runner.err.log</string>
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>

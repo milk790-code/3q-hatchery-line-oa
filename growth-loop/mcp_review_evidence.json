@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "evidence_status": "external_and_local_verified",
+  "github": {
+    "pr": 74,
+    "merged": true,
+    "merge_commit": "f86faa7356ac7962d9b429951b67c742370271c0",
+    "workflow_green": false
+  },
+  "live": {
+    "deployed": true,
+    "worker": "3q-site",
+    "build": "growth-loop-telemetry-v2",
+    "collector_configured": true,
+    "collector_url_matches_expected": true
+  },
+  "verification": {
+    "tests_passed": true,
+    "syntax_passed": true,
+    "dependency_audit_passed": true
+  },
+  "captured_at": "2026-07-10T21:49:57.210Z"
+}

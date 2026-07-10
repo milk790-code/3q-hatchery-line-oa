@@ -1,0 +1,86 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:43:59.341Z",
+  "started_at": "2026-07-10T21:43:44.060Z",
+  "mode": "isolated_local_d1_schema_contract",
+  "status": "local_schema_idempotency_and_constraints_verified",
+  "database_name": "3q-growth-loop-candidate",
+  "schema_path": "schema/d1-week0.sql",
+  "schema_sha256": "abb969fbc496dea8e4914ea1c447a8e1ddf6a6beaf4ff77278ddd01978522d93",
+  "checks": {
+    "first_migration_apply_ok": true,
+    "second_migration_apply_ok": true,
+    "migration_idempotent": true,
+    "expected_tables_exact": true,
+    "expected_indexes_present": true,
+    "sqlite_integrity_ok": true,
+    "foreign_key_check_clean": true,
+    "seed_assets_exact": true,
+    "seed_ab_test_exact": true,
+    "event_type_constraint_enforced": true,
+    "asset_role_constraint_enforced": true,
+    "foreign_key_constraint_enforced": true
+  },
+  "before_second_apply": {
+    "tables": [
+      "ab_tests",
+      "approval_queue",
+      "iteration_decisions",
+      "lp_assets",
+      "lp_events",
+      "prepared_but_blocked",
+      "weekly_growth_scores"
+    ],
+    "indexes": [
+      "idx_lp_events_asset_time",
+      "idx_lp_events_campaign",
+      "idx_lp_events_type_time"
+    ],
+    "integrity_check": "ok",
+    "foreign_key_violations": 0,
+    "seed_assets": 2,
+    "seed_ab_tests": 1
+  },
+  "after_second_apply": {
+    "tables": [
+      "ab_tests",
+      "approval_queue",
+      "iteration_decisions",
+      "lp_assets",
+      "lp_events",
+      "prepared_but_blocked",
+      "weekly_growth_scores"
+    ],
+    "indexes": [
+      "idx_lp_events_asset_time",
+      "idx_lp_events_campaign",
+      "idx_lp_events_type_time"
+    ],
+    "integrity_check": "ok",
+    "foreign_key_violations": 0,
+    "seed_assets": 2,
+    "seed_ab_tests": 1
+  },
+  "constraints": {
+    "event_type": true,
+    "asset_role": true,
+    "foreign_key": true
+  },
+  "error": null,
+  "isolated_local_d1_write_performed": true,
+  "temporary_files_removed": true,
+  "remote_d1_create_performed": false,
+  "remote_d1_migration_performed": false,
+  "remote_d1_query_performed": false,
+  "customer_data_read_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "production_deploy_performed": false,
+  "public_link_change_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

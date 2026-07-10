@@ -1,0 +1,73 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:44:07.827Z",
+  "mode": "full_funnel_preview",
+  "input_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/funnel_aggregates.example.csv",
+  "output_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/funnel_aggregates.preview.jsonl",
+  "aggregate_rows_read": 10,
+  "events_prepared": 48,
+  "events_written": 48,
+  "existing_event_ids_skipped": 0,
+  "counts_by_event_type": {
+    "link_click": 20,
+    "page_view": 17,
+    "cta_click": 6,
+    "line_add": 2,
+    "lead_submit": 1,
+    "deal": 1,
+    "quality_flag": 1
+  },
+  "counts_by_asset": {
+    "challenger-week0-cta-text-v1": 48
+  },
+  "counts_by_content_id": {
+    "week0-post-001": 31,
+    "week0-post-002": 17
+  },
+  "allowed_columns": [
+    "date",
+    "asset_id",
+    "event_type",
+    "count",
+    "source",
+    "medium",
+    "campaign",
+    "content_id",
+    "variant_id",
+    "quality_score"
+  ],
+  "required_columns": [
+    "date",
+    "asset_id",
+    "event_type",
+    "count",
+    "content_id",
+    "variant_id"
+  ],
+  "allowed_event_types": [
+    "link_click",
+    "page_view",
+    "cta_click",
+    "line_add",
+    "lead_submit",
+    "deal",
+    "quality_flag"
+  ],
+  "contains_sensitive_columns": false,
+  "contains_sensitive_values": false,
+  "confirm_real_data": false,
+  "example_input_detected": false,
+  "apply_performed": false,
+  "append_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Preview only. Full-funnel aggregate rows are not scored until explicitly applied to data/lp_events.jsonl."
+}

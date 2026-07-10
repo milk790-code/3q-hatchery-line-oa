@@ -1,0 +1,37 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "3q-growth-loop-candidate",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-09",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 0.1
+  },
+  "vars": {
+    "ENVIRONMENT": "candidate",
+    "PUBLIC_BASE_URL": "https://3q-growth-loop-candidate.milk790.workers.dev",
+    "CHAMPION_URL": "https://3q-site.milk790.workers.dev/",
+    "CHAMPION_ORIGIN": "https://3q-site.milk790.workers.dev",
+    "CHALLENGER_URL": "/candidate",
+    "LINE_URL": "https://lin.ee/VZvs7sj",
+    "AB_TEST_ID": "ab-week0-cta-text-001",
+    "CHAMPION_ASSET_ID": "champion-3q-line-v0",
+    "CHALLENGER_ASSET_ID": "challenger-week0-cta-text-v1",
+    "AB_CHALLENGER_PERCENT": "10"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "3q-growth-loop-candidate",
+      "database_id": "deb85e19-95fd-4611-8710-9cb6ea6dc7ff"
+    }
+  ],
+  "triggers": {
+    "crons": [
+      "0 17 * * SUN"
+    ]
+  }
+}

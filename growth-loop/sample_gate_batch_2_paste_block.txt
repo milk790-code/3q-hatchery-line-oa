@@ -1,0 +1,13 @@
+capture_date=2026-07-11
+evidence_ref=<aggregate_ref>
+reviewer=<alias>
+pii_checked=yes
+post_week0_post_001_cta_v1_diagnostic.visits=<count>
+post_week0_post_001_cta_v1_diagnostic.cta=<count>
+post_week0_post_001_cta_v1_diagnostic.line=<count>
+post_week0_post_002_cta_v2_audit.visits=<count>
+post_week0_post_002_cta_v2_audit.cta=<count>
+post_week0_post_002_cta_v2_audit.line=<count>
+post_week0_post_003_cta_v3_sample.visits=<count>
+post_week0_post_003_cta_v3_sample.cta=<count>
+post_week0_post_003_cta_v3_sample.line=<count>

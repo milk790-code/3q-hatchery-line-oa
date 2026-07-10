@@ -1,0 +1,88 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T15:34:01Z",
+  "mode": "read_only_remote_d1_schema_observation",
+  "database": {
+    "name": "3q-growth-loop-candidate",
+    "id": "deb85e19-95fd-4611-8710-9cb6ea6dc7ff",
+    "dedicated_target_exact": true
+  },
+  "historical_migration": {
+    "observed": true,
+    "executed_at": "2026-07-10T02:31:27.779Z",
+    "agent_alias": "claude-code",
+    "query_count": 15,
+    "rows_written": 30,
+    "reported_table_count": 7,
+    "final_bookmark": "00000000-0000000e-000050a4-b7c71da210dc4fe07134ab176ac685ba",
+    "verification_log": "/Users/mac/.wrangler/logs/wrangler-2026-07-10_02-31-24_887.log"
+  },
+  "schema": {
+    "expected_tables": [
+      "ab_tests",
+      "approval_queue",
+      "iteration_decisions",
+      "lp_assets",
+      "lp_events",
+      "prepared_but_blocked",
+      "weekly_growth_scores"
+    ],
+    "observed_tables": [
+      "ab_tests",
+      "approval_queue",
+      "iteration_decisions",
+      "lp_assets",
+      "lp_events",
+      "prepared_but_blocked",
+      "weekly_growth_scores"
+    ],
+    "expected_tables_exact": true,
+    "expected_indexes": [
+      "idx_lp_events_asset_time",
+      "idx_lp_events_campaign",
+      "idx_lp_events_type_time"
+    ],
+    "expected_indexes_present": true,
+    "table_sql_contract_matches_week0": true,
+    "pragma_integrity_check_supported": false,
+    "pragma_integrity_check_error": "SQLITE_AUTH",
+    "pragma_failure_interpreted_as_schema_failure": false
+  },
+  "seed": {
+    "assets_exact": true,
+    "asset_count": 2,
+    "ab_test_exact": true,
+    "ab_test_count": 1,
+    "allocation_champion": 90,
+    "allocation_challenger": 10,
+    "status": "draft_needs_human_link_gate"
+  },
+  "aggregate_counts": {
+    "lp_assets": 2,
+    "lp_events": 10,
+    "ab_tests": 1,
+    "weekly_growth_scores": 0,
+    "iteration_decisions": 0,
+    "approval_queue": 0,
+    "prepared_but_blocked": 0
+  },
+  "rollback": {
+    "time_travel_available": true,
+    "current_bookmark": "00000008-00000000-000050a4-bf9b29fb137164090c2cf5f71410e041",
+    "pre_import_restore_timestamp": "2026-07-10T02:31:24Z",
+    "restore_performed": false
+  },
+  "privacy": {
+    "schema_metadata_read_performed": true,
+    "aggregate_count_read_performed": true,
+    "seed_business_metadata_read_performed": true,
+    "raw_event_rows_read_performed": false,
+    "customer_data_read_performed": false,
+    "event_payload_read_performed": false
+  },
+  "rows_written": 0,
+  "external_effect": false,
+  "remote_schema_migration_performed_this_observation": false,
+  "delete_action_performed": false,
+  "note": "This observation reconciles an already-completed remote migration with current read-only schema, seed, aggregate-count, and Time Travel evidence. It did not inspect raw event rows or customer data."
+}

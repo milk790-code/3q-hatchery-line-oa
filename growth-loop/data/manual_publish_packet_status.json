@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:45:57.212Z",
+  "mode": "manual_publish_packet_local_review",
+  "status": "ready_local_review",
+  "round_id": "week0-cta-text",
+  "changed_variable": "cta_text",
+  "packet_count": 3,
+  "draft_count": 3,
+  "tracking_link_count": 3,
+  "sample_threshold_met": false,
+  "challenger_win_rule_met": false,
+  "owner_manual_publish_required": true,
+  "blocked_action_count": 10,
+  "issue_count": 0,
+  "issues": [],
+  "outputs": {
+    "packet_json": "manual_publish_packet.json",
+    "packet_md": "manual_publish_packet.md",
+    "status_json": "data/manual_publish_packet_status.json"
+  },
+  "external_effect": false,
+  "data_lp_events_write_performed": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

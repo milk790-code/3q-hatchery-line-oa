@@ -1,0 +1,307 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:46:06.552Z",
+  "mode": "variable_rotation_fixture_dry_run",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/variable_rotation_fixture_status.json",
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/variable_rotation_fixture_report.md",
+  "allowed_variables": [
+    "hook",
+    "offer",
+    "visual_claim",
+    "cta_text"
+  ],
+  "expected_variables": [
+    "hook",
+    "offer",
+    "visual_claim",
+    "cta_text"
+  ],
+  "scenario_count": 4,
+  "candidate_template_count": 12,
+  "checks": [
+    {
+      "id": "allowed_variables_exact",
+      "ok": true,
+      "evidence": "Config exposes hook / offer / visual_claim / cta_text in the requested order.",
+      "external_effect": false
+    },
+    {
+      "id": "all_variables_have_fixture",
+      "ok": true,
+      "evidence": "Every allowed variable has a passing one-variable fixture.",
+      "external_effect": false
+    },
+    {
+      "id": "live_config_not_mutated",
+      "ok": true,
+      "evidence": "Fixture builds in-memory candidates only; it never rewrites config/growth-loop.config.json.",
+      "external_effect": false
+    },
+    {
+      "id": "red_line_flags_false",
+      "ok": true,
+      "evidence": "Fixture performs no post, deploy, public link change, LINE push, payment, customer-data mutation, or delete.",
+      "external_effect": false
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "hook_one_variable_fixture",
+      "changed_variable": "hook",
+      "ok": true,
+      "allowed_by_config": true,
+      "draft_count": 3,
+      "changed_value_count": 3,
+      "locked_variables": [
+        "offer",
+        "visual_claim",
+        "cta_text"
+      ],
+      "locked_variables_ok": true,
+      "changed_only_ok": true,
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "production_deploy_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false,
+      "drafts": [
+        {
+          "variant_id": "hook-fixture-1",
+          "changed_variable": "hook",
+          "fields": {
+            "hook": "Find the exact 100-click leak before rebuilding the page.",
+            "offer": "免費 48h 成交診斷，先指出漏斗缺口，不承諾成交。",
+            "visual_claim": "1 變因：本輪只測 CTA text，樣本不足不換冠軍。",
+            "cta_text": "加 LINE 領 48h 成交診斷"
+          },
+          "final_gate": "fixture_only_not_for_public_use",
+          "external_effect": false
+        },
+        {
+          "variant_id": "hook-fixture-2",
+          "changed_variable": "hook",
+          "fields": {
+            "hook": "Your LINE adds are not low by accident; one funnel step is leaking.",
+            "offer": "免費 48h 成交診斷，先指出漏斗缺口，不承諾成交。",
+            "visual_claim": "1 變因：本輪只測 CTA text，樣本不足不換冠軍。",
+            "cta_text": "加 LINE 領 48h 成交診斷"
+          },
+          "final_gate": "fixture_only_not_for_public_use",
+          "external_effect": false
+        },
+        {
+          "variant_id": "hook-fixture-3",
+          "changed_variable": "hook",
+          "fields": {
+            "hook": "Stop guessing which page section blocks LINE inquiries.",
+            "offer": "免費 48h 成交診斷，先指出漏斗缺口，不承諾成交。",
+            "visual_claim": "1 變因：本輪只測 CTA text，樣本不足不換冠軍。",
+            "cta_text": "加 LINE 領 48h 成交診斷"
+          },
+          "final_gate": "fixture_only_not_for_public_use",
+          "external_effect": false
+        }
+      ]
+    },
+    {
+      "id": "offer_one_variable_fixture",
+      "changed_variable": "offer",
+      "ok": true,
+      "allowed_by_config": true,
+      "draft_count": 3,
+      "changed_value_count": 3,
+      "locked_variables": [
+        "hook",
+        "visual_claim",
+        "cta_text"
+      ],
+      "locked_variables_ok": true,
+      "changed_only_ok": true,
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "production_deploy_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false,
+      "drafts": [
+        {
+          "variant_id": "offer-fixture-1",
+          "changed_variable": "offer",
+          "fields": {
+            "hook": "48 小時內，把你的頁面改成會有人加 LINE 的版本。",
+            "offer": "Free 48h conversion diagnosis with one bottleneck map.",
+            "visual_claim": "1 變因：本輪只測 CTA text，樣本不足不換冠軍。",
+            "cta_text": "加 LINE 領 48h 成交診斷"
+          },
+          "final_gate": "fixture_only_not_for_public_use",
+          "external_effect": false
+        },
+        {
+          "variant_id": "offer-fixture-2",
+          "changed_variable": "offer",
+          "fields": {
+            "hook": "48 小時內，把你的頁面改成會有人加 LINE 的版本。",
+            "offer": "Free one-page audit focused only on LINE add friction.",
+            "visual_claim": "1 變因：本輪只測 CTA text，樣本不足不換冠軍。",
+            "cta_text": "加 LINE 領 48h 成交診斷"
+          },
+          "final_gate": "fixture_only_not_for_public_use",
+          "external_effect": false
+        },
+        {
+          "variant_id": "offer-fixture-3",
+          "changed_variable": "offer",
+          "fields": {
+            "hook": "48 小時內，把你的頁面改成會有人加 LINE 的版本。",
+            "offer": "Free 100-click funnel review with one next action.",
+            "visual_claim": "1 變因：本輪只測 CTA text，樣本不足不換冠軍。",
+            "cta_text": "加 LINE 領 48h 成交診斷"
+          },
+          "final_gate": "fixture_only_not_for_public_use",
+          "external_effect": false
+        }
+      ]
+    },
+    {
+      "id": "visual_claim_one_variable_fixture",
+      "changed_variable": "visual_claim",
+      "ok": true,
+      "allowed_by_config": true,
+      "draft_count": 3,
+      "changed_value_count": 3,
+      "locked_variables": [
+        "hook",
+        "offer",
+        "cta_text"
+      ],
+      "locked_variables_ok": true,
+      "changed_only_ok": true,
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "production_deploy_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false,
+      "drafts": [
+        {
+          "variant_id": "visual_claim-fixture-1",
+          "changed_variable": "visual_claim",
+          "fields": {
+            "hook": "48 小時內，把你的頁面改成會有人加 LINE 的版本。",
+            "offer": "免費 48h 成交診斷，先指出漏斗缺口，不承諾成交。",
+            "visual_claim": "One variable tested this week; no champion swap before sample.",
+            "cta_text": "加 LINE 領 48h 成交診斷"
+          },
+          "final_gate": "fixture_only_not_for_public_use",
+          "external_effect": false
+        },
+        {
+          "variant_id": "visual_claim-fixture-2",
+          "changed_variable": "visual_claim",
+          "fields": {
+            "hook": "48 小時內，把你的頁面改成會有人加 LINE 的版本。",
+            "offer": "免費 48h 成交診斷，先指出漏斗缺口，不承諾成交。",
+            "visual_claim": "100 visits, 20 CTA clicks, 5 LINE adds, 3 days minimum.",
+            "cta_text": "加 LINE 領 48h 成交診斷"
+          },
+          "final_gate": "fixture_only_not_for_public_use",
+          "external_effect": false
+        },
+        {
+          "variant_id": "visual_claim-fixture-3",
+          "changed_variable": "visual_claim",
+          "fields": {
+            "hook": "48 小時內，把你的頁面改成會有人加 LINE 的版本。",
+            "offer": "免費 48h 成交診斷，先指出漏斗缺口，不承諾成交。",
+            "visual_claim": "Challenger must beat champion by 15% without quality regression.",
+            "cta_text": "加 LINE 領 48h 成交診斷"
+          },
+          "final_gate": "fixture_only_not_for_public_use",
+          "external_effect": false
+        }
+      ]
+    },
+    {
+      "id": "cta_text_one_variable_fixture",
+      "changed_variable": "cta_text",
+      "ok": true,
+      "allowed_by_config": true,
+      "draft_count": 3,
+      "changed_value_count": 3,
+      "locked_variables": [
+        "hook",
+        "offer",
+        "visual_claim"
+      ],
+      "locked_variables_ok": true,
+      "changed_only_ok": true,
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "production_deploy_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false,
+      "drafts": [
+        {
+          "variant_id": "cta_text-fixture-1",
+          "changed_variable": "cta_text",
+          "fields": {
+            "hook": "48 小時內，把你的頁面改成會有人加 LINE 的版本。",
+            "offer": "免費 48h 成交診斷，先指出漏斗缺口，不承諾成交。",
+            "visual_claim": "1 變因：本輪只測 CTA text，樣本不足不換冠軍。",
+            "cta_text": "Get the 48h conversion diagnosis"
+          },
+          "final_gate": "fixture_only_not_for_public_use",
+          "external_effect": false
+        },
+        {
+          "variant_id": "cta_text-fixture-2",
+          "changed_variable": "cta_text",
+          "fields": {
+            "hook": "48 小時內，把你的頁面改成會有人加 LINE 的版本。",
+            "offer": "免費 48h 成交診斷，先指出漏斗缺口，不承諾成交。",
+            "visual_claim": "1 變因：本輪只測 CTA text，樣本不足不換冠軍。",
+            "cta_text": "Send the page and find the leak"
+          },
+          "final_gate": "fixture_only_not_for_public_use",
+          "external_effect": false
+        },
+        {
+          "variant_id": "cta_text-fixture-3",
+          "changed_variable": "cta_text",
+          "fields": {
+            "hook": "48 小時內，把你的頁面改成會有人加 LINE 的版本。",
+            "offer": "免費 48h 成交診斷，先指出漏斗缺口，不承諾成交。",
+            "visual_claim": "1 變因：本輪只測 CTA text，樣本不足不換冠軍。",
+            "cta_text": "Start with one testable CTA"
+          },
+          "final_gate": "fixture_only_not_for_public_use",
+          "external_effect": false
+        }
+      ]
+    }
+  ],
+  "execution_performed": false,
+  "live_config_write_performed": false,
+  "real_event_write_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Fixture-only one-variable rotation guard. It proves hook, offer, visual_claim, and cta_text can each vary alone while all other fields stay locked."
+}

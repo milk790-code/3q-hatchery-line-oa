@@ -1,0 +1,42 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:44:41.023Z",
+  "mode": "sample_gate_ledger_pack",
+  "status": "sample_gate_template_ready",
+  "week": {
+    "start": "2026-06-29",
+    "end": "2026-07-05",
+    "startUtc": "2026-06-28T16:00:00.000Z",
+    "endUtc": "2026-07-05T15:59:59.999Z"
+  },
+  "template_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/source_capture/sample_gate_ledger.fill-template.csv",
+  "owner_fill_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/source_capture/sample_gate_ledger.filled.csv",
+  "source_full_ledger_template_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/source_capture/source_capture_ledger.fill-template.csv",
+  "row_count": 18,
+  "link_count": 6,
+  "sample_stage_count": 3,
+  "required_event_types": [
+    "page_view",
+    "cta_click",
+    "line_add"
+  ],
+  "compile_preview_command": "npm run source:compile -- --input=data/source_capture/sample_gate_ledger.filled.csv --input-kind=sample_gate_filled",
+  "template_only": true,
+  "owner_review_required": true,
+  "live_input_files_created": false,
+  "real_events_before": 0,
+  "real_events_after": 0,
+  "real_events_unchanged": true,
+  "apply_performed": false,
+  "append_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

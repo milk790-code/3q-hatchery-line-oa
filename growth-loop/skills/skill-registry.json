@@ -1,0 +1,239 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-10",
+  "purpose": "Curated, provenance-aware skill routing for the 3Q Growth Loop knowledge base.",
+  "policy": {
+    "default_install_scope": "global_codex_skills",
+    "require_source_commit": true,
+    "require_license_review": true,
+    "require_security_scan_before_adoption": true,
+    "require_human_gate_before_external_effect": true,
+    "never_auto_install_entire_marketplace": true,
+    "scanner_limitations": "A clean scan is evidence, not certification; keep manual review and least privilege."
+  },
+  "installed": [
+    {
+      "id": "writing-plans",
+      "source": "https://github.com/obra/superpowers",
+      "source_commit": "d884ae04edebef577e82ff7c4e143debd0bbec99",
+      "upstream_path": "skills/writing-plans",
+      "license": "MIT",
+      "local_path": "/Users/mac/.codex/skills/writing-plans",
+      "status": "installed",
+      "route_after": "brainstorming",
+      "route_before": "implementation",
+      "why": "Turns an approved design into file-specific, testable tasks without replacing the existing business-context brainstorming skill."
+    },
+    {
+      "id": "using-git-worktrees",
+      "source": "https://github.com/obra/superpowers",
+      "source_commit": "d884ae04edebef577e82ff7c4e143debd0bbec99",
+      "upstream_path": "skills/using-git-worktrees",
+      "license": "MIT",
+      "local_path": "/Users/mac/.codex/skills/using-git-worktrees",
+      "status": "installed",
+      "route_after": "writing-plans",
+      "route_before": "implementation",
+      "why": "Keeps feature work isolated and prevents the knowledge-base runner, worktree, and source repository from being mixed."
+    },
+    {
+      "id": "test-driven-development",
+      "source": "https://github.com/obra/superpowers",
+      "source_commit": "d884ae04edebef577e82ff7c4e143debd0bbec99",
+      "upstream_path": "skills/test-driven-development",
+      "license": "MIT",
+      "local_path": "/Users/mac/.codex/skills/test-driven-development",
+      "status": "installed",
+      "route_after": "using-git-worktrees",
+      "route_before": "implementation",
+      "why": "Adds failing-test-first discipline to new guards and workflow changes; it complements existing fixture-heavy verification."
+    },
+    {
+      "id": "systematic-debugging",
+      "source": "https://github.com/obra/superpowers",
+      "source_commit": "d884ae04edebef577e82ff7c4e143debd0bbec99",
+      "upstream_path": "skills/systematic-debugging",
+      "license": "MIT",
+      "local_path": "/Users/mac/.codex/skills/systematic-debugging",
+      "status": "installed",
+      "route_after": "test-failure",
+      "route_before": "fix",
+      "why": "Prevents symptom patches in the long weekly runner and requires a root-cause/evidence loop before changing code."
+    },
+    {
+      "id": "requesting-code-review",
+      "source": "https://github.com/obra/superpowers",
+      "source_commit": "d884ae04edebef577e82ff7c4e143debd0bbec99",
+      "upstream_path": "skills/requesting-code-review",
+      "license": "MIT",
+      "local_path": "/Users/mac/.codex/skills/requesting-code-review",
+      "status": "installed",
+      "route_after": "verification",
+      "route_before": "push-or-pr",
+      "why": "Adds an explicit review checkpoint before branch export, matching the owner-gated Draft PR policy."
+    },
+    {
+      "id": "receiving-code-review",
+      "source": "https://github.com/obra/superpowers",
+      "source_commit": "d884ae04edebef577e82ff7c4e143debd0bbec99",
+      "upstream_path": "skills/receiving-code-review",
+      "source_sha256": "647036bbdab7bf2317e14e079595e984c9030f64295e2b4c0fb57dbeb48f25dd",
+      "license": "MIT",
+      "local_path": "/Users/mac/.codex/skills/receiving-code-review",
+      "status": "installed",
+      "trigger": "A human or external reviewer provides code-review feedback that may require clarification, verification, pushback, or implementation.",
+      "route_after": "requesting-code-review or incoming PR review feedback",
+      "route_before": "test-driven fix and fresh verification",
+      "why": "Fills the missing feedback-handling step: review comments are checked against codebase reality before any one-at-a-time tested change."
+    },
+    {
+      "id": "verification-before-completion",
+      "source": "https://github.com/obra/superpowers",
+      "source_commit": "d884ae04edebef577e82ff7c4e143debd0bbec99",
+      "upstream_path": "skills/verification-before-completion",
+      "source_sha256": "ea52d15aabaf72bc6b558efe2c126f161b53961090ddcd712000273bfe8c7b6c",
+      "license": "MIT",
+      "local_path": "/Users/mac/.codex/skills/verification-before-completion",
+      "status": "installed",
+      "trigger": "The agent is about to claim that work is complete, fixed, passing, ready, or safe to hand off.",
+      "route_after": "implementation, review fixes, or any workflow phase",
+      "route_before": "completion claim, commit, Draft PR, handoff, or next phase",
+      "why": "Turns the existing evidence-first preference into an explicit completion gate requiring fresh full-command output rather than stale reports or inferred success."
+    },
+    {
+      "id": "finishing-a-development-branch",
+      "source": "https://github.com/obra/superpowers",
+      "source_commit": "d884ae04edebef577e82ff7c4e143debd0bbec99",
+      "upstream_path": "skills/finishing-a-development-branch",
+      "license": "MIT",
+      "local_path": "/Users/mac/.codex/skills/finishing-a-development-branch",
+      "status": "installed",
+      "route_after": "requesting-code-review",
+      "route_before": "Draft PR or owner gate",
+      "why": "Makes the final branch decision explicit: verify, present options, then stop at push/PR/merge/deploy gates."
+    },
+    {
+      "id": "skill-scanner",
+      "source": "https://github.com/getsentry/skills",
+      "source_commit": "5a64b36c62d042d3981b7937d9d6ca7bd1753b9a",
+      "upstream_path": "skills/skill-scanner",
+      "license": "Apache-2.0",
+      "local_path": "/Users/mac/.codex/skills/skill-scanner",
+      "status": "installed",
+      "route_before": "any external skill adoption",
+      "route_after": "license-and-human-review",
+      "why": "Adds a supply-chain/prompt-injection review gate before importing future open-source skills."
+    },
+    {
+      "id": "transcribe",
+      "source": "https://github.com/openai/skills",
+      "source_commit": "49f948faa9258a0c61caceaf225e179651397431",
+      "upstream_path": "skills/.curated/transcribe",
+      "license": "Apache-2.0",
+      "local_path": "/Users/mac/.codex/skills/transcribe",
+      "status": "installed",
+      "route_after": "google-photos-video-import",
+      "route_before": "footage-multiplier",
+      "why": "Turns video speech into searchable text and optional speaker-aware transcripts for the permanent footage catalog."
+    },
+    {
+      "id": "playwright",
+      "source": "https://github.com/openai/skills",
+      "source_commit": "49f948faa9258a0c61caceaf225e179651397431",
+      "upstream_path": "skills/.curated/playwright",
+      "license": "Apache-2.0",
+      "local_path": "/Users/mac/.codex/skills/playwright",
+      "status": "installed",
+      "route_after": "connector-or-browser-unavailable",
+      "route_before": "manual-browser-handoff",
+      "why": "Provides a repeatable terminal browser fallback for Google Takeout setup, download verification, and UI flow debugging."
+    },
+    {
+      "id": "security-best-practices",
+      "source": "https://github.com/openai/skills",
+      "source_commit": "49f948faa9258a0c61caceaf225e179651397431",
+      "upstream_path": "skills/.curated/security-best-practices",
+      "license": "Apache-2.0",
+      "local_path": "/Users/mac/.codex/skills/security-best-practices",
+      "status": "installed",
+      "route_before": "release-of-importer-security-changes",
+      "route_after": "explicit-security-review-request",
+      "why": "Adds Python secure-default review guidance around untrusted Takeout ZIPs, paths, subprocesses, and metadata handling."
+    },
+    {
+      "id": "google-photos-video-library",
+      "source": "local-composite",
+      "source_commit": null,
+      "upstream_path": null,
+      "license": "private-local-workflow",
+      "local_path": "/Users/mac/.codex/skills/google-photos-video-library",
+      "status": "installed",
+      "route_after": "google-photos-or-takeout-request",
+      "route_before": "connector-browser-import-transcribe-footage-multiplier",
+      "why": "Provides one durable trigger and enforces storage, privacy, external-upload, cost, and evidence gates across the complete Google Photos footage workflow."
+    }
+  ],
+  "evaluated_not_installed": [
+    {
+      "id": "openai-skills-catalog",
+      "source": "https://github.com/openai/skills",
+      "source_commit": "49f948faa9258a0c61caceaf225e179651397431",
+      "decision": "selective-pinned-adoption",
+      "reason": "The repository is deprecated as a general catalog, but the bundled skill-installer still resolves its curated skills. Only three reviewed Apache-2.0 directories were pinned at the recorded commit; bulk adoption remains prohibited."
+    },
+    {
+      "id": "google-photos-takeout-helper",
+      "source": "https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper",
+      "source_commit": "a9de187efd9ce7cd072c5803dabc45079d416e64",
+      "license": "Apache-2.0",
+      "decision": "tool-reference-only",
+      "reason": "Useful Takeout organizer but not an agent skill. Upstream moves files by default and documents disabling macOS quarantine, so it is not installed globally or executed against the only copy of a library."
+    },
+    {
+      "id": "openclip",
+      "source": "https://github.com/Oak-Ridge-Ventures/openclip-skill",
+      "source_commit": "5de5bde73123aa562fb3fdd8cc775e19b8170caa",
+      "upstream_path": "skills/openclip",
+      "license": "MIT",
+      "decision": "not-adopted-privacy-gate",
+      "reason": "Capable media MCP skill, but it uploads local videos to a third-party service, requires OAuth/account setup, and may enter a paid clipping pipeline. Keep outside the private permanent footage library unless the owner explicitly approves that destination and data transfer."
+    },
+    {
+      "id": "anthropic-office-skills",
+      "source": "https://github.com/anthropics/skills",
+      "source_commit": "9d2f1ae187231d8199c64b5b762e1bdf2244733d",
+      "decision": "not-adopted",
+      "reason": "The examined docx/xlsx/pptx/pdf directories declare proprietary licensing; they are not suitable for an open-source-only adoption lane."
+    },
+    {
+      "id": "voltagent-awesome-agent-skills",
+      "source": "https://github.com/VoltAgent/awesome-agent-skills",
+      "decision": "discovery-index-only",
+      "reason": "Useful for locating vendor-maintained skills (Cloudflare, Sentry, Trail of Bits, Figma), but each candidate still needs source, license, and security review."
+    },
+    {
+      "id": "agent-skills-hub",
+      "source": "https://github.com/agent-skills-hub/agent-skills-hub",
+      "decision": "discovery-index-only",
+      "reason": "Large registry is useful for search, but bulk installation would bypass provenance and prompt-injection review."
+    },
+    {
+      "id": "executing-plans",
+      "source": "https://github.com/obra/superpowers",
+      "source_commit": "d884ae04edebef577e82ff7c4e143debd0bbec99",
+      "upstream_path": "skills/executing-plans",
+      "license": "MIT",
+      "decision": "not-adopted-duplicate",
+      "reason": "Its batch execution role is already covered by go, gogogogo, and autopilot-mission; adding it would create competing checkpoints instead of a new capability."
+    },
+    {
+      "id": "agents-md",
+      "source": "https://github.com/getsentry/skills",
+      "source_commit": "5a64b36c62d042d3981b7937d9d6ca7bd1753b9a",
+      "upstream_path": "skills/agents-md",
+      "license": "Apache-2.0",
+      "decision": "pending-review-not-installed",
+      "reason": "Potentially useful for concise instruction maintenance, but the control-center AGENTS.md intentionally carries durable Mac, Obsidian, permission, and human-gate rules. Adoption needs a project-specific non-destructive contract before it may edit that surface."
+    }
+  ]
+}

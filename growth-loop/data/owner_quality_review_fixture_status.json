@@ -1,0 +1,816 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:45:40.267Z",
+  "mode": "owner_quality_review_fixture_dry_run",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/owner_quality_review_fixture_status.json",
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/owner_quality_review_fixture_report.md",
+  "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT",
+  "scenario_count": 6,
+  "scenarios": [
+    {
+      "id": "waiting_for_sample_rate_candidate_no_input",
+      "ok": true,
+      "description": "No sample-rate winner exists, so quality review stays idle.",
+      "expected": {
+        "exitCode": 0,
+        "status": "waiting_for_sample_rate_candidate",
+        "decision": "wait_for_sample_rate_candidate",
+        "no_quality_regression": null,
+        "challenger_win_rule_met": false,
+        "promotion_review_queued": false,
+        "owner_review_required": false
+      },
+      "assertions": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "status_written",
+          "ok": true,
+          "expected": "status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "waiting_for_sample_rate_candidate",
+          "actual": "waiting_for_sample_rate_candidate",
+          "external_effect": false
+        },
+        {
+          "name": "decision",
+          "ok": true,
+          "expected": "wait_for_sample_rate_candidate",
+          "actual": "wait_for_sample_rate_candidate",
+          "external_effect": false
+        },
+        {
+          "name": "no_quality_regression",
+          "ok": true,
+          "expected": null,
+          "actual": null,
+          "external_effect": false
+        },
+        {
+          "name": "challenger_win_rule_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "promotion_review_queued",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_promotion",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_approval_queue_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "issue_count_zero",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        }
+      ],
+      "command_exit_code": 0,
+      "status": "waiting_for_sample_rate_candidate",
+      "decision": "wait_for_sample_rate_candidate",
+      "input_exists": false,
+      "sample_rate_win_candidate": false,
+      "owner_review_required": false,
+      "quality_guard_status": "not_evaluated_waiting_for_sample_rate_candidate",
+      "no_quality_regression": null,
+      "challenger_win_rule_met": false,
+      "promotion_review_queued": false,
+      "promotion_performed": false,
+      "issue_count": 0,
+      "quality_regression_count": 0,
+      "real_events_unchanged": true,
+      "data_lp_events_write_performed": false,
+      "approval_queue_write_performed": false,
+      "external_effect": false,
+      "temp_files": {
+        "sample_gate_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/waiting_for_sample_rate_candidate_no_input/owner_sample_gate_status.json",
+        "input_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/waiting_for_sample_rate_candidate_no_input/owner_quality_review.filled.json",
+        "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/waiting_for_sample_rate_candidate_no_input/owner_quality_review_status.json",
+        "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/waiting_for_sample_rate_candidate_no_input/owner_quality_review.md",
+        "example_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/waiting_for_sample_rate_candidate_no_input/owner_quality_review.example.json"
+      }
+    },
+    {
+      "id": "sample_rate_win_waits_for_quality_evidence",
+      "ok": true,
+      "description": "A sample-rate winner exists, but no quality evidence has been filled yet.",
+      "expected": {
+        "exitCode": 0,
+        "status": "waiting_for_owner_quality_evidence",
+        "decision": "collect_owner_quality_review_evidence",
+        "no_quality_regression": null,
+        "challenger_win_rule_met": false,
+        "promotion_review_queued": false,
+        "owner_review_required": true
+      },
+      "assertions": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "status_written",
+          "ok": true,
+          "expected": "status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "waiting_for_owner_quality_evidence",
+          "actual": "waiting_for_owner_quality_evidence",
+          "external_effect": false
+        },
+        {
+          "name": "decision",
+          "ok": true,
+          "expected": "collect_owner_quality_review_evidence",
+          "actual": "collect_owner_quality_review_evidence",
+          "external_effect": false
+        },
+        {
+          "name": "no_quality_regression",
+          "ok": true,
+          "expected": null,
+          "actual": null,
+          "external_effect": false
+        },
+        {
+          "name": "challenger_win_rule_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "promotion_review_queued",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "no_promotion",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_approval_queue_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "issue_count_zero",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        }
+      ],
+      "command_exit_code": 0,
+      "status": "waiting_for_owner_quality_evidence",
+      "decision": "collect_owner_quality_review_evidence",
+      "input_exists": false,
+      "sample_rate_win_candidate": true,
+      "owner_review_required": true,
+      "quality_guard_status": "owner_quality_review_required",
+      "no_quality_regression": null,
+      "challenger_win_rule_met": false,
+      "promotion_review_queued": false,
+      "promotion_performed": false,
+      "issue_count": 0,
+      "quality_regression_count": 0,
+      "real_events_unchanged": true,
+      "data_lp_events_write_performed": false,
+      "approval_queue_write_performed": false,
+      "external_effect": false,
+      "temp_files": {
+        "sample_gate_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/sample_rate_win_waits_for_quality_evidence/owner_sample_gate_status.json",
+        "input_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/sample_rate_win_waits_for_quality_evidence/owner_quality_review.filled.json",
+        "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/sample_rate_win_waits_for_quality_evidence/owner_quality_review_status.json",
+        "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/sample_rate_win_waits_for_quality_evidence/owner_quality_review.md",
+        "example_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/sample_rate_win_waits_for_quality_evidence/owner_quality_review.example.json"
+      }
+    },
+    {
+      "id": "sample_rate_win_quality_pass_queues_review",
+      "ok": true,
+      "description": "Aggregate quality evidence passes, so final promotion evidence is queued for owner review only.",
+      "expected": {
+        "exitCode": 0,
+        "status": "owner_quality_review_passed_no_auto_promotion",
+        "decision": "queue_owner_promotion_review_no_auto_promotion",
+        "no_quality_regression": true,
+        "challenger_win_rule_met": true,
+        "promotion_review_queued": true,
+        "owner_review_required": true
+      },
+      "assertions": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "status_written",
+          "ok": true,
+          "expected": "status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "owner_quality_review_passed_no_auto_promotion",
+          "actual": "owner_quality_review_passed_no_auto_promotion",
+          "external_effect": false
+        },
+        {
+          "name": "decision",
+          "ok": true,
+          "expected": "queue_owner_promotion_review_no_auto_promotion",
+          "actual": "queue_owner_promotion_review_no_auto_promotion",
+          "external_effect": false
+        },
+        {
+          "name": "no_quality_regression",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "challenger_win_rule_met",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "promotion_review_queued",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "no_promotion",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_approval_queue_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "issue_count_zero",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        }
+      ],
+      "command_exit_code": 0,
+      "status": "owner_quality_review_passed_no_auto_promotion",
+      "decision": "queue_owner_promotion_review_no_auto_promotion",
+      "input_exists": true,
+      "sample_rate_win_candidate": true,
+      "owner_review_required": true,
+      "quality_guard_status": "owner_quality_review_passed",
+      "no_quality_regression": true,
+      "challenger_win_rule_met": true,
+      "promotion_review_queued": true,
+      "promotion_performed": false,
+      "issue_count": 0,
+      "quality_regression_count": 0,
+      "real_events_unchanged": true,
+      "data_lp_events_write_performed": false,
+      "approval_queue_write_performed": false,
+      "external_effect": false,
+      "temp_files": {
+        "sample_gate_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/sample_rate_win_quality_pass_queues_review/owner_sample_gate_status.json",
+        "input_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/sample_rate_win_quality_pass_queues_review/owner_quality_review.filled.json",
+        "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/sample_rate_win_quality_pass_queues_review/owner_quality_review_status.json",
+        "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/sample_rate_win_quality_pass_queues_review/owner_quality_review.md",
+        "example_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/sample_rate_win_quality_pass_queues_review/owner_quality_review.example.json"
+      }
+    },
+    {
+      "id": "sample_rate_win_quality_regression_keeps_champion",
+      "ok": true,
+      "description": "Valid aggregate evidence shows quality regression, so the champion remains in place.",
+      "expected": {
+        "exitCode": 0,
+        "status": "owner_quality_review_failed_keep_champion",
+        "decision": "keep_champion_due_quality_regression",
+        "no_quality_regression": false,
+        "challenger_win_rule_met": false,
+        "promotion_review_queued": false,
+        "owner_review_required": true
+      },
+      "assertions": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "status_written",
+          "ok": true,
+          "expected": "status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "owner_quality_review_failed_keep_champion",
+          "actual": "owner_quality_review_failed_keep_champion",
+          "external_effect": false
+        },
+        {
+          "name": "decision",
+          "ok": true,
+          "expected": "keep_champion_due_quality_regression",
+          "actual": "keep_champion_due_quality_regression",
+          "external_effect": false
+        },
+        {
+          "name": "no_quality_regression",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "challenger_win_rule_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "promotion_review_queued",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "no_promotion",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_approval_queue_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "issue_count_zero",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        }
+      ],
+      "command_exit_code": 0,
+      "status": "owner_quality_review_failed_keep_champion",
+      "decision": "keep_champion_due_quality_regression",
+      "input_exists": true,
+      "sample_rate_win_candidate": true,
+      "owner_review_required": true,
+      "quality_guard_status": "owner_quality_review_failed",
+      "no_quality_regression": false,
+      "challenger_win_rule_met": false,
+      "promotion_review_queued": false,
+      "promotion_performed": false,
+      "issue_count": 0,
+      "quality_regression_count": 1,
+      "real_events_unchanged": true,
+      "data_lp_events_write_performed": false,
+      "approval_queue_write_performed": false,
+      "external_effect": false,
+      "temp_files": {
+        "sample_gate_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/sample_rate_win_quality_regression_keeps_champion/owner_sample_gate_status.json",
+        "input_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/sample_rate_win_quality_regression_keeps_champion/owner_quality_review.filled.json",
+        "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/sample_rate_win_quality_regression_keeps_champion/owner_quality_review_status.json",
+        "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/sample_rate_win_quality_regression_keeps_champion/owner_quality_review.md",
+        "example_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/sample_rate_win_quality_regression_keeps_champion/owner_quality_review.example.json"
+      }
+    },
+    {
+      "id": "sensitive_evidence_blocks_review",
+      "ok": true,
+      "description": "Sensitive-looking evidence references are rejected before any promotion review can be queued.",
+      "expected": {
+        "exitCode": 1,
+        "status": "blocked_invalid_owner_quality_review",
+        "decision": "fix_owner_quality_review_input",
+        "no_quality_regression": false,
+        "challenger_win_rule_met": false,
+        "promotion_review_queued": false,
+        "owner_review_required": true,
+        "issue_count_positive": true
+      },
+      "assertions": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 1,
+          "actual": 1,
+          "external_effect": false
+        },
+        {
+          "name": "status_written",
+          "ok": true,
+          "expected": "status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "blocked_invalid_owner_quality_review",
+          "actual": "blocked_invalid_owner_quality_review",
+          "external_effect": false
+        },
+        {
+          "name": "decision",
+          "ok": true,
+          "expected": "fix_owner_quality_review_input",
+          "actual": "fix_owner_quality_review_input",
+          "external_effect": false
+        },
+        {
+          "name": "no_quality_regression",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "challenger_win_rule_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "promotion_review_queued",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "no_promotion",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_approval_queue_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "issue_count_positive",
+          "ok": true,
+          "expected": ">0",
+          "actual": 1,
+          "external_effect": false
+        }
+      ],
+      "command_exit_code": 1,
+      "status": "blocked_invalid_owner_quality_review",
+      "decision": "fix_owner_quality_review_input",
+      "input_exists": true,
+      "sample_rate_win_candidate": true,
+      "owner_review_required": true,
+      "quality_guard_status": "blocked_invalid_owner_quality_review",
+      "no_quality_regression": false,
+      "challenger_win_rule_met": false,
+      "promotion_review_queued": false,
+      "promotion_performed": false,
+      "issue_count": 1,
+      "quality_regression_count": 0,
+      "real_events_unchanged": true,
+      "data_lp_events_write_performed": false,
+      "approval_queue_write_performed": false,
+      "external_effect": false,
+      "temp_files": {
+        "sample_gate_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/sensitive_evidence_blocks_review/owner_sample_gate_status.json",
+        "input_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/sensitive_evidence_blocks_review/owner_quality_review.filled.json",
+        "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/sensitive_evidence_blocks_review/owner_quality_review_status.json",
+        "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/sensitive_evidence_blocks_review/owner_quality_review.md",
+        "example_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/sensitive_evidence_blocks_review/owner_quality_review.example.json"
+      }
+    },
+    {
+      "id": "missing_required_fields_blocks_review",
+      "ok": true,
+      "description": "Missing aggregate quality fields block the review input.",
+      "expected": {
+        "exitCode": 1,
+        "status": "blocked_invalid_owner_quality_review",
+        "decision": "fix_owner_quality_review_input",
+        "no_quality_regression": false,
+        "challenger_win_rule_met": false,
+        "promotion_review_queued": false,
+        "owner_review_required": true,
+        "issue_count_positive": true
+      },
+      "assertions": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 1,
+          "actual": 1,
+          "external_effect": false
+        },
+        {
+          "name": "status_written",
+          "ok": true,
+          "expected": "status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "blocked_invalid_owner_quality_review",
+          "actual": "blocked_invalid_owner_quality_review",
+          "external_effect": false
+        },
+        {
+          "name": "decision",
+          "ok": true,
+          "expected": "fix_owner_quality_review_input",
+          "actual": "fix_owner_quality_review_input",
+          "external_effect": false
+        },
+        {
+          "name": "no_quality_regression",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "challenger_win_rule_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "promotion_review_queued",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "no_promotion",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_approval_queue_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "issue_count_positive",
+          "ok": true,
+          "expected": ">0",
+          "actual": 2,
+          "external_effect": false
+        }
+      ],
+      "command_exit_code": 1,
+      "status": "blocked_invalid_owner_quality_review",
+      "decision": "fix_owner_quality_review_input",
+      "input_exists": true,
+      "sample_rate_win_candidate": true,
+      "owner_review_required": true,
+      "quality_guard_status": "blocked_invalid_owner_quality_review",
+      "no_quality_regression": false,
+      "challenger_win_rule_met": false,
+      "promotion_review_queued": false,
+      "promotion_performed": false,
+      "issue_count": 2,
+      "quality_regression_count": 0,
+      "real_events_unchanged": true,
+      "data_lp_events_write_performed": false,
+      "approval_queue_write_performed": false,
+      "external_effect": false,
+      "temp_files": {
+        "sample_gate_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/missing_required_fields_blocks_review/owner_sample_gate_status.json",
+        "input_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/missing_required_fields_blocks_review/owner_quality_review.filled.json",
+        "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/missing_required_fields_blocks_review/owner_quality_review_status.json",
+        "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/missing_required_fields_blocks_review/owner_quality_review.md",
+        "example_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-quality-review-fixtures-gjZrkT/missing_required_fields_blocks_review/owner_quality_review.example.json"
+      }
+    }
+  ],
+  "local_fixture_commands_executed": true,
+  "owner_quality_review_commands_executed": true,
+  "real_events_unchanged": true,
+  "execution_performed": false,
+  "real_event_write_performed": false,
+  "data_lp_events_write_performed": false,
+  "approval_queue_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Fixture-only owner quality-review contract. It uses temporary aggregate JSON inputs and never creates data/owner_quality_review.filled.json, writes data/lp_events.jsonl, changes approval_queue.json, promotes a challenger, deploys, posts, pushes LINE, mutates customer data, touches payments, or deletes data."
+}

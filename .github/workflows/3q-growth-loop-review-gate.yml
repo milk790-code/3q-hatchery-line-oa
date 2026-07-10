@@ -1,0 +1,30 @@
+name: 3Q Growth Loop Review Gate
+
+on:
+  pull_request:
+    paths:
+      - "growth-loop/**"
+      - ".github/workflows/3q-growth-loop-review-gate.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  growth-loop-review-gate:
+    name: growth-loop-review-gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: growth-loop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: growth-loop/package-lock.json
+      - run: npm ci
+      - name: Fail closed on unresolved HIGH and regressions
+        run: npm run mcp:review:gate

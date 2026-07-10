@@ -1,0 +1,103 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:48:20.571Z",
+  "mode": "approval_queue_status_local_only",
+  "status": "approval_queue_ready_with_human_gates",
+  "queue_json_path": "approval_queue.json",
+  "item_count": 20,
+  "status_counts": {
+    "ready_local_review": 14,
+    "pending_human": 5,
+    "completed_local_reversible": 1
+  },
+  "risk_tier_counts": {
+    "T1": 15,
+    "T2": 2,
+    "T3": 3
+  },
+  "type_counts": {
+    "data_collection": 1,
+    "cloudflare_d1_setup": 1,
+    "candidate_worker_existing_deployment_provenance": 1,
+    "ab_traffic_link_change": 1,
+    "weekly_report_review": 1,
+    "champion_contract_review": 1,
+    "champion_integration_candidate_review": 1,
+    "champion_integration_production_deploy": 1,
+    "next_round_review": 1,
+    "launch_readiness_review": 1,
+    "owner_console_review": 1,
+    "real_data_input_pack_review": 1,
+    "source_readiness_review": 1,
+    "source_capture_review": 1,
+    "source_capture_compile_review": 1,
+    "real_data_intake_review": 1,
+    "data_collection_review": 1,
+    "line_inbound_playbook_review": 1,
+    "local_schedule_install": 1,
+    "github_publish_or_pr": 1
+  },
+  "ready_local_review_count": 14,
+  "pending_human_count": 5,
+  "completed_local_reversible_count": 1,
+  "completed_external_evidence_verified_count": 0,
+  "high_risk_pending_count": 5,
+  "next_ready_local_review_id": "collect-first-real-events",
+  "next_ready_local_review_artifact": "data/lp_events.jsonl",
+  "next_pending_human_id": "approve-d1-create-and-migrate",
+  "next_pending_human_artifact": "schema/d1-week0.sql",
+  "pending_human_ids": [
+    "approve-d1-create-and-migrate",
+    "approve-candidate-worker-deploy",
+    "approve-small-ab-link",
+    "approve-champion-integration-production-deploy",
+    "approve-github-repo-and-pr"
+  ],
+  "ready_local_review_ids": [
+    "collect-first-real-events",
+    "review-weekly-report",
+    "review-champion-contract-audit",
+    "review-champion-integration-candidate",
+    "review-next-round-plan",
+    "review-owner-approval-pack",
+    "review-owner-console",
+    "review-real-data-input-pack",
+    "review-source-readiness",
+    "review-source-capture-pack",
+    "review-source-capture-compile",
+    "review-real-data-intake-plan",
+    "review-data-collection-brief",
+    "review-line-inbound-playbook"
+  ],
+  "completed_local_reversible_ids": [
+    "review-local-launchagent-install"
+  ],
+  "completed_external_evidence_verified_ids": [],
+  "high_risk_pending_ids": [
+    "approve-d1-create-and-migrate",
+    "approve-candidate-worker-deploy",
+    "approve-small-ab-link",
+    "approve-champion-integration-production-deploy",
+    "approve-github-repo-and-pr"
+  ],
+  "policy": {
+    "no_external_send": true,
+    "no_production_deploy": true,
+    "no_primary_link_change": true,
+    "no_customer_data_mutation": true
+  },
+  "policy_ok": true,
+  "external_effect": false,
+  "live_input_files_created": false,
+  "data_lp_events_write_performed": false,
+  "approval_action_executed": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Compact local status for approval_queue.json. It summarizes owner gates and executes no approval, deploy, GitHub, public-link, post, LINE, payment, customer-data, or delete action."
+}

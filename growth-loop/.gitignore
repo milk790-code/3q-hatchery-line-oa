@@ -1,0 +1,9 @@
+node_modules/
+.wrangler/
+github_export/
+archive/
+logs/
+output/
+owner_gate_evidence.json
+.dev.vars
+*.local

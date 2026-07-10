@@ -1,0 +1,489 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:45:17.514Z",
+  "mode": "sample_gate_due_fixture_dry_run",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/sample_gate_due_fixture_status.json",
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/sample_gate_due_fixture_report.md",
+  "scenario_count": 4,
+  "scenario_ids": [
+    "waiting_before_day3",
+    "day3_due",
+    "day3_overdue_recovery",
+    "day7_due"
+  ],
+  "scenarios": [
+    {
+      "id": "waiting_before_day3",
+      "today": "2026-07-07",
+      "ok": true,
+      "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-waiting_before_day3-PTxNEi",
+      "command": "node scripts/sample-gate-due-status.mjs --today=2026-07-07 --progress=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-waiting_before_day3-PTxNEi/fixtures/progress.json --owner-sample-gate=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-waiting_before_day3-PTxNEi/fixtures/owner-sample-gate.json --capture-calendar=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-waiting_before_day3-PTxNEi/fixtures/capture-calendar.json --owner-action=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-waiting_before_day3-PTxNEi/fixtures/owner-action.json --next-p0=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-waiting_before_day3-PTxNEi/fixtures/next-p0.json --json=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-waiting_before_day3-PTxNEi/sample_gate_due_status.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-waiting_before_day3-PTxNEi/sample_gate_due_status_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-waiting_before_day3-PTxNEi/sample_gate_due_status.md",
+      "exit_code": 0,
+      "status": "waiting_until_day3",
+      "due_phase": "pre_minimum_check",
+      "due_event_id": "minimum_sample_check_day3",
+      "due_now": false,
+      "checks": [
+        {
+          "name": "exit_success",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "full_status_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "compact_status_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "status_matches",
+          "ok": true,
+          "expected": "waiting_until_day3",
+          "actual": "waiting_until_day3",
+          "external_effect": false
+        },
+        {
+          "name": "compact_status_matches",
+          "ok": true,
+          "expected": "waiting_until_day3",
+          "actual": "waiting_until_day3",
+          "external_effect": false
+        },
+        {
+          "name": "phase_matches",
+          "ok": true,
+          "expected": "pre_minimum_check",
+          "actual": "pre_minimum_check",
+          "external_effect": false
+        },
+        {
+          "name": "event_matches",
+          "ok": true,
+          "expected": "minimum_sample_check_day3",
+          "actual": "minimum_sample_check_day3",
+          "external_effect": false
+        },
+        {
+          "name": "due_now_matches",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "today_matches",
+          "ok": true,
+          "expected": "2026-07-07",
+          "actual": "2026-07-07",
+          "external_effect": false
+        },
+        {
+          "name": "focused_input_count_matches",
+          "ok": true,
+          "expected": 9,
+          "actual": 9,
+          "external_effect": false
+        },
+        {
+          "name": "no_calendar_import",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_browser_open",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        }
+      ],
+      "project_due_status_write_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "day3_due",
+      "today": "2026-07-08",
+      "ok": true,
+      "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day3_due-ahDV8c",
+      "command": "node scripts/sample-gate-due-status.mjs --today=2026-07-08 --progress=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day3_due-ahDV8c/fixtures/progress.json --owner-sample-gate=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day3_due-ahDV8c/fixtures/owner-sample-gate.json --capture-calendar=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day3_due-ahDV8c/fixtures/capture-calendar.json --owner-action=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day3_due-ahDV8c/fixtures/owner-action.json --next-p0=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day3_due-ahDV8c/fixtures/next-p0.json --json=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day3_due-ahDV8c/sample_gate_due_status.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day3_due-ahDV8c/sample_gate_due_status_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day3_due-ahDV8c/sample_gate_due_status.md",
+      "exit_code": 0,
+      "status": "day3_due_waiting_for_owner_counts",
+      "due_phase": "minimum_check_due",
+      "due_event_id": "minimum_sample_check_day3",
+      "due_now": true,
+      "checks": [
+        {
+          "name": "exit_success",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "full_status_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "compact_status_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "status_matches",
+          "ok": true,
+          "expected": "day3_due_waiting_for_owner_counts",
+          "actual": "day3_due_waiting_for_owner_counts",
+          "external_effect": false
+        },
+        {
+          "name": "compact_status_matches",
+          "ok": true,
+          "expected": "day3_due_waiting_for_owner_counts",
+          "actual": "day3_due_waiting_for_owner_counts",
+          "external_effect": false
+        },
+        {
+          "name": "phase_matches",
+          "ok": true,
+          "expected": "minimum_check_due",
+          "actual": "minimum_check_due",
+          "external_effect": false
+        },
+        {
+          "name": "event_matches",
+          "ok": true,
+          "expected": "minimum_sample_check_day3",
+          "actual": "minimum_sample_check_day3",
+          "external_effect": false
+        },
+        {
+          "name": "due_now_matches",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "today_matches",
+          "ok": true,
+          "expected": "2026-07-08",
+          "actual": "2026-07-08",
+          "external_effect": false
+        },
+        {
+          "name": "focused_input_count_matches",
+          "ok": true,
+          "expected": 9,
+          "actual": 9,
+          "external_effect": false
+        },
+        {
+          "name": "no_calendar_import",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_browser_open",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        }
+      ],
+      "project_due_status_write_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "day3_overdue_recovery",
+      "today": "2026-07-09",
+      "ok": true,
+      "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day3_overdue_recovery-nAYWwX",
+      "command": "node scripts/sample-gate-due-status.mjs --today=2026-07-09 --progress=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day3_overdue_recovery-nAYWwX/fixtures/progress.json --owner-sample-gate=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day3_overdue_recovery-nAYWwX/fixtures/owner-sample-gate.json --capture-calendar=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day3_overdue_recovery-nAYWwX/fixtures/capture-calendar.json --owner-action=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day3_overdue_recovery-nAYWwX/fixtures/owner-action.json --next-p0=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day3_overdue_recovery-nAYWwX/fixtures/next-p0.json --json=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day3_overdue_recovery-nAYWwX/sample_gate_due_status.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day3_overdue_recovery-nAYWwX/sample_gate_due_status_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day3_overdue_recovery-nAYWwX/sample_gate_due_status.md",
+      "exit_code": 0,
+      "status": "day3_overdue_waiting_for_owner_counts",
+      "due_phase": "minimum_check_overdue",
+      "due_event_id": "minimum_sample_check_day3_overdue",
+      "due_now": true,
+      "checks": [
+        {
+          "name": "exit_success",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "full_status_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "compact_status_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "status_matches",
+          "ok": true,
+          "expected": "day3_overdue_waiting_for_owner_counts",
+          "actual": "day3_overdue_waiting_for_owner_counts",
+          "external_effect": false
+        },
+        {
+          "name": "compact_status_matches",
+          "ok": true,
+          "expected": "day3_overdue_waiting_for_owner_counts",
+          "actual": "day3_overdue_waiting_for_owner_counts",
+          "external_effect": false
+        },
+        {
+          "name": "phase_matches",
+          "ok": true,
+          "expected": "minimum_check_overdue",
+          "actual": "minimum_check_overdue",
+          "external_effect": false
+        },
+        {
+          "name": "event_matches",
+          "ok": true,
+          "expected": "minimum_sample_check_day3_overdue",
+          "actual": "minimum_sample_check_day3_overdue",
+          "external_effect": false
+        },
+        {
+          "name": "due_now_matches",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "today_matches",
+          "ok": true,
+          "expected": "2026-07-09",
+          "actual": "2026-07-09",
+          "external_effect": false
+        },
+        {
+          "name": "focused_input_count_matches",
+          "ok": true,
+          "expected": 9,
+          "actual": 9,
+          "external_effect": false
+        },
+        {
+          "name": "no_calendar_import",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_browser_open",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        }
+      ],
+      "project_due_status_write_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "day7_due",
+      "today": "2026-07-12",
+      "ok": true,
+      "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day7_due-Q9hLCV",
+      "command": "node scripts/sample-gate-due-status.mjs --today=2026-07-12 --progress=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day7_due-Q9hLCV/fixtures/progress.json --owner-sample-gate=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day7_due-Q9hLCV/fixtures/owner-sample-gate.json --capture-calendar=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day7_due-Q9hLCV/fixtures/capture-calendar.json --owner-action=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day7_due-Q9hLCV/fixtures/owner-action.json --next-p0=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day7_due-Q9hLCV/fixtures/next-p0.json --json=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day7_due-Q9hLCV/sample_gate_due_status.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day7_due-Q9hLCV/sample_gate_due_status_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-sample-gate-due-day7_due-Q9hLCV/sample_gate_due_status.md",
+      "exit_code": 0,
+      "status": "day7_due_waiting_for_owner_counts",
+      "due_phase": "preferred_check_due",
+      "due_event_id": "preferred_sample_check_day7",
+      "due_now": true,
+      "checks": [
+        {
+          "name": "exit_success",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "full_status_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "compact_status_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "status_matches",
+          "ok": true,
+          "expected": "day7_due_waiting_for_owner_counts",
+          "actual": "day7_due_waiting_for_owner_counts",
+          "external_effect": false
+        },
+        {
+          "name": "compact_status_matches",
+          "ok": true,
+          "expected": "day7_due_waiting_for_owner_counts",
+          "actual": "day7_due_waiting_for_owner_counts",
+          "external_effect": false
+        },
+        {
+          "name": "phase_matches",
+          "ok": true,
+          "expected": "preferred_check_due",
+          "actual": "preferred_check_due",
+          "external_effect": false
+        },
+        {
+          "name": "event_matches",
+          "ok": true,
+          "expected": "preferred_sample_check_day7",
+          "actual": "preferred_sample_check_day7",
+          "external_effect": false
+        },
+        {
+          "name": "due_now_matches",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "today_matches",
+          "ok": true,
+          "expected": "2026-07-12",
+          "actual": "2026-07-12",
+          "external_effect": false
+        },
+        {
+          "name": "focused_input_count_matches",
+          "ok": true,
+          "expected": 9,
+          "actual": 9,
+          "external_effect": false
+        },
+        {
+          "name": "no_calendar_import",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_browser_open",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        }
+      ],
+      "project_due_status_write_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    }
+  ],
+  "local_fixture_commands_executed": true,
+  "project_due_status_write_performed": false,
+  "data_lp_events_write_performed": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "external_effect": false,
+  "note": "Fixture-only sample-gate due-state guard. It writes temporary due-status outputs only and never touches project due-status artifacts, data/lp_events.jsonl, or external systems."
+}

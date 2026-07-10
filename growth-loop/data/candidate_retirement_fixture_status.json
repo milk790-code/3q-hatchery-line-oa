@@ -1,0 +1,720 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:47:22.037Z",
+  "mode": "candidate_retirement_fixture_dry_run",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/candidate_retirement_fixture_status.json",
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/candidate_retirement_fixture_report.md",
+  "scenario_count": 6,
+  "scenarios": [
+    {
+      "id": "sample_insufficient_keeps_testing",
+      "ok": true,
+      "description": "A challenger below sample threshold must stay in testing and cannot be retired.",
+      "assertions": [
+        {
+          "name": "queue_status",
+          "ok": true,
+          "expected": "no_retirement_sample_insufficient_or_not_needed",
+          "actual": "no_retirement_sample_insufficient_or_not_needed",
+          "external_effect": false
+        },
+        {
+          "name": "item_status",
+          "ok": true,
+          "expected": "keep_testing_sample_insufficient",
+          "actual": "keep_testing_sample_insufficient",
+          "external_effect": false
+        },
+        {
+          "name": "recommended_action",
+          "ok": true,
+          "expected": "keep_in_candidate_rotation",
+          "actual": "keep_in_candidate_rotation",
+          "external_effect": false
+        },
+        {
+          "name": "retirement_ready",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "promotion_reviews",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "keep_testing",
+          "ok": true,
+          "expected": 1,
+          "actual": 1,
+          "external_effect": false
+        },
+        {
+          "name": "policy_no_data_delete",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "policy_no_primary_link_change",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "policy_no_champion_promotion",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "policy_local_rotation_only",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "no_item_external_effect",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        }
+      ],
+      "queue_status": "no_retirement_sample_insufficient_or_not_needed",
+      "summary": {
+        "candidates_observed": 1,
+        "retirement_ready": 0,
+        "keep_testing": 1,
+        "promotion_reviews": 0
+      },
+      "target_item": {
+        "asset_id": "challenger-sample-gap",
+        "role": "challenger",
+        "status": "keep_testing_sample_insufficient",
+        "recommended_action": "keep_in_candidate_rotation",
+        "retirement_ready": false,
+        "external_effect": false,
+        "reason": "sample_threshold_met=false; visits=40, cta_clicks=8, line_adds=1, test_days=2",
+        "human_gate": null
+      },
+      "policy": {
+        "no_data_delete": true,
+        "no_primary_link_change": true,
+        "no_champion_promotion": true,
+        "local_rotation_only": true
+      },
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "champion_promotion_performed": false,
+      "delete_action_performed": false
+    },
+    {
+      "id": "winning_challenger_requires_owner_review",
+      "ok": true,
+      "description": "A challenger that wins the rate rule must be held for owner review, not retired or promoted.",
+      "assertions": [
+        {
+          "name": "queue_status",
+          "ok": true,
+          "expected": "no_retirement_sample_insufficient_or_not_needed",
+          "actual": "no_retirement_sample_insufficient_or_not_needed",
+          "external_effect": false
+        },
+        {
+          "name": "item_status",
+          "ok": true,
+          "expected": "promotion_review_required",
+          "actual": "promotion_review_required",
+          "external_effect": false
+        },
+        {
+          "name": "recommended_action",
+          "ok": true,
+          "expected": "do_not_retire_or_promote_without_owner_review",
+          "actual": "do_not_retire_or_promote_without_owner_review",
+          "external_effect": false
+        },
+        {
+          "name": "retirement_ready",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "promotion_reviews",
+          "ok": true,
+          "expected": 1,
+          "actual": 1,
+          "external_effect": false
+        },
+        {
+          "name": "keep_testing",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "policy_no_data_delete",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "policy_no_primary_link_change",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "policy_no_champion_promotion",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "policy_local_rotation_only",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "no_item_external_effect",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "winner_has_human_gate",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        }
+      ],
+      "queue_status": "no_retirement_sample_insufficient_or_not_needed",
+      "summary": {
+        "candidates_observed": 1,
+        "retirement_ready": 0,
+        "keep_testing": 0,
+        "promotion_reviews": 1
+      },
+      "target_item": {
+        "asset_id": "challenger-rate-winner",
+        "role": "challenger",
+        "status": "promotion_review_required",
+        "recommended_action": "do_not_retire_or_promote_without_owner_review",
+        "retirement_ready": false,
+        "external_effect": false,
+        "reason": "challenger meets win rule, but promotion changes the primary funnel and remains gated",
+        "human_gate": "Owner must approve champion replacement manually."
+      },
+      "policy": {
+        "no_data_delete": true,
+        "no_primary_link_change": true,
+        "no_champion_promotion": true,
+        "local_rotation_only": true
+      },
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "champion_promotion_performed": false,
+      "delete_action_performed": false
+    },
+    {
+      "id": "underperforming_challenger_ready_for_local_retirement",
+      "ok": true,
+      "description": "A sampled challenger that fails the lift rule can be removed from future local rotation without deleting data.",
+      "assertions": [
+        {
+          "name": "queue_status",
+          "ok": true,
+          "expected": "local_retirement_actions_prepared",
+          "actual": "local_retirement_actions_prepared",
+          "external_effect": false
+        },
+        {
+          "name": "item_status",
+          "ok": true,
+          "expected": "retire_local_candidate_due_underperformance",
+          "actual": "retire_local_candidate_due_underperformance",
+          "external_effect": false
+        },
+        {
+          "name": "recommended_action",
+          "ok": true,
+          "expected": "remove_from_next_candidate_rotation_without_deleting_data",
+          "actual": "remove_from_next_candidate_rotation_without_deleting_data",
+          "external_effect": false
+        },
+        {
+          "name": "retirement_ready",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "promotion_reviews",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "keep_testing",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "policy_no_data_delete",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "policy_no_primary_link_change",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "policy_no_champion_promotion",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "policy_local_rotation_only",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "no_item_external_effect",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        }
+      ],
+      "queue_status": "local_retirement_actions_prepared",
+      "summary": {
+        "candidates_observed": 1,
+        "retirement_ready": 1,
+        "keep_testing": 0,
+        "promotion_reviews": 0
+      },
+      "target_item": {
+        "asset_id": "challenger-underperforming",
+        "role": "challenger",
+        "status": "retire_local_candidate_due_underperformance",
+        "recommended_action": "remove_from_next_candidate_rotation_without_deleting_data",
+        "retirement_ready": true,
+        "external_effect": false,
+        "reason": "sample is sufficient but line_add_rate=4.2% did not beat champion by 1.15x",
+        "human_gate": "Do not change public links or delete data; retirement is local rotation control only."
+      },
+      "policy": {
+        "no_data_delete": true,
+        "no_primary_link_change": true,
+        "no_champion_promotion": true,
+        "local_rotation_only": true
+      },
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "champion_promotion_performed": false,
+      "delete_action_performed": false
+    },
+    {
+      "id": "quality_regression_ready_for_local_retirement",
+      "ok": true,
+      "description": "A sampled challenger with quality regression can be locally retired without deleting data.",
+      "assertions": [
+        {
+          "name": "queue_status",
+          "ok": true,
+          "expected": "local_retirement_actions_prepared",
+          "actual": "local_retirement_actions_prepared",
+          "external_effect": false
+        },
+        {
+          "name": "item_status",
+          "ok": true,
+          "expected": "retire_local_candidate_due_quality_regression",
+          "actual": "retire_local_candidate_due_quality_regression",
+          "external_effect": false
+        },
+        {
+          "name": "recommended_action",
+          "ok": true,
+          "expected": "remove_from_next_candidate_rotation_without_deleting_data",
+          "actual": "remove_from_next_candidate_rotation_without_deleting_data",
+          "external_effect": false
+        },
+        {
+          "name": "retirement_ready",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "promotion_reviews",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "keep_testing",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "policy_no_data_delete",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "policy_no_primary_link_change",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "policy_no_champion_promotion",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "policy_local_rotation_only",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "no_item_external_effect",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        }
+      ],
+      "queue_status": "local_retirement_actions_prepared",
+      "summary": {
+        "candidates_observed": 1,
+        "retirement_ready": 1,
+        "keep_testing": 0,
+        "promotion_reviews": 0
+      },
+      "target_item": {
+        "asset_id": "challenger-quality-regression",
+        "role": "challenger",
+        "status": "retire_local_candidate_due_quality_regression",
+        "recommended_action": "remove_from_next_candidate_rotation_without_deleting_data",
+        "retirement_ready": true,
+        "external_effect": false,
+        "reason": "sample is sufficient but quality regression was observed",
+        "human_gate": "Do not delete historical event data; only stop using this candidate in future drafts."
+      },
+      "policy": {
+        "no_data_delete": true,
+        "no_primary_link_change": true,
+        "no_champion_promotion": true,
+        "local_rotation_only": true
+      },
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "champion_promotion_performed": false,
+      "delete_action_performed": false
+    },
+    {
+      "id": "unknown_candidate_observed_only",
+      "ok": true,
+      "description": "A non-champion asset with an unknown role is observed only and cannot be promoted, retired, or deleted automatically.",
+      "assertions": [
+        {
+          "name": "queue_status",
+          "ok": true,
+          "expected": "no_retirement_sample_insufficient_or_not_needed",
+          "actual": "no_retirement_sample_insufficient_or_not_needed",
+          "external_effect": false
+        },
+        {
+          "name": "item_status",
+          "ok": true,
+          "expected": "observed_only_no_rotation_action",
+          "actual": "observed_only_no_rotation_action",
+          "external_effect": false
+        },
+        {
+          "name": "recommended_action",
+          "ok": true,
+          "expected": "review_manually",
+          "actual": "review_manually",
+          "external_effect": false
+        },
+        {
+          "name": "retirement_ready",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "promotion_reviews",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "keep_testing",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "policy_no_data_delete",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "policy_no_primary_link_change",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "policy_no_champion_promotion",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "policy_local_rotation_only",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "no_item_external_effect",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "unknown_has_manual_gate",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        }
+      ],
+      "queue_status": "no_retirement_sample_insufficient_or_not_needed",
+      "summary": {
+        "candidates_observed": 1,
+        "retirement_ready": 0,
+        "keep_testing": 0,
+        "promotion_reviews": 0
+      },
+      "target_item": {
+        "asset_id": "candidate-unknown-role",
+        "role": "candidate",
+        "status": "observed_only_no_rotation_action",
+        "recommended_action": "review_manually",
+        "retirement_ready": false,
+        "external_effect": false,
+        "reason": "role=candidate; decision=needs_manual_classification",
+        "human_gate": "Unknown assets are not promoted, deleted, or published automatically."
+      },
+      "policy": {
+        "no_data_delete": true,
+        "no_primary_link_change": true,
+        "no_champion_promotion": true,
+        "local_rotation_only": true
+      },
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "champion_promotion_performed": false,
+      "delete_action_performed": false
+    },
+    {
+      "id": "mixed_candidates_summary_counts",
+      "ok": true,
+      "description": "Mixed candidate states must produce correct summary counts and still remain local-only.",
+      "assertions": [
+        {
+          "name": "queue_status",
+          "ok": true,
+          "expected": "local_retirement_actions_prepared",
+          "actual": "local_retirement_actions_prepared",
+          "external_effect": false
+        },
+        {
+          "name": "item_status",
+          "ok": true,
+          "expected": "retire_local_candidate_due_underperformance",
+          "actual": "retire_local_candidate_due_underperformance",
+          "external_effect": false
+        },
+        {
+          "name": "recommended_action",
+          "ok": true,
+          "expected": "remove_from_next_candidate_rotation_without_deleting_data",
+          "actual": "remove_from_next_candidate_rotation_without_deleting_data",
+          "external_effect": false
+        },
+        {
+          "name": "retirement_ready",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "promotion_reviews",
+          "ok": true,
+          "expected": 1,
+          "actual": 1,
+          "external_effect": false
+        },
+        {
+          "name": "keep_testing",
+          "ok": true,
+          "expected": 1,
+          "actual": 1,
+          "external_effect": false
+        },
+        {
+          "name": "policy_no_data_delete",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "policy_no_primary_link_change",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "policy_no_champion_promotion",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "policy_local_rotation_only",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "no_item_external_effect",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "retirement_ready_count",
+          "ok": true,
+          "expected": 1,
+          "actual": 1,
+          "external_effect": false
+        }
+      ],
+      "queue_status": "local_retirement_actions_prepared",
+      "summary": {
+        "candidates_observed": 3,
+        "retirement_ready": 1,
+        "keep_testing": 1,
+        "promotion_reviews": 1
+      },
+      "target_item": {
+        "asset_id": "challenger-underperforming-mixed",
+        "role": "challenger",
+        "status": "retire_local_candidate_due_underperformance",
+        "recommended_action": "remove_from_next_candidate_rotation_without_deleting_data",
+        "retirement_ready": true,
+        "external_effect": false,
+        "reason": "sample is sufficient but line_add_rate=3.8% did not beat champion by 1.15x",
+        "human_gate": "Do not change public links or delete data; retirement is local rotation control only."
+      },
+      "policy": {
+        "no_data_delete": true,
+        "no_primary_link_change": true,
+        "no_champion_promotion": true,
+        "local_rotation_only": true
+      },
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "champion_promotion_performed": false,
+      "delete_action_performed": false
+    }
+  ],
+  "current_queue_safety": {
+    "ok": true,
+    "status": "current_queue_safe",
+    "issues": [],
+    "current_status": "no_retirement_sample_insufficient_or_not_needed",
+    "items": 1,
+    "retirement_ready": 0
+  },
+  "real_events_unchanged": true,
+  "execution_performed": false,
+  "real_event_write_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "champion_promotion_performed": false,
+  "note": "Fixture-only candidate retirement contract. It evaluates temporary score scenarios and never edits candidate_retirement_queue.json, writes data/lp_events.jsonl, changes public links, promotes challengers, deploys, posts, pushes LINE, mutates customer data, touches payments, or deletes data."
+}

@@ -1,0 +1,877 @@
+<!doctype html>
+<html lang="zh-Hant-TW" data-external-effect="false">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>3Q Growth Loop Owner Console</title>
+  <style>
+    :root {
+      --ink: #16201b;
+      --muted: #68736d;
+      --line: #d9ded8;
+      --paper: #f7f8f4;
+      --panel: #ffffff;
+      --panel-2: #eef2ec;
+      --green: #2d6f55;
+      --green-soft: #dce9e1;
+      --amber: #8a5b16;
+      --amber-soft: #f2e5ce;
+      --red: #8b2e2e;
+      --red-soft: #f2dada;
+      --blue: #315f7d;
+      --blue-soft: #dce8ef;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--paper); color: var(--ink); font-family: var(--sans); }
+    body { margin: 0; min-width: 320px; }
+    a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    .shell { max-width: 1440px; margin: 0 auto; padding: 24px; }
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(300px, .8fr);
+      gap: 16px;
+      align-items: stretch;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 18px;
+      margin-bottom: 18px;
+    }
+    .title-block h1 { margin: 0 0 8px; font-size: 30px; line-height: 1.08; letter-spacing: 0; }
+    .title-block p { margin: 0; color: var(--muted); font-size: 14px; max-width: 820px; line-height: 1.55; text-wrap: pretty; }
+    .stamp {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      border-radius: 6px;
+    }
+    .stamp div { min-width: 0; }
+    .label { display: block; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+    .value { display: block; font-family: var(--mono); font-size: 12px; overflow-wrap: anywhere; }
+    .grid { display: grid; gap: 14px; }
+    .grid.metrics { grid-template-columns: repeat(6, minmax(0, 1fr)); margin-bottom: 14px; }
+    .grid.main { grid-template-columns: minmax(0, 1.2fr) minmax(360px, .8fr); align-items: start; }
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .panel {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .panel header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel-2);
+    }
+    .panel h2 { margin: 0; font-size: 14px; letter-spacing: 0; }
+    .panel .body { padding: 14px; }
+    .metric {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 6px;
+      padding: 14px;
+      min-height: 104px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .metric .number { font-family: var(--mono); font-size: 28px; line-height: 1; }
+    .metric .caption { color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-family: var(--mono);
+      white-space: nowrap;
+      background: var(--blue-soft);
+      color: var(--blue);
+      border: 1px solid color-mix(in srgb, var(--blue) 24%, transparent);
+    }
+    .badge.ok { background: var(--green-soft); color: var(--green); border-color: color-mix(in srgb, var(--green) 24%, transparent); }
+    .badge.warn { background: var(--amber-soft); color: var(--amber); border-color: color-mix(in srgb, var(--amber) 24%, transparent); }
+    .badge.block { background: var(--red-soft); color: var(--red); border-color: color-mix(in srgb, var(--red) 24%, transparent); }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { padding: 8px 9px; border-bottom: 1px solid var(--line); vertical-align: top; text-align: left; }
+    th { color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+    td code, .code { font-family: var(--mono); font-size: 11px; overflow-wrap: anywhere; }
+    tr:last-child td { border-bottom: 0; }
+    .split-list { display: grid; gap: 8px; }
+    .row {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      font-size: 12px;
+      border-bottom: 1px solid var(--line);
+      padding: 8px 0;
+    }
+    .row:first-child { padding-top: 0; }
+    .row:last-child { border-bottom: 0; padding-bottom: 0; }
+    .row strong { font-size: 12px; }
+    .row span:last-child { color: var(--muted); overflow-wrap: anywhere; }
+    .artifact-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .artifact {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 9px;
+      background: #fbfcf9;
+      font-size: 12px;
+      min-height: 48px;
+    }
+    .artifact span { display: block; color: var(--muted); font-size: 11px; margin-top: 3px; }
+    .gate-list { display: grid; gap: 8px; }
+    .gate {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px;
+      background: #fbfcf9;
+    }
+    .gate strong { display: block; font-size: 12px; margin-bottom: 5px; }
+    .gate p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .foot {
+      margin-top: 16px;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    @media (max-width: 1020px) {
+      .topbar, .grid.main, .grid.two { grid-template-columns: 1fr; }
+      .grid.metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .artifact-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 640px) {
+      .shell { padding: 14px; }
+      .grid.metrics, .artifact-grid, .stamp { grid-template-columns: 1fr; }
+      .row { grid-template-columns: 1fr; gap: 3px; }
+      th, td { padding: 7px 6px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="topbar">
+      <div class="title-block">
+        <h1>3Q Growth Loop Owner Console</h1>
+        <p>本地審核台。它只讀取本機產物並集中顯示漏斗、下一輪決策、approval queue、紅線、archive 與 weekly runner 狀態。</p>
+      </div>
+      <div class="stamp" aria-label="console status">
+        <div><span class="label">Generated</span><span class="value">2026-07-10T21:48:31.567Z</span></div>
+        <div><span class="label">Week</span><span class="value">2026-06-29 to 2026-07-05</span></div>
+        <div><span class="label">Mode</span><span class="value">week0_data_collection</span></div>
+        <div><span class="label">External effect</span><span class="value">false</span></div>
+      </div>
+    </section>
+
+    <section class="grid metrics" aria-label="north star metrics">
+      <article class="metric"><span class="label">Real events</span><span class="number">0</span><span class="caption">data/lp_events.jsonl scored rows</span></article>
+      <article class="metric"><span class="label">Goal complete</span><span class="number">no</span><span class="caption">not_complete_data_and_external_gates</span></article>
+      <article class="metric"><span class="label">Funnel preview</span><span class="number">48</span><span class="caption">full-funnel aggregate, not applied</span></article>
+      <article class="metric"><span class="label">Funnel guard</span><span class="number">6</span><span class="caption">aggregate importer fixtures</span></article>
+      <article class="metric"><span class="label">Apply guard</span><span class="number">4</span><span class="caption">real-data apply fixtures</span></article>
+      <article class="metric"><span class="label">Decision replay</span><span class="number">6</span><span class="caption">real_data_decision_replay_fixture_dry_run / ledger=yes / compile=yes / data_write=no</span></article>
+      <article class="metric"><span class="label">Input pack</span><span class="number">2</span><span class="caption">template_ready / template-only</span></article>
+      <article class="metric"><span class="label">Sources</span><span class="number">0/7</span><span class="caption">source readiness: waiting_for_real_data</span></article>
+      <article class="metric"><span class="label">Source capture</span><span class="number">42</span><span class="caption">waiting_for_owner_aggregate_capture / template-only</span></article>
+      <article class="metric"><span class="label">Sample ledger</span><span class="number">18</span><span class="caption">sample_gate_template_ready / links=6</span></article>
+      <article class="metric"><span class="label">Sample replay</span><span class="number">3</span><span class="caption">sample_gate_replay_fixture_dry_run / data_write=no</span></article>
+      <article class="metric"><span class="label">Source compile</span><span class="number">0</span><span class="caption">waiting_for_filled_counts / owner-preview</span></article>
+      <article class="metric"><span class="label">Compile guard</span><span class="number">7</span><span class="caption">source compile fixtures</span></article>
+      <article class="metric"><span class="label">Intake ready</span><span class="number">0</span><span class="caption">no_real_input_files</span></article>
+      <article class="metric"><span class="label">Data queue</span><span class="number">42</span><span class="caption">waiting_for_owner_aggregate_counts</span></article>
+      <article class="metric"><span class="label">Data progress</span><span class="number">0/42</span><span class="caption">waiting_for_p0_sample_gate_counts / P0 pending=18</span></article>
+      <article class="metric"><span class="label">Next P0 inputs</span><span class="number">9</span><span class="caption">waiting_for_p0_owner_inputs / source groups=2</span></article>
+      <article class="metric"><span class="label">Next P0 form</span><span class="number">9</span><span class="caption">ready_local_next_p0_owner_form / browser=yes / network=no</span></article>
+      <article class="metric"><span class="label">Next P0 form guard</span><span class="number">4</span><span class="caption">next_p0_owner_form_fixture_dry_run / static=yes / external=no</span></article>
+      <article class="metric"><span class="label">Next P0 quick</span><span class="number">wait</span><span class="caption">waiting_for_quick_counts / counts=0/9 / filled=0/9 / missing=9 / partial=no / template=yes</span></article>
+      <article class="metric"><span class="label">Quick guard</span><span class="number">9</span><span class="caption">next_p0_quick_capture_fixture_dry_run / inbox=no / data_write=no</span></article>
+      <article class="metric"><span class="label">P0 preflight</span><span class="number">wait</span><span class="caption">waiting_for_owner_p0_counts / filled=0/9 / placeholders=9 / issues=0 / data_write=no</span></article>
+      <article class="metric"><span class="label">Preflight guard</span><span class="number">4</span><span class="caption">p0_counts_preflight_fixture_dry_run / data_write=no / external=no</span></article>
+      <article class="metric"><span class="label">Next P0 intake</span><span class="number">wait</span><span class="caption">waiting_for_next_p0_owner_download / preview=0 / staged=no</span></article>
+      <article class="metric"><span class="label">Next P0 intake guard</span><span class="number">5</span><span class="caption">next_p0_owner_intake_fixture_dry_run / live_project_inputs=no / data_write=no</span></article>
+      <article class="metric"><span class="label">Owner data preflight</span><span class="number">0</span><span class="caption">waiting_for_owner_preview_rows / sample=wait / win=no / data_write=no</span></article>
+      <article class="metric"><span class="label">Capture calendar</span><span class="number">3</span><span class="caption">waiting_for_owner_sample_gate_counts / next=2026-07-05 / import=no</span></article>
+      <article class="metric"><span class="label">Owner capture</span><span class="number">18</span><span class="caption">waiting_for_owner_sample_gate_counts / links=6</span></article>
+      <article class="metric"><span class="label">Owner sample gate</span><span class="number">0</span><span class="caption">waiting_for_owner_sample_gate_counts / win=no</span></article>
+      <article class="metric"><span class="label">Sample form guard</span><span class="number">3</span><span class="caption">sample_gate_owner_form_fixture_dry_run / compile=yes / sample_gate=yes / data_write=no</span></article>
+      <article class="metric"><span class="label">Sample intake</span><span class="number">wait</span><span class="caption">waiting_for_owner_download / staged=no</span></article>
+      <article class="metric"><span class="label">Intake guard</span><span class="number">5</span><span class="caption">owner_sample_gate_intake_fixture_dry_run / data_write=no</span></article>
+      <article class="metric"><span class="label">Next action</span><span class="number">ready</span><span class="caption">collect_owner_sample_gate_counts / waiting_for_owner_sample_gate_counts</span></article>
+      <article class="metric"><span class="label">Outcome preflight</span><span class="number">wait</span><span class="caption">waiting_for_north_star_outcome_counts / filled=0/24 / pending=24 / ready_compile=no / write=no</span></article>
+      <article class="metric"><span class="label">Outcome form</span><span class="number">24</span><span class="caption">ready_local_browser_fill / browser=yes / network=no / write=no</span></article>
+      <article class="metric"><span class="label">Outcome form guard</span><span class="number">26</span><span class="caption">north_star_outcome_form_fixture_static_guard / static=yes / external=no</span></article>
+      <article class="metric"><span class="label">P1 outcome intake</span><span class="number">wait</span><span class="caption">waiting_for_p1_outcome_download / filled=0/24 / staged=no / write=no</span></article>
+      <article class="metric"><span class="label">P1 intake guard</span><span class="number">5</span><span class="caption">owner_p1_outcome_intake_fixtures / data_write=no / external=no</span></article>
+      <article class="metric"><span class="label">P1 outcome post-fill</span><span class="number">wait</span><span class="caption">waiting_for_p1_outcome_counts / stage=waiting_for_p1_outcome_counts / commands=8 / local_only=yes / trust=waiting_for_trusted_scoring_input / trusted=0 / data_write=no / external=no</span></article>
+      <article class="metric"><span class="label">Recovery pack</span><span class="number">due</span><span class="caption">sample_gate_due_recovery_ready / missing=9/9 / write=no</span></article>
+      <article class="metric"><span class="label">P0 batches</span><span class="number">9+9</span><span class="caption">p0_full_coverage_batched_for_owner_counts / full=yes / write=no</span></article>
+      <article class="metric"><span class="label">Count handoff</span><span class="number">ready</span><span class="caption">waiting_for_owner_sample_counts / focused_missing=9/9 / full_p0=18/18 / remaining=9 / write=no</span></article>
+      <article class="metric"><span class="label">P0 now</span><span class="number">ready</span><span class="caption">waiting_for_owner_sample_counts / focused=9/9 / full=18/18 / quick_missing=9 / next=approve-d1-create-and-migrate / write=no</span></article>
+      <article class="metric"><span class="label">Collection sprint</span><span class="number">active</span><span class="caption">sample_gate_due_collection_sprint_active / pending=18/18 / steps=5 / due=day7_due_waiting_for_owner_counts / report=sample_gate_collection_sprint.md / write=no</span></article>
+      <article class="metric"><span class="label">P0 launcher</span><span class="number">ready</span><span class="caption">owner_p0_launcher / targets=13 / focused_missing=9/9 / local_only=yes / external=no</span></article>
+      <article class="metric"><span class="label">Count recovery</span><span class="number">ready</span><span class="caption">waiting_for_owner_sample_counts / preview=0 / full=18 / full_intake=no / staged=no / sample=no / write=no</span></article>
+      <article class="metric"><span class="label">Count recovery guard</span><span class="number">9</span><span class="caption">owner_sample_count_recovery_fixture_dry_run / data_write=no / external=no</span></article>
+      <article class="metric"><span class="label">Owner launcher</span><span class="number">ready</span><span class="caption">owner_action_launcher / targets=48 / external=no</span></article>
+      <article class="metric"><span class="label">Approval queue</span><span class="number">20</span><span class="caption">approval_queue_ready_with_human_gates / ready=14 / pending=5 / high=5</span></article>
+      <article class="metric"><span class="label">Approval form</span><span class="number">ready</span><span class="caption">ready_local_owner_approval_form / gates=4 / network=no</span></article>
+      <article class="metric"><span class="label">Approval form guard</span><span class="number">4</span><span class="caption">owner_approval_form_fixture_dry_run / replay=yes / external=no</span></article>
+      <article class="metric"><span class="label">Sample gate guard</span><span class="number">7</span><span class="caption">owner_sample_gate_fixture_dry_run / data_write=no</span></article>
+      <article class="metric"><span class="label">Quality review</span><span class="number">n/a</span><span class="caption">waiting_for_sample_rate_candidate / queued=no</span></article>
+      <article class="metric"><span class="label">Quality form</span><span class="number">wait</span><span class="caption">waiting_for_sample_rate_candidate_local_form_ready / browser_only=yes / network=no</span></article>
+      <article class="metric"><span class="label">Quality form guard</span><span class="number">4</span><span class="caption">owner_quality_review_form_fixture_dry_run / data_write=no / approval_write=no</span></article>
+      <article class="metric"><span class="label">Quality guard</span><span class="number">6</span><span class="caption">owner_quality_review_fixture_dry_run / data_write=no</span></article>
+      <article class="metric"><span class="label">Retirement guard</span><span class="number">6</span><span class="caption">candidate_retirement_fixture_dry_run / delete=no</span></article>
+      <article class="metric"><span class="label">Sample gate</span><span class="number">18</span><span class="caption">waiting_for_sample_gate_counts / links=6</span></article>
+      <article class="metric"><span class="label">Due status</span><span class="number">due</span><span class="caption">day7_due_waiting_for_owner_counts / phase=preferred_check_due</span></article>
+      <article class="metric"><span class="label">Due guard</span><span class="number">4</span><span class="caption">sample_gate_due_fixture_dry_run / project_overwrite=no / external=no</span></article>
+      <article class="metric"><span class="label">Manual preview</span><span class="number">10</span><span class="caption">aggregate-only, not applied</span></article>
+      <article class="metric"><span class="label">Manual packet</span><span class="number">3</span><span class="caption">ready_local_review / post=no</span></article>
+      <article class="metric"><span class="label">Capture plan</span><span class="number">9</span><span class="caption">waiting_for_owner_manual_publish_and_counts / north=21</span></article>
+      <article class="metric"><span class="label">Publish brief</span><span class="number">blocked</span><span class="caption">prepared_but_blocked_public_tracking_url / public_url=no / selected=manual-publish-01-week0-post-001-cta-v1-diagnostic</span></article>
+      <article class="metric"><span class="label">Public URL pack</span><span class="number">blocked</span><span class="caption">prepared_but_blocked_owner_public_url / previews=4 / selected=post-week0-post-001-cta-v1-diagnostic</span></article>
+      <article class="metric"><span class="label">Public URL approval</span><span class="number">blocked</span><span class="caption">prepared_but_blocked_owner_approval_input / gates=3 / fields=15 / live_input=no</span></article>
+      <article class="metric"><span class="label">Publish evidence</span><span class="number">wait</span><span class="caption">waiting_for_owner_manual_publish_evidence / day3=n/a / day7=n/a</span></article>
+      <article class="metric"><span class="label">Publish evidence form</span><span class="number">ready</span><span class="caption">ready_local_manual_publish_evidence_form / browser=yes / network=no / input=missing</span></article>
+      <article class="metric"><span class="label">Publish evidence form guard</span><span class="number">4</span><span class="caption">manual_publish_evidence_form_fixture_dry_run / data_write=no</span></article>
+      <article class="metric"><span class="label">Publish evidence guard</span><span class="number">7</span><span class="caption">manual_publish_evidence_fixture_dry_run / data_write=no</span></article>
+      <article class="metric"><span class="label">North Star</span><span class="number">n/a</span><span class="caption">LINE / 100 clicks / clicks=0</span></article>
+      <article class="metric"><span class="label">Content links</span><span class="number">3</span><span class="caption">draft-only post attribution</span></article>
+      <article class="metric"><span class="label">Tracking smoke</span><span class="number">7/7</span><span class="caption">generated links isolated smoke</span></article>
+      <article class="metric"><span class="label">Runner</span><span class="number">126/126</span><span class="caption">weekly local commands succeeded</span></article>
+      <article class="metric"><span class="label">Schedule</span><span class="number">active</span><span class="caption">weekly_sunday / Sunday 00:10 Asia/Taipei</span></article>
+      <article class="metric"><span class="label">Catch-up</span><span class="number">current</span><span class="caption">current_weekly_run_confirmed / next=2026-07-12, 00:10:00 Asia/Taipei / invoked=no</span></article>
+      <article class="metric"><span class="label">LaunchAgent</span><span class="number">verified</span><span class="caption">com.angelia.3q-growth-loop.weekly / runs=1 / exit=0 / proof=completed_exit_zero / external=no</span></article>
+      <article class="metric"><span class="label">History</span><span class="number">3</span><span class="caption">collect_more_data</span></article>
+      <article class="metric"><span class="label">GitHub guard</span><span class="number">ok</span><span class="caption">github_workflow_guard_local_only / checks=80 / failed=0</span></article>
+      <article class="metric"><span class="label">GitHub bundle</span><span class="number">508</span><span class="caption">repo-ready local copy</span></article>
+      <article class="metric"><span class="label">Retention</span><span class="number">0</span><span class="caption">within_review_budget / total=50.2 MB / delete=no</span></article>
+      <article class="metric"><span class="label">Retention review</span><span class="number">ok</span><span class="caption">within_review_budget / candidates=0 / commands=no / delete=no</span></article>
+      <article class="metric"><span class="label">Gate evidence</span><span class="number">0/4</span><span class="caption">waiting_for_owner_evidence</span></article>
+      <article class="metric"><span class="label">Evidence guard</span><span class="number">10</span><span class="caption">owner_gate_evidence_fixture_dry_run / external=no</span></article>
+      <article class="metric"><span class="label">Post-gate</span><span class="number">0/4</span><span class="caption">waiting_for_owner_evidence</span></article>
+      <article class="metric"><span class="label">Post-gate guard</span><span class="number">9</span><span class="caption">post_gate_verification_fixture_dry_run / external=no</span></article>
+      <article class="metric"><span class="label">Owner gates</span><span class="number">5</span><span class="caption">pending external-effect approvals</span></article>
+      <article class="metric"><span class="label">Gate matrix</span><span class="number">0/5</span><span class="caption">gate readiness: prepared_but_blocked</span></article>
+      <article class="metric"><span class="label">Red-line priority</span><span class="number">25</span><span class="caption">prioritize_p0_sample_gate_counts / next=p0_collect_sample_gate_counts: Open next_p0_owner_form.html or next_p0_quick_capture.md, fill aggregate-only P0 counts, then rerun owner intake/weekly verification.</span></article>
+      <article class="metric"><span class="label">Gate metadata</span><span class="number">4</span><span class="caption">public_ab_small_traffic_link / capture_or_fix_non_secret_metadata</span></article>
+    </section>
+
+    <section class="grid main">
+      <div class="grid">
+        <section class="panel">
+          <header>
+            <h2>Funnel Decision</h2>
+            <span class="badge ok">do_not_promote_challenger</span>
+          </header>
+          <div class="body">
+            <div class="grid two">
+              <div class="panel">
+    <header><h2>Champion</h2><span class="badge ok">keep_champion_until_challenger_beats_rule</span></header>
+    <div class="body">
+      <div class="split-list">
+        <div class="row"><strong>Asset</strong><span>champion-3q-line-v0</span></div>
+        <div class="row"><strong>Line add rate</strong><span>0.0%</span></div>
+        <div class="row"><strong>Visits</strong><span>0</span></div>
+        <div class="row"><strong>CTA clicks</strong><span>0</span></div>
+        <div class="row"><strong>LINE adds</strong><span>0</span></div>
+        <div class="row"><strong>Test days</strong><span>0</span></div>
+      </div>
+    </div>
+  </div>
+              <div class="panel">
+    <header><h2>Challenger</h2><span class="badge warn">keep_testing_sample_insufficient</span></header>
+    <div class="body">
+      <div class="split-list">
+        <div class="row"><strong>Asset</strong><span>challenger-week0-cta-text-v1</span></div>
+        <div class="row"><strong>Line add rate</strong><span>0.0%</span></div>
+        <div class="row"><strong>Visits</strong><span>0</span></div>
+        <div class="row"><strong>CTA clicks</strong><span>0</span></div>
+        <div class="row"><strong>LINE adds</strong><span>0</span></div>
+        <div class="row"><strong>Test days</strong><span>0</span></div>
+      </div>
+    </div>
+  </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <header>
+            <h2>Next Round</h2>
+            <span class="badge ok">continue_current_round_until_sample_threshold</span>
+          </header>
+          <div class="body">
+            <div class="split-list">
+              <div class="row"><strong>Current variable</strong><span>cta_text</span></div>
+              <div class="row"><strong>Next variable</strong><span>cta_text</span></div>
+              <div class="row"><strong>Start new round</strong><span>no</span></div>
+              <div class="row"><strong>Sample gaps</strong><span>visits 100, cta 20, line 5, days 3</span></div>
+              <div class="row"><strong>Human gate</strong><span>Review the next-round decision before public posting, link changes, production deploy, or challenger promotion.</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <header>
+            <h2>Iteration History</h2>
+            <span class="badge ok">history ok</span>
+          </header>
+          <div class="body">
+            <div class="split-list">
+              <div class="row"><strong>Status</strong><span>collect_more_data</span></div>
+              <div class="row"><strong>Cadence</strong><span>weekly_7_day_iteration</span></div>
+              <div class="row"><strong>Current variable</strong><span>cta_text</span></div>
+              <div class="row"><strong>Sample met</strong><span>no</span></div>
+              <div class="row"><strong>Archives scanned</strong><span>3</span></div>
+              <div class="row"><strong>Next safe actions</strong><span>4</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <header>
+            <h2>Funnel Breakdown</h2>
+            <span class="badge ok">attribution ready</span>
+          </header>
+          <div class="body">
+            <div class="split-list">
+              <div class="row"><strong>Rows</strong><span>6</span></div>
+              <div class="row"><strong>Content links</strong><span>3</span></div>
+              <div class="row"><strong>Real events</strong><span>0</span></div>
+              <div class="row"><strong>External effect</strong><span>no</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <header>
+            <h2>Objective Contract</h2>
+            <span class="badge ok">contract ok</span>
+          </header>
+          <div class="body">
+            <div class="split-list">
+    <div class="row"><strong>Status</strong><span>local_objective_contract_verified_external_gated</span></div>
+    <div class="row"><strong>Sequence</strong><span>collect_data -&gt; score_assets -&gt; winners_losers -&gt; content_mix -&gt; generate_lp_challenger -&gt; deploy_candidate_worker -&gt; create_ab_plan -&gt; weekly_report -&gt; approval_queue</span></div>
+    <div class="row"><strong>Checks</strong><span>93/93</span></div>
+    <div class="row"><strong>One variable</strong><span>cta_text</span></div>
+    <div class="row"><strong>Sample gate</strong><span>not met</span></div>
+    <div class="row"><strong>External effect</strong><span>false</span></div>
+  </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <header>
+            <h2>Approval Queue</h2>
+            <span class="badge block">5 pending</span>
+          </header>
+          <div class="body">
+            <div class="rows">
+              <div class="row"><strong>Approval queue status</strong><span>approval_queue_ready_with_human_gates / items=20 / ready=14 / pending=5 / high_risk=5 / policy_ok=yes / external=no</span></div>
+              <div class="row"><strong>Next local review</strong><span>collect-first-real-events / data/lp_events.jsonl</span></div>
+              <div class="row"><strong>Next human gate</strong><span>approve-d1-create-and-migrate / schema/d1-week0.sql</span></div>
+            </div>
+            <table><thead><tr><th>ID</th><th>Tier</th><th>Status</th><th>Gate</th></tr></thead><tbody><tr>
+        <td><code>collect-first-real-events</code></td>
+        <td><span class="badge ok">T1</span></td>
+        <td>ready_local_review</td>
+        <td>Start with local/manual lp_events ingestion or approve D1 connection.</td>
+      </tr><tr>
+        <td><code>approve-d1-create-and-migrate</code></td>
+        <td><span class="badge block">T2</span></td>
+        <td>pending_human</td>
+        <td>Confirm the newly observed dedicated D1, separately approve its remote schema migration, and explicitly scope recurring aggregate-only reads.</td>
+      </tr><tr>
+        <td><code>approve-candidate-worker-deploy</code></td>
+        <td><span class="badge block">T3</span></td>
+        <td>pending_human</td>
+        <td>Confirm the observed Candidate Worker deployment provenance and rollback reference; do not redeploy unless the live version is rejected.</td>
+      </tr><tr>
+        <td><code>approve-small-ab-link</code></td>
+        <td><span class="badge block">T3</span></td>
+        <td>pending_human</td>
+        <td>Approve any small-traffic link routing before changing public links.</td>
+      </tr><tr>
+        <td><code>review-weekly-report</code></td>
+        <td><span class="badge ok">T1</span></td>
+        <td>ready_local_review</td>
+        <td>Review weekly_report.md before external action.</td>
+      </tr><tr>
+        <td><code>review-champion-contract-audit</code></td>
+        <td><span class="badge ok">T1</span></td>
+        <td>ready_local_review</td>
+        <td>Review champion_contract_audit.md and confirm the observed LINE-only contract provenance before approving public A/B traffic.</td>
+      </tr><tr>
+        <td><code>review-champion-integration-candidate</code></td>
+        <td><span class="badge ok">T1</span></td>
+        <td>ready_local_review</td>
+        <td>Review the source-locked 3q-site patch and isolated integration smoke before approving any production deploy.</td>
+      </tr><tr>
+        <td><code>approve-champion-integration-production-deploy</code></td>
+        <td><span class="badge block">T3</span></td>
+        <td>pending_human</td>
+        <td>Confirm the current live integration provenance before approving any redeploy of the exact source-locked patch, collector URL, verification steps, and rollback plan.</td>
+      </tr><tr>
+        <td><code>review-next-round-plan</code></td>
+        <td><span class="badge ok">T1</span></td>
+        <td>ready_local_review</td>
+        <td>Review next_round_plan.md before starting a new public A/B variable or extending the current test.</td>
+      </tr><tr>
+        <td><code>review-owner-approval-pack</code></td>
+        <td><span class="badge ok">T1</span></td>
+        <td>ready_local_review</td>
+        <td>Review owner_approval_pack.md before approving remote D1, Worker deploy, public A/B routing, or GitHub publishing.</td>
+      </tr><tr>
+        <td><code>review-owner-console</code></td>
+        <td><span class="badge ok">T1</span></td>
+        <td>ready_local_review</td>
+        <td>Review owner_console.html as the local single-screen approval surface.</td>
+      </tr><tr>
+        <td><code>review-real-data-input-pack</code></td>
+        <td><span class="badge ok">T1</span></td>
+        <td>ready_local_review</td>
+        <td>Review real_data_input_pack.md before filling aggregate counts or copying templates into live input CSV filenames.</td>
+      </tr><tr>
+        <td><code>review-source-readiness</code></td>
+        <td><span class="badge ok">T1</span></td>
+        <td>ready_local_review</td>
+        <td>Review source_readiness.md before interpreting sample gaps or approving any public A/B route.</td>
+      </tr><tr>
+        <td><code>review-source-capture-pack</code></td>
+        <td><span class="badge ok">T1</span></td>
+        <td>ready_local_review</td>
+        <td>Review source_capture_pack.md before filling aggregate source counts or creating live input CSVs.</td>
+      </tr><tr>
+        <td><code>review-source-capture-compile</code></td>
+        <td><span class="badge ok">T1</span></td>
+        <td>ready_local_review</td>
+        <td>Review source_capture_compile_report.md and owner-preview CSVs before copying them to live aggregate input filenames.</td>
+      </tr><tr>
+        <td><code>review-real-data-intake-plan</code></td>
+        <td><span class="badge ok">T1</span></td>
+        <td>ready_local_review</td>
+        <td>Review real_data_intake_plan.md to see which aggregate CSV inputs are still missing.</td>
+      </tr><tr>
+        <td><code>review-data-collection-brief</code></td>
+        <td><span class="badge ok">T1</span></td>
+        <td>ready_local_review</td>
+        <td>Review data_collection_brief.md and sample_gate_collection_plan.md before filling aggregate counts or compiling owner-preview CSVs.</td>
+      </tr><tr>
+        <td><code>review-line-inbound-playbook</code></td>
+        <td><span class="badge ok">T1</span></td>
+        <td>ready_local_review</td>
+        <td>Review line_inbound_playbook.md before using it in manual LINE replies.</td>
+      </tr><tr>
+        <td><code>review-local-launchagent-install</code></td>
+        <td><span class="badge ok">T1</span></td>
+        <td>completed_local_reversible</td>
+        <td>Local LaunchAgent is installed. Use npm run schedule:uninstall to stop the Sunday local runner.</td>
+      </tr><tr>
+        <td><code>approve-github-repo-and-pr</code></td>
+        <td><span class="badge block">T2</span></td>
+        <td>pending_human</td>
+        <td>Review the prepared local Champion commit, then explicitly approve its branch push or draft PR. Do not merge from this gate.</td>
+      </tr></tbody></table>
+          </div>
+        </section>
+
+        <section class="panel">
+          <header>
+            <h2>Local Verification</h2>
+            <span class="badge ok">preflight ok</span>
+          </header>
+          <div class="body">
+            <div class="split-list">
+              <div class="row"><strong>Worker dry run</strong><span>ok</span></div>
+              <div class="row"><strong>Dry-run exit</strong><span>yes</span></div>
+              <div class="row"><strong>Exit code</strong><span>0</span></div>
+              <div class="row"><strong>Production deploy</strong><span>no</span></div>
+              <div class="row"><strong>Report</strong><span>/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/worker_dry_run.md</span></div>
+              <div class="row"><strong>Log</strong><span>/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/logs/worker-dry-run-20260710T214607Z.log</span></div>
+              <div class="row"><strong>D1 readiness</strong><span>dedicated_d1_bound_owner_migration_review_required / exact=1 / table_query=no</span></div>
+              <div class="row"><strong>Live telemetry chain</strong><span>live_chain_observed_owner_provenance_and_schema_evidence_required / candidate=observed / operation=verify_existing_candidate_deployment / deploy_required=no / ingest=blocked / weekly_read=blocked</span></div>
+              <div class="row"><strong>Live telemetry guard</strong><span>ok / scenarios=6 / live_network=no / table_query=no</span></div>
+              <div class="row"><strong>D1 schema contract</strong><span>local_schema_idempotency_and_constraints_verified / checks=12 / remote=no</span></div>
+              <div class="row"><strong>D1 config guard</strong><span>prepared_but_blocked_owner_d1_approval_or_inventory / ready=no / write=no</span></div>
+              <div class="row"><strong>D1 auto collection</strong><span>local_review_collection_completed / scope=local_review_only / remote_authorized=no / raw_rows=no / customer_data=no</span></div>
+              <div class="row"><strong>D1 selector guard</strong><span>ok / scenarios=5 / remote_read=no</span></div>
+              <div class="row"><strong>D1 aggregate guard</strong><span>ok / scenarios=2 / real_remote=no / customer_data=no</span></div>
+              <div class="row"><strong>Champion local commit</strong><span>integration_already_merged_at_source_lock / 9b6fd00c082f / remote=yes</span></div>
+              <div class="row"><strong>Champion release</strong><span>prepared_but_blocked_production_prerequisites / dry_run=pass / deploy=no</span></div>
+              <div class="row"><strong>Champion GitHub</strong><span>integration_already_merged_followup_repairs_only / repo=milk790-code/3q-hatchery-line-oa / push_pr=no</span></div>
+            </div>
+            <table><thead><tr><th>Check</th><th>Status</th><th>External effect</th></tr></thead><tbody><tr><td><code>bootstrap_local_d1_schema</code></td><td>success</td><td>false</td></tr><tr><td><code>weekly_runner_lock_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>collect_data</code></td><td>success</td><td>false</td></tr><tr><td><code>cloudflare_d1_readiness</code></td><td>success</td><td>false</td></tr><tr><td><code>live_telemetry_readiness</code></td><td>success</td><td>false</td></tr><tr><td><code>live_telemetry_readiness_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>d1_schema_contract</code></td><td>success</td><td>false</td></tr><tr><td><code>approved_d1_config_preview</code></td><td>success</td><td>false</td></tr><tr><td><code>d1_collection_mode_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>d1_aggregate_export_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>event_input_quality_gate</code></td><td>success</td><td>false</td></tr><tr><td><code>funnel_aggregate_preview</code></td><td>success</td><td>false</td></tr><tr><td><code>funnel_aggregate_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>real_data_apply_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>real_data_input_pack</code></td><td>success</td><td>false</td></tr><tr><td><code>source_readiness_monitor</code></td><td>success</td><td>false</td></tr><tr><td><code>champion_contract_audit</code></td><td>success</td><td>false</td></tr><tr><td><code>champion_source_lock_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>champion_integration_candidate_build</code></td><td>success</td><td>false</td></tr><tr><td><code>source_capture_pack</code></td><td>success</td><td>false</td></tr><tr><td><code>sample_gate_compile_probe</code></td><td>success</td><td>false</td></tr><tr><td><code>sample_gate_replay_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>source_capture_compile</code></td><td>success</td><td>false</td></tr><tr><td><code>source_capture_compile_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>real_data_intake_plan</code></td><td>success</td><td>false</td></tr><tr><td><code>data_collection_brief</code></td><td>success</td><td>false</td></tr><tr><td><code>week0_owner_capture_queue</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_sample_gate_status</code></td><td>success</td><td>false</td></tr><tr><td><code>data_collection_progress</code></td><td>success</td><td>false</td></tr><tr><td><code>north_star_outcome_preflight</code></td><td>success</td><td>false</td></tr><tr><td><code>north_star_outcome_form</code></td><td>success</td><td>false</td></tr><tr><td><code>north_star_outcome_form_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_p1_outcome_intake</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_p1_outcome_intake_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_p1_outcome_postfill_check</code></td><td>success</td><td>false</td></tr><tr><td><code>next_p0_owner_form</code></td><td>success</td><td>false</td></tr><tr><td><code>next_p0_quick_capture</code></td><td>success</td><td>false</td></tr><tr><td><code>p0_counts_preflight</code></td><td>success</td><td>false</td></tr><tr><td><code>next_p0_owner_intake</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_data_preflight</code></td><td>success</td><td>false</td></tr><tr><td><code>source_trust_matrix</code></td><td>success</td><td>false</td></tr><tr><td><code>next_p0_owner_form_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>next_p0_quick_capture_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>p0_counts_preflight_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>next_p0_owner_intake_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>sample_gate_capture_calendar</code></td><td>success</td><td>false</td></tr><tr><td><code>sample_gate_due_status</code></td><td>success</td><td>false</td></tr><tr><td><code>sample_gate_due_status_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>sample_gate_owner_worksheet</code></td><td>success</td><td>false</td></tr><tr><td><code>sample_gate_owner_form</code></td><td>success</td><td>false</td></tr><tr><td><code>sample_gate_owner_form_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_sample_gate_intake</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_sample_gate_intake_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_sample_gate_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_quality_review</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_quality_review_form</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_quality_review_form_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_quality_review_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_next_action</code></td><td>success</td><td>false</td></tr><tr><td><code>sample_gate_recovery_pack</code></td><td>success</td><td>false</td></tr><tr><td><code>sample_gate_batch_handoff</code></td><td>success</td><td>false</td></tr><tr><td><code>sample_gate_batch_preflight</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_sample_count_handoff</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_p0_now</code></td><td>success</td><td>false</td></tr><tr><td><code>sample_gate_collection_sprint</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_p0_launcher</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_sample_count_recovery</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_p0_postfill_check</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_sample_count_recovery_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_next_action_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_action_launcher</code></td><td>success</td><td>false</td></tr><tr><td><code>manual_conversion_preview</code></td><td>success</td><td>false</td></tr><tr><td><code>line_inbound_playbook</code></td><td>success</td><td>false</td></tr><tr><td><code>manual_publish_packet</code></td><td>success</td><td>false</td></tr><tr><td><code>manual_publish_capture_plan</code></td><td>success</td><td>false</td></tr><tr><td><code>manual_publish_brief</code></td><td>success</td><td>false</td></tr><tr><td><code>public_tracking_url_pack</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_public_url_approval_preview</code></td><td>success</td><td>false</td></tr><tr><td><code>manual_publish_evidence</code></td><td>success</td><td>false</td></tr><tr><td><code>manual_publish_evidence_form</code></td><td>success</td><td>false</td></tr><tr><td><code>manual_publish_evidence_form_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>manual_publish_evidence_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>variable_rotation_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>deploy_candidate_worker</code></td><td>success</td><td>false</td></tr><tr><td><code>browser_route_smoke</code></td><td>success</td><td>false</td></tr><tr><td><code>tracking_link_smoke</code></td><td>success</td><td>false</td></tr><tr><td><code>event_contract_smoke</code></td><td>success</td><td>false</td></tr><tr><td><code>champion_integration_smoke</code></td><td>success</td><td>false</td></tr><tr><td><code>champion_local_branch_status</code></td><td>success</td><td>false</td></tr><tr><td><code>champion_release_preflight</code></td><td>success</td><td>false</td></tr><tr><td><code>champion_github_handoff</code></td><td>success</td><td>false</td></tr><tr><td><code>win_rule_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>real_data_decision_replay</code></td><td>success</td><td>false</td></tr><tr><td><code>launchagent_status_readback</code></td><td>success</td><td>false</td></tr><tr><td><code>generate_weekly_artifacts</code></td><td>success</td><td>false</td></tr><tr><td><code>north_star_funnel</code></td><td>success</td><td>false</td></tr><tr><td><code>candidate_retirement_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>iteration_history</code></td><td>success</td><td>false</td></tr><tr><td><code>schedule_catchup_status</code></td><td>success</td><td>false</td></tr><tr><td><code>approval_resume_plan</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_approval_form</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_approval_form_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_gate_evidence</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_gate_evidence_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>post_gate_verification</code></td><td>success</td><td>false</td></tr><tr><td><code>post_gate_verification_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>live_telemetry_readiness_after_evidence</code></td><td>success</td><td>false</td></tr><tr><td><code>champion_release_preflight_after_evidence</code></td><td>success</td><td>false</td></tr><tr><td><code>champion_github_handoff_after_evidence</code></td><td>success</td><td>false</td></tr><tr><td><code>generate_weekly_artifacts_after_evidence</code></td><td>success</td><td>false</td></tr><tr><td><code>gate_readiness_matrix</code></td><td>success</td><td>false</td></tr><tr><td><code>redline_priority</code></td><td>success</td><td>false</td></tr><tr><td><code>prepared_but_blocked_report</code></td><td>success</td><td>false</td></tr><tr><td><code>approval_resume_fixtures</code></td><td>success</td><td>false</td></tr><tr><td><code>github_workflow_guard</code></td><td>success</td><td>false</td></tr><tr><td><code>artifact_retention_monitor_pre_export</code></td><td>success</td><td>false</td></tr><tr><td><code>artifact_retention_review_pre_export</code></td><td>success</td><td>false</td></tr><tr><td><code>github_export_bundle</code></td><td>success</td><td>false</td></tr><tr><td><code>artifact_retention_monitor</code></td><td>success</td><td>false</td></tr><tr><td><code>artifact_retention_review</code></td><td>success</td><td>false</td></tr><tr><td><code>objective_sequence_audit</code></td><td>success</td><td>false</td></tr><tr><td><code>archive_weekly_run</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_console</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_action_launcher_refresh_after_console</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_console_refresh_after_launcher</code></td><td>success</td><td>false</td></tr><tr><td><code>owner_console_smoke</code></td><td>success</td><td>false</td></tr><tr><td><code>health</code></td><td>ok</td><td>false</td></tr><tr><td><code>candidate_page</code></td><td>ok</td><td>false</td></tr><tr><td><code>candidate_attribution_script</code></td><td>ok</td><td>false</td></tr><tr><td><code>ab_status</code></td><td>ok</td><td>false</td></tr><tr><td><code>ab_champion_target_ready</code></td><td>ok</td><td>false</td></tr><tr><td><code>sample_insufficient_keeps_champion</code></td><td>ok</td><td>false</td></tr><tr><td><code>win_rule_queues_human_promotion_only</code></td><td>ok</td><td>false</td></tr><tr><td><code>sample_met_underperform_rework</code></td><td>ok</td><td>false</td></tr><tr><td><code>quality_regression_blocks_promotion</code></td><td>ok</td><td>false</td></tr><tr><td><code>lead_rate_regression_blocks_promotion</code></td><td>ok</td><td>false</td></tr><tr><td><code>close_rate_regression_blocks_promotion</code></td><td>ok</td><td>false</td></tr><tr><td><code>valid_full_funnel_preview</code></td><td>ok</td><td>false</td></tr><tr><td><code>blocked_unknown_asset</code></td><td>ok</td><td>false</td></tr><tr><td><code>blocked_missing_content_id</code></td><td>ok</td><td>false</td></tr><tr><td><code>blocked_sensitive_column</code></td><td>ok</td><td>false</td></tr><tr><td><code>blocked_sensitive_value</code></td><td>ok</td><td>false</td></tr><tr><td><code>blocked_apply_without_append</code></td><td>ok</td><td>false</td></tr><tr><td><code>funnel_apply_requires_confirm_real_data</code></td><td>ok</td><td>false</td></tr><tr><td><code>funnel_copied_example_never_applies</code></td><td>ok</td><td>false</td></tr><tr><td><code>manual_apply_requires_confirm_real_data</code></td><td>ok</td><td>false</td></tr><tr><td><code>manual_copied_example_never_applies</code></td><td>ok</td><td>false</td></tr><tr><td><code>sample_insufficient_replay</code></td><td>ok</td><td>false</td></tr><tr><td><code>winning_replay_owner_review_only</code></td><td>ok</td><td>false</td></tr><tr><td><code>underperform_replay_next_variable</code></td><td>ok</td><td>false</td></tr><tr><td><code>spam_regression_replay</code></td><td>ok</td><td>false</td></tr><tr><td><code>lead_regression_replay</code></td><td>ok</td><td>false</td></tr><tr><td><code>close_regression_replay</code></td><td>ok</td><td>false</td></tr><tr><td><code>sample_gate_insufficient_keeps_collecting</code></td><td>ok</td><td>false</td></tr><tr><td><code>sample_gate_ready_challenger_beats_rate</code></td><td>ok</td><td>false</td></tr><tr><td><code>sample_gate_ready_challenger_underperforms</code></td><td>ok</td><td>false</td></tr><tr><td><code>waiting_before_day3</code></td><td>ok</td><td>false</td></tr><tr><td><code>day3_due</code></td><td>ok</td><td>false</td></tr><tr><td><code>day3_overdue_recovery</code></td><td>ok</td><td>false</td></tr><tr><td><code>day7_due</code></td><td>ok</td><td>false</td></tr><tr><td><code>no_input_keeps_all_gates_blocked</code></td><td>ok</td><td>false</td></tr><tr><td><code>copied_example_placeholders_block_ready_state</code></td><td>ok</td><td>false</td></tr><tr><td><code>valid_github_gate_becomes_plan_only_ready</code></td><td>ok</td><td>false</td></tr><tr><td><code>sensitive_approval_value_blocks_gate</code></td><td>ok</td><td>false</td></tr><tr><td><code>public_ab_requires_absolute_champion_url</code></td><td>ok</td><td>false</td></tr><tr><td><code>manual_only_gate_never_becomes_automated</code></td><td>ok</td><td>false</td></tr><tr><td><code>invalid_d1_metadata_blocks_remote_gate</code></td><td>ok</td><td>false</td></tr><tr><td><code>invalid_worker_url_blocks_deploy_gate</code></td><td>ok</td><td>false</td></tr><tr><td><code>invalid_github_metadata_blocks_pr_gate</code></td><td>ok</td><td>false</td></tr><tr><td><code>wrong_valid_github_target_blocks_pr_gate</code></td><td>ok</td><td>false</td></tr><tr><td><code>invalid_approval_timestamp_blocks_gate</code></td><td>ok</td><td>false</td></tr></tbody></table>
+          </div>
+        </section>
+      </div>
+
+      <aside class="grid">
+        <section class="panel">
+          <header>
+            <h2>Hard Red Lines</h2>
+            <span class="badge ok">preserved</span>
+          </header>
+          <div class="body">
+            <div class="gate-list">
+              <div class="gate"><strong>Production deploy <span class="badge ok">no</span></strong><p>No autonomous external effect recorded.</p></div>
+              <div class="gate"><strong>Public link change <span class="badge ok">no</span></strong><p>No autonomous external effect recorded.</p></div>
+              <div class="gate"><strong>Formal post <span class="badge ok">no</span></strong><p>No autonomous external effect recorded.</p></div>
+              <div class="gate"><strong>LINE push <span class="badge ok">no</span></strong><p>No autonomous external effect recorded.</p></div>
+              <div class="gate"><strong>Customer data mutation <span class="badge ok">no</span></strong><p>No autonomous external effect recorded.</p></div>
+              <div class="gate"><strong>Payment action <span class="badge ok">no</span></strong><p>No autonomous external effect recorded.</p></div>
+              <div class="gate"><strong>Delete action <span class="badge ok">no</span></strong><p>No autonomous external effect recorded.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <header>
+            <h2>Archive</h2>
+            <span class="badge ok">snapshot ok</span>
+          </header>
+          <div class="body">
+            <div class="split-list">
+              <div class="row"><strong>Files</strong><span>326/326</span></div>
+              <div class="row"><strong>Missing</strong><span>0</span></div>
+              <div class="row"><strong>Manifest</strong><span>/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/archive/2026-06-29/20260710T214828267Z/manifest.json</span></div>
+              <div class="row"><strong>Directory</strong><span>/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/archive/2026-06-29/20260710T214828267Z</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <header>
+            <h2>Artifacts</h2>
+            <span class="badge ok">local links</span>
+          </header>
+          <div class="body">
+            <div class="artifact-grid">
+              <a class="artifact" href="weekly_report.md">Weekly report<span>weekly_report.md</span></a>
+              <a class="artifact" href="data/schedule_status.json">Schedule status<span>data/schedule_status.json</span></a>
+              <a class="artifact" href="schedule_catchup_status.md">Catch-up status<span>schedule_catchup_status.md</span></a>
+              <a class="artifact" href="data/schedule_catchup_status.json">Catch-up JSON<span>data/schedule_catchup_status.json</span></a>
+              <a class="artifact" href="data/launchagent_status.json">LaunchAgent status<span>data/launchagent_status.json</span></a>
+              <a class="artifact" href="launchd/com.angelia.3q-growth-loop.weekly.plist">LaunchAgent plist<span>launchd/com.angelia.3q-growth-loop.weekly.plist</span></a>
+              <a class="artifact" href="growth_scores.json">Growth scores<span>growth_scores.json</span></a>
+              <a class="artifact" href="ab_test_status.json">A/B status<span>ab_test_status.json</span></a>
+              <a class="artifact" href="next_round_plan.md">Next round<span>next_round_plan.md</span></a>
+              <a class="artifact" href="iteration_history.md">Iteration history<span>iteration_history.md</span></a>
+              <a class="artifact" href="north_star_funnel.md">North Star<span>north_star_funnel.md</span></a>
+              <a class="artifact" href="funnel_breakdown.md">Funnel breakdown<span>funnel_breakdown.md</span></a>
+              <a class="artifact" href="worker_dry_run.md">Worker dry run<span>worker_dry_run.md</span></a>
+              <a class="artifact" href="cloudflare_d1_readiness.md">D1 readiness<span>cloudflare_d1_readiness.md</span></a>
+              <a class="artifact" href="live_telemetry_readiness.md">Live telemetry readiness<span>live_telemetry_readiness.md</span></a>
+              <a class="artifact" href="live_telemetry_readiness_fixture_report.md">Live telemetry fixtures<span>live_telemetry_readiness_fixture_report.md</span></a>
+              <a class="artifact" href="d1_schema_contract.md">D1 schema contract<span>d1_schema_contract.md</span></a>
+              <a class="artifact" href="approved_d1_config.md">D1 config guard<span>approved_d1_config.md</span></a>
+              <a class="artifact" href="d1_collection_mode.md">D1 collection mode<span>d1_collection_mode.md</span></a>
+              <a class="artifact" href="d1_collection_mode_fixture_report.md">D1 selector fixtures<span>d1_collection_mode_fixture_report.md</span></a>
+              <a class="artifact" href="d1_aggregate_export_fixture_report.md">D1 aggregate fixtures<span>d1_aggregate_export_fixture_report.md</span></a>
+              <a class="artifact" href="champion_local_branch.md">Champion local commit<span>champion_local_branch.md</span></a>
+              <a class="artifact" href="champion_release_preflight.md">Champion release<span>champion_release_preflight.md</span></a>
+              <a class="artifact" href="champion_release_owner_packet.md">Champion owner packet<span>champion_release_owner_packet.md</span></a>
+              <a class="artifact" href="champion_github_handoff.md">Champion GitHub<span>champion_github_handoff.md</span></a>
+              <a class="artifact" href="champion_github_pr_body.md">Champion PR body<span>champion_github_pr_body.md</span></a>
+              <a class="artifact" href="tracking_link_smoke.md">Tracking smoke<span>tracking_link_smoke.md</span></a>
+              <a class="artifact" href="data/funnel_aggregates.preview.jsonl">Funnel preview<span>data/funnel_aggregates.preview.jsonl</span></a>
+              <a class="artifact" href="funnel_aggregate_fixture_report.md">Funnel guard<span>funnel_aggregate_fixture_report.md</span></a>
+              <a class="artifact" href="real_data_apply_fixture_report.md">Apply guard<span>real_data_apply_fixture_report.md</span></a>
+              <a class="artifact" href="real_data_decision_replay_report.md">Decision replay<span>real_data_decision_replay_report.md</span></a>
+              <a class="artifact" href="source_capture_pack.md">Source capture<span>source_capture_pack.md</span></a>
+              <a class="artifact" href="sample_gate_ledger.md">Sample ledger<span>sample_gate_ledger.md</span></a>
+              <a class="artifact" href="sample_gate_replay_fixture_report.md">Sample replay<span>sample_gate_replay_fixture_report.md</span></a>
+              <a class="artifact" href="source_capture_compile_report.md">Source compile<span>source_capture_compile_report.md</span></a>
+              <a class="artifact" href="source_capture_compile_fixture_report.md">Compile guard<span>source_capture_compile_fixture_report.md</span></a>
+              <a class="artifact" href="real_data_intake_plan.md">Intake plan<span>real_data_intake_plan.md</span></a>
+              <a class="artifact" href="data_collection_brief.md">Data brief<span>data_collection_brief.md</span></a>
+              <a class="artifact" href="week0_owner_capture_queue.md">Owner capture<span>week0_owner_capture_queue.md</span></a>
+              <a class="artifact" href="owner_sample_gate_status.md">Owner sample gate<span>owner_sample_gate_status.md</span></a>
+              <a class="artifact" href="north_star_outcome_preflight.md">Outcome preflight<span>north_star_outcome_preflight.md</span></a>
+              <a class="artifact" href="north_star_outcome_preflight.json">Outcome preflight JSON<span>north_star_outcome_preflight.json</span></a>
+              <a class="artifact" href="north_star_outcome_form.html">Outcome form<span>north_star_outcome_form.html</span></a>
+              <a class="artifact" href="north_star_outcome_form_fixture_report.md">Outcome form guard<span>north_star_outcome_form_fixture_report.md</span></a>
+              <a class="artifact" href="owner_p1_outcome_intake.md">P1 outcome intake<span>owner_p1_outcome_intake.md</span></a>
+              <a class="artifact" href="owner_p1_outcome_intake.json">P1 outcome intake JSON<span>owner_p1_outcome_intake.json</span></a>
+              <a class="artifact" href="owner_p1_outcome_intake_fixture_report.md">P1 outcome intake guard<span>owner_p1_outcome_intake_fixture_report.md</span></a>
+              <a class="artifact" href="owner_p1_outcome_postfill_check.md">P1 outcome post-fill<span>owner_p1_outcome_postfill_check.md</span></a>
+              <a class="artifact" href="owner_p1_outcome_postfill_check.json">P1 outcome post-fill JSON<span>owner_p1_outcome_postfill_check.json</span></a>
+              <a class="artifact" href="RUN-P1-OUTCOME-POST-FILL-CHECK.command">P1 outcome post-fill command<span>RUN-P1-OUTCOME-POST-FILL-CHECK.command</span></a>
+              <a class="artifact" href="sample_gate_owner_worksheet.md">Sample worksheet<span>sample_gate_owner_worksheet.md</span></a>
+              <a class="artifact" href="sample_gate_owner_form.html">Sample form<span>sample_gate_owner_form.html</span></a>
+              <a class="artifact" href="sample_gate_owner_form_fixture_report.md">Sample form guard<span>sample_gate_owner_form_fixture_report.md</span></a>
+              <a class="artifact" href="owner_sample_gate_intake.md">Sample intake<span>owner_sample_gate_intake.md</span></a>
+              <a class="artifact" href="owner_sample_gate_intake_fixture_report.md">Intake guard<span>owner_sample_gate_intake_fixture_report.md</span></a>
+              <a class="artifact" href="owner_next_action.md">Next action<span>owner_next_action.md</span></a>
+              <a class="artifact" href="sample_gate_recovery_pack.md">Sample gate recovery<span>sample_gate_recovery_pack.md</span></a>
+              <a class="artifact" href="sample_gate_recovery_pack.json">Sample gate recovery JSON<span>sample_gate_recovery_pack.json</span></a>
+              <a class="artifact" href="sample_gate_batch_handoff.md">P0 batch handoff<span>sample_gate_batch_handoff.md</span></a>
+              <a class="artifact" href="sample_gate_batch_handoff.json">P0 batch handoff JSON<span>sample_gate_batch_handoff.json</span></a>
+              <a class="artifact" href="sample_gate_batch_preflight.md">P0 batch preflight<span>sample_gate_batch_preflight.md</span></a>
+              <a class="artifact" href="sample_gate_batch_preflight.json">P0 batch preflight JSON<span>sample_gate_batch_preflight.json</span></a>
+              <a class="artifact" href="sample_gate_batch_1_paste_block.txt">P0 batch 1 paste block<span>sample_gate_batch_1_paste_block.txt</span></a>
+              <a class="artifact" href="sample_gate_batch_2_paste_block.txt">P0 batch 2 paste block<span>sample_gate_batch_2_paste_block.txt</span></a>
+              <a class="artifact" href="owner_sample_count_handoff.md">Sample count handoff<span>owner_sample_count_handoff.md</span></a>
+              <a class="artifact" href="owner_sample_count_paste_block.txt">Sample count paste block<span>owner_sample_count_paste_block.txt</span></a>
+              <a class="artifact" href="owner_sample_count_handoff.json">Sample count handoff JSON<span>owner_sample_count_handoff.json</span></a>
+              <a class="artifact" href="owner_p0_now.html">P0 now cockpit<span>owner_p0_now.html</span></a>
+              <a class="artifact" href="owner_p0_now.md">P0 now<span>owner_p0_now.md</span></a>
+              <a class="artifact" href="owner_p0_now.json">P0 now JSON<span>owner_p0_now.json</span></a>
+              <a class="artifact" href="data/owner_p0_now_status.json">P0 now status<span>data/owner_p0_now_status.json</span></a>
+              <a class="artifact" href="owner_p0_launcher.md">P0 launcher<span>owner_p0_launcher.md</span></a>
+              <a class="artifact" href="OPEN-P0-SAMPLE-GATE.command">P0 open command<span>OPEN-P0-SAMPLE-GATE.command</span></a>
+              <a class="artifact" href="owner_sample_count_recovery.md">Sample count recovery<span>owner_sample_count_recovery.md</span></a>
+              <a class="artifact" href="owner_sample_count_recovery.json">Sample count recovery JSON<span>owner_sample_count_recovery.json</span></a>
+              <a class="artifact" href="owner_p0_postfill_check.md">P0 post-fill check<span>owner_p0_postfill_check.md</span></a>
+              <a class="artifact" href="owner_p0_postfill_check.json">P0 post-fill check JSON<span>owner_p0_postfill_check.json</span></a>
+              <a class="artifact" href="RUN-P0-POST-FILL-CHECK.command">P0 post-fill command<span>RUN-P0-POST-FILL-CHECK.command</span></a>
+              <a class="artifact" href="owner_sample_count_recovery_fixture_report.md">Sample count recovery guard<span>owner_sample_count_recovery_fixture_report.md</span></a>
+              <a class="artifact" href="owner_action_launcher.md">Owner launcher<span>owner_action_launcher.md</span></a>
+              <a class="artifact" href="OPEN-3Q-GROWTH-LOOP.command">Open command<span>OPEN-3Q-GROWTH-LOOP.command</span></a>
+              <a class="artifact" href="owner_sample_gate_fixture_report.md">Sample gate guard<span>owner_sample_gate_fixture_report.md</span></a>
+              <a class="artifact" href="owner_quality_review.md">Quality review<span>owner_quality_review.md</span></a>
+              <a class="artifact" href="owner_quality_review_form.html">Quality form<span>owner_quality_review_form.html</span></a>
+              <a class="artifact" href="owner_quality_review_form_fixture_report.md">Quality form guard<span>owner_quality_review_form_fixture_report.md</span></a>
+              <a class="artifact" href="owner_quality_review_fixture_report.md">Quality guard<span>owner_quality_review_fixture_report.md</span></a>
+              <a class="artifact" href="candidate_retirement_fixture_report.md">Retirement guard<span>candidate_retirement_fixture_report.md</span></a>
+              <a class="artifact" href="sample_gate_collection_plan.md">Sample gate<span>sample_gate_collection_plan.md</span></a>
+              <a class="artifact" href="data_collection_queue.json">Data queue<span>data_collection_queue.json</span></a>
+              <a class="artifact" href="data_collection_progress.md">Data progress<span>data_collection_progress.md</span></a>
+              <a class="artifact" href="next_p0_owner_inputs.md">Next P0 inputs<span>next_p0_owner_inputs.md</span></a>
+              <a class="artifact" href="next_p0_owner_form.html">Next P0 form<span>next_p0_owner_form.html</span></a>
+              <a class="artifact" href="next_p0_owner_form_fixture_report.md">Next P0 form guard<span>next_p0_owner_form_fixture_report.md</span></a>
+              <a class="artifact" href="next_p0_quick_capture.md">Next P0 quick<span>next_p0_quick_capture.md</span></a>
+              <a class="artifact" href="next_p0_quick_capture_fixture_report.md">Next P0 quick guard<span>next_p0_quick_capture_fixture_report.md</span></a>
+              <a class="artifact" href="data/next_p0_quick_capture/next_p0_owner_inputs.quick-template.csv">Next P0 quick template<span>data/next_p0_quick_capture/next_p0_owner_inputs.quick-template.csv</span></a>
+              <a class="artifact" href="data/next_p0_quick_capture/next_p0_owner_inputs.counts-paste-template.txt">Next P0 paste template<span>data/next_p0_quick_capture/next_p0_owner_inputs.counts-paste-template.txt</span></a>
+              <a class="artifact" href="p0_counts_preflight.md">P0 counts preflight<span>p0_counts_preflight.md</span></a>
+              <a class="artifact" href="p0_counts_preflight.json">P0 counts preflight JSON<span>p0_counts_preflight.json</span></a>
+              <a class="artifact" href="data/p0_counts_preflight_status.json">P0 counts preflight status<span>data/p0_counts_preflight_status.json</span></a>
+              <a class="artifact" href="p0_counts_preflight_fixture_report.md">P0 counts preflight guard<span>p0_counts_preflight_fixture_report.md</span></a>
+              <a class="artifact" href="data/p0_counts_preflight_fixture_status.json">P0 counts preflight guard status<span>data/p0_counts_preflight_fixture_status.json</span></a>
+              <a class="artifact" href="next_p0_owner_intake.md">Next P0 intake<span>next_p0_owner_intake.md</span></a>
+              <a class="artifact" href="next_p0_owner_intake_fixture_report.md">Next P0 intake guard<span>next_p0_owner_intake_fixture_report.md</span></a>
+              <a class="artifact" href="owner_data_preflight.md">Owner data preflight<span>owner_data_preflight.md</span></a>
+              <a class="artifact" href="owner_data_preflight.json">Owner data preflight JSON<span>owner_data_preflight.json</span></a>
+              <a class="artifact" href="sample_gate_capture_calendar.md">Capture calendar<span>sample_gate_capture_calendar.md</span></a>
+              <a class="artifact" href="sample_gate_due_status.md">Due status<span>sample_gate_due_status.md</span></a>
+              <a class="artifact" href="sample_gate_due_fixture_report.md">Due guard<span>sample_gate_due_fixture_report.md</span></a>
+              <a class="artifact" href="approval_queue.json">Approval queue<span>approval_queue.json</span></a>
+              <a class="artifact" href="goal_completion_audit.md">Goal completion<span>goal_completion_audit.md</span></a>
+              <a class="artifact" href="data/goal_completion_audit_status.json">Goal completion status<span>data/goal_completion_audit_status.json</span></a>
+              <a class="artifact" href="owner_approval_pack.md">Owner pack<span>owner_approval_pack.md</span></a>
+              <a class="artifact" href="owner_approval_form.html">Approval form<span>owner_approval_form.html</span></a>
+              <a class="artifact" href="owner_approval_form_fixture_report.md">Approval form guard<span>owner_approval_form_fixture_report.md</span></a>
+              <a class="artifact" href="line_inbound_playbook.md">LINE inbound<span>line_inbound_playbook.md</span></a>
+              <a class="artifact" href="manual_publish_packet.md">Manual publish packet<span>manual_publish_packet.md</span></a>
+              <a class="artifact" href="manual_publish_capture_plan.md">Manual capture plan<span>manual_publish_capture_plan.md</span></a>
+              <a class="artifact" href="manual_publish_brief.md">Manual publish brief<span>manual_publish_brief.md</span></a>
+              <a class="artifact" href="manual_publish_brief.json">Manual publish brief JSON<span>manual_publish_brief.json</span></a>
+              <a class="artifact" href="public_tracking_url_pack.md">Public tracking URL pack<span>public_tracking_url_pack.md</span></a>
+              <a class="artifact" href="public_tracking_url_pack.json">Public tracking URL pack JSON<span>public_tracking_url_pack.json</span></a>
+              <a class="artifact" href="owner_public_url_approval_preview.md">Owner public URL approval preview<span>owner_public_url_approval_preview.md</span></a>
+              <a class="artifact" href="owner_public_url_approval_preview.json">Owner public URL approval JSON<span>owner_public_url_approval_preview.json</span></a>
+              <a class="artifact" href="manual_publish_evidence.md">Manual publish evidence<span>manual_publish_evidence.md</span></a>
+              <a class="artifact" href="manual_publish_evidence_form.html">Manual publish evidence form<span>manual_publish_evidence_form.html</span></a>
+              <a class="artifact" href="manual_publish_evidence_form_fixture_report.md">Manual publish evidence form guard<span>manual_publish_evidence_form_fixture_report.md</span></a>
+              <a class="artifact" href="manual_publish_evidence_fixture_report.md">Manual publish evidence guard<span>manual_publish_evidence_fixture_report.md</span></a>
+              <a class="artifact" href="approval_resume_plan.md">Resume plan<span>approval_resume_plan.md</span></a>
+              <a class="artifact" href="owner_gate_evidence.md">Gate evidence<span>owner_gate_evidence.md</span></a>
+              <a class="artifact" href="owner_gate_evidence_fixture_report.md">Evidence guard<span>owner_gate_evidence_fixture_report.md</span></a>
+              <a class="artifact" href="post_gate_verification.md">Post-gate verify<span>post_gate_verification.md</span></a>
+              <a class="artifact" href="post_gate_verification_fixture_report.md">Post-gate guard<span>post_gate_verification_fixture_report.md</span></a>
+              <a class="artifact" href="gate_readiness.md">Gate readiness<span>gate_readiness.md</span></a>
+              <a class="artifact" href="redline_priority.md">Red-line priority<span>redline_priority.md</span></a>
+              <a class="artifact" href="redline_priority.json">Red-line priority JSON<span>redline_priority.json</span></a>
+              <a class="artifact" href="prepared_but_blocked.md">PreparedButBlocked handoff<span>prepared_but_blocked.md</span></a>
+              <a class="artifact" href="data/prepared_but_blocked_report_status.json">PreparedButBlocked status<span>data/prepared_but_blocked_report_status.json</span></a>
+              <a class="artifact" href="github_workflow_guard.md">GitHub workflow guard<span>github_workflow_guard.md</span></a>
+              <a class="artifact" href="github_workflow_guard.json">GitHub workflow guard JSON<span>github_workflow_guard.json</span></a>
+              <a class="artifact" href="github_export_manifest.md">GitHub bundle<span>github_export_manifest.md</span></a>
+              <a class="artifact" href="artifact_retention.md">Artifact retention<span>artifact_retention.md</span></a>
+              <a class="artifact" href="data/artifact_retention_status.json">Artifact retention JSON<span>data/artifact_retention_status.json</span></a>
+              <a class="artifact" href="artifact_retention_review_pack.md">Retention review<span>artifact_retention_review_pack.md</span></a>
+              <a class="artifact" href="artifact_retention_review_pack.json">Retention review JSON<span>artifact_retention_review_pack.json</span></a>
+              <a class="artifact" href="data/artifact_retention_review_status.json">Retention review status<span>data/artifact_retention_review_status.json</span></a>
+              <a class="artifact" href="prepared_but_blocked.json">Blocked queue<span>prepared_but_blocked.json</span></a>
+              <a class="artifact" href="landing_page_candidate.html">Candidate page<span>landing_page_candidate.html</span></a>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <header>
+            <h2>Data Sources</h2>
+            <span class="badge ok">local only</span>
+          </header>
+          <div class="body">
+            <div class="split-list">
+              <div class="row"><strong>D1 export</strong><span>local / rows=0 / scoring=blocked / smoke=0 / data_write=no</span></div>
+              <div class="row"><strong>D1 collection selector</strong><span>local_review_collection_completed / scope=local_review_only / recurring=blocked / remote_read=no / raw_rows=no / customer_data=no</span></div>
+              <div class="row"><strong>D1 collection plan</strong><span>local_review_collection_only / plan_only=yes / remote_read=no</span></div>
+              <div class="row"><strong>Source trust</strong><span>waiting_for_trusted_scoring_input / trusted=0 / sample_gate=0 / p0_pending=18 / scoring=blocked</span></div>
+              <div class="row"><strong>Weekly schedule</strong><span>active / cadence=weekly_sunday / runner=npm run weekly:local / launchd=installed / external=no</span></div>
+              <div class="row"><strong>Catch-up status</strong><span>current_weekly_run_confirmed / required=no / latest=2026-07-05, 00:10:00 Asia/Taipei / action=No catch-up needed. Review owner_console.html and wait for the next Sunday local run. / external=no</span></div>
+              <div class="row"><strong>LaunchAgent</strong><span>loaded / label=com.angelia.3q-growth-loop.weekly / file=yes / runs=1 / last_exit=0 / successful_run=yes / current_launchd_invocation=no / proof=completed_exit_zero / rollback=npm run schedule:uninstall / external=no</span></div>
+              <div class="row"><strong>Gate evidence</strong><span>ok / status=waiting_for_owner_evidence / input=missing / ready=0/4 / issues=0 / executed=no</span></div>
+              <div class="row"><strong>Evidence guard</strong><span>ok / scenarios=10 / executed=no / external=no</span></div>
+              <div class="row"><strong>Post-gate verify</strong><span>ok / status=waiting_for_owner_evidence / ready=0/4 / network=no / remote_cli=no / executed=no</span></div>
+              <div class="row"><strong>Post-gate guard</strong><span>ok / scenarios=9 / network=no / remote_cli=no / executed=no / external=no</span></div>
+              <div class="row"><strong>Gate readiness</strong><span>ok / status=prepared_but_blocked / ready=0/5 / autorun=no / executed=no</span></div>
+              <div class="row"><strong>Red-line priority</strong><span>ok / status=prioritize_p0_sample_gate_counts / actions=25 / covered=yes / autorun=no / external=no</span></div>
+              <div class="row"><strong>PreparedButBlocked handoff</strong><span>ok / status=prepared_but_blocked / blocked=8 / pending=5 / covered=yes / autorun=no / external=no</span></div>
+              <div class="row"><strong>Gate metadata</strong><span>4 plan-only / external=no / order_enforced=yes</span></div>
+              <div class="row"><strong>Public A/B metadata</strong><span>fields=approved_by, approved_at, champion_url, public_surface, rollback_url / blockers=candidate_worker_production_deploy_owner_executed, approved_current_champion_url, approved_rollback_url, approval_metadata.public_ab_small_traffic_link</span></div>
+              <div class="row"><strong>GitHub workflow guard</strong><span>ok / checks=80 / failed=0 / read_only=yes / macos_readback=blocked / external=no</span></div>
+              <div class="row"><strong>GitHub bundle</strong><span>ok / files=508 / git_init=no / push_pr=no / manifest=/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/github_export/bundles/repo-ready-20260710T214808273Z/manifest.json</span></div>
+              <div class="row"><strong>Artifact retention</strong><span>ok / status=within_review_budget / total=50.2 MB / warnings=0 / candidates=0 / cleanup=no / delete=no / external=no</span></div>
+              <div class="row"><strong>Retention review</strong><span>ok / status=within_review_budget / review=no / candidates=0 / section=n/a / command=no / cleanup=no / delete=no / external=no</span></div>
+              <div class="row"><strong>Iteration history</strong><span>ok / status=collect_more_data / archives=3 / actions=4 / external=no</span></div>
+              <div class="row"><strong>Approval fixtures</strong><span>ok / scenarios=11</span></div>
+              <div class="row"><strong>Approval form</strong><span>ok / status=ready_local_owner_approval_form / gates=4 / manual_excluded=1 / browser_only=yes / network=no / live_created=no / approval_write=no / external=no</span></div>
+              <div class="row"><strong>Approval form guard</strong><span>ok / scenarios=4 / form_replay=yes / live_created=no / approval_write=no / external=no</span></div>
+              <div class="row"><strong>LINE inbound</strong><span>ok / scenarios=6</span></div>
+              <div class="row"><strong>Manual publish packet</strong><span>ok / status=ready_local_review / packets=3 / post=no / line_push=no / external=no</span></div>
+              <div class="row"><strong>Manual capture plan</strong><span>ok / status=waiting_for_owner_manual_publish_and_counts / packets=3 / sample_rows=9 / north_rows=21 / data_write=no / external=no</span></div>
+              <div class="row"><strong>Manual publish brief</strong><span>ok / status=prepared_but_blocked_public_tracking_url / selected=manual-publish-01-week0-post-001-cta-v1-diagnostic / public_url=no / formal_ready=no / post=no / external=no</span></div>
+              <div class="row"><strong>Public tracking URL pack</strong><span>ok / status=prepared_but_blocked_owner_public_url / selected=post-week0-post-001-cta-v1-diagnostic / previews=4 / ready=no / formal_ready=no / external=no</span></div>
+              <div class="row"><strong>Public URL approval preview</strong><span>ok / status=prepared_but_blocked_owner_approval_input / gates=3 / fields=15 / live_created=no / approval_write=no / external=no</span></div>
+              <div class="row"><strong>Manual publish evidence</strong><span>ok / status=waiting_for_owner_manual_publish_evidence / input=missing / active=none / day3=n/a / day7=n/a / data_write=no / external=no</span></div>
+              <div class="row"><strong>Manual publish evidence form</strong><span>ok / status=ready_local_manual_publish_evidence_form / packets=3 / browser_only=yes / persistence=no / network=no / url_fetch=no / live_created=no / external=no</span></div>
+              <div class="row"><strong>Manual publish evidence form guard</strong><span>ok / scenarios=4 / form_replay=yes / data_write=no / external=no</span></div>
+              <div class="row"><strong>Manual publish evidence guard</strong><span>ok / scenarios=7 / data_write=no / external=no</span></div>
+              <div class="row"><strong>North Star</strong><span>ok / mode=north_star_funnel_local_only / clicks=0 / line_per_100=n/a / sample_met=no / data_write=no / external=no</span></div>
+              <div class="row"><strong>Funnel breakdown</strong><span>content_variant_attribution / rows=6</span></div>
+              <div class="row"><strong>Funnel aggregate</strong><span>full_funnel_preview / events=48 / data_write=no</span></div>
+              <div class="row"><strong>Funnel guard</strong><span>ok / scenarios=6 / data_write=no</span></div>
+              <div class="row"><strong>Apply guard</strong><span>ok / scenarios=4 / data_write=no</span></div>
+              <div class="row"><strong>Decision replay</strong><span>ok / scenarios=6 / ledger=yes / compile=yes / importer_previews=yes / data_write=no / external=no</span></div>
+              <div class="row"><strong>Sample replay</strong><span>ok / scenarios=3 / ledger=yes / compile=yes / data_write=no / external=no</span></div>
+              <div class="row"><strong>Input pack</strong><span>ok / status=template_ready / templates=2 / live_created=no / data_write=no</span></div>
+              <div class="row"><strong>Source readiness</strong><span>ok / status=waiting_for_real_data / missing=7 / public_ready=no / data_write=no</span></div>
+              <div class="row"><strong>Source capture</strong><span>ok / status=waiting_for_owner_aggregate_capture / rows=42 / live_created=no / data_write=no</span></div>
+              <div class="row"><strong>Source compile</strong><span>ok / status=waiting_for_filled_counts / filled=0 / preview_rows=0 / live_created=no / data_write=no</span></div>
+              <div class="row"><strong>Compile guard</strong><span>ok / scenarios=7 / data_write=no</span></div>
+              <div class="row"><strong>Intake plan</strong><span>ok / status=no_real_input_files / ready_apply=0 / missing=2 / data_write=no</span></div>
+              <div class="row"><strong>Data queue</strong><span>ok / status=waiting_for_owner_aggregate_counts / tasks=42 / filled_ledger=no / data_write=no</span></div>
+              <div class="row"><strong>Next P0 inputs</strong><span>ok / status=waiting_for_p0_owner_inputs / current_inputs=9 / p0_pending=18 / data_write=no / external=no</span></div>
+              <div class="row"><strong>Next P0 quick</strong><span>ok / status=waiting_for_quick_counts / counts=0/9 / filled=0/9 / missing=9 / missing_ranks=1,2,3,4,5,6,7,8,9 / partial=no / paste_template=yes / preview=no / inbox=no / data_write=no / external=no</span></div>
+              <div class="row"><strong>Quick guard</strong><span>ok / scenarios=9 / inbox=no / stage=no / data_write=no / external=no</span></div>
+              <div class="row"><strong>P0 counts preflight</strong><span>ok / status=waiting_for_owner_p0_counts / ready=no / filled=0/9 / placeholders=9 / invalid=0 / issues=0 / data_write=no / external=no</span></div>
+              <div class="row"><strong>P0 preflight guard</strong><span>ok / scenarios=4 / data_write=no / external=no</span></div>
+              <div class="row"><strong>Next P0 intake</strong><span>ok / status=waiting_for_next_p0_owner_download / found=no / valid=no / preview=0 / staged=no / live_created=no / data_write=no / external=no</span></div>
+              <div class="row"><strong>Owner data preflight</strong><span>ok / status=waiting_for_owner_preview_rows / source=next_p0_owner_intake / rows=0 / sample_met=no / win=no / data_write=no / external=no</span></div>
+              <div class="row"><strong>Capture calendar</strong><span>ok / status=waiting_for_owner_sample_gate_counts / events=3 / next=2026-07-05 / import=no / reminder=no / external=no</span></div>
+              <div class="row"><strong>Due status</strong><span>ok / status=day7_due_waiting_for_owner_counts / phase=preferred_check_due / due_now=yes / date=2026-07-05 / champion=keep_champion_sample_insufficient / external=no</span></div>
+              <div class="row"><strong>Due guard</strong><span>ok / scenarios=4 / project_overwrite=no / data_write=no / external=no</span></div>
+              <div class="row"><strong>Owner capture</strong><span>ok / status=waiting_for_owner_sample_gate_counts / p0=18 / links=6 / source_groups=2 / data_write=no / external=no</span></div>
+              <div class="row"><strong>Owner sample gate</strong><span>ok / status=waiting_for_owner_sample_gate_counts / filled=0 / pending=18 / sample_met=no / quality=not_evaluated_from_sample_gate / promoted=no / data_write=no / external=no</span></div>
+              <div class="row"><strong>Sample worksheet</strong><span>ok / status=waiting_for_owner_sample_gate_counts / rows=18 / links=6 / filled=no / live_created=no / data_write=no / external=no</span></div>
+              <div class="row"><strong>Sample form</strong><span>ok / status=ready_local_browser_fill / rows=18 / browser_only=yes / persistence=no / network=no / data_write=no / external=no</span></div>
+              <div class="row"><strong>Sample form guard</strong><span>ok / scenarios=3 / form_replay=yes / compile=yes / sample_gate=yes / data_write=no / external=no</span></div>
+              <div class="row"><strong>Sample intake</strong><span>ok / status=waiting_for_owner_download / found=no / valid=no / filled=0 / pending=n/a / staged=no / live_created=no / data_write=no / external=no</span></div>
+              <div class="row"><strong>Intake guard</strong><span>ok / scenarios=5 / commands=yes / compile=yes / sample_gate=yes / data_write=no / external=no</span></div>
+              <div class="row"><strong>Next action</strong><span>ok / primary=collect_owner_sample_gate_counts / status=waiting_for_owner_sample_gate_counts / trust=waiting_for_trusted_scoring_input / trusted=0 / sample_gate=0 / scoring=no / sample_met=no / rate_win=no / owner_review=no / external=no</span></div>
+              <div class="row"><strong>Outcome preflight</strong><span>ok / status=waiting_for_north_star_outcome_counts / filled=0/24 / pending=24 / ready_compile=no / data_write=no / external=no</span></div>
+              <div class="row"><strong>Outcome form</strong><span>ok / status=ready_local_browser_fill / rows=24 / browser_only=yes / persistence=no / network=no / data_write=no / external=no</span></div>
+              <div class="row"><strong>Outcome form guard</strong><span>ok / checks=26 / static=yes / data_write=no / external=no</span></div>
+              <div class="row"><strong>P1 outcome intake</strong><span>ok / status=waiting_for_p1_outcome_download / candidate=no / valid=no / filled=0/24 / pending=24 / staged=no / data_write=no / external=no</span></div>
+              <div class="row"><strong>P1 intake guard</strong><span>ok / scenarios=5 / data_write=no / external=no</span></div>
+              <div class="row"><strong>P1 outcome post-fill</strong><span>ok / status=waiting_for_p1_outcome_counts / stage=waiting_for_p1_outcome_counts / ready=no / trust=waiting_for_trusted_scoring_input / trusted=0 / scoring=no / commands=8 / local_only=yes / data_write=no / external=no</span></div>
+              <div class="row"><strong>Recovery pack</strong><span>ok / status=sample_gate_due_recovery_ready / due=yes / missing=9/9 / commands=8 / data_write=no / external=no</span></div>
+              <div class="row"><strong>P0 batch handoff</strong><span>ok / status=p0_full_coverage_batched_for_owner_counts / rows=18/18 / batches=2 / focused=9 / remaining=9 / full=yes / data_write=no / external=no</span></div>
+              <div class="row"><strong>P0 batch preflight</strong><span>ok / status=waiting_for_full_p0_counts / input=template / filled=0/18 / pending=18 / invalid=0 / ready_compile=no / data_write=no / external=no</span></div>
+              <div class="row"><strong>Sample count handoff</strong><span>ok / status=waiting_for_owner_sample_counts / due=yes / focused_missing=9/9 / full_p0=18/18 / remaining=9 / commands=8 / data_write=no / external=no</span></div>
+              <div class="row"><strong>P0 now</strong><span>ok / status=waiting_for_owner_sample_counts / focused=9/9 / full=18/18 / batch2=9 / quick_missing=9 / open_targets=9 / next=approve-d1-create-and-migrate / data_write=no / external=no</span></div>
+              <div class="row"><strong>Collection sprint</strong><span>ok / status=sample_gate_due_collection_sprint_active / pending=18/18 / focused=9 / steps=5 / open_targets=7 / owner_review=yes / report=sample_gate_collection_sprint.md / data_write=no / external=no</span></div>
+              <div class="row"><strong>P0 launcher</strong><span>ok / targets=13 / focused=9/9 / full=18/18 / local_only=yes / network=no / external=no</span></div>
+              <div class="row"><strong>Sample count recovery</strong><span>ok / status=waiting_for_owner_sample_counts / quick=no / intake=no / full=18 / full_intake=no / full_staged=no / preflight=no / rows=0 / sample_met=no / data_write=no / external=no</span></div>
+              <div class="row"><strong>P0 post-fill check</strong><span>ok / status=waiting_for_owner_sample_counts / stage=waiting_for_owner_sample_counts / ready=no / trust=waiting_for_trusted_scoring_input / trusted=0 / sample_gate=0 / scoring=no / commands=14 / local_only=yes / data_write=no / external=no</span></div>
+              <div class="row"><strong>Sample count recovery guard</strong><span>ok / scenarios=9 / commands=yes / project_write=no / data_write=no / external=no</span></div>
+              <div class="row"><strong>Owner launcher</strong><span>ok / targets=48 / trust=waiting_for_trusted_scoring_input / trusted=0 / sample_gate=0 / scoring=no / local_only=yes / network=no / external=no</span></div>
+              <div class="row"><strong>Sample gate guard</strong><span>ok / scenarios=7 / commands=yes / data_write=no / external=no</span></div>
+              <div class="row"><strong>Quality review</strong><span>ok / status=waiting_for_sample_rate_candidate / sample_win=no / no_quality_regression=n/a / promotion_queue=no / data_write=no / external=no</span></div>
+              <div class="row"><strong>Quality form</strong><span>ok / status=waiting_for_sample_rate_candidate_local_form_ready / sample_win=no / browser_only=yes / persistence=no / network=no / data_write=no / approval_write=no / external=no</span></div>
+              <div class="row"><strong>Quality form guard</strong><span>ok / scenarios=4 / commands=yes / data_write=no / approval_write=no / external=no</span></div>
+              <div class="row"><strong>Quality guard</strong><span>ok / scenarios=6 / commands=yes / data_write=no / external=no</span></div>
+              <div class="row"><strong>Retirement guard</strong><span>ok / scenarios=6 / current_queue=current_queue_safe / delete=no / external=no</span></div>
+              <div class="row"><strong>Event input quality</strong><span>ok / rows=0 / issues=0</span></div>
+              <div class="row"><strong>Manual import</strong><span>preview / events=10</span></div>
+              <div class="row"><strong>Tracking smoke</strong><span>ok / links=7/7 / real_write=no / data_write=no</span></div>
+              <div class="row"><strong>Event contract</strong><span>ok / isolated fixture only</span></div>
+              <div class="row"><strong>Fixture event writes</strong><span>isolated yes</span></div>
+              <div class="row"><strong>Sensitive columns</strong><span>no</span></div>
+              <div class="row"><strong>Sensitive values</strong><span>no</span></div>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </section>
+
+    <section class="panel" style="margin-top:14px">
+      <header>
+        <h2>Prepared But Blocked</h2>
+        <span class="badge block">8 queued</span>
+      </header>
+      <div class="body">
+        <table><thead><tr><th>Action</th><th>Blocked by</th><th>Artifact</th></tr></thead><tbody><tr>
+        <td><code>verify_existing_cloudflare_d1_and_apply_schema</code></td>
+        <td>Read-only Cloudflare inventory confirms the exact dedicated Growth Loop D1 now exists and matches wrangler.jsonc, but no table query or remote schema migration has been approved or performed.</td>
+        <td><code>schema/d1-week0.sql</code></td>
+      </tr><tr>
+        <td><code>confirm_existing_candidate_worker_provenance</code></td>
+        <td>Read-only observation confirms Candidate deployment 5073984b-bcc0-40f1-a331-daaadd741071 / version 133d27b0-36e5-41e8-96ec-b55925b7b30a is healthy and wired to the Champion, but owner provenance evidence is not recorded. A redeploy is not currently required.</td>
+        <td><code>live_telemetry_readiness.md</code></td>
+      </tr><tr>
+        <td><code>confirm_champion_live_contract_provenance_before_redeploy</code></td>
+        <td>The LINE-only Champion contract is observable live, but deployment provenance is not owner evidence and any redeploy remains a production action.</td>
+        <td><code>champion_integration_candidate.md</code></td>
+      </tr><tr>
+        <td><code>change_primary_social_or_bio_link</code></td>
+        <td>Primary link changes affect public acquisition flow.</td>
+        <td><code>ab_test_status.json</code></td>
+      </tr><tr>
+        <td><code>formal_social_post_or_line_push</code></td>
+        <td>External posting and LINE push remain human-only.</td>
+        <td><code>weekly_report.md</code></td>
+      </tr><tr>
+        <td><code>github_push_or_pr_creation</code></td>
+        <td>The Champion feature commit and exact draft PR packet are prepared locally (integration_already_merged_followup_repairs_only), but branch push / PR creation is an external GitHub write; the engine bundle remains a separate local-only handoff.</td>
+        <td><code>champion_github_handoff.md</code></td>
+      </tr><tr>
+        <td><code>execute_owner_approved_launch_sequence</code></td>
+        <td>The launch sequence combines remote D1, production Worker, public A/B route, and GitHub publishing decisions.</td>
+        <td><code>owner_approval_pack.md</code></td>
+      </tr><tr>
+        <td><code>customer_data_or_ecpay_payment_mutation</code></td>
+        <td>Customer data, payments, refunds, and ECPay are hard red lines.</td>
+        <td><code>n/a</code></td>
+      </tr></tbody></table>
+      </div>
+    </section>
+
+    <div class="foot">
+      <span>Local console only. No form, no fetch, no publish, no deploy.</span>
+      <span class="code">/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/owner_console.html</span>
+    </div>
+  </main>
+</body>
+</html>

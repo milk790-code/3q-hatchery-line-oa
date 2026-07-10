@@ -1,0 +1,45 @@
+{
+  "ok": true,
+  "checked_at": "2026-07-10T21:43:33.424Z",
+  "mode": "read_only_cloudflare_d1_inventory",
+  "total_database_count": 14,
+  "related_databases": [
+    {
+      "uuid": "deb85e19-95fd-4611-8710-9cb6ea6dc7ff",
+      "name": "3q-growth-loop-candidate",
+      "created_at": "2026-07-10T02:31:03.851Z",
+      "version": "production",
+      "num_tables": 0,
+      "file_size": 90112
+    },
+    {
+      "uuid": "e54671b1-d15e-4552-babf-cef367267568",
+      "name": "3q-hatchery-crm",
+      "created_at": "2026-05-18T08:34:01.827Z",
+      "version": "production",
+      "num_tables": 0,
+      "file_size": 1077248
+    },
+    {
+      "uuid": "16941c56-651e-4a87-8302-a8cf6b0c494b",
+      "name": "3q-hatchery-db",
+      "created_at": "2026-05-27T06:58:52.628Z",
+      "version": "production",
+      "num_tables": 0,
+      "file_size": 86016
+    }
+  ],
+  "remote_table_query_performed": false,
+  "customer_data_read_performed": false,
+  "resource_create_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "production_deploy_performed": false,
+  "public_link_change_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

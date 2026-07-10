@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:44:56.680Z",
+  "mode": "north_star_outcome_form_local_browser_only",
+  "status": "ready_local_browser_fill",
+  "form_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/north_star_outcome_form.html",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/north_star_outcome_form_status.json",
+  "template_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/source_capture/source_capture_ledger.fill-template.csv",
+  "owner_filled_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/source_capture/source_capture_ledger.filled.csv",
+  "owner_filled_exists": false,
+  "row_count": 24,
+  "event_types": [
+    "link_click",
+    "lead_submit",
+    "deal",
+    "quality_flag"
+  ],
+  "link_count": 6,
+  "target_live_files": [
+    "data/funnel_aggregates.csv",
+    "data/manual_conversions.csv"
+  ],
+  "required_owner_fields": [
+    "capture_date",
+    "aggregate_count",
+    "evidence_ref",
+    "reviewer",
+    "pii_checked"
+  ],
+  "optional_owner_fields": [
+    "quality_score"
+  ],
+  "download_filename": "source_capture_ledger.filled.csv",
+  "output_filename": "source_capture_ledger.filled.csv",
+  "json_download_filename": "north_star_outcome_form.review.json",
+  "browser_only": true,
+  "browser_persistence": false,
+  "form_action": "none",
+  "network_calls_performed": false,
+  "live_input_files_created": false,
+  "real_events_unchanged": true,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

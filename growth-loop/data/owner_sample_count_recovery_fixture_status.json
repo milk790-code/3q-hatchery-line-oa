@@ -1,0 +1,2080 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:45:50.150Z",
+  "mode": "owner_sample_count_recovery_fixture_dry_run",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/owner_sample_count_recovery_fixture_status.json",
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/owner_sample_count_recovery_fixture_report.md",
+  "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-count-recovery-fixtures-YcFrCU",
+  "scenario_count": 9,
+  "scenario_ids": [
+    "waiting_without_owner_counts",
+    "quick_preview_ready_prompts_intake",
+    "focused_intake_ready_prompts_preflight",
+    "full_p0_intake_ready_prompts_owner_reviewed_stage",
+    "full_p0_owner_reviewed_stage_prompts_sample_gate",
+    "preflight_sample_insufficient_keeps_collecting",
+    "sample_ready_no_auto_promotion",
+    "win_rule_requires_owner_review",
+    "red_line_violation_blocks_recovery"
+  ],
+  "scenarios": [
+    {
+      "id": "waiting_without_owner_counts",
+      "ok": true,
+      "expected_status": "waiting_for_owner_sample_counts",
+      "actual_status": "waiting_for_owner_sample_counts",
+      "checks": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "full_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "compact_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "full_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "compact_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "waiting_for_owner_sample_counts",
+          "actual": "waiting_for_owner_sample_counts",
+          "external_effect": false
+        },
+        {
+          "name": "mode",
+          "ok": true,
+          "expected": "owner_sample_count_recovery_local_only",
+          "actual": "owner_sample_count_recovery_local_only",
+          "external_effect": false
+        },
+        {
+          "name": "quick_preview_ready",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "data_write_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "github_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "deploy_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "formal_post_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "line_push_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "external_effect_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "intake_preview_ready",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_preflight_ready",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "sample_threshold_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "challenger_win_rule_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "red_line_violation_count_zero",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "chain_len",
+          "ok": true,
+          "expected": 4,
+          "actual": 4,
+          "external_effect": false
+        },
+        {
+          "name": "full_p0_chain_len",
+          "ok": true,
+          "expected": 4,
+          "actual": 4,
+          "external_effect": false
+        },
+        {
+          "name": "full_p0_after_commands_present",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "npm run owner:intake",
+            "npm run owner:sample-gate",
+            "npm run owner:data-preflight",
+            "npm run weekly:local"
+          ],
+          "external_effect": false
+        },
+        {
+          "name": "next_commands_present",
+          "ok": true,
+          "expected": ">0",
+          "actual": 3,
+          "external_effect": false
+        },
+        {
+          "name": "blocks_event_write",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "append_to_data_lp_events_jsonl",
+            "stage_live_input_without_owner_review",
+            "fake_or_backfill_counts_without_owner_source",
+            "promote_challenger_to_champion",
+            "rotate_next_variable",
+            "formal_social_post_or_schedule",
+            "line_push_or_broadcast",
+            "public_link_change",
+            "production_worker_deploy",
+            "github_push_or_pr_creation",
+            "customer_data_mutation",
+            "payment_or_refund_action",
+            "delete_data"
+          ],
+          "external_effect": false
+        },
+        {
+          "name": "blocks_github",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "append_to_data_lp_events_jsonl",
+            "stage_live_input_without_owner_review",
+            "fake_or_backfill_counts_without_owner_source",
+            "promote_challenger_to_champion",
+            "rotate_next_variable",
+            "formal_social_post_or_schedule",
+            "line_push_or_broadcast",
+            "public_link_change",
+            "production_worker_deploy",
+            "github_push_or_pr_creation",
+            "customer_data_mutation",
+            "payment_or_refund_action",
+            "delete_data"
+          ],
+          "external_effect": false
+        }
+      ],
+      "exit_code": 0,
+      "quick_preview_ready": false,
+      "intake_preview_ready": false,
+      "full_p0_intake_ready": false,
+      "full_p0_staged_ready": false,
+      "owner_preflight_ready": false,
+      "sample_threshold_met": false,
+      "challenger_win_rule_met": false,
+      "source_issue_count": 0,
+      "red_line_violation_count": 0,
+      "data_lp_events_write_performed": false,
+      "github_push_or_pr_performed": false,
+      "production_deploy_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "external_effect": false,
+      "scenario_root": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-count-recovery-fixtures-YcFrCU/waiting_without_owner_counts",
+      "stdout_bytes": 1816,
+      "stderr_bytes": 0
+    },
+    {
+      "id": "quick_preview_ready_prompts_intake",
+      "ok": true,
+      "expected_status": "quick_preview_ready_run_intake",
+      "actual_status": "quick_preview_ready_run_intake",
+      "checks": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "full_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "compact_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "full_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "compact_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "quick_preview_ready_run_intake",
+          "actual": "quick_preview_ready_run_intake",
+          "external_effect": false
+        },
+        {
+          "name": "mode",
+          "ok": true,
+          "expected": "owner_sample_count_recovery_local_only",
+          "actual": "owner_sample_count_recovery_local_only",
+          "external_effect": false
+        },
+        {
+          "name": "quick_preview_ready",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "data_write_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "github_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "deploy_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "formal_post_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "line_push_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "external_effect_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "intake_preview_ready",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_preflight_ready",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "sample_threshold_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "challenger_win_rule_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "red_line_violation_count_zero",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "chain_len",
+          "ok": true,
+          "expected": 4,
+          "actual": 4,
+          "external_effect": false
+        },
+        {
+          "name": "full_p0_chain_len",
+          "ok": true,
+          "expected": 4,
+          "actual": 4,
+          "external_effect": false
+        },
+        {
+          "name": "full_p0_after_commands_present",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "npm run owner:intake",
+            "npm run owner:sample-gate",
+            "npm run owner:data-preflight",
+            "npm run weekly:local"
+          ],
+          "external_effect": false
+        },
+        {
+          "name": "next_commands_present",
+          "ok": true,
+          "expected": ">0",
+          "actual": 3,
+          "external_effect": false
+        },
+        {
+          "name": "blocks_event_write",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "append_to_data_lp_events_jsonl",
+            "stage_live_input_without_owner_review",
+            "fake_or_backfill_counts_without_owner_source",
+            "promote_challenger_to_champion",
+            "rotate_next_variable",
+            "formal_social_post_or_schedule",
+            "line_push_or_broadcast",
+            "public_link_change",
+            "production_worker_deploy",
+            "github_push_or_pr_creation",
+            "customer_data_mutation",
+            "payment_or_refund_action",
+            "delete_data"
+          ],
+          "external_effect": false
+        },
+        {
+          "name": "blocks_github",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "append_to_data_lp_events_jsonl",
+            "stage_live_input_without_owner_review",
+            "fake_or_backfill_counts_without_owner_source",
+            "promote_challenger_to_champion",
+            "rotate_next_variable",
+            "formal_social_post_or_schedule",
+            "line_push_or_broadcast",
+            "public_link_change",
+            "production_worker_deploy",
+            "github_push_or_pr_creation",
+            "customer_data_mutation",
+            "payment_or_refund_action",
+            "delete_data"
+          ],
+          "external_effect": false
+        }
+      ],
+      "exit_code": 0,
+      "quick_preview_ready": true,
+      "intake_preview_ready": false,
+      "full_p0_intake_ready": false,
+      "full_p0_staged_ready": false,
+      "owner_preflight_ready": false,
+      "sample_threshold_met": false,
+      "challenger_win_rule_met": false,
+      "source_issue_count": 0,
+      "red_line_violation_count": 0,
+      "data_lp_events_write_performed": false,
+      "github_push_or_pr_performed": false,
+      "production_deploy_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "external_effect": false,
+      "scenario_root": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-count-recovery-fixtures-YcFrCU/quick_preview_ready_prompts_intake",
+      "stdout_bytes": 1814,
+      "stderr_bytes": 0
+    },
+    {
+      "id": "focused_intake_ready_prompts_preflight",
+      "ok": true,
+      "expected_status": "focused_intake_preview_ready_run_preflight",
+      "actual_status": "focused_intake_preview_ready_run_preflight",
+      "checks": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "full_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "compact_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "full_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "compact_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "focused_intake_preview_ready_run_preflight",
+          "actual": "focused_intake_preview_ready_run_preflight",
+          "external_effect": false
+        },
+        {
+          "name": "mode",
+          "ok": true,
+          "expected": "owner_sample_count_recovery_local_only",
+          "actual": "owner_sample_count_recovery_local_only",
+          "external_effect": false
+        },
+        {
+          "name": "quick_preview_ready",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "data_write_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "github_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "deploy_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "formal_post_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "line_push_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "external_effect_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "intake_preview_ready",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "owner_preflight_ready",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "sample_threshold_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "challenger_win_rule_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "red_line_violation_count_zero",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "chain_len",
+          "ok": true,
+          "expected": 4,
+          "actual": 4,
+          "external_effect": false
+        },
+        {
+          "name": "full_p0_chain_len",
+          "ok": true,
+          "expected": 4,
+          "actual": 4,
+          "external_effect": false
+        },
+        {
+          "name": "full_p0_after_commands_present",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "npm run owner:intake",
+            "npm run owner:sample-gate",
+            "npm run owner:data-preflight",
+            "npm run weekly:local"
+          ],
+          "external_effect": false
+        },
+        {
+          "name": "next_commands_present",
+          "ok": true,
+          "expected": ">0",
+          "actual": 3,
+          "external_effect": false
+        },
+        {
+          "name": "blocks_event_write",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "append_to_data_lp_events_jsonl",
+            "stage_live_input_without_owner_review",
+            "fake_or_backfill_counts_without_owner_source",
+            "promote_challenger_to_champion",
+            "rotate_next_variable",
+            "formal_social_post_or_schedule",
+            "line_push_or_broadcast",
+            "public_link_change",
+            "production_worker_deploy",
+            "github_push_or_pr_creation",
+            "customer_data_mutation",
+            "payment_or_refund_action",
+            "delete_data"
+          ],
+          "external_effect": false
+        },
+        {
+          "name": "blocks_github",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "append_to_data_lp_events_jsonl",
+            "stage_live_input_without_owner_review",
+            "fake_or_backfill_counts_without_owner_source",
+            "promote_challenger_to_champion",
+            "rotate_next_variable",
+            "formal_social_post_or_schedule",
+            "line_push_or_broadcast",
+            "public_link_change",
+            "production_worker_deploy",
+            "github_push_or_pr_creation",
+            "customer_data_mutation",
+            "payment_or_refund_action",
+            "delete_data"
+          ],
+          "external_effect": false
+        }
+      ],
+      "exit_code": 0,
+      "quick_preview_ready": true,
+      "intake_preview_ready": true,
+      "full_p0_intake_ready": false,
+      "full_p0_staged_ready": false,
+      "owner_preflight_ready": false,
+      "sample_threshold_met": false,
+      "challenger_win_rule_met": false,
+      "source_issue_count": 0,
+      "red_line_violation_count": 0,
+      "data_lp_events_write_performed": false,
+      "github_push_or_pr_performed": false,
+      "production_deploy_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "external_effect": false,
+      "scenario_root": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-count-recovery-fixtures-YcFrCU/focused_intake_ready_prompts_preflight",
+      "stdout_bytes": 1825,
+      "stderr_bytes": 0
+    },
+    {
+      "id": "full_p0_intake_ready_prompts_owner_reviewed_stage",
+      "ok": true,
+      "expected_status": "full_p0_intake_ready_needs_owner_reviewed_stage",
+      "actual_status": "full_p0_intake_ready_needs_owner_reviewed_stage",
+      "checks": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "full_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "compact_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "full_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "compact_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "full_p0_intake_ready_needs_owner_reviewed_stage",
+          "actual": "full_p0_intake_ready_needs_owner_reviewed_stage",
+          "external_effect": false
+        },
+        {
+          "name": "mode",
+          "ok": true,
+          "expected": "owner_sample_count_recovery_local_only",
+          "actual": "owner_sample_count_recovery_local_only",
+          "external_effect": false
+        },
+        {
+          "name": "quick_preview_ready",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "data_write_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "github_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "deploy_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "formal_post_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "line_push_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "external_effect_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "intake_preview_ready",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_preflight_ready",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "sample_threshold_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "challenger_win_rule_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "full_p0_intake_ready",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "full_p0_staged_ready",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "red_line_violation_count_zero",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "chain_len",
+          "ok": true,
+          "expected": 4,
+          "actual": 4,
+          "external_effect": false
+        },
+        {
+          "name": "full_p0_chain_len",
+          "ok": true,
+          "expected": 4,
+          "actual": 4,
+          "external_effect": false
+        },
+        {
+          "name": "full_p0_after_commands_present",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "npm run owner:intake",
+            "npm run owner:sample-gate",
+            "npm run owner:data-preflight",
+            "npm run weekly:local"
+          ],
+          "external_effect": false
+        },
+        {
+          "name": "next_commands_present",
+          "ok": true,
+          "expected": ">0",
+          "actual": 3,
+          "external_effect": false
+        },
+        {
+          "name": "blocks_event_write",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "append_to_data_lp_events_jsonl",
+            "stage_live_input_without_owner_review",
+            "fake_or_backfill_counts_without_owner_source",
+            "promote_challenger_to_champion",
+            "rotate_next_variable",
+            "formal_social_post_or_schedule",
+            "line_push_or_broadcast",
+            "public_link_change",
+            "production_worker_deploy",
+            "github_push_or_pr_creation",
+            "customer_data_mutation",
+            "payment_or_refund_action",
+            "delete_data"
+          ],
+          "external_effect": false
+        },
+        {
+          "name": "blocks_github",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "append_to_data_lp_events_jsonl",
+            "stage_live_input_without_owner_review",
+            "fake_or_backfill_counts_without_owner_source",
+            "promote_challenger_to_champion",
+            "rotate_next_variable",
+            "formal_social_post_or_schedule",
+            "line_push_or_broadcast",
+            "public_link_change",
+            "production_worker_deploy",
+            "github_push_or_pr_creation",
+            "customer_data_mutation",
+            "payment_or_refund_action",
+            "delete_data"
+          ],
+          "external_effect": false
+        }
+      ],
+      "exit_code": 0,
+      "quick_preview_ready": false,
+      "intake_preview_ready": false,
+      "full_p0_intake_ready": true,
+      "full_p0_staged_ready": false,
+      "owner_preflight_ready": false,
+      "sample_threshold_met": false,
+      "challenger_win_rule_met": false,
+      "source_issue_count": 0,
+      "red_line_violation_count": 0,
+      "data_lp_events_write_performed": false,
+      "github_push_or_pr_performed": false,
+      "production_deploy_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "external_effect": false,
+      "scenario_root": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-count-recovery-fixtures-YcFrCU/full_p0_intake_ready_prompts_owner_reviewed_stage",
+      "stdout_bytes": 1834,
+      "stderr_bytes": 0
+    },
+    {
+      "id": "full_p0_owner_reviewed_stage_prompts_sample_gate",
+      "ok": true,
+      "expected_status": "full_p0_staged_run_sample_gate",
+      "actual_status": "full_p0_staged_run_sample_gate",
+      "checks": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "full_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "compact_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "full_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "compact_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "full_p0_staged_run_sample_gate",
+          "actual": "full_p0_staged_run_sample_gate",
+          "external_effect": false
+        },
+        {
+          "name": "mode",
+          "ok": true,
+          "expected": "owner_sample_count_recovery_local_only",
+          "actual": "owner_sample_count_recovery_local_only",
+          "external_effect": false
+        },
+        {
+          "name": "quick_preview_ready",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "data_write_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "github_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "deploy_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "formal_post_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "line_push_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "external_effect_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "intake_preview_ready",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_preflight_ready",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "sample_threshold_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "challenger_win_rule_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "full_p0_intake_ready",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "full_p0_staged_ready",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "red_line_violation_count_zero",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "chain_len",
+          "ok": true,
+          "expected": 4,
+          "actual": 4,
+          "external_effect": false
+        },
+        {
+          "name": "full_p0_chain_len",
+          "ok": true,
+          "expected": 4,
+          "actual": 4,
+          "external_effect": false
+        },
+        {
+          "name": "full_p0_after_commands_present",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "npm run owner:intake",
+            "npm run owner:sample-gate",
+            "npm run owner:data-preflight",
+            "npm run weekly:local"
+          ],
+          "external_effect": false
+        },
+        {
+          "name": "next_commands_present",
+          "ok": true,
+          "expected": ">0",
+          "actual": 3,
+          "external_effect": false
+        },
+        {
+          "name": "blocks_event_write",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "append_to_data_lp_events_jsonl",
+            "stage_live_input_without_owner_review",
+            "fake_or_backfill_counts_without_owner_source",
+            "promote_challenger_to_champion",
+            "rotate_next_variable",
+            "formal_social_post_or_schedule",
+            "line_push_or_broadcast",
+            "public_link_change",
+            "production_worker_deploy",
+            "github_push_or_pr_creation",
+            "customer_data_mutation",
+            "payment_or_refund_action",
+            "delete_data"
+          ],
+          "external_effect": false
+        },
+        {
+          "name": "blocks_github",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "append_to_data_lp_events_jsonl",
+            "stage_live_input_without_owner_review",
+            "fake_or_backfill_counts_without_owner_source",
+            "promote_challenger_to_champion",
+            "rotate_next_variable",
+            "formal_social_post_or_schedule",
+            "line_push_or_broadcast",
+            "public_link_change",
+            "production_worker_deploy",
+            "github_push_or_pr_creation",
+            "customer_data_mutation",
+            "payment_or_refund_action",
+            "delete_data"
+          ],
+          "external_effect": false
+        }
+      ],
+      "exit_code": 0,
+      "quick_preview_ready": false,
+      "intake_preview_ready": false,
+      "full_p0_intake_ready": true,
+      "full_p0_staged_ready": true,
+      "owner_preflight_ready": false,
+      "sample_threshold_met": false,
+      "challenger_win_rule_met": false,
+      "source_issue_count": 0,
+      "red_line_violation_count": 0,
+      "data_lp_events_write_performed": false,
+      "github_push_or_pr_performed": false,
+      "production_deploy_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "external_effect": false,
+      "scenario_root": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-count-recovery-fixtures-YcFrCU/full_p0_owner_reviewed_stage_prompts_sample_gate",
+      "stdout_bytes": 1821,
+      "stderr_bytes": 0
+    },
+    {
+      "id": "preflight_sample_insufficient_keeps_collecting",
+      "ok": true,
+      "expected_status": "owner_preview_scored_keep_collecting",
+      "actual_status": "owner_preview_scored_keep_collecting",
+      "checks": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "full_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "compact_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "full_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "compact_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "owner_preview_scored_keep_collecting",
+          "actual": "owner_preview_scored_keep_collecting",
+          "external_effect": false
+        },
+        {
+          "name": "mode",
+          "ok": true,
+          "expected": "owner_sample_count_recovery_local_only",
+          "actual": "owner_sample_count_recovery_local_only",
+          "external_effect": false
+        },
+        {
+          "name": "quick_preview_ready",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "data_write_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "github_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "deploy_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "formal_post_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "line_push_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "external_effect_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "intake_preview_ready",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "owner_preflight_ready",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "sample_threshold_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "challenger_win_rule_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "red_line_violation_count_zero",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "chain_len",
+          "ok": true,
+          "expected": 4,
+          "actual": 4,
+          "external_effect": false
+        },
+        {
+          "name": "full_p0_chain_len",
+          "ok": true,
+          "expected": 4,
+          "actual": 4,
+          "external_effect": false
+        },
+        {
+          "name": "full_p0_after_commands_present",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "npm run owner:intake",
+            "npm run owner:sample-gate",
+            "npm run owner:data-preflight",
+            "npm run weekly:local"
+          ],
+          "external_effect": false
+        },
+        {
+          "name": "next_commands_present",
+          "ok": true,
+          "expected": ">0",
+          "actual": 2,
+          "external_effect": false
+        },
+        {
+          "name": "blocks_event_write",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "append_to_data_lp_events_jsonl",
+            "stage_live_input_without_owner_review",
+            "fake_or_backfill_counts_without_owner_source",
+            "promote_challenger_to_champion",
+            "rotate_next_variable",
+            "formal_social_post_or_schedule",
+            "line_push_or_broadcast",
+            "public_link_change",
+            "production_worker_deploy",
+            "github_push_or_pr_creation",
+            "customer_data_mutation",
+            "payment_or_refund_action",
+            "delete_data"
+          ],
+          "external_effect": false
+        },
+        {
+          "name": "blocks_github",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "append_to_data_lp_events_jsonl",
+            "stage_live_input_without_owner_review",
+            "fake_or_backfill_counts_without_owner_source",
+            "promote_challenger_to_champion",
+            "rotate_next_variable",
+            "formal_social_post_or_schedule",
+            "line_push_or_broadcast",
+            "public_link_change",
+            "production_worker_deploy",
+            "github_push_or_pr_creation",
+            "customer_data_mutation",
+            "payment_or_refund_action",
+            "delete_data"
+          ],
+          "external_effect": false
+        }
+      ],
+      "exit_code": 0,
+      "quick_preview_ready": true,
+      "intake_preview_ready": true,
+      "full_p0_intake_ready": false,
+      "full_p0_staged_ready": false,
+      "owner_preflight_ready": true,
+      "sample_threshold_met": false,
+      "challenger_win_rule_met": false,
+      "source_issue_count": 0,
+      "red_line_violation_count": 0,
+      "data_lp_events_write_performed": false,
+      "github_push_or_pr_performed": false,
+      "production_deploy_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "external_effect": false,
+      "scenario_root": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-count-recovery-fixtures-YcFrCU/preflight_sample_insufficient_keeps_collecting",
+      "stdout_bytes": 1818,
+      "stderr_bytes": 0
+    },
+    {
+      "id": "sample_ready_no_auto_promotion",
+      "ok": true,
+      "expected_status": "owner_preview_sample_ready_no_auto_promotion",
+      "actual_status": "owner_preview_sample_ready_no_auto_promotion",
+      "checks": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "full_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "compact_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "full_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "compact_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "owner_preview_sample_ready_no_auto_promotion",
+          "actual": "owner_preview_sample_ready_no_auto_promotion",
+          "external_effect": false
+        },
+        {
+          "name": "mode",
+          "ok": true,
+          "expected": "owner_sample_count_recovery_local_only",
+          "actual": "owner_sample_count_recovery_local_only",
+          "external_effect": false
+        },
+        {
+          "name": "quick_preview_ready",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "data_write_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "github_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "deploy_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "formal_post_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "line_push_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "external_effect_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "intake_preview_ready",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "owner_preflight_ready",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "sample_threshold_met",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "challenger_win_rule_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "red_line_violation_count_zero",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "chain_len",
+          "ok": true,
+          "expected": 4,
+          "actual": 4,
+          "external_effect": false
+        },
+        {
+          "name": "full_p0_chain_len",
+          "ok": true,
+          "expected": 4,
+          "actual": 4,
+          "external_effect": false
+        },
+        {
+          "name": "full_p0_after_commands_present",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "npm run owner:intake",
+            "npm run owner:sample-gate",
+            "npm run owner:data-preflight",
+            "npm run weekly:local"
+          ],
+          "external_effect": false
+        },
+        {
+          "name": "next_commands_present",
+          "ok": true,
+          "expected": ">0",
+          "actual": 2,
+          "external_effect": false
+        },
+        {
+          "name": "blocks_event_write",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "append_to_data_lp_events_jsonl",
+            "stage_live_input_without_owner_review",
+            "fake_or_backfill_counts_without_owner_source",
+            "promote_challenger_to_champion",
+            "rotate_next_variable",
+            "formal_social_post_or_schedule",
+            "line_push_or_broadcast",
+            "public_link_change",
+            "production_worker_deploy",
+            "github_push_or_pr_creation",
+            "customer_data_mutation",
+            "payment_or_refund_action",
+            "delete_data"
+          ],
+          "external_effect": false
+        },
+        {
+          "name": "blocks_github",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "append_to_data_lp_events_jsonl",
+            "stage_live_input_without_owner_review",
+            "fake_or_backfill_counts_without_owner_source",
+            "promote_challenger_to_champion",
+            "rotate_next_variable",
+            "formal_social_post_or_schedule",
+            "line_push_or_broadcast",
+            "public_link_change",
+            "production_worker_deploy",
+            "github_push_or_pr_creation",
+            "customer_data_mutation",
+            "payment_or_refund_action",
+            "delete_data"
+          ],
+          "external_effect": false
+        }
+      ],
+      "exit_code": 0,
+      "quick_preview_ready": true,
+      "intake_preview_ready": true,
+      "full_p0_intake_ready": false,
+      "full_p0_staged_ready": false,
+      "owner_preflight_ready": true,
+      "sample_threshold_met": true,
+      "challenger_win_rule_met": false,
+      "source_issue_count": 0,
+      "red_line_violation_count": 0,
+      "data_lp_events_write_performed": false,
+      "github_push_or_pr_performed": false,
+      "production_deploy_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "external_effect": false,
+      "scenario_root": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-count-recovery-fixtures-YcFrCU/sample_ready_no_auto_promotion",
+      "stdout_bytes": 1825,
+      "stderr_bytes": 0
+    },
+    {
+      "id": "win_rule_requires_owner_review",
+      "ok": true,
+      "expected_status": "owner_review_required_before_promotion",
+      "actual_status": "owner_review_required_before_promotion",
+      "checks": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "full_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "compact_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "full_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "compact_ok",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "owner_review_required_before_promotion",
+          "actual": "owner_review_required_before_promotion",
+          "external_effect": false
+        },
+        {
+          "name": "mode",
+          "ok": true,
+          "expected": "owner_sample_count_recovery_local_only",
+          "actual": "owner_sample_count_recovery_local_only",
+          "external_effect": false
+        },
+        {
+          "name": "quick_preview_ready",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "data_write_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "github_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "deploy_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "formal_post_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "line_push_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "external_effect_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "intake_preview_ready",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "owner_preflight_ready",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "sample_threshold_met",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "challenger_win_rule_met",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "red_line_violation_count_zero",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "chain_len",
+          "ok": true,
+          "expected": 4,
+          "actual": 4,
+          "external_effect": false
+        },
+        {
+          "name": "full_p0_chain_len",
+          "ok": true,
+          "expected": 4,
+          "actual": 4,
+          "external_effect": false
+        },
+        {
+          "name": "full_p0_after_commands_present",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "npm run owner:intake",
+            "npm run owner:sample-gate",
+            "npm run owner:data-preflight",
+            "npm run weekly:local"
+          ],
+          "external_effect": false
+        },
+        {
+          "name": "next_commands_present",
+          "ok": true,
+          "expected": ">0",
+          "actual": 3,
+          "external_effect": false
+        },
+        {
+          "name": "blocks_event_write",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "append_to_data_lp_events_jsonl",
+            "stage_live_input_without_owner_review",
+            "fake_or_backfill_counts_without_owner_source",
+            "promote_challenger_to_champion",
+            "rotate_next_variable",
+            "formal_social_post_or_schedule",
+            "line_push_or_broadcast",
+            "public_link_change",
+            "production_worker_deploy",
+            "github_push_or_pr_creation",
+            "customer_data_mutation",
+            "payment_or_refund_action",
+            "delete_data"
+          ],
+          "external_effect": false
+        },
+        {
+          "name": "blocks_github",
+          "ok": true,
+          "expected": true,
+          "actual": [
+            "append_to_data_lp_events_jsonl",
+            "stage_live_input_without_owner_review",
+            "fake_or_backfill_counts_without_owner_source",
+            "promote_challenger_to_champion",
+            "rotate_next_variable",
+            "formal_social_post_or_schedule",
+            "line_push_or_broadcast",
+            "public_link_change",
+            "production_worker_deploy",
+            "github_push_or_pr_creation",
+            "customer_data_mutation",
+            "payment_or_refund_action",
+            "delete_data"
+          ],
+          "external_effect": false
+        }
+      ],
+      "exit_code": 0,
+      "quick_preview_ready": true,
+      "intake_preview_ready": true,
+      "full_p0_intake_ready": false,
+      "full_p0_staged_ready": false,
+      "owner_preflight_ready": true,
+      "sample_threshold_met": true,
+      "challenger_win_rule_met": true,
+      "source_issue_count": 0,
+      "red_line_violation_count": 0,
+      "data_lp_events_write_performed": false,
+      "github_push_or_pr_performed": false,
+      "production_deploy_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "external_effect": false,
+      "scenario_root": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-count-recovery-fixtures-YcFrCU/win_rule_requires_owner_review",
+      "stdout_bytes": 1818,
+      "stderr_bytes": 0
+    },
+    {
+      "id": "red_line_violation_blocks_recovery",
+      "ok": true,
+      "expected_status": "blocked_red_line_violation_detected",
+      "actual_status": "blocked_red_line_violation_detected",
+      "checks": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 1,
+          "actual": 1,
+          "external_effect": false
+        },
+        {
+          "name": "full_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "compact_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "full_ok",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "compact_ok",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "blocked_red_line_violation_detected",
+          "actual": "blocked_red_line_violation_detected",
+          "external_effect": false
+        },
+        {
+          "name": "mode",
+          "ok": true,
+          "expected": "owner_sample_count_recovery_local_only",
+          "actual": "owner_sample_count_recovery_local_only",
+          "external_effect": false
+        },
+        {
+          "name": "quick_preview_ready",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "data_write_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "github_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "deploy_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "formal_post_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "line_push_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "external_effect_false",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "red_line_violation_count_positive",
+          "ok": true,
+          "expected": ">0",
+          "actual": 1,
+          "external_effect": false
+        }
+      ],
+      "exit_code": 1,
+      "quick_preview_ready": true,
+      "intake_preview_ready": false,
+      "full_p0_intake_ready": false,
+      "full_p0_staged_ready": false,
+      "owner_preflight_ready": false,
+      "sample_threshold_met": false,
+      "challenger_win_rule_met": false,
+      "source_issue_count": 0,
+      "red_line_violation_count": 1,
+      "data_lp_events_write_performed": false,
+      "github_push_or_pr_performed": false,
+      "production_deploy_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "external_effect": false,
+      "scenario_root": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-count-recovery-fixtures-YcFrCU/red_line_violation_blocks_recovery",
+      "stdout_bytes": 1820,
+      "stderr_bytes": 0
+    }
+  ],
+  "local_fixture_commands_executed": true,
+  "owner_sample_count_recovery_commands_executed": true,
+  "live_project_write_performed": false,
+  "live_input_files_created": false,
+  "stage_performed": false,
+  "apply_performed": false,
+  "append_performed": false,
+  "data_lp_events_write_performed": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "external_effect": false,
+  "note": "Fixture-only sample-count recovery guard. It runs owner:sample-count-recovery against temporary roots and never stages project files, appends events, deploys, posts, pushes GitHub/LINE, mutates customer data, touches payments, or deletes data."
+}

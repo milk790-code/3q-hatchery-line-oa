@@ -1,0 +1,505 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:48:31.567Z",
+  "output_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/owner_console.html",
+  "source_status": [
+    {
+      "file": "growth_scores.json",
+      "ok": true
+    },
+    {
+      "file": "data/candidate_retirement_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "ab_test_status.json",
+      "ok": true
+    },
+    {
+      "file": "approval_queue.json",
+      "ok": true
+    },
+    {
+      "file": "data/approval_queue_status.json",
+      "ok": true
+    },
+    {
+      "file": "prepared_but_blocked.json",
+      "ok": true
+    },
+    {
+      "file": "objective_sequence_audit.json",
+      "ok": true
+    },
+    {
+      "file": "data/goal_completion_audit_status.json",
+      "ok": true
+    },
+    {
+      "file": "next_round_plan.json",
+      "ok": true
+    },
+    {
+      "file": "iteration_history.json",
+      "ok": true
+    },
+    {
+      "file": "funnel_breakdown.json",
+      "ok": true
+    },
+    {
+      "file": "north_star_funnel.json",
+      "ok": true
+    },
+    {
+      "file": "launch_readiness.json",
+      "ok": true
+    },
+    {
+      "file": "data/github_export_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/github_workflow_guard_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/artifact_retention_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/artifact_retention_review_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/week_archive_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/weekly_runner_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/schedule_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/launchagent_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/schedule_catchup_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/d1_sync_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/d1_collection_mode_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/d1_collection_mode_plan_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/d1_collection_mode_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/d1_aggregate_export_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_gate_evidence_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_gate_evidence_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/post_gate_verification_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/post_gate_verification_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/gate_readiness_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/redline_priority_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/prepared_but_blocked_report_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/approval_resume_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_approval_form_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_approval_form_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/line_inbound_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/manual_publish_packet_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/manual_publish_capture_plan_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/manual_publish_brief_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/public_tracking_url_pack_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_public_url_approval_preview_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/manual_publish_evidence_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/manual_publish_evidence_form_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/manual_publish_evidence_form_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/manual_publish_evidence_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/event_input_quality_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/funnel_aggregate_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/funnel_aggregate_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/real_data_apply_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/real_data_decision_replay_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/real_data_input_pack_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/source_readiness_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/cloudflare_d1_readiness_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/live_telemetry_readiness_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/live_telemetry_readiness_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/d1_schema_contract_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/approved_d1_config_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/champion_local_branch_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/champion_release_preflight_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/champion_github_handoff_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/source_capture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/source_trust_matrix_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/sample_gate_ledger_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/sample_gate_replay_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/source_capture_compile_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/source_capture_compile_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/real_data_intake_status.json",
+      "ok": true
+    },
+    {
+      "file": "data_collection_queue.json",
+      "ok": true
+    },
+    {
+      "file": "data/data_collection_brief_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/data_collection_progress_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/next_p0_owner_inputs_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/next_p0_owner_form_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/next_p0_owner_form_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/next_p0_quick_capture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/next_p0_quick_capture_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/p0_counts_preflight_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/p0_counts_preflight_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/next_p0_owner_intake_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/next_p0_owner_intake_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_data_preflight_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/sample_gate_capture_calendar_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/sample_gate_due_status_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/sample_gate_due_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/week0_owner_capture_queue_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_sample_gate_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/sample_gate_owner_worksheet_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/sample_gate_owner_form_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/sample_gate_owner_form_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_sample_gate_intake_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_sample_gate_intake_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_next_action_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/north_star_outcome_preflight_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/north_star_outcome_form_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/north_star_outcome_form_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_p1_outcome_intake_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_p1_outcome_intake_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_p1_outcome_postfill_check_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/sample_gate_recovery_pack_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/sample_gate_batch_handoff_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/sample_gate_batch_preflight_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_sample_count_handoff_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_p0_now_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/sample_gate_collection_sprint_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_p0_launcher_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_sample_count_recovery_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_p0_postfill_check_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_sample_count_recovery_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_action_launcher_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_sample_gate_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_quality_review_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_quality_review_form_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_quality_review_form_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/owner_quality_review_fixture_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/sample_gate_collection_plan_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/manual_conversion_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/worker_dry_run_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/browser_smoke_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/tracking_link_smoke_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/event_contract_smoke_status.json",
+      "ok": true
+    },
+    {
+      "file": "data/win_rule_fixture_status.json",
+      "ok": true
+    }
+  ],
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Local owner review console only. It reads local artifacts and writes owner_console.html."
+}

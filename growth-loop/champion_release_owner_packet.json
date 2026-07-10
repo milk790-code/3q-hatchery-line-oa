@@ -1,0 +1,185 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:47:41.794Z",
+  "mode": "champion_release_owner_packet_review_only",
+  "release_id": "champion-contact-v1-d63f07cc8f6f",
+  "source_lock": {
+    "repository": "milk790-code/3q-hatchery-line-oa",
+    "repo_path": "/Users/mac/Documents/GitHub/3q-hatchery-line-oa",
+    "ref": "origin/main",
+    "commit": "f86faa7356ac7962d9b429951b67c742370271c0",
+    "observed_ref_commit": "f86faa7356ac7962d9b429951b67c742370271c0",
+    "ref_advanced": false,
+    "path": "workers/3q-site/worker.js",
+    "blob_sha": "c9ffd646fd88750b6170fa1aa8ac2acd91c6f5a1",
+    "sha256": "d63f07cc8f6fe0944cf9c7279eb4ed2abe4b3b6e1e7d05c4cd87425beb26542a"
+  },
+  "candidate": {
+    "patch": "integrations/3q-site/generated/worker.candidate.patch",
+    "worker": "integrations/3q-site/generated/worker.candidate.js",
+    "sha256": "d63f07cc8f6fe0944cf9c7279eb4ed2abe4b3b6e1e7d05c4cd87425beb26542a",
+    "checks": {
+      "exact_source_commit": true,
+      "expected_lock_tuple_verified": true,
+      "source_ref_pinned_once": true,
+      "source_ref_descends_from_lock": true,
+      "source_ref_target_matches_lock": true,
+      "exact_source_blob": true,
+      "exact_source_sha256": true,
+      "candidate_build_status_ok": true,
+      "candidate_source_lock_matches": true,
+      "isolated_two_worker_smoke_ok": true,
+      "patch_check_ok": true,
+      "patch_apply_ok": true,
+      "patched_source_matches_generated_candidate": true,
+      "node_syntax_ok": true,
+      "wrangler_dry_run_ok": true,
+      "wrangler_bundle_created": true,
+      "production_command_template_dry_run_ok": true,
+      "source_repository_unchanged": true,
+      "local_feature_commit_ready": true,
+      "d1_readiness_monitor_ok": true,
+      "live_telemetry_readiness_monitor_ok": true
+    }
+  },
+  "review_artifacts": {
+    "d1_schema_contract": "d1_schema_contract.md",
+    "d1_config_guard": "approved_d1_config.md",
+    "github_handoff": "champion_github_handoff.md",
+    "github_pr_body": "champion_github_pr_body.md"
+  },
+  "local_branch": {
+    "name": "codex/3q-growth-loop-champion-v1",
+    "commit": "9b6fd00c082f2b67d6cde159e61dc6c407d02ea0",
+    "parent_commit": "355981c978bdb1c93a29bb89ae700fda7b41cac0",
+    "source_lock_base_commit": "f86faa7356ac7962d9b429951b67c742370271c0",
+    "worker_commit": null,
+    "workflow_commit": null,
+    "commit_count": 0,
+    "commits": [],
+    "worktree": "/Users/mac/Documents/Codex/control-center/worktrees/3q-site-growth-loop-champion-v1",
+    "changed_paths": [
+      ".github/workflows/deploy-3q-line-oa.yml",
+      ".github/workflows/deploy-fleet-sentinel.yml",
+      ".github/workflows/deploy-pop-line-oa.yml",
+      ".github/workflows/deploy-tudigong.yml",
+      "brands/popmonster.json",
+      "workers/3q-line-oa/worker.js",
+      "workers/fleet-sentinel/worker.js",
+      "workers/outreach/worker.js",
+      "workers/pop-line-oa/worker.js",
+      "workers/pop-sales-ai/worker.js",
+      "workers/sales-ai/worker.js",
+      "workers/tudigong-sales-ai/worker.js",
+      "workers/tudigong/worker.js"
+    ],
+    "candidate_sha256": "d63f07cc8f6fe0944cf9c7279eb4ed2abe4b3b6e1e7d05c4cd87425beb26542a",
+    "remote_branch_observed": true,
+    "remote_commit": "9b6fd00c082f2b67d6cde159e61dc6c407d02ea0",
+    "remote_state": "up_to_date_with_local",
+    "local_ahead_count": 0,
+    "github_push_or_pr_performed": false
+  },
+  "collector_readiness": {
+    "status": "dedicated_d1_bound_owner_migration_review_required",
+    "inventory_checked_at": "2026-07-10T21:43:33.424Z",
+    "expected_database_name": "3q-growth-loop-candidate",
+    "dedicated_database_present": true,
+    "configured_id_is_placeholder": false,
+    "existing_database_reuse_allowed": false,
+    "remote_table_query_performed": false,
+    "candidate_deployment_observed": true,
+    "candidate_deployment_id": "5073984b-bcc0-40f1-a331-daaadd741071",
+    "candidate_version_id": "133d27b0-36e5-41e8-96ec-b55925b7b30a",
+    "candidate_security_contract": "origin-pii-v2",
+    "candidate_security_contract_ok": true,
+    "candidate_deploy_required": false,
+    "observed_live_chain_ready_for_owner_evidence": true,
+    "live_ingest_readiness_proven": false,
+    "weekly_aggregate_read_authorized": false
+  },
+  "current_live": {
+    "snapshot_checked_at": "2026-07-10T14:39:57.325Z",
+    "worker_name": "3q-site",
+    "deployment_id": "53d92717-f826-453e-91f8-a835b51d4be2",
+    "version_id": "de2997a0-6a6a-4780-9e24-e65774dc3f1a",
+    "compatibility_date": "2024-12-01",
+    "false_success_state_present": false,
+    "line_only_mode_present": true,
+    "collector_configured": true
+  },
+  "gates": [
+    {
+      "id": "review_champion_patch",
+      "risk_tier": "T1",
+      "status": "local_feature_commit_ready_for_owner_review",
+      "reason": "Review local head 9b6fd00c082f2b67d6cde159e61dc6c407d02ea0; the full stack is scoped to .github/workflows/deploy-3q-line-oa.yml, .github/workflows/deploy-fleet-sentinel.yml, .github/workflows/deploy-pop-line-oa.yml, .github/workflows/deploy-tudigong.yml, brands/popmonster.json, workers/3q-line-oa/worker.js, workers/fleet-sentinel/worker.js, workers/outreach/worker.js, workers/pop-line-oa/worker.js, workers/pop-sales-ai/worker.js, workers/sales-ai/worker.js, workers/tudigong-sales-ai/worker.js, workers/tudigong/worker.js. Remote state is up_to_date_with_local; this preflight performed no GitHub write."
+    },
+    {
+      "id": "provision_production_collector",
+      "risk_tier": "T3",
+      "status": "existing_collector_observed_owner_provenance_and_schema_evidence_required",
+      "reason": "Candidate deployment 5073984b-bcc0-40f1-a331-daaadd741071 / version 133d27b0-36e5-41e8-96ec-b55925b7b30a is observed healthy, security-current, and wired to the Champion. No redeploy is currently required, but owner provenance and remote schema evidence are still missing."
+    },
+    {
+      "id": "approve_champion_production_deploy",
+      "risk_tier": "T3",
+      "status": "blocked_owner_approval_required",
+      "reason": "A live integration may already be observable, but its provenance is not owner evidence. Any deploy or redeploy still requires patch review, current rollback confirmation, and explicit approval."
+    },
+    {
+      "id": "approve_github_branch_push_or_pr",
+      "risk_tier": "T2",
+      "status": "blocked_owner_approval_required",
+      "reason": "The remote branch is a reviewed ancestor (up_to_date_with_local) and local is ahead by 0; updating it or opening a PR remains an external GitHub write."
+    }
+  ],
+  "safe_review_commands": [
+    "REVIEW_WORKTREE='/Users/mac/Documents/Codex/control-center/worktrees/3q-site-growth-loop-champion-v1'",
+    "git -C \"$REVIEW_WORKTREE\" status --short --branch",
+    "git -C \"$REVIEW_WORKTREE\" log --oneline --decorate f86faa7356ac7962d9b429951b67c742370271c0..HEAD",
+    "git -C \"$REVIEW_WORKTREE\" diff --stat f86faa7356ac7962d9b429951b67c742370271c0..HEAD",
+    "git -C \"$REVIEW_WORKTREE\" diff f86faa7356ac7962d9b429951b67c742370271c0..HEAD -- .github/workflows/deploy-3q-line-oa.yml .github/workflows/deploy-fleet-sentinel.yml .github/workflows/deploy-pop-line-oa.yml .github/workflows/deploy-tudigong.yml brands/popmonster.json workers/3q-line-oa/worker.js workers/fleet-sentinel/worker.js workers/outreach/worker.js workers/pop-line-oa/worker.js workers/pop-sales-ai/worker.js workers/sales-ai/worker.js workers/tudigong-sales-ai/worker.js workers/tudigong/worker.js",
+    "node --check \"$REVIEW_WORKTREE/workers/3q-site/worker.js\"",
+    "cmp \"$REVIEW_WORKTREE/workers/3q-site/worker.js\" /Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/integrations/3q-site/generated/worker.candidate.js"
+  ],
+  "production_commands_after_owner_approval": {
+    "prerequisites": [
+      "Confirm owner evidence for the observed collector Worker, D1 binding, and remote schema migration before treating telemetry as reliable; do not redeploy the existing collector unless its version is rejected.",
+      "Confirm the existing GROWTH_LOOP_COLLECTOR_URL binding equals https://3q-growth-loop-candidate.milk790.workers.dev; the deployment workflow fails closed if the exact plain-text binding or origin-pii-v2 health marker is missing and never rewrites bindings.",
+      "Confirm current live version and rollback target again immediately before deploy.",
+      "Review and merge local branch codex/3q-growth-loop-champion-v1 at commit 9b6fd00c082f2b67d6cde159e61dc6c407d02ea0; merge and production workflow dispatch remain owner-gated."
+    ],
+    "pre_deploy_read_only": [
+      "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/node_modules/.bin/wrangler deployments list --name 3q-site --json",
+      "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/node_modules/.bin/wrangler versions view de2997a0-6a6a-4780-9e24-e65774dc3f1a --name 3q-site --json",
+      "curl -fsS https://3q-site.milk790.workers.dev/health"
+    ],
+    "deploy_template_do_not_run_without_owner_approval": [
+      "REVIEW_WORKTREE='/Users/mac/Documents/Codex/control-center/worktrees/3q-site-growth-loop-champion-v1'",
+      "rg '\\$\\{api\\}/settings|\\$\\{api\\}/content|binding_fingerprint' \"$REVIEW_WORKTREE/.github/workflows/deploy-3q-site.yml\"",
+      "gh workflow run deploy-3q-site.yml --repo milk790-code/3q-hatchery-line-oa --ref main"
+    ],
+    "post_deploy_read_only": [
+      "curl -fsS https://3q-site.milk790.workers.dev/health | jq -e '.ok == true and .build == \"growth-loop-telemetry-v2\"'",
+      "curl -fsS https://3q-site.milk790.workers.dev/growth-loop/status | jq -e '.ok == true and .collector_configured == true and .collector_origin == \"https://3q-growth-loop-candidate.milk790.workers.dev\" and .collector_url_matches_expected == true and .build == \"growth-loop-telemetry-v2\"'",
+      "curl -fsS https://3q-site.milk790.workers.dev/contact | rg 'data-growth-contact-mode|data-growth-loop-telemetry|匿名瀏覽與 CTA 成效事件'"
+    ]
+  },
+  "rollback": {
+    "target_version_id": "de2997a0-6a6a-4780-9e24-e65774dc3f1a",
+    "command_requires_owner_approval": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/node_modules/.bin/wrangler rollback de2997a0-6a6a-4780-9e24-e65774dc3f1a --name 3q-site -m \"Rollback champion Growth Loop integration\"",
+    "source_restore_reference": "f86faa7356ac7962d9b429951b67c742370271c0",
+    "note": "Re-read live deployments immediately before deploy. If the active version changed, regenerate this packet before using rollback."
+  },
+  "external_effect": false,
+  "data_lp_events_write_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "public_link_change_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

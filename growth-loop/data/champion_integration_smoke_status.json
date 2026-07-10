@@ -1,0 +1,177 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:46:51.748Z",
+  "started_at": "2026-07-10T21:46:43.430Z",
+  "duration_ms": 8318,
+  "mode": "isolated_local_champion_integration_smoke",
+  "collector_url": "http://127.0.0.1:60617",
+  "champion_url": "http://127.0.0.1:60618",
+  "isolated_state_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-champion-integration-kkRfy2",
+  "log_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/logs/champion-integration-smoke-20260710T214643Z.log",
+  "page_contract": {
+    "ok": true,
+    "status": 200,
+    "bytes": 13003,
+    "growth_status": {
+      "ok": true,
+      "mode": "champion_integration_candidate",
+      "build": "growth-loop-telemetry-v2",
+      "collector_configured": true,
+      "collector_origin": "https://3q-growth-loop-candidate.milk790.workers.dev",
+      "collector_url_matches_expected": true,
+      "external_effects": false
+    },
+    "checks": {
+      "response_ok": true,
+      "html_no_store": true,
+      "false_success_state_absent": true,
+      "personal_input_controls_absent": true,
+      "line_only_mode_present": true,
+      "line_url_present": true,
+      "telemetry_script_present": true,
+      "collector_url_injected": true,
+      "credentials_omitted": true,
+      "accurate_telemetry_disclosure": true,
+      "attribution_persisted": true,
+      "client_token_sanitizer_present": true,
+      "client_embedded_pii_guard_present": true,
+      "allowed_campaign_preserved": true,
+      "foreign_phone_campaign_rejected": true,
+      "client_uuid_session_guard_present": true,
+      "non_crypto_random_fallback_absent": true,
+      "build_marker_present": true,
+      "collector_origin_exact": true,
+      "page_view_present": true,
+      "cta_click_present": true,
+      "line_add_not_inferred": true
+    }
+  },
+  "cors_contract": {
+    "ok": true,
+    "status": 204,
+    "allow_origin": "http://127.0.0.1:60618",
+    "allow_methods": "POST, OPTIONS",
+    "vary": "Origin"
+  },
+  "allowed_writes": [
+    {
+      "status": 200,
+      "body": {
+        "ok": true,
+        "event_id": "d8b7d779-bcc0-4e71-95be-2f04d9c0ea42"
+      },
+      "allow_origin": "http://127.0.0.1:60618"
+    },
+    {
+      "status": 200,
+      "body": {
+        "ok": true,
+        "event_id": "f1aa542e-5279-4a78-b467-9e69a66144b9"
+      },
+      "allow_origin": "http://127.0.0.1:60618"
+    }
+  ],
+  "denied_write": {
+    "status": 403,
+    "body": {
+      "ok": false,
+      "error": "origin_not_allowed"
+    },
+    "allow_origin": null
+  },
+  "missing_origin_write": {
+    "status": 403,
+    "body": {
+      "ok": false,
+      "error": "origin_not_allowed"
+    },
+    "allow_origin": null
+  },
+  "sensitive_write": {
+    "status": 400,
+    "body": {
+      "ok": false,
+      "error": "blocked_metadata_key"
+    },
+    "allow_origin": "http://127.0.0.1:60618"
+  },
+  "sensitive_token_write": {
+    "status": 400,
+    "body": {
+      "ok": false,
+      "error": "invalid_session_id"
+    },
+    "allow_origin": "http://127.0.0.1:60618"
+  },
+  "embedded_phone_write": {
+    "status": 400,
+    "body": {
+      "ok": false,
+      "error": "invalid_campaign"
+    },
+    "allow_origin": "http://127.0.0.1:60618"
+  },
+  "url_path_pii_write": {
+    "status": 400,
+    "body": {
+      "ok": false,
+      "error": "invalid_url"
+    },
+    "allow_origin": "http://127.0.0.1:60618"
+  },
+  "blocked_conversion_write": {
+    "status": 400,
+    "body": {
+      "ok": false,
+      "error": "event_type_not_allowed_public"
+    },
+    "allow_origin": "http://127.0.0.1:60618"
+  },
+  "wrong_binding_contract": {
+    "ok": true,
+    "status": {
+      "ok": true,
+      "mode": "champion_integration_candidate",
+      "build": "growth-loop-telemetry-v2",
+      "collector_configured": false,
+      "collector_origin": null,
+      "collector_url_matches_expected": false,
+      "external_effects": false
+    },
+    "telemetry_injected": false
+  },
+  "database_contract": {
+    "ok": true,
+    "rows": [
+      {
+        "campaign": "champion-integration-smoke-allowed",
+        "event_type": "cta_click",
+        "n": 1
+      },
+      {
+        "campaign": "champion-integration-smoke-allowed",
+        "event_type": "page_view",
+        "n": 1
+      }
+    ],
+    "allowed_page_view_rows": 1,
+    "allowed_cta_click_rows": 1,
+    "denied_origin_rows": 0,
+    "line_add_rows": 0,
+    "sensitive_rows": 0
+  },
+  "isolated_fixture_event_write_performed": true,
+  "real_event_write_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_read_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Runs both Workers on random localhost ports and writes synthetic events only to an isolated temporary local D1."
+}

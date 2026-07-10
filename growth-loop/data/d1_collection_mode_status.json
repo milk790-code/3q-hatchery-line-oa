@@ -1,0 +1,92 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:43:29.774Z",
+  "mode": "owner_evidence_driven_d1_collection_selector",
+  "status": "local_review_collection_completed",
+  "selected_scope": "local_review_only",
+  "selected_command": "npm run collect:d1:local",
+  "remote_read_authorized": false,
+  "recurring_aggregate_read_approved": false,
+  "aggregate_only_policy": true,
+  "raw_event_rows_allowed": false,
+  "checks": [
+    {
+      "id": "owner_evidence_input_present",
+      "ok": false,
+      "reason": "Owner D1 evidence input is required.",
+      "external_effect": false
+    },
+    {
+      "id": "owner_evidence_valid",
+      "ok": false,
+      "reason": "Owner D1 evidence must pass the local evidence contract.",
+      "external_effect": false
+    },
+    {
+      "id": "recurring_aggregate_read_approved",
+      "ok": false,
+      "reason": "Owner must explicitly approve recurring aggregate-only D1 reads.",
+      "external_effect": false
+    },
+    {
+      "id": "post_gate_verification_ready",
+      "ok": false,
+      "reason": "D1 post-gate verification plan must be ready.",
+      "external_effect": false
+    },
+    {
+      "id": "dedicated_database_present",
+      "ok": true,
+      "reason": "The dedicated Growth Loop D1 must be present.",
+      "external_effect": false
+    },
+    {
+      "id": "configured_id_matches",
+      "ok": true,
+      "reason": "The configured D1 id must match read-only inventory.",
+      "external_effect": false
+    },
+    {
+      "id": "evidence_database_name_matches",
+      "ok": false,
+      "reason": "Owner evidence D1 name must match the configured dedicated database.",
+      "external_effect": false
+    },
+    {
+      "id": "evidence_database_id_matches",
+      "ok": false,
+      "reason": "Owner evidence D1 id must match the configured dedicated database.",
+      "external_effect": false
+    }
+  ],
+  "blocked_reasons": [
+    "Owner D1 evidence input is required.",
+    "Owner D1 evidence must pass the local evidence contract.",
+    "Owner must explicitly approve recurring aggregate-only D1 reads.",
+    "D1 post-gate verification plan must be ready.",
+    "Owner evidence D1 name must match the configured dedicated database.",
+    "Owner evidence D1 id must match the configured dedicated database."
+  ],
+  "plan_only": false,
+  "gate_refresh_performed": true,
+  "readiness_live_refresh_performed": false,
+  "collection_execution_performed": true,
+  "local_read_performed": true,
+  "remote_read_performed": false,
+  "aggregate_only_read_performed": false,
+  "raw_event_rows_read_performed": false,
+  "customer_data_read_performed": false,
+  "customer_data_mutation_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "rows_exported": 0,
+  "aggregate_rows_read": 0,
+  "d1_sync_status": null
+}

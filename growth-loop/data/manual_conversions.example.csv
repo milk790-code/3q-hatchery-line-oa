@@ -1,0 +1,6 @@
+date,asset_id,event_type,count,source,medium,campaign,content_id,variant_id,quality_score
+2026-07-08,champion-3q-line-v0,line_add,4,manual,line_oa,week0,week0-post-001,champion-3q-line-v0,
+2026-07-08,champion-3q-line-v0,lead_submit,1,manual,line_oa,week0,week0-post-001,champion-3q-line-v0,
+2026-07-08,challenger-week0-cta-text-v1,line_add,3,manual,line_oa,week0,week0-post-001,cta-v1-diagnostic,
+2026-07-08,challenger-week0-cta-text-v1,lead_submit,1,manual,line_oa,week0,week0-post-001,cta-v1-diagnostic,
+2026-07-08,challenger-week0-cta-text-v1,quality_flag,1,manual,line_oa,week0,week0-post-001,cta-v1-diagnostic,1

@@ -1,0 +1,111 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:45:15.764Z",
+  "mode": "sample_gate_capture_calendar",
+  "status": "waiting_for_owner_sample_gate_counts",
+  "timezone": "Asia/Taipei",
+  "week": {
+    "start": "2026-06-29",
+    "end": "2026-07-05",
+    "startUtc": "2026-06-28T16:00:00.000Z",
+    "endUtc": "2026-07-05T15:59:59.999Z"
+  },
+  "thresholds": {
+    "min_visits": 100,
+    "min_cta_clicks": 20,
+    "min_line_adds": 5,
+    "min_test_days": 3,
+    "preferred_test_days": 7
+  },
+  "p0_input_count": 9,
+  "source_group_count": 2,
+  "source_groups": [
+    {
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "input_count": 6,
+      "event_types": [
+        "page_view",
+        "cta_click"
+      ],
+      "external_effect": false
+    },
+    {
+      "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+      "input_count": 3,
+      "event_types": [
+        "line_add"
+      ],
+      "external_effect": false
+    }
+  ],
+  "progress_status": "waiting_for_p0_sample_gate_counts",
+  "p0_pending_count": 18,
+  "owner_next_action_status": "waiting_for_owner_sample_gate_counts",
+  "owner_next_action_command": "open sample_gate_batch_handoff.md",
+  "events": [
+    {
+      "id": "week0_capture_open",
+      "date": "2026-06-29",
+      "title": "Open Week 0 P0 aggregate capture",
+      "purpose": "Confirm the current one-variable round, review the focused Next P0 rows, and start collecting aggregate counts.",
+      "command": "open next_p0_owner_form.html",
+      "artifact": "next_p0_owner_form.html",
+      "owner_gate": "Collect aggregate counts only; do not export customer rows.",
+      "owner_review_required": true,
+      "external_effect": false
+    },
+    {
+      "id": "minimum_sample_check_day3",
+      "date": "2026-07-01",
+      "title": "Day 3 minimum sample check",
+      "purpose": "Check whether min_visits=100, min_cta_clicks=20, min_line_adds=5, and min_test_days=3 are met before any winner review.",
+      "command": "npm run data:progress && npm run next-p0:intake && npm run owner:next-action",
+      "artifact": "owner_next_action.md",
+      "owner_gate": "If a valid focused CSV exists, staging still requires --stage --confirm-owner-reviewed.",
+      "owner_review_required": true,
+      "external_effect": false
+    },
+    {
+      "id": "preferred_sample_check_day7",
+      "date": "2026-07-05",
+      "title": "Day 7 preferred weekly review",
+      "purpose": "Run the full local weekly loop, refresh scores, archive evidence, and review the approval queue without external actions.",
+      "command": "npm run weekly:local",
+      "artifact": "weekly_report.md",
+      "owner_gate": "Review approval_queue.json before any public route, deploy, GitHub, post, or LINE action.",
+      "owner_review_required": true,
+      "external_effect": false
+    }
+  ],
+  "next_due_event": {
+    "id": "preferred_sample_check_day7",
+    "date": "2026-07-05",
+    "title": "Day 7 preferred weekly review",
+    "purpose": "Run the full local weekly loop, refresh scores, archive evidence, and review the approval queue without external actions.",
+    "command": "npm run weekly:local",
+    "artifact": "weekly_report.md",
+    "owner_gate": "Review approval_queue.json before any public route, deploy, GitHub, post, or LINE action.",
+    "owner_review_required": true,
+    "external_effect": false
+  },
+  "outputs": {
+    "json": "sample_gate_capture_calendar.json",
+    "markdown": "sample_gate_capture_calendar.md",
+    "ics": "sample_gate_capture_calendar.ics",
+    "status": "data/sample_gate_capture_calendar_status.json"
+  },
+  "calendar_import_performed": false,
+  "system_reminder_created": false,
+  "browser_open_performed": false,
+  "data_lp_events_write_performed": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "external_effect": false,
+  "note": "Local capture calendar only. It writes review artifacts and an importable ICS file, but it does not import into Calendar, create reminders, post, deploy, change links, push LINE, mutate customer data, touch payments, delete data, or push GitHub."
+}
