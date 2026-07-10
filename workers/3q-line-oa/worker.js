@@ -145,11 +145,11 @@ async function callBrain(history, env, cfg, systemPrompt, maxTokens) {
         body: JSON.stringify({ model: pickModel(history), max_tokens: maxTokens || 600,
           system: [{ type: 'text', text: sys, cache_control: { type: 'ephemeral' } }], messages: history }),
       });
-      if (!r.ok && [400, 403, 404, 429].includes(r.status)) {
+      if (!r.ok && [400, 403, 404].includes(r.status)) {
       console.error('anthropic', r.status, '-> fallback opus-4-8');
       r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: HDRS, body: JSON.stringify({ model: 'claude-opus-4-8', max_tokens: maxTokens || 600, system: [{ type: 'text', text: sys, cache_control: { type: 'ephemeral' } }], messages: history }) });
       }
-      if (r.ok) { const d = await r.json(); return d.content?.[0]?.text || ''; }
+      if (r.ok) { const d = await r.json(); return d.content?.find(b => b.type === 'text')?.text || ''; }
       console.error('[3q-line] anthropic', r.status);
     } catch (e) { console.error('[3q-line] anthropic ex', e.message); }
   }
@@ -392,6 +392,14 @@ async function handleEvent(ev, env, cfg) {
     await lineReplyRaw(cfg.lineToken, ev.replyToken, GIFT_FLOW());
     // 點完氣泡(我做汽車美容…)或大按鈕的後續訊息,會落回下方 AI 七幕商談,自然接手
     return;
+  }
+
+  // 每人每分鐘限流:真好友狂傳也擋得住,超過就罐頭回覆不打 AI(止血 Anthropic 帳單)
+  if (env.SESSION && uid !== 'unknown') {
+    const rlKey = 'rl:3qline:' + uid + ':' + Math.floor(Date.now() / 60000);
+    const rlN = parseInt(await env.SESSION.get(rlKey) || '0', 10);
+    if (rlN >= 12) { await lineReply(cfg.lineToken, ev.replyToken, '訊息有點多,我先喘口氣,稍等一下再問我一次。'); return; }
+    await env.SESSION.put(rlKey, String(rlN + 1), { expirationTtl: 120 }).catch(() => {});
   }
 
   const kvKey = '3qline:' + uid;

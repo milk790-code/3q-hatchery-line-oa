@@ -177,11 +177,11 @@ async function callBrain(history, env, cfg, systemPrompt, maxTokens, turnDirecti
         body: JSON.stringify({ model: pickModel(history), max_tokens: maxTokens || 600,
           system: sysBlocks, messages: history }),
       });
-      if (!r.ok && [400, 403, 404, 429].includes(r.status)) {
+      if (!r.ok && [400, 403, 404].includes(r.status)) {
       console.error('anthropic', r.status, '-> fallback opus-4-8');
       r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: HDRS, body: JSON.stringify({ model: 'claude-opus-4-8', max_tokens: maxTokens || 600, system: sysBlocks, messages: history }) });
       }
-      if (r.ok) { const d = await r.json(); return d.content?.[0]?.text || ''; }
+      if (r.ok) { const d = await r.json(); return d.content?.find(b => b.type === 'text')?.text || ''; }
       const errBody = (await r.text().catch(() => '')).slice(0, 200);
       console.error('[pop-line] anthropic', r.status, errBody);
       await env.SESSION?.put('dbg:anthropic', r.status + ' ' + errBody + ' @' + new Date().toISOString()).catch(() => {});
@@ -282,6 +282,14 @@ async function handleEvent(ev, env, cfg) {
     await env.SESSION?.put('cfg:pop_owner', uid);
     await lineReply(cfg.lineToken, ev.replyToken, '已綁定老闆身分。以後客人成交意向我會推給你。', env);
     return;
+  }
+
+  // 每人每分鐘限流:真好友狂傳也擋得住,超過就罐頭回覆不打 AI(止血 Anthropic 帳單)
+  if (env.SESSION && uid !== 'unknown') {
+    const rlKey = 'rl:popline:' + uid + ':' + Math.floor(Date.now() / 60000);
+    const rlN = parseInt(await env.SESSION.get(rlKey) || '0', 10);
+    if (rlN >= 12) { await lineReply(cfg.lineToken, ev.replyToken, '訊息有點多,我先喘口氣,稍等一下再問我;急的話直接加真人。', env); return; }
+    await env.SESSION.put(rlKey, String(rlN + 1), { expirationTtl: 120 }).catch(() => {});
   }
 
   // session:hist=對話、n=客人累計第幾句、ho=第10句檢查點已觸發、dc=已完成第1句揭露

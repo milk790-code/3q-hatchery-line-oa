@@ -9,7 +9,7 @@
 // 部署:.github/workflows/deploy-outreach.yml(API PUT + cron schedules)
 
 const VER = 'v1.1';
-const getAdminKey = (env) => env.ADMIN_KEY || 'outr-9k3v7p-2026';  // CF Secret 覆寫，未設定時用內建常數
+const getAdminKey = (env) => env.ADMIN_KEY || '';  // 只認 CF Secret ADMIN_KEY；未設定→fail-closed，/admin/* 一律 403（不再用寫死預設值）
 const LINE_ADD_URL = 'https://lin.ee/UKKodJj';   // 3Q OA 加好友
 const DAILY_QUOTA = 15;
 

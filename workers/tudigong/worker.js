@@ -487,6 +487,12 @@ https://tudigong-line-oa.milk790.workers.dev/ref/${code}
     await replyLine(ev.replyToken, [KEYWORD_REPLIES[text]], cfg);
     return;
   }
+  if (env.STATE && userId) {
+    const rlKey = `rl:tudiline:${userId}:${Math.floor(Date.now() / 60000)}`;
+    const rlN = parseInt(await env.STATE.get(rlKey) || "0", 10);
+    if (rlN >= 12) { await replyLine(ev.replyToken, ["土地公一次看一件事比較準\n你先等我一下,馬上回你"], cfg); return; }
+    await env.STATE.put(rlKey, String(rlN + 1), { expirationTtl: 120 }).catch(() => {});
+  }
   const state = await loadState(env, userId);
   state.history.push({ role: "user", content: text });
   const ai = await callSalesBrain(env, cfg, state);
@@ -526,7 +532,7 @@ ${stateBlock}`, messages })
   }
   const data = await res.json();
   try {
-    const textOut = data.content && data.content[0] && data.content[0].text || "";
+    const textOut = data.content && data.content.find((b) => b.type === "text")?.text || "";
     return JSON.parse(textOut.slice(textOut.indexOf("{"), textOut.lastIndexOf("}") + 1));
   } catch (e) {
     return null;
