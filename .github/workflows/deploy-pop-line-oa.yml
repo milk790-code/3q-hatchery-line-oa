@@ -46,7 +46,7 @@ jobs:
             { main_module:"worker.js", compatibility_date:"2024-12-01",
               bindings: ([ {name:"SESSION",type:"kv_namespace",namespace_id:$kv},
                            {name:"CRM",type:"d1",id:$d1},
-                           {name:"GENOME",type:"d1",id:"f0419cec-f26d-452b-b2a9-9fe3851a4174"},這個啊
+                           {name:"GENOME",type:"d1",id:"f0419cec-f26d-452b-b2a9-9fe3851a4174"},
                            {name:"AI",type:"ai"},
                            {name:"DELAY_DO",type:"durable_object_namespace",class_name:"DelayReplyDO"} ] + $secrets) }' > /tmp/meta.json
           resp=$(curl -sS -X PUT \
