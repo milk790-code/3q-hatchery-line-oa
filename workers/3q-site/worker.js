@@ -982,7 +982,7 @@ function App() {
                 <div className="h3" style={{ fontSize: 18, color: 'var(--lavd)' }}>改用 LINE 完成預約</div>
                 <p className="caption">本站不在網頁收集姓名、電話、Email 或 LINE ID，也不顯示未送出的成功訊息。</p>
                 <Button variant="primary" href="https://lin.ee/VZvs7sj" target="_blank">加 LINE 預約免費補助健檢 →</Button>
-                <div className="caption">開啟 LINE 後由你主動傳訊；本頁不會自動送出任何資料。</div>
+                <div className="caption">本頁僅自動送出不含姓名、電話、Email、LINE ID 的匿名瀏覽與 CTA 成效事件；LINE 訊息仍由你主動送出。</div>
               </div>
             </div>
           </Reveal>
@@ -3013,31 +3013,79 @@ __ds_ns.StatBadge = __ds_scope.StatBadge;
 }
 ` }
 };
+function resolveGrowthLoopCollector(env) {
+  const expectedCollector = "https://3q-growth-loop-candidate.milk790.workers.dev";
+  const configuredCollector = String(env.GROWTH_LOOP_COLLECTOR_URL || '');
+  return configuredCollector === expectedCollector ? expectedCollector : '';
+}
+
 function injectGrowthLoopTelemetry(body, env) {
-  const collector = String(env.GROWTH_LOOP_COLLECTOR_URL || '').replace(/\/+$/, '');
+  const collector = resolveGrowthLoopCollector(env);
   if (!collector || !body.includes('</body>')) return body;
-  const collectorLiteral = JSON.stringify(collector).replaceAll('<', '\u003c');
+  const collectorLiteral = JSON.stringify(collector).replaceAll('<', '\\u003c');
   const script = `<script data-growth-loop-telemetry>
 (() => {
   const collector = ${collectorLiteral};
   const params = new URLSearchParams(location.search);
-  const storageKey = '3q_growth_loop_sid';
-  let storedSid = null;
-  try { storedSid = sessionStorage.getItem(storageKey); } catch {}
-  let sid = params.get('sid') || storedSid;
-  if (!sid) {
-    sid = crypto.randomUUID ? crypto.randomUUID() : Date.now() + '-' + Math.random().toString(36).slice(2);
-    try { sessionStorage.setItem(storageKey, sid); } catch {}
+  const storageKey = '3q_growth_loop_attribution_v1';
+  const tokenPattern = /^[A-Za-z0-9][A-Za-z0-9._~:-]{0,79}$/;
+  const uuidV4Pattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const emailLikePattern = /[A-Z0-9._%+-]+(?:@|%40)[A-Z0-9.-]+[.][A-Z]{2,}/i;
+  const phoneLikePattern = /(?:[+]?886[ ._~:()-]?)?0?9(?:[ ._~:()-]?[0-9]){8}|0[2-8](?:[ ._~:()-]?[0-9]){7,8}/;
+  const containsPiiLike = (value) => {
+    const candidates = [value];
+    let decoded = value;
+    for (let index = 0; index < 2; index += 1) {
+      try {
+        const next = decodeURIComponent(decoded);
+        if (next === decoded) break;
+        candidates.push(next);
+        decoded = next;
+      } catch { break; }
+    }
+    return candidates.some((candidate) => emailLikePattern.test(candidate) || phoneLikePattern.test(candidate));
+  };
+  const safeToken = (value) => {
+    if (typeof value !== 'string') return null;
+    const normalized = value.trim();
+    return tokenPattern.test(normalized) && !containsPiiLike(normalized) ? normalized : null;
+  };
+  const safeSessionId = (value) => typeof value === 'string' && uuidV4Pattern.test(value.trim()) ? value.trim().toLowerCase() : null;
+  let stored = {};
+  try {
+    const parsed = JSON.parse(sessionStorage.getItem(storageKey) || '{}');
+    if (parsed && typeof parsed === 'object') stored = parsed;
+  } catch {}
+  const fromUrl = {
+    session_id: safeSessionId(params.get('sid')),
+    variant_id: safeToken(params.get('variant_id')),
+    content_id: safeToken(params.get('content_id')),
+    source: safeToken(params.get('utm_source')),
+    medium: safeToken(params.get('utm_medium')),
+    campaign: safeToken(params.get('utm_campaign'))
+  };
+  const attribution = {
+    session_id: fromUrl.session_id || safeSessionId(stored.session_id)
+  };
+  for (const key of ['variant_id', 'content_id', 'source', 'medium', 'campaign']) {
+    attribution[key] = fromUrl[key] || safeToken(stored[key]);
   }
+  if (!attribution.session_id) {
+    if (typeof crypto.randomUUID !== 'function') return;
+    attribution.session_id = crypto.randomUUID();
+  }
+  attribution.source ||= '3q_site';
+  attribution.medium ||= 'champion_page';
+  try { sessionStorage.setItem(storageKey, JSON.stringify(attribution)); } catch {}
   const send = (eventType) => {
     const payload = {
       asset_id: 'champion-3q-line-v0',
-      variant_id: params.get('variant_id'),
-      content_id: params.get('content_id'),
-      session_id: sid,
-      source: params.get('utm_source') || '3q_site',
-      medium: params.get('utm_medium') || 'champion_page',
-      campaign: params.get('utm_campaign'),
+      variant_id: attribution.variant_id,
+      content_id: attribution.content_id,
+      session_id: attribution.session_id,
+      source: attribution.source,
+      medium: attribution.medium,
+      campaign: attribution.campaign,
       event_type: eventType,
       url: location.origin + location.pathname,
       metadata_json: { integration: '3q_site_champion_v1', page: location.pathname }
@@ -3061,10 +3109,10 @@ function injectGrowthLoopTelemetry(body, env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    if (url.pathname === '/growth-loop/status') return new Response(JSON.stringify({ok:true,mode:'champion_integration_candidate',collector_configured:Boolean(env.GROWTH_LOOP_COLLECTOR_URL),external_effects:false}),{headers:{'Content-Type':'application/json','Cache-Control':'no-store'}});
+    if (url.pathname === '/growth-loop/status') { const collector = resolveGrowthLoopCollector(env); return new Response(JSON.stringify({ok:true,mode:'champion_integration_candidate',build:'growth-loop-telemetry-v2',collector_configured:Boolean(collector),collector_origin:collector || null,collector_url_matches_expected:Boolean(collector),external_effects:false}),{headers:{'Content-Type':'application/json','Cache-Control':'no-store'}}); }
     if (url.pathname === '/robots.txt') return new Response('User-agent: *\nAllow: /\nSitemap: https://3q-site.milk790.workers.dev/sitemap.xml\n', { headers: { 'Content-Type': 'text/plain' } });
     if (url.pathname === '/sitemap.xml') return new Response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://3q-site.milk790.workers.dev/</loc></url><url><loc>https://3q-site.milk790.workers.dev/assess</loc></url><url><loc>https://3q-site.milk790.workers.dev/contact</loc></url></urlset>', { headers: { 'Content-Type': 'application/xml' } });
-    if (url.pathname === '/health') return new Response(JSON.stringify({ok:true,worker:'3q-site',ver:'v1.2',pages:Object.keys(FILES).filter(k=>k.endsWith('.html')).length}),{headers:{'Content-Type':'application/json'}});
+    if (url.pathname === '/health') return new Response(JSON.stringify({ok:true,worker:'3q-site',ver:'v1.2',build:'growth-loop-telemetry-v2',pages:Object.keys(FILES).filter(k=>k.endsWith('.html')).length}),{headers:{'Content-Type':'application/json','Cache-Control':'no-store'}});
     let p = url.pathname;
     if (p === '/') p = '/index.html';
     if (!FILES[p] && FILES[p + '.html']) p = p + '.html';

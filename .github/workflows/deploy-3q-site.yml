@@ -13,23 +13,89 @@ jobs:
     runs-on: ubuntu-latest
     env:
       WORKER_NAME: 3q-site
+      LIVE_BASE_URL: https://3q-site.milk790.workers.dev
+      COLLECTOR_BASE_URL: https://3q-growth-loop-candidate.milk790.workers.dev
+      REQUIRED_BINDING: GROWTH_LOOP_COLLECTOR_URL
     steps:
       - uses: actions/checkout@v4
-      - name: Deploy
+      - name: Deploy content without mutating bindings
         env:
           CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
         run: |
           set -euo pipefail
-          jq -n '{ main_module:"worker.js", compatibility_date:"2024-12-01", bindings:[] }' > /tmp/meta.json
-          resp=$(curl -sS -X PUT \
-            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}" \
-            -H "Authorization: Bearer $CF_TOKEN" \
-            -F "metadata=@/tmp/meta.json;type=application/json" \
-            -F "worker.js=@workers/3q-site/worker.js;type=application/javascript+module")
-          echo "$resp" | jq -e '.success==true' >/dev/null || { echo "$resp" | jq -c '.errors'; exit 1; }
-          curl -sS -X POST "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/subdomain" \
-            -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" -d '{"enabled":true}' | jq -e '.success==true' >/dev/null
+          api="https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}"
+          before=$(mktemp)
+          after=$(mktemp)
+          upload=$(mktemp)
+          trap 'rm -f "$before" "$after" "$upload"' EXIT
+
+          get_settings() {
+            curl --fail-with-body --silent --show-error \
+              -H "Authorization: Bearer ${CF_TOKEN}" \
+              "${api}/settings"
+          }
+
+          verify_collector_security_contract() {
+            curl --fail-with-body --silent --show-error "${COLLECTOR_BASE_URL}/health" \
+              | jq -e \
+                '.ok == true
+                 and .service == "3q-growth-loop-candidate"
+                 and .build == "origin-pii-v2"
+                 and .security_contract == "origin-pii-v2"' >/dev/null
+          }
+
+          binding_fingerprint() {
+            jq -cS '[.result.bindings[]?] | sort_by([.name, .type])' "$1" \
+              | sha256sum \
+              | awk '{print $1}'
+          }
+
+          get_settings > "$before"
+          jq -e '.success == true' "$before" >/dev/null
+          jq -e --arg name "$REQUIRED_BINDING" \
+            --arg expected "$COLLECTOR_BASE_URL" \
+            'any(.result.bindings[]?;
+              .name == $name
+              and .type == "plain_text"
+              and .text == $expected)' \
+            "$before" >/dev/null
+          before_bindings=$(binding_fingerprint "$before")
+          verify_collector_security_contract
+
+          curl --fail-with-body --silent --show-error \
+            -X PUT \
+            -H "Authorization: Bearer ${CF_TOKEN}" \
+            -F 'metadata={"main_module":"worker.js"};type=application/json' \
+            -F 'worker.js=@workers/3q-site/worker.js;filename=worker.js;type=application/javascript+module' \
+            "${api}/content" > "$upload"
+          jq -e '.success == true' "$upload" >/dev/null
+
+          get_settings > "$after"
+          jq -e '.success == true' "$after" >/dev/null
+          after_bindings=$(binding_fingerprint "$after")
+          test "$before_bindings" = "$after_bindings"
+          jq -e --arg name "$REQUIRED_BINDING" \
+            --arg expected "$COLLECTOR_BASE_URL" \
+            'any(.result.bindings[]?;
+              .name == $name
+              and .type == "plain_text"
+              and .text == $expected)' \
+            "$after" >/dev/null
+
           sleep 5
-          curl -sS "https://${WORKER_NAME}.milk790.workers.dev/health" | jq -e '.ok==true' >/dev/null
-          echo "::notice::3q-site deployed + health OK"
+          verify_collector_security_contract
+          curl --fail-with-body --silent --show-error "${LIVE_BASE_URL}/health" \
+            | jq -e '.ok == true and .worker == "3q-site" and .build == "growth-loop-telemetry-v2"' >/dev/null
+          curl --fail-with-body --silent --show-error "${LIVE_BASE_URL}/growth-loop/status" \
+            | jq -e --arg expected "$COLLECTOR_BASE_URL" \
+              '.ok == true
+               and .collector_configured == true
+               and .collector_origin == $expected
+               and .collector_url_matches_expected == true
+               and .build == "growth-loop-telemetry-v2"' >/dev/null
+          contact=$(curl --fail-with-body --silent --show-error "${LIVE_BASE_URL}/contact")
+          grep -F 'data-growth-contact-mode="line-only"' <<<"$contact" >/dev/null
+          grep -F 'data-growth-loop-telemetry' <<<"$contact" >/dev/null
+          grep -F '匿名瀏覽與 CTA 成效事件' <<<"$contact" >/dev/null
+          echo "::notice::3q-site content deployed; bindings preserved; collector, build, status, and contact markers verified"
