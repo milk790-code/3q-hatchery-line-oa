@@ -1,0 +1,93 @@
+name: Deploy Fleet Sentinel (每日巡檢哨兵)
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'workers/fleet-sentinel/worker.js'
+      - '.github/workflows/deploy-fleet-sentinel.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      WORKER_NAME: fleet-sentinel
+      WORKER_PATH: workers/fleet-sentinel/worker.js
+      # 每天台灣 09:00 = 01:00 UTC 巡檢一次
+      CRON: '0 1 * * *'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set CF account ID
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: echo "CF_ACCOUNT_ID=$CF_ACCOUNT_ID" >> $GITHUB_ENV
+
+      - name: Deploy worker (secrets 3-tier inherit-safe)
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          LINE_TOKEN: ${{ secrets.SENTINEL_LINE_TOKEN }}
+          RUN_KEY: ${{ secrets.SENTINEL_RUN_KEY }}
+          ANTHROPIC_ADMIN_KEY: ${{ secrets.ANTHROPIC_ADMIN_KEY }}
+          OWNER_USER_ID: ${{ secrets.OWNER_USER_ID }}
+        run: |
+          set -euo pipefail
+          existing=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/settings" \
+            | jq -c '[.result.bindings[]? | select(.type=="secret_text") | .name]' || echo '[]')
+
+          # 每把 secret：有帶新值就寫入，沒帶但線上已存在就沿用(inherit)，都沒有就略過
+          secrets_json=$(jq -n --argjson existing "$existing" '
+            [ {name:"LINE_TOKEN",          val:(env.LINE_TOKEN          // "")},
+              {name:"RUN_KEY",             val:(env.RUN_KEY             // "")},
+              {name:"ANTHROPIC_ADMIN_KEY", val:(env.ANTHROPIC_ADMIN_KEY // "")} ]
+            | map(
+                if .val != "" then {name:.name, type:"secret_text", text:.val}
+                elif ([.name] | inside($existing)) then {name:.name, type:"inherit"}
+                else empty
+                end
+              )')
+
+          # OWNER_USER_ID 走明文變數(非機密)
+          owner_json=$(jq -n --arg v "${OWNER_USER_ID:-}" '
+            if $v != "" then [{name:"OWNER_USER_ID", type:"plain_text", text:$v}] else [] end')
+
+          jq -n --argjson secrets "$secrets_json" --argjson owner "$owner_json" '
+            { main_module: "worker.js", bindings: ($secrets + $owner) }' > /tmp/meta.json
+
+          resp=$(curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -F "metadata=@/tmp/meta.json;type=application/json" \
+            -F "worker.js=@${WORKER_PATH};type=application/javascript+module")
+          echo "$resp" | jq -e '.success == true' > /dev/null || { echo "$resp" | jq -c '.errors'; exit 1; }
+          echo "::notice::${WORKER_NAME} deployed"
+
+      - name: Register cron schedule
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/schedules" \
+            -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" \
+            -d "[{\"cron\": \"${CRON}\"}]" | jq -e '.success == true' > /dev/null
+          echo "::notice::cron ${CRON} registered"
+
+      - name: Enable workers.dev + smoke test
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/subdomain" \
+            -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" \
+            -d '{"enabled": true}' | jq -e '.success == true' > /dev/null
+          SUB=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/subdomain" | jq -r '.result.subdomain')
+          URL="https://${WORKER_NAME}.${SUB}.workers.dev"
+          sleep 5
+          curl -sS "$URL/health" | jq -e '.ok == true' > /dev/null
+          echo "::notice::LIVE → $URL"
+
