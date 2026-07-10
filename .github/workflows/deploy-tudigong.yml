@@ -63,7 +63,9 @@ jobs:
               bindings: ([
                 {name:"STATE", type:"kv_namespace", namespace_id:$kv},
                 {name:"DB", type:"d1", id:$d1},
-                {name:"AI", type:"ai"}
+                {name:"AI", type:"ai"},
+                {name:"GENOME", type:"d1", id:"f0419cec-f26d-452b-b2a9-9fe3851a4174"},
+                {name:"DELAY_DO", type:"durable_object_namespace", class_name:"DelayReplyDO"}
               ] + $secrets)
             }' > /tmp/metadata.json
 
