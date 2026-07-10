@@ -39,6 +39,13 @@ SYSTEM_PROMPT += `
 ［土地公佈告欄+代蒐包(2026-06 新服務)］
 佈告欄=畸零空間刊登板(夾娃娃機台位/騎樓攤位/櫃位分租,三類以外不收,整層住宅與一般店面婉拒),網址 https://tudigong-line-oa.milk790.workers.dev/board 。出租方:回「刊登」拿格式,照格式留資料,土地公親自審核後上板,刊期 30 天;首發期前 30 件免費刊登。找位方:回「找位」看佈告欄;或用「土地公代蒐包」:給需求(區域/預算/用途/坪數),土地公從佈告欄+公開市場(591/樂屋/FB租屋社團)篩 5-10 件清單,每件附三重點快評(嫌惡設施/人流/行情);看屋、聯絡、議價、簽約全部客人自理,土地公不經手。首發期代蒐包免啟動金、日限 2 件。
 佈告欄合規鐵律(凌駕成交,違反=品牌毀滅):只說「刊登」「情報」「快評」,永不說「媒合」「仲介」「佣金」「保證租出/成交」;不接洽房東、不帶看、不斡旋、不代談、不代收訂金、不見證合約;所有收費永遠與成交無關。被要求幫忙談價,回「土地公幫你看清楚,談的事你自己作主」。被問刊登費/認證刊登價格:首發期免費,之後的價目負責人確認中,確認後公布——不臆測不報價。`;
+// ── v5.1 嫁接(2026-07-07):情緒優先鐵律 + emoji 準則 + [EMO]/[STK] 輸出契約(只加不改,不動原 JSON 契約)
+SYSTEM_PROMPT += `
+
+［v5.1 情緒優先鐵律(凌駕以上一切話術)］
+情緒永遠先於推進:每則回覆先用一句話承接對方此刻的情緒/處境(讓他覺得被聽懂),再進正題,順序不可顛倒。
+emoji 準則:每則 1~3 個,自然點綴不氾濫;抱怨/客訴的第一時間回覆不用笑臉 emoji。
+輸出契約補充(不改原 JSON 結構):reply 欄位字串的最後,另起一行輸出 [EMO]情緒[/EMO](從 比價|抱怨|猶豫|趕時間|閒聊|砍價|質疑效果|售後|中性 中選一),再下一行輸出 [STK]槽位[/STK](從 歡迎|開心|感謝|鼓勵|無 中選一;只在正向時刻帶,抱怨/客訴一律填 無,大約每 2~3 則帶一次就好)。這兩行系統會自動移除,客人不會看到。`;
 var KEYWORD_REPLIES = {
   "地址": "好 把你想看的地址貼給我(越完整越準)\n順便告訴我 你是要 買房/租店/開攤/純了解\n\n土地公免費幫你看三個重點\n嫌惡設施 人流 行情\n24小時內回你",
   "監看": "想長期盯一塊地的行情變化?\n\n回我 地址+你的目標價\n我幫你設到價提醒(最長盯5年)\n有動靜通知你",
@@ -71,6 +78,231 @@ function pickModel(messages) {
   return MODELS.chat;
 }
 var CLAUDE_MODEL = "claude-sonnet-4-6";
+
+// ═══════════ v5.1 情緒優先 × 延遲擬真 × 貼圖 引擎(2026-07-07 嫁接自 pop-line-oa v5.1;KV=STATE、D1=DB、表=tdg_line_delivery)═══════════
+var TDG_HUMAN_RX = /真人|人工|客服|專人|找人/;
+var ACK_POOL = {
+  "抱怨": ["先跟你說聲歹勢 讓你有這種感覺😔 你說的我馬上看 稍等我一下", "收到 你先別急😔 土地公馬上看你的狀況 等我一下"],
+  "售後": ["這部分土地公很在意🙏 我馬上看 稍等一下", "收到你的狀況了🙏 我先幫你判斷 等我一下下"],
+  "default": ["收到~我看一下您說的區域😊 稍等我一下下", "好 土地公幫你看一下🙏 馬上回你", "收到你的訊息了😊 我整理一下 稍等喔"]
+};
+var EMO_RX = [
+  ["抱怨", /(客訴|抱怨|生氣|不爽|太爛|很爛|退費|退款|沒收到|等太久|已讀不回|怎麼還沒)/],
+  ["售後", /(拿到報告|看完報告|報告看不懂|報告有問題|跟實際不符|之後有問題)/],
+  ["趕時間", /(趕時間|很急|急用|快點|馬上要|立刻|現在就要|今天就要)/],
+  ["砍價", /(便宜一點|算便宜|折扣|優惠|降價|算我|殺價)/],
+  ["比價", /(別家|其他家|哪家好|比較一下|跟.{0,6}比)/],
+  ["質疑效果", /(有效嗎|真的假的|準不準|會不會沒用|是不是騙|詐騙|真的有用)/]
+];
+function guessEmotion(t) { for (const [k, rx] of EMO_RX) if (rx.test(t || "")) return k; return "中性"; }
+__name(guessEmotion, "guessEmotion");
+function pickAck(emo) { const pool = ACK_POOL[emo] || ACK_POOL.default; return pool[Math.floor(Math.random() * pool.length)]; }
+__name(pickAck, "pickAck");
+function abGroup(uid) { let h = 0; const s = String(uid || ""); for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return (Math.abs(h) % 2) === 0 ? "delay" : "instant"; }
+__name(abGroup, "abGroup");
+// 情緒→延遲秒數連續映射(秒;抱怨快回安撫、猶豫/質疑慎重感;最終被 env DELAY_MIN_S/MAX_S 夾住)
+var EMO_DELAY = {
+  "抱怨": [40, 110], "售後": [40, 110],
+  "砍價": [90, 200], "比價": [90, 200], "質疑效果": [100, 220], "猶豫": [110, 240],
+  "閒聊": [80, 200], "中性": [60, 180]
+};
+function pickDelayMs(env, emo) {
+  const lo = Math.max(5, parseInt(env.DELAY_MIN_S || "30", 10) || 30);
+  const hi = Math.max(lo, parseInt(env.DELAY_MAX_S || "240", 10) || 240);
+  const range = EMO_DELAY[emo] || EMO_DELAY["中性"];
+  const l = Math.min(Math.max(range[0], lo), hi), h = Math.min(Math.max(range[1], lo), hi);
+  const lo2 = Math.min(l, h), hi2 = Math.max(l, h);
+  return (lo2 + Math.floor(Math.random() * (hi2 - lo2 + 1))) * 1000;
+}
+__name(pickDelayMs, "pickDelayMs");
+// 已讀時機延遲(擬真:真人不會秒已讀)
+async function markAsRead(token, markAsReadToken) {
+  if (!markAsReadToken || !token) return;
+  try {
+    await fetch("https://api.line.me/v2/bot/chat/markAsRead", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" },
+      body: JSON.stringify({ markAsReadToken })
+    });
+  } catch (_) {}
+}
+__name(markAsRead, "markAsRead");
+function pickReadDelayMs(env) {
+  const lo = Math.max(3, parseInt(env.READ_DELAY_MIN_S || "8", 10) || 8);
+  const hi = Math.max(lo, parseInt(env.READ_DELAY_MAX_S || "22", 10) || 22);
+  return (lo + Math.floor(Math.random() * (hi - lo + 1))) * 1000;
+}
+__name(pickReadDelayMs, "pickReadDelayMs");
+// 貼圖情緒引擎(語意槽→官方基本貼圖;抱怨/售後絕不帶;ID 可微調)
+var STICKERS = {
+  "歡迎": { packageId: "11537", stickerId: "52002734" },
+  "開心": { packageId: "11537", stickerId: "52002735" },
+  "感謝": { packageId: "11537", stickerId: "52002737" },
+  "鼓勵": { packageId: "11537", stickerId: "52002736" }
+};
+var STICKER_BLOCK_EMO = ["抱怨", "售後"];
+function extractStk(t) {
+  const m = (t || "").match(/\[STK\]\s*([^\[\]\n]{1,6})\s*\[\/STK\]/);
+  const v = m ? m[1].trim() : "";
+  return STICKERS[v] ? v : "";
+}
+__name(extractStk, "extractStk");
+function withSticker(text, stkKey) {
+  const msgs = [{ type: "text", text }];
+  const s = STICKERS[stkKey];
+  if (s) msgs.push({ type: "sticker", packageId: s.packageId, stickerId: s.stickerId });
+  return msgs;
+}
+__name(withSticker, "withSticker");
+function extractEmo(t) {
+  const m = (t || "").match(/\[EMO\]\s*([^\[\]\n]{1,10})\s*\[\/EMO\]/);
+  const v = m ? m[1].trim() : "";
+  return ["比價", "抱怨", "猶豫", "趕時間", "閒聊", "砍價", "質疑效果", "售後", "中性"].includes(v) ? v : "";
+}
+__name(extractEmo, "extractEmo");
+function stripV5Tags(t) {
+  return (t || "").replace(/\[EMO\][\s\S]*?(\[\/EMO\]|$)/g, "").replace(/\[STK\][\s\S]*?(\[\/STK\]|$)/g, "").trim();
+}
+__name(stripV5Tags, "stripV5Tags");
+// 深夜守夜(台北時間):QUIET_START~QUIET_END 進線 → 秒回守夜話術,主回覆隔天早上送
+function taipeiHour() { return new Date(Date.now() + 8 * 3600 * 1000).getUTCHours(); }
+__name(taipeiHour, "taipeiHour");
+function inQuietHours(env) {
+  if ((env.QUIET_MODE || "on") !== "on") return false;
+  const qs = parseInt(env.QUIET_START || "23", 10), qe = parseInt(env.QUIET_END || "8", 10);
+  const h = taipeiHour();
+  return qs > qe ? (h >= qs || h < qe) : (h >= qs && h < qe);
+}
+__name(inQuietHours, "inQuietHours");
+function morningTs(env) {
+  const qe = parseInt(env.QUIET_END || "8", 10);
+  const tw = new Date(Date.now() + 8 * 3600 * 1000);
+  const t = new Date(tw);
+  t.setUTCHours(qe, 0, 0, 0);
+  if (t.getTime() <= tw.getTime()) t.setUTCDate(t.getUTCDate() + 1);
+  return t.getTime() - 8 * 3600 * 1000 + Math.floor(Math.random() * 1800 * 1000); // 08:00~08:30 抖動
+}
+__name(morningTs, "morningTs");
+var QUIET_ACK = "現在是土地公休息的時辰😴 你說的我先幫你記著\n明天一早第一件事回你\n有急事直接留言 我都會記下來";
+async function showLoading(userId, token, secs) {
+  try {
+    await fetch("https://api.line.me/v2/bot/chat/loading/start", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" },
+      body: JSON.stringify({ chatId: userId, loadingSeconds: secs || 20 })
+    });
+  } catch (_) {}
+}
+__name(showLoading, "showLoading");
+// 通用 DO 排程:job = { kind:'ack'|'main', notBefore, token, ...詳見 DelayReplyDO }
+async function scheduleDO(env, uid, job) {
+  if (!env.DELAY_DO) return false;
+  try {
+    const id = env.DELAY_DO.idFromName(uid);
+    const r = await env.DELAY_DO.get(id).fetch("https://do/schedule", { method: "POST", body: JSON.stringify(job) });
+    return r.ok;
+  } catch (e) { console.error("[tdg-line] DO schedule", e.message); return false; }
+}
+__name(scheduleDO, "scheduleDO");
+// messages 陣列版 reply/push(text/sticker 混用;同一次送出只計 1 則)
+async function lineReplyMsgs(token, replyToken, messages, env) {
+  try {
+    const r = await fetch("https://api.line.me/v2/bot/message/reply", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" },
+      body: JSON.stringify({ replyToken, messages })
+    });
+    if (!r.ok && env?.STATE) await env.STATE.put("diag:last_line_error", r.status + " " + (await r.text()).slice(0, 200) + " @" + new Date().toISOString(), { expirationTtl: 86400 }).catch(() => {});
+    return r.ok;
+  } catch (_) { return false; }
+}
+__name(lineReplyMsgs, "lineReplyMsgs");
+async function linePushMsgs(token, to, messages, env) {
+  try {
+    const r = await fetch("https://api.line.me/v2/bot/message/push", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" },
+      body: JSON.stringify({ to, messages })
+    });
+    if (!r.ok && env?.STATE) await env.STATE.put("diag:last_push_error", r.status + " " + (await r.text()).slice(0, 200) + " @" + new Date().toISOString(), { expirationTtl: 86400 }).catch(() => {});
+    return r.ok;
+  } catch (_) { return false; }
+}
+__name(linePushMsgs, "linePushMsgs");
+// 金句飛輪:讀 cdg-core 中央基因庫的跨品牌情緒承接金句(只讀不寫;無 GENOME 綁定時回空字串)
+async function loadGems(env) {
+  if (!env.GENOME) return "";
+  try {
+    const r = await env.GENOME.prepare("SELECT gem FROM emotion_gems ORDER BY win_score DESC, id DESC LIMIT 3").all();
+    const list = (r.results || []).map((x) => x.gem).filter(Boolean);
+    return list.length ? "\n\n【跨品牌情緒承接金句(三品牌實戰驗證,優先化用進你的承接句)】\n· " + list.join("\n· ") : "";
+  } catch (_) { return ""; }
+}
+__name(loadGems, "loadGems");
+// v5.1 遙測表(lazy 建;原碼無 ensureTables,webhook 處理前先確保)
+var TDG_TABLES_OK = false;
+async function ensureDeliveryTable(env) {
+  if (TDG_TABLES_OK || !env.DB) return;
+  try {
+    await env.DB.prepare("CREATE TABLE IF NOT EXISTS tdg_line_delivery (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, ab_group TEXT, emotion TEXT, path TEXT, delay_ms INTEGER DEFAULT 0, delivered_at TEXT, created_at TEXT DEFAULT (datetime('now')))").run();
+    TDG_TABLES_OK = true;
+  } catch (e) { console.error("[tdg-line] tables", e.message); }
+}
+__name(ensureDeliveryTable, "ensureDeliveryTable");
+async function logDelivery(env, uid, ab, emo, path, delayMs) {
+  if (!env.DB) return;
+  await env.DB.prepare("INSERT INTO tdg_line_delivery (user_id, ab_group, emotion, path, delay_ms) VALUES (?,?,?,?,?)").bind(uid, ab, emo, path, delayMs).run().catch(() => {});
+}
+__name(logDelivery, "logDelivery");
+// ═══ Durable Object:延遲擬真信使(per-user 排程,FIFO 保序,至少一次)═══
+// job.kind='ack':延遲已讀(markAsRead)→ reply token 墊場 → loading 動畫(全部擬真時序)
+// job.kind='main'(預設):延遲 push messages 陣列(text/sticker 混用)
+export class DelayReplyDO {
+  constructor(state, env) { this.storage = state.storage; this.env = env; }
+  async fetch(request) {
+    const job = await request.json();
+    const lastNB = (await this.storage.get("lastNB")) || 0;
+    job.notBefore = Math.max(job.notBefore, lastNB + 4000); // 同客人多則保序,至少隔 4 秒
+    await this.storage.put("lastNB", job.notBefore);
+    const jobs = (await this.storage.get("jobs")) || [];
+    jobs.push(job);
+    await this.storage.put("jobs", jobs);
+    const cur = await this.storage.getAlarm();
+    if (cur === null || job.notBefore < cur) await this.storage.setAlarm(job.notBefore);
+    return new Response("scheduled");
+  }
+  async alarm() {
+    const jobs = (await this.storage.get("jobs")) || [];
+    const now = Date.now();
+    const due = jobs.filter((j) => j.notBefore <= now + 3000);
+    const rest = jobs.filter((j) => j.notBefore > now + 3000);
+    for (const j of due) {
+      try {
+        const H = { "Authorization": "Bearer " + j.token, "Content-Type": "application/json" };
+        if (j.kind === "ack") {
+          if (j.markAsReadToken) await fetch("https://api.line.me/v2/bot/chat/markAsRead", { method: "POST", headers: H, body: JSON.stringify({ markAsReadToken: j.markAsReadToken }) }).catch(() => {});
+          if (j.replyToken && j.messages) {
+            const r = await fetch("https://api.line.me/v2/bot/message/reply", { method: "POST", headers: H, body: JSON.stringify({ replyToken: j.replyToken, messages: j.messages }) });
+            // reply token 過期就放棄墊場(不花 push,主回覆稍後會到)
+            if (!r.ok) await this.env.STATE?.put("diag:do_ack_expired", r.status + " @" + new Date().toISOString(), { expirationTtl: 86400 }).catch(() => {});
+          }
+          if (j.chatId) await fetch("https://api.line.me/v2/bot/chat/loading/start", { method: "POST", headers: H, body: JSON.stringify({ chatId: j.chatId, loadingSeconds: 20 }) }).catch(() => {});
+        } else {
+          const messages = j.messages || [{ type: "text", text: j.text }];
+          const r = await fetch("https://api.line.me/v2/bot/message/push", { method: "POST", headers: H, body: JSON.stringify({ to: j.to, messages }) });
+          if (!r.ok) await this.env.STATE?.put("diag:do_push_error", r.status + " @" + new Date().toISOString(), { expirationTtl: 86400 }).catch(() => {});
+          if (this.env.DB) await this.env.DB.prepare("UPDATE tdg_line_delivery SET delivered_at=datetime('now') WHERE user_id=? AND delivered_at IS NULL").bind(j.to).run().catch(() => {});
+        }
+      } catch (e) {
+        await this.env.STATE?.put("diag:do_push_error", "EX " + e.message + " @" + new Date().toISOString(), { expirationTtl: 86400 }).catch(() => {});
+      }
+    }
+    if (rest.length) { await this.storage.put("jobs", rest); await this.storage.setAlarm(Math.min(...rest.map((j) => j.notBefore))); }
+    else { await this.storage.delete("jobs"); }
+  }
+}
+// ═══════════ v5.1 引擎區塊結束 ═══════════
+
 let SETUP_KEY = '';  // 由 env.SETUP_KEY 注入（fetch/scheduled 開頭，未設用隨機值 fail-closed）
 var worker_default = {
   async scheduled(event, env, ctx) {
@@ -83,7 +315,7 @@ var worker_default = {
     if (url.pathname === "/setup") return handleSetup(request, env, url);
     if (url.pathname === "/health") {
       const cfg2 = await loadCfg(env);
-      return new Response(`tudigong bot alive | secret=${!!cfg2.lineSecret} token=${!!cfg2.lineToken} ai=${cfg2.anthropicKey ? "claude" : "builtin"} owner=${!!cfg2.ownerId} board=v1`, { status: 200 });
+      return new Response(`tudigong bot alive | secret=${!!cfg2.lineSecret} token=${!!cfg2.lineToken} ai=${cfg2.anthropicKey ? "claude" : "builtin"} owner=${!!cfg2.ownerId} board=v1 | seed=v5.1.0-graft delay_engine=${env.DELAY_DO ? "on" : "off"} read_delay=${env.READ_DELAY || "on"} genome=${env.GENOME ? "on" : "off"} stickers=on`, { status: 200 });
     }
     if (url.pathname.startsWith("/ref/")) {
       const code = url.pathname.slice(5).toUpperCase();
@@ -406,10 +638,19 @@ function resultHtml(msg, ok) {
 }
 __name(resultHtml, "resultHtml");
 async function handleEvents(events, env, cfg) {
+  await ensureDeliveryTable(env);   // v5.1:遙測表 lazy 建(webhook 處理前)
   for (const ev of events) {
     try {
       if (ev.type === "follow") await onFollow(ev, env, cfg);
       else if (ev.type === "message" && ev.message?.type === "text") await onText(ev, env, cfg);
+      else if (ev.type === "message" && ev.message?.type === "image") await onImage(ev, env, cfg);
+      else if (ev.type === "message" && ev.message?.type === "sticker") {
+        // v5.1:貼圖進來 → 當閒聊文字走大腦
+        await onText({ ...ev, message: { ...ev.message, type: "text", text: "(客人傳了一張貼圖給你,用一句輕鬆有溫度的話接住,順著目前話題繼續,不要問他貼圖是什麼意思)" } }, env, cfg);
+      } else if (ev.type === "message" && ["video", "audio", "file", "location"].includes(ev.message?.type)) {
+        await markAsRead(cfg.lineToken, ev.message?.markAsReadToken);
+        await replyLine(ev.replyToken, ["收到,我先記下來請真人看😊"], cfg);
+      }
     } catch (e) {
       console.error("event error", e.message);
     }
@@ -487,24 +728,90 @@ https://tudigong-line-oa.milk790.workers.dev/ref/${code}
     await replyLine(ev.replyToken, [KEYWORD_REPLIES[text]], cfg);
     return;
   }
+  // ═══════════ v5.1 主對話路徑:分類 → 已讀延遲+墊場 → 大腦照舊 → 抽標籤 → 方案C 遞送 ═══════════
+  const mrToken = ev.message?.markAsReadToken;
+  const oneToOne = (ev.source?.type || "user") === "user";
+  const stickerIn = text.startsWith("(客人傳了一張貼圖");
+  let emo = stickerIn ? "閒聊" : guessEmotion(text);
+  const quiet = inQuietHours(env);
+  const wantsHuman = TDG_HUMAN_RX.test(text);
+  const isRush = emo === "趕時間" || (!stickerIn && text.length <= 12 && LITE_RX.test(text)) || wantsHuman;   // 趕時間/純事實短問/喊真人 → 秒回不延遲
+  const ab = (env.AB_TEST || "on") === "on" ? abGroup(userId) : "delay";
+  let ackSent = false, ackScheduled = false;
+  // ① 已讀延遲 + 秒回墊場(先 8~22 秒後標已讀→墊場→loading,全鏈擬真;90 秒內不重複墊場)
+  if (!isRush && ab === "delay" && ev.replyToken) {
+    const recentAck = await env.STATE.get("ack:" + userId).catch(() => null);
+    if (!recentAck || quiet) {
+      const ackText = quiet ? QUIET_ACK : pickAck(emo);
+      if (mrToken && (env.READ_DELAY || "on") === "on") {
+        ackScheduled = await scheduleDO(env, userId, { kind: "ack", notBefore: Date.now() + pickReadDelayMs(env), token: cfg.lineToken, markAsReadToken: mrToken, replyToken: ev.replyToken, messages: [{ type: "text", text: ackText }], chatId: oneToOne && !quiet ? userId : null });
+      }
+      if (!ackScheduled) {
+        await markAsRead(cfg.lineToken, mrToken);
+        ackSent = await lineReplyMsgs(cfg.lineToken, ev.replyToken, [{ type: "text", text: ackText }], env);
+        if (oneToOne && !quiet) await showLoading(userId, cfg.lineToken, 20);
+      }
+      if (ackSent || ackScheduled) await env.STATE.put("ack:" + userId, "1", { expirationTtl: 90 }).catch(() => {});
+    } else {
+      await markAsRead(cfg.lineToken, mrToken);   // 已墊過場:直接標已讀
+      if (oneToOne && !quiet) await showLoading(userId, cfg.lineToken, 20);
+    }
+  } else {
+    await markAsRead(cfg.lineToken, mrToken);
+    if (oneToOne && !quiet) await showLoading(userId, cfg.lineToken, 15);   // 秒回路徑也給「輸入中」擬真
+  }
+  // 每人每分鐘限流:超過 12 則先擋下,避免刷爆大腦
   if (env.STATE && userId) {
     const rlKey = `rl:tudiline:${userId}:${Math.floor(Date.now() / 60000)}`;
     const rlN = parseInt(await env.STATE.get(rlKey) || "0", 10);
     if (rlN >= 12) { await replyLine(ev.replyToken, ["土地公一次看一件事比較準\n你先等我一下,馬上回你"], cfg); return; }
     await env.STATE.put(rlKey, String(rlN + 1), { expirationTtl: 120 }).catch(() => {});
   }
+  // ② 大腦照舊
   const state = await loadState(env, userId);
   state.history.push({ role: "user", content: text });
   const ai = await callSalesBrain(env, cfg, state);
+  const ackDone = ackSent || ackScheduled;
   if (!ai) {
-    await replyLine(ev.replyToken, ["土地公這邊訊號卡了一下\n你剛剛說的我記著 稍等回你"], cfg);
+    const failMsg = "土地公這邊訊號卡了一下\n你剛剛說的我記著 稍等回你";
+    if (ackDone) await linePushMsgs(cfg.lineToken, userId, [{ type: "text", text: failMsg }], env);
+    else await replyLine(ev.replyToken, [failMsg], cfg);
     return;
   }
+  // ③ 抽 [EMO]/[STK] 標籤並剝除(模型判斷優先,regex 兜底;抱怨/售後絕不帶貼圖)
+  const rawReply = String(ai.reply || "");
+  const modelEmo = extractEmo(rawReply);
+  if (modelEmo) emo = modelEmo;
+  let stk = extractStk(rawReply);
+  if (STICKER_BLOCK_EMO.includes(emo)) stk = "";
+  ai.reply = stripV5Tags(rawReply);
   state.history.push({ role: "assistant", content: JSON.stringify(ai) });
   state.history = state.history.slice(-MAX_HISTORY);
   state.sales = ai.state || state.sales;
   await saveState(env, userId, state);
-  await replyLine(ev.replyToken, [ai.reply], cfg);
+  // ④ 主回覆遞送(方案C):rush/instant=秒回(過期 fallback push)、quiet=隔早 08:00-08:30、其餘=DO 延遲(EMO_DELAY 映射)
+  const mainMsgs = [{ type: "text", text: ai.reply }];
+  if (stk) { const s = STICKERS[stk]; mainMsgs.push({ type: "sticker", packageId: s.packageId, stickerId: s.stickerId }); }
+  let path = "reply_instant", delayMs = 0;
+  if (isRush || ab === "instant") {
+    if (ackDone) { await linePushMsgs(cfg.lineToken, userId, mainMsgs, env); path = "push_now"; }
+    else { const ok = await lineReplyMsgs(cfg.lineToken, ev.replyToken, mainMsgs, env); if (!ok) { await linePushMsgs(cfg.lineToken, userId, mainMsgs, env); path = "push_fallback"; } }
+  } else if (quiet) {
+    delayMs = Math.max(60000, morningTs(env) - Date.now()); path = "push_morning";
+    if (!(await scheduleDO(env, userId, { kind: "main", to: userId, token: cfg.lineToken, messages: mainMsgs, notBefore: Date.now() + delayMs }))) {
+      if (ackDone) await linePushMsgs(cfg.lineToken, userId, mainMsgs, env);
+      else { const ok = await lineReplyMsgs(cfg.lineToken, ev.replyToken, mainMsgs, env); if (!ok) await linePushMsgs(cfg.lineToken, userId, mainMsgs, env); }
+      path = "push_now"; delayMs = 0;
+    }
+  } else {
+    delayMs = pickDelayMs(env, emo); path = "push_delayed";
+    if (!(await scheduleDO(env, userId, { kind: "main", to: userId, token: cfg.lineToken, messages: mainMsgs, notBefore: Date.now() + delayMs }))) {
+      if (ackDone) await linePushMsgs(cfg.lineToken, userId, mainMsgs, env);
+      else { const ok = await lineReplyMsgs(cfg.lineToken, ev.replyToken, mainMsgs, env); if (!ok) await linePushMsgs(cfg.lineToken, userId, mainMsgs, env); }
+      path = "push_now"; delayMs = 0;
+    }
+  }
+  await logDelivery(env, userId, ab, emo, path, delayMs);
   if (ai.state && ai.state.needs_principal && cfg.ownerId) {
     await pushLine(cfg.ownerId, [formatHandoff(userId, ai.state)], cfg);
     await pushLine(userId, [HANDOFF_CUSTOMER_MSG], cfg);
@@ -514,15 +821,68 @@ https://tudigong-line-oa.milk790.workers.dev/ref/${code}
   }
 }
 __name(onText, "onText");
+// v5.1 圖片訊息:客人傳照片 → 已讀+秒回承接 → Claude 視覺(店面/地段/現場照)→ 延遲 30~90s push
+async function onImage(ev, env, cfg) {
+  const userId = ev.source?.userId || "unknown";
+  const oneToOne = (ev.source?.type || "user") === "user";
+  await markAsRead(cfg.lineToken, ev.message?.markAsReadToken);
+  await replyLine(ev.replyToken, ["收到照片📸 土地公幫你看一下 稍等我一下下"], cfg);
+  if (oneToOne) await showLoading(userId, cfg.lineToken, 30);
+  let reply = "";
+  try {
+    if (cfg.anthropicKey) {
+      const imgR = await fetch(`https://api-data.line.me/v2/bot/message/${ev.message.id}/content/preview`, { headers: { authorization: "Bearer " + cfg.lineToken } });
+      if (imgR.ok) {
+        const buf = new Uint8Array(await imgR.arrayBuffer());
+        let bin = ""; const CH = 32768;
+        for (let i = 0; i < buf.length; i += CH) bin += String.fromCharCode.apply(null, buf.subarray(i, i + CH));
+        const b64 = btoa(bin);
+        const mediaType = ((imgR.headers.get("content-type") || "image/jpeg").split(";")[0]) || "image/jpeg";
+        const res = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: { "x-api-key": cfg.anthropicKey, "anthropic-version": "2023-06-01", "content-type": "application/json" },
+          body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 700, system: SYSTEM_PROMPT, messages: [{ role: "user", content: [
+            { type: "image", source: { type: "base64", media_type: mediaType, data: b64 } },
+            { type: "text", text: "客人在 LINE 傳來這張照片(可能是店面/地段/騎樓/櫃位/攤位或現場照,也可能是其他生活照)。先用一句話說出你在照片裡具體看到什麼(讓他知道你真的看了),再自然接到選址判斷或土地公的服務(免費快問/報告/佈告欄)。不確定的不要硬掰,可以問一個收斂式問題。照舊輸出 JSON 契約。" }
+          ] }] })
+        });
+        if (res.ok) {
+          const d = await res.json();
+          const textOut = d.content && d.content.find((b) => b.type === "text")?.text || "";
+          try {
+            const j = JSON.parse(textOut.slice(textOut.indexOf("{"), textOut.lastIndexOf("}") + 1));
+            reply = stripV5Tags(String(j.reply || ""));
+          } catch (_) {
+            reply = stripV5Tags(textOut).slice(0, 900);
+          }
+        }
+      }
+    }
+  } catch (e) { console.error("tdg vision", e.message); }
+  if (!reply) reply = "照片土地公收到了📸\n你先跟我說一下 這是哪裡的位置?\n你是要 買房/租店/開攤 哪一種用途?";
+  const delayMs = 30000 + Math.floor(Math.random() * 60000);
+  if (!(await scheduleDO(env, userId, { kind: "main", to: userId, token: cfg.lineToken, messages: [{ type: "text", text: reply }], notBefore: Date.now() + delayMs }))) {
+    await pushLine(userId, [reply], cfg);
+  }
+  try {
+    const state = await loadState(env, userId);
+    state.history.push({ role: "user", content: "(傳了一張照片)" }, { role: "assistant", content: reply });
+    state.history = state.history.slice(-MAX_HISTORY);
+    await saveState(env, userId, state);
+    await logDelivery(env, userId, "delay", "中性", "image_vision", delayMs);
+  } catch (_) {}
+}
+__name(onImage, "onImage");
 async function callSalesBrain(env, cfg, state) {
   if (!cfg.anthropicKey) return callBuiltinBrain(env, state);
   const messages = state.history.map((m) => ({ role: m.role, content: m.content }));
   const stateBlock = `［對話狀態］${JSON.stringify(state.sales || { completion: 0 })}
 (以上為後端攜帶的進度,接續推進,勿從頭開始)`;
+  const gems = await loadGems(env);   // v5.1 金句飛輪(無 GENOME 綁定時為空字串)
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "x-api-key": cfg.anthropicKey, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-    body: JSON.stringify({ model: pickModel(messages), max_tokens: 1024, system: `${SYSTEM_PROMPT}
+    body: JSON.stringify({ model: pickModel(messages), max_tokens: 1024, system: `${SYSTEM_PROMPT}${gems}
 
 ${stateBlock}`, messages })
   });
