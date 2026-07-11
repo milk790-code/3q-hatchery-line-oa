@@ -1,0 +1,98 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:44:03.984Z",
+  "mode": "d1_collection_mode_fixture_dry_run",
+  "scenario_count": 5,
+  "scenarios": [
+    {
+      "id": "missing_owner_evidence_stays_local",
+      "ok": true,
+      "selected_scope": "local_review_only",
+      "remote_read_authorized": false,
+      "blocked_check_ids": [
+        "owner_evidence_input_present",
+        "owner_evidence_valid",
+        "recurring_aggregate_read_approved",
+        "post_gate_verification_ready",
+        "evidence_database_name_matches",
+        "evidence_database_id_matches"
+      ],
+      "collection_execution_performed": false,
+      "remote_read_performed": false,
+      "raw_event_rows_read_performed": false,
+      "customer_data_read_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "recurring_read_not_approved_stays_local",
+      "ok": true,
+      "selected_scope": "local_review_only",
+      "remote_read_authorized": false,
+      "blocked_check_ids": [
+        "recurring_aggregate_read_approved"
+      ],
+      "collection_execution_performed": false,
+      "remote_read_performed": false,
+      "raw_event_rows_read_performed": false,
+      "customer_data_read_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "post_gate_not_ready_stays_local",
+      "ok": true,
+      "selected_scope": "local_review_only",
+      "remote_read_authorized": false,
+      "blocked_check_ids": [
+        "post_gate_verification_ready"
+      ],
+      "collection_execution_performed": false,
+      "remote_read_performed": false,
+      "raw_event_rows_read_performed": false,
+      "customer_data_read_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "mismatched_d1_target_stays_local",
+      "ok": true,
+      "selected_scope": "local_review_only",
+      "remote_read_authorized": false,
+      "blocked_check_ids": [
+        "evidence_database_name_matches",
+        "evidence_database_id_matches"
+      ],
+      "collection_execution_performed": false,
+      "remote_read_performed": false,
+      "raw_event_rows_read_performed": false,
+      "customer_data_read_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "valid_owner_evidence_selects_remote_aggregate_plan",
+      "ok": true,
+      "selected_scope": "remote_aggregate_only",
+      "remote_read_authorized": true,
+      "blocked_check_ids": [],
+      "collection_execution_performed": false,
+      "remote_read_performed": false,
+      "raw_event_rows_read_performed": false,
+      "customer_data_read_performed": false,
+      "external_effect": false
+    }
+  ],
+  "plan_only": true,
+  "selector_commands_executed": true,
+  "collection_execution_performed": false,
+  "remote_read_performed": false,
+  "raw_event_rows_read_performed": false,
+  "customer_data_read_performed": false,
+  "customer_data_mutation_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "production_deploy_performed": false,
+  "public_link_change_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

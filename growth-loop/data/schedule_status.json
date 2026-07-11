@@ -1,0 +1,72 @@
+{
+  "generated_at": "2026-07-10T21:48:20.571Z",
+  "timezone": "Asia/Taipei",
+  "cadence": "weekly_sunday",
+  "local_runner_command": "npm run weekly:local",
+  "launchagent_status_file": "data/launchagent_status.json",
+  "launchd_template": "launchd/com.angelia.3q-growth-loop.weekly.plist",
+  "launchd_installed": true,
+  "install_performed": true,
+  "uninstall_performed": false,
+  "file_installed": true,
+  "service_loaded": true,
+  "local_persistent_schedule": true,
+  "external_effect": false,
+  "local_schedule": {
+    "weekday": "Sunday",
+    "hour": 0,
+    "minute": 10,
+    "timezone": "Asia/Taipei"
+  },
+  "worker_cron": {
+    "expression": "0 16 * * SAT",
+    "timezone_interpretation": "UTC",
+    "taipei_time": "Sunday 00:00",
+    "production_deploy_required": true,
+    "production_deploy_performed": false
+  },
+  "weekly_sequence": [
+    "collect_data",
+    "score_assets",
+    "winners_losers",
+    "content_mix",
+    "generate_lp_challenger",
+    "deploy_candidate_worker",
+    "create_ab_plan",
+    "weekly_report",
+    "approval_queue"
+  ],
+  "runner_status": {
+    "ok": true,
+    "status": "success",
+    "finished_at": "2026-07-10T21:48:19.360Z",
+    "log_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/logs/weekly-runner-20260710T214317Z.log",
+    "external_effect": false
+  },
+  "launchagent_status": {
+    "ok": true,
+    "action": "status",
+    "label": "com.angelia.3q-growth-loop.weekly",
+    "file_installed": true,
+    "service_loaded": true,
+    "state": "not running",
+    "active_count": 0,
+    "run_count": 1,
+    "last_exit_code": 0,
+    "observed_successful_run": true,
+    "current_launchd_invocation_observed": false,
+    "current_process_descends_from_service": false,
+    "proof_kind": "completed_exit_zero",
+    "rollback_command": "npm run schedule:uninstall",
+    "external_effect": false
+  },
+  "red_lines_preserved": {
+    "production_deploy_performed": false,
+    "public_link_change_performed": false,
+    "formal_post_performed": false,
+    "line_push_performed": false,
+    "customer_data_mutation_performed": false,
+    "payment_action_performed": false,
+    "delete_action_performed": false
+  }
+}

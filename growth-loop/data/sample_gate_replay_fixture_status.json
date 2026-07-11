@@ -1,0 +1,519 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:44:42.873Z",
+  "mode": "sample_gate_replay_fixture_dry_run",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/sample_gate_replay_fixture_status.json",
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/sample_gate_replay_fixture_report.md",
+  "template_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/source_capture/sample_gate_ledger.fill-template.csv",
+  "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg",
+  "template_rows": 18,
+  "sample_event_types": [
+    "page_view",
+    "cta_click",
+    "line_add"
+  ],
+  "scenario_count": 3,
+  "scenarios": [
+    {
+      "id": "sample_gate_insufficient_keeps_collecting",
+      "ok": true,
+      "description": "Challenger has LINE adds, but visits stay below min_visits, so the sample gate stays closed.",
+      "expected": {
+        "challenger_sample_threshold_met": false,
+        "challenger_beats_sample_rate": false,
+        "decision": "continue_collecting_sample_gate_counts"
+      },
+      "assertions": [
+        {
+          "name": "source_compile_ok",
+          "ok": true,
+          "expected": "owner_preview_ready",
+          "actual": "owner_preview_ready"
+        },
+        {
+          "name": "sample_rows_filled",
+          "ok": true,
+          "expected": "18:18",
+          "actual": "18:18"
+        },
+        {
+          "name": "importers_preview_ok",
+          "ok": true,
+          "expected": "preview importers ok",
+          "actual": "full_funnel_preview:preview"
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "challenger_sample_threshold",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "challenger_beats_sample_rate",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "decision",
+          "ok": true,
+          "expected": "continue_collecting_sample_gate_counts",
+          "actual": "continue_collecting_sample_gate_counts"
+        },
+        {
+          "name": "no_auto_promotion",
+          "ok": true,
+          "expected": "owner_review_required_no_promotion",
+          "actual": "true:false"
+        }
+      ],
+      "imported_events": 250,
+      "source_capture_compile": {
+        "ok": true,
+        "status": "owner_preview_ready",
+        "input_kind": "sample_gate_replay_fixture",
+        "ledger_rows_read": 18,
+        "filled_rows": 18,
+        "funnel_rows": 13,
+        "manual_rows": 5,
+        "issue_count": 0,
+        "data_lp_events_write_performed": false,
+        "external_effect": false
+      },
+      "importer_status": {
+        "funnel_ok": true,
+        "funnel_mode": "full_funnel_preview",
+        "funnel_events_written": 244,
+        "manual_ok": true,
+        "manual_mode": "preview",
+        "manual_events_written": 6,
+        "manual_append_performed": true,
+        "data_lp_events_write_performed": false
+      },
+      "sample_summary": {
+        "thresholds": {
+          "min_visits": 100,
+          "min_cta_clicks": 20,
+          "min_line_adds": 5,
+          "min_test_days": 3,
+          "preferred_test_days": 7
+        },
+        "assets": [
+          {
+            "asset_id": "champion-3q-line-v0",
+            "role": "champion",
+            "visits": 100,
+            "cta_clicks": 20,
+            "line_adds": 5,
+            "line_add_rate": 0.05,
+            "sample_threshold_met": true
+          },
+          {
+            "asset_id": "challenger-week0-cta-text-v1",
+            "role": "challenger",
+            "visits": 99,
+            "cta_clicks": 20,
+            "line_adds": 6,
+            "line_add_rate": 0.0606,
+            "sample_threshold_met": false
+          }
+        ],
+        "champion": {
+          "asset_id": "champion-3q-line-v0",
+          "role": "champion",
+          "visits": 100,
+          "cta_clicks": 20,
+          "line_adds": 5,
+          "line_add_rate": 0.05,
+          "sample_threshold_met": true
+        },
+        "challenger": {
+          "asset_id": "challenger-week0-cta-text-v1",
+          "role": "challenger",
+          "visits": 99,
+          "cta_clicks": 20,
+          "line_adds": 6,
+          "line_add_rate": 0.0606,
+          "sample_threshold_met": false
+        },
+        "lift": 1.212,
+        "challenger_beats_sample_rate": false,
+        "decision": "continue_collecting_sample_gate_counts",
+        "no_quality_regression_checked": false,
+        "owner_review_required": true,
+        "promotion_performed": false
+      },
+      "real_event_write_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "production_deploy_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false,
+      "temp_files": {
+        "filled_ledger_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg/sample_gate_insufficient_keeps_collecting/sample_gate_ledger.filled.csv",
+        "compile_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg/sample_gate_insufficient_keeps_collecting/source_capture_compile_status.json",
+        "funnel_preview_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg/sample_gate_insufficient_keeps_collecting/compiled/funnel_aggregates.owner-preview.csv",
+        "manual_preview_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg/sample_gate_insufficient_keeps_collecting/compiled/manual_conversions.owner-preview.csv",
+        "events_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg/sample_gate_insufficient_keeps_collecting/sample_gate.preview.jsonl",
+        "funnel_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg/sample_gate_insufficient_keeps_collecting/funnel_aggregate_status.json",
+        "manual_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg/sample_gate_insufficient_keeps_collecting/manual_conversion_status.json"
+      },
+      "exit_codes": {
+        "source_capture_compile": 0,
+        "funnel": 0,
+        "manual": 0
+      }
+    },
+    {
+      "id": "sample_gate_ready_challenger_beats_rate",
+      "ok": true,
+      "description": "Challenger clears sample thresholds and beats the champion LINE add rate by more than 1.15x, but still queues owner review only.",
+      "expected": {
+        "challenger_sample_threshold_met": true,
+        "challenger_beats_sample_rate": true,
+        "decision": "queue_owner_review_no_auto_promotion"
+      },
+      "assertions": [
+        {
+          "name": "source_compile_ok",
+          "ok": true,
+          "expected": "owner_preview_ready",
+          "actual": "owner_preview_ready"
+        },
+        {
+          "name": "sample_rows_filled",
+          "ok": true,
+          "expected": "18:18",
+          "actual": "18:18"
+        },
+        {
+          "name": "importers_preview_ok",
+          "ok": true,
+          "expected": "preview importers ok",
+          "actual": "full_funnel_preview:preview"
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "challenger_sample_threshold",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "challenger_beats_sample_rate",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "decision",
+          "ok": true,
+          "expected": "queue_owner_review_no_auto_promotion",
+          "actual": "queue_owner_review_no_auto_promotion"
+        },
+        {
+          "name": "no_auto_promotion",
+          "ok": true,
+          "expected": "owner_review_required_no_promotion",
+          "actual": "true:false"
+        }
+      ],
+      "imported_events": 278,
+      "source_capture_compile": {
+        "ok": true,
+        "status": "owner_preview_ready",
+        "input_kind": "sample_gate_replay_fixture",
+        "ledger_rows_read": 18,
+        "filled_rows": 18,
+        "funnel_rows": 13,
+        "manual_rows": 5,
+        "issue_count": 0,
+        "data_lp_events_write_performed": false,
+        "external_effect": false
+      },
+      "importer_status": {
+        "funnel_ok": true,
+        "funnel_mode": "full_funnel_preview",
+        "funnel_events_written": 270,
+        "manual_ok": true,
+        "manual_mode": "preview",
+        "manual_events_written": 8,
+        "manual_append_performed": true,
+        "data_lp_events_write_performed": false
+      },
+      "sample_summary": {
+        "thresholds": {
+          "min_visits": 100,
+          "min_cta_clicks": 20,
+          "min_line_adds": 5,
+          "min_test_days": 3,
+          "preferred_test_days": 7
+        },
+        "assets": [
+          {
+            "asset_id": "champion-3q-line-v0",
+            "role": "champion",
+            "visits": 100,
+            "cta_clicks": 20,
+            "line_adds": 5,
+            "line_add_rate": 0.05,
+            "sample_threshold_met": true
+          },
+          {
+            "asset_id": "challenger-week0-cta-text-v1",
+            "role": "challenger",
+            "visits": 120,
+            "cta_clicks": 25,
+            "line_adds": 8,
+            "line_add_rate": 0.0667,
+            "sample_threshold_met": true
+          }
+        ],
+        "champion": {
+          "asset_id": "champion-3q-line-v0",
+          "role": "champion",
+          "visits": 100,
+          "cta_clicks": 20,
+          "line_adds": 5,
+          "line_add_rate": 0.05,
+          "sample_threshold_met": true
+        },
+        "challenger": {
+          "asset_id": "challenger-week0-cta-text-v1",
+          "role": "challenger",
+          "visits": 120,
+          "cta_clicks": 25,
+          "line_adds": 8,
+          "line_add_rate": 0.0667,
+          "sample_threshold_met": true
+        },
+        "lift": 1.334,
+        "challenger_beats_sample_rate": true,
+        "decision": "queue_owner_review_no_auto_promotion",
+        "no_quality_regression_checked": false,
+        "owner_review_required": true,
+        "promotion_performed": false
+      },
+      "real_event_write_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "production_deploy_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false,
+      "temp_files": {
+        "filled_ledger_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg/sample_gate_ready_challenger_beats_rate/sample_gate_ledger.filled.csv",
+        "compile_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg/sample_gate_ready_challenger_beats_rate/source_capture_compile_status.json",
+        "funnel_preview_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg/sample_gate_ready_challenger_beats_rate/compiled/funnel_aggregates.owner-preview.csv",
+        "manual_preview_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg/sample_gate_ready_challenger_beats_rate/compiled/manual_conversions.owner-preview.csv",
+        "events_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg/sample_gate_ready_challenger_beats_rate/sample_gate.preview.jsonl",
+        "funnel_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg/sample_gate_ready_challenger_beats_rate/funnel_aggregate_status.json",
+        "manual_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg/sample_gate_ready_challenger_beats_rate/manual_conversion_status.json"
+      },
+      "exit_codes": {
+        "source_capture_compile": 0,
+        "funnel": 0,
+        "manual": 0
+      }
+    },
+    {
+      "id": "sample_gate_ready_challenger_underperforms",
+      "ok": true,
+      "description": "Challenger clears sample thresholds but loses on LINE add rate, so the current challenger should be reworked or retired locally.",
+      "expected": {
+        "challenger_sample_threshold_met": true,
+        "challenger_beats_sample_rate": false,
+        "decision": "plan_rework_or_next_variable_after_owner_review"
+      },
+      "assertions": [
+        {
+          "name": "source_compile_ok",
+          "ok": true,
+          "expected": "owner_preview_ready",
+          "actual": "owner_preview_ready"
+        },
+        {
+          "name": "sample_rows_filled",
+          "ok": true,
+          "expected": "18:18",
+          "actual": "18:18"
+        },
+        {
+          "name": "importers_preview_ok",
+          "ok": true,
+          "expected": "preview importers ok",
+          "actual": "full_funnel_preview:preview"
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "challenger_sample_threshold",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "challenger_beats_sample_rate",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "decision",
+          "ok": true,
+          "expected": "plan_rework_or_next_variable_after_owner_review",
+          "actual": "plan_rework_or_next_variable_after_owner_review"
+        },
+        {
+          "name": "no_auto_promotion",
+          "ok": true,
+          "expected": "owner_review_required_no_promotion",
+          "actual": "true:false"
+        }
+      ],
+      "imported_events": 253,
+      "source_capture_compile": {
+        "ok": true,
+        "status": "owner_preview_ready",
+        "input_kind": "sample_gate_replay_fixture",
+        "ledger_rows_read": 18,
+        "filled_rows": 18,
+        "funnel_rows": 13,
+        "manual_rows": 5,
+        "issue_count": 0,
+        "data_lp_events_write_performed": false,
+        "external_effect": false
+      },
+      "importer_status": {
+        "funnel_ok": true,
+        "funnel_mode": "full_funnel_preview",
+        "funnel_events_written": 248,
+        "manual_ok": true,
+        "manual_mode": "preview",
+        "manual_events_written": 5,
+        "manual_append_performed": true,
+        "data_lp_events_write_performed": false
+      },
+      "sample_summary": {
+        "thresholds": {
+          "min_visits": 100,
+          "min_cta_clicks": 20,
+          "min_line_adds": 5,
+          "min_test_days": 3,
+          "preferred_test_days": 7
+        },
+        "assets": [
+          {
+            "asset_id": "champion-3q-line-v0",
+            "role": "champion",
+            "visits": 100,
+            "cta_clicks": 20,
+            "line_adds": 8,
+            "line_add_rate": 0.08,
+            "sample_threshold_met": true
+          },
+          {
+            "asset_id": "challenger-week0-cta-text-v1",
+            "role": "challenger",
+            "visits": 100,
+            "cta_clicks": 20,
+            "line_adds": 5,
+            "line_add_rate": 0.05,
+            "sample_threshold_met": true
+          }
+        ],
+        "champion": {
+          "asset_id": "champion-3q-line-v0",
+          "role": "champion",
+          "visits": 100,
+          "cta_clicks": 20,
+          "line_adds": 8,
+          "line_add_rate": 0.08,
+          "sample_threshold_met": true
+        },
+        "challenger": {
+          "asset_id": "challenger-week0-cta-text-v1",
+          "role": "challenger",
+          "visits": 100,
+          "cta_clicks": 20,
+          "line_adds": 5,
+          "line_add_rate": 0.05,
+          "sample_threshold_met": true
+        },
+        "lift": 0.625,
+        "challenger_beats_sample_rate": false,
+        "decision": "plan_rework_or_next_variable_after_owner_review",
+        "no_quality_regression_checked": false,
+        "owner_review_required": true,
+        "promotion_performed": false
+      },
+      "real_event_write_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "production_deploy_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false,
+      "temp_files": {
+        "filled_ledger_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg/sample_gate_ready_challenger_underperforms/sample_gate_ledger.filled.csv",
+        "compile_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg/sample_gate_ready_challenger_underperforms/source_capture_compile_status.json",
+        "funnel_preview_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg/sample_gate_ready_challenger_underperforms/compiled/funnel_aggregates.owner-preview.csv",
+        "manual_preview_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg/sample_gate_ready_challenger_underperforms/compiled/manual_conversions.owner-preview.csv",
+        "events_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg/sample_gate_ready_challenger_underperforms/sample_gate.preview.jsonl",
+        "funnel_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg/sample_gate_ready_challenger_underperforms/funnel_aggregate_status.json",
+        "manual_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-sample-gate-replay-slXuEg/sample_gate_ready_challenger_underperforms/manual_conversion_status.json"
+      },
+      "exit_codes": {
+        "source_capture_compile": 0,
+        "funnel": 0,
+        "manual": 0
+      }
+    }
+  ],
+  "local_fixture_commands_executed": true,
+  "source_capture_compile_commands_executed": true,
+  "importer_preview_commands_executed": true,
+  "sample_gate_ledger_replay_executed": true,
+  "real_events_unchanged": true,
+  "execution_performed": false,
+  "real_event_write_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Fixture-only sample-gate replay. It fills a temporary copy of the 18-row sample-gate ledger, compiles owner-preview CSVs, imports them to temporary JSONL, and checks sample threshold logic without writing data/lp_events.jsonl."
+}

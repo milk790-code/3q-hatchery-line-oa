@@ -1,0 +1,228 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:45:04.906Z",
+  "mode": "p0_counts_preflight_local_only",
+  "status": "waiting_for_owner_p0_counts",
+  "next_p0_inputs_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/next_p0_owner_inputs.json",
+  "paste_template_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/next_p0_quick_capture/next_p0_owner_inputs.counts-paste-template.txt",
+  "expected_count_key_count": 9,
+  "filled_count_key_count": 0,
+  "placeholder_count_key_count": 9,
+  "invalid_count_key_count": 0,
+  "metadata_ready": false,
+  "counts_ready": false,
+  "ready_for_quick_preview": false,
+  "missing_or_placeholder_keys": [
+    "champion.visits",
+    "champion.cta",
+    "champion.line",
+    "challenger.visits",
+    "challenger.cta",
+    "challenger.line",
+    "line_cta.visits",
+    "line_cta.cta",
+    "line_cta.line"
+  ],
+  "invalid_keys": [],
+  "unknown_keys": [],
+  "metadata": {
+    "capture_date": {
+      "state": "ready",
+      "value": "2026-07-11"
+    },
+    "evidence_ref": {
+      "state": "placeholder",
+      "value": "<aggregate_ref>"
+    },
+    "reviewer": {
+      "state": "placeholder",
+      "value": "<alias>"
+    },
+    "pii_checked": {
+      "state": "placeholder",
+      "value": "<yes_after_aggregate_only_review>"
+    }
+  },
+  "count_rows": [
+    {
+      "rank": "1",
+      "role": "champion",
+      "event_type": "page_view",
+      "tracking_link_id": "track-champion-3q-line-v0",
+      "paste_key": "champion.visits",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "evidence_rule": "只記 aggregate page views；不要存 IP、User-Agent、個人識別。",
+      "value": "<count>",
+      "state": "placeholder"
+    },
+    {
+      "rank": "2",
+      "role": "champion",
+      "event_type": "cta_click",
+      "tracking_link_id": "track-champion-3q-line-v0",
+      "paste_key": "champion.cta",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "evidence_rule": "只記 aggregate CTA clicks；不要存個別 session 明細。",
+      "value": "<count>",
+      "state": "placeholder"
+    },
+    {
+      "rank": "3",
+      "role": "champion",
+      "event_type": "line_add",
+      "tracking_link_id": "track-champion-3q-line-v0",
+      "paste_key": "champion.line",
+      "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+      "evidence_rule": "只記新增數或進線數；不要貼 LINE user id、暱稱、聊天內容。",
+      "value": "<count>",
+      "state": "placeholder"
+    },
+    {
+      "rank": "4",
+      "role": "challenger",
+      "event_type": "page_view",
+      "tracking_link_id": "track-challenger-week0-cta-text-v1",
+      "paste_key": "challenger.visits",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "evidence_rule": "只記 aggregate page views；不要存 IP、User-Agent、個人識別。",
+      "value": "<count>",
+      "state": "placeholder"
+    },
+    {
+      "rank": "5",
+      "role": "challenger",
+      "event_type": "cta_click",
+      "tracking_link_id": "track-challenger-week0-cta-text-v1",
+      "paste_key": "challenger.cta",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "evidence_rule": "只記 aggregate CTA clicks；不要存個別 session 明細。",
+      "value": "<count>",
+      "state": "placeholder"
+    },
+    {
+      "rank": "6",
+      "role": "challenger",
+      "event_type": "line_add",
+      "tracking_link_id": "track-challenger-week0-cta-text-v1",
+      "paste_key": "challenger.line",
+      "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+      "evidence_rule": "只記新增數或進線數；不要貼 LINE user id、暱稱、聊天內容。",
+      "value": "<count>",
+      "state": "placeholder"
+    },
+    {
+      "rank": "7",
+      "role": "line_cta",
+      "event_type": "page_view",
+      "tracking_link_id": "track-challenger-week0-cta-text-v1-line",
+      "paste_key": "line_cta.visits",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "evidence_rule": "只記 aggregate page views；不要存 IP、User-Agent、個人識別。",
+      "value": "<count>",
+      "state": "placeholder"
+    },
+    {
+      "rank": "8",
+      "role": "line_cta",
+      "event_type": "cta_click",
+      "tracking_link_id": "track-challenger-week0-cta-text-v1-line",
+      "paste_key": "line_cta.cta",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "evidence_rule": "只記 aggregate CTA clicks；不要存個別 session 明細。",
+      "value": "<count>",
+      "state": "placeholder"
+    },
+    {
+      "rank": "9",
+      "role": "line_cta",
+      "event_type": "line_add",
+      "tracking_link_id": "track-challenger-week0-cta-text-v1-line",
+      "paste_key": "line_cta.line",
+      "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+      "evidence_rule": "只記新增數或進線數；不要貼 LINE user id、暱稱、聊天內容。",
+      "value": "<count>",
+      "state": "placeholder"
+    }
+  ],
+  "issue_count": 0,
+  "warning_count": 12,
+  "issues": [],
+  "warnings": [
+    {
+      "field": "evidence_ref",
+      "message": "Metadata still has a placeholder.",
+      "code": "placeholder_metadata"
+    },
+    {
+      "field": "reviewer",
+      "message": "Metadata still has a placeholder.",
+      "code": "placeholder_metadata"
+    },
+    {
+      "field": "pii_checked",
+      "message": "Metadata still has a placeholder.",
+      "code": "placeholder_metadata"
+    },
+    {
+      "field": "champion.visits",
+      "message": "Count still has a placeholder.",
+      "code": "placeholder_count"
+    },
+    {
+      "field": "champion.cta",
+      "message": "Count still has a placeholder.",
+      "code": "placeholder_count"
+    },
+    {
+      "field": "champion.line",
+      "message": "Count still has a placeholder.",
+      "code": "placeholder_count"
+    },
+    {
+      "field": "challenger.visits",
+      "message": "Count still has a placeholder.",
+      "code": "placeholder_count"
+    },
+    {
+      "field": "challenger.cta",
+      "message": "Count still has a placeholder.",
+      "code": "placeholder_count"
+    },
+    {
+      "field": "challenger.line",
+      "message": "Count still has a placeholder.",
+      "code": "placeholder_count"
+    },
+    {
+      "field": "line_cta.visits",
+      "message": "Count still has a placeholder.",
+      "code": "placeholder_count"
+    },
+    {
+      "field": "line_cta.cta",
+      "message": "Count still has a placeholder.",
+      "code": "placeholder_count"
+    },
+    {
+      "field": "line_cta.line",
+      "message": "Count still has a placeholder.",
+      "code": "placeholder_count"
+    }
+  ],
+  "next_safe_action": "Fill metadata and all focused P0 aggregate count placeholders in the paste template.",
+  "recommended_command": "npm run next-p0:quick",
+  "live_input_files_created": false,
+  "owner_inbox_write_performed": false,
+  "stage_performed": false,
+  "data_lp_events_write_performed": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "external_effect": false,
+  "note": "Local paste-template preflight only. It validates aggregate P0 metadata/count placeholders before quick capture; it does not create live inputs, write events, stage data, deploy, push GitHub, post, push LINE, mutate customer data, process payments, or delete data."
+}

@@ -1,0 +1,269 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:47:27.530Z",
+  "status": "waiting_for_owner_evidence",
+  "mode": "owner_gate_evidence_intake",
+  "input_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/owner_gate_evidence.json",
+  "input_exists": false,
+  "example_input_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/owner_gate_evidence.example.json",
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/owner_gate_evidence.md",
+  "launch_readiness_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/launch_readiness.json",
+  "expected_github_target": {
+    "repo_url": "https://github.com/milk790-code/3q-hatchery-line-oa.git",
+    "branch_name": "codex/3q-growth-loop-champion-v1",
+    "commit_ref": "9b6fd00c082f2b67d6cde159e61dc6c407d02ea0"
+  },
+  "evidence_only": true,
+  "owner_decision_required": true,
+  "ready_gate_count": 0,
+  "evidence_gate_count": 0,
+  "non_manual_gate_count": 4,
+  "ready_for_post_gate_verification": false,
+  "issue_count": 0,
+  "invalid_evidence_issues": [],
+  "gate_issues": [],
+  "sensitive_evidence_detected": false,
+  "execution_performed": false,
+  "external_effect": false,
+  "remote_d1_create_performed": false,
+  "remote_d1_migration_performed": false,
+  "production_deploy_performed": false,
+  "public_link_change_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "gates": [
+    {
+      "gate_id": "remote_d1_create_and_migrate",
+      "approval_id": "approve-d1-create-and-migrate",
+      "risk_tier": "T2",
+      "prepared_artifact": "schema/d1-week0.sql",
+      "gate_status": "owner_approval_required",
+      "evidence_detected": false,
+      "evidence_valid": false,
+      "ready_for_post_gate_verification": false,
+      "recurring_aggregate_read_approved": false,
+      "manual_only": false,
+      "required_fields": [
+        "gate_id",
+        "operator_alias",
+        "executed_at",
+        "cloudflare_account_alias",
+        "d1_database_name",
+        "d1_database_id",
+        "schema_applied_at",
+        "recurring_aggregate_read_approved",
+        "verification_ref",
+        "rollback_ref"
+      ],
+      "optional_fields": [
+        "notes_ref"
+      ],
+      "missing_fields": [
+        "operator_alias",
+        "executed_at",
+        "cloudflare_account_alias",
+        "d1_database_name",
+        "d1_database_id",
+        "schema_applied_at",
+        "recurring_aggregate_read_approved",
+        "verification_ref",
+        "rollback_ref"
+      ],
+      "placeholder_fields": [],
+      "unknown_fields": [],
+      "sensitive_or_customer_fields": [],
+      "field_validation_errors": [],
+      "blocked_reasons": [
+        "owner_gate_evidence.json has no evidence entry for this gate.",
+        "missing_fields=operator_alias,executed_at,cloudflare_account_alias,d1_database_name,d1_database_id,schema_applied_at,recurring_aggregate_read_approved,verification_ref,rollback_ref"
+      ],
+      "gate_external_effect": true,
+      "evidence_intake_external_effect": false,
+      "execution_policy": "owner_executed_evidence_only",
+      "executed_by_this_script": false
+    },
+    {
+      "gate_id": "candidate_worker_production_deploy",
+      "approval_id": "approve-candidate-worker-deploy",
+      "risk_tier": "T3",
+      "prepared_artifact": "live_telemetry_readiness.md",
+      "gate_status": "owner_approval_required",
+      "evidence_detected": false,
+      "evidence_valid": false,
+      "ready_for_post_gate_verification": false,
+      "recurring_aggregate_read_approved": false,
+      "manual_only": false,
+      "required_fields": [
+        "gate_id",
+        "operator_alias",
+        "executed_at",
+        "worker_name",
+        "worker_url",
+        "health_status",
+        "verification_ref",
+        "rollback_ref"
+      ],
+      "optional_fields": [
+        "route_ref",
+        "notes_ref"
+      ],
+      "missing_fields": [
+        "operator_alias",
+        "executed_at",
+        "worker_name",
+        "worker_url",
+        "health_status",
+        "verification_ref",
+        "rollback_ref"
+      ],
+      "placeholder_fields": [],
+      "unknown_fields": [],
+      "sensitive_or_customer_fields": [],
+      "field_validation_errors": [],
+      "blocked_reasons": [
+        "owner_gate_evidence.json has no evidence entry for this gate.",
+        "missing_fields=operator_alias,executed_at,worker_name,worker_url,health_status,verification_ref,rollback_ref"
+      ],
+      "gate_external_effect": true,
+      "evidence_intake_external_effect": false,
+      "execution_policy": "owner_executed_evidence_only",
+      "executed_by_this_script": false
+    },
+    {
+      "gate_id": "public_ab_small_traffic_link",
+      "approval_id": "approve-small-ab-link",
+      "risk_tier": "T3",
+      "prepared_artifact": "ab_test_status.json",
+      "gate_status": "owner_approval_required",
+      "evidence_detected": false,
+      "evidence_valid": false,
+      "ready_for_post_gate_verification": false,
+      "recurring_aggregate_read_approved": false,
+      "manual_only": false,
+      "required_fields": [
+        "gate_id",
+        "operator_alias",
+        "executed_at",
+        "champion_url",
+        "public_surface",
+        "ab_url",
+        "traffic_share_challenger",
+        "rollback_url",
+        "verification_ref"
+      ],
+      "optional_fields": [
+        "notes_ref"
+      ],
+      "missing_fields": [
+        "operator_alias",
+        "executed_at",
+        "champion_url",
+        "public_surface",
+        "ab_url",
+        "traffic_share_challenger",
+        "rollback_url",
+        "verification_ref"
+      ],
+      "placeholder_fields": [],
+      "unknown_fields": [],
+      "sensitive_or_customer_fields": [],
+      "field_validation_errors": [],
+      "blocked_reasons": [
+        "owner_gate_evidence.json has no evidence entry for this gate.",
+        "missing_fields=operator_alias,executed_at,champion_url,public_surface,ab_url,traffic_share_challenger,rollback_url,verification_ref"
+      ],
+      "gate_external_effect": true,
+      "evidence_intake_external_effect": false,
+      "execution_policy": "owner_executed_evidence_only",
+      "executed_by_this_script": false
+    },
+    {
+      "gate_id": "github_repo_branch_pr",
+      "approval_id": "approve-github-repo-and-pr",
+      "risk_tier": "T2",
+      "prepared_artifact": "champion_github_handoff.md",
+      "gate_status": "owner_approval_required",
+      "evidence_detected": false,
+      "evidence_valid": false,
+      "ready_for_post_gate_verification": false,
+      "recurring_aggregate_read_approved": false,
+      "manual_only": false,
+      "required_fields": [
+        "gate_id",
+        "operator_alias",
+        "executed_at",
+        "repo_url",
+        "branch_name",
+        "pr_url",
+        "commit_ref"
+      ],
+      "optional_fields": [
+        "notes_ref"
+      ],
+      "missing_fields": [
+        "operator_alias",
+        "executed_at",
+        "repo_url",
+        "branch_name",
+        "pr_url",
+        "commit_ref"
+      ],
+      "placeholder_fields": [],
+      "unknown_fields": [],
+      "sensitive_or_customer_fields": [],
+      "field_validation_errors": [],
+      "blocked_reasons": [
+        "owner_gate_evidence.json has no evidence entry for this gate.",
+        "missing_fields=operator_alias,executed_at,repo_url,branch_name,pr_url,commit_ref"
+      ],
+      "gate_external_effect": true,
+      "evidence_intake_external_effect": false,
+      "execution_policy": "owner_executed_evidence_only",
+      "executed_by_this_script": false
+    },
+    {
+      "gate_id": "formal_posts_line_push_payment_customer_data",
+      "approval_id": null,
+      "risk_tier": "T3",
+      "prepared_artifact": "weekly_report.md",
+      "gate_status": "manual_only",
+      "evidence_detected": false,
+      "evidence_valid": false,
+      "ready_for_post_gate_verification": false,
+      "recurring_aggregate_read_approved": false,
+      "manual_only": true,
+      "required_fields": [
+        "gate_id",
+        "operator_alias",
+        "executed_at",
+        "manual_only_acknowledged",
+        "notes_ref"
+      ],
+      "optional_fields": [],
+      "missing_fields": [
+        "operator_alias",
+        "executed_at",
+        "manual_only_acknowledged",
+        "notes_ref"
+      ],
+      "placeholder_fields": [],
+      "unknown_fields": [],
+      "sensitive_or_customer_fields": [],
+      "field_validation_errors": [],
+      "blocked_reasons": [
+        "owner_gate_evidence.json has no evidence entry for this gate.",
+        "missing_fields=operator_alias,executed_at,manual_only_acknowledged,notes_ref"
+      ],
+      "gate_external_effect": true,
+      "evidence_intake_external_effect": false,
+      "execution_policy": "manual_only_no_autorun",
+      "executed_by_this_script": false
+    }
+  ],
+  "next_safe_action": "Copy owner_gate_evidence.example.json to owner_gate_evidence.json only after owner-executed external gates are complete, then rerun npm run owner:evidence.",
+  "note": "Evidence intake validates owner-supplied, non-secret post-gate metadata only. It never deploys, posts, pushes, changes public links, touches LINE, mutates customer data, handles payment, or deletes data."
+}

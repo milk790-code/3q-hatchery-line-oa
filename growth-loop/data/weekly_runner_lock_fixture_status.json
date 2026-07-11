@@ -1,0 +1,87 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:43:28.412Z",
+  "mode": "isolated_weekly_runner_lock_policy_fixtures",
+  "owner_identity_fields": [
+    "pid",
+    "process_start",
+    "command_sha256"
+  ],
+  "recovery_compare_before_rename": true,
+  "replacement_owner_delete_prevented": true,
+  "exclusive_recovery_claim_proven": true,
+  "filesystem_replacement_owner_preserved": true,
+  "pid_reuse_detected": true,
+  "cases": [
+    {
+      "id": "active_owner_over_four_hours_is_never_recovered",
+      "expected": "keep_active_owner",
+      "observed": "keep_active_owner",
+      "ok": true
+    },
+    {
+      "id": "active_owner_unknown_age_is_never_recovered",
+      "expected": "keep_active_owner",
+      "observed": "keep_active_owner",
+      "ok": true
+    },
+    {
+      "id": "active_owner_identity_unavailable_fails_closed",
+      "expected": "keep_active_owner_identity_unverified",
+      "observed": "keep_active_owner_identity_unverified",
+      "ok": true
+    },
+    {
+      "id": "pid_reuse_identity_mismatch_is_recovered",
+      "expected": "recover_pid_reused_owner",
+      "observed": "recover_pid_reused_owner",
+      "ok": true
+    },
+    {
+      "id": "dead_owner_is_recovered",
+      "expected": "recover_stale_or_dead_owner",
+      "observed": "recover_stale_or_dead_owner",
+      "ok": true
+    },
+    {
+      "id": "fresh_partial_lock_gets_startup_grace",
+      "expected": "keep_fresh_unknown_owner",
+      "observed": "keep_fresh_unknown_owner",
+      "ok": true
+    },
+    {
+      "id": "old_invalid_lock_is_recovered",
+      "expected": "recover_stale_or_dead_owner",
+      "observed": "recover_stale_or_dead_owner",
+      "ok": true
+    },
+    {
+      "id": "recovery_claim_same_owner_is_recoverable",
+      "expected": "recover_claimed_owner",
+      "observed": "recover_claimed_owner",
+      "ok": true
+    },
+    {
+      "id": "recovery_race_never_removes_replacement_owner",
+      "expected": "abort_lock_replaced",
+      "observed": "abort_lock_replaced",
+      "ok": true
+    },
+    {
+      "id": "two_recoverers_have_one_exclusive_claim",
+      "expected": "one_recoverer_claimed",
+      "observed": "one_recoverer_claimed",
+      "ok": true
+    },
+    {
+      "id": "filesystem_recovery_race_preserves_replacement_owner",
+      "expected": "replacement_owner_preserved",
+      "observed": "replacement_owner_preserved",
+      "ok": true
+    }
+  ],
+  "external_effect": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "delete_action_performed": false
+}

@@ -1,0 +1,108 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:45:59.846Z",
+  "mode": "manual_publish_brief_local_only",
+  "status": "prepared_but_blocked_public_tracking_url",
+  "round_id": "week0-cta-text",
+  "changed_variable": "cta_text",
+  "one_variable_rule_ok": true,
+  "selection_rule": "first_packet_lowest_packet_id_current_round",
+  "selected_packet_id": "manual-publish-01-week0-post-001-cta-v1-diagnostic",
+  "selected_content_id": "week0-post-001",
+  "selected_variant_id": "cta-v1-diagnostic",
+  "selected_cta_text": "加 LINE 領 48h 成交診斷",
+  "selected_surface": "Facebook / Threads / LINE draft",
+  "draft_caption": "頁面有流量但沒人加 LINE，通常不是你不會賣，而是 hook、offer、視覺主張、CTA 有一段斷掉。這輪我只測 CTA，不動主連結、不碰客戶資料。想先知道漏在哪，先走 48h 成交診斷。",
+  "tracking_url": "http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=cta-v1-diagnostic&content_id=week0-post-001",
+  "tracking_url_public_ready": false,
+  "public_tracking_url_required_before_formal_publish": true,
+  "public_tracking_url_gate_reason": "selected tracking URL is local-only or missing; do not place it in public traffic",
+  "candidate_page": "landing_page_candidate.html",
+  "candidate_worker": "worker.ts",
+  "line_inbound_reply_template": "我先幫你抓漏斗斷點。你不用重做整站，先回覆目前最像哪一段卡住：有點擊沒進 LINE / 進 LINE 不留資 / 留資不成交 / 還不確定。",
+  "lead_qualification_reply_template": "收到。我會用 48h 成交診斷看三件事：入口、CTA、LINE 後續。請用選項回：在地服務 / 電商 / 課程顧問 / B2B / 其他，還有近 7 天點擊量大概 0-99 / 100-499 / 500+ / 不確定。",
+  "line_inbound_only": true,
+  "line_manual_reply_only": true,
+  "aggregate_or_pseudonymous_only": true,
+  "sample_threshold_met": false,
+  "challenger_win_rule_met": false,
+  "no_quality_regression": true,
+  "packet_count": 3,
+  "sample_gate_row_count": 3,
+  "north_star_capture_row_count": 7,
+  "observation_checkpoints": [
+    {
+      "checkpoint": "day_0",
+      "status": "owner_manual_publish_gate",
+      "owner_action": "If approved, manually publish exactly one packet and record the surface plus timestamp outside this runner.",
+      "automation_action": "No automatic post, schedule, public-link change, LINE push, or deploy."
+    },
+    {
+      "checkpoint": "day_3",
+      "status": "minimum_test_day_check",
+      "owner_action": "Collect aggregate page_view, cta_click, and line_add counts for this packet only.",
+      "sample_gate_rule": "Minimum days before any decision: 3"
+    },
+    {
+      "checkpoint": "day_7",
+      "status": "preferred_test_window_check",
+      "owner_action": "Refresh aggregate counts, then run the local owner sample-gate and North Star checks.",
+      "sample_gate_rule": "Preferred test days: 7"
+    }
+  ],
+  "sample_gate_required_events": [
+    "page_view",
+    "cta_click",
+    "line_add"
+  ],
+  "north_star_events": [
+    "link_click",
+    "line_add",
+    "lead_submit",
+    "deal"
+  ],
+  "owner_manual_publish_required": true,
+  "owner_exact_copy_surface_time_required": true,
+  "formal_publish_ready": false,
+  "evidence_status": "waiting_for_owner_manual_publish_evidence",
+  "evidence_waiting_for_owner": true,
+  "evidence_artifacts": {
+    "form": "manual_publish_evidence_form.html",
+    "intake_report": "manual_publish_evidence.md",
+    "example_json": "manual_publish_evidence.example.json",
+    "status_json": "data/manual_publish_evidence_status.json"
+  },
+  "next_safe_actions": [
+    "Review the selected caption and LINE handoff locally only.",
+    "Approve or prepare the public tracking URL / candidate Worker gate before any formal post.",
+    "After the owner manually publishes exactly one reviewed packet, fill manual_publish_evidence_form.html with non-sensitive evidence only."
+  ],
+  "blocked_actions": [
+    "formal_social_post",
+    "schedule_social_post",
+    "change_primary_social_or_bio_link",
+    "promote_challenger_to_champion",
+    "line_push_or_broadcast",
+    "production_worker_deploy",
+    "github_push_or_pr_creation",
+    "customer_data_mutation",
+    "ecpay_payment_refund_or_capture",
+    "delete_data_or_retire_live_assets"
+  ],
+  "issues": [],
+  "outputs": {
+    "brief_json": "manual_publish_brief.json",
+    "brief_md": "manual_publish_brief.md",
+    "status_json": "data/manual_publish_brief_status.json"
+  },
+  "external_effect": false,
+  "data_lp_events_write_performed": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

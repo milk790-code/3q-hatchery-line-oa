@@ -1,0 +1,106 @@
+name: 3Q Growth Loop Weekly Verification
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Sunday 00:10 Asia/Taipei. GitHub cron is UTC.
+    - cron: "10 16 * * 6"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: 3q-growth-loop-weekly
+  cancel-in-progress: false
+
+jobs:
+  verify-local-engine:
+    name: Verify local-only growth loop artifacts
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: growth-loop/package-lock.json
+
+      - name: Install dependencies
+        working-directory: growth-loop
+        run: npm ci
+
+      - name: Verify local-only artifacts
+        working-directory: growth-loop
+        run: npm run verify
+
+      - name: Upload review artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: 3q-growth-loop-weekly-review
+          retention-days: 14
+          if-no-files-found: error
+          path: |
+            growth-loop/weekly_report.md
+            growth-loop/growth_scores.json
+            growth-loop/approval_queue.json
+            growth-loop/ab_test_status.json
+            growth-loop/tracking_links.json
+            growth-loop/worker_dry_run.md
+            growth-loop/data/worker_dry_run_status.json
+            growth-loop/champion_integration_candidate.md
+            growth-loop/data/champion_integration_candidate_status.json
+            growth-loop/champion_source_lock_fixtures.md
+            growth-loop/data/champion_source_lock_fixture_status.json
+            growth-loop/weekly_runner_lock_fixtures.md
+            growth-loop/data/weekly_runner_lock_fixture_status.json
+            growth-loop/champion_integration_smoke.md
+            growth-loop/data/champion_integration_smoke_status.json
+            growth-loop/cloudflare_d1_readiness.md
+            growth-loop/data/cloudflare_d1_readiness_status.json
+            growth-loop/data/cloudflare_d1_inventory_snapshot.json
+            growth-loop/live_telemetry_readiness.md
+            growth-loop/data/live_telemetry_readiness_status.json
+            growth-loop/data/live_telemetry_observation_snapshot.json
+            growth-loop/live_telemetry_readiness_fixture_report.md
+            growth-loop/data/live_telemetry_readiness_fixture_status.json
+            growth-loop/d1_schema_contract.md
+            growth-loop/data/d1_schema_contract_status.json
+            growth-loop/approved_d1_config.md
+            growth-loop/data/approved_d1_config_status.json
+            growth-loop/champion_local_branch.md
+            growth-loop/data/champion_local_branch_status.json
+            growth-loop/champion_release_preflight.md
+            growth-loop/data/champion_release_preflight_status.json
+            growth-loop/data/champion_live_deployment_snapshot.json
+            growth-loop/champion_release_owner_packet.md
+            growth-loop/champion_release_owner_packet.json
+            growth-loop/champion_github_handoff.md
+            growth-loop/champion_github_pr_body.md
+            growth-loop/data/champion_github_handoff_status.json
+            growth-loop/integrations/3q-site/generated/worker.candidate.patch
+            growth-loop/funnel_breakdown.md
+            growth-loop/funnel_breakdown.json
+            growth-loop/next_round_plan.md
+            growth-loop/prepared_but_blocked.json
+            growth-loop/objective_sequence_audit.md
+            growth-loop/objective_sequence_audit.json
+            growth-loop/d1_collection_guard.md
+            growth-loop/github_export_manifest.md
+            growth-loop/owner_approval_pack.md
+            growth-loop/sample_gate_collection_sprint.md
+            growth-loop/sample_gate_collection_sprint.json
+            growth-loop/data/sample_gate_collection_sprint_status.json
+            growth-loop/source_trust_matrix.md
+            growth-loop/source_trust_matrix.json
+            growth-loop/data/source_trust_matrix_status.json
+            growth-loop/artifact_retention_review_pack.md
+            growth-loop/artifact_retention_review_pack.json
+            growth-loop/data/artifact_retention_review_status.json
+            growth-loop/gate_readiness.md
+            growth-loop/data/weekly_runner_status.json
+            growth-loop/data/gate_readiness_status.json

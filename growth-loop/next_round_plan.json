@@ -1,0 +1,84 @@
+{
+  "generated_at": "2026-07-10T21:48:20.571Z",
+  "week": {
+    "start": "2026-06-29",
+    "end": "2026-07-05",
+    "startUtc": "2026-06-28T16:00:00.000Z",
+    "endUtc": "2026-07-05T15:59:59.999Z"
+  },
+  "status": "continue_current_round",
+  "decision": "continue_current_round_until_sample_threshold",
+  "rationale": "Sample is insufficient, so the loop keeps the current one-variable test and does not create a new variable round.",
+  "current_round": {
+    "round_id": "week0-cta-text",
+    "changed_variable": "cta_text",
+    "hypothesis": "A concrete 48h diagnostic CTA will produce more LINE adds than a broad free-service CTA without reducing lead quality.",
+    "asset_id": "challenger-week0-cta-text-v1"
+  },
+  "next_round": {
+    "round_id": "week0-cta-text-continue",
+    "changed_variable": "cta_text",
+    "rotation_candidate_after_current": "hook",
+    "start_new_variable_round": false,
+    "one_variable_rule_ok": true,
+    "generated_candidate_performed": false,
+    "public_link_change_performed": false,
+    "production_deploy_performed": false,
+    "formal_post_performed": false,
+    "line_push_performed": false,
+    "customer_data_mutation_performed": false,
+    "payment_action_performed": false,
+    "delete_action_performed": false
+  },
+  "sample_gate": {
+    "sample_threshold_met": false,
+    "preferred_test_days": 7,
+    "min_visits": 100,
+    "min_cta_clicks": 20,
+    "min_line_adds": 5,
+    "min_test_days": 3,
+    "observed_visits": 0,
+    "observed_cta_clicks": 0,
+    "observed_line_adds": 0,
+    "observed_test_days": 0,
+    "gaps": {
+      "visits": 100,
+      "cta_clicks": 20,
+      "line_adds": 5,
+      "test_days": 3
+    }
+  },
+  "win_gate": {
+    "metric": "line_add_rate",
+    "challenger_lift_required": 1.15,
+    "challenger_win_rule_met": false,
+    "no_quality_regression": true,
+    "lift": null,
+    "champion_line_add_rate": 0,
+    "challenger_line_add_rate": 0
+  },
+  "candidate_action": "keep_testing_current_challenger",
+  "retirement_queue_status": "no_retirement_sample_insufficient_or_not_needed",
+  "approval_gate": {
+    "review_required": true,
+    "artifact": "next_round_plan.md",
+    "human_gate": "Review the next-round decision before public posting, link changes, production deploy, or challenger promotion.",
+    "external_effect": false
+  },
+  "draft_brief": {
+    "mode": "continue_existing_variable",
+    "changed_variable": "cta_text",
+    "instruction": "Do not introduce a new variable yet. Keep collecting evidence for the current challenger until sample thresholds are met.",
+    "locked_variables_policy": "All other variables stay locked."
+  },
+  "safety_invariants": {
+    "no_external_send": true,
+    "no_production_deploy": true,
+    "no_primary_link_change": true,
+    "no_champion_promotion": true,
+    "no_line_push": true,
+    "no_payment_action": true,
+    "no_customer_data_mutation": true,
+    "no_data_delete": true
+  }
+}

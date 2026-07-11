@@ -1,0 +1,64 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:48:22.109Z",
+  "mode": "owner_approval_form",
+  "status": "ready_local_owner_approval_form",
+  "form_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/owner_approval_form.html",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/owner_approval_form_status.json",
+  "owner_input_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/owner_approval_input.json",
+  "owner_input_exists": false,
+  "approval_resume_status": "prepared_but_blocked",
+  "launch_readiness_status": "owner_approval_required",
+  "form_gate_count": 4,
+  "excluded_manual_gate_count": 1,
+  "excluded_manual_gates": [
+    "formal_posts_line_push_payment_customer_data"
+  ],
+  "required_owner_fields": {
+    "remote_d1_create_and_migrate": [
+      "approved_by",
+      "approved_at",
+      "cloudflare_account_alias",
+      "d1_database_name",
+      "d1_database_id"
+    ],
+    "candidate_worker_production_deploy": [
+      "approved_by",
+      "approved_at",
+      "worker_name",
+      "worker_url",
+      "rollback_plan"
+    ],
+    "public_ab_small_traffic_link": [
+      "approved_by",
+      "approved_at",
+      "champion_url",
+      "public_surface",
+      "rollback_url"
+    ],
+    "github_repo_branch_pr": [
+      "approved_by",
+      "approved_at",
+      "repo_url",
+      "branch_name"
+    ]
+  },
+  "download_filename": "owner_approval_input.json",
+  "review_download_filename": "owner_approval_form.review.json",
+  "browser_only": true,
+  "browser_persistence": false,
+  "form_action": "none",
+  "network_calls_performed": false,
+  "live_input_files_created": false,
+  "approval_input_write_performed": false,
+  "external_effect": false,
+  "data_lp_events_write_performed": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

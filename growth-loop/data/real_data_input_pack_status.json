@@ -1,0 +1,91 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:44:14.154Z",
+  "mode": "real_data_input_pack",
+  "status": "template_ready",
+  "week": {
+    "start": "2026-07-06",
+    "end": "2026-07-12"
+  },
+  "output_dir": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/real_data_input_pack",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/real_data_input_pack_status.json",
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/real_data_input_pack.md",
+  "template_only": true,
+  "owner_review_required": true,
+  "live_input_files_created": false,
+  "real_events_before": 0,
+  "real_events_after": 0,
+  "real_events_unchanged": true,
+  "templates": [
+    {
+      "source_id": "funnel_aggregates",
+      "label": "Full-funnel aggregate fill template",
+      "template_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/real_data_input_pack/funnel_aggregates.fill-template.csv",
+      "live_target": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/funnel_aggregates.csv",
+      "rows": 42,
+      "expected_event_types": [
+        "link_click",
+        "page_view",
+        "cta_click",
+        "line_add",
+        "lead_submit",
+        "deal",
+        "quality_flag"
+      ],
+      "required_owner_action": "Fill the count column with reviewed aggregate numbers, then copy to data/funnel_aggregates.csv before preview/apply."
+    },
+    {
+      "source_id": "manual_conversions",
+      "label": "Manual LINE / lead / deal conversion fill template",
+      "template_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/real_data_input_pack/manual_conversions.fill-template.csv",
+      "live_target": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/manual_conversions.csv",
+      "rows": 20,
+      "expected_event_types": [
+        "line_add",
+        "lead_submit",
+        "deal",
+        "quality_flag"
+      ],
+      "required_owner_action": "Fill the count column with reviewed aggregate LINE/customer-service outcomes, then copy to data/manual_conversions.csv before preview/apply."
+    }
+  ],
+  "live_inputs": [
+    {
+      "source_id": "funnel_aggregates",
+      "live_target": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/funnel_aggregates.csv",
+      "exists_now": false
+    },
+    {
+      "source_id": "manual_conversions",
+      "live_target": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/manual_conversions.csv",
+      "exists_now": false
+    }
+  ],
+  "copy_commands_after_fill": [
+    "cp data/real_data_input_pack/funnel_aggregates.fill-template.csv data/funnel_aggregates.csv",
+    "cp data/real_data_input_pack/manual_conversions.fill-template.csv data/manual_conversions.csv"
+  ],
+  "follow_up_commands_after_copy": [
+    "npm run real-data:intake",
+    "npm run event:quality",
+    "npm run week0"
+  ],
+  "safety_rules": [
+    "Templates live under data/real_data_input_pack/ and are not scored.",
+    "The script never creates data/funnel_aggregates.csv or data/manual_conversions.csv.",
+    "The count column is intentionally blank; importers reject blank counts until reviewed aggregate numbers are filled.",
+    "Do not include phone, email, LINE user ID, customer name, address, payment fields, private notes, messages, or conversation text."
+  ],
+  "apply_performed": false,
+  "append_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

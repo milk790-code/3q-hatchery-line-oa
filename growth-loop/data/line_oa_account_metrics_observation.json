@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "observed_at": "2026-07-10T14:05:00Z",
+  "source": "LINE Official Account Manager home analytics table",
+  "scope": "account_wide_non_attributable",
+  "period": {
+    "start": "2026-07-03",
+    "end": "2026-07-09"
+  },
+  "metrics": {
+    "added_friends": {
+      "start": 11,
+      "end": 12,
+      "change": 1
+    },
+    "target_friends": {
+      "start": 10,
+      "end": 11,
+      "change": 1
+    },
+    "blocked": {
+      "start": 1,
+      "end": 1,
+      "change": 0
+    }
+  },
+  "scoring_eligible": false,
+  "sample_gate_eligible": false,
+  "reason": "The dashboard total has no Growth Loop tracking context and cannot be allocated to champion, challenger, LINE CTA, or content variants.",
+  "customer_level_data_read": false,
+  "customer_level_data_stored": false,
+  "external_write_performed": false
+}

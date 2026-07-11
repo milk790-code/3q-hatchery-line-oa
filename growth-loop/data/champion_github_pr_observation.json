@@ -1,0 +1,40 @@
+{
+  "ok": true,
+  "observed_at": "2026-07-10T14:09:28Z",
+  "source": "GitHub CLI read-only PR view",
+  "repository": "milk790-code/3q-hatchery-line-oa",
+  "pull_request": {
+    "number": 74,
+    "url": "https://github.com/milk790-code/3q-hatchery-line-oa/pull/74",
+    "state": "OPEN",
+    "is_draft": true,
+    "merge_state_status": "CLEAN",
+    "mergeable": "MERGEABLE",
+    "base_branch": "main",
+    "head_branch": "codex/3q-growth-loop-champion-v1",
+    "head_sha": "9b6fd00c082f2b67d6cde159e61dc6c407d02ea0",
+    "changed_paths": [
+      ".github/workflows/deploy-3q-site.yml",
+      "workers/3q-site/worker.js"
+    ],
+    "checks": [
+      {
+        "workflow": "js-syntax",
+        "name": "node-check",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "workflow": "js-syntax",
+        "name": "node-check",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      }
+    ]
+  },
+  "draft_pr_gate_satisfied": true,
+  "merge_performed": false,
+  "production_deploy_performed": false,
+  "next_gate": "owner_review_before_merge_and_production_deploy",
+  "external_write_performed_by_this_observation": false
+}

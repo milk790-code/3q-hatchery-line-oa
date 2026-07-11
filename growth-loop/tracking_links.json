@@ -1,0 +1,116 @@
+{
+  "generated_at": "2026-07-10T21:48:20.708Z",
+  "week": {
+    "start": "2026-06-29",
+    "end": "2026-07-05",
+    "startUtc": "2026-06-28T16:00:00.000Z",
+    "endUtc": "2026-07-05T15:59:59.999Z"
+  },
+  "base_url": "http://127.0.0.1:8787",
+  "public_link_change_performed": false,
+  "links": [
+    {
+      "link_id": "track-champion-3q-line-v0",
+      "asset_id": "champion-3q-line-v0",
+      "role": "champion",
+      "status": "champion_live_verified_read_only",
+      "target": "champion",
+      "tracking_url": "http://127.0.0.1:8787/r/champion-3q-line-v0?to=champion&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=champion-3q-line-v0&content_id=2026-06-29-champion",
+      "destination_url": "https://3q-site.milk790.workers.dev/",
+      "line_url": "https://lin.ee/VZvs7sj",
+      "external_effect": false,
+      "human_gate": "Live champion URL verified read-only; do not change public routing without owner approval."
+    },
+    {
+      "link_id": "track-challenger-week0-cta-text-v1",
+      "asset_id": "challenger-week0-cta-text-v1",
+      "role": "challenger",
+      "status": "candidate_local_only",
+      "target": "challenger",
+      "tracking_url": "http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=challenger-week0-cta-text-v1&content_id=2026-06-29-challenger",
+      "destination_url": "landing_page_candidate.html",
+      "line_url": "https://lin.ee/VZvs7sj",
+      "external_effect": false,
+      "human_gate": "Do not place this URL in public bio/post until owner approves small-traffic test."
+    },
+    {
+      "link_id": "track-challenger-week0-cta-text-v1-line",
+      "asset_id": "challenger-week0-cta-text-v1",
+      "role": "line_cta",
+      "status": "candidate_local_only",
+      "target": "line",
+      "tracking_url": "http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=line&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=challenger-week0-cta-text-v1-line&content_id=2026-06-29-line-cta",
+      "destination_url": "https://lin.ee/VZvs7sj",
+      "line_url": "https://lin.ee/VZvs7sj",
+      "external_effect": false,
+      "human_gate": "Do not use this LINE tracking redirect in public traffic until owner approves."
+    },
+    {
+      "link_id": "post-week0-post-001-cta-v1-diagnostic",
+      "asset_id": "challenger-week0-cta-text-v1",
+      "role": "content_variant",
+      "status": "draft_only_human_publish_required",
+      "target": "challenger",
+      "surface": "Facebook / Threads / LINE draft",
+      "content_id": "week0-post-001",
+      "variant_id": "cta-v1-diagnostic",
+      "changed_variable": "cta_text",
+      "cta_text": "加 LINE 領 48h 成交診斷",
+      "tracking_url": "http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=cta-v1-diagnostic&content_id=week0-post-001",
+      "destination_url": "landing_page_candidate.html",
+      "line_url": "https://lin.ee/VZvs7sj",
+      "external_effect": false,
+      "human_gate": "Draft-only post tracking link. Do not publish, schedule, or place it in public traffic until owner approves the exact surface and copy."
+    },
+    {
+      "link_id": "post-week0-post-002-cta-v2-audit",
+      "asset_id": "challenger-week0-cta-text-v1",
+      "role": "content_variant",
+      "status": "draft_only_human_publish_required",
+      "target": "challenger",
+      "surface": "Facebook / Threads / LINE draft",
+      "content_id": "week0-post-002",
+      "variant_id": "cta-v2-audit",
+      "changed_variable": "cta_text",
+      "cta_text": "丟頁面，先抓成交斷點",
+      "tracking_url": "http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=cta-v2-audit&content_id=week0-post-002",
+      "destination_url": "landing_page_candidate.html",
+      "line_url": "https://lin.ee/VZvs7sj",
+      "external_effect": false,
+      "human_gate": "Draft-only post tracking link. Do not publish, schedule, or place it in public traffic until owner approves the exact surface and copy."
+    },
+    {
+      "link_id": "post-week0-post-003-cta-v3-sample",
+      "asset_id": "challenger-week0-cta-text-v1",
+      "role": "content_variant",
+      "status": "draft_only_human_publish_required",
+      "target": "challenger",
+      "surface": "Facebook / Threads / LINE draft",
+      "content_id": "week0-post-003",
+      "variant_id": "cta-v3-sample",
+      "changed_variable": "cta_text",
+      "cta_text": "先拿一版可測 CTA",
+      "tracking_url": "http://127.0.0.1:8787/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=cta-v3-sample&content_id=week0-post-003",
+      "destination_url": "landing_page_candidate.html",
+      "line_url": "https://lin.ee/VZvs7sj",
+      "external_effect": false,
+      "human_gate": "Draft-only post tracking link. Do not publish, schedule, or place it in public traffic until owner approves the exact surface and copy."
+    },
+    {
+      "link_id": "ab-ab-week0-cta-text-001",
+      "asset_id": "champion-3q-line-v0:challenger-week0-cta-text-v1",
+      "role": "ab_small_traffic",
+      "status": "draft_needs_human_link_gate",
+      "target": "ab_router",
+      "tracking_url": "http://127.0.0.1:8787/ab/ab-week0-cta-text-001?utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&content_id=2026-06-29-ab-router",
+      "destination_url": "http://127.0.0.1:8787/ab/ab-week0-cta-text-001",
+      "line_url": "https://lin.ee/VZvs7sj",
+      "external_effect": false,
+      "traffic_allocation": {
+        "champion": 90,
+        "challenger": 10
+      },
+      "human_gate": "Do not use this A/B router in public traffic until owner confirms champion URL, 10% challenger allocation, duration, and rollback."
+    }
+  ]
+}

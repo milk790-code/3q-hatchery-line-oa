@@ -1,0 +1,1217 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:47:11.181Z",
+  "mode": "real_data_decision_replay_fixture_dry_run",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/real_data_decision_replay_status.json",
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/real_data_decision_replay_report.md",
+  "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y",
+  "scenario_count": 6,
+  "scenario_ids": [
+    "sample_insufficient_replay",
+    "winning_replay_owner_review_only",
+    "underperform_replay_next_variable",
+    "spam_regression_replay",
+    "lead_regression_replay",
+    "close_regression_replay"
+  ],
+  "scenarios": [
+    {
+      "id": "sample_insufficient_replay",
+      "ok": true,
+      "description": "Challenger lift is visible, but visits stay below min_visits so the champion remains in place.",
+      "imported_events": 533,
+      "expected": {
+        "challenger_decision": "keep_testing_sample_insufficient",
+        "ab_decision": "do_not_promote_challenger",
+        "challenger_win_rule_met": false,
+        "next_round_decision": "continue_current_round_until_sample_threshold",
+        "next_changed_variable": "cta_text",
+        "start_new_variable_round": false,
+        "quality_reasons_include": []
+      },
+      "assertions": [
+        {
+          "name": "source_capture_compile_preview_ok",
+          "ok": true,
+          "expected": "source_capture_compile_preview",
+          "actual": "source_capture_compile_preview"
+        },
+        {
+          "name": "source_capture_compile_owner_preview_ready",
+          "ok": true,
+          "expected": "owner_preview_ready_with_rows",
+          "actual": "owner_preview_ready:40:24:16"
+        },
+        {
+          "name": "source_capture_compile_does_not_write_real_events",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "funnel_import_preview_ok",
+          "ok": true,
+          "expected": "full_funnel_preview",
+          "actual": "full_funnel_preview"
+        },
+        {
+          "name": "manual_import_preview_ok",
+          "ok": true,
+          "expected": "preview_append",
+          "actual": "preview:true"
+        },
+        {
+          "name": "importers_do_not_write_real_events",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "challenger_decision",
+          "ok": true,
+          "expected": "keep_testing_sample_insufficient",
+          "actual": "keep_testing_sample_insufficient"
+        },
+        {
+          "name": "ab_decision",
+          "ok": true,
+          "expected": "do_not_promote_challenger",
+          "actual": "do_not_promote_challenger"
+        },
+        {
+          "name": "challenger_win_rule_met",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "next_round_decision",
+          "ok": true,
+          "expected": "continue_current_round_until_sample_threshold",
+          "actual": "continue_current_round_until_sample_threshold"
+        },
+        {
+          "name": "next_changed_variable",
+          "ok": true,
+          "expected": "cta_text",
+          "actual": "cta_text"
+        },
+        {
+          "name": "start_new_variable_round",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "quality_reasons_include",
+          "ok": true,
+          "expected": [],
+          "actual": []
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        }
+      ],
+      "source_capture_compile": {
+        "ok": true,
+        "mode": "source_capture_compile_preview",
+        "status": "owner_preview_ready",
+        "input_kind": "decision_replay_fixture",
+        "filled_rows": 40,
+        "funnel_rows": 24,
+        "manual_rows": 16,
+        "issue_count": 0,
+        "data_lp_events_write_performed": false,
+        "live_input_files_created": false,
+        "external_effect": false
+      },
+      "importer_status": {
+        "funnel_ok": true,
+        "funnel_mode": "full_funnel_preview",
+        "funnel_events_written": 498,
+        "funnel_data_lp_events_write_performed": false,
+        "manual_ok": true,
+        "manual_mode": "preview",
+        "manual_events_written": 35,
+        "manual_append_performed": true,
+        "manual_data_lp_events_write_performed": false
+      },
+      "challenger_summary": {
+        "visits": 99,
+        "cta_clicks": 30,
+        "line_adds": 15,
+        "leads": 3,
+        "deals": 1,
+        "test_days": 4,
+        "line_add_rate": 0.1515,
+        "lead_rate": 0.2,
+        "close_rate": 0.3333,
+        "sample_threshold_met": false,
+        "no_quality_regression": true,
+        "spam_flag_rate": 0,
+        "quality_regression_reasons": [],
+        "lead_rate_retention_vs_champion": 0.8,
+        "close_rate_retention_vs_champion": 1,
+        "decision": "keep_testing_sample_insufficient",
+        "champion_lift": 1.515
+      },
+      "ab_status": {
+        "decision": "do_not_promote_challenger",
+        "challenger_win_rule_met": false,
+        "lift": 1.515,
+        "sample_threshold_met": false,
+        "no_quality_regression": true,
+        "quality_regression_reasons": [],
+        "lead_rate_retention_vs_champion": 0.8,
+        "close_rate_retention_vs_champion": 1,
+        "public_link_change_performed": false,
+        "production_deploy_performed": false
+      },
+      "next_round_summary": {
+        "status": "continue_current_round",
+        "decision": "continue_current_round_until_sample_threshold",
+        "changed_variable": "cta_text",
+        "start_new_variable_round": false,
+        "public_link_change_performed": false,
+        "production_deploy_performed": false
+      },
+      "promotion_performed": false,
+      "real_event_write_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "production_deploy_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false,
+      "temp_files": {
+        "source_capture_ledger_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/sample_insufficient_replay/source_capture_ledger.filled.csv",
+        "source_capture_compile_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/sample_insufficient_replay/source_capture_compile_status.json",
+        "source_capture_compile_report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/sample_insufficient_replay/source_capture_compile_report.md",
+        "compiled_funnel_csv_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/sample_insufficient_replay/compiled/funnel_aggregates.owner-preview.csv",
+        "compiled_manual_csv_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/sample_insufficient_replay/compiled/manual_conversions.owner-preview.csv",
+        "events_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/sample_insufficient_replay/combined.preview.jsonl",
+        "funnel_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/sample_insufficient_replay/funnel_aggregate_status.json",
+        "manual_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/sample_insufficient_replay/manual_conversion_status.json"
+      },
+      "importer_exit_codes": {
+        "source_capture_compile": 0,
+        "funnel": 0,
+        "manual": 0
+      }
+    },
+    {
+      "id": "winning_replay_owner_review_only",
+      "ok": true,
+      "description": "Challenger beats line_add_rate by more than 1.15x with enough sample and no quality regression.",
+      "imported_events": 579,
+      "expected": {
+        "challenger_decision": "eligible_for_human_promotion_review",
+        "ab_decision": "queue_human_promotion_review",
+        "challenger_win_rule_met": true,
+        "next_round_decision": "queue_owner_promotion_review_before_next_variable",
+        "next_changed_variable": "cta_text",
+        "start_new_variable_round": false,
+        "quality_reasons_include": []
+      },
+      "assertions": [
+        {
+          "name": "source_capture_compile_preview_ok",
+          "ok": true,
+          "expected": "source_capture_compile_preview",
+          "actual": "source_capture_compile_preview"
+        },
+        {
+          "name": "source_capture_compile_owner_preview_ready",
+          "ok": true,
+          "expected": "owner_preview_ready_with_rows",
+          "actual": "owner_preview_ready:42:24:18"
+        },
+        {
+          "name": "source_capture_compile_does_not_write_real_events",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "funnel_import_preview_ok",
+          "ok": true,
+          "expected": "full_funnel_preview",
+          "actual": "full_funnel_preview"
+        },
+        {
+          "name": "manual_import_preview_ok",
+          "ok": true,
+          "expected": "preview_append",
+          "actual": "preview:true"
+        },
+        {
+          "name": "importers_do_not_write_real_events",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "challenger_decision",
+          "ok": true,
+          "expected": "eligible_for_human_promotion_review",
+          "actual": "eligible_for_human_promotion_review"
+        },
+        {
+          "name": "ab_decision",
+          "ok": true,
+          "expected": "queue_human_promotion_review",
+          "actual": "queue_human_promotion_review"
+        },
+        {
+          "name": "challenger_win_rule_met",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "next_round_decision",
+          "ok": true,
+          "expected": "queue_owner_promotion_review_before_next_variable",
+          "actual": "queue_owner_promotion_review_before_next_variable"
+        },
+        {
+          "name": "next_changed_variable",
+          "ok": true,
+          "expected": "cta_text",
+          "actual": "cta_text"
+        },
+        {
+          "name": "start_new_variable_round",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "quality_reasons_include",
+          "ok": true,
+          "expected": [],
+          "actual": []
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        }
+      ],
+      "source_capture_compile": {
+        "ok": true,
+        "mode": "source_capture_compile_preview",
+        "status": "owner_preview_ready",
+        "input_kind": "decision_replay_fixture",
+        "filled_rows": 42,
+        "funnel_rows": 24,
+        "manual_rows": 18,
+        "issue_count": 0,
+        "data_lp_events_write_performed": false,
+        "live_input_files_created": false,
+        "external_effect": false
+      },
+      "importer_status": {
+        "funnel_ok": true,
+        "funnel_mode": "full_funnel_preview",
+        "funnel_events_written": 540,
+        "funnel_data_lp_events_write_performed": false,
+        "manual_ok": true,
+        "manual_mode": "preview",
+        "manual_events_written": 39,
+        "manual_append_performed": true,
+        "manual_data_lp_events_write_performed": false
+      },
+      "challenger_summary": {
+        "visits": 120,
+        "cta_clicks": 30,
+        "line_adds": 17,
+        "leads": 4,
+        "deals": 2,
+        "test_days": 4,
+        "line_add_rate": 0.1417,
+        "lead_rate": 0.2353,
+        "close_rate": 0.5,
+        "sample_threshold_met": true,
+        "no_quality_regression": true,
+        "spam_flag_rate": 0,
+        "quality_regression_reasons": [],
+        "lead_rate_retention_vs_champion": 0.9412,
+        "close_rate_retention_vs_champion": 1.5002,
+        "decision": "eligible_for_human_promotion_review",
+        "champion_lift": 1.417
+      },
+      "ab_status": {
+        "decision": "queue_human_promotion_review",
+        "challenger_win_rule_met": true,
+        "lift": 1.417,
+        "sample_threshold_met": true,
+        "no_quality_regression": true,
+        "quality_regression_reasons": [],
+        "lead_rate_retention_vs_champion": 0.9412,
+        "close_rate_retention_vs_champion": 1.5002,
+        "public_link_change_performed": false,
+        "production_deploy_performed": false
+      },
+      "next_round_summary": {
+        "status": "continue_current_round",
+        "decision": "queue_owner_promotion_review_before_next_variable",
+        "changed_variable": "cta_text",
+        "start_new_variable_round": false,
+        "public_link_change_performed": false,
+        "production_deploy_performed": false
+      },
+      "promotion_performed": false,
+      "real_event_write_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "production_deploy_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false,
+      "temp_files": {
+        "source_capture_ledger_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/winning_replay_owner_review_only/source_capture_ledger.filled.csv",
+        "source_capture_compile_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/winning_replay_owner_review_only/source_capture_compile_status.json",
+        "source_capture_compile_report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/winning_replay_owner_review_only/source_capture_compile_report.md",
+        "compiled_funnel_csv_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/winning_replay_owner_review_only/compiled/funnel_aggregates.owner-preview.csv",
+        "compiled_manual_csv_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/winning_replay_owner_review_only/compiled/manual_conversions.owner-preview.csv",
+        "events_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/winning_replay_owner_review_only/combined.preview.jsonl",
+        "funnel_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/winning_replay_owner_review_only/funnel_aggregate_status.json",
+        "manual_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/winning_replay_owner_review_only/manual_conversion_status.json"
+      },
+      "importer_exit_codes": {
+        "source_capture_compile": 0,
+        "funnel": 0,
+        "manual": 0
+      }
+    },
+    {
+      "id": "underperform_replay_next_variable",
+      "ok": true,
+      "description": "Sample is ready, but challenger does not beat champion, so the next local draft can rotate variables.",
+      "imported_events": 572,
+      "expected": {
+        "challenger_decision": "retire_or_rework_candidate",
+        "ab_decision": "do_not_promote_challenger",
+        "challenger_win_rule_met": false,
+        "next_round_decision": "retire_underperforming_challenger_plan_next_variable",
+        "next_changed_variable": "hook",
+        "start_new_variable_round": true,
+        "quality_reasons_include": []
+      },
+      "assertions": [
+        {
+          "name": "source_capture_compile_preview_ok",
+          "ok": true,
+          "expected": "source_capture_compile_preview",
+          "actual": "source_capture_compile_preview"
+        },
+        {
+          "name": "source_capture_compile_owner_preview_ready",
+          "ok": true,
+          "expected": "owner_preview_ready_with_rows",
+          "actual": "owner_preview_ready:40:24:16"
+        },
+        {
+          "name": "source_capture_compile_does_not_write_real_events",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "funnel_import_preview_ok",
+          "ok": true,
+          "expected": "full_funnel_preview",
+          "actual": "full_funnel_preview"
+        },
+        {
+          "name": "manual_import_preview_ok",
+          "ok": true,
+          "expected": "preview_append",
+          "actual": "preview:true"
+        },
+        {
+          "name": "importers_do_not_write_real_events",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "challenger_decision",
+          "ok": true,
+          "expected": "retire_or_rework_candidate",
+          "actual": "retire_or_rework_candidate"
+        },
+        {
+          "name": "ab_decision",
+          "ok": true,
+          "expected": "do_not_promote_challenger",
+          "actual": "do_not_promote_challenger"
+        },
+        {
+          "name": "challenger_win_rule_met",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "next_round_decision",
+          "ok": true,
+          "expected": "retire_underperforming_challenger_plan_next_variable",
+          "actual": "retire_underperforming_challenger_plan_next_variable"
+        },
+        {
+          "name": "next_changed_variable",
+          "ok": true,
+          "expected": "hook",
+          "actual": "hook"
+        },
+        {
+          "name": "start_new_variable_round",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "quality_reasons_include",
+          "ok": true,
+          "expected": [],
+          "actual": []
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        }
+      ],
+      "source_capture_compile": {
+        "ok": true,
+        "mode": "source_capture_compile_preview",
+        "status": "owner_preview_ready",
+        "input_kind": "decision_replay_fixture",
+        "filled_rows": 40,
+        "funnel_rows": 24,
+        "manual_rows": 16,
+        "issue_count": 0,
+        "data_lp_events_write_performed": false,
+        "live_input_files_created": false,
+        "external_effect": false
+      },
+      "importer_status": {
+        "funnel_ok": true,
+        "funnel_mode": "full_funnel_preview",
+        "funnel_events_written": 540,
+        "funnel_data_lp_events_write_performed": false,
+        "manual_ok": true,
+        "manual_mode": "preview",
+        "manual_events_written": 32,
+        "manual_append_performed": true,
+        "manual_data_lp_events_write_performed": false
+      },
+      "challenger_summary": {
+        "visits": 120,
+        "cta_clicks": 30,
+        "line_adds": 12,
+        "leads": 3,
+        "deals": 1,
+        "test_days": 4,
+        "line_add_rate": 0.1,
+        "lead_rate": 0.25,
+        "close_rate": 0.3333,
+        "sample_threshold_met": true,
+        "no_quality_regression": true,
+        "spam_flag_rate": 0,
+        "quality_regression_reasons": [],
+        "lead_rate_retention_vs_champion": 1,
+        "close_rate_retention_vs_champion": 1,
+        "decision": "retire_or_rework_candidate",
+        "champion_lift": 1
+      },
+      "ab_status": {
+        "decision": "do_not_promote_challenger",
+        "challenger_win_rule_met": false,
+        "lift": 1,
+        "sample_threshold_met": true,
+        "no_quality_regression": true,
+        "quality_regression_reasons": [],
+        "lead_rate_retention_vs_champion": 1,
+        "close_rate_retention_vs_champion": 1,
+        "public_link_change_performed": false,
+        "production_deploy_performed": false
+      },
+      "next_round_summary": {
+        "status": "next_variable_round_prepared_local_only",
+        "decision": "retire_underperforming_challenger_plan_next_variable",
+        "changed_variable": "hook",
+        "start_new_variable_round": true,
+        "public_link_change_performed": false,
+        "production_deploy_performed": false
+      },
+      "promotion_performed": false,
+      "real_event_write_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "production_deploy_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false,
+      "temp_files": {
+        "source_capture_ledger_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/underperform_replay_next_variable/source_capture_ledger.filled.csv",
+        "source_capture_compile_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/underperform_replay_next_variable/source_capture_compile_status.json",
+        "source_capture_compile_report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/underperform_replay_next_variable/source_capture_compile_report.md",
+        "compiled_funnel_csv_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/underperform_replay_next_variable/compiled/funnel_aggregates.owner-preview.csv",
+        "compiled_manual_csv_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/underperform_replay_next_variable/compiled/manual_conversions.owner-preview.csv",
+        "events_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/underperform_replay_next_variable/combined.preview.jsonl",
+        "funnel_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/underperform_replay_next_variable/funnel_aggregate_status.json",
+        "manual_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/underperform_replay_next_variable/manual_conversion_status.json"
+      },
+      "importer_exit_codes": {
+        "source_capture_compile": 0,
+        "funnel": 0,
+        "manual": 0
+      }
+    },
+    {
+      "id": "spam_regression_replay",
+      "ok": true,
+      "description": "Challenger beats line_add_rate, but low-quality flags exceed the spam limit.",
+      "imported_events": 588,
+      "expected": {
+        "challenger_decision": "reject_quality_regression",
+        "ab_decision": "do_not_promote_challenger",
+        "challenger_win_rule_met": false,
+        "next_round_decision": "reject_challenger_quality_regression_plan_next_variable",
+        "next_changed_variable": "hook",
+        "start_new_variable_round": true,
+        "quality_reasons_include": [
+          "spam_flag_rate_above_limit"
+        ]
+      },
+      "assertions": [
+        {
+          "name": "source_capture_compile_preview_ok",
+          "ok": true,
+          "expected": "source_capture_compile_preview",
+          "actual": "source_capture_compile_preview"
+        },
+        {
+          "name": "source_capture_compile_owner_preview_ready",
+          "ok": true,
+          "expected": "owner_preview_ready_with_rows",
+          "actual": "owner_preview_ready:47:24:23"
+        },
+        {
+          "name": "source_capture_compile_does_not_write_real_events",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "funnel_import_preview_ok",
+          "ok": true,
+          "expected": "full_funnel_preview",
+          "actual": "full_funnel_preview"
+        },
+        {
+          "name": "manual_import_preview_ok",
+          "ok": true,
+          "expected": "preview_append",
+          "actual": "preview:true"
+        },
+        {
+          "name": "importers_do_not_write_real_events",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "challenger_decision",
+          "ok": true,
+          "expected": "reject_quality_regression",
+          "actual": "reject_quality_regression"
+        },
+        {
+          "name": "ab_decision",
+          "ok": true,
+          "expected": "do_not_promote_challenger",
+          "actual": "do_not_promote_challenger"
+        },
+        {
+          "name": "challenger_win_rule_met",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "next_round_decision",
+          "ok": true,
+          "expected": "reject_challenger_quality_regression_plan_next_variable",
+          "actual": "reject_challenger_quality_regression_plan_next_variable"
+        },
+        {
+          "name": "next_changed_variable",
+          "ok": true,
+          "expected": "hook",
+          "actual": "hook"
+        },
+        {
+          "name": "start_new_variable_round",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "quality_reasons_include",
+          "ok": true,
+          "expected": [
+            "spam_flag_rate_above_limit"
+          ],
+          "actual": [
+            "spam_flag_rate_above_limit",
+            "close_rate_retention_below_champion"
+          ]
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        }
+      ],
+      "source_capture_compile": {
+        "ok": true,
+        "mode": "source_capture_compile_preview",
+        "status": "owner_preview_ready",
+        "input_kind": "decision_replay_fixture",
+        "filled_rows": 47,
+        "funnel_rows": 24,
+        "manual_rows": 23,
+        "issue_count": 0,
+        "data_lp_events_write_performed": false,
+        "live_input_files_created": false,
+        "external_effect": false
+      },
+      "importer_status": {
+        "funnel_ok": true,
+        "funnel_mode": "full_funnel_preview",
+        "funnel_events_written": 540,
+        "funnel_data_lp_events_write_performed": false,
+        "manual_ok": true,
+        "manual_mode": "preview",
+        "manual_events_written": 48,
+        "manual_append_performed": true,
+        "manual_data_lp_events_write_performed": false
+      },
+      "challenger_summary": {
+        "visits": 120,
+        "cta_clicks": 30,
+        "line_adds": 17,
+        "leads": 4,
+        "deals": 1,
+        "test_days": 4,
+        "line_add_rate": 0.1417,
+        "lead_rate": 0.2353,
+        "close_rate": 0.25,
+        "sample_threshold_met": true,
+        "no_quality_regression": false,
+        "spam_flag_rate": 0.2,
+        "quality_regression_reasons": [
+          "spam_flag_rate_above_limit",
+          "close_rate_retention_below_champion"
+        ],
+        "lead_rate_retention_vs_champion": 0.9412,
+        "close_rate_retention_vs_champion": 0.7501,
+        "decision": "reject_quality_regression",
+        "champion_lift": 1.417
+      },
+      "ab_status": {
+        "decision": "do_not_promote_challenger",
+        "challenger_win_rule_met": false,
+        "lift": 1.417,
+        "sample_threshold_met": true,
+        "no_quality_regression": false,
+        "quality_regression_reasons": [
+          "spam_flag_rate_above_limit",
+          "close_rate_retention_below_champion"
+        ],
+        "lead_rate_retention_vs_champion": 0.9412,
+        "close_rate_retention_vs_champion": 0.7501,
+        "public_link_change_performed": false,
+        "production_deploy_performed": false
+      },
+      "next_round_summary": {
+        "status": "next_variable_round_prepared_local_only",
+        "decision": "reject_challenger_quality_regression_plan_next_variable",
+        "changed_variable": "hook",
+        "start_new_variable_round": true,
+        "public_link_change_performed": false,
+        "production_deploy_performed": false
+      },
+      "promotion_performed": false,
+      "real_event_write_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "production_deploy_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false,
+      "temp_files": {
+        "source_capture_ledger_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/spam_regression_replay/source_capture_ledger.filled.csv",
+        "source_capture_compile_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/spam_regression_replay/source_capture_compile_status.json",
+        "source_capture_compile_report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/spam_regression_replay/source_capture_compile_report.md",
+        "compiled_funnel_csv_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/spam_regression_replay/compiled/funnel_aggregates.owner-preview.csv",
+        "compiled_manual_csv_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/spam_regression_replay/compiled/manual_conversions.owner-preview.csv",
+        "events_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/spam_regression_replay/combined.preview.jsonl",
+        "funnel_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/spam_regression_replay/funnel_aggregate_status.json",
+        "manual_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/spam_regression_replay/manual_conversion_status.json"
+      },
+      "importer_exit_codes": {
+        "source_capture_compile": 0,
+        "funnel": 0,
+        "manual": 0
+      }
+    },
+    {
+      "id": "lead_regression_replay",
+      "ok": true,
+      "description": "Challenger beats line_add_rate, but lead-rate retention falls below the champion guardrail.",
+      "imported_events": 580,
+      "expected": {
+        "challenger_decision": "reject_quality_regression",
+        "ab_decision": "do_not_promote_challenger",
+        "challenger_win_rule_met": false,
+        "next_round_decision": "reject_challenger_quality_regression_plan_next_variable",
+        "next_changed_variable": "hook",
+        "start_new_variable_round": true,
+        "quality_reasons_include": [
+          "lead_rate_retention_below_champion"
+        ]
+      },
+      "assertions": [
+        {
+          "name": "source_capture_compile_preview_ok",
+          "ok": true,
+          "expected": "source_capture_compile_preview",
+          "actual": "source_capture_compile_preview"
+        },
+        {
+          "name": "source_capture_compile_owner_preview_ready",
+          "ok": true,
+          "expected": "owner_preview_ready_with_rows",
+          "actual": "owner_preview_ready:41:24:17"
+        },
+        {
+          "name": "source_capture_compile_does_not_write_real_events",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "funnel_import_preview_ok",
+          "ok": true,
+          "expected": "full_funnel_preview",
+          "actual": "full_funnel_preview"
+        },
+        {
+          "name": "manual_import_preview_ok",
+          "ok": true,
+          "expected": "preview_append",
+          "actual": "preview:true"
+        },
+        {
+          "name": "importers_do_not_write_real_events",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "challenger_decision",
+          "ok": true,
+          "expected": "reject_quality_regression",
+          "actual": "reject_quality_regression"
+        },
+        {
+          "name": "ab_decision",
+          "ok": true,
+          "expected": "do_not_promote_challenger",
+          "actual": "do_not_promote_challenger"
+        },
+        {
+          "name": "challenger_win_rule_met",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "next_round_decision",
+          "ok": true,
+          "expected": "reject_challenger_quality_regression_plan_next_variable",
+          "actual": "reject_challenger_quality_regression_plan_next_variable"
+        },
+        {
+          "name": "next_changed_variable",
+          "ok": true,
+          "expected": "hook",
+          "actual": "hook"
+        },
+        {
+          "name": "start_new_variable_round",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "quality_reasons_include",
+          "ok": true,
+          "expected": [
+            "lead_rate_retention_below_champion"
+          ],
+          "actual": [
+            "lead_rate_retention_below_champion"
+          ]
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        }
+      ],
+      "source_capture_compile": {
+        "ok": true,
+        "mode": "source_capture_compile_preview",
+        "status": "owner_preview_ready",
+        "input_kind": "decision_replay_fixture",
+        "filled_rows": 41,
+        "funnel_rows": 24,
+        "manual_rows": 17,
+        "issue_count": 0,
+        "data_lp_events_write_performed": false,
+        "live_input_files_created": false,
+        "external_effect": false
+      },
+      "importer_status": {
+        "funnel_ok": true,
+        "funnel_mode": "full_funnel_preview",
+        "funnel_events_written": 540,
+        "funnel_data_lp_events_write_performed": false,
+        "manual_ok": true,
+        "manual_mode": "preview",
+        "manual_events_written": 40,
+        "manual_append_performed": true,
+        "manual_data_lp_events_write_performed": false
+      },
+      "challenger_summary": {
+        "visits": 120,
+        "cta_clicks": 30,
+        "line_adds": 17,
+        "leads": 2,
+        "deals": 1,
+        "test_days": 4,
+        "line_add_rate": 0.1417,
+        "lead_rate": 0.1176,
+        "close_rate": 0.5,
+        "sample_threshold_met": true,
+        "no_quality_regression": false,
+        "spam_flag_rate": 0,
+        "quality_regression_reasons": [
+          "lead_rate_retention_below_champion"
+        ],
+        "lead_rate_retention_vs_champion": 0.2352,
+        "close_rate_retention_vs_champion": 1.5002,
+        "decision": "reject_quality_regression",
+        "champion_lift": 1.417
+      },
+      "ab_status": {
+        "decision": "do_not_promote_challenger",
+        "challenger_win_rule_met": false,
+        "lift": 1.417,
+        "sample_threshold_met": true,
+        "no_quality_regression": false,
+        "quality_regression_reasons": [
+          "lead_rate_retention_below_champion"
+        ],
+        "lead_rate_retention_vs_champion": 0.2352,
+        "close_rate_retention_vs_champion": 1.5002,
+        "public_link_change_performed": false,
+        "production_deploy_performed": false
+      },
+      "next_round_summary": {
+        "status": "next_variable_round_prepared_local_only",
+        "decision": "reject_challenger_quality_regression_plan_next_variable",
+        "changed_variable": "hook",
+        "start_new_variable_round": true,
+        "public_link_change_performed": false,
+        "production_deploy_performed": false
+      },
+      "promotion_performed": false,
+      "real_event_write_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "production_deploy_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false,
+      "temp_files": {
+        "source_capture_ledger_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/lead_regression_replay/source_capture_ledger.filled.csv",
+        "source_capture_compile_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/lead_regression_replay/source_capture_compile_status.json",
+        "source_capture_compile_report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/lead_regression_replay/source_capture_compile_report.md",
+        "compiled_funnel_csv_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/lead_regression_replay/compiled/funnel_aggregates.owner-preview.csv",
+        "compiled_manual_csv_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/lead_regression_replay/compiled/manual_conversions.owner-preview.csv",
+        "events_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/lead_regression_replay/combined.preview.jsonl",
+        "funnel_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/lead_regression_replay/funnel_aggregate_status.json",
+        "manual_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/lead_regression_replay/manual_conversion_status.json"
+      },
+      "importer_exit_codes": {
+        "source_capture_compile": 0,
+        "funnel": 0,
+        "manual": 0
+      }
+    },
+    {
+      "id": "close_regression_replay",
+      "ok": true,
+      "description": "Challenger beats line_add_rate and lead retention holds, but close-rate retention collapses.",
+      "imported_events": 580,
+      "expected": {
+        "challenger_decision": "reject_quality_regression",
+        "ab_decision": "do_not_promote_challenger",
+        "challenger_win_rule_met": false,
+        "next_round_decision": "reject_challenger_quality_regression_plan_next_variable",
+        "next_changed_variable": "hook",
+        "start_new_variable_round": true,
+        "quality_reasons_include": [
+          "close_rate_retention_below_champion"
+        ]
+      },
+      "assertions": [
+        {
+          "name": "source_capture_compile_preview_ok",
+          "ok": true,
+          "expected": "source_capture_compile_preview",
+          "actual": "source_capture_compile_preview"
+        },
+        {
+          "name": "source_capture_compile_owner_preview_ready",
+          "ok": true,
+          "expected": "owner_preview_ready_with_rows",
+          "actual": "owner_preview_ready:42:24:18"
+        },
+        {
+          "name": "source_capture_compile_does_not_write_real_events",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "funnel_import_preview_ok",
+          "ok": true,
+          "expected": "full_funnel_preview",
+          "actual": "full_funnel_preview"
+        },
+        {
+          "name": "manual_import_preview_ok",
+          "ok": true,
+          "expected": "preview_append",
+          "actual": "preview:true"
+        },
+        {
+          "name": "importers_do_not_write_real_events",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "challenger_decision",
+          "ok": true,
+          "expected": "reject_quality_regression",
+          "actual": "reject_quality_regression"
+        },
+        {
+          "name": "ab_decision",
+          "ok": true,
+          "expected": "do_not_promote_challenger",
+          "actual": "do_not_promote_challenger"
+        },
+        {
+          "name": "challenger_win_rule_met",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "next_round_decision",
+          "ok": true,
+          "expected": "reject_challenger_quality_regression_plan_next_variable",
+          "actual": "reject_challenger_quality_regression_plan_next_variable"
+        },
+        {
+          "name": "next_changed_variable",
+          "ok": true,
+          "expected": "hook",
+          "actual": "hook"
+        },
+        {
+          "name": "start_new_variable_round",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "quality_reasons_include",
+          "ok": true,
+          "expected": [
+            "close_rate_retention_below_champion"
+          ],
+          "actual": [
+            "close_rate_retention_below_champion"
+          ]
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        }
+      ],
+      "source_capture_compile": {
+        "ok": true,
+        "mode": "source_capture_compile_preview",
+        "status": "owner_preview_ready",
+        "input_kind": "decision_replay_fixture",
+        "filled_rows": 42,
+        "funnel_rows": 24,
+        "manual_rows": 18,
+        "issue_count": 0,
+        "data_lp_events_write_performed": false,
+        "live_input_files_created": false,
+        "external_effect": false
+      },
+      "importer_status": {
+        "funnel_ok": true,
+        "funnel_mode": "full_funnel_preview",
+        "funnel_events_written": 540,
+        "funnel_data_lp_events_write_performed": false,
+        "manual_ok": true,
+        "manual_mode": "preview",
+        "manual_events_written": 40,
+        "manual_append_performed": true,
+        "manual_data_lp_events_write_performed": false
+      },
+      "challenger_summary": {
+        "visits": 120,
+        "cta_clicks": 30,
+        "line_adds": 17,
+        "leads": 5,
+        "deals": 0,
+        "test_days": 4,
+        "line_add_rate": 0.1417,
+        "lead_rate": 0.2941,
+        "close_rate": 0,
+        "sample_threshold_met": true,
+        "no_quality_regression": false,
+        "spam_flag_rate": 0,
+        "quality_regression_reasons": [
+          "close_rate_retention_below_champion"
+        ],
+        "lead_rate_retention_vs_champion": 0.8824,
+        "close_rate_retention_vs_champion": 0,
+        "decision": "reject_quality_regression",
+        "champion_lift": 1.417
+      },
+      "ab_status": {
+        "decision": "do_not_promote_challenger",
+        "challenger_win_rule_met": false,
+        "lift": 1.417,
+        "sample_threshold_met": true,
+        "no_quality_regression": false,
+        "quality_regression_reasons": [
+          "close_rate_retention_below_champion"
+        ],
+        "lead_rate_retention_vs_champion": 0.8824,
+        "close_rate_retention_vs_champion": 0,
+        "public_link_change_performed": false,
+        "production_deploy_performed": false
+      },
+      "next_round_summary": {
+        "status": "next_variable_round_prepared_local_only",
+        "decision": "reject_challenger_quality_regression_plan_next_variable",
+        "changed_variable": "hook",
+        "start_new_variable_round": true,
+        "public_link_change_performed": false,
+        "production_deploy_performed": false
+      },
+      "promotion_performed": false,
+      "real_event_write_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "public_link_change_performed": false,
+      "production_deploy_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false,
+      "temp_files": {
+        "source_capture_ledger_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/close_regression_replay/source_capture_ledger.filled.csv",
+        "source_capture_compile_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/close_regression_replay/source_capture_compile_status.json",
+        "source_capture_compile_report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/close_regression_replay/source_capture_compile_report.md",
+        "compiled_funnel_csv_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/close_regression_replay/compiled/funnel_aggregates.owner-preview.csv",
+        "compiled_manual_csv_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/close_regression_replay/compiled/manual_conversions.owner-preview.csv",
+        "events_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/close_regression_replay/combined.preview.jsonl",
+        "funnel_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/close_regression_replay/funnel_aggregate_status.json",
+        "manual_status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-decision-replay-sYbj1Y/close_regression_replay/manual_conversion_status.json"
+      },
+      "importer_exit_codes": {
+        "source_capture_compile": 0,
+        "funnel": 0,
+        "manual": 0
+      }
+    }
+  ],
+  "local_fixture_commands_executed": true,
+  "local_importer_preview_commands_executed": true,
+  "source_capture_ledger_replay_executed": true,
+  "source_capture_compile_commands_executed": true,
+  "ledger_to_decision_replay_performed": true,
+  "execution_performed": false,
+  "real_events_unchanged": true,
+  "real_event_write_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Fixture-only decision replay. It writes synthetic filled source-capture ledgers, compiles owner-preview CSVs, imports them into temporary JSONL, scores them locally, and proves no data/lp_events.jsonl write or external action occurs."
+}

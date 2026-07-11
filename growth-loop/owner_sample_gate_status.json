@@ -1,0 +1,129 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:44:52.860Z",
+  "mode": "owner_sample_gate_status",
+  "status": "waiting_for_owner_sample_gate_counts",
+  "input_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/source_capture/sample_gate_ledger.filled.csv",
+  "input_exists": false,
+  "template_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/source_capture/sample_gate_ledger.fill-template.csv",
+  "template_exists": true,
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/owner_sample_gate_status.md",
+  "json_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/owner_sample_gate_status.json",
+  "thresholds": {
+    "min_visits": 100,
+    "min_cta_clicks": 20,
+    "min_line_adds": 5,
+    "min_test_days": 3,
+    "preferred_test_days": 7
+  },
+  "win_rule": {
+    "metric": "line_add_rate",
+    "challenger_lift_required": 1.15,
+    "require_sample_threshold_met": true,
+    "require_no_quality_regression": true
+  },
+  "current_round": {
+    "round_id": "week0-cta-text",
+    "changed_variable": "cta_text",
+    "hypothesis": "A concrete 48h diagnostic CTA will produce more LINE adds than a broad free-service CTA without reducing lead quality."
+  },
+  "rows_read": 0,
+  "filled_rows": 0,
+  "pending_rows": 18,
+  "issue_count": 0,
+  "warning_count": 0,
+  "issues": [],
+  "warnings": [],
+  "assets": [
+    {
+      "asset_id": "champion-3q-line-v0",
+      "role": "champion",
+      "visits": 0,
+      "cta_clicks": 0,
+      "line_adds": 0,
+      "line_add_rate": 0,
+      "observed_test_days": 0,
+      "sample_threshold_met": false,
+      "gaps": {
+        "visits": 100,
+        "cta_clicks": 20,
+        "line_adds": 5,
+        "test_days": 3
+      }
+    },
+    {
+      "asset_id": "challenger-week0-cta-text-v1",
+      "role": "challenger",
+      "visits": 0,
+      "cta_clicks": 0,
+      "line_adds": 0,
+      "line_add_rate": 0,
+      "observed_test_days": 0,
+      "sample_threshold_met": false,
+      "gaps": {
+        "visits": 100,
+        "cta_clicks": 20,
+        "line_adds": 5,
+        "test_days": 3
+      }
+    }
+  ],
+  "champion": {
+    "asset_id": "champion-3q-line-v0",
+    "role": "champion",
+    "visits": 0,
+    "cta_clicks": 0,
+    "line_adds": 0,
+    "line_add_rate": 0,
+    "observed_test_days": 0,
+    "sample_threshold_met": false,
+    "gaps": {
+      "visits": 100,
+      "cta_clicks": 20,
+      "line_adds": 5,
+      "test_days": 3
+    }
+  },
+  "challenger": {
+    "asset_id": "challenger-week0-cta-text-v1",
+    "role": "challenger",
+    "visits": 0,
+    "cta_clicks": 0,
+    "line_adds": 0,
+    "line_add_rate": 0,
+    "observed_test_days": 0,
+    "sample_threshold_met": false,
+    "gaps": {
+      "visits": 100,
+      "cta_clicks": 20,
+      "line_adds": 5,
+      "test_days": 3
+    }
+  },
+  "sample_threshold_met": false,
+  "sample_rate_win_candidate": false,
+  "challenger_lift": null,
+  "no_quality_regression": null,
+  "quality_guard_status": "not_evaluated_from_sample_gate",
+  "challenger_win_rule_met": false,
+  "promotion_performed": false,
+  "owner_review_required": false,
+  "decision": "continue_collecting_sample_gate_counts",
+  "next_safe_action": "Fill data/source_capture/sample_gate_ledger.filled.csv with aggregate counts only, then rerun npm run owner:sample-gate.",
+  "real_events_before": 0,
+  "live_input_files_created": false,
+  "apply_performed": false,
+  "append_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "real_events_after": 0,
+  "real_events_unchanged": true
+}

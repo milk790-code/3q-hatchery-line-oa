@@ -1,0 +1,13 @@
+capture_date=2026-07-11
+evidence_ref=<aggregate_ref>
+reviewer=<alias>
+pii_checked=yes
+champion.visits=<count>
+champion.cta=<count>
+champion.line=<count>
+challenger.visits=<count>
+challenger.cta=<count>
+challenger.line=<count>
+line_cta.visits=<count>
+line_cta.cta=<count>
+line_cta.line=<count>

@@ -1,0 +1,20 @@
+{
+  "observed_at": "2026-07-10T02:08:45+08:00",
+  "source": "Cloudflare Dashboard > Workers & Pages > 3q-site > Metrics",
+  "worker": "3q-site",
+  "environment": "production",
+  "metrics": {
+    "past_24_hours": {
+      "invocations": 224,
+      "errors": 0
+    },
+    "selected_past_7_days": {
+      "invocations": 979,
+      "errors": 0,
+      "chart_span_observed": "2026-07-06 to 2026-07-10 Asia/Taipei",
+      "ui_note": "The range menu was changed to Last 7 days; the translated button label remained stale while the chart and total refreshed."
+    }
+  },
+  "scoring_eligible": false,
+  "reason": "Worker invocations include HTML, script, stylesheet, health, bot, and other path requests. They are diagnostic traffic only and must not be counted as landing-page visits."
+}

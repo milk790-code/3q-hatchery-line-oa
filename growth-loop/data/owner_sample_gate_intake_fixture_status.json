@@ -1,0 +1,334 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:45:27.018Z",
+  "mode": "owner_sample_gate_intake_fixture_dry_run",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/owner_sample_gate_intake_fixture_status.json",
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/owner_sample_gate_intake_fixture_report.md",
+  "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-intake-fixtures-Ucebpv",
+  "scenario_count": 5,
+  "scenario_ids": [
+    "no_download_waits_safely",
+    "valid_download_ready_for_review",
+    "sensitive_download_blocks_stage",
+    "stage_requires_owner_confirm",
+    "confirmed_stage_uses_temp_target_only"
+  ],
+  "scenarios": [
+    {
+      "id": "no_download_waits_safely",
+      "ok": true,
+      "description": "No owner download exists; the intake guard reports a safe waiting state.",
+      "expected_status": "waiting_for_owner_download",
+      "assertions": [
+        {
+          "name": "exit_code",
+          "ok": true
+        },
+        {
+          "name": "status",
+          "ok": true
+        },
+        {
+          "name": "candidate_valid",
+          "ok": true
+        },
+        {
+          "name": "stage_performed",
+          "ok": true
+        },
+        {
+          "name": "target_exists",
+          "ok": true
+        },
+        {
+          "name": "data_write_false",
+          "ok": true
+        },
+        {
+          "name": "external_false",
+          "ok": true
+        },
+        {
+          "name": "no_forbidden_actions",
+          "ok": true
+        }
+      ],
+      "exit_code": 0,
+      "status": "waiting_for_owner_download",
+      "candidate_found": false,
+      "candidate_valid": false,
+      "compile_status": "missing",
+      "owner_status": "missing",
+      "filled_rows": 0,
+      "pending_rows": null,
+      "stage_requested": false,
+      "stage_performed": false,
+      "target_exists": false,
+      "live_input_files_created": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "temp_files": {
+        "input_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-intake-fixtures-Ucebpv/no_download_waits_safely/sample_gate_ledger.filled.csv",
+        "target_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-intake-fixtures-Ucebpv/no_download_waits_safely/staged/sample_gate_ledger.filled.csv",
+        "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-intake-fixtures-Ucebpv/no_download_waits_safely/intake_status.json",
+        "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-intake-fixtures-Ucebpv/no_download_waits_safely/intake_report.md"
+      }
+    },
+    {
+      "id": "valid_download_ready_for_review",
+      "ok": true,
+      "description": "A valid aggregate-only downloaded CSV is ready for owner review but not staged.",
+      "expected_status": "owner_download_ready_for_review",
+      "assertions": [
+        {
+          "name": "exit_code",
+          "ok": true
+        },
+        {
+          "name": "status",
+          "ok": true
+        },
+        {
+          "name": "candidate_valid",
+          "ok": true
+        },
+        {
+          "name": "stage_performed",
+          "ok": true
+        },
+        {
+          "name": "target_exists",
+          "ok": true
+        },
+        {
+          "name": "data_write_false",
+          "ok": true
+        },
+        {
+          "name": "external_false",
+          "ok": true
+        },
+        {
+          "name": "no_forbidden_actions",
+          "ok": true
+        }
+      ],
+      "exit_code": 0,
+      "status": "owner_download_ready_for_review",
+      "candidate_found": true,
+      "candidate_valid": true,
+      "compile_status": "owner_preview_ready",
+      "owner_status": "sample_insufficient_keep_champion",
+      "filled_rows": 18,
+      "pending_rows": 0,
+      "stage_requested": false,
+      "stage_performed": false,
+      "target_exists": false,
+      "live_input_files_created": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "temp_files": {
+        "input_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-intake-fixtures-Ucebpv/valid_download_ready_for_review/sample_gate_ledger.filled.csv",
+        "target_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-intake-fixtures-Ucebpv/valid_download_ready_for_review/staged/sample_gate_ledger.filled.csv",
+        "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-intake-fixtures-Ucebpv/valid_download_ready_for_review/intake_status.json",
+        "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-intake-fixtures-Ucebpv/valid_download_ready_for_review/intake_report.md"
+      }
+    },
+    {
+      "id": "sensitive_download_blocks_stage",
+      "ok": true,
+      "description": "Sensitive-looking evidence blocks intake before any stage action.",
+      "expected_status": "blocked_invalid_owner_download",
+      "assertions": [
+        {
+          "name": "exit_code",
+          "ok": true
+        },
+        {
+          "name": "status",
+          "ok": true
+        },
+        {
+          "name": "candidate_valid",
+          "ok": true
+        },
+        {
+          "name": "stage_performed",
+          "ok": true
+        },
+        {
+          "name": "target_exists",
+          "ok": true
+        },
+        {
+          "name": "data_write_false",
+          "ok": true
+        },
+        {
+          "name": "external_false",
+          "ok": true
+        },
+        {
+          "name": "no_forbidden_actions",
+          "ok": true
+        }
+      ],
+      "exit_code": 0,
+      "status": "blocked_invalid_owner_download",
+      "candidate_found": true,
+      "candidate_valid": false,
+      "compile_status": "blocked_invalid_filled_ledger",
+      "owner_status": "blocked_invalid_owner_sample_gate",
+      "filled_rows": 17,
+      "pending_rows": 0,
+      "stage_requested": false,
+      "stage_performed": false,
+      "target_exists": false,
+      "live_input_files_created": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "temp_files": {
+        "input_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-intake-fixtures-Ucebpv/sensitive_download_blocks_stage/sample_gate_ledger.filled.csv",
+        "target_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-intake-fixtures-Ucebpv/sensitive_download_blocks_stage/staged/sample_gate_ledger.filled.csv",
+        "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-intake-fixtures-Ucebpv/sensitive_download_blocks_stage/intake_status.json",
+        "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-intake-fixtures-Ucebpv/sensitive_download_blocks_stage/intake_report.md"
+      }
+    },
+    {
+      "id": "stage_requires_owner_confirm",
+      "ok": true,
+      "description": "A valid candidate with --stage but no confirmation does not create the staged target.",
+      "expected_status": "owner_download_ready_needs_confirmed_stage",
+      "assertions": [
+        {
+          "name": "exit_code",
+          "ok": true
+        },
+        {
+          "name": "status",
+          "ok": true
+        },
+        {
+          "name": "candidate_valid",
+          "ok": true
+        },
+        {
+          "name": "stage_performed",
+          "ok": true
+        },
+        {
+          "name": "target_exists",
+          "ok": true
+        },
+        {
+          "name": "data_write_false",
+          "ok": true
+        },
+        {
+          "name": "external_false",
+          "ok": true
+        },
+        {
+          "name": "no_forbidden_actions",
+          "ok": true
+        }
+      ],
+      "exit_code": 1,
+      "status": "owner_download_ready_needs_confirmed_stage",
+      "candidate_found": true,
+      "candidate_valid": true,
+      "compile_status": "owner_preview_ready",
+      "owner_status": "sample_insufficient_keep_champion",
+      "filled_rows": 18,
+      "pending_rows": 0,
+      "stage_requested": true,
+      "stage_performed": false,
+      "target_exists": false,
+      "live_input_files_created": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "temp_files": {
+        "input_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-intake-fixtures-Ucebpv/stage_requires_owner_confirm/sample_gate_ledger.filled.csv",
+        "target_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-intake-fixtures-Ucebpv/stage_requires_owner_confirm/staged/sample_gate_ledger.filled.csv",
+        "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-intake-fixtures-Ucebpv/stage_requires_owner_confirm/intake_status.json",
+        "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-intake-fixtures-Ucebpv/stage_requires_owner_confirm/intake_report.md"
+      }
+    },
+    {
+      "id": "confirmed_stage_uses_temp_target_only",
+      "ok": true,
+      "description": "A valid candidate stages only to a temporary target when --confirm-owner-reviewed is present.",
+      "expected_status": "owner_download_staged_for_sample_gate",
+      "assertions": [
+        {
+          "name": "exit_code",
+          "ok": true
+        },
+        {
+          "name": "status",
+          "ok": true
+        },
+        {
+          "name": "candidate_valid",
+          "ok": true
+        },
+        {
+          "name": "stage_performed",
+          "ok": true
+        },
+        {
+          "name": "target_exists",
+          "ok": true
+        },
+        {
+          "name": "data_write_false",
+          "ok": true
+        },
+        {
+          "name": "external_false",
+          "ok": true
+        },
+        {
+          "name": "no_forbidden_actions",
+          "ok": true
+        }
+      ],
+      "exit_code": 0,
+      "status": "owner_download_staged_for_sample_gate",
+      "candidate_found": true,
+      "candidate_valid": true,
+      "compile_status": "owner_preview_ready",
+      "owner_status": "sample_insufficient_keep_champion",
+      "filled_rows": 18,
+      "pending_rows": 0,
+      "stage_requested": true,
+      "stage_performed": true,
+      "target_exists": true,
+      "live_input_files_created": true,
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "temp_files": {
+        "input_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-intake-fixtures-Ucebpv/confirmed_stage_uses_temp_target_only/sample_gate_ledger.filled.csv",
+        "target_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-intake-fixtures-Ucebpv/confirmed_stage_uses_temp_target_only/staged/sample_gate_ledger.filled.csv",
+        "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-intake-fixtures-Ucebpv/confirmed_stage_uses_temp_target_only/intake_status.json",
+        "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-intake-fixtures-Ucebpv/confirmed_stage_uses_temp_target_only/intake_report.md"
+      }
+    }
+  ],
+  "local_fixture_commands_executed": true,
+  "owner_sample_gate_intake_commands_executed": true,
+  "source_capture_compile_commands_executed": true,
+  "owner_sample_gate_commands_executed": true,
+  "real_events_unchanged": true,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Fixture-only owner sample-gate intake guard. It validates temporary downloaded CSV candidates and stages only to a temporary target when explicitly confirmed."
+}

@@ -1,0 +1,417 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:47:23.030Z",
+  "mode": "iteration_history_local_only",
+  "status": "collect_more_data",
+  "operator": "Angelia 3Q Growth Loop Operator",
+  "week": {
+    "start": "2026-06-29",
+    "end": "2026-07-05",
+    "startUtc": "2026-06-28T16:00:00.000Z",
+    "endUtc": "2026-07-05T15:59:59.999Z"
+  },
+  "cadence": "weekly_7_day_iteration",
+  "north_star_metric": "per_100_link_clicks_to_line_add_to_lead_to_deal",
+  "iteration_policy": {
+    "one_variable_only": true,
+    "allowed_variables": [
+      "hook",
+      "offer",
+      "visual_claim",
+      "cta_text"
+    ],
+    "current_changed_variable": "cta_text",
+    "sample_thresholds": {
+      "min_visits": 100,
+      "min_cta_clicks": 20,
+      "min_line_adds": 5,
+      "min_test_days": 3,
+      "preferred_test_days": 7
+    },
+    "preferred_test_days": 7,
+    "sample_insufficient_policy": "do_not_replace_champion",
+    "challenger_win_rule": {
+      "metric": "line_add_rate",
+      "challenger_lift_required": 1.15,
+      "require_sample_threshold_met": true,
+      "require_no_quality_regression": true
+    }
+  },
+  "current_round": {
+    "round_id": "week0-cta-text",
+    "asset_id": "challenger-week0-cta-text-v1",
+    "changed_variable": "cta_text",
+    "hypothesis": "A concrete 48h diagnostic CTA will produce more LINE adds than a broad free-service CTA without reducing lead quality.",
+    "decision": "continue_current_round_until_sample_threshold",
+    "candidate_action": "keep_testing_current_challenger",
+    "start_new_variable_round": false,
+    "next_changed_variable": "cta_text",
+    "rotation_candidate_after_current": "hook"
+  },
+  "sample_gate": {
+    "sample_threshold_met": false,
+    "preferred_test_days": 7,
+    "min_visits": 100,
+    "min_cta_clicks": 20,
+    "min_line_adds": 5,
+    "min_test_days": 3,
+    "observed_visits": 0,
+    "observed_cta_clicks": 0,
+    "observed_line_adds": 0,
+    "observed_test_days": 0,
+    "gaps": {
+      "visits": 100,
+      "cta_clicks": 20,
+      "line_adds": 5,
+      "test_days": 3
+    }
+  },
+  "win_gate": {
+    "metric": "line_add_rate",
+    "challenger_lift_required": 1.15,
+    "challenger_win_rule_met": false,
+    "no_quality_regression": true,
+    "lift": null,
+    "champion_line_add_rate": 0,
+    "challenger_line_add_rate": 0
+  },
+  "north_star_per_100_clicks": [
+    {
+      "asset_id": "champion-3q-line-v0",
+      "role": "champion",
+      "changed_variable": null,
+      "link_clicks": 0,
+      "visits": 0,
+      "cta_clicks": 0,
+      "line_adds": 0,
+      "leads": 0,
+      "deals": 0,
+      "line_adds_per_100_clicks": null,
+      "leads_per_100_clicks": null,
+      "deals_per_100_clicks": null,
+      "line_add_rate": 0,
+      "sample_threshold_met": false,
+      "no_quality_regression": true,
+      "decision": "keep_champion_until_challenger_beats_rule"
+    },
+    {
+      "asset_id": "challenger-week0-cta-text-v1",
+      "role": "challenger",
+      "changed_variable": "cta_text",
+      "link_clicks": 0,
+      "visits": 0,
+      "cta_clicks": 0,
+      "line_adds": 0,
+      "leads": 0,
+      "deals": 0,
+      "line_adds_per_100_clicks": null,
+      "leads_per_100_clicks": null,
+      "deals_per_100_clicks": null,
+      "line_add_rate": 0,
+      "sample_threshold_met": false,
+      "no_quality_regression": true,
+      "decision": "keep_testing_sample_insufficient"
+    }
+  ],
+  "asset_summary": {
+    "champion": {
+      "asset_id": "champion-3q-line-v0",
+      "role": "champion",
+      "status": "champion_live_verified_read_only",
+      "changed_variable": null,
+      "link_clicks": 0,
+      "visits": 0,
+      "cta_clicks": 0,
+      "line_adds": 0,
+      "leads": 0,
+      "deals": 0,
+      "test_days": 0,
+      "line_add_rate": 0,
+      "sample_threshold_met": false,
+      "no_quality_regression": true,
+      "quality_regression_reasons": [],
+      "decision": "keep_champion_until_challenger_beats_rule"
+    },
+    "challenger": {
+      "asset_id": "challenger-week0-cta-text-v1",
+      "role": "challenger",
+      "status": "candidate_local_only",
+      "changed_variable": "cta_text",
+      "link_clicks": 0,
+      "visits": 0,
+      "cta_clicks": 0,
+      "line_adds": 0,
+      "leads": 0,
+      "deals": 0,
+      "test_days": 0,
+      "line_add_rate": 0,
+      "sample_threshold_met": false,
+      "no_quality_regression": true,
+      "quality_regression_reasons": [],
+      "decision": "keep_testing_sample_insufficient"
+    }
+  },
+  "data_collection": {
+    "ok": true,
+    "status": "waiting_for_owner_aggregate_counts",
+    "task_count": 42,
+    "stage_count": 7,
+    "importable_link_count": 6,
+    "gated_link_count": 1,
+    "filled_ledger_exists": false,
+    "sample_threshold_met": false,
+    "missing_stage_count": 7,
+    "stage_priorities": [
+      {
+        "event_type": "link_click",
+        "priority": "P1_funnel_completeness",
+        "sample_gate_key": null,
+        "sample_gap": 0,
+        "target_live_file": "data/funnel_aggregates.csv"
+      },
+      {
+        "event_type": "page_view",
+        "priority": "P0_sample_gate",
+        "sample_gate_key": "visits",
+        "sample_gap": 100,
+        "target_live_file": "data/funnel_aggregates.csv"
+      },
+      {
+        "event_type": "cta_click",
+        "priority": "P0_sample_gate",
+        "sample_gate_key": "cta_clicks",
+        "sample_gap": 20,
+        "target_live_file": "data/funnel_aggregates.csv"
+      },
+      {
+        "event_type": "line_add",
+        "priority": "P0_sample_gate",
+        "sample_gate_key": "line_adds",
+        "sample_gap": 5,
+        "target_live_file": "data/manual_conversions.csv"
+      },
+      {
+        "event_type": "lead_submit",
+        "priority": "P1_funnel_completeness",
+        "sample_gate_key": null,
+        "sample_gap": 0,
+        "target_live_file": "data/manual_conversions.csv"
+      },
+      {
+        "event_type": "deal",
+        "priority": "P1_funnel_completeness",
+        "sample_gate_key": null,
+        "sample_gap": 0,
+        "target_live_file": "data/manual_conversions.csv"
+      },
+      {
+        "event_type": "quality_flag",
+        "priority": "P1_funnel_completeness",
+        "sample_gate_key": null,
+        "sample_gap": 0,
+        "target_live_file": "data/manual_conversions.csv"
+      }
+    ],
+    "real_events_unchanged": true,
+    "live_input_files_created": false,
+    "data_lp_events_write_performed": false
+  },
+  "owner_gate_summary": {
+    "pending_human_count": 5,
+    "ready_local_review_count": 14,
+    "pending_human_ids": [
+      "approve-d1-create-and-migrate",
+      "approve-candidate-worker-deploy",
+      "approve-small-ab-link",
+      "approve-champion-integration-production-deploy",
+      "approve-github-repo-and-pr"
+    ],
+    "ready_local_review_ids": [
+      "collect-first-real-events",
+      "review-weekly-report",
+      "review-champion-contract-audit",
+      "review-champion-integration-candidate",
+      "review-next-round-plan",
+      "review-owner-approval-pack",
+      "review-owner-console",
+      "review-real-data-input-pack",
+      "review-source-readiness",
+      "review-source-capture-pack",
+      "review-source-capture-compile",
+      "review-real-data-intake-plan",
+      "review-data-collection-brief",
+      "review-line-inbound-playbook"
+    ],
+    "prepared_but_blocked_count": 8,
+    "prepared_but_blocked_actions": [
+      "verify_existing_cloudflare_d1_and_apply_schema",
+      "confirm_existing_candidate_worker_provenance",
+      "confirm_champion_live_contract_provenance_before_redeploy",
+      "change_primary_social_or_bio_link",
+      "formal_social_post_or_line_push",
+      "github_push_or_pr_creation",
+      "execute_owner_approved_launch_sequence",
+      "customer_data_or_ecpay_payment_mutation"
+    ]
+  },
+  "source_status": {
+    "readiness": {
+      "ok": true,
+      "status": "waiting_for_real_data",
+      "missing_stage_count": 7,
+      "ready_for_public_iteration_decision": false,
+      "sample_threshold_met": false
+    },
+    "compile": {
+      "ok": true,
+      "status": "waiting_for_filled_counts",
+      "filled_rows": 0,
+      "issue_count": 0,
+      "live_input_files_created": false,
+      "data_lp_events_write_performed": false
+    },
+    "real_data_intake": {
+      "ok": true,
+      "status": "no_real_input_files",
+      "ready_apply_count": 0,
+      "missing_input_count": 2,
+      "data_lp_events_write_performed": false
+    }
+  },
+  "archive_summary": {
+    "current_archive_status_ok": true,
+    "current_archive_dir": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/archive/2026-06-29/20260710T214238251Z",
+    "current_manifest_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/archive/2026-06-29/20260710T214238251Z/manifest.json",
+    "archives_scanned": 3,
+    "latest_archives": [
+      {
+        "generated_at": "2026-07-10T21:42:38.251Z",
+        "week_start": "2026-06-29",
+        "week_end": "2026-07-05",
+        "archive_dir": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/archive/2026-06-29/20260710T214238251Z",
+        "files_archived": 326,
+        "expected_files": 326,
+        "missing_files_count": 0,
+        "immutable_snapshot": true,
+        "has_growth_scores": true,
+        "has_weekly_report": true,
+        "has_data_collection_brief": true,
+        "has_iteration_history": true,
+        "changed_variable": "cta_text",
+        "decision": "continue_current_round_until_sample_threshold",
+        "sample_threshold_met": false,
+        "observed_visits": 0,
+        "observed_cta_clicks": 0,
+        "observed_line_adds": 0,
+        "data_collection_status": "waiting_for_owner_aggregate_counts",
+        "external_effect": false
+      },
+      {
+        "generated_at": "2026-07-10T21:35:49.800Z",
+        "week_start": "2026-06-29",
+        "week_end": "2026-07-05",
+        "archive_dir": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/archive/2026-06-29/20260710T213549800Z",
+        "files_archived": 326,
+        "expected_files": 326,
+        "missing_files_count": 0,
+        "immutable_snapshot": true,
+        "has_growth_scores": true,
+        "has_weekly_report": true,
+        "has_data_collection_brief": true,
+        "has_iteration_history": true,
+        "changed_variable": "cta_text",
+        "decision": "continue_current_round_until_sample_threshold",
+        "sample_threshold_met": false,
+        "observed_visits": 0,
+        "observed_cta_clicks": 0,
+        "observed_line_adds": 0,
+        "data_collection_status": "waiting_for_owner_aggregate_counts",
+        "external_effect": false
+      },
+      {
+        "generated_at": "2026-07-10T21:35:42.074Z",
+        "week_start": "2026-06-29",
+        "week_end": "2026-07-05",
+        "archive_dir": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/archive/2026-06-29/20260710T213542074Z",
+        "files_archived": 326,
+        "expected_files": 326,
+        "missing_files_count": 0,
+        "immutable_snapshot": true,
+        "has_growth_scores": true,
+        "has_weekly_report": true,
+        "has_data_collection_brief": true,
+        "has_iteration_history": true,
+        "changed_variable": "cta_text",
+        "decision": "continue_current_round_until_sample_threshold",
+        "sample_threshold_met": false,
+        "observed_visits": 0,
+        "observed_cta_clicks": 0,
+        "observed_line_adds": 0,
+        "data_collection_status": "waiting_for_owner_aggregate_counts",
+        "external_effect": false
+      }
+    ]
+  },
+  "next_safe_actions": [
+    {
+      "id": "continue_current_round_until_sample_gate",
+      "type": "data_collection",
+      "owner_gate": false,
+      "action": "Keep the current cta_text challenger and collect aggregate counts until visits, CTA clicks, LINE adds, and test days meet thresholds.",
+      "external_effect": false
+    },
+    {
+      "id": "fill_source_capture_ledger_copy",
+      "type": "owner_review",
+      "owner_gate": true,
+      "action": "Copy the fill template to data/source_capture/source_capture_ledger.filled.csv and fill aggregate counts only; do not include customer identifiers or chat text.",
+      "external_effect": false
+    },
+    {
+      "id": "review_external_redline_queue",
+      "type": "approval_queue",
+      "owner_gate": true,
+      "action": "Review pending_human approval items, but do not auto-run remote D1, production Worker deploy, public link changes, GitHub push/PR, LINE, payment, customer-data, or delete actions.",
+      "external_effect": false
+    },
+    {
+      "id": "rerun_weekly_local_after_counts",
+      "type": "verification",
+      "owner_gate": false,
+      "action": "After aggregate counts are locally prepared and reviewed, rerun npm run weekly:local or npm run verify to refresh scores, report, queue, archive, and console.",
+      "external_effect": false
+    }
+  ],
+  "red_line_summary": {
+    "flags": {
+      "public_link_change_performed": false,
+      "production_deploy_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false
+    },
+    "violations": [],
+    "external_effect": false
+  },
+  "paths": {
+    "json": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/iteration_history.json",
+    "markdown": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/iteration_history.md",
+    "weekly_report": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/weekly_report.md",
+    "data_collection_brief": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data_collection_brief.md",
+    "data_collection_queue": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data_collection_queue.json",
+    "approval_queue": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/approval_queue.json",
+    "prepared_but_blocked": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/prepared_but_blocked.json"
+  },
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

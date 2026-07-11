@@ -1,0 +1,4175 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:48:27.037Z",
+  "status": "local_objective_contract_verified_external_gated",
+  "mode": "week0_data_collection",
+  "week": {
+    "start": "2026-06-29",
+    "end": "2026-07-05",
+    "startUtc": "2026-06-28T16:00:00.000Z",
+    "endUtc": "2026-07-05T15:59:59.999Z"
+  },
+  "objective_sequence": [
+    "collect_data",
+    "score_assets",
+    "winners_losers",
+    "content_mix",
+    "generate_lp_challenger",
+    "deploy_candidate_worker",
+    "create_ab_plan",
+    "weekly_report",
+    "approval_queue"
+  ],
+  "sequence_status": {
+    "config_sequence_ok": true,
+    "pipeline_sequence_ok": true,
+    "pipeline_steps_ok": true,
+    "weekly_runner_command_present": true
+  },
+  "weekly_runner_concurrency": {
+    "atomic_run_lock": true,
+    "overlapping_run_skips_without_status_overwrite": true,
+    "stale_lock_recovery": true,
+    "lock_policy_fixtures_ok": true,
+    "atomic_status_replace": true
+  },
+  "north_star_per_100_clicks": [
+    {
+      "asset_id": "champion-3q-line-v0",
+      "role": "champion",
+      "link_clicks": 0,
+      "line_adds_per_100_clicks": null,
+      "leads_per_100_clicks": null,
+      "deals_per_100_clicks": null,
+      "sample_threshold_met": false,
+      "decision": "keep_champion_until_challenger_beats_rule"
+    },
+    {
+      "asset_id": "challenger-week0-cta-text-v1",
+      "role": "challenger",
+      "link_clicks": 0,
+      "line_adds_per_100_clicks": null,
+      "leads_per_100_clicks": null,
+      "deals_per_100_clicks": null,
+      "sample_threshold_met": false,
+      "decision": "keep_testing_sample_insufficient"
+    }
+  ],
+  "one_variable_contract": {
+    "changed_variable": "cta_text",
+    "allowed_variables": [
+      "hook",
+      "offer",
+      "visual_claim",
+      "cta_text"
+    ],
+    "one_variable_rule_ok": true,
+    "locked_variables": {
+      "hook": "48 小時內，把你的頁面改成會有人加 LINE 的版本。",
+      "offer": "免費 48h 成交診斷，先指出漏斗缺口，不承諾成交。",
+      "visual_claim": "1 變因：本輪只測 CTA text，樣本不足不換冠軍。"
+    }
+  },
+  "variable_rotation_fixtures": {
+    "ok": true,
+    "mode": "variable_rotation_fixture_dry_run",
+    "scenario_count": 4,
+    "candidate_template_count": 12,
+    "allowed_variables": [
+      "hook",
+      "offer",
+      "visual_claim",
+      "cta_text"
+    ],
+    "expected_variables": [
+      "hook",
+      "offer",
+      "visual_claim",
+      "cta_text"
+    ],
+    "live_config_write_performed": false,
+    "external_effect": false,
+    "scenarios": [
+      {
+        "id": "hook_one_variable_fixture",
+        "changed_variable": "hook",
+        "ok": true,
+        "draft_count": 3,
+        "changed_value_count": 3,
+        "locked_variables_ok": true,
+        "changed_only_ok": true
+      },
+      {
+        "id": "offer_one_variable_fixture",
+        "changed_variable": "offer",
+        "ok": true,
+        "draft_count": 3,
+        "changed_value_count": 3,
+        "locked_variables_ok": true,
+        "changed_only_ok": true
+      },
+      {
+        "id": "visual_claim_one_variable_fixture",
+        "changed_variable": "visual_claim",
+        "ok": true,
+        "draft_count": 3,
+        "changed_value_count": 3,
+        "locked_variables_ok": true,
+        "changed_only_ok": true
+      },
+      {
+        "id": "cta_text_one_variable_fixture",
+        "changed_variable": "cta_text",
+        "ok": true,
+        "draft_count": 3,
+        "changed_value_count": 3,
+        "locked_variables_ok": true,
+        "changed_only_ok": true
+      }
+    ]
+  },
+  "funnel_breakdown": {
+    "ok": true,
+    "mode": "content_variant_attribution",
+    "rows": 6,
+    "content_variant_links": 3,
+    "real_events": 0,
+    "external_effect": false,
+    "public_link_change_performed": false,
+    "formal_post_performed": false
+  },
+  "sample_gate": {
+    "thresholds": {
+      "min_visits": 100,
+      "min_cta_clicks": 20,
+      "min_line_adds": 5,
+      "min_test_days": 3,
+      "preferred_test_days": 7
+    },
+    "sample_threshold_met": false,
+    "next_round_decision": "continue_current_round_until_sample_threshold",
+    "next_changed_variable": "cta_text",
+    "start_new_variable_round": false
+  },
+  "worker_dry_run": {
+    "ok": true,
+    "mode": "worker_deploy_dry_run_status",
+    "command": "wrangler deploy --dry-run",
+    "exit_code": 0,
+    "dry_run_exit_observed": true,
+    "required_markers_present": true,
+    "failed_markers": [],
+    "total_upload_line": "Total Upload: 36.40 KiB / gzip: 10.03 KiB",
+    "production_deploy_performed": false,
+    "deploy_performed": false,
+    "external_effect": false,
+    "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/worker_dry_run.md",
+    "log_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/logs/worker-dry-run-20260710T214607Z.log"
+  },
+  "event_contract_smoke": {
+    "ok": true,
+    "mode": "isolated_local_event_contract_smoke",
+    "event_type_counts": {
+      "cta_click": 1,
+      "page_view": 1
+    },
+    "sensitive_rejection_ok": true,
+    "sensitive_token_rejection_ok": true,
+    "phone_campaign_rejection_ok": true,
+    "missing_origin_rejection_ok": true,
+    "invalid_event_rejection_ok": true,
+    "redirect_attribution_ok": true,
+    "redirect_attribution_observed": {
+      "asset_id": "challenger-week0-cta-text-v1",
+      "content_id": "event-contract-redirect-content",
+      "variant_id": "event-contract-redirect-variant",
+      "sid": "00000000-0000-4000-8000-000000000002",
+      "utm_source": "local",
+      "utm_medium": "event_contract_smoke",
+      "utm_campaign": "event-contract-redirect-smoke"
+    },
+    "ab_redirect_attribution_ok": true,
+    "ab_redirect_attribution_observed": {
+      "asset_id": "challenger-week0-cta-text-v1",
+      "content_id": "event-contract-ab-content",
+      "variant_id": "ab-week0-cta-text-001:challenger",
+      "sid": "00000000-0000-4000-8000-000000000000",
+      "utm_source": "local",
+      "utm_medium": "event_contract_smoke",
+      "utm_campaign": "event-contract-ab-smoke"
+    },
+    "scheduled_quality_regression_ok": true,
+    "scheduled_quality_regression_decision": "reject_quality_regression",
+    "scheduled_quality_regression_no_quality_regression": 0,
+    "real_event_write_performed": false,
+    "data_lp_events_write_performed": false
+  },
+  "champion_integration_candidate": {
+    "ok": true,
+    "mode": "champion_integration_candidate_local_only",
+    "source_lock_verified": true,
+    "source_commit": "f86faa7356ac7962d9b429951b67c742370271c0",
+    "observed_ref_commit": "f86faa7356ac7962d9b429951b67c742370271c0",
+    "ref_advanced": false,
+    "ancestry_verified": true,
+    "lock_commit_is_ancestor": true,
+    "ref_file_matches_lock": true,
+    "expected_lock_tuple_verified": true,
+    "syntax_ok": true,
+    "worker_dry_run_ok": true,
+    "customer_fields_collected": false,
+    "credentials_sent": false,
+    "line_add_inferred_from_click": false,
+    "external_effect": false,
+    "production_deploy_performed": false
+  },
+  "champion_source_lock_fixtures": {
+    "ok": true,
+    "mode": "isolated_local_champion_source_lock_fixtures",
+    "case_count": 8,
+    "case_ids": [
+      "exact_lock_passes",
+      "descendant_with_same_target_passes",
+      "annotated_ref_is_pinned_to_commit",
+      "ref_advances_between_checks_with_same_target_passes",
+      "blob_match_with_sha_mismatch_fails",
+      "missing_repo_fallback_is_unverified_and_blocked",
+      "descendant_target_drift_fails",
+      "non_ancestor_with_same_target_fails"
+    ],
+    "external_effect": false
+  },
+  "champion_integration_smoke": {
+    "ok": true,
+    "mode": "isolated_local_champion_integration_smoke",
+    "page_contract_ok": true,
+    "cors_contract_ok": true,
+    "allowed_page_view_rows": 1,
+    "allowed_cta_click_rows": 1,
+    "denied_origin_rows": 0,
+    "line_add_rows": 0,
+    "sensitive_rows": 0,
+    "missing_origin_rejected": true,
+    "sensitive_token_rejected": true,
+    "real_event_write_performed": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false
+  },
+  "cloudflare_d1_readiness": {
+    "ok": true,
+    "status": "dedicated_d1_bound_owner_migration_review_required",
+    "inventory_checked_at": "2026-07-10T21:43:33.424Z",
+    "total_database_count": 14,
+    "exact_match_count": 1,
+    "dedicated_database_present": true,
+    "configured_id_is_placeholder": false,
+    "remote_table_query_performed": false,
+    "customer_data_read_performed": false,
+    "resource_create_performed": false,
+    "external_effect": false
+  },
+  "live_telemetry_readiness": {
+    "ok": true,
+    "status": "live_chain_observed_owner_provenance_and_schema_evidence_required",
+    "snapshot_checked_at": "2026-07-10T21:43:37.059Z",
+    "candidate_deployment_observed": true,
+    "candidate_deployment_id": "5073984b-bcc0-40f1-a331-daaadd741071",
+    "candidate_version_id": "133d27b0-36e5-41e8-96ec-b55925b7b30a",
+    "candidate_operation_mode": "verify_existing_candidate_deployment",
+    "candidate_security_contract": "origin-pii-v2",
+    "candidate_security_contract_ok": true,
+    "candidate_deploy_required": false,
+    "champion_collector_origin_matches": true,
+    "privacy_event_contract_ok": true,
+    "d1_exact_target_ready": true,
+    "inventory_reported_num_tables": 0,
+    "inventory_table_count_authoritative": false,
+    "schema_absence_inferred_from_inventory": false,
+    "schema_evidence_valid": false,
+    "recurring_aggregate_read_approved": false,
+    "observed_live_chain_ready_for_owner_evidence": true,
+    "live_ingest_readiness_proven": false,
+    "weekly_aggregate_read_authorized": false,
+    "remote_table_query_performed": false,
+    "event_post_performed": false,
+    "customer_data_read_performed": false,
+    "production_deploy_performed": false,
+    "external_effect": false
+  },
+  "live_telemetry_readiness_fixtures": {
+    "ok": true,
+    "scenario_count": 6,
+    "live_network_refresh_performed": false,
+    "remote_table_query_performed": false,
+    "event_post_performed": false,
+    "customer_data_read_performed": false,
+    "external_effect": false,
+    "scenario_ids": [
+      "candidate_missing_requires_deploy_gate",
+      "deployed_candidate_missing_security_contract_requires_update",
+      "live_chain_observed_requires_owner_provenance_and_schema_evidence",
+      "collector_origin_mismatch_blocks_chain",
+      "schema_and_deployment_evidence_valid_recurring_read_false",
+      "full_evidence_enables_weekly_aggregate_read_plan"
+    ]
+  },
+  "d1_schema_contract": {
+    "ok": true,
+    "status": "local_schema_idempotency_and_constraints_verified",
+    "check_count": 12,
+    "failed_check_count": 0,
+    "migration_idempotent": true,
+    "remote_d1_migration_performed": false,
+    "external_effect": false
+  },
+  "approved_d1_config": {
+    "ok": true,
+    "mode": "approved_d1_config_preview_local_only",
+    "status": "prepared_but_blocked_owner_d1_approval_or_inventory",
+    "ready_to_apply": false,
+    "local_config_write_performed": false,
+    "remote_d1_migration_performed": false,
+    "external_effect": false
+  },
+  "d1_collection_mode": {
+    "ok": true,
+    "status": "local_review_collection_completed",
+    "selected_scope": "local_review_only",
+    "remote_read_authorized": false,
+    "recurring_aggregate_read_approved": false,
+    "collection_execution_performed": true,
+    "remote_read_performed": false,
+    "raw_event_rows_read_performed": false,
+    "customer_data_read_performed": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false
+  },
+  "d1_collection_mode_fixtures": {
+    "ok": true,
+    "scenario_count": 5,
+    "approved_remote_plan_covered": true,
+    "remote_read_performed": false,
+    "customer_data_read_performed": false,
+    "external_effect": false
+  },
+  "d1_aggregate_export_fixtures": {
+    "ok": true,
+    "scenario_count": 2,
+    "aggregate_sql_covered": true,
+    "real_remote_cli_performed": false,
+    "raw_event_rows_read_performed": false,
+    "customer_data_read_performed": false,
+    "project_real_events_write_performed": false,
+    "external_effect": false
+  },
+  "champion_local_branch": {
+    "ok": true,
+    "status": "integration_already_merged_at_source_lock",
+    "branch": "codex/3q-growth-loop-champion-v1",
+    "commit": "9b6fd00c082f2b67d6cde159e61dc6c407d02ea0",
+    "parent_commit": "355981c978bdb1c93a29bb89ae700fda7b41cac0",
+    "changed_paths": [
+      ".github/workflows/deploy-3q-line-oa.yml",
+      ".github/workflows/deploy-fleet-sentinel.yml",
+      ".github/workflows/deploy-pop-line-oa.yml",
+      ".github/workflows/deploy-tudigong.yml",
+      "brands/popmonster.json",
+      "workers/3q-line-oa/worker.js",
+      "workers/fleet-sentinel/worker.js",
+      "workers/outreach/worker.js",
+      "workers/pop-line-oa/worker.js",
+      "workers/pop-sales-ai/worker.js",
+      "workers/sales-ai/worker.js",
+      "workers/tudigong-sales-ai/worker.js",
+      "workers/tudigong/worker.js"
+    ],
+    "remote_branch_present": true,
+    "git_push_performed": false,
+    "github_push_or_pr_performed": false,
+    "external_effect": false
+  },
+  "champion_release_preflight": {
+    "ok": true,
+    "mode": "clean_archive_champion_release_preflight_local_only",
+    "status": "prepared_but_blocked_production_prerequisites",
+    "source_mode": "git_ref_pinned",
+    "observed_ref_commit": "f86faa7356ac7962d9b429951b67c742370271c0",
+    "ref_advanced": false,
+    "ancestry_verified": true,
+    "lock_commit_is_ancestor": true,
+    "ref_file_matches_lock": true,
+    "expected_lock_tuple_verified": true,
+    "source_repo_present": true,
+    "source_repository_unchanged": true,
+    "patch_byte_identical": true,
+    "wrangler_dry_run_ok": true,
+    "production_command_template_dry_run_ok": true,
+    "live_snapshot_checked_at": "2026-07-10T14:39:57.325Z",
+    "live_version_id": "de2997a0-6a6a-4780-9e24-e65774dc3f1a",
+    "live_false_success_state_present": false,
+    "owner_packet_ok": true,
+    "owner_gate_count": 4,
+    "rollback_target_version_id": "de2997a0-6a6a-4780-9e24-e65774dc3f1a",
+    "external_effect": false,
+    "production_deploy_performed": false,
+    "source_repo_write_performed": false,
+    "local_branch_commit": "9b6fd00c082f2b67d6cde159e61dc6c407d02ea0",
+    "collector_readiness_status": "dedicated_d1_bound_owner_migration_review_required"
+  },
+  "champion_github_handoff": {
+    "ok": true,
+    "status": "integration_already_merged_followup_repairs_only",
+    "repository": "milk790-code/3q-hatchery-line-oa",
+    "branch": "codex/3q-growth-loop-champion-v1",
+    "commit": "9b6fd00c082f2b67d6cde159e61dc6c407d02ea0",
+    "draft_required": true,
+    "merge_permitted": false,
+    "github_push_or_pr_performed": false,
+    "external_effect": false
+  },
+  "tracking_link_smoke": {
+    "ok": true,
+    "mode": "isolated_local_tracking_link_smoke",
+    "links_checked": 7,
+    "expected_link_count": 7,
+    "isolated_link_click_events_written": 7,
+    "checks_passed": 7,
+    "real_event_write_performed": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false,
+    "public_link_change_performed": false,
+    "production_deploy_performed": false,
+    "line_push_performed": false,
+    "customer_data_mutation_performed": false,
+    "payment_action_performed": false,
+    "delete_action_performed": false
+  },
+  "event_input_quality_gate": {
+    "ok": true,
+    "mode": "real_event_input_quality_gate",
+    "rows_scanned": 0,
+    "issue_count": 0,
+    "scoring_allowed": true,
+    "pii_or_sensitive_data_detected": false,
+    "data_lp_events_write_performed": false
+  },
+  "funnel_aggregate_preview": {
+    "ok": true,
+    "mode": "full_funnel_preview",
+    "events_written": 48,
+    "counts_by_event_type": {
+      "link_click": 20,
+      "page_view": 17,
+      "cta_click": 6,
+      "line_add": 2,
+      "lead_submit": 1,
+      "deal": 1,
+      "quality_flag": 1
+    },
+    "contains_sensitive_columns": false,
+    "contains_sensitive_values": false,
+    "apply_performed": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false
+  },
+  "funnel_aggregate_fixtures": {
+    "ok": true,
+    "mode": "funnel_aggregate_fixture_dry_run",
+    "scenario_count": 6,
+    "execution_performed": false,
+    "real_event_write_performed": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false,
+    "scenarios": [
+      {
+        "id": "valid_full_funnel_preview",
+        "ok": true,
+        "status_mode": "full_funnel_preview",
+        "data_lp_events_write_performed": false
+      },
+      {
+        "id": "blocked_unknown_asset",
+        "ok": true,
+        "status_mode": "failed",
+        "data_lp_events_write_performed": false
+      },
+      {
+        "id": "blocked_missing_content_id",
+        "ok": true,
+        "status_mode": "failed",
+        "data_lp_events_write_performed": false
+      },
+      {
+        "id": "blocked_sensitive_column",
+        "ok": true,
+        "status_mode": "blocked",
+        "data_lp_events_write_performed": false
+      },
+      {
+        "id": "blocked_sensitive_value",
+        "ok": true,
+        "status_mode": "blocked",
+        "data_lp_events_write_performed": false
+      },
+      {
+        "id": "blocked_apply_without_append",
+        "ok": true,
+        "status_mode": "blocked",
+        "data_lp_events_write_performed": false
+      }
+    ]
+  },
+  "real_data_apply_fixtures": {
+    "ok": true,
+    "mode": "real_data_apply_fixture_dry_run",
+    "scenario_count": 4,
+    "execution_performed": false,
+    "real_event_write_performed": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false,
+    "scenarios": [
+      {
+        "id": "funnel_apply_requires_confirm_real_data",
+        "importer": "funnel",
+        "ok": true,
+        "status_mode": "blocked",
+        "confirm_real_data": false,
+        "example_input_detected": false,
+        "real_events_unchanged": true,
+        "data_lp_events_write_performed": false
+      },
+      {
+        "id": "funnel_copied_example_never_applies",
+        "importer": "funnel",
+        "ok": true,
+        "status_mode": "blocked",
+        "confirm_real_data": true,
+        "example_input_detected": true,
+        "real_events_unchanged": true,
+        "data_lp_events_write_performed": false
+      },
+      {
+        "id": "manual_apply_requires_confirm_real_data",
+        "importer": "manual",
+        "ok": true,
+        "status_mode": "blocked",
+        "confirm_real_data": false,
+        "example_input_detected": false,
+        "real_events_unchanged": true,
+        "data_lp_events_write_performed": false
+      },
+      {
+        "id": "manual_copied_example_never_applies",
+        "importer": "manual",
+        "ok": true,
+        "status_mode": "blocked",
+        "confirm_real_data": true,
+        "example_input_detected": true,
+        "real_events_unchanged": true,
+        "data_lp_events_write_performed": false
+      }
+    ]
+  },
+  "real_data_input_pack": {
+    "ok": true,
+    "mode": "real_data_input_pack",
+    "status": "template_ready",
+    "template_only": true,
+    "template_count": 2,
+    "live_input_files_created": false,
+    "real_events_unchanged": true,
+    "data_lp_events_write_performed": false,
+    "external_effect": false
+  },
+  "source_readiness": {
+    "ok": true,
+    "mode": "source_readiness_monitor",
+    "status": "waiting_for_real_data",
+    "real_event_rows": 0,
+    "missing_stage_count": 7,
+    "ready_for_public_iteration_decision": false,
+    "sample_threshold_met": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false
+  },
+  "source_capture_pack": {
+    "ok": true,
+    "mode": "source_capture_pack",
+    "status": "waiting_for_owner_aggregate_capture",
+    "tracking_links_total": 7,
+    "importable_tracking_links": 6,
+    "ab_router_gate_count": 1,
+    "stage_count": 7,
+    "ledger_rows": 42,
+    "sample_gate_ledger_rows": 18,
+    "template_only": true,
+    "owner_review_required": true,
+    "live_input_files_created": false,
+    "real_events_unchanged": true,
+    "data_lp_events_write_performed": false,
+    "external_effect": false
+  },
+  "sample_gate_replay_fixtures": {
+    "ok": true,
+    "mode": "sample_gate_replay_fixture_dry_run",
+    "template_rows": 18,
+    "scenario_count": 3,
+    "sample_gate_ledger_replay_executed": true,
+    "source_capture_compile_commands_executed": true,
+    "importer_preview_commands_executed": true,
+    "execution_performed": false,
+    "real_event_write_performed": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false,
+    "scenarios": [
+      {
+        "id": "sample_gate_insufficient_keeps_collecting",
+        "ok": true,
+        "imported_events": 250,
+        "decision": "continue_collecting_sample_gate_counts",
+        "challenger_sample_threshold_met": false,
+        "challenger_beats_sample_rate": false,
+        "source_capture_compile_ok": true,
+        "source_capture_compile_status": "owner_preview_ready",
+        "source_capture_compile_data_lp_events_write_performed": false,
+        "source_capture_compile_external_effect": false
+      },
+      {
+        "id": "sample_gate_ready_challenger_beats_rate",
+        "ok": true,
+        "imported_events": 278,
+        "decision": "queue_owner_review_no_auto_promotion",
+        "challenger_sample_threshold_met": true,
+        "challenger_beats_sample_rate": true,
+        "source_capture_compile_ok": true,
+        "source_capture_compile_status": "owner_preview_ready",
+        "source_capture_compile_data_lp_events_write_performed": false,
+        "source_capture_compile_external_effect": false
+      },
+      {
+        "id": "sample_gate_ready_challenger_underperforms",
+        "ok": true,
+        "imported_events": 253,
+        "decision": "plan_rework_or_next_variable_after_owner_review",
+        "challenger_sample_threshold_met": true,
+        "challenger_beats_sample_rate": false,
+        "source_capture_compile_ok": true,
+        "source_capture_compile_status": "owner_preview_ready",
+        "source_capture_compile_data_lp_events_write_performed": false,
+        "source_capture_compile_external_effect": false
+      }
+    ]
+  },
+  "source_capture_compile": {
+    "ok": true,
+    "mode": "source_capture_compile_preview",
+    "status": "waiting_for_filled_counts",
+    "input_kind": "template",
+    "ledger_rows_read": 42,
+    "filled_rows": 0,
+    "empty_rows": 42,
+    "funnel_rows": 0,
+    "manual_rows": 0,
+    "issue_count": 0,
+    "warning_count": 0,
+    "owner_review_required": true,
+    "live_input_files_created": false,
+    "apply_performed": false,
+    "append_performed": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false
+  },
+  "source_capture_compile_fixtures": {
+    "ok": true,
+    "mode": "source_capture_compile_fixture_dry_run",
+    "scenario_count": 7,
+    "local_fixture_commands_executed": true,
+    "execution_performed": false,
+    "real_event_write_performed": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false,
+    "scenarios": [
+      {
+        "id": "valid_filled_compile_preview",
+        "ok": true,
+        "status_status": "owner_preview_ready",
+        "data_lp_events_write_performed": false
+      },
+      {
+        "id": "empty_template_waits_for_counts",
+        "ok": true,
+        "status_status": "waiting_for_filled_counts",
+        "data_lp_events_write_performed": false
+      },
+      {
+        "id": "partial_blank_count_warns_not_blocks",
+        "ok": true,
+        "status_status": "waiting_for_filled_counts",
+        "data_lp_events_write_performed": false
+      },
+      {
+        "id": "blocked_missing_pii_checked",
+        "ok": true,
+        "status_status": "blocked_invalid_filled_ledger",
+        "data_lp_events_write_performed": false
+      },
+      {
+        "id": "blocked_sensitive_evidence",
+        "ok": true,
+        "status_status": "blocked_invalid_filled_ledger",
+        "data_lp_events_write_performed": false
+      },
+      {
+        "id": "blocked_invalid_date",
+        "ok": true,
+        "status_status": "blocked_invalid_filled_ledger",
+        "data_lp_events_write_performed": false
+      },
+      {
+        "id": "blocked_invalid_target_file",
+        "ok": true,
+        "status_status": "blocked_invalid_filled_ledger",
+        "data_lp_events_write_performed": false
+      }
+    ]
+  },
+  "real_data_intake_plan": {
+    "ok": true,
+    "mode": "real_data_intake_plan",
+    "status": "no_real_input_files",
+    "ready_apply_count": 0,
+    "missing_input_count": 2,
+    "blocked_input_count": 0,
+    "real_events_unchanged": true,
+    "data_lp_events_write_performed": false,
+    "external_effect": false
+  },
+  "data_collection_brief": {
+    "ok": true,
+    "mode": "data_collection_brief",
+    "status": "waiting_for_owner_aggregate_counts",
+    "task_count": 42,
+    "stage_count": 7,
+    "importable_link_count": 6,
+    "gated_link_count": 1,
+    "sample_gate_status": "waiting_for_sample_gate_counts",
+    "sample_gate_p0_task_count": 18,
+    "sample_gate_p0_link_count": 6,
+    "sample_gate_stage_count": 3,
+    "filled_ledger_exists": false,
+    "sample_threshold_met": false,
+    "missing_stage_count": 7,
+    "real_events_unchanged": true,
+    "live_input_files_created": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false,
+    "queue_task_count": 42,
+    "stage_priorities": [
+      {
+        "event_type": "link_click",
+        "label": "連結點擊",
+        "priority": "P1_funnel_completeness",
+        "sample_gate_key": null,
+        "sample_gap": 0,
+        "source_surface": "社群平台連結點擊報表 / remote D1 link_click",
+        "source_metric": "link clicks by content_id / variant_id",
+        "target_template": "data/real_data_input_pack/funnel_aggregates.fill-template.csv",
+        "target_live_file": "data/funnel_aggregates.csv",
+        "evidence_rule": "只記 aggregate count 與報表截圖/匯出檔路徑；不要貼使用者名單。"
+      },
+      {
+        "event_type": "page_view",
+        "label": "落地頁瀏覽",
+        "priority": "P0_sample_gate",
+        "sample_gate_key": "visits",
+        "sample_gap": 100,
+        "source_surface": "candidate Worker D1 / landing page analytics",
+        "source_metric": "page_view count by asset_id / content_id / variant_id",
+        "target_template": "data/real_data_input_pack/funnel_aggregates.fill-template.csv",
+        "target_live_file": "data/funnel_aggregates.csv",
+        "evidence_rule": "只記 aggregate page views；不要存 IP、User-Agent、個人識別。"
+      },
+      {
+        "event_type": "cta_click",
+        "label": "CTA 點擊",
+        "priority": "P0_sample_gate",
+        "sample_gate_key": "cta_clicks",
+        "sample_gap": 20,
+        "source_surface": "candidate Worker D1 / landing page analytics",
+        "source_metric": "cta_click count by asset_id / content_id / variant_id",
+        "target_template": "data/real_data_input_pack/funnel_aggregates.fill-template.csv",
+        "target_live_file": "data/funnel_aggregates.csv",
+        "evidence_rule": "只記 aggregate CTA clicks；不要存個別 session 明細。"
+      },
+      {
+        "event_type": "line_add",
+        "label": "LINE 進線 / 加好友",
+        "priority": "P0_sample_gate",
+        "sample_gate_key": "line_adds",
+        "sample_gap": 5,
+        "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+        "source_metric": "line_add aggregate count by tracking context",
+        "target_template": "data/real_data_input_pack/manual_conversions.fill-template.csv",
+        "target_live_file": "data/manual_conversions.csv",
+        "evidence_rule": "只記新增數或進線數；不要貼 LINE user id、暱稱、聊天內容。"
+      },
+      {
+        "event_type": "lead_submit",
+        "label": "留資",
+        "priority": "P1_funnel_completeness",
+        "sample_gate_key": null,
+        "sample_gap": 0,
+        "source_surface": "LINE 客服手動分桶 / lead qualification aggregate",
+        "source_metric": "lead_submit aggregate count",
+        "target_template": "data/real_data_input_pack/manual_conversions.fill-template.csv",
+        "target_live_file": "data/manual_conversions.csv",
+        "evidence_rule": "只記合格留資數；不要貼姓名、電話、email、公司私密資料。"
+      },
+      {
+        "event_type": "deal",
+        "label": "成交",
+        "priority": "P1_funnel_completeness",
+        "sample_gate_key": null,
+        "sample_gap": 0,
+        "source_surface": "owner-confirmed aggregate deal log",
+        "source_metric": "deal aggregate count",
+        "target_template": "data/real_data_input_pack/manual_conversions.fill-template.csv",
+        "target_live_file": "data/manual_conversions.csv",
+        "evidence_rule": "只記成交筆數與金額桶；不要貼付款資訊、ECPay 訂單或退款資料。"
+      },
+      {
+        "event_type": "quality_flag",
+        "label": "品質 / 垃圾訊號",
+        "priority": "P1_funnel_completeness",
+        "sample_gate_key": null,
+        "sample_gap": 0,
+        "source_surface": "LINE 客服手動分桶 / quality aggregate",
+        "source_metric": "quality_flag count and optional aggregate quality_score",
+        "target_template": "data/real_data_input_pack/manual_conversions.fill-template.csv",
+        "target_live_file": "data/manual_conversions.csv",
+        "evidence_rule": "只記品質旗標數；不要貼對話原文或客戶資料。"
+      }
+    ],
+    "immediate_actions": [
+      {
+        "id": "create_owner_filled_ledger_copy",
+        "status": "owner_local_review_required",
+        "command": "cp data/source_capture/source_capture_ledger.fill-template.csv data/source_capture/source_capture_ledger.filled.csv",
+        "note": "Run locally only after reviewing the template. This creates an owner working copy, not a live scoring input.",
+        "external_effect": false
+      },
+      {
+        "id": "fill_aggregate_counts",
+        "status": "owner_manual_input_required",
+        "command": "Open data/source_capture/source_capture_ledger.filled.csv and fill aggregate_count plus evidence fields.",
+        "note": "Use aggregate counts only. Do not paste customer rows or chat text.",
+        "external_effect": false
+      }
+    ]
+  },
+  "data_collection_progress": {
+    "ok": true,
+    "mode": "data_collection_progress",
+    "status": "waiting_for_p0_sample_gate_counts",
+    "total_task_count": 42,
+    "filled_task_count": 0,
+    "pending_task_count": 42,
+    "p0_task_count": 18,
+    "p0_pending_count": 18,
+    "p1_task_count": 24,
+    "p1_pending_count": 24,
+    "next_owner_input_count": 9,
+    "real_events_unchanged": true,
+    "live_input_files_created": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false
+  },
+  "next_p0_owner_inputs": {
+    "ok": true,
+    "mode": "next_p0_owner_inputs",
+    "status": "waiting_for_p0_owner_inputs",
+    "source_progress_status": "waiting_for_p0_sample_gate_counts",
+    "current_input_count": 9,
+    "p0_pending_count": 18,
+    "p1_pending_count": 24,
+    "source_group_count": 2,
+    "recommended_open_command": "open next_p0_owner_form.html",
+    "real_events_unchanged": true,
+    "live_input_files_created": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false
+  },
+  "next_p0_owner_form": {
+    "ok": true,
+    "mode": "next_p0_owner_form",
+    "status": "ready_local_next_p0_owner_form",
+    "source_progress_status": "waiting_for_p0_sample_gate_counts",
+    "owner_sample_gate_status": "waiting_for_owner_sample_gate_counts",
+    "row_count": 9,
+    "current_input_count": 9,
+    "p0_pending_count": 18,
+    "p1_pending_count": 24,
+    "source_group_count": 2,
+    "export_headers": [
+      "rank",
+      "capture_date",
+      "role",
+      "tracking_link_id",
+      "event_type",
+      "stage_label",
+      "source_surface",
+      "target_live_file",
+      "aggregate_count",
+      "evidence_ref",
+      "reviewer",
+      "pii_checked"
+    ],
+    "download_filename": "next_p0_owner_inputs.filled.csv",
+    "json_download_filename": "next_p0_owner_inputs.review.json",
+    "target_live_files": [
+      "data/funnel_aggregates.csv",
+      "data/manual_conversions.csv"
+    ],
+    "owner_fill_paths": [
+      "data/source_capture/source_capture_ledger.filled.csv"
+    ],
+    "browser_only": true,
+    "browser_persistence": false,
+    "network_calls_performed": false,
+    "export_contract": "Focused owner-reviewed aggregate-count download only. It is not a live input CSV and does not stage or apply data.",
+    "real_events_unchanged": true,
+    "live_input_files_created": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false
+  },
+  "next_p0_owner_form_fixtures": {
+    "ok": true,
+    "mode": "next_p0_owner_form_fixture_dry_run",
+    "row_count": 9,
+    "expected_row_count": 9,
+    "scenario_count": 4,
+    "browser_form_static_checks_executed": true,
+    "export_contract_verified": true,
+    "local_fixture_commands_executed": true,
+    "real_events_unchanged": true,
+    "live_input_files_created": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false,
+    "scenarios": [
+      {
+        "id": "html_contains_all_focused_inputs",
+        "ok": true,
+        "live_input_files_created": false,
+        "data_lp_events_write_performed": false,
+        "external_effect": false
+      },
+      {
+        "id": "no_network_or_browser_persistence",
+        "ok": true,
+        "live_input_files_created": false,
+        "data_lp_events_write_performed": false,
+        "external_effect": false
+      },
+      {
+        "id": "exports_aggregate_only_review_contract",
+        "ok": true,
+        "live_input_files_created": false,
+        "data_lp_events_write_performed": false,
+        "external_effect": false
+      },
+      {
+        "id": "red_line_flags_false",
+        "ok": true,
+        "live_input_files_created": false,
+        "data_lp_events_write_performed": false,
+        "external_effect": false
+      }
+    ]
+  },
+  "next_p0_owner_intake": {
+    "ok": true,
+    "mode": "next_p0_owner_intake",
+    "status": "waiting_for_next_p0_owner_download",
+    "candidate_found": false,
+    "candidate_valid": false,
+    "expected_row_count": 9,
+    "downloaded_row_count": 0,
+    "filled_rows": 0,
+    "funnel_preview_rows": 0,
+    "manual_preview_rows": 0,
+    "stage_performed": false,
+    "live_input_files_created": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false
+  },
+  "next_p0_owner_intake_fixtures": {
+    "ok": true,
+    "mode": "next_p0_owner_intake_fixture_dry_run",
+    "row_count": 9,
+    "scenario_count": 5,
+    "local_fixture_commands_executed": true,
+    "live_project_inputs_created": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false,
+    "scenarios": [
+      {
+        "id": "valid_download_preview_ready",
+        "ok": true,
+        "status": "next_p0_owner_download_preview_ready",
+        "exit_code": 0,
+        "live_project_inputs_created": false,
+        "data_lp_events_write_performed": false,
+        "external_effect": false
+      },
+      {
+        "id": "quick_preview_auto_intake_ready",
+        "ok": true,
+        "status": "next_p0_owner_download_preview_ready",
+        "exit_code": 0,
+        "live_project_inputs_created": false,
+        "data_lp_events_write_performed": false,
+        "external_effect": false
+      },
+      {
+        "id": "sensitive_evidence_blocked",
+        "ok": true,
+        "status": "blocked_invalid_next_p0_owner_download",
+        "exit_code": 1,
+        "live_project_inputs_created": false,
+        "data_lp_events_write_performed": false,
+        "external_effect": false
+      },
+      {
+        "id": "stage_without_confirmation_blocked",
+        "ok": true,
+        "status": "next_p0_owner_download_ready_needs_confirmed_stage",
+        "exit_code": 1,
+        "live_project_inputs_created": false,
+        "data_lp_events_write_performed": false,
+        "external_effect": false
+      },
+      {
+        "id": "confirmed_stage_writes_temp_live_inputs_only",
+        "ok": true,
+        "status": "next_p0_owner_download_staged_local_inputs",
+        "exit_code": 0,
+        "live_project_inputs_created": false,
+        "data_lp_events_write_performed": false,
+        "external_effect": false
+      }
+    ]
+  },
+  "owner_data_preflight": {
+    "ok": true,
+    "mode": "owner_data_preflight_local_only",
+    "status": "waiting_for_owner_preview_rows",
+    "selected_source_id": "next_p0_owner_intake",
+    "selected_source_row_count": 0,
+    "selected_source_event_total": 0,
+    "sample_threshold_met": false,
+    "no_quality_regression": true,
+    "challenger_win_rule_met": false,
+    "next_round_decision": "continue_current_round_until_sample_threshold",
+    "owner_review_required": true,
+    "real_events_unchanged": true,
+    "data_lp_events_write_performed": false,
+    "external_effect": false
+  },
+  "sample_gate_capture_calendar": {
+    "ok": true,
+    "mode": "sample_gate_capture_calendar",
+    "status": "waiting_for_owner_sample_gate_counts",
+    "event_count": 3,
+    "next_due_event_id": "preferred_sample_check_day7",
+    "next_due_date": "2026-07-05",
+    "p0_input_count": 9,
+    "p0_pending_count": 18,
+    "progress_status": "waiting_for_p0_sample_gate_counts",
+    "calendar_import_performed": false,
+    "system_reminder_created": false,
+    "browser_open_performed": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false
+  },
+  "sample_gate_due_status": {
+    "ok": true,
+    "mode": "sample_gate_due_status",
+    "status": "day7_due_waiting_for_owner_counts",
+    "today": "2026-07-11",
+    "min_check_date": "2026-07-01",
+    "preferred_check_date": "2026-07-05",
+    "due_phase": "preferred_check_due",
+    "due_event_id": "preferred_sample_check_day7",
+    "due_date": "2026-07-05",
+    "due_now": true,
+    "sample_threshold_met": false,
+    "sample_rate_win_candidate": false,
+    "p0_input_count": 9,
+    "p0_pending_count": 18,
+    "progress_status": "waiting_for_p0_sample_gate_counts",
+    "owner_sample_gate_status": "waiting_for_owner_sample_gate_counts",
+    "capture_calendar_status": "waiting_for_owner_sample_gate_counts",
+    "capture_calendar_next_due_date": "2026-07-05",
+    "capture_calendar_next_due_event_id": "preferred_sample_check_day7",
+    "champion_action": "keep_champion_sample_insufficient",
+    "challenger_promotion_allowed": false,
+    "next_variable_rotation_allowed": false,
+    "next_safe_command": "open next_p0_owner_form.html",
+    "calendar_import_performed": false,
+    "system_reminder_created": false,
+    "browser_open_performed": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false
+  },
+  "north_star_funnel": {
+    "ok": true,
+    "mode": "north_star_funnel_local_only",
+    "status": "waiting_for_owner_sample_gate_counts",
+    "path": [
+      "link_click",
+      "line_add",
+      "lead_submit",
+      "deal"
+    ],
+    "primary_metric": "line_adds_per_100_clicks",
+    "link_clicks": 0,
+    "line_adds": 0,
+    "leads": 0,
+    "deals": 0,
+    "line_adds_per_100_clicks": null,
+    "leads_per_100_clicks": null,
+    "deals_per_100_clicks": null,
+    "sample_threshold_met": false,
+    "challenger_win_rule_met": false,
+    "quality_guard_status": "not_evaluated_from_sample_gate",
+    "owner_review_required": false,
+    "promotion_performed": false,
+    "asset_count": 2,
+    "attribution_row_count": 6,
+    "real_events_unchanged": true,
+    "data_lp_events_write_performed": false,
+    "external_effect": false
+  },
+  "week0_owner_capture_queue": {
+    "ok": true,
+    "mode": "week0_owner_capture_queue",
+    "status": "waiting_for_owner_sample_gate_counts",
+    "p0_task_count": 18,
+    "p0_link_count": 6,
+    "source_group_count": 2,
+    "sample_filled_exists": false,
+    "owner_fill_path": "data/source_capture/sample_gate_ledger.filled.csv",
+    "next_safe_command_after_owner_fill": "npm run source:compile -- --input=data/source_capture/sample_gate_ledger.filled.csv --input-kind=sample_gate_filled",
+    "real_events_unchanged": true,
+    "live_input_files_created": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false
+  },
+  "owner_sample_gate_status": {
+    "ok": true,
+    "mode": "owner_sample_gate_status",
+    "status": "waiting_for_owner_sample_gate_counts",
+    "input_exists": false,
+    "filled_rows": 0,
+    "pending_rows": 18,
+    "issue_count": 0,
+    "sample_threshold_met": false,
+    "sample_rate_win_candidate": false,
+    "challenger_win_rule_met": false,
+    "quality_guard_status": "not_evaluated_from_sample_gate",
+    "decision": "continue_collecting_sample_gate_counts",
+    "owner_review_required": false,
+    "promotion_performed": false,
+    "real_events_unchanged": true,
+    "live_input_files_created": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false
+  },
+  "sample_gate_owner_worksheet": {
+    "ok": true,
+    "mode": "sample_gate_owner_worksheet",
+    "status": "waiting_for_owner_sample_gate_counts",
+    "owner_sample_gate_status": "waiting_for_owner_sample_gate_counts",
+    "owner_filled_exists": false,
+    "row_count": 18,
+    "link_count": 6,
+    "source_group_count": 2,
+    "required_owner_fields": [
+      "capture_date",
+      "aggregate_count",
+      "evidence_ref",
+      "reviewer",
+      "pii_checked"
+    ],
+    "real_events_unchanged": true,
+    "live_input_files_created": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false
+  },
+  "sample_gate_owner_form": {
+    "ok": true,
+    "mode": "sample_gate_owner_form",
+    "status": "ready_local_browser_fill",
+    "owner_filled_exists": false,
+    "worksheet_status": "waiting_for_owner_sample_gate_counts",
+    "row_count": 18,
+    "link_count": 6,
+    "source_group_count": 2,
+    "required_owner_fields": [
+      "capture_date",
+      "aggregate_count",
+      "evidence_ref",
+      "reviewer",
+      "pii_checked"
+    ],
+    "optional_owner_fields": [
+      "quality_score"
+    ],
+    "download_filename": "sample_gate_ledger.filled.csv",
+    "browser_only": true,
+    "browser_persistence": false,
+    "network_calls_performed": false,
+    "real_events_unchanged": true,
+    "live_input_files_created": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false
+  },
+  "sample_gate_owner_form_fixtures": {
+    "ok": true,
+    "mode": "sample_gate_owner_form_fixture_dry_run",
+    "scenario_count": 3,
+    "local_fixture_commands_executed": true,
+    "form_export_replay_executed": true,
+    "source_capture_compile_commands_executed": true,
+    "owner_sample_gate_commands_executed": true,
+    "real_events_unchanged": true,
+    "live_input_files_created": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false,
+    "scenarios": [
+      {
+        "id": "form_export_sample_insufficient_keeps_collecting",
+        "ok": true,
+        "compile_status": "owner_preview_ready",
+        "owner_status": "sample_insufficient_keep_champion",
+        "owner_decision": "continue_collecting_sample_gate_counts",
+        "sample_threshold_met": false,
+        "sample_rate_win_candidate": false,
+        "challenger_win_rule_met": false,
+        "quality_guard_status": "not_evaluated_from_sample_gate",
+        "promotion_performed": false
+      },
+      {
+        "id": "form_export_ready_queues_owner_review",
+        "ok": true,
+        "compile_status": "owner_preview_ready",
+        "owner_status": "sample_rate_win_needs_quality_review",
+        "owner_decision": "queue_owner_quality_review_no_auto_promotion",
+        "sample_threshold_met": true,
+        "sample_rate_win_candidate": true,
+        "challenger_win_rule_met": false,
+        "quality_guard_status": "not_evaluated_from_sample_gate",
+        "promotion_performed": false
+      },
+      {
+        "id": "form_export_sensitive_evidence_blocked",
+        "ok": true,
+        "compile_status": "blocked_invalid_filled_ledger",
+        "owner_status": "blocked_invalid_owner_sample_gate",
+        "owner_decision": "fix_owner_sample_gate_ledger",
+        "sample_threshold_met": false,
+        "sample_rate_win_candidate": false,
+        "challenger_win_rule_met": false,
+        "quality_guard_status": "not_evaluated_from_sample_gate",
+        "promotion_performed": false
+      }
+    ]
+  },
+  "sample_gate_batch_handoff": {
+    "ok": true,
+    "mode": "sample_gate_batch_handoff_local_only",
+    "status": "p0_full_coverage_batched_for_owner_counts",
+    "p0_task_count": 18,
+    "all_p0_row_count": 18,
+    "focused_batch_row_count": 9,
+    "remaining_batch_row_count": 9,
+    "p0_pending_count": 18,
+    "focused_pending_count": 9,
+    "remaining_pending_count": 9,
+    "full_coverage_ready": true,
+    "batch_count": 2,
+    "live_input_files_created": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false,
+    "delete_action_performed": false
+  },
+  "sample_gate_collection_sprint": {
+    "ok": true,
+    "mode": "sample_gate_collection_sprint_local_only",
+    "status": "sample_gate_due_collection_sprint_active",
+    "due_status": "day7_due_waiting_for_owner_counts",
+    "due_now": true,
+    "p0_full_task_count": 18,
+    "p0_full_row_count": 18,
+    "p0_pending_count": 18,
+    "focused_missing_count": 9,
+    "sprint_step_count": 5,
+    "owner_open_target_count": 7,
+    "owner_review_required": true,
+    "data_lp_events_write_performed": false,
+    "external_effect": false,
+    "delete_action_performed": false
+  },
+  "owner_sample_gate_fixtures": {
+    "ok": true,
+    "mode": "owner_sample_gate_fixture_dry_run",
+    "scenario_count": 7,
+    "owner_sample_gate_commands_executed": true,
+    "real_events_unchanged": true,
+    "data_lp_events_write_performed": false,
+    "external_effect": false,
+    "scenarios": [
+      {
+        "id": "missing_input_waits_for_owner_counts",
+        "ok": true,
+        "status": "waiting_for_owner_sample_gate_counts",
+        "decision": "continue_collecting_sample_gate_counts",
+        "sample_threshold_met": false,
+        "sample_rate_win_candidate": false,
+        "challenger_win_rule_met": false,
+        "quality_guard_status": "not_evaluated_from_sample_gate",
+        "promotion_performed": false
+      },
+      {
+        "id": "partial_counts_keep_collecting",
+        "ok": true,
+        "status": "owner_counts_incomplete",
+        "decision": "continue_collecting_sample_gate_counts",
+        "sample_threshold_met": false,
+        "sample_rate_win_candidate": false,
+        "challenger_win_rule_met": false,
+        "quality_guard_status": "not_evaluated_from_sample_gate",
+        "promotion_performed": false
+      },
+      {
+        "id": "sample_insufficient_due_visits",
+        "ok": true,
+        "status": "sample_insufficient_keep_champion",
+        "decision": "continue_collecting_sample_gate_counts",
+        "sample_threshold_met": false,
+        "sample_rate_win_candidate": false,
+        "challenger_win_rule_met": false,
+        "quality_guard_status": "not_evaluated_from_sample_gate",
+        "promotion_performed": false
+      },
+      {
+        "id": "sample_insufficient_due_test_days",
+        "ok": true,
+        "status": "sample_insufficient_keep_champion",
+        "decision": "continue_collecting_sample_gate_counts",
+        "sample_threshold_met": false,
+        "sample_rate_win_candidate": false,
+        "challenger_win_rule_met": false,
+        "quality_guard_status": "not_evaluated_from_sample_gate",
+        "promotion_performed": false
+      },
+      {
+        "id": "sample_rate_win_needs_quality_review",
+        "ok": true,
+        "status": "sample_rate_win_needs_quality_review",
+        "decision": "queue_owner_quality_review_no_auto_promotion",
+        "sample_threshold_met": true,
+        "sample_rate_win_candidate": true,
+        "challenger_win_rule_met": false,
+        "quality_guard_status": "not_evaluated_from_sample_gate",
+        "promotion_performed": false
+      },
+      {
+        "id": "sample_ready_challenger_underperforms",
+        "ok": true,
+        "status": "sample_ready_challenger_underperforms",
+        "decision": "plan_rework_or_next_variable_after_owner_review",
+        "sample_threshold_met": true,
+        "sample_rate_win_candidate": false,
+        "challenger_win_rule_met": false,
+        "quality_guard_status": "not_evaluated_from_sample_gate",
+        "promotion_performed": false
+      },
+      {
+        "id": "sensitive_evidence_blocks_status",
+        "ok": true,
+        "status": "blocked_invalid_owner_sample_gate",
+        "decision": "fix_owner_sample_gate_ledger",
+        "sample_threshold_met": false,
+        "sample_rate_win_candidate": false,
+        "challenger_win_rule_met": false,
+        "quality_guard_status": "not_evaluated_from_sample_gate",
+        "promotion_performed": false
+      }
+    ]
+  },
+  "owner_quality_review": {
+    "ok": true,
+    "mode": "owner_quality_review",
+    "status": "waiting_for_sample_rate_candidate",
+    "owner_sample_gate_status": "waiting_for_owner_sample_gate_counts",
+    "input_exists": false,
+    "sample_threshold_met": false,
+    "sample_rate_win_candidate": false,
+    "quality_guard_status": "not_evaluated_waiting_for_sample_rate_candidate",
+    "no_quality_regression": null,
+    "challenger_win_rule_met": false,
+    "promotion_review_queued": false,
+    "promotion_performed": false,
+    "issue_count": 0,
+    "quality_regression_count": 0,
+    "live_input_files_created": false,
+    "data_lp_events_write_performed": false,
+    "approval_queue_write_performed": false,
+    "external_effect": false
+  },
+  "owner_quality_review_form": {
+    "ok": true,
+    "mode": "owner_quality_review_form",
+    "status": "waiting_for_sample_rate_candidate_local_form_ready",
+    "owner_sample_gate_status": "waiting_for_owner_sample_gate_counts",
+    "owner_quality_review_status": "waiting_for_sample_rate_candidate",
+    "owner_filled_exists": false,
+    "sample_rate_win_candidate": false,
+    "required_owner_fields": [
+      "reviewer",
+      "pii_checked",
+      "evidence_ref",
+      "lead_rate_retention_vs_champion",
+      "close_rate_retention_vs_champion",
+      "spam_flag_rate"
+    ],
+    "optional_owner_fields": [
+      "low_quality_flag_count",
+      "notes"
+    ],
+    "download_filename": "owner_quality_review.filled.json",
+    "review_download_filename": "owner_quality_review_form.review.json",
+    "thresholds": {
+      "min_lead_rate_retention_vs_champion": 0.8,
+      "min_close_rate_retention_vs_champion": 0.8,
+      "max_spam_flag_rate": 0.05,
+      "blocked_metadata_keys": [
+        "phone",
+        "email",
+        "line_user_id",
+        "customer_name",
+        "address",
+        "payment",
+        "card"
+      ]
+    },
+    "browser_only": true,
+    "browser_persistence": false,
+    "form_action": "none",
+    "network_calls_performed": false,
+    "real_events_unchanged": true,
+    "live_input_files_created": false,
+    "data_lp_events_write_performed": false,
+    "approval_queue_write_performed": false,
+    "external_effect": false,
+    "promotion_performed": false
+  },
+  "owner_quality_review_form_fixtures": {
+    "ok": true,
+    "mode": "owner_quality_review_form_fixture_dry_run",
+    "form_status": "waiting_for_sample_rate_candidate_local_form_ready",
+    "form_download_filename": "owner_quality_review.filled.json",
+    "scenario_count": 4,
+    "local_fixture_commands_executed": true,
+    "form_export_replay_executed": true,
+    "owner_quality_review_commands_executed": true,
+    "real_events_unchanged": true,
+    "live_input_files_created": false,
+    "data_lp_events_write_performed": false,
+    "approval_queue_write_performed": false,
+    "external_effect": false,
+    "promotion_performed": false,
+    "scenarios": [
+      {
+        "id": "quality_form_export_waits_for_sample_rate_candidate",
+        "ok": true,
+        "owner_status": "waiting_for_sample_rate_candidate",
+        "owner_decision": "hold_quality_review_until_sample_rate_candidate",
+        "sample_rate_win_candidate": false,
+        "quality_guard_status": "quality_evidence_valid_but_not_actionable",
+        "no_quality_regression": null,
+        "challenger_win_rule_met": false,
+        "promotion_review_queued": false,
+        "promotion_performed": false,
+        "issue_count": 0,
+        "quality_regression_count": 0
+      },
+      {
+        "id": "quality_form_export_pass_queues_owner_review",
+        "ok": true,
+        "owner_status": "owner_quality_review_passed_no_auto_promotion",
+        "owner_decision": "queue_owner_promotion_review_no_auto_promotion",
+        "sample_rate_win_candidate": true,
+        "quality_guard_status": "owner_quality_review_passed",
+        "no_quality_regression": true,
+        "challenger_win_rule_met": true,
+        "promotion_review_queued": true,
+        "promotion_performed": false,
+        "issue_count": 0,
+        "quality_regression_count": 0
+      },
+      {
+        "id": "quality_form_export_regression_keeps_champion",
+        "ok": true,
+        "owner_status": "owner_quality_review_failed_keep_champion",
+        "owner_decision": "keep_champion_due_quality_regression",
+        "sample_rate_win_candidate": true,
+        "quality_guard_status": "owner_quality_review_failed",
+        "no_quality_regression": false,
+        "challenger_win_rule_met": false,
+        "promotion_review_queued": false,
+        "promotion_performed": false,
+        "issue_count": 0,
+        "quality_regression_count": 1
+      },
+      {
+        "id": "quality_form_export_sensitive_notes_blocked",
+        "ok": true,
+        "owner_status": "blocked_invalid_owner_quality_review",
+        "owner_decision": "fix_owner_quality_review_input",
+        "sample_rate_win_candidate": true,
+        "quality_guard_status": "blocked_invalid_owner_quality_review",
+        "no_quality_regression": false,
+        "challenger_win_rule_met": false,
+        "promotion_review_queued": false,
+        "promotion_performed": false,
+        "issue_count": 1,
+        "quality_regression_count": 0
+      }
+    ]
+  },
+  "owner_quality_review_fixtures": {
+    "ok": true,
+    "mode": "owner_quality_review_fixture_dry_run",
+    "scenario_count": 6,
+    "local_fixture_commands_executed": true,
+    "owner_quality_review_commands_executed": true,
+    "real_events_unchanged": true,
+    "data_lp_events_write_performed": false,
+    "approval_queue_write_performed": false,
+    "external_effect": false,
+    "scenarios": [
+      {
+        "id": "waiting_for_sample_rate_candidate_no_input",
+        "ok": true,
+        "status": "waiting_for_sample_rate_candidate",
+        "decision": "wait_for_sample_rate_candidate",
+        "no_quality_regression": null,
+        "challenger_win_rule_met": false,
+        "promotion_review_queued": false,
+        "promotion_performed": false,
+        "issue_count": 0
+      },
+      {
+        "id": "sample_rate_win_waits_for_quality_evidence",
+        "ok": true,
+        "status": "waiting_for_owner_quality_evidence",
+        "decision": "collect_owner_quality_review_evidence",
+        "no_quality_regression": null,
+        "challenger_win_rule_met": false,
+        "promotion_review_queued": false,
+        "promotion_performed": false,
+        "issue_count": 0
+      },
+      {
+        "id": "sample_rate_win_quality_pass_queues_review",
+        "ok": true,
+        "status": "owner_quality_review_passed_no_auto_promotion",
+        "decision": "queue_owner_promotion_review_no_auto_promotion",
+        "no_quality_regression": true,
+        "challenger_win_rule_met": true,
+        "promotion_review_queued": true,
+        "promotion_performed": false,
+        "issue_count": 0
+      },
+      {
+        "id": "sample_rate_win_quality_regression_keeps_champion",
+        "ok": true,
+        "status": "owner_quality_review_failed_keep_champion",
+        "decision": "keep_champion_due_quality_regression",
+        "no_quality_regression": false,
+        "challenger_win_rule_met": false,
+        "promotion_review_queued": false,
+        "promotion_performed": false,
+        "issue_count": 0
+      },
+      {
+        "id": "sensitive_evidence_blocks_review",
+        "ok": true,
+        "status": "blocked_invalid_owner_quality_review",
+        "decision": "fix_owner_quality_review_input",
+        "no_quality_regression": false,
+        "challenger_win_rule_met": false,
+        "promotion_review_queued": false,
+        "promotion_performed": false,
+        "issue_count": 1
+      },
+      {
+        "id": "missing_required_fields_blocks_review",
+        "ok": true,
+        "status": "blocked_invalid_owner_quality_review",
+        "decision": "fix_owner_quality_review_input",
+        "no_quality_regression": false,
+        "challenger_win_rule_met": false,
+        "promotion_review_queued": false,
+        "promotion_performed": false,
+        "issue_count": 2
+      }
+    ]
+  },
+  "candidate_retirement_fixtures": {
+    "ok": true,
+    "mode": "candidate_retirement_fixture_dry_run",
+    "scenario_count": 6,
+    "current_queue_safety": {
+      "ok": true,
+      "status": "current_queue_safe",
+      "issues": [],
+      "current_status": "no_retirement_sample_insufficient_or_not_needed",
+      "items": 1,
+      "retirement_ready": 0
+    },
+    "real_events_unchanged": true,
+    "data_lp_events_write_performed": false,
+    "external_effect": false,
+    "public_link_change_performed": false,
+    "champion_promotion_performed": false,
+    "delete_action_performed": false,
+    "scenarios": [
+      {
+        "id": "sample_insufficient_keeps_testing",
+        "ok": true,
+        "queue_status": "no_retirement_sample_insufficient_or_not_needed",
+        "retirement_ready": 0,
+        "keep_testing": 1,
+        "promotion_reviews": 0,
+        "target_status": "keep_testing_sample_insufficient"
+      },
+      {
+        "id": "winning_challenger_requires_owner_review",
+        "ok": true,
+        "queue_status": "no_retirement_sample_insufficient_or_not_needed",
+        "retirement_ready": 0,
+        "keep_testing": 0,
+        "promotion_reviews": 1,
+        "target_status": "promotion_review_required"
+      },
+      {
+        "id": "underperforming_challenger_ready_for_local_retirement",
+        "ok": true,
+        "queue_status": "local_retirement_actions_prepared",
+        "retirement_ready": 1,
+        "keep_testing": 0,
+        "promotion_reviews": 0,
+        "target_status": "retire_local_candidate_due_underperformance"
+      },
+      {
+        "id": "quality_regression_ready_for_local_retirement",
+        "ok": true,
+        "queue_status": "local_retirement_actions_prepared",
+        "retirement_ready": 1,
+        "keep_testing": 0,
+        "promotion_reviews": 0,
+        "target_status": "retire_local_candidate_due_quality_regression"
+      },
+      {
+        "id": "unknown_candidate_observed_only",
+        "ok": true,
+        "queue_status": "no_retirement_sample_insufficient_or_not_needed",
+        "retirement_ready": 0,
+        "keep_testing": 0,
+        "promotion_reviews": 0,
+        "target_status": "observed_only_no_rotation_action"
+      },
+      {
+        "id": "mixed_candidates_summary_counts",
+        "ok": true,
+        "queue_status": "local_retirement_actions_prepared",
+        "retirement_ready": 1,
+        "keep_testing": 1,
+        "promotion_reviews": 1,
+        "target_status": "retire_local_candidate_due_underperformance"
+      }
+    ]
+  },
+  "iteration_history": {
+    "ok": true,
+    "mode": "iteration_history_local_only",
+    "status": "collect_more_data",
+    "cadence": "weekly_7_day_iteration",
+    "current_changed_variable": "cta_text",
+    "sample_threshold_met": false,
+    "archives_scanned": 3,
+    "next_safe_action_count": 4,
+    "pending_human_count": 5,
+    "ready_local_review_count": 14,
+    "external_effect": false,
+    "public_link_change_performed": false,
+    "production_deploy_performed": false,
+    "github_push_or_pr_performed": false,
+    "formal_post_performed": false,
+    "line_push_performed": false,
+    "customer_data_mutation_performed": false,
+    "payment_action_performed": false,
+    "delete_action_performed": false
+  },
+  "line_inbound_playbook": {
+    "ok": true,
+    "mode": "line_inbound_fixture_dry_run",
+    "scenario_count": 6,
+    "execution_performed": false,
+    "external_effect": false,
+    "line_push_performed": false,
+    "customer_data_mutation_performed": false,
+    "data_lp_events_write_performed": false
+  },
+  "win_rule_contract": {
+    "metric": "line_add_rate",
+    "challenger_lift_required": 1.15,
+    "require_sample_threshold_met": true,
+    "require_no_quality_regression": true,
+    "challenger_win_rule_met": false,
+    "decision": "do_not_promote_challenger",
+    "promotion_performed": false
+  },
+  "real_data_decision_replay": {
+    "ok": true,
+    "mode": "real_data_decision_replay_fixture_dry_run",
+    "scenario_count": 6,
+    "scenario_ids": [
+      "sample_insufficient_replay",
+      "winning_replay_owner_review_only",
+      "underperform_replay_next_variable",
+      "spam_regression_replay",
+      "lead_regression_replay",
+      "close_regression_replay"
+    ],
+    "local_fixture_commands_executed": true,
+    "local_importer_preview_commands_executed": true,
+    "source_capture_ledger_replay_executed": true,
+    "source_capture_compile_commands_executed": true,
+    "ledger_to_decision_replay_performed": true,
+    "execution_performed": false,
+    "real_event_write_performed": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false,
+    "scenarios": [
+      {
+        "id": "sample_insufficient_replay",
+        "ok": true,
+        "imported_events": 533,
+        "challenger_decision": "keep_testing_sample_insufficient",
+        "ab_decision": "do_not_promote_challenger",
+        "next_round_decision": "continue_current_round_until_sample_threshold",
+        "next_changed_variable": "cta_text",
+        "start_new_variable_round": false,
+        "quality_regression_reasons": [],
+        "source_capture_compile_ok": true,
+        "source_capture_compile_status": "owner_preview_ready",
+        "source_capture_compile_data_lp_events_write_performed": false,
+        "source_capture_compile_external_effect": false
+      },
+      {
+        "id": "winning_replay_owner_review_only",
+        "ok": true,
+        "imported_events": 579,
+        "challenger_decision": "eligible_for_human_promotion_review",
+        "ab_decision": "queue_human_promotion_review",
+        "next_round_decision": "queue_owner_promotion_review_before_next_variable",
+        "next_changed_variable": "cta_text",
+        "start_new_variable_round": false,
+        "quality_regression_reasons": [],
+        "source_capture_compile_ok": true,
+        "source_capture_compile_status": "owner_preview_ready",
+        "source_capture_compile_data_lp_events_write_performed": false,
+        "source_capture_compile_external_effect": false
+      },
+      {
+        "id": "underperform_replay_next_variable",
+        "ok": true,
+        "imported_events": 572,
+        "challenger_decision": "retire_or_rework_candidate",
+        "ab_decision": "do_not_promote_challenger",
+        "next_round_decision": "retire_underperforming_challenger_plan_next_variable",
+        "next_changed_variable": "hook",
+        "start_new_variable_round": true,
+        "quality_regression_reasons": [],
+        "source_capture_compile_ok": true,
+        "source_capture_compile_status": "owner_preview_ready",
+        "source_capture_compile_data_lp_events_write_performed": false,
+        "source_capture_compile_external_effect": false
+      },
+      {
+        "id": "spam_regression_replay",
+        "ok": true,
+        "imported_events": 588,
+        "challenger_decision": "reject_quality_regression",
+        "ab_decision": "do_not_promote_challenger",
+        "next_round_decision": "reject_challenger_quality_regression_plan_next_variable",
+        "next_changed_variable": "hook",
+        "start_new_variable_round": true,
+        "quality_regression_reasons": [
+          "spam_flag_rate_above_limit",
+          "close_rate_retention_below_champion"
+        ],
+        "source_capture_compile_ok": true,
+        "source_capture_compile_status": "owner_preview_ready",
+        "source_capture_compile_data_lp_events_write_performed": false,
+        "source_capture_compile_external_effect": false
+      },
+      {
+        "id": "lead_regression_replay",
+        "ok": true,
+        "imported_events": 580,
+        "challenger_decision": "reject_quality_regression",
+        "ab_decision": "do_not_promote_challenger",
+        "next_round_decision": "reject_challenger_quality_regression_plan_next_variable",
+        "next_changed_variable": "hook",
+        "start_new_variable_round": true,
+        "quality_regression_reasons": [
+          "lead_rate_retention_below_champion"
+        ],
+        "source_capture_compile_ok": true,
+        "source_capture_compile_status": "owner_preview_ready",
+        "source_capture_compile_data_lp_events_write_performed": false,
+        "source_capture_compile_external_effect": false
+      },
+      {
+        "id": "close_regression_replay",
+        "ok": true,
+        "imported_events": 580,
+        "challenger_decision": "reject_quality_regression",
+        "ab_decision": "do_not_promote_challenger",
+        "next_round_decision": "reject_challenger_quality_regression_plan_next_variable",
+        "next_changed_variable": "hook",
+        "start_new_variable_round": true,
+        "quality_regression_reasons": [
+          "close_rate_retention_below_champion"
+        ],
+        "source_capture_compile_ok": true,
+        "source_capture_compile_status": "owner_preview_ready",
+        "source_capture_compile_data_lp_events_write_performed": false,
+        "source_capture_compile_external_effect": false
+      }
+    ]
+  },
+  "output_status": [
+    {
+      "file": "weekly_report.md",
+      "present": true
+    },
+    {
+      "file": "growth_scores.json",
+      "present": true
+    },
+    {
+      "file": "approval_queue.json",
+      "present": true
+    },
+    {
+      "file": "ab_test_status.json",
+      "present": true
+    },
+    {
+      "file": "landing_page_candidate.html",
+      "present": true
+    },
+    {
+      "file": "worker.ts",
+      "present": true
+    },
+    {
+      "file": "worker_dry_run.md",
+      "present": true
+    },
+    {
+      "file": "data/worker_dry_run_status.json",
+      "present": true
+    },
+    {
+      "file": "prepared_but_blocked.json",
+      "present": true
+    },
+    {
+      "file": "pipeline_status.json",
+      "present": true
+    },
+    {
+      "file": "next_round_plan.json",
+      "present": true
+    },
+    {
+      "file": "content_variants.json",
+      "present": true
+    },
+    {
+      "file": "tracking_links.json",
+      "present": true
+    },
+    {
+      "file": "funnel_breakdown.json",
+      "present": true
+    },
+    {
+      "file": "funnel_breakdown.md",
+      "present": true
+    },
+    {
+      "file": "goal_completion_audit.md",
+      "present": true
+    },
+    {
+      "file": "data/goal_completion_audit_status.json",
+      "present": true
+    },
+    {
+      "file": "north_star_funnel.json",
+      "present": true
+    },
+    {
+      "file": "north_star_funnel.md",
+      "present": true
+    },
+    {
+      "file": "schedule_catchup_status.md",
+      "present": true
+    },
+    {
+      "file": "data/schedule_catchup_status.json",
+      "present": true
+    },
+    {
+      "file": "data/approval_resume_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "owner_approval_form.html",
+      "present": true
+    },
+    {
+      "file": "data/owner_approval_form_status.json",
+      "present": true
+    },
+    {
+      "file": "owner_approval_form_fixture_report.md",
+      "present": true
+    },
+    {
+      "file": "data/owner_approval_form_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "line_inbound_playbook.md",
+      "present": true
+    },
+    {
+      "file": "line_inbound_playbook.json",
+      "present": true
+    },
+    {
+      "file": "line_inbound_fixture_report.md",
+      "present": true
+    },
+    {
+      "file": "data/line_inbound_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "variable_rotation_fixture_report.md",
+      "present": true
+    },
+    {
+      "file": "data/variable_rotation_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "data/funnel_aggregate_status.json",
+      "present": true
+    },
+    {
+      "file": "data/funnel_aggregates.example.csv",
+      "present": true
+    },
+    {
+      "file": "data/funnel_aggregates.preview.jsonl",
+      "present": true
+    },
+    {
+      "file": "data/funnel_aggregate_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "funnel_aggregate_fixture_report.md",
+      "present": true
+    },
+    {
+      "file": "data/real_data_apply_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "real_data_apply_fixture_report.md",
+      "present": true
+    },
+    {
+      "file": "data/real_data_input_pack_status.json",
+      "present": true
+    },
+    {
+      "file": "real_data_input_pack.md",
+      "present": true
+    },
+    {
+      "file": "data/real_data_input_pack/funnel_aggregates.fill-template.csv",
+      "present": true
+    },
+    {
+      "file": "data/real_data_input_pack/manual_conversions.fill-template.csv",
+      "present": true
+    },
+    {
+      "file": "data/source_readiness_status.json",
+      "present": true
+    },
+    {
+      "file": "source_readiness.md",
+      "present": true
+    },
+    {
+      "file": "data/champion_contract_audit_status.json",
+      "present": true
+    },
+    {
+      "file": "data/cloudflare_3q_site_metrics_observation.json",
+      "present": true
+    },
+    {
+      "file": "champion_contract_audit.md",
+      "present": true
+    },
+    {
+      "file": "scripts/champion-contract-audit.mjs",
+      "present": true
+    },
+    {
+      "file": "integrations/3q-site/champion-integration.config.json",
+      "present": true
+    },
+    {
+      "file": "integrations/3q-site/wrangler.jsonc",
+      "present": true
+    },
+    {
+      "file": "integrations/3q-site/source/worker.origin-main.js",
+      "present": true
+    },
+    {
+      "file": "integrations/3q-site/generated/worker.candidate.js",
+      "present": true
+    },
+    {
+      "file": "integrations/3q-site/generated/worker.candidate.patch",
+      "present": true
+    },
+    {
+      "file": "scripts/build-champion-integration-candidate.mjs",
+      "present": true
+    },
+    {
+      "file": "champion_integration_candidate.md",
+      "present": true
+    },
+    {
+      "file": "data/champion_integration_candidate_status.json",
+      "present": true
+    },
+    {
+      "file": "scripts/champion-integration-smoke.mjs",
+      "present": true
+    },
+    {
+      "file": "champion_integration_smoke.md",
+      "present": true
+    },
+    {
+      "file": "data/champion_integration_smoke_status.json",
+      "present": true
+    },
+    {
+      "file": "scripts/cloudflare-d1-readiness.mjs",
+      "present": true
+    },
+    {
+      "file": "cloudflare_d1_readiness.md",
+      "present": true
+    },
+    {
+      "file": "data/cloudflare_d1_readiness_status.json",
+      "present": true
+    },
+    {
+      "file": "data/cloudflare_d1_inventory_snapshot.json",
+      "present": true
+    },
+    {
+      "file": "scripts/live-telemetry-readiness.mjs",
+      "present": true
+    },
+    {
+      "file": "live_telemetry_readiness.md",
+      "present": true
+    },
+    {
+      "file": "data/live_telemetry_readiness_status.json",
+      "present": true
+    },
+    {
+      "file": "data/live_telemetry_observation_snapshot.json",
+      "present": true
+    },
+    {
+      "file": "scripts/live-telemetry-readiness-fixtures.mjs",
+      "present": true
+    },
+    {
+      "file": "live_telemetry_readiness_fixture_report.md",
+      "present": true
+    },
+    {
+      "file": "data/live_telemetry_readiness_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "scripts/lib/champion-source-lock.mjs",
+      "present": true
+    },
+    {
+      "file": "scripts/champion-source-lock-fixtures.mjs",
+      "present": true
+    },
+    {
+      "file": "champion_source_lock_fixtures.md",
+      "present": true
+    },
+    {
+      "file": "data/champion_source_lock_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "scripts/lib/run-lock-policy.mjs",
+      "present": true
+    },
+    {
+      "file": "scripts/weekly-runner-lock-fixtures.mjs",
+      "present": true
+    },
+    {
+      "file": "weekly_runner_lock_fixtures.md",
+      "present": true
+    },
+    {
+      "file": "data/weekly_runner_lock_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "scripts/d1-schema-contract.mjs",
+      "present": true
+    },
+    {
+      "file": "d1_schema_contract.md",
+      "present": true
+    },
+    {
+      "file": "data/d1_schema_contract_status.json",
+      "present": true
+    },
+    {
+      "file": "scripts/approved-d1-config.mjs",
+      "present": true
+    },
+    {
+      "file": "approved_d1_config.md",
+      "present": true
+    },
+    {
+      "file": "data/approved_d1_config_status.json",
+      "present": true
+    },
+    {
+      "file": "d1_collection_mode.md",
+      "present": true
+    },
+    {
+      "file": "data/d1_collection_mode_status.json",
+      "present": true
+    },
+    {
+      "file": "d1_collection_mode_plan.md",
+      "present": true
+    },
+    {
+      "file": "data/d1_collection_mode_plan_status.json",
+      "present": true
+    },
+    {
+      "file": "d1_collection_mode_fixture_report.md",
+      "present": true
+    },
+    {
+      "file": "data/d1_collection_mode_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "d1_aggregate_export_fixture_report.md",
+      "present": true
+    },
+    {
+      "file": "data/d1_aggregate_export_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "scripts/champion-local-branch.mjs",
+      "present": true
+    },
+    {
+      "file": "champion_local_branch.md",
+      "present": true
+    },
+    {
+      "file": "data/champion_local_branch_status.json",
+      "present": true
+    },
+    {
+      "file": "scripts/champion-release-preflight.mjs",
+      "present": true
+    },
+    {
+      "file": "champion_release_preflight.md",
+      "present": true
+    },
+    {
+      "file": "data/champion_release_preflight_status.json",
+      "present": true
+    },
+    {
+      "file": "data/champion_live_deployment_snapshot.json",
+      "present": true
+    },
+    {
+      "file": "champion_release_owner_packet.md",
+      "present": true
+    },
+    {
+      "file": "champion_release_owner_packet.json",
+      "present": true
+    },
+    {
+      "file": "scripts/champion-github-handoff.mjs",
+      "present": true
+    },
+    {
+      "file": "champion_github_handoff.md",
+      "present": true
+    },
+    {
+      "file": "champion_github_pr_body.md",
+      "present": true
+    },
+    {
+      "file": "data/champion_github_handoff_status.json",
+      "present": true
+    },
+    {
+      "file": "data/source_capture_status.json",
+      "present": true
+    },
+    {
+      "file": "source_capture_pack.md",
+      "present": true
+    },
+    {
+      "file": "data/source_capture/source_capture_checklist.json",
+      "present": true
+    },
+    {
+      "file": "data/source_capture/source_capture_ledger.fill-template.csv",
+      "present": true
+    },
+    {
+      "file": "data/source_capture/sample_gate_ledger.fill-template.csv",
+      "present": true
+    },
+    {
+      "file": "sample_gate_ledger.md",
+      "present": true
+    },
+    {
+      "file": "data/sample_gate_ledger_status.json",
+      "present": true
+    },
+    {
+      "file": "sample_gate_replay_fixture_report.md",
+      "present": true
+    },
+    {
+      "file": "data/sample_gate_replay_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "source_capture_compile_report.md",
+      "present": true
+    },
+    {
+      "file": "data/source_capture_compile_status.json",
+      "present": true
+    },
+    {
+      "file": "source_capture_compile_fixture_report.md",
+      "present": true
+    },
+    {
+      "file": "data/source_capture_compile_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "data/source_capture/compiled/funnel_aggregates.owner-preview.csv",
+      "present": true
+    },
+    {
+      "file": "data/source_capture/compiled/manual_conversions.owner-preview.csv",
+      "present": true
+    },
+    {
+      "file": "data/real_data_intake_status.json",
+      "present": true
+    },
+    {
+      "file": "real_data_intake_plan.md",
+      "present": true
+    },
+    {
+      "file": "data_collection_queue.json",
+      "present": true
+    },
+    {
+      "file": "data_collection_brief.md",
+      "present": true
+    },
+    {
+      "file": "data/data_collection_brief_status.json",
+      "present": true
+    },
+    {
+      "file": "data_collection_progress.md",
+      "present": true
+    },
+    {
+      "file": "data_collection_progress.json",
+      "present": true
+    },
+    {
+      "file": "data/data_collection_progress_status.json",
+      "present": true
+    },
+    {
+      "file": "source_trust_matrix.md",
+      "present": true
+    },
+    {
+      "file": "source_trust_matrix.json",
+      "present": true
+    },
+    {
+      "file": "data/source_trust_matrix_status.json",
+      "present": true
+    },
+    {
+      "file": "scripts/source-trust-matrix.mjs",
+      "present": true
+    },
+    {
+      "file": "next_p0_owner_inputs.md",
+      "present": true
+    },
+    {
+      "file": "next_p0_owner_inputs.json",
+      "present": true
+    },
+    {
+      "file": "data/next_p0_owner_inputs_status.json",
+      "present": true
+    },
+    {
+      "file": "next_p0_owner_form.html",
+      "present": true
+    },
+    {
+      "file": "data/next_p0_owner_form_status.json",
+      "present": true
+    },
+    {
+      "file": "next_p0_owner_form_fixture_report.md",
+      "present": true
+    },
+    {
+      "file": "data/next_p0_owner_form_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "next_p0_owner_intake.md",
+      "present": true
+    },
+    {
+      "file": "data/next_p0_owner_intake_status.json",
+      "present": true
+    },
+    {
+      "file": "next_p0_owner_intake_fixture_report.md",
+      "present": true
+    },
+    {
+      "file": "data/next_p0_owner_intake_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "data/next_p0_owner_intake/funnel_aggregates.owner-preview.csv",
+      "present": true
+    },
+    {
+      "file": "data/next_p0_owner_intake/manual_conversions.owner-preview.csv",
+      "present": true
+    },
+    {
+      "file": "owner_data_preflight.md",
+      "present": true
+    },
+    {
+      "file": "owner_data_preflight.json",
+      "present": true
+    },
+    {
+      "file": "data/owner_data_preflight_status.json",
+      "present": true
+    },
+    {
+      "file": "sample_gate_capture_calendar.json",
+      "present": true
+    },
+    {
+      "file": "sample_gate_capture_calendar.md",
+      "present": true
+    },
+    {
+      "file": "sample_gate_capture_calendar.ics",
+      "present": true
+    },
+    {
+      "file": "data/sample_gate_capture_calendar_status.json",
+      "present": true
+    },
+    {
+      "file": "sample_gate_due_status.json",
+      "present": true
+    },
+    {
+      "file": "sample_gate_due_status.md",
+      "present": true
+    },
+    {
+      "file": "data/sample_gate_due_status_status.json",
+      "present": true
+    },
+    {
+      "file": "week0_owner_capture_queue.md",
+      "present": true
+    },
+    {
+      "file": "week0_owner_capture_queue.json",
+      "present": true
+    },
+    {
+      "file": "data/week0_owner_capture_queue_status.json",
+      "present": true
+    },
+    {
+      "file": "owner_sample_gate_status.md",
+      "present": true
+    },
+    {
+      "file": "owner_sample_gate_status.json",
+      "present": true
+    },
+    {
+      "file": "data/owner_sample_gate_status.json",
+      "present": true
+    },
+    {
+      "file": "sample_gate_owner_worksheet.md",
+      "present": true
+    },
+    {
+      "file": "sample_gate_owner_worksheet.json",
+      "present": true
+    },
+    {
+      "file": "data/sample_gate_owner_worksheet_status.json",
+      "present": true
+    },
+    {
+      "file": "sample_gate_owner_form.html",
+      "present": true
+    },
+    {
+      "file": "data/sample_gate_owner_form_status.json",
+      "present": true
+    },
+    {
+      "file": "sample_gate_owner_form_fixture_report.md",
+      "present": true
+    },
+    {
+      "file": "data/sample_gate_owner_form_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "sample_gate_batch_handoff.md",
+      "present": true
+    },
+    {
+      "file": "sample_gate_batch_handoff.json",
+      "present": true
+    },
+    {
+      "file": "data/sample_gate_batch_handoff_status.json",
+      "present": true
+    },
+    {
+      "file": "sample_gate_batch_1_paste_block.txt",
+      "present": true
+    },
+    {
+      "file": "sample_gate_batch_2_paste_block.txt",
+      "present": true
+    },
+    {
+      "file": "sample_gate_collection_sprint.md",
+      "present": true
+    },
+    {
+      "file": "sample_gate_collection_sprint.json",
+      "present": true
+    },
+    {
+      "file": "data/sample_gate_collection_sprint_status.json",
+      "present": true
+    },
+    {
+      "file": "owner_sample_gate_fixture_report.md",
+      "present": true
+    },
+    {
+      "file": "data/owner_sample_gate_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "owner_quality_review.md",
+      "present": true
+    },
+    {
+      "file": "owner_quality_review.example.json",
+      "present": true
+    },
+    {
+      "file": "data/owner_quality_review_status.json",
+      "present": true
+    },
+    {
+      "file": "owner_quality_review_form.html",
+      "present": true
+    },
+    {
+      "file": "data/owner_quality_review_form_status.json",
+      "present": true
+    },
+    {
+      "file": "owner_quality_review_form_fixture_report.md",
+      "present": true
+    },
+    {
+      "file": "data/owner_quality_review_form_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "owner_quality_review_fixture_report.md",
+      "present": true
+    },
+    {
+      "file": "data/owner_quality_review_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "candidate_retirement_fixture_report.md",
+      "present": true
+    },
+    {
+      "file": "data/candidate_retirement_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "sample_gate_collection_plan.json",
+      "present": true
+    },
+    {
+      "file": "sample_gate_collection_plan.md",
+      "present": true
+    },
+    {
+      "file": "data/sample_gate_collection_plan_status.json",
+      "present": true
+    },
+    {
+      "file": "iteration_history.json",
+      "present": true
+    },
+    {
+      "file": "iteration_history.md",
+      "present": true
+    },
+    {
+      "file": "data/event_input_quality_status.json",
+      "present": true
+    },
+    {
+      "file": "d1_collection_guard.md",
+      "present": true
+    },
+    {
+      "file": "scripts/export-d1-events.mjs",
+      "present": true
+    },
+    {
+      "file": "tracking_link_smoke.md",
+      "present": true
+    },
+    {
+      "file": "data/tracking_link_smoke_status.json",
+      "present": true
+    },
+    {
+      "file": "data/event_contract_smoke_status.json",
+      "present": true
+    },
+    {
+      "file": "github_export_manifest.md",
+      "present": true
+    },
+    {
+      "file": "data/github_export_status.json",
+      "present": true
+    },
+    {
+      "file": "artifact_retention.md",
+      "present": true
+    },
+    {
+      "file": "data/artifact_retention_status.json",
+      "present": true
+    },
+    {
+      "file": "artifact_retention_review_pack.md",
+      "present": true
+    },
+    {
+      "file": "artifact_retention_review_pack.json",
+      "present": true
+    },
+    {
+      "file": "data/artifact_retention_review_status.json",
+      "present": true
+    },
+    {
+      "file": "data/real_data_decision_replay_status.json",
+      "present": true
+    },
+    {
+      "file": "real_data_decision_replay_report.md",
+      "present": true
+    },
+    {
+      "file": "owner_gate_evidence.md",
+      "present": true
+    },
+    {
+      "file": "owner_gate_evidence.example.json",
+      "present": true
+    },
+    {
+      "file": "data/owner_gate_evidence_status.json",
+      "present": true
+    },
+    {
+      "file": "owner_gate_evidence_fixture_report.md",
+      "present": true
+    },
+    {
+      "file": "data/owner_gate_evidence_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "post_gate_verification.md",
+      "present": true
+    },
+    {
+      "file": "data/post_gate_verification_status.json",
+      "present": true
+    },
+    {
+      "file": "post_gate_verification_fixture_report.md",
+      "present": true
+    },
+    {
+      "file": "data/post_gate_verification_fixture_status.json",
+      "present": true
+    },
+    {
+      "file": "redline_priority.md",
+      "present": true
+    },
+    {
+      "file": "redline_priority.json",
+      "present": true
+    },
+    {
+      "file": "data/redline_priority_status.json",
+      "present": true
+    },
+    {
+      "file": ".github/workflows/3q-growth-loop-weekly.yml",
+      "present": true
+    }
+  ],
+  "approval_gate_ids": [
+    "collect-first-real-events",
+    "approve-d1-create-and-migrate",
+    "approve-candidate-worker-deploy",
+    "approve-small-ab-link",
+    "review-weekly-report",
+    "review-champion-contract-audit",
+    "review-champion-integration-candidate",
+    "approve-champion-integration-production-deploy",
+    "review-next-round-plan",
+    "review-owner-approval-pack",
+    "review-owner-console",
+    "review-real-data-input-pack",
+    "review-source-readiness",
+    "review-source-capture-pack",
+    "review-source-capture-compile",
+    "review-real-data-intake-plan",
+    "review-data-collection-brief",
+    "review-line-inbound-playbook",
+    "review-local-launchagent-install",
+    "approve-github-repo-and-pr"
+  ],
+  "approval_resume_fixtures": {
+    "ok": true,
+    "mode": "approval_resume_fixture_dry_run",
+    "scenario_count": 11,
+    "execution_performed": false,
+    "external_effect": false,
+    "scenarios": [
+      {
+        "id": "no_input_keeps_all_gates_blocked",
+        "ok": true,
+        "ready_gate_count": 0,
+        "sensitive_approval_detected": false
+      },
+      {
+        "id": "copied_example_placeholders_block_ready_state",
+        "ok": true,
+        "ready_gate_count": 0,
+        "sensitive_approval_detected": false
+      },
+      {
+        "id": "valid_github_gate_becomes_plan_only_ready",
+        "ok": true,
+        "ready_gate_count": 1,
+        "sensitive_approval_detected": false
+      },
+      {
+        "id": "sensitive_approval_value_blocks_gate",
+        "ok": true,
+        "ready_gate_count": 0,
+        "sensitive_approval_detected": true
+      },
+      {
+        "id": "public_ab_requires_absolute_champion_url",
+        "ok": true,
+        "ready_gate_count": 0,
+        "sensitive_approval_detected": false
+      },
+      {
+        "id": "manual_only_gate_never_becomes_automated",
+        "ok": true,
+        "ready_gate_count": 0,
+        "sensitive_approval_detected": false
+      },
+      {
+        "id": "invalid_d1_metadata_blocks_remote_gate",
+        "ok": true,
+        "ready_gate_count": 0,
+        "sensitive_approval_detected": false
+      },
+      {
+        "id": "invalid_worker_url_blocks_deploy_gate",
+        "ok": true,
+        "ready_gate_count": 0,
+        "sensitive_approval_detected": false
+      },
+      {
+        "id": "invalid_github_metadata_blocks_pr_gate",
+        "ok": true,
+        "ready_gate_count": 0,
+        "sensitive_approval_detected": false
+      },
+      {
+        "id": "wrong_valid_github_target_blocks_pr_gate",
+        "ok": true,
+        "ready_gate_count": 0,
+        "sensitive_approval_detected": false
+      },
+      {
+        "id": "invalid_approval_timestamp_blocks_gate",
+        "ok": true,
+        "ready_gate_count": 0,
+        "sensitive_approval_detected": false
+      }
+    ]
+  },
+  "owner_approval_form": {
+    "ok": true,
+    "mode": "owner_approval_form",
+    "status": "ready_local_owner_approval_form",
+    "form_gate_count": 4,
+    "excluded_manual_gate_count": 1,
+    "download_filename": "owner_approval_input.json",
+    "review_download_filename": "owner_approval_form.review.json",
+    "browser_only": true,
+    "browser_persistence": false,
+    "form_action": "none",
+    "network_calls_performed": false,
+    "live_input_files_created": false,
+    "approval_input_write_performed": false,
+    "data_lp_events_write_performed": false,
+    "external_effect": false,
+    "public_link_change_performed": false,
+    "production_deploy_performed": false,
+    "github_push_or_pr_performed": false,
+    "formal_post_performed": false,
+    "line_push_performed": false,
+    "customer_data_mutation_performed": false,
+    "payment_action_performed": false,
+    "delete_action_performed": false
+  },
+  "owner_approval_form_fixtures": {
+    "ok": true,
+    "mode": "owner_approval_form_fixture_dry_run",
+    "scenario_count": 4,
+    "form_export_replay_executed": true,
+    "approval_resume_commands_executed": true,
+    "live_input_files_created": false,
+    "approval_input_write_performed": false,
+    "execution_performed": false,
+    "external_effect": false,
+    "public_link_change_performed": false,
+    "production_deploy_performed": false,
+    "github_push_or_pr_performed": false,
+    "formal_post_performed": false,
+    "line_push_performed": false,
+    "customer_data_mutation_performed": false,
+    "payment_action_performed": false,
+    "delete_action_performed": false,
+    "contract_checks": [
+      {
+        "ok": true
+      },
+      {
+        "ok": true
+      },
+      {
+        "ok": true
+      },
+      {
+        "ok": true
+      },
+      {
+        "ok": true
+      },
+      {
+        "ok": true
+      },
+      {
+        "ok": true
+      },
+      {
+        "ok": true
+      },
+      {
+        "ok": true
+      },
+      {
+        "ok": true
+      },
+      {
+        "ok": true
+      }
+    ],
+    "scenarios": [
+      {
+        "id": "form_static_contract",
+        "ok": true,
+        "external_effect": false
+      },
+      {
+        "id": "form_export_valid_github_plan_only",
+        "ok": true,
+        "ready_gate_count": 1,
+        "sensitive_approval_detected": false,
+        "github_push_or_pr_performed": false,
+        "external_effect": false
+      },
+      {
+        "id": "form_export_placeholder_blocked",
+        "ok": true,
+        "ready_gate_count": 0,
+        "sensitive_approval_detected": false,
+        "github_push_or_pr_performed": false,
+        "external_effect": false
+      },
+      {
+        "id": "form_export_sensitive_value_blocked",
+        "ok": true,
+        "ready_gate_count": 0,
+        "sensitive_approval_detected": true,
+        "github_push_or_pr_performed": false,
+        "external_effect": false
+      }
+    ]
+  },
+  "owner_gate_evidence": {
+    "ok": true,
+    "mode": "owner_gate_evidence_intake",
+    "status": "waiting_for_owner_evidence",
+    "input_exists": false,
+    "evidence_only": true,
+    "ready_gate_count": 0,
+    "non_manual_gate_count": 4,
+    "issue_count": 0,
+    "execution_performed": false,
+    "external_effect": false,
+    "ready_for_post_gate_verification": false,
+    "gates": [
+      {
+        "gate_id": "remote_d1_create_and_migrate",
+        "evidence_detected": false,
+        "evidence_valid": false,
+        "ready_for_post_gate_verification": false,
+        "executed_by_this_script": false
+      },
+      {
+        "gate_id": "candidate_worker_production_deploy",
+        "evidence_detected": false,
+        "evidence_valid": false,
+        "ready_for_post_gate_verification": false,
+        "executed_by_this_script": false
+      },
+      {
+        "gate_id": "public_ab_small_traffic_link",
+        "evidence_detected": false,
+        "evidence_valid": false,
+        "ready_for_post_gate_verification": false,
+        "executed_by_this_script": false
+      },
+      {
+        "gate_id": "github_repo_branch_pr",
+        "evidence_detected": false,
+        "evidence_valid": false,
+        "ready_for_post_gate_verification": false,
+        "executed_by_this_script": false
+      },
+      {
+        "gate_id": "formal_posts_line_push_payment_customer_data",
+        "evidence_detected": false,
+        "evidence_valid": false,
+        "ready_for_post_gate_verification": false,
+        "executed_by_this_script": false
+      }
+    ]
+  },
+  "owner_gate_evidence_fixtures": {
+    "ok": true,
+    "mode": "owner_gate_evidence_fixture_dry_run",
+    "scenario_count": 10,
+    "local_fixture_commands_executed": true,
+    "owner_gate_evidence_fixture_executed": true,
+    "execution_performed": false,
+    "external_effect": false,
+    "scenarios": [
+      {
+        "id": "no_input_waits_for_owner_evidence",
+        "ok": true,
+        "intake_status": "waiting_for_owner_evidence",
+        "ready_gate_count": 0,
+        "issue_count": 0,
+        "sensitive_evidence_detected": false
+      },
+      {
+        "id": "copied_example_placeholders_block_evidence",
+        "ok": true,
+        "intake_status": "blocked_invalid_owner_evidence",
+        "ready_gate_count": 2,
+        "issue_count": 2,
+        "sensitive_evidence_detected": false
+      },
+      {
+        "id": "valid_remote_d1_evidence_enables_post_gate_plan",
+        "ok": true,
+        "intake_status": "partial_owner_evidence_validated",
+        "ready_gate_count": 1,
+        "issue_count": 0,
+        "sensitive_evidence_detected": false
+      },
+      {
+        "id": "remote_d1_without_recurring_read_approval_keeps_schema_evidence_valid",
+        "ok": true,
+        "intake_status": "partial_owner_evidence_validated",
+        "ready_gate_count": 1,
+        "issue_count": 0,
+        "sensitive_evidence_detected": false
+      },
+      {
+        "id": "valid_all_non_manual_evidence_ready_for_post_gate_verification",
+        "ok": true,
+        "intake_status": "owner_evidence_validated_ready_for_post_gate_verification",
+        "ready_gate_count": 4,
+        "issue_count": 0,
+        "sensitive_evidence_detected": false
+      },
+      {
+        "id": "sensitive_or_customer_evidence_blocks_gate",
+        "ok": true,
+        "intake_status": "blocked_invalid_owner_evidence",
+        "ready_gate_count": 0,
+        "issue_count": 2,
+        "sensitive_evidence_detected": true
+      },
+      {
+        "id": "invalid_public_ab_evidence_blocks_route",
+        "ok": true,
+        "intake_status": "blocked_invalid_owner_evidence",
+        "ready_gate_count": 0,
+        "issue_count": 2,
+        "sensitive_evidence_detected": false
+      },
+      {
+        "id": "duplicate_and_unknown_gate_evidence_blocks_input",
+        "ok": true,
+        "intake_status": "blocked_invalid_owner_evidence",
+        "ready_gate_count": 1,
+        "issue_count": 2,
+        "sensitive_evidence_detected": false
+      },
+      {
+        "id": "manual_only_acknowledgement_never_opens_post_gate",
+        "ok": true,
+        "intake_status": "owner_evidence_detected_no_gate_ready",
+        "ready_gate_count": 0,
+        "issue_count": 0,
+        "sensitive_evidence_detected": false
+      },
+      {
+        "id": "invalid_github_evidence_blocks_review",
+        "ok": true,
+        "intake_status": "blocked_invalid_owner_evidence",
+        "ready_gate_count": 0,
+        "issue_count": 4,
+        "sensitive_evidence_detected": false
+      }
+    ]
+  },
+  "post_gate_verification": {
+    "ok": true,
+    "mode": "post_gate_verification_plan",
+    "status": "waiting_for_owner_evidence",
+    "owner_gate_evidence_status": "waiting_for_owner_evidence",
+    "ready_gate_count": 0,
+    "non_manual_gate_count": 4,
+    "no_network_read_performed": true,
+    "no_remote_cli_performed": true,
+    "no_actual_evidence_values_persisted": true,
+    "execution_performed": false,
+    "external_effect": false,
+    "gates": [
+      {
+        "gate_id": "remote_d1_create_and_migrate",
+        "owner_evidence_valid": false,
+        "post_gate_verification_ready": false,
+        "safe_to_run_automatically": false
+      },
+      {
+        "gate_id": "candidate_worker_production_deploy",
+        "owner_evidence_valid": false,
+        "post_gate_verification_ready": false,
+        "safe_to_run_automatically": false
+      },
+      {
+        "gate_id": "public_ab_small_traffic_link",
+        "owner_evidence_valid": false,
+        "post_gate_verification_ready": false,
+        "safe_to_run_automatically": false
+      },
+      {
+        "gate_id": "github_repo_branch_pr",
+        "owner_evidence_valid": false,
+        "post_gate_verification_ready": false,
+        "safe_to_run_automatically": false
+      },
+      {
+        "gate_id": "formal_posts_line_push_payment_customer_data",
+        "owner_evidence_valid": false,
+        "post_gate_verification_ready": false,
+        "safe_to_run_automatically": false
+      }
+    ]
+  },
+  "post_gate_verification_fixtures": {
+    "ok": true,
+    "mode": "post_gate_verification_fixture_dry_run",
+    "scenario_count": 9,
+    "local_fixture_commands_executed": true,
+    "owner_gate_evidence_fixture_executed": true,
+    "post_gate_verification_fixture_executed": true,
+    "execution_performed": false,
+    "external_effect": false,
+    "scenarios": [
+      {
+        "id": "waiting_for_owner_evidence_stays_plan_only",
+        "ok": true,
+        "owner_evidence_status": "waiting_for_owner_evidence",
+        "post_gate_status": "waiting_for_owner_evidence",
+        "ready_gate_count": 0,
+        "no_network_read_performed": true,
+        "no_remote_cli_performed": true
+      },
+      {
+        "id": "remote_d1_evidence_ready_only",
+        "ok": true,
+        "owner_evidence_status": "partial_owner_evidence_validated",
+        "post_gate_status": "partial_post_gate_verification_plan_ready",
+        "ready_gate_count": 1,
+        "no_network_read_performed": true,
+        "no_remote_cli_performed": true
+      },
+      {
+        "id": "remote_d1_without_recurring_read_approval_allows_schema_plan_only",
+        "ok": true,
+        "owner_evidence_status": "partial_owner_evidence_validated",
+        "post_gate_status": "partial_post_gate_verification_plan_ready",
+        "ready_gate_count": 1,
+        "no_network_read_performed": true,
+        "no_remote_cli_performed": true
+      },
+      {
+        "id": "worker_evidence_requires_remote_d1_ready",
+        "ok": true,
+        "owner_evidence_status": "partial_owner_evidence_validated",
+        "post_gate_status": "owner_evidence_detected_no_post_gate_verification_ready",
+        "ready_gate_count": 0,
+        "no_network_read_performed": true,
+        "no_remote_cli_performed": true
+      },
+      {
+        "id": "public_ab_requires_worker_evidence_ready",
+        "ok": true,
+        "owner_evidence_status": "partial_owner_evidence_validated",
+        "post_gate_status": "partial_post_gate_verification_plan_ready",
+        "ready_gate_count": 1,
+        "no_network_read_performed": true,
+        "no_remote_cli_performed": true
+      },
+      {
+        "id": "github_evidence_ready_plan_only",
+        "ok": true,
+        "owner_evidence_status": "partial_owner_evidence_validated",
+        "post_gate_status": "partial_post_gate_verification_plan_ready",
+        "ready_gate_count": 1,
+        "no_network_read_performed": true,
+        "no_remote_cli_performed": true
+      },
+      {
+        "id": "all_non_manual_evidence_ready_plan_only",
+        "ok": true,
+        "owner_evidence_status": "owner_evidence_validated_ready_for_post_gate_verification",
+        "post_gate_status": "post_gate_verification_plan_ready",
+        "ready_gate_count": 4,
+        "no_network_read_performed": true,
+        "no_remote_cli_performed": true
+      },
+      {
+        "id": "manual_only_acknowledgement_never_opens_post_gate",
+        "ok": true,
+        "owner_evidence_status": "owner_evidence_detected_no_gate_ready",
+        "post_gate_status": "owner_evidence_detected_no_post_gate_verification_ready",
+        "ready_gate_count": 0,
+        "no_network_read_performed": true,
+        "no_remote_cli_performed": true
+      },
+      {
+        "id": "invalid_owner_evidence_blocks_post_verify",
+        "ok": true,
+        "owner_evidence_status": "blocked_invalid_owner_evidence",
+        "post_gate_status": "blocked_invalid_owner_evidence",
+        "ready_gate_count": 0,
+        "no_network_read_performed": true,
+        "no_remote_cli_performed": true
+      }
+    ]
+  },
+  "github_export_bundle": {
+    "ok": true,
+    "mode": "github_export_bundle_local_only",
+    "file_count": 508,
+    "repo_dir": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/github_export/bundles/repo-ready-20260710T214808273Z/repo",
+    "manifest_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/github_export/bundles/repo-ready-20260710T214808273Z/manifest.json",
+    "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/github_export_manifest.md",
+    "excluded_live_or_owner_inputs": [
+      "data/funnel_aggregates.csv",
+      "data/github_export_status.json",
+      "data/lp_events.d1-local.jsonl",
+      "data/lp_events.jsonl",
+      "data/manual_conversions.csv",
+      "data/source_capture/sample_gate_ledger.filled.csv",
+      "data/source_capture/source_capture_ledger.filled.csv",
+      "github_export_manifest.md",
+      "manual_publish_evidence.json",
+      "output/playwright",
+      "owner_approval_input.json",
+      "owner_gate_evidence.json"
+    ],
+    "external_effect": false,
+    "git_init_performed": false,
+    "git_commit_performed": false,
+    "github_push_or_pr_performed": false
+  },
+  "artifact_retention_monitor": {
+    "ok": true,
+    "mode": "artifact_retention_monitor_local_only",
+    "status": "within_review_budget",
+    "total_human": "50.2 MB",
+    "warning_count": 0,
+    "cleanup_candidate_count": 0,
+    "owner_review_required": false,
+    "cleanup_execution_policy": "owner_only_manual_cleanup_after_review",
+    "cleanup_command_generated": false,
+    "cleanup_command_executed": false,
+    "blocked_actions": [
+      "delete_github_export_bundles",
+      "delete_weekly_archives",
+      "delete_logs",
+      "compress_or_move_artifacts_without_owner_approval"
+    ],
+    "external_effect": false,
+    "delete_action_performed": false,
+    "sections": [
+      {
+        "id": "github_export_bundles",
+        "item_count": 4,
+        "total_human": "31.8 MB",
+        "warning_count": 0,
+        "cleanup_candidate_count": 0,
+        "delete_action_performed": false,
+        "external_effect": false
+      },
+      {
+        "id": "archive_snapshots",
+        "item_count": 4,
+        "total_human": "11.8 MB",
+        "warning_count": 0,
+        "cleanup_candidate_count": 0,
+        "delete_action_performed": false,
+        "external_effect": false
+      },
+      {
+        "id": "logs",
+        "item_count": 51,
+        "total_human": "6.5 MB",
+        "warning_count": 0,
+        "cleanup_candidate_count": 0,
+        "delete_action_performed": false,
+        "external_effect": false
+      }
+    ]
+  },
+  "artifact_retention_review_pack": {
+    "ok": true,
+    "mode": "artifact_retention_review_pack_local_only",
+    "status": "within_review_budget",
+    "source_status_path": "data/artifact_retention_status.json",
+    "total_human": "50.2 MB",
+    "warning_count": 0,
+    "cleanup_candidate_count": 0,
+    "cleanup_candidates_reviewed_count": 0,
+    "section_count": 3,
+    "review_required": false,
+    "highest_priority_section_id": null,
+    "cleanup_execution_policy": "owner_only_manual_after_review",
+    "cleanup_command_generated": false,
+    "cleanup_command_executed": false,
+    "filesystem_mutation_performed": false,
+    "live_data_touched": false,
+    "external_effect": false,
+    "delete_action_performed": false
+  },
+  "github_actions_workflow": {
+    "ok": true,
+    "path": ".github/workflows/3q-growth-loop-weekly.yml",
+    "schedule_cron": "10 16 * * 6",
+    "taipei_time": "Sunday 00:10",
+    "workflow_dispatch": true,
+    "verify_command": true,
+    "upload_artifact": true,
+    "deploy_step_present": false,
+    "git_write_step_present": false,
+    "external_effect": false
+  },
+  "launchagent_runtime": {
+    "service_loaded": true,
+    "state": "not running",
+    "active_count": 0,
+    "run_count": 1,
+    "last_exit_code": 0,
+    "observed_successful_run": true,
+    "current_launchd_invocation_observed": false,
+    "current_process_descends_from_service": false,
+    "proof_kind": "completed_exit_zero",
+    "proof_ok": true,
+    "external_effect": false
+  },
+  "schedule_catchup": {
+    "ok": true,
+    "mode": "weekly_schedule_catchup_monitor",
+    "status": "current_weekly_run_confirmed",
+    "catchup_required": false,
+    "latest_expected_run": {
+      "utc": "2026-07-04T16:10:00.000Z",
+      "taipei": "2026-07-05, 00:10:00 Asia/Taipei"
+    },
+    "next_expected_run": {
+      "utc": "2026-07-11T16:10:00.000Z",
+      "taipei": "2026-07-12, 00:10:00 Asia/Taipei"
+    },
+    "weekly_runner_status": "success",
+    "weekly_runner_finished_at": "2026-07-10T21:48:19.360Z",
+    "weekly_runner_commands": 126,
+    "weekly_runner_failed_commands": 0,
+    "weekly_runner_pending_commands": 0,
+    "weekly_runner_invoked": false,
+    "catchup_run_performed": false,
+    "next_safe_action": "No catch-up needed. Review owner_console.html and wait for the next Sunday local run.",
+    "external_effect": false
+  },
+  "redline_priority": {
+    "ok": true,
+    "mode": "redline_priority_local_only",
+    "status": "prioritize_p0_sample_gate_counts",
+    "action_count": 25,
+    "local_action_count": 18,
+    "gate_action_count": 5,
+    "manual_only_action_count": 2,
+    "redline_queue_covered": true,
+    "uncovered_blocked_actions": [],
+    "next_operator_action": "p0_collect_sample_gate_counts: Open next_p0_owner_form.html or next_p0_quick_capture.md, fill aggregate-only P0 counts, then rerun owner intake/weekly verification.",
+    "no_autorun_for_external_gates": true,
+    "gates_execute_in_order": true,
+    "execution_performed": false,
+    "external_effect": false
+  },
+  "blocked_actions": [
+    "verify_existing_cloudflare_d1_and_apply_schema",
+    "confirm_existing_candidate_worker_provenance",
+    "confirm_champion_live_contract_provenance_before_redeploy",
+    "change_primary_social_or_bio_link",
+    "formal_social_post_or_line_push",
+    "github_push_or_pr_creation",
+    "execute_owner_approved_launch_sequence",
+    "customer_data_or_ecpay_payment_mutation"
+  ],
+  "red_line_flags": [
+    {
+      "source_index": 0,
+      "flag": "public_link_change_performed",
+      "value": false
+    },
+    {
+      "source_index": 0,
+      "flag": "production_deploy_performed",
+      "value": false
+    },
+    {
+      "source_index": 0,
+      "flag": "github_push_or_pr_performed"
+    },
+    {
+      "source_index": 0,
+      "flag": "formal_post_performed",
+      "value": false
+    },
+    {
+      "source_index": 0,
+      "flag": "line_push_performed",
+      "value": false
+    },
+    {
+      "source_index": 0,
+      "flag": "customer_data_mutation_performed",
+      "value": false
+    },
+    {
+      "source_index": 0,
+      "flag": "payment_action_performed",
+      "value": false
+    },
+    {
+      "source_index": 0,
+      "flag": "delete_action_performed",
+      "value": false
+    },
+    {
+      "source_index": 1,
+      "flag": "public_link_change_performed",
+      "value": false
+    },
+    {
+      "source_index": 1,
+      "flag": "production_deploy_performed",
+      "value": false
+    },
+    {
+      "source_index": 1,
+      "flag": "github_push_or_pr_performed"
+    },
+    {
+      "source_index": 1,
+      "flag": "formal_post_performed"
+    },
+    {
+      "source_index": 1,
+      "flag": "line_push_performed"
+    },
+    {
+      "source_index": 1,
+      "flag": "customer_data_mutation_performed"
+    },
+    {
+      "source_index": 1,
+      "flag": "payment_action_performed"
+    },
+    {
+      "source_index": 1,
+      "flag": "delete_action_performed"
+    },
+    {
+      "source_index": 2,
+      "flag": "public_link_change_performed",
+      "value": false
+    },
+    {
+      "source_index": 2,
+      "flag": "production_deploy_performed",
+      "value": false
+    },
+    {
+      "source_index": 2,
+      "flag": "github_push_or_pr_performed"
+    },
+    {
+      "source_index": 2,
+      "flag": "formal_post_performed",
+      "value": false
+    },
+    {
+      "source_index": 2,
+      "flag": "line_push_performed",
+      "value": false
+    },
+    {
+      "source_index": 2,
+      "flag": "customer_data_mutation_performed",
+      "value": false
+    },
+    {
+      "source_index": 2,
+      "flag": "payment_action_performed",
+      "value": false
+    },
+    {
+      "source_index": 2,
+      "flag": "delete_action_performed",
+      "value": false
+    },
+    {
+      "source_index": 3,
+      "flag": "public_link_change_performed",
+      "value": false
+    },
+    {
+      "source_index": 3,
+      "flag": "production_deploy_performed",
+      "value": false
+    },
+    {
+      "source_index": 3,
+      "flag": "github_push_or_pr_performed"
+    },
+    {
+      "source_index": 3,
+      "flag": "formal_post_performed",
+      "value": false
+    },
+    {
+      "source_index": 3,
+      "flag": "line_push_performed",
+      "value": false
+    },
+    {
+      "source_index": 3,
+      "flag": "customer_data_mutation_performed",
+      "value": false
+    },
+    {
+      "source_index": 3,
+      "flag": "payment_action_performed"
+    },
+    {
+      "source_index": 3,
+      "flag": "delete_action_performed"
+    },
+    {
+      "source_index": 4,
+      "flag": "public_link_change_performed",
+      "value": false
+    },
+    {
+      "source_index": 4,
+      "flag": "production_deploy_performed",
+      "value": false
+    },
+    {
+      "source_index": 4,
+      "flag": "github_push_or_pr_performed"
+    },
+    {
+      "source_index": 4,
+      "flag": "formal_post_performed",
+      "value": false
+    },
+    {
+      "source_index": 4,
+      "flag": "line_push_performed",
+      "value": false
+    },
+    {
+      "source_index": 4,
+      "flag": "customer_data_mutation_performed",
+      "value": false
+    },
+    {
+      "source_index": 4,
+      "flag": "payment_action_performed",
+      "value": false
+    },
+    {
+      "source_index": 4,
+      "flag": "delete_action_performed",
+      "value": false
+    }
+  ],
+  "checks": [
+    {
+      "id": "config_weekly_sequence_exact",
+      "ok": true,
+      "evidence": "config/growth-loop.config.json matches the requested Sunday sequence.",
+      "external_effect": false
+    },
+    {
+      "id": "weekly_runner_lock_policy_fixtures",
+      "ok": true,
+      "evidence": "Lock fixtures prove a live PID always owns the run regardless of age and only dead/invalid owners are recovered.",
+      "external_effect": false
+    },
+    {
+      "id": "pipeline_weekly_sequence_exact",
+      "ok": true,
+      "evidence": "pipeline_status.json preserves the requested sequence.",
+      "external_effect": false
+    },
+    {
+      "id": "pipeline_steps_exact_order",
+      "ok": true,
+      "evidence": "pipeline_status.json has one evidence row per requested step.",
+      "external_effect": false
+    },
+    {
+      "id": "weekly_runner_concurrency_guard",
+      "ok": true,
+      "evidence": "Weekly runner uses an atomic process lock and atomic status replacement so overlapping manual, LaunchAgent, or agent invocations cannot corrupt the authoritative run state.",
+      "external_effect": false
+    },
+    {
+      "id": "all_requested_outputs_present",
+      "ok": true,
+      "evidence": "All objective output artifacts exist.",
+      "external_effect": false
+    },
+    {
+      "id": "north_star_event_types_scored",
+      "ok": true,
+      "evidence": "Scores include link clicks, LINE adds, leads, and deals.",
+      "external_effect": false
+    },
+    {
+      "id": "north_star_funnel_contract",
+      "ok": true,
+      "evidence": "North Star funnel reports LINE adds, leads, and deals per 100 link clicks without event writes or external effects.",
+      "external_effect": false
+    },
+    {
+      "id": "one_variable_allowed",
+      "ok": true,
+      "evidence": "The changed variable is one of hook / offer / visual_claim / cta_text.",
+      "external_effect": false
+    },
+    {
+      "id": "one_variable_consistent",
+      "ok": true,
+      "evidence": "Content drafts only change the active variable.",
+      "external_effect": false
+    },
+    {
+      "id": "one_variable_rotation_fixtures_cover_all_variables",
+      "ok": true,
+      "evidence": "Fixture-only rotation coverage proves hook, offer, visual_claim, and cta_text can each vary alone.",
+      "external_effect": false
+    },
+    {
+      "id": "content_variant_tracking_unique",
+      "ok": true,
+      "evidence": "Each draft has a unique post-level tracking link and content attribution row.",
+      "external_effect": false
+    },
+    {
+      "id": "sample_gate_exact",
+      "ok": true,
+      "evidence": "Sample thresholds match the objective.",
+      "external_effect": false
+    },
+    {
+      "id": "next_round_keeps_variable_when_sample_insufficient",
+      "ok": true,
+      "evidence": "Sample-insufficient rounds keep the current champion and variable.",
+      "external_effect": false
+    },
+    {
+      "id": "win_rule_exact",
+      "ok": true,
+      "evidence": "Win rule requires 1.15 lift, sample threshold, and no quality regression.",
+      "external_effect": false
+    },
+    {
+      "id": "winning_challenger_never_auto_promotes",
+      "ok": true,
+      "evidence": "Winning challenger can only be queued for human review.",
+      "external_effect": false
+    },
+    {
+      "id": "ab_small_traffic_local_only",
+      "ok": true,
+      "evidence": "A/B plan is 90/10 and does not change public links.",
+      "external_effect": false
+    },
+    {
+      "id": "manual_conversion_preview_only",
+      "ok": true,
+      "evidence": "Manual conversion import remains preview-only.",
+      "external_effect": false
+    },
+    {
+      "id": "line_inbound_playbook_aggregate_only",
+      "ok": true,
+      "evidence": "LINE inbound playbook stays manual, inbound-only, aggregate-only, and blocks sensitive customer fields.",
+      "external_effect": false
+    },
+    {
+      "id": "event_input_quality_gate",
+      "ok": true,
+      "evidence": "Real lp_events input is scanned for PII, unknown assets, duplicates, and malformed rows before scoring.",
+      "external_effect": false
+    },
+    {
+      "id": "funnel_aggregate_preview_only",
+      "ok": true,
+      "evidence": "Full-funnel aggregate import previews top-to-bottom event counts without scoring or writing real lp_events.",
+      "external_effect": false
+    },
+    {
+      "id": "funnel_aggregate_fixtures_cover_import_gates",
+      "ok": true,
+      "evidence": "Full-funnel aggregate fixtures block unknown assets, missing attribution, sensitive columns, sensitive values, and unsafe apply attempts.",
+      "external_effect": false
+    },
+    {
+      "id": "real_data_apply_fixtures_block_examples",
+      "ok": true,
+      "evidence": "Real-data apply fixtures block unconfirmed apply commands and copied example/template CSVs before they can write data/lp_events.jsonl.",
+      "external_effect": false
+    },
+    {
+      "id": "real_data_input_pack_template_only",
+      "ok": true,
+      "evidence": "Real-data input pack creates fill templates only and never creates live input CSVs or writes data/lp_events.jsonl.",
+      "external_effect": false
+    },
+    {
+      "id": "source_readiness_covers_funnel_stages",
+      "ok": true,
+      "evidence": "Source readiness covers every north-star funnel event stage and remains read-only.",
+      "external_effect": false
+    },
+    {
+      "id": "champion_contract_audit_blocks_false_leads",
+      "ok": true,
+      "evidence": "Live champion URL and LINE destination are observed read-only; local-only success UI is never counted as a lead.",
+      "external_effect": false
+    },
+    {
+      "id": "champion_integration_candidate_source_locked",
+      "ok": true,
+      "evidence": "Source-locked 3q-site candidate removes false-success lead UI and prepares no-PII page_view/cta_click telemetry without deployment.",
+      "external_effect": false
+    },
+    {
+      "id": "champion_source_lock_fixture_matrix",
+      "ok": true,
+      "evidence": "Isolated fixtures prove pinned-ref, ancestry, target-drift, tuple-integrity, and missing-repo fail-closed behavior.",
+      "external_effect": false
+    },
+    {
+      "id": "cloudflare_d1_metadata_readiness",
+      "ok": true,
+      "evidence": "Read-only D1 metadata inventory detects whether the dedicated Growth Loop database exists without querying tables, reading customer data, or reusing CRM databases.",
+      "external_effect": false
+    },
+    {
+      "id": "live_telemetry_chain_observed_and_owner_gated",
+      "ok": true,
+      "evidence": "Live observation mirrors the validated Candidate/Champion/D1 evidence state while keeping all reads aggregate-only and any redeploy separately gated.",
+      "external_effect": false
+    },
+    {
+      "id": "live_telemetry_readiness_fixture_states",
+      "ok": true,
+      "evidence": "Fixture states prove deployment observation, schema evidence, and recurring aggregate-read authorization are independent without a live network refresh, table query, event POST, or external effect.",
+      "external_effect": false
+    },
+    {
+      "id": "d1_schema_idempotency_contract",
+      "ok": true,
+      "evidence": "Week 0 D1 schema applies twice in disposable local state and passes integrity, seed, and constraint checks without remote D1 access.",
+      "external_effect": false
+    },
+    {
+      "id": "approved_d1_config_guard_preview",
+      "ok": true,
+      "evidence": "D1 id config guard remains preview-only until explicit owner approval and exact live metadata match.",
+      "external_effect": false
+    },
+    {
+      "id": "d1_collection_selector_defaults_local",
+      "ok": true,
+      "evidence": "Weekly collect_data stays local until matching evidence exists, then permits only the approved aggregate-only remote path.",
+      "external_effect": false
+    },
+    {
+      "id": "d1_collection_selector_fixture_gates",
+      "ok": true,
+      "evidence": "Plan-only fixtures prove only matching owner evidence, recurring-read approval, and post-gate readiness select remote aggregate collection.",
+      "external_effect": false
+    },
+    {
+      "id": "d1_remote_export_aggregate_only_fixture",
+      "ok": true,
+      "evidence": "Fixture Wrangler proves the approved remote path reads grouped counts only and excludes raw session, URL, referrer, metadata, and customer fields.",
+      "external_effect": false
+    },
+    {
+      "id": "champion_local_feature_commit",
+      "ok": true,
+      "evidence": "Champion release stack descends from the exact source lock, changes only the Worker and optional binding-preservation workflow, and this audit performs no GitHub write.",
+      "external_effect": false
+    },
+    {
+      "id": "champion_release_preflight_clean_source",
+      "ok": true,
+      "evidence": "Champion patch applies to a clean git archive or locked snapshot, matches the generated candidate byte-for-byte, and passes both Wrangler dry-run command shapes with an owner-gated rollback packet.",
+      "external_effect": false
+    },
+    {
+      "id": "champion_github_handoff_exact_and_gated",
+      "ok": true,
+      "evidence": "Champion GitHub handoff targets the exact known repo, branch, and commit, stops at a draft PR, and performs no GitHub write.",
+      "external_effect": false
+    },
+    {
+      "id": "source_capture_pack_template_only",
+      "ok": true,
+      "evidence": "Source capture pack maps tracking links and funnel stages to aggregate-only owner capture rows without creating live inputs or writing data/lp_events.jsonl.",
+      "external_effect": false
+    },
+    {
+      "id": "sample_gate_replay_fixtures_cover_fast_path",
+      "ok": true,
+      "evidence": "Sample-gate replay fixtures prove the 18-row owner-filled fast path can compile and preview sample decisions without writing data/lp_events.jsonl.",
+      "external_effect": false
+    },
+    {
+      "id": "source_capture_compile_preview_only",
+      "ok": true,
+      "evidence": "Source capture compile validates filled owner ledgers and emits owner-preview CSVs without creating live inputs or writing data/lp_events.jsonl.",
+      "external_effect": false
+    },
+    {
+      "id": "source_capture_compile_fixtures_cover_gates",
+      "ok": true,
+      "evidence": "Source capture compile fixtures cover valid filled rows, empty templates, partial blanks, PII, bad dates, and invalid target files.",
+      "external_effect": false
+    },
+    {
+      "id": "real_data_intake_plan_owner_gated",
+      "ok": true,
+      "evidence": "Real-data intake plan checks reviewed aggregate CSVs and produces owner-gated local apply commands without writing data/lp_events.jsonl.",
+      "external_effect": false
+    },
+    {
+      "id": "data_collection_brief_owner_queue",
+      "ok": true,
+      "evidence": "Data collection brief converts missing funnel-stage source data into owner-reviewed aggregate-count tasks without creating live inputs or writing data/lp_events.jsonl.",
+      "external_effect": false
+    },
+    {
+      "id": "source_trust_matrix_blocks_untrusted_inputs",
+      "ok": true,
+      "evidence": "Source trust matrix separates scoring-ready inputs from local D1 smoke rows and owner-preview artifacts before sample-gate decisions.",
+      "external_effect": false
+    },
+    {
+      "id": "next_p0_owner_form_safe",
+      "ok": true,
+      "evidence": "Focused Next P0 browser form exposes only the current owner aggregate rows, exports review files locally, and performs no network calls, staging, or event writes.",
+      "external_effect": false
+    },
+    {
+      "id": "next_p0_owner_form_fixtures_safe",
+      "ok": true,
+      "evidence": "Focused Next P0 browser form fixture verifies local-only HTML, aggregate-only export contract, and false red-line flags.",
+      "external_effect": false
+    },
+    {
+      "id": "next_p0_owner_intake_preview_only",
+      "ok": true,
+      "evidence": "Focused Next P0 owner-download intake validates aggregate CSVs and emits owner-preview CSVs without event writes or external effects.",
+      "external_effect": false
+    },
+    {
+      "id": "next_p0_owner_intake_fixtures_safe",
+      "ok": true,
+      "evidence": "Focused Next P0 intake fixtures cover valid preview, quick-preview auto-intake, sensitive blocking, and confirmed temp staging without writing project live inputs.",
+      "external_effect": false
+    },
+    {
+      "id": "owner_data_preflight_local_only",
+      "ok": true,
+      "evidence": "Owner data preflight previews sample-gate and win-rule decisions from aggregate preview CSVs without applying data or executing external gates.",
+      "external_effect": false
+    },
+    {
+      "id": "sample_gate_capture_calendar_local_only",
+      "ok": true,
+      "evidence": "Sample-gate capture calendar turns Day 3 / Day 7 checkpoints into local-only review artifacts without importing calendars or creating reminders.",
+      "external_effect": false
+    },
+    {
+      "id": "sample_gate_due_status_local_only",
+      "ok": true,
+      "evidence": "Sample-gate due status turns Day 3 / Day 7 timing into a local operator signal without importing calendars, opening browsers, writing events, or changing winners.",
+      "external_effect": false
+    },
+    {
+      "id": "week0_owner_capture_queue_shortens_sample_gate_collection",
+      "ok": true,
+      "evidence": "Week 0 owner capture queue reduces collection to P0 sample-gate counts and remains local-only.",
+      "external_effect": false
+    },
+    {
+      "id": "owner_sample_gate_status_keeps_promotion_blocked",
+      "ok": true,
+      "evidence": "Owner sample-gate status reads filled aggregate counts, reports threshold gaps, and never promotes or applies data automatically.",
+      "external_effect": false
+    },
+    {
+      "id": "sample_gate_owner_worksheet_safe",
+      "ok": true,
+      "evidence": "Owner sample-gate worksheet covers 18 P0 rows and remains local-only.",
+      "external_effect": false
+    },
+    {
+      "id": "sample_gate_owner_form_safe",
+      "ok": true,
+      "evidence": "Owner sample-gate browser form covers 18 P0 rows, exports local files only, and performs no network calls or event writes.",
+      "external_effect": false
+    },
+    {
+      "id": "sample_gate_owner_form_fixtures_safe",
+      "ok": true,
+      "evidence": "Owner sample-gate browser form fixtures replay downloaded CSVs through source compile and owner sample-gate status without live writes or promotion.",
+      "external_effect": false
+    },
+    {
+      "id": "sample_gate_batch_handoff_full_p0_coverage",
+      "ok": true,
+      "evidence": "P0 sample-gate batch handoff maps the full 18-row coverage into focused and remaining owner-count batches without event writes or external effects.",
+      "external_effect": false
+    },
+    {
+      "id": "sample_gate_collection_sprint_local_only",
+      "ok": true,
+      "evidence": "Sample-gate collection sprint turns due state and P0 gaps into a local owner queue without event writes or external effects.",
+      "external_effect": false
+    },
+    {
+      "id": "owner_sample_gate_fixtures_cover_decision_paths",
+      "ok": true,
+      "evidence": "Owner sample-gate fixtures cover missing, partial, insufficient, winning-review, underperform, and sensitive-evidence paths without real writes or promotion.",
+      "external_effect": false
+    },
+    {
+      "id": "owner_quality_review_gate_local_only",
+      "ok": true,
+      "evidence": "Owner quality review validates aggregate no-quality-regression evidence after a sample-rate winner and still never promotes.",
+      "external_effect": false
+    },
+    {
+      "id": "owner_quality_review_form_safe",
+      "ok": true,
+      "evidence": "Owner quality-review browser form exports local aggregate JSON only and performs no network calls, event writes, approval queue writes, or promotion.",
+      "external_effect": false
+    },
+    {
+      "id": "owner_quality_review_form_fixtures_safe",
+      "ok": true,
+      "evidence": "Owner quality-review browser form fixtures replay downloaded JSON through quality review without live writes, approval queue writes, or promotion.",
+      "external_effect": false
+    },
+    {
+      "id": "owner_quality_review_fixtures_cover_quality_paths",
+      "ok": true,
+      "evidence": "Owner quality-review fixtures cover waiting, missing evidence, passing evidence, regression, sensitive evidence, and missing fields without external effects.",
+      "external_effect": false
+    },
+    {
+      "id": "candidate_retirement_fixtures_cover_rotation_paths",
+      "ok": true,
+      "evidence": "Candidate retirement fixtures cover sample-insufficient keep-testing, owner promotion review, underperforming retirement, quality-regression retirement, unknown candidates, and mixed summaries without deletion or external effects.",
+      "external_effect": false
+    },
+    {
+      "id": "iteration_history_local_only",
+      "ok": true,
+      "evidence": "Iteration history records the 7-day loop status, sample gate, archive history, and next safe actions without external effects.",
+      "external_effect": false
+    },
+    {
+      "id": "worker_dry_run_no_deploy",
+      "ok": true,
+      "evidence": "Candidate Worker dry-run validates the bundle and bindings while preserving no-deploy and no-external-effect flags.",
+      "external_effect": false
+    },
+    {
+      "id": "browser_smoke_no_event_write",
+      "ok": true,
+      "evidence": "Browser route smoke is local and does not write events.",
+      "external_effect": false
+    },
+    {
+      "id": "tracking_link_smoke_covers_generated_links",
+      "ok": true,
+      "evidence": "Generated tracking links redirect correctly in isolated local smoke without following external URLs or writing real events.",
+      "external_effect": false
+    },
+    {
+      "id": "event_contract_smoke_isolated",
+      "ok": true,
+      "evidence": "Worker /e writes expected synthetic funnel events into isolated local D1, rejects sensitive metadata, and preserves redirect attribution.",
+      "external_effect": false
+    },
+    {
+      "id": "champion_integration_smoke_isolated",
+      "ok": true,
+      "evidence": "3q-site candidate and collector pass a two-Worker localhost smoke with exact-origin CORS, no sensitive rows, and no inferred line_add.",
+      "external_effect": false
+    },
+    {
+      "id": "win_rule_fixtures_cover_gates",
+      "ok": true,
+      "evidence": "Win-rule fixtures cover sample insufficient, winner review only, underperform, and quality regression.",
+      "external_effect": false
+    },
+    {
+      "id": "real_data_decision_replay_covers_import_to_decision",
+      "ok": true,
+      "evidence": "Real-data-shaped filled source-capture ledgers compile to owner-preview aggregate CSVs, then replay through scoring, A/B decision, and next-round planning without writing data/lp_events.jsonl.",
+      "external_effect": false
+    },
+    {
+      "id": "sunday_local_schedule",
+      "ok": true,
+      "evidence": "Local weekly schedule targets Sunday and weekly:local.",
+      "external_effect": false
+    },
+    {
+      "id": "launchagent_runtime_proof",
+      "ok": true,
+      "evidence": "The installed macOS LaunchAgent has completed at least one real weekly runner invocation with exit code 0.",
+      "external_effect": false
+    },
+    {
+      "id": "schedule_catchup_monitor_local_only",
+      "ok": true,
+      "evidence": "Local catch-up monitor detects missed weekly windows without invoking weekly:local or external actions.",
+      "external_effect": false
+    },
+    {
+      "id": "approval_queue_has_required_gates",
+      "ok": true,
+      "evidence": "Approval queue includes every unresolved review or external gate and may retire the first-event item after trusted events arrive.",
+      "external_effect": false
+    },
+    {
+      "id": "approval_resume_fixtures_plan_only",
+      "ok": true,
+      "evidence": "Owner approval resume fixtures stay dry-run only and cover placeholders, valid metadata, secret rejection, URL validation, and manual-only gates.",
+      "external_effect": false
+    },
+    {
+      "id": "owner_approval_form_safe",
+      "ok": true,
+      "evidence": "Owner approval browser form exports non-secret approval metadata only and performs no network call, live input write, gate execution, deploy, GitHub, public link, LINE, payment, customer-data, or delete action.",
+      "external_effect": false
+    },
+    {
+      "id": "owner_approval_form_fixtures_plan_only",
+      "ok": true,
+      "evidence": "Owner approval form fixtures replay exports through the dry-run resume planner, block placeholders and sensitive metadata, and never create live input files or execute external actions.",
+      "external_effect": false
+    },
+    {
+      "id": "owner_gate_evidence_intake_evidence_only",
+      "ok": true,
+      "evidence": "Owner gate evidence intake validates non-secret post-gate metadata only and performs no external action.",
+      "external_effect": false
+    },
+    {
+      "id": "owner_gate_evidence_fixtures_cover_intake_gates",
+      "ok": true,
+      "evidence": "Owner gate evidence fixtures cover missing, placeholder, valid, sensitive, invalid A/B, duplicate, manual-only, and invalid GitHub evidence without external action.",
+      "external_effect": false
+    },
+    {
+      "id": "post_gate_verification_plan_local_only",
+      "ok": true,
+      "evidence": "Post-gate verification remains local-only and performs no network, remote CLI, deploy, push, public link, LINE, payment, customer-data, or delete action.",
+      "external_effect": false
+    },
+    {
+      "id": "post_gate_verification_fixtures_cover_plan_gates",
+      "ok": true,
+      "evidence": "Post-gate verification fixtures separate schema evidence readiness from recurring-read authorization while covering dependencies, manual-only gates, and invalid evidence without external action.",
+      "external_effect": false
+    },
+    {
+      "id": "github_export_bundle_local_only",
+      "ok": true,
+      "evidence": "GitHub export bundle is repo-ready locally, excludes live owner inputs, and performs no git init, commit, push, PR, deploy, send, payment, customer-data, or delete actions.",
+      "external_effect": false
+    },
+    {
+      "id": "artifact_retention_monitor_local_only",
+      "ok": true,
+      "evidence": "Artifact retention monitor reports local bundle/archive/log growth for owner review without generating or executing cleanup commands.",
+      "external_effect": false
+    },
+    {
+      "id": "artifact_retention_review_pack_local_only",
+      "ok": true,
+      "evidence": "Artifact retention review pack converts monitor output into owner-only cleanup review without commands, mutation, deletion, or external effects.",
+      "external_effect": false
+    },
+    {
+      "id": "github_actions_weekly_verify_only",
+      "ok": true,
+      "evidence": "GitHub Actions workflow is prepared for weekly verify/artifact upload only, with no deploy, push, LINE, payment, customer-data, or delete step.",
+      "external_effect": false
+    },
+    {
+      "id": "prepared_but_blocked_has_required_redlines",
+      "ok": true,
+      "evidence": "PreparedButBlocked includes current-state red-line actions without asking for duplicate resource creation.",
+      "external_effect": false
+    },
+    {
+      "id": "redline_priority_covers_blocked_queue",
+      "ok": true,
+      "evidence": "Red-line priority queue covers every PreparedButBlocked action and keeps external gates non-autorun.",
+      "external_effect": false
+    },
+    {
+      "id": "launch_readiness_owner_gated",
+      "ok": true,
+      "evidence": "Launch readiness remains owner-gated.",
+      "external_effect": false
+    },
+    {
+      "id": "red_line_flags_false",
+      "ok": true,
+      "evidence": "No local artifact claims prohibited external actions.",
+      "external_effect": false
+    }
+  ],
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

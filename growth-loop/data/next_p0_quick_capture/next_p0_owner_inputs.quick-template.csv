@@ -1,0 +1,10 @@
+rank,capture_date,role,tracking_link_id,event_type,stage_label,source_surface,target_live_file,aggregate_count,evidence_ref,reviewer,pii_checked
+1,2026-07-11,champion,track-champion-3q-line-v0,page_view,落地頁瀏覽,candidate Worker D1 / landing page analytics,data/funnel_aggregates.csv,,,,
+2,2026-07-11,champion,track-champion-3q-line-v0,cta_click,CTA 點擊,candidate Worker D1 / landing page analytics,data/funnel_aggregates.csv,,,,
+3,2026-07-11,champion,track-champion-3q-line-v0,line_add,LINE 進線 / 加好友,LINE OA 管理後台 / inbound customer-service aggregate,data/manual_conversions.csv,,,,
+4,2026-07-11,challenger,track-challenger-week0-cta-text-v1,page_view,落地頁瀏覽,candidate Worker D1 / landing page analytics,data/funnel_aggregates.csv,,,,
+5,2026-07-11,challenger,track-challenger-week0-cta-text-v1,cta_click,CTA 點擊,candidate Worker D1 / landing page analytics,data/funnel_aggregates.csv,,,,
+6,2026-07-11,challenger,track-challenger-week0-cta-text-v1,line_add,LINE 進線 / 加好友,LINE OA 管理後台 / inbound customer-service aggregate,data/manual_conversions.csv,,,,
+7,2026-07-11,line_cta,track-challenger-week0-cta-text-v1-line,page_view,落地頁瀏覽,candidate Worker D1 / landing page analytics,data/funnel_aggregates.csv,,,,
+8,2026-07-11,line_cta,track-challenger-week0-cta-text-v1-line,cta_click,CTA 點擊,candidate Worker D1 / landing page analytics,data/funnel_aggregates.csv,,,,
+9,2026-07-11,line_cta,track-challenger-week0-cta-text-v1-line,line_add,LINE 進線 / 加好友,LINE OA 管理後台 / inbound customer-service aggregate,data/manual_conversions.csv,,,,

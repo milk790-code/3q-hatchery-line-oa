@@ -1,0 +1,97 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:44:16.160Z",
+  "mode": "champion_contract_audit_read_only",
+  "status": "champion_line_only_contract_observed",
+  "champion": {
+    "asset_id": "champion-3q-line-v0",
+    "url": "https://3q-site.milk790.workers.dev/",
+    "configured_line_url": "https://lin.ee/VZvs7sj",
+    "configured_line_basic_id": "@121lkspe",
+    "status": "champion_live_verified_read_only"
+  },
+  "observations": {
+    "health": {
+      "ok": true,
+      "status": 200,
+      "url": "https://3q-site.milk790.workers.dev/health",
+      "headers": {
+        "location": null
+      },
+      "body": {
+        "ok": true,
+        "worker": "3q-site",
+        "ver": "v1.2",
+        "build": "growth-loop-telemetry-v2",
+        "pages": 3
+      }
+    },
+    "landing": {
+      "ok": true,
+      "status": 200,
+      "url": "https://3q-site.milk790.workers.dev/",
+      "location": null,
+      "error": null
+    },
+    "contact": {
+      "ok": true,
+      "status": 200,
+      "url": "https://3q-site.milk790.workers.dev/contact",
+      "location": null,
+      "error": null
+    },
+    "line_redirect": {
+      "ok": true,
+      "status": 301,
+      "url": "https://lin.ee/VZvs7sj",
+      "location": "https://line.me/R/ti/p/@121lkspe?ts=06101837&oat_content=url",
+      "error": null
+    },
+    "live_contact_line_urls": [
+      "https://lin.ee/VZvs7sj"
+    ],
+    "form_element_detected": false,
+    "form_submit_handler_detected": false,
+    "local_success_only_detected": false,
+    "line_only_contact_detected": true,
+    "lead_capture_transport_detected": false,
+    "misleading_success_state_detected": false
+  },
+  "cloudflare_metrics": {
+    "observed_at": "2026-07-10T02:08:45+08:00",
+    "source": "Cloudflare Dashboard > Workers & Pages > 3q-site > Metrics",
+    "worker": "3q-site",
+    "environment": "production",
+    "metrics": {
+      "past_24_hours": {
+        "invocations": 224,
+        "errors": 0
+      },
+      "selected_past_7_days": {
+        "invocations": 979,
+        "errors": 0,
+        "chart_span_observed": "2026-07-06 to 2026-07-10 Asia/Taipei",
+        "ui_note": "The range menu was changed to Last 7 days; the translated button label remained stale while the chart and total refreshed."
+      }
+    },
+    "scoring_eligible": false,
+    "reason": "Worker invocations include HTML, script, stylesheet, health, bot, and other path requests. They are diagnostic traffic only and must not be counted as landing-page visits."
+  },
+  "scoring_policy": {
+    "worker_invocations_scoring_eligible": false,
+    "champion_form_submission_scoring_eligible": false,
+    "reason": "Invocations are not visits, and the observed LINE-only contact page has no in-page lead submission."
+  },
+  "prepared_but_blocked": null,
+  "live_read_ok": true,
+  "data_lp_events_write_performed": false,
+  "customer_data_read_performed": false,
+  "customer_data_mutation_performed": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "external_effect": false
+}

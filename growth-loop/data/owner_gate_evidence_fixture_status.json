@@ -1,0 +1,1433 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:47:28.097Z",
+  "mode": "owner_gate_evidence_fixture_dry_run",
+  "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU",
+  "scenario_count": 10,
+  "local_fixture_commands_executed": true,
+  "owner_gate_evidence_fixture_executed": true,
+  "execution_performed": false,
+  "external_effect": false,
+  "remote_d1_create_performed": false,
+  "remote_d1_migration_performed": false,
+  "production_deploy_performed": false,
+  "public_link_change_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "scenarios": [
+    {
+      "id": "no_input_waits_for_owner_evidence",
+      "ok": true,
+      "command": "node scripts/owner-gate-evidence.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/no_input_waits_for_owner_evidence/owner_gate_evidence.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/no_input_waits_for_owner_evidence/owner_gate_evidence_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/no_input_waits_for_owner_evidence/owner_gate_evidence.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/no_input_waits_for_owner_evidence/owner_gate_evidence.example.json",
+      "exit_code": 0,
+      "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/no_input_waits_for_owner_evidence/owner_gate_evidence_status.json",
+      "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/no_input_waits_for_owner_evidence/owner_gate_evidence.md",
+      "stdout_bytes": 9609,
+      "stderr_bytes": 0,
+      "intake_status": "waiting_for_owner_evidence",
+      "ready_gate_count": 0,
+      "evidence_gate_count": 0,
+      "issue_count": 0,
+      "sensitive_evidence_detected": false,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "cloudflare_account_alias",
+            "d1_database_name",
+            "d1_database_id",
+            "schema_applied_at",
+            "recurring_aggregate_read_approved",
+            "verification_ref",
+            "rollback_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,cloudflare_account_alias,d1_database_name,d1_database_id,schema_applied_at,recurring_aggregate_read_approved,verification_ref,rollback_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "worker_name",
+            "worker_url",
+            "health_status",
+            "verification_ref",
+            "rollback_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,worker_name,worker_url,health_status,verification_ref,rollback_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "champion_url",
+            "public_surface",
+            "ab_url",
+            "traffic_share_challenger",
+            "rollback_url",
+            "verification_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,champion_url,public_surface,ab_url,traffic_share_challenger,rollback_url,verification_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "repo_url",
+            "branch_name",
+            "pr_url",
+            "commit_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,repo_url,branch_name,pr_url,commit_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": true,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "manual_only_acknowledged",
+            "notes_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,manual_only_acknowledged,notes_ref"
+          ],
+          "execution_policy": "manual_only_no_autorun",
+          "executed_by_this_script": false
+        }
+      ]
+    },
+    {
+      "id": "copied_example_placeholders_block_evidence",
+      "ok": true,
+      "command": "node scripts/owner-gate-evidence.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/copied_example_placeholders_block_evidence/owner_gate_evidence.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/copied_example_placeholders_block_evidence/owner_gate_evidence_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/copied_example_placeholders_block_evidence/owner_gate_evidence.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/copied_example_placeholders_block_evidence/owner_gate_evidence.example.json",
+      "exit_code": 1,
+      "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/copied_example_placeholders_block_evidence/owner_gate_evidence_status.json",
+      "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/copied_example_placeholders_block_evidence/owner_gate_evidence.md",
+      "stdout_bytes": 8150,
+      "stderr_bytes": 0,
+      "intake_status": "blocked_invalid_owner_evidence",
+      "ready_gate_count": 2,
+      "evidence_gate_count": 5,
+      "issue_count": 2,
+      "sensitive_evidence_detected": false,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "evidence_detected": true,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [],
+          "placeholder_fields": [
+            "d1_database_id"
+          ],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "placeholder_fields=d1_database_id"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "evidence_detected": true,
+          "evidence_valid": true,
+          "ready_for_post_gate_verification": true,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "evidence_detected": true,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [],
+          "placeholder_fields": [
+            "champion_url",
+            "rollback_url"
+          ],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "placeholder_fields=champion_url,rollback_url"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "evidence_detected": true,
+          "evidence_valid": true,
+          "ready_for_post_gate_verification": true,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "evidence_detected": true,
+          "evidence_valid": true,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": true,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [],
+          "execution_policy": "manual_only_no_autorun",
+          "executed_by_this_script": false
+        }
+      ]
+    },
+    {
+      "id": "valid_remote_d1_evidence_enables_post_gate_plan",
+      "ok": true,
+      "command": "node scripts/owner-gate-evidence.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/valid_remote_d1_evidence_enables_post_gate_plan/owner_gate_evidence.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/valid_remote_d1_evidence_enables_post_gate_plan/owner_gate_evidence_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/valid_remote_d1_evidence_enables_post_gate_plan/owner_gate_evidence.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/valid_remote_d1_evidence_enables_post_gate_plan/owner_gate_evidence.example.json",
+      "exit_code": 0,
+      "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/valid_remote_d1_evidence_enables_post_gate_plan/owner_gate_evidence_status.json",
+      "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/valid_remote_d1_evidence_enables_post_gate_plan/owner_gate_evidence.md",
+      "stdout_bytes": 9053,
+      "stderr_bytes": 0,
+      "intake_status": "partial_owner_evidence_validated",
+      "ready_gate_count": 1,
+      "evidence_gate_count": 1,
+      "issue_count": 0,
+      "sensitive_evidence_detected": false,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "evidence_detected": true,
+          "evidence_valid": true,
+          "ready_for_post_gate_verification": true,
+          "recurring_aggregate_read_approved": true,
+          "manual_only": false,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "worker_name",
+            "worker_url",
+            "health_status",
+            "verification_ref",
+            "rollback_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,worker_name,worker_url,health_status,verification_ref,rollback_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "champion_url",
+            "public_surface",
+            "ab_url",
+            "traffic_share_challenger",
+            "rollback_url",
+            "verification_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,champion_url,public_surface,ab_url,traffic_share_challenger,rollback_url,verification_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "repo_url",
+            "branch_name",
+            "pr_url",
+            "commit_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,repo_url,branch_name,pr_url,commit_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": true,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "manual_only_acknowledged",
+            "notes_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,manual_only_acknowledged,notes_ref"
+          ],
+          "execution_policy": "manual_only_no_autorun",
+          "executed_by_this_script": false
+        }
+      ]
+    },
+    {
+      "id": "remote_d1_without_recurring_read_approval_keeps_schema_evidence_valid",
+      "ok": true,
+      "command": "node scripts/owner-gate-evidence.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/remote_d1_without_recurring_read_approval_keeps_schema_evidence_valid/owner_gate_evidence.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/remote_d1_without_recurring_read_approval_keeps_schema_evidence_valid/owner_gate_evidence_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/remote_d1_without_recurring_read_approval_keeps_schema_evidence_valid/owner_gate_evidence.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/remote_d1_without_recurring_read_approval_keeps_schema_evidence_valid/owner_gate_evidence.example.json",
+      "exit_code": 0,
+      "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/remote_d1_without_recurring_read_approval_keeps_schema_evidence_valid/owner_gate_evidence_status.json",
+      "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/remote_d1_without_recurring_read_approval_keeps_schema_evidence_valid/owner_gate_evidence.md",
+      "stdout_bytes": 9120,
+      "stderr_bytes": 0,
+      "intake_status": "partial_owner_evidence_validated",
+      "ready_gate_count": 1,
+      "evidence_gate_count": 1,
+      "issue_count": 0,
+      "sensitive_evidence_detected": false,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "evidence_detected": true,
+          "evidence_valid": true,
+          "ready_for_post_gate_verification": true,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "worker_name",
+            "worker_url",
+            "health_status",
+            "verification_ref",
+            "rollback_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,worker_name,worker_url,health_status,verification_ref,rollback_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "champion_url",
+            "public_surface",
+            "ab_url",
+            "traffic_share_challenger",
+            "rollback_url",
+            "verification_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,champion_url,public_surface,ab_url,traffic_share_challenger,rollback_url,verification_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "repo_url",
+            "branch_name",
+            "pr_url",
+            "commit_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,repo_url,branch_name,pr_url,commit_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": true,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "manual_only_acknowledged",
+            "notes_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,manual_only_acknowledged,notes_ref"
+          ],
+          "execution_policy": "manual_only_no_autorun",
+          "executed_by_this_script": false
+        }
+      ]
+    },
+    {
+      "id": "valid_all_non_manual_evidence_ready_for_post_gate_verification",
+      "ok": true,
+      "command": "node scripts/owner-gate-evidence.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/valid_all_non_manual_evidence_ready_for_post_gate_verification/owner_gate_evidence.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/valid_all_non_manual_evidence_ready_for_post_gate_verification/owner_gate_evidence_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/valid_all_non_manual_evidence_ready_for_post_gate_verification/owner_gate_evidence.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/valid_all_non_manual_evidence_ready_for_post_gate_verification/owner_gate_evidence.example.json",
+      "exit_code": 0,
+      "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/valid_all_non_manual_evidence_ready_for_post_gate_verification/owner_gate_evidence_status.json",
+      "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/valid_all_non_manual_evidence_ready_for_post_gate_verification/owner_gate_evidence.md",
+      "stdout_bytes": 8084,
+      "stderr_bytes": 0,
+      "intake_status": "owner_evidence_validated_ready_for_post_gate_verification",
+      "ready_gate_count": 4,
+      "evidence_gate_count": 4,
+      "issue_count": 0,
+      "sensitive_evidence_detected": false,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "evidence_detected": true,
+          "evidence_valid": true,
+          "ready_for_post_gate_verification": true,
+          "recurring_aggregate_read_approved": true,
+          "manual_only": false,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "evidence_detected": true,
+          "evidence_valid": true,
+          "ready_for_post_gate_verification": true,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "evidence_detected": true,
+          "evidence_valid": true,
+          "ready_for_post_gate_verification": true,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "evidence_detected": true,
+          "evidence_valid": true,
+          "ready_for_post_gate_verification": true,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": true,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "manual_only_acknowledged",
+            "notes_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,manual_only_acknowledged,notes_ref"
+          ],
+          "execution_policy": "manual_only_no_autorun",
+          "executed_by_this_script": false
+        }
+      ]
+    },
+    {
+      "id": "sensitive_or_customer_evidence_blocks_gate",
+      "ok": true,
+      "command": "node scripts/owner-gate-evidence.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/sensitive_or_customer_evidence_blocks_gate/owner_gate_evidence.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/sensitive_or_customer_evidence_blocks_gate/owner_gate_evidence_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/sensitive_or_customer_evidence_blocks_gate/owner_gate_evidence.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/sensitive_or_customer_evidence_blocks_gate/owner_gate_evidence.example.json",
+      "exit_code": 1,
+      "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/sensitive_or_customer_evidence_blocks_gate/owner_gate_evidence_status.json",
+      "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/sensitive_or_customer_evidence_blocks_gate/owner_gate_evidence.md",
+      "stdout_bytes": 9782,
+      "stderr_bytes": 0,
+      "intake_status": "blocked_invalid_owner_evidence",
+      "ready_gate_count": 0,
+      "evidence_gate_count": 1,
+      "issue_count": 2,
+      "sensitive_evidence_detected": true,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "cloudflare_account_alias",
+            "d1_database_name",
+            "d1_database_id",
+            "schema_applied_at",
+            "recurring_aggregate_read_approved",
+            "verification_ref",
+            "rollback_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,cloudflare_account_alias,d1_database_name,d1_database_id,schema_applied_at,recurring_aggregate_read_approved,verification_ref,rollback_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "evidence_detected": true,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "unknown_fields": [
+            "customer_email"
+          ],
+          "sensitive_or_customer_fields": [
+            {
+              "field_path": "customer_email",
+              "code": "sensitive_or_customer_value"
+            }
+          ],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "unknown_fields=customer_email",
+            "sensitive_or_customer_fields=customer_email"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "champion_url",
+            "public_surface",
+            "ab_url",
+            "traffic_share_challenger",
+            "rollback_url",
+            "verification_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,champion_url,public_surface,ab_url,traffic_share_challenger,rollback_url,verification_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "repo_url",
+            "branch_name",
+            "pr_url",
+            "commit_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,repo_url,branch_name,pr_url,commit_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": true,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "manual_only_acknowledged",
+            "notes_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,manual_only_acknowledged,notes_ref"
+          ],
+          "execution_policy": "manual_only_no_autorun",
+          "executed_by_this_script": false
+        }
+      ]
+    },
+    {
+      "id": "invalid_public_ab_evidence_blocks_route",
+      "ok": true,
+      "command": "node scripts/owner-gate-evidence.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/invalid_public_ab_evidence_blocks_route/owner_gate_evidence.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/invalid_public_ab_evidence_blocks_route/owner_gate_evidence_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/invalid_public_ab_evidence_blocks_route/owner_gate_evidence.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/invalid_public_ab_evidence_blocks_route/owner_gate_evidence.example.json",
+      "exit_code": 1,
+      "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/invalid_public_ab_evidence_blocks_route/owner_gate_evidence_status.json",
+      "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/invalid_public_ab_evidence_blocks_route/owner_gate_evidence.md",
+      "stdout_bytes": 9977,
+      "stderr_bytes": 0,
+      "intake_status": "blocked_invalid_owner_evidence",
+      "ready_gate_count": 0,
+      "evidence_gate_count": 1,
+      "issue_count": 2,
+      "sensitive_evidence_detected": false,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "cloudflare_account_alias",
+            "d1_database_name",
+            "d1_database_id",
+            "schema_applied_at",
+            "recurring_aggregate_read_approved",
+            "verification_ref",
+            "rollback_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,cloudflare_account_alias,d1_database_name,d1_database_id,schema_applied_at,recurring_aggregate_read_approved,verification_ref,rollback_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "worker_name",
+            "worker_url",
+            "health_status",
+            "verification_ref",
+            "rollback_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,worker_name,worker_url,health_status,verification_ref,rollback_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "evidence_detected": true,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [
+            {
+              "field": "champion_url",
+              "code": "invalid_champion_url",
+              "message": "champion_url must be an absolute https URL."
+            },
+            {
+              "field": "traffic_share_challenger",
+              "code": "invalid_traffic_share",
+              "message": "traffic_share_challenger must be a number from 1 to 10."
+            }
+          ],
+          "blocked_reasons": [
+            "champion_url must be an absolute https URL.",
+            "traffic_share_challenger must be a number from 1 to 10."
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "repo_url",
+            "branch_name",
+            "pr_url",
+            "commit_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,repo_url,branch_name,pr_url,commit_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": true,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "manual_only_acknowledged",
+            "notes_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,manual_only_acknowledged,notes_ref"
+          ],
+          "execution_policy": "manual_only_no_autorun",
+          "executed_by_this_script": false
+        }
+      ]
+    },
+    {
+      "id": "duplicate_and_unknown_gate_evidence_blocks_input",
+      "ok": true,
+      "command": "node scripts/owner-gate-evidence.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/duplicate_and_unknown_gate_evidence_blocks_input/owner_gate_evidence.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/duplicate_and_unknown_gate_evidence_blocks_input/owner_gate_evidence_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/duplicate_and_unknown_gate_evidence_blocks_input/owner_gate_evidence.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/duplicate_and_unknown_gate_evidence_blocks_input/owner_gate_evidence.example.json",
+      "exit_code": 1,
+      "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/duplicate_and_unknown_gate_evidence_blocks_input/owner_gate_evidence_status.json",
+      "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/duplicate_and_unknown_gate_evidence_blocks_input/owner_gate_evidence.md",
+      "stdout_bytes": 9215,
+      "stderr_bytes": 0,
+      "intake_status": "blocked_invalid_owner_evidence",
+      "ready_gate_count": 1,
+      "evidence_gate_count": 1,
+      "issue_count": 2,
+      "sensitive_evidence_detected": false,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "evidence_detected": true,
+          "evidence_valid": true,
+          "ready_for_post_gate_verification": true,
+          "recurring_aggregate_read_approved": true,
+          "manual_only": false,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "worker_name",
+            "worker_url",
+            "health_status",
+            "verification_ref",
+            "rollback_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,worker_name,worker_url,health_status,verification_ref,rollback_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "champion_url",
+            "public_surface",
+            "ab_url",
+            "traffic_share_challenger",
+            "rollback_url",
+            "verification_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,champion_url,public_surface,ab_url,traffic_share_challenger,rollback_url,verification_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "repo_url",
+            "branch_name",
+            "pr_url",
+            "commit_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,repo_url,branch_name,pr_url,commit_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": true,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "manual_only_acknowledged",
+            "notes_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,manual_only_acknowledged,notes_ref"
+          ],
+          "execution_policy": "manual_only_no_autorun",
+          "executed_by_this_script": false
+        }
+      ]
+    },
+    {
+      "id": "manual_only_acknowledgement_never_opens_post_gate",
+      "ok": true,
+      "command": "node scripts/owner-gate-evidence.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/manual_only_acknowledgement_never_opens_post_gate/owner_gate_evidence.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/manual_only_acknowledgement_never_opens_post_gate/owner_gate_evidence_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/manual_only_acknowledgement_never_opens_post_gate/owner_gate_evidence.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/manual_only_acknowledgement_never_opens_post_gate/owner_gate_evidence.example.json",
+      "exit_code": 0,
+      "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/manual_only_acknowledgement_never_opens_post_gate/owner_gate_evidence_status.json",
+      "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/manual_only_acknowledgement_never_opens_post_gate/owner_gate_evidence.md",
+      "stdout_bytes": 9313,
+      "stderr_bytes": 0,
+      "intake_status": "owner_evidence_detected_no_gate_ready",
+      "ready_gate_count": 0,
+      "evidence_gate_count": 1,
+      "issue_count": 0,
+      "sensitive_evidence_detected": false,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "cloudflare_account_alias",
+            "d1_database_name",
+            "d1_database_id",
+            "schema_applied_at",
+            "recurring_aggregate_read_approved",
+            "verification_ref",
+            "rollback_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,cloudflare_account_alias,d1_database_name,d1_database_id,schema_applied_at,recurring_aggregate_read_approved,verification_ref,rollback_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "worker_name",
+            "worker_url",
+            "health_status",
+            "verification_ref",
+            "rollback_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,worker_name,worker_url,health_status,verification_ref,rollback_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "champion_url",
+            "public_surface",
+            "ab_url",
+            "traffic_share_challenger",
+            "rollback_url",
+            "verification_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,champion_url,public_surface,ab_url,traffic_share_challenger,rollback_url,verification_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "repo_url",
+            "branch_name",
+            "pr_url",
+            "commit_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,repo_url,branch_name,pr_url,commit_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "evidence_detected": true,
+          "evidence_valid": true,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": true,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [],
+          "execution_policy": "manual_only_no_autorun",
+          "executed_by_this_script": false
+        }
+      ]
+    },
+    {
+      "id": "invalid_github_evidence_blocks_review",
+      "ok": true,
+      "command": "node scripts/owner-gate-evidence.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/invalid_github_evidence_blocks_review/owner_gate_evidence.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/invalid_github_evidence_blocks_review/owner_gate_evidence_status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/invalid_github_evidence_blocks_review/owner_gate_evidence.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/invalid_github_evidence_blocks_review/owner_gate_evidence.example.json",
+      "exit_code": 1,
+      "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/invalid_github_evidence_blocks_review/owner_gate_evidence_status.json",
+      "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-owner-evidence-fixtures-3MJCxU/invalid_github_evidence_blocks_review/owner_gate_evidence.md",
+      "stdout_bytes": 10749,
+      "stderr_bytes": 0,
+      "intake_status": "blocked_invalid_owner_evidence",
+      "ready_gate_count": 0,
+      "evidence_gate_count": 1,
+      "issue_count": 4,
+      "sensitive_evidence_detected": false,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "cloudflare_account_alias",
+            "d1_database_name",
+            "d1_database_id",
+            "schema_applied_at",
+            "recurring_aggregate_read_approved",
+            "verification_ref",
+            "rollback_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,cloudflare_account_alias,d1_database_name,d1_database_id,schema_applied_at,recurring_aggregate_read_approved,verification_ref,rollback_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "worker_name",
+            "worker_url",
+            "health_status",
+            "verification_ref",
+            "rollback_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,worker_name,worker_url,health_status,verification_ref,rollback_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "champion_url",
+            "public_surface",
+            "ab_url",
+            "traffic_share_challenger",
+            "rollback_url",
+            "verification_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,champion_url,public_surface,ab_url,traffic_share_challenger,rollback_url,verification_ref"
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "evidence_detected": true,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": false,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [
+            {
+              "field": "repo_url",
+              "code": "invalid_repo_url",
+              "message": "repo_url must be a GitHub repository URL."
+            },
+            {
+              "field": "pr_url",
+              "code": "invalid_pr_url",
+              "message": "pr_url must be a GitHub pull request URL."
+            },
+            {
+              "field": "branch_name",
+              "code": "invalid_branch_name",
+              "message": "branch_name must be a safe git branch name."
+            },
+            {
+              "field": "commit_ref",
+              "code": "invalid_commit_ref",
+              "message": "commit_ref must be a 7 to 64 character git SHA."
+            }
+          ],
+          "blocked_reasons": [
+            "repo_url must be a GitHub repository URL.",
+            "pr_url must be a GitHub pull request URL.",
+            "branch_name must be a safe git branch name.",
+            "commit_ref must be a 7 to 64 character git SHA."
+          ],
+          "execution_policy": "owner_executed_evidence_only",
+          "executed_by_this_script": false
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "evidence_detected": false,
+          "evidence_valid": false,
+          "ready_for_post_gate_verification": false,
+          "recurring_aggregate_read_approved": false,
+          "manual_only": true,
+          "missing_fields": [
+            "operator_alias",
+            "executed_at",
+            "manual_only_acknowledged",
+            "notes_ref"
+          ],
+          "placeholder_fields": [],
+          "unknown_fields": [],
+          "sensitive_or_customer_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_gate_evidence.json has no evidence entry for this gate.",
+            "missing_fields=operator_alias,executed_at,manual_only_acknowledged,notes_ref"
+          ],
+          "execution_policy": "manual_only_no_autorun",
+          "executed_by_this_script": false
+        }
+      ]
+    }
+  ],
+  "note": "Fixture-only owner gate evidence contract. It uses temporary evidence inputs and never executes external commands."
+}

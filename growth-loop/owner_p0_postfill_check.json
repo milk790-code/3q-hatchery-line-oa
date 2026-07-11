@@ -1,0 +1,311 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:45:49.199Z",
+  "mode": "owner_p0_postfill_check_local_only",
+  "status": "waiting_for_owner_sample_counts",
+  "current_stage": "waiting_for_owner_sample_counts",
+  "postfill_ready": false,
+  "expected_to_advance_now": false,
+  "focused_path_ready": false,
+  "full_p0_path_ready": false,
+  "p0_counts_preflight_status": "waiting_for_owner_p0_counts",
+  "p0_counts_preflight_ready_for_quick_preview": false,
+  "p0_counts_preflight_filled_count_key_count": 0,
+  "p0_counts_preflight_expected_count_key_count": 9,
+  "p0_counts_preflight_placeholder_count_key_count": 9,
+  "next_p0_quick_status": "waiting_for_quick_counts",
+  "next_p0_quick_filled_rank_count": 0,
+  "next_p0_quick_missing_rank_count": 9,
+  "next_p0_quick_filled_preview_created": false,
+  "next_p0_intake_status": "waiting_for_next_p0_owner_download",
+  "next_p0_intake_candidate_found": false,
+  "next_p0_intake_candidate_valid": false,
+  "next_p0_intake_preview_rows": 0,
+  "owner_data_preflight_status": "waiting_for_owner_preview_rows",
+  "owner_data_preflight_selected_source_row_count": 0,
+  "owner_data_preflight_sample_threshold_met": false,
+  "owner_data_preflight_challenger_win_rule_met": false,
+  "owner_sample_gate_status": "waiting_for_owner_sample_gate_counts",
+  "owner_sample_gate_input_exists": false,
+  "owner_sample_gate_filled_rows": 0,
+  "owner_sample_gate_pending_rows": 18,
+  "sample_gate_intake_status": "waiting_for_owner_download",
+  "sample_gate_intake_candidate_valid": false,
+  "sample_gate_intake_stage_performed": false,
+  "sample_gate_batch_all_p0_row_count": 18,
+  "sample_gate_batch_p0_pending_count": 18,
+  "sample_count_handoff_status": "waiting_for_owner_sample_counts",
+  "sample_count_handoff_after_fill_command_count": 8,
+  "p0_now_status": "waiting_for_owner_sample_counts",
+  "p0_now_focused_missing_count": 9,
+  "p0_now_focused_total_count": 9,
+  "sample_count_recovery_status": "waiting_for_owner_sample_counts",
+  "sample_count_recovery_full_p0_intake_ready": false,
+  "sample_count_recovery_full_p0_staged_ready": false,
+  "sample_count_recovery_red_line_violation_count": 0,
+  "source_trust_status": "waiting_for_trusted_scoring_input",
+  "source_trust_trusted_scoring_source_count": 0,
+  "source_trust_sample_gate_source_count": 0,
+  "source_trust_scoring_allowed_now": false,
+  "source_trust_real_event_rows": 0,
+  "source_trust_p0_pending_count": 18,
+  "source_trust_sample_threshold_met": false,
+  "source_trust_data_lp_events_write_performed": false,
+  "source_trust_external_effect": false,
+  "goal_completion_status": "not_complete_data_and_external_gates",
+  "goal_complete": false,
+  "current_real_event_rows": 0,
+  "approval_queue_status": "approval_queue_ready_with_human_gates",
+  "approval_queue_pending_human_count": 5,
+  "safe_command_count": 14,
+  "safe_commands": [
+    {
+      "order": 1,
+      "id": "p0_counts_preflight",
+      "command": "npm run p0:counts-preflight",
+      "purpose": "Read the focused paste template and report whether all P0 aggregate count keys are ready.",
+      "script": "p0:counts-preflight",
+      "external_effect": false
+    },
+    {
+      "order": 2,
+      "id": "next_p0_quick_capture",
+      "command": "npm run next-p0:quick",
+      "purpose": "Convert fully filled focused aggregate counts into a preview-only owner CSV.",
+      "script": "next-p0:quick",
+      "external_effect": false
+    },
+    {
+      "order": 3,
+      "id": "next_p0_owner_intake",
+      "command": "npm run next-p0:intake",
+      "purpose": "Validate the focused owner CSV and write preview-only funnel/manual conversion files.",
+      "script": "next-p0:intake",
+      "external_effect": false
+    },
+    {
+      "order": 4,
+      "id": "full_p0_owner_intake",
+      "command": "npm run owner:intake",
+      "purpose": "Validate the full P0 sample-gate browser download when present, without staging unless owner later runs the explicit stage command.",
+      "script": "owner:intake",
+      "external_effect": false
+    },
+    {
+      "order": 5,
+      "id": "owner_data_preflight",
+      "command": "npm run owner:data-preflight",
+      "purpose": "Score owner-preview rows against sample thresholds and win rules without applying events.",
+      "script": "owner:data-preflight",
+      "external_effect": false
+    },
+    {
+      "order": 6,
+      "id": "data_collection_progress",
+      "command": "npm run data:progress",
+      "purpose": "Refresh the Week 0 data collection progress card.",
+      "script": "data:progress",
+      "external_effect": false
+    },
+    {
+      "order": 7,
+      "id": "owner_sample_gate_status",
+      "command": "npm run owner:sample-gate",
+      "purpose": "Refresh full P0 sample-gate status from owner-reviewed aggregate counts.",
+      "script": "owner:sample-gate",
+      "external_effect": false
+    },
+    {
+      "order": 8,
+      "id": "source_trust_matrix",
+      "command": "npm run source:trust",
+      "purpose": "Recompute whether the latest owner-reviewed previews are trusted for sample-gate or scoring decisions.",
+      "script": "source:trust",
+      "external_effect": false
+    },
+    {
+      "order": 9,
+      "id": "owner_sample_count_recovery",
+      "command": "npm run owner:sample-count-recovery",
+      "purpose": "Re-score the current focused/full P0 recovery stage after counts are filled.",
+      "script": "owner:sample-count-recovery",
+      "external_effect": false
+    },
+    {
+      "order": 10,
+      "id": "owner_next_action",
+      "command": "npm run owner:next-action",
+      "purpose": "Refresh the single next local action after post-fill checks.",
+      "script": "owner:next-action",
+      "external_effect": false
+    },
+    {
+      "order": 11,
+      "id": "sample_gate_recovery",
+      "command": "npm run sample-gate:recovery",
+      "purpose": "Refresh the Day 3 / Day 7 recovery pack.",
+      "script": "sample-gate:recovery",
+      "external_effect": false
+    },
+    {
+      "order": 12,
+      "id": "owner_p0_now",
+      "command": "npm run owner:p0-now",
+      "purpose": "Refresh the P0-now cockpit with the latest count state.",
+      "script": "owner:p0-now",
+      "external_effect": false
+    },
+    {
+      "order": 13,
+      "id": "owner_p0_launcher",
+      "command": "npm run owner:p0-launcher",
+      "purpose": "Refresh the narrow P0 launcher after the post-fill check.",
+      "script": "owner:p0-launcher",
+      "external_effect": false
+    },
+    {
+      "order": 14,
+      "id": "weekly_local",
+      "command": "npm run weekly:local",
+      "purpose": "Run the full local weekly chain and final artifact verifier.",
+      "script": "weekly:local",
+      "external_effect": false
+    }
+  ],
+  "safe_command_scripts": [
+    "p0:counts-preflight",
+    "next-p0:quick",
+    "next-p0:intake",
+    "owner:intake",
+    "owner:data-preflight",
+    "data:progress",
+    "owner:sample-gate",
+    "source:trust",
+    "owner:sample-count-recovery",
+    "owner:next-action",
+    "sample-gate:recovery",
+    "owner:p0-now",
+    "owner:p0-launcher",
+    "weekly:local"
+  ],
+  "command_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/RUN-P0-POST-FILL-CHECK.command",
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/owner_p0_postfill_check.md",
+  "json_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/owner_p0_postfill_check.json",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/owner_p0_postfill_check_status.json",
+  "source_status": [
+    {
+      "key": "quick",
+      "file": "data/next_p0_quick_capture_status.json",
+      "ok": true
+    },
+    {
+      "key": "focusedIntake",
+      "file": "data/next_p0_owner_intake_status.json",
+      "ok": true
+    },
+    {
+      "key": "p0CountsPreflight",
+      "file": "data/p0_counts_preflight_status.json",
+      "ok": true
+    },
+    {
+      "key": "ownerDataPreflight",
+      "file": "data/owner_data_preflight_status.json",
+      "ok": true
+    },
+    {
+      "key": "ownerSampleGate",
+      "file": "data/owner_sample_gate_status.json",
+      "ok": true
+    },
+    {
+      "key": "sampleGateIntake",
+      "file": "data/owner_sample_gate_intake_status.json",
+      "ok": true
+    },
+    {
+      "key": "sampleGateBatch",
+      "file": "data/sample_gate_batch_handoff_status.json",
+      "ok": true
+    },
+    {
+      "key": "sampleCountHandoff",
+      "file": "data/owner_sample_count_handoff_status.json",
+      "ok": true
+    },
+    {
+      "key": "p0Now",
+      "file": "data/owner_p0_now_status.json",
+      "ok": true
+    },
+    {
+      "key": "p0Launcher",
+      "file": "data/owner_p0_launcher_status.json",
+      "ok": true
+    },
+    {
+      "key": "sampleCountRecovery",
+      "file": "data/owner_sample_count_recovery_status.json",
+      "ok": true
+    },
+    {
+      "key": "sourceTrust",
+      "file": "data/source_trust_matrix_status.json",
+      "ok": true
+    },
+    {
+      "key": "goalCompletion",
+      "file": "data/goal_completion_audit_status.json",
+      "ok": true
+    },
+    {
+      "key": "approvalStatus",
+      "file": "data/approval_queue_status.json",
+      "ok": true
+    }
+  ],
+  "missing_source_count": 0,
+  "missing_sources": [],
+  "blocked_actions": [
+    "remote_d1_create_or_migrate",
+    "append_to_data_lp_events_jsonl",
+    "import_funnel_or_manual_apply",
+    "stage_live_input_without_owner_review",
+    "promote_challenger_to_champion",
+    "rotate_next_variable",
+    "formal_social_post_or_schedule",
+    "line_push_or_broadcast",
+    "public_link_change",
+    "production_worker_deploy",
+    "github_push_or_pr_creation",
+    "customer_data_mutation",
+    "payment_or_refund_action",
+    "delete_data"
+  ],
+  "blocked_action_count": 14,
+  "command_runs_local_scripts_only": true,
+  "command_has_external_url": false,
+  "command_has_forbidden_remote_cli": false,
+  "command_has_forbidden_git_cli": false,
+  "command_has_apply_or_stage_flags": false,
+  "command_has_delete_or_launchd_action": false,
+  "command_whitelist_enforced_by_verifier": true,
+  "next_safe_action": "Fill Batch 1 and Batch 2 aggregate counts first, then run RUN-P0-POST-FILL-CHECK.command.",
+  "external_effect": false,
+  "network_calls_performed": false,
+  "live_input_files_created": false,
+  "owner_inbox_write_performed": false,
+  "stage_performed": false,
+  "apply_performed": false,
+  "append_performed": false,
+  "data_lp_events_write_performed": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Local post-fill check launcher only. The generated command runs whitelisted local npm scripts and does not stage, apply, append events, deploy, post, push GitHub/LINE, mutate customer data, process payments, or delete data."
+}

@@ -1,0 +1,64 @@
+{
+  "ok": true,
+  "checked_at": "2026-07-10T21:43:37.059Z",
+  "mode": "read_only_live_telemetry_observation",
+  "candidate": {
+    "deployment_present": true,
+    "deployment": {
+      "id": "5073984b-bcc0-40f1-a331-daaadd741071",
+      "created_on": "2026-07-10T14:07:46.119142Z",
+      "source": "wrangler",
+      "strategy": "percentage",
+      "version_id": "133d27b0-36e5-41e8-96ec-b55925b7b30a",
+      "percentage": 100
+    },
+    "health": {
+      "ok": true,
+      "status": 200,
+      "service": "3q-growth-loop-candidate",
+      "build": "origin-pii-v2",
+      "security_contract": "origin-pii-v2",
+      "environment": "candidate"
+    },
+    "page": {
+      "ok": true,
+      "status": 200,
+      "bytes": 4379,
+      "offer_marker": true
+    }
+  },
+  "champion": {
+    "page": {
+      "ok": true,
+      "status": 200,
+      "bytes": 16765,
+      "page_view_marker": true,
+      "cta_click_marker": true,
+      "line_add_marker": false
+    },
+    "growth_loop_status": {
+      "ok": true,
+      "status": 200,
+      "collector_configured": true
+    },
+    "collector_origin": "https://3q-growth-loop-candidate.milk790.workers.dev",
+    "observed_worker_origins": [
+      "https://3q-site.milk790.workers.dev",
+      "https://3q-growth-loop-candidate.milk790.workers.dev"
+    ]
+  },
+  "external_read_performed": true,
+  "remote_table_query_performed": false,
+  "customer_data_read_performed": false,
+  "event_post_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "production_deploy_performed": false,
+  "public_link_change_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

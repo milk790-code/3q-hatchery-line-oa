@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {"finding_id":"confirmed-001","status":"fixed","fixed_at":"2026-07-11T00:00:00+08:00","evidence":["scripts/high-severity-scoring.test.mjs"]},
+    {"finding_id":"confirmed-002","status":"fixed","fixed_at":"2026-07-11T00:00:00+08:00","evidence":["scripts/high-severity-scoring.test.mjs"]},
+    {"finding_id":"confirmed-003","status":"fixed","fixed_at":"2026-07-11T00:00:00+08:00","evidence":["scripts/high-severity-event-store.test.mjs"]},
+    {"finding_id":"confirmed-004","status":"fixed","fixed_at":"2026-07-11T00:00:00+08:00","evidence":["scripts/high-severity-event-store.test.mjs","scripts/d1-aggregate-export-fixtures.mjs"]},
+    {"finding_id":"confirmed-005","status":"fixed","fixed_at":"2026-07-11T00:00:00+08:00","evidence":["scripts/high-severity-importers.test.mjs"]},
+    {"finding_id":"confirmed-006","status":"fixed","fixed_at":"2026-07-11T00:00:00+08:00","evidence":["scripts/high-severity-importers.test.mjs"]},
+    {"finding_id":"confirmed-007","status":"fixed","fixed_at":"2026-07-11T00:00:00+08:00","evidence":["scripts/high-severity-scoring.test.mjs"]},
+    {"finding_id":"confirmed-008","status":"fixed","fixed_at":"2026-07-11T00:00:00+08:00","evidence":["scripts/high-severity-scoring.test.mjs"]},
+    {"finding_id":"confirmed-009","status":"fixed","fixed_at":"2026-07-11T00:00:00+08:00","evidence":["scripts/high-severity-gates.test.mjs","scripts/next-p0-quick-capture-fixtures.mjs"]},
+    {"finding_id":"confirmed-010","status":"fixed","fixed_at":"2026-07-11T00:00:00+08:00","evidence":["scripts/high-severity-gates.test.mjs"]}
+  ]
+}

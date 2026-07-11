@@ -1,0 +1,171 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:44:57.537Z",
+  "mode": "north_star_outcome_form_fixture_static_guard",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/north_star_outcome_form_fixture_status.json",
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/north_star_outcome_form_fixture_report.md",
+  "template_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/source_capture/source_capture_ledger.fill-template.csv",
+  "html_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/north_star_outcome_form.html",
+  "form_status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/north_star_outcome_form_status.json",
+  "form_status": "ready_local_browser_fill",
+  "form_download_filename": "source_capture_ledger.filled.csv",
+  "row_count": 24,
+  "event_types": [
+    "link_click",
+    "lead_submit",
+    "deal",
+    "quality_flag"
+  ],
+  "check_count": 26,
+  "checks": [
+    {
+      "name": "status_ok",
+      "ok": true,
+      "message": "form status must be ok"
+    },
+    {
+      "name": "mode",
+      "ok": true,
+      "message": "form mode must be local browser-only"
+    },
+    {
+      "name": "template_source",
+      "ok": true,
+      "message": "form must read source_capture_ledger.fill-template.csv"
+    },
+    {
+      "name": "row_count",
+      "ok": true,
+      "message": "form must cover exactly 24 P1 outcome rows"
+    },
+    {
+      "name": "event_type_count",
+      "ok": true,
+      "message": "form must cover link_click, lead_submit, deal, and quality_flag"
+    },
+    {
+      "name": "download_filename",
+      "ok": true,
+      "message": "form must export source_capture_ledger.filled.csv"
+    },
+    {
+      "name": "browser_only",
+      "ok": true,
+      "message": "form must be browser-only"
+    },
+    {
+      "name": "browser_persistence_false",
+      "ok": true,
+      "message": "form must not persist browser data"
+    },
+    {
+      "name": "network_false",
+      "ok": true,
+      "message": "form status must declare no network calls"
+    },
+    {
+      "name": "live_input_false",
+      "ok": true,
+      "message": "form must not create live input files"
+    },
+    {
+      "name": "event_write_false",
+      "ok": true,
+      "message": "form must not write data/lp_events.jsonl"
+    },
+    {
+      "name": "external_false",
+      "ok": true,
+      "message": "form must not claim external effects"
+    },
+    {
+      "name": "html_title",
+      "ok": true,
+      "message": "HTML must include the form title"
+    },
+    {
+      "name": "html_no_external_effect",
+      "ok": true,
+      "message": "HTML must mark no external effect"
+    },
+    {
+      "name": "html_no_network_marker",
+      "ok": true,
+      "message": "HTML must mark no network"
+    },
+    {
+      "name": "html_mentions_download",
+      "ok": true,
+      "message": "HTML must mention the download filename"
+    },
+    {
+      "name": "html_has_form",
+      "ok": true,
+      "message": "HTML must include a local owner form with no action"
+    },
+    {
+      "name": "html_no_form_action",
+      "ok": true,
+      "message": "HTML form must not define an action URL"
+    },
+    {
+      "name": "html_download_control",
+      "ok": true,
+      "message": "HTML must include CSV download control"
+    },
+    {
+      "name": "html_no_fetch",
+      "ok": true,
+      "message": "HTML must not call fetch"
+    },
+    {
+      "name": "html_no_xhr",
+      "ok": true,
+      "message": "HTML must not send beacons or XHR"
+    },
+    {
+      "name": "html_no_persistence",
+      "ok": true,
+      "message": "HTML must not use browser persistence APIs"
+    },
+    {
+      "name": "html_no_external_links",
+      "ok": true,
+      "message": "HTML must not link to external URLs"
+    },
+    {
+      "name": "quality_score_guard",
+      "ok": true,
+      "message": "HTML must restrict quality_score to quality_flag rows"
+    },
+    {
+      "name": "required_headers",
+      "ok": true,
+      "message": "template must include all owner-required fields"
+    },
+    {
+      "name": "real_events_unchanged",
+      "ok": true,
+      "message": "fixture guard must not change data/lp_events.jsonl"
+    }
+  ],
+  "browser_form_static_checks_executed": true,
+  "form_export_replay_executed": false,
+  "source_capture_compile_commands_executed": false,
+  "owner_sample_gate_commands_executed": false,
+  "real_events_unchanged": true,
+  "execution_performed": false,
+  "live_input_files_created": false,
+  "real_event_write_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Static local guard for the North Star outcome browser form. It inspects the generated HTML/status contract only and never creates live CSVs, appends data/lp_events.jsonl, stages/applies data, deploys, posts, pushes LINE/GitHub, mutates customer data, touches payments, or deletes data."
+}

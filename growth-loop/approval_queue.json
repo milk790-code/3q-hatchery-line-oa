@@ -1,0 +1,224 @@
+{
+  "generated_at": "2026-07-10T21:48:20.571Z",
+  "policy": {
+    "no_external_send": true,
+    "no_production_deploy": true,
+    "no_primary_link_change": true,
+    "no_customer_data_mutation": true
+  },
+  "items": [
+    {
+      "id": "collect-first-real-events",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "risk_tier": "T1",
+      "status": "ready_local_review",
+      "type": "data_collection",
+      "human_gate": "Start with local/manual lp_events ingestion or approve D1 connection.",
+      "artifact": "data/lp_events.jsonl",
+      "reason": "No real events are present yet; sample is insufficient by design."
+    },
+    {
+      "id": "approve-d1-create-and-migrate",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "risk_tier": "T2",
+      "status": "pending_human",
+      "type": "cloudflare_d1_setup",
+      "human_gate": "Confirm the newly observed dedicated D1, separately approve its remote schema migration, and explicitly scope recurring aggregate-only reads.",
+      "artifact": "schema/d1-week0.sql",
+      "supporting_artifact": "d1_schema_contract.md",
+      "readiness_artifact": "cloudflare_d1_readiness.md",
+      "config_guard_artifact": "approved_d1_config.md",
+      "reason": "Read-only inventory now confirms the exact dedicated D1 and local binding; schema_contract=local_schema_idempotency_and_constraints_verified; config_guard=prepared_but_blocked_owner_d1_approval_or_inventory. No table query or remote migration was performed, so migration remains owner-gated."
+    },
+    {
+      "id": "approve-candidate-worker-deploy",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "risk_tier": "T3",
+      "status": "pending_human",
+      "type": "candidate_worker_existing_deployment_provenance",
+      "human_gate": "Confirm the observed Candidate Worker deployment provenance and rollback reference; do not redeploy unless the live version is rejected.",
+      "artifact": "live_telemetry_readiness.md",
+      "supporting_artifact": "worker.ts",
+      "reason": "Read-only observation confirms Candidate deployment 5073984b-bcc0-40f1-a331-daaadd741071 / version 133d27b0-36e5-41e8-96ec-b55925b7b30a is healthy and already wired to the Champion. Owner evidence is still required, but another deploy is not currently required."
+    },
+    {
+      "id": "approve-small-ab-link",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "risk_tier": "T3",
+      "status": "pending_human",
+      "type": "ab_traffic_link_change",
+      "human_gate": "Approve any small-traffic link routing before changing public links.",
+      "artifact": "ab_test_status.json",
+      "reason": "Changing a public link can affect brand funnel and customer experience."
+    },
+    {
+      "id": "review-weekly-report",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "risk_tier": "T1",
+      "status": "ready_local_review",
+      "type": "weekly_report_review",
+      "human_gate": "Review weekly_report.md before external action.",
+      "artifact": "weekly_report.md",
+      "reason": "Report is local and safe; any external action from it remains gated."
+    },
+    {
+      "id": "review-champion-contract-audit",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "risk_tier": "T1",
+      "status": "ready_local_review",
+      "type": "champion_contract_review",
+      "human_gate": "Review champion_contract_audit.md and confirm the observed LINE-only contract provenance before approving public A/B traffic.",
+      "artifact": "champion_contract_audit.md",
+      "reason": "The live Champion currently exposes a LINE-only contact path with no misleading form success; this observation is read-only and is not deployment provenance."
+    },
+    {
+      "id": "review-champion-integration-candidate",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "risk_tier": "T1",
+      "status": "ready_local_review",
+      "type": "champion_integration_candidate_review",
+      "human_gate": "Review the source-locked 3q-site patch and isolated integration smoke before approving any production deploy.",
+      "artifact": "champion_integration_candidate.md",
+      "supporting_artifact": "champion_integration_smoke.md",
+      "release_artifact": "champion_release_owner_packet.md",
+      "local_commit_artifact": "champion_local_branch.md",
+      "reason": "The same LINE-only contract is observable live, but the local source-locked candidate remains the reviewable provenance for page_view/cta_click telemetry; any redeploy and public-link change remain blocked."
+    },
+    {
+      "id": "approve-champion-integration-production-deploy",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "risk_tier": "T3",
+      "status": "pending_human",
+      "type": "champion_integration_production_deploy",
+      "human_gate": "Confirm the current live integration provenance before approving any redeploy of the exact source-locked patch, collector URL, verification steps, and rollback plan.",
+      "artifact": "champion_integration_candidate.md",
+      "supporting_artifact": "champion_integration_smoke.md",
+      "release_artifact": "champion_release_owner_packet.md",
+      "local_commit_artifact": "champion_local_branch.md",
+      "reason": "A LINE-only contract is already observable, so this gate must not imply another deploy is required. Any redeploy still mutates production and remains owner-only."
+    },
+    {
+      "id": "review-next-round-plan",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "risk_tier": "T1",
+      "status": "ready_local_review",
+      "type": "next_round_review",
+      "human_gate": "Review next_round_plan.md before starting a new public A/B variable or extending the current test.",
+      "artifact": "next_round_plan.md",
+      "reason": "Current decision=continue_current_round_until_sample_threshold; this remains a local planning artifact with no public link change."
+    },
+    {
+      "id": "review-owner-approval-pack",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "risk_tier": "T1",
+      "status": "ready_local_review",
+      "type": "launch_readiness_review",
+      "human_gate": "Review owner_approval_pack.md before approving remote D1, Worker deploy, public A/B routing, or GitHub publishing.",
+      "artifact": "owner_approval_pack.md",
+      "reason": "The pack consolidates owner-only actions, resume commands, rollback notes, and current evidence."
+    },
+    {
+      "id": "review-owner-console",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "risk_tier": "T1",
+      "status": "ready_local_review",
+      "type": "owner_console_review",
+      "human_gate": "Review owner_console.html as the local single-screen approval surface.",
+      "artifact": "owner_console.html",
+      "reason": "The console is local-only and groups report, next-round decision, archive, red lines, and owner gates."
+    },
+    {
+      "id": "review-real-data-input-pack",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "risk_tier": "T1",
+      "status": "ready_local_review",
+      "type": "real_data_input_pack_review",
+      "human_gate": "Review real_data_input_pack.md before filling aggregate counts or copying templates into live input CSV filenames.",
+      "artifact": "real_data_input_pack.md",
+      "reason": "The fill pack is local-only, but copied live CSVs can later affect scoring; keep it aggregate-only and PII-free."
+    },
+    {
+      "id": "review-source-readiness",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "risk_tier": "T1",
+      "status": "ready_local_review",
+      "type": "source_readiness_review",
+      "human_gate": "Review source_readiness.md before interpreting sample gaps or approving any public A/B route.",
+      "artifact": "source_readiness.md",
+      "reason": "Source readiness shows which north-star funnel stages are still missing real data and keeps public iteration decisions blocked until sample thresholds are met."
+    },
+    {
+      "id": "review-source-capture-pack",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "risk_tier": "T1",
+      "status": "ready_local_review",
+      "type": "source_capture_review",
+      "human_gate": "Review source_capture_pack.md before filling aggregate source counts or creating live input CSVs.",
+      "artifact": "source_capture_pack.md",
+      "reason": "The capture pack maps source systems to aggregate-only counts and keeps data/lp_events.jsonl unchanged until owner-reviewed local apply."
+    },
+    {
+      "id": "review-source-capture-compile",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "risk_tier": "T1",
+      "status": "ready_local_review",
+      "type": "source_capture_compile_review",
+      "human_gate": "Review source_capture_compile_report.md and owner-preview CSVs before copying them to live aggregate input filenames.",
+      "artifact": "source_capture_compile_report.md",
+      "reason": "The compiler validates filled aggregate rows and creates preview CSVs, but live CSV promotion and any apply remain owner-reviewed local actions."
+    },
+    {
+      "id": "review-real-data-intake-plan",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "risk_tier": "T1",
+      "status": "ready_local_review",
+      "type": "real_data_intake_review",
+      "human_gate": "Review real_data_intake_plan.md to see which aggregate CSV inputs are still missing.",
+      "artifact": "real_data_intake_plan.md",
+      "reason": "Intake status=no_real_input_files; ready_apply_count=0; data/lp_events.jsonl is not changed by the intake plan."
+    },
+    {
+      "id": "review-data-collection-brief",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "risk_tier": "T1",
+      "status": "ready_local_review",
+      "type": "data_collection_review",
+      "human_gate": "Review data_collection_brief.md and sample_gate_collection_plan.md before filling aggregate counts or compiling owner-preview CSVs.",
+      "artifact": "data_collection_brief.md",
+      "supporting_artifact": "sample_gate_collection_plan.md",
+      "reason": "Brief status=waiting_for_owner_aggregate_counts; tasks=42; sample_gate_p0_tasks=18; live_input_files_created=no; data/lp_events.jsonl is not changed by the brief."
+    },
+    {
+      "id": "review-line-inbound-playbook",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "risk_tier": "T1",
+      "status": "ready_local_review",
+      "type": "line_inbound_playbook_review",
+      "human_gate": "Review line_inbound_playbook.md before using it in manual LINE replies.",
+      "artifact": "line_inbound_playbook.md",
+      "reason": "The playbook is inbound-only and aggregate-only; formal LINE push, customer-data edits, and payment actions remain blocked."
+    },
+    {
+      "id": "review-local-launchagent-install",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "risk_tier": "T1",
+      "status": "completed_local_reversible",
+      "type": "local_schedule_install",
+      "human_gate": "Local LaunchAgent is installed. Use npm run schedule:uninstall to stop the Sunday local runner.",
+      "artifact": "data/launchagent_status.json",
+      "reason": "Persistent local automation is active and reversible; external publishing/deploy gates remain blocked."
+    },
+    {
+      "id": "approve-github-repo-and-pr",
+      "created_at": "2026-07-10T21:48:20.571Z",
+      "risk_tier": "T2",
+      "status": "pending_human",
+      "type": "github_publish_or_pr",
+      "human_gate": "Review the prepared local Champion commit, then explicitly approve its branch push or draft PR. Do not merge from this gate.",
+      "artifact": "champion_github_handoff.md",
+      "supporting_artifact": "champion_local_branch.md",
+      "engine_bundle_artifact": "github_handoff.md",
+      "reason": "The exact 3q-site repository, branch, commit, and PR body are prepared locally (handoff=integration_already_merged_followup_repairs_only), but pushing the branch or opening a draft PR is an external GitHub write. The separate control-center engine bundle remains local-only."
+    }
+  ]
+}

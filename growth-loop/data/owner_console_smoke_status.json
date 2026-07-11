@@ -1,0 +1,803 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:48:32.362Z",
+  "html_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/owner_console.html",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/owner_console_status.json",
+  "checks": [
+    {
+      "name": "status_ok",
+      "ok": true,
+      "message": "owner console status must be ok",
+      "external_effect": false
+    },
+    {
+      "name": "html_non_empty",
+      "ok": true,
+      "message": "owner console HTML must be non-empty",
+      "external_effect": false
+    },
+    {
+      "name": "external_effect_false",
+      "ok": true,
+      "message": "console must mark no external effect",
+      "external_effect": false
+    },
+    {
+      "name": "no_form",
+      "ok": true,
+      "message": "console must not include forms",
+      "external_effect": false
+    },
+    {
+      "name": "no_fetch",
+      "ok": true,
+      "message": "console must not call fetch",
+      "external_effect": false
+    },
+    {
+      "name": "no_send_beacon",
+      "ok": true,
+      "message": "console must not send beacons or XHR",
+      "external_effect": false
+    },
+    {
+      "name": "no_external_links",
+      "ok": true,
+      "message": "console must not link to external URLs",
+      "external_effect": false
+    },
+    {
+      "name": "has_approval_queue",
+      "ok": true,
+      "message": "console must include approval queue",
+      "external_effect": false
+    },
+    {
+      "name": "has_objective_contract",
+      "ok": true,
+      "message": "console must include objective contract audit",
+      "external_effect": false
+    },
+    {
+      "name": "has_goal_completion_status",
+      "ok": true,
+      "message": "console must include goal completion audit status",
+      "external_effect": false
+    },
+    {
+      "name": "has_event_input_quality",
+      "ok": true,
+      "message": "console must include event input quality status",
+      "external_effect": false
+    },
+    {
+      "name": "has_tracking_smoke",
+      "ok": true,
+      "message": "console must include tracking link smoke status",
+      "external_effect": false
+    },
+    {
+      "name": "has_event_contract",
+      "ok": true,
+      "message": "console must include event contract status",
+      "external_effect": false
+    },
+    {
+      "name": "has_approval_fixtures",
+      "ok": true,
+      "message": "console must include approval resume fixture status",
+      "external_effect": false
+    },
+    {
+      "name": "has_line_inbound",
+      "ok": true,
+      "message": "console must include LINE inbound playbook status",
+      "external_effect": false
+    },
+    {
+      "name": "has_manual_publish_packet",
+      "ok": true,
+      "message": "console must include draft-only manual publish packet",
+      "external_effect": false
+    },
+    {
+      "name": "has_manual_capture_plan",
+      "ok": true,
+      "message": "console must include manual post-publish capture plan",
+      "external_effect": false
+    },
+    {
+      "name": "has_manual_publish_brief",
+      "ok": true,
+      "message": "console must include Day 0 manual publish brief",
+      "external_effect": false
+    },
+    {
+      "name": "has_public_tracking_url_pack",
+      "ok": true,
+      "message": "console must include public tracking URL approval pack",
+      "external_effect": false
+    },
+    {
+      "name": "has_owner_public_url_approval_preview",
+      "ok": true,
+      "message": "console must include owner public URL approval preview",
+      "external_effect": false
+    },
+    {
+      "name": "has_manual_publish_evidence",
+      "ok": true,
+      "message": "console must include manual-publish evidence intake",
+      "external_effect": false
+    },
+    {
+      "name": "has_manual_publish_evidence_form",
+      "ok": true,
+      "message": "console must include manual-publish evidence browser form",
+      "external_effect": false
+    },
+    {
+      "name": "has_manual_publish_evidence_form_guard",
+      "ok": true,
+      "message": "console must include manual-publish evidence form fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_manual_publish_evidence_guard",
+      "ok": true,
+      "message": "console must include manual-publish evidence fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_north_star",
+      "ok": true,
+      "message": "console must include North Star funnel status",
+      "external_effect": false
+    },
+    {
+      "name": "has_funnel_breakdown",
+      "ok": true,
+      "message": "console must include funnel breakdown status",
+      "external_effect": false
+    },
+    {
+      "name": "has_funnel_aggregate",
+      "ok": true,
+      "message": "console must include full-funnel aggregate preview status",
+      "external_effect": false
+    },
+    {
+      "name": "has_funnel_guard",
+      "ok": true,
+      "message": "console must include full-funnel aggregate fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_apply_guard",
+      "ok": true,
+      "message": "console must include real-data apply fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_input_pack",
+      "ok": true,
+      "message": "console must include real-data input pack status",
+      "external_effect": false
+    },
+    {
+      "name": "has_source_readiness",
+      "ok": true,
+      "message": "console must include source readiness status",
+      "external_effect": false
+    },
+    {
+      "name": "has_source_capture",
+      "ok": true,
+      "message": "console must include source capture pack status",
+      "external_effect": false
+    },
+    {
+      "name": "has_source_trust",
+      "ok": true,
+      "message": "console must include source trust matrix status",
+      "external_effect": false
+    },
+    {
+      "name": "has_sample_gate_ledger",
+      "ok": true,
+      "message": "console must include sample gate ledger status",
+      "external_effect": false
+    },
+    {
+      "name": "has_sample_gate_replay",
+      "ok": true,
+      "message": "console must include sample gate replay fixture status",
+      "external_effect": false
+    },
+    {
+      "name": "has_source_compile",
+      "ok": true,
+      "message": "console must include source capture compile status",
+      "external_effect": false
+    },
+    {
+      "name": "has_compile_guard",
+      "ok": true,
+      "message": "console must include source capture compile fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_data_queue",
+      "ok": true,
+      "message": "console must include data collection brief and queue",
+      "external_effect": false
+    },
+    {
+      "name": "has_data_progress",
+      "ok": true,
+      "message": "console must include data collection progress",
+      "external_effect": false
+    },
+    {
+      "name": "has_next_p0_inputs",
+      "ok": true,
+      "message": "console must include next P0 owner inputs",
+      "external_effect": false
+    },
+    {
+      "name": "has_next_p0_form",
+      "ok": true,
+      "message": "console must include focused Next P0 browser form",
+      "external_effect": false
+    },
+    {
+      "name": "has_next_p0_form_guard",
+      "ok": true,
+      "message": "console must include focused Next P0 form fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_next_p0_quick",
+      "ok": true,
+      "message": "console must include focused Next P0 quick capture status",
+      "external_effect": false
+    },
+    {
+      "name": "has_next_p0_quick_progress",
+      "ok": true,
+      "message": "console must expose focused Next P0 quick fill progress",
+      "external_effect": false
+    },
+    {
+      "name": "has_next_p0_quick_guard",
+      "ok": true,
+      "message": "console must include focused Next P0 quick capture fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_p0_counts_preflight",
+      "ok": true,
+      "message": "console must include P0 counts preflight status",
+      "external_effect": false
+    },
+    {
+      "name": "has_p0_counts_preflight_guard",
+      "ok": true,
+      "message": "console must include P0 counts preflight fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_next_p0_intake",
+      "ok": true,
+      "message": "console must include focused Next P0 owner-download intake",
+      "external_effect": false
+    },
+    {
+      "name": "has_next_p0_intake_guard",
+      "ok": true,
+      "message": "console must include focused Next P0 intake fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_owner_data_preflight",
+      "ok": true,
+      "message": "console must include owner-preview data preflight",
+      "external_effect": false
+    },
+    {
+      "name": "has_sample_gate_capture_calendar",
+      "ok": true,
+      "message": "console must include sample-gate capture calendar",
+      "external_effect": false
+    },
+    {
+      "name": "has_sample_gate_due_status",
+      "ok": true,
+      "message": "console must include sample-gate due status",
+      "external_effect": false
+    },
+    {
+      "name": "has_sample_gate_due_guard",
+      "ok": true,
+      "message": "console must include sample-gate due fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_owner_capture",
+      "ok": true,
+      "message": "console must include Week 0 owner capture queue",
+      "external_effect": false
+    },
+    {
+      "name": "has_owner_sample_gate",
+      "ok": true,
+      "message": "console must include owner sample-gate status",
+      "external_effect": false
+    },
+    {
+      "name": "has_sample_gate_owner_worksheet",
+      "ok": true,
+      "message": "console must include owner sample-gate worksheet",
+      "external_effect": false
+    },
+    {
+      "name": "has_sample_gate_owner_form",
+      "ok": true,
+      "message": "console must include owner sample-gate browser form",
+      "external_effect": false
+    },
+    {
+      "name": "has_sample_gate_owner_form_guard",
+      "ok": true,
+      "message": "console must include owner sample-gate browser form fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_sample_gate_intake",
+      "ok": true,
+      "message": "console must include owner sample-gate download intake status",
+      "external_effect": false
+    },
+    {
+      "name": "has_sample_gate_intake_guard",
+      "ok": true,
+      "message": "console must include owner sample-gate download intake fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_owner_next_action",
+      "ok": true,
+      "message": "console must include owner next-action card with source trust state",
+      "external_effect": false
+    },
+    {
+      "name": "has_north_star_outcome_preflight",
+      "ok": true,
+      "message": "console must include North Star outcome preflight status",
+      "external_effect": false
+    },
+    {
+      "name": "has_north_star_outcome_form",
+      "ok": true,
+      "message": "console must include North Star outcome browser form",
+      "external_effect": false
+    },
+    {
+      "name": "has_north_star_outcome_form_guard",
+      "ok": true,
+      "message": "console must include North Star outcome browser form fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_p1_outcome_intake",
+      "ok": true,
+      "message": "console must include owner P1 outcome download intake",
+      "external_effect": false
+    },
+    {
+      "name": "has_p1_outcome_intake_guard",
+      "ok": true,
+      "message": "console must include owner P1 outcome intake fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_p1_outcome_postfill_check",
+      "ok": true,
+      "message": "console must include owner P1 outcome post-fill local check",
+      "external_effect": false
+    },
+    {
+      "name": "has_p1_outcome_postfill_source_trust",
+      "ok": true,
+      "message": "console must include source trust state inside owner P1 outcome post-fill local check",
+      "external_effect": false
+    },
+    {
+      "name": "has_sample_gate_recovery",
+      "ok": true,
+      "message": "console must include sample-gate recovery pack",
+      "external_effect": false
+    },
+    {
+      "name": "has_sample_gate_batch_handoff",
+      "ok": true,
+      "message": "console must include full P0 sample-gate batch handoff",
+      "external_effect": false
+    },
+    {
+      "name": "has_sample_gate_batch_preflight",
+      "ok": true,
+      "message": "console must include full P0 batch preflight status",
+      "external_effect": false
+    },
+    {
+      "name": "has_sample_count_handoff",
+      "ok": true,
+      "message": "console must include owner sample-count handoff",
+      "external_effect": false
+    },
+    {
+      "name": "has_owner_p0_now",
+      "ok": true,
+      "message": "console must include owner P0-now action card",
+      "external_effect": false
+    },
+    {
+      "name": "has_sample_gate_collection_sprint",
+      "ok": true,
+      "message": "console must include sample-gate collection sprint status",
+      "external_effect": false
+    },
+    {
+      "name": "has_owner_p0_launcher",
+      "ok": true,
+      "message": "console must include P0-only local launcher",
+      "external_effect": false
+    },
+    {
+      "name": "has_sample_count_recovery",
+      "ok": true,
+      "message": "console must include owner sample-count recovery status",
+      "external_effect": false
+    },
+    {
+      "name": "has_p0_postfill_check",
+      "ok": true,
+      "message": "console must include owner P0 post-fill local check",
+      "external_effect": false
+    },
+    {
+      "name": "has_p0_postfill_source_trust",
+      "ok": true,
+      "message": "console must include source trust state inside owner P0 post-fill local check",
+      "external_effect": false
+    },
+    {
+      "name": "has_worker_dry_run",
+      "ok": true,
+      "message": "console must include candidate Worker dry-run proof",
+      "external_effect": false
+    },
+    {
+      "name": "has_cloudflare_d1_readiness",
+      "ok": true,
+      "message": "console must include metadata-only D1 readiness",
+      "external_effect": false
+    },
+    {
+      "name": "has_live_telemetry_readiness",
+      "ok": true,
+      "message": "console must include read-only live telemetry chain readiness",
+      "external_effect": false
+    },
+    {
+      "name": "has_live_telemetry_guard",
+      "ok": true,
+      "message": "console must include live telemetry readiness fixtures",
+      "external_effect": false
+    },
+    {
+      "name": "has_d1_schema_contract",
+      "ok": true,
+      "message": "console must include local D1 idempotency contract",
+      "external_effect": false
+    },
+    {
+      "name": "has_approved_d1_config_guard",
+      "ok": true,
+      "message": "console must include preview-only approved D1 config guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_d1_collection_mode",
+      "ok": true,
+      "message": "console must include owner-evidence-driven D1 collection mode",
+      "external_effect": false
+    },
+    {
+      "name": "has_d1_collection_guards",
+      "ok": true,
+      "message": "console must include D1 selector and aggregate-only fixture guards",
+      "external_effect": false
+    },
+    {
+      "name": "has_champion_local_commit",
+      "ok": true,
+      "message": "console must include the isolated local Champion commit",
+      "external_effect": false
+    },
+    {
+      "name": "has_champion_release",
+      "ok": true,
+      "message": "console must include Champion release readiness",
+      "external_effect": false
+    },
+    {
+      "name": "has_champion_github_handoff",
+      "ok": true,
+      "message": "console must include exact owner-gated Champion GitHub handoff",
+      "external_effect": false
+    },
+    {
+      "name": "has_sample_count_recovery_guard",
+      "ok": true,
+      "message": "console must include owner sample-count recovery fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_owner_launcher",
+      "ok": true,
+      "message": "console must include owner action launcher report with source trust state",
+      "external_effect": false
+    },
+    {
+      "name": "has_open_command",
+      "ok": true,
+      "message": "console must include local open command",
+      "external_effect": false
+    },
+    {
+      "name": "has_owner_sample_gate_guard",
+      "ok": true,
+      "message": "console must include owner sample-gate fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_owner_quality_review",
+      "ok": true,
+      "message": "console must include owner quality-review status",
+      "external_effect": false
+    },
+    {
+      "name": "has_owner_quality_form",
+      "ok": true,
+      "message": "console must include owner quality-review browser form",
+      "external_effect": false
+    },
+    {
+      "name": "has_owner_quality_form_guard",
+      "ok": true,
+      "message": "console must include owner quality-review browser form fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_owner_quality_guard",
+      "ok": true,
+      "message": "console must include owner quality-review fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_retirement_guard",
+      "ok": true,
+      "message": "console must include candidate retirement fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_gate_readiness",
+      "ok": true,
+      "message": "console must include owner gate readiness matrix",
+      "external_effect": false
+    },
+    {
+      "name": "has_redline_priority",
+      "ok": true,
+      "message": "console must include red-line priority queue",
+      "external_effect": false
+    },
+    {
+      "name": "has_prepared_but_blocked_report",
+      "ok": true,
+      "message": "console must include PreparedButBlocked handoff",
+      "external_effect": false
+    },
+    {
+      "name": "has_gate_metadata",
+      "ok": true,
+      "message": "console must include plan-only gate metadata capture status",
+      "external_effect": false
+    },
+    {
+      "name": "has_gate_evidence",
+      "ok": true,
+      "message": "console must include owner gate evidence intake",
+      "external_effect": false
+    },
+    {
+      "name": "has_evidence_guard",
+      "ok": true,
+      "message": "console must include owner gate evidence fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_post_gate_verify",
+      "ok": true,
+      "message": "console must include post-gate verification plan",
+      "external_effect": false
+    },
+    {
+      "name": "has_post_gate_guard",
+      "ok": true,
+      "message": "console must include post-gate verification fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "has_github_workflow_guard",
+      "ok": true,
+      "message": "console must include GitHub workflow guard status",
+      "external_effect": false
+    },
+    {
+      "name": "has_github_bundle",
+      "ok": true,
+      "message": "console must include GitHub export bundle status",
+      "external_effect": false
+    },
+    {
+      "name": "has_artifact_retention",
+      "ok": true,
+      "message": "console must include artifact retention monitor status",
+      "external_effect": false
+    },
+    {
+      "name": "has_artifact_retention_review",
+      "ok": true,
+      "message": "console must include artifact retention review pack status",
+      "external_effect": false
+    },
+    {
+      "name": "has_intake_plan",
+      "ok": true,
+      "message": "console must include real-data intake plan status",
+      "external_effect": false
+    },
+    {
+      "name": "has_iteration_history",
+      "ok": true,
+      "message": "console must include iteration history status",
+      "external_effect": false
+    },
+    {
+      "name": "has_next_round",
+      "ok": true,
+      "message": "console must include next-round plan",
+      "external_effect": false
+    },
+    {
+      "name": "has_archive",
+      "ok": true,
+      "message": "console must include archive status",
+      "external_effect": false
+    },
+    {
+      "name": "has_schedule_status",
+      "ok": true,
+      "message": "console must include local weekly schedule status",
+      "external_effect": false
+    },
+    {
+      "name": "has_schedule_catchup_status",
+      "ok": true,
+      "message": "console must include missed-run catch-up status",
+      "external_effect": false
+    },
+    {
+      "name": "has_launchagent_status",
+      "ok": true,
+      "message": "console must include macOS LaunchAgent status",
+      "external_effect": false
+    },
+    {
+      "name": "has_launchagent_runtime_proof",
+      "ok": true,
+      "message": "console must include completed or current pending-exit LaunchAgent runtime proof",
+      "external_effect": false
+    },
+    {
+      "name": "has_red_lines",
+      "ok": true,
+      "message": "console must include red lines",
+      "external_effect": false
+    },
+    {
+      "name": "has_weekly_report_link",
+      "ok": true,
+      "message": "console must link weekly report",
+      "external_effect": false
+    },
+    {
+      "name": "has_owner_pack_link",
+      "ok": true,
+      "message": "console must link owner approval pack",
+      "external_effect": false
+    },
+    {
+      "name": "has_owner_approval_form",
+      "ok": true,
+      "message": "console must include owner approval browser form",
+      "external_effect": false
+    },
+    {
+      "name": "has_owner_approval_form_guard",
+      "ok": true,
+      "message": "console must include owner approval form fixture guard",
+      "external_effect": false
+    },
+    {
+      "name": "runner_no_external_effect",
+      "ok": true,
+      "message": "status must not claim external effects",
+      "external_effect": false
+    },
+    {
+      "name": "no_production_deploy",
+      "ok": true,
+      "message": "status must not claim production deploy",
+      "external_effect": false
+    },
+    {
+      "name": "no_public_link_change",
+      "ok": true,
+      "message": "status must not claim public link changes",
+      "external_effect": false
+    },
+    {
+      "name": "no_formal_post",
+      "ok": true,
+      "message": "status must not claim formal post",
+      "external_effect": false
+    },
+    {
+      "name": "no_line_push",
+      "ok": true,
+      "message": "status must not claim LINE push",
+      "external_effect": false
+    },
+    {
+      "name": "no_customer_data_mutation",
+      "ok": true,
+      "message": "status must not mutate customer data",
+      "external_effect": false
+    },
+    {
+      "name": "no_payment",
+      "ok": true,
+      "message": "status must not touch payments",
+      "external_effect": false
+    },
+    {
+      "name": "no_delete",
+      "ok": true,
+      "message": "status must not delete data",
+      "external_effect": false
+    }
+  ],
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

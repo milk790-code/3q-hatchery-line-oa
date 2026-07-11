@@ -1,0 +1,512 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:48:22.822Z",
+  "mode": "gate_readiness_matrix",
+  "status": "prepared_but_blocked",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/gate_readiness_status.json",
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/gate_readiness.md",
+  "gate_count": 5,
+  "ready_gate_count": 0,
+  "blocked_gate_count": 5,
+  "manual_only_count": 1,
+  "no_gate_execution": true,
+  "no_autorun_for_external_gates": true,
+  "source_readiness_status": "waiting_for_real_data",
+  "public_iteration_ready": false,
+  "weekly_runner_ok": true,
+  "archive_ok": true,
+  "git_repo_present": false,
+  "champion_repo_prepared": true,
+  "champion_repository": "milk790-code/3q-hatchery-line-oa",
+  "champion_branch": "codex/3q-growth-loop-champion-v1",
+  "post_gate_verification_status": "waiting_for_owner_evidence",
+  "post_gate_ready_count": 0,
+  "gates": [
+    {
+      "gate_id": "remote_d1_create_and_migrate",
+      "display_label": "Existing D1 schema verification and migration approval",
+      "operation_mode": "verify_existing_d1_then_migrate_schema",
+      "resource_create_required": false,
+      "resource_deploy_required": false,
+      "current_blocker": "The exact dedicated D1 exists and matches wrangler.jsonc, but its creation provenance is not recorded in owner approval metadata and no remote schema migration or table query has been approved.",
+      "owner_action": "Confirm the observed D1 belongs to this Growth Loop, record only non-secret approval metadata, review the local schema contract, explicitly approve the remote migration, and opt in to recurring aggregate-only reads if desired. Do not create another database.",
+      "approval_id": "approve-d1-create-and-migrate",
+      "order": 1,
+      "risk_tier": "T2",
+      "prepared_artifact": "schema/d1-week0.sql",
+      "current_status": "owner_approval_required",
+      "owner_approval_detected": false,
+      "ready_for_owner_execution": false,
+      "ready_for_autorun": false,
+      "no_autorun": true,
+      "execution_policy": "plan_only_owner_executes",
+      "dependencies": [
+        {
+          "id": "schema/d1-week0.sql",
+          "ok": true,
+          "reason": "schema artifact exists in verified bundle"
+        },
+        {
+          "id": "launch_readiness.local_preflight_ok",
+          "ok": true,
+          "reason": "launch readiness remains owner-gated"
+        },
+        {
+          "id": "approval_metadata.remote_d1_create_and_migrate",
+          "ok": false,
+          "reason": "owner approval metadata is missing, placeholder, sensitive, or invalid"
+        }
+      ],
+      "dependency_ok": false,
+      "blocked_reasons": [
+        "owner_approval_input.json has no approval entry for this gate.",
+        "missing_fields=approved_by,approved_at,cloudflare_account_alias,d1_database_name,d1_database_id",
+        "approval_metadata.remote_d1_create_and_migrate: owner approval metadata is missing, placeholder, sensitive, or invalid"
+      ],
+      "resume_command_preview": [
+        "npm run d1:schema:contract",
+        "npm run cloudflare:d1:readiness:live",
+        "npm run d1:config:preview",
+        "wrangler d1 execute 3q-growth-loop-candidate --remote --file=schema/d1-week0.sql",
+        "wrangler d1 execute 3q-growth-loop-candidate --remote --command='PRAGMA integrity_check; PRAGMA foreign_key_check;' --json",
+        "npm run collect:d1:remote:approved"
+      ],
+      "next_owner_action": "Fill non-secret owner approval metadata in owner_approval_input.json, then rerun npm run approval:plan and npm run gate:readiness.",
+      "external_effect": true,
+      "executed": false
+    },
+    {
+      "gate_id": "candidate_worker_production_deploy",
+      "display_label": "Existing Candidate Worker provenance confirmation",
+      "operation_mode": "verify_existing_candidate_deployment",
+      "resource_create_required": false,
+      "resource_deploy_required": false,
+      "current_blocker": "Candidate deployment 5073984b-bcc0-40f1-a331-daaadd741071 / version 133d27b0-36e5-41e8-96ec-b55925b7b30a is observed healthy; owner provenance and rollback evidence are not yet recorded. Redeploy is not currently required.",
+      "owner_action": "Confirm the observed Worker name, URL, deployment/version reference, health result, and rollback reference. Do not redeploy unless the observed version is rejected.",
+      "approval_id": "approve-candidate-worker-deploy",
+      "order": 2,
+      "risk_tier": "T3",
+      "prepared_artifact": "live_telemetry_readiness.md",
+      "current_status": "owner_approval_required",
+      "owner_approval_detected": false,
+      "ready_for_owner_execution": false,
+      "ready_for_autorun": false,
+      "no_autorun": true,
+      "execution_policy": "plan_only_owner_executes",
+      "dependencies": [
+        {
+          "id": "worker:dry-run",
+          "ok": true,
+          "reason": "dry run passed in weekly runner"
+        },
+        {
+          "id": "browser_route_smoke",
+          "ok": true,
+          "reason": "local route smoke passed without event write"
+        },
+        {
+          "id": "event_contract_smoke",
+          "ok": true,
+          "reason": "isolated event contract smoke passed"
+        },
+        {
+          "id": "remote_d1_create_and_migrate_owner_executed",
+          "ok": false,
+          "reason": "existing D1 schema migration and table verification is a human gate and post-gate evidence is not ready"
+        },
+        {
+          "id": "approval_metadata.candidate_worker_production_deploy",
+          "ok": false,
+          "reason": "owner approval metadata is missing, placeholder, sensitive, or invalid"
+        }
+      ],
+      "dependency_ok": false,
+      "blocked_reasons": [
+        "owner_approval_input.json has no approval entry for this gate.",
+        "missing_fields=approved_by,approved_at,worker_name,worker_url,rollback_plan",
+        "remote_d1_create_and_migrate_owner_executed: existing D1 schema migration and table verification is a human gate and post-gate evidence is not ready",
+        "approval_metadata.candidate_worker_production_deploy: owner approval metadata is missing, placeholder, sensitive, or invalid"
+      ],
+      "resume_command_preview": [
+        "npm run telemetry:readiness:live",
+        "Review live_telemetry_readiness.md and record non-secret owner evidence.",
+        "npm run owner:evidence && npm run post:verify && npm run telemetry:readiness"
+      ],
+      "next_owner_action": "Fill non-secret owner approval metadata in owner_approval_input.json, then rerun npm run approval:plan and npm run gate:readiness.",
+      "external_effect": true,
+      "executed": false
+    },
+    {
+      "gate_id": "public_ab_small_traffic_link",
+      "display_label": "public_ab_small_traffic_link",
+      "operation_mode": null,
+      "resource_create_required": false,
+      "resource_deploy_required": false,
+      "current_blocker": "The live champion URL is verified, but public link routing still affects the live acquisition funnel.",
+      "owner_action": "Approve the verified champion URL metadata, 90/10 split, test duration, public placement, and rollback URL.",
+      "approval_id": "approve-small-ab-link",
+      "order": 3,
+      "risk_tier": "T3",
+      "prepared_artifact": "ab_test_status.json",
+      "current_status": "owner_approval_required",
+      "owner_approval_detected": false,
+      "ready_for_owner_execution": false,
+      "ready_for_autorun": false,
+      "no_autorun": true,
+      "execution_policy": "plan_only_owner_executes",
+      "dependencies": [
+        {
+          "id": "candidate_worker_production_deploy_owner_executed",
+          "ok": false,
+          "reason": "candidate Worker provenance or deployment evidence is a human gate and post-gate evidence is not ready"
+        },
+        {
+          "id": "approved_current_champion_url",
+          "ok": false,
+          "reason": "approved current champion URL is still missing"
+        },
+        {
+          "id": "approved_rollback_url",
+          "ok": false,
+          "reason": "approved rollback URL is still missing"
+        },
+        {
+          "id": "approval_metadata.public_ab_small_traffic_link",
+          "ok": false,
+          "reason": "owner approval metadata is missing, placeholder, sensitive, or invalid"
+        }
+      ],
+      "dependency_ok": false,
+      "blocked_reasons": [
+        "owner_approval_input.json has no approval entry for this gate.",
+        "missing_fields=approved_by,approved_at,champion_url,public_surface,rollback_url",
+        "candidate_worker_production_deploy_owner_executed: candidate Worker provenance or deployment evidence is a human gate and post-gate evidence is not ready",
+        "approved_current_champion_url: approved current champion URL is still missing",
+        "approved_rollback_url: approved rollback URL is still missing",
+        "approval_metadata.public_ab_small_traffic_link: owner approval metadata is missing, placeholder, sensitive, or invalid"
+      ],
+      "resume_command_preview": [
+        "Confirm CHAMPION_URL remains https://3q-site.milk790.workers.dev/.",
+        "Confirm existing Candidate Worker provenance before public traffic; no redeploy is required unless the observed version is rejected.",
+        "Manually place the approved /ab/ab-week0-cta-text-001 URL in the selected small-traffic surface."
+      ],
+      "next_owner_action": "Fill non-secret owner approval metadata in owner_approval_input.json, then rerun npm run approval:plan and npm run gate:readiness.",
+      "external_effect": true,
+      "executed": false
+    },
+    {
+      "gate_id": "github_repo_branch_pr",
+      "display_label": "github_repo_branch_pr",
+      "operation_mode": null,
+      "resource_create_required": false,
+      "resource_deploy_required": false,
+      "current_blocker": "The remote branch is up_to_date_with_local at 9b6fd00c082f2b67d6cde159e61dc6c407d02ea0; local head 9b6fd00c082f2b67d6cde159e61dc6c407d02ea0 is ahead by 0. Updating it or opening a draft PR is an external GitHub write.",
+      "owner_action": "Review local head 9b6fd00c082f2b67d6cde159e61dc6c407d02ea0 and champion_github_pr_body.md, then explicitly approve any remaining fast-forward push or draft PR in milk790-code/3q-hatchery-line-oa. Do not merge from this gate.",
+      "approval_id": "approve-github-repo-and-pr",
+      "order": 4,
+      "risk_tier": "T2",
+      "prepared_artifact": "champion_github_handoff.md",
+      "current_status": "owner_approval_required",
+      "owner_approval_detected": false,
+      "ready_for_owner_execution": false,
+      "ready_for_autorun": false,
+      "no_autorun": true,
+      "execution_policy": "plan_only_owner_executes",
+      "dependencies": [
+        {
+          "id": "target_github_repo",
+          "ok": true,
+          "reason": "verified Champion handoff targets milk790-code/3q-hatchery-line-oa"
+        },
+        {
+          "id": "safe_branch_name",
+          "ok": true,
+          "reason": "verified Champion handoff locks branch codex/3q-growth-loop-champion-v1"
+        },
+        {
+          "id": "approval_metadata.github_repo_branch_pr",
+          "ok": false,
+          "reason": "owner approval metadata is missing, placeholder, sensitive, or invalid"
+        }
+      ],
+      "dependency_ok": false,
+      "blocked_reasons": [
+        "owner_approval_input.json has no approval entry for this gate.",
+        "missing_fields=approved_by,approved_at,repo_url,branch_name",
+        "approval_metadata.github_repo_branch_pr: owner approval metadata is missing, placeholder, sensitive, or invalid"
+      ],
+      "resume_command_preview": [
+        "git -C /Users/mac/Documents/Codex/control-center/worktrees/3q-site-growth-loop-champion-v1 status --short --branch",
+        "git -C /Users/mac/Documents/Codex/control-center/worktrees/3q-site-growth-loop-champion-v1 show --stat --oneline HEAD",
+        "git -C /Users/mac/Documents/Codex/control-center/worktrees/3q-site-growth-loop-champion-v1 push -u origin codex/3q-growth-loop-champion-v1",
+        "gh pr create --repo milk790-code/3q-hatchery-line-oa --base main --head codex/3q-growth-loop-champion-v1 --draft --title \"3Q site: persist privacy-safe Growth Loop telemetry\" --body-file champion_github_pr_body.md"
+      ],
+      "next_owner_action": "Fill non-secret owner approval metadata in owner_approval_input.json, then rerun npm run approval:plan and npm run gate:readiness.",
+      "external_effect": true,
+      "executed": false
+    },
+    {
+      "gate_id": "formal_posts_line_push_payment_customer_data",
+      "display_label": "formal_posts_line_push_payment_customer_data",
+      "operation_mode": null,
+      "resource_create_required": false,
+      "resource_deploy_required": false,
+      "current_blocker": "Formal posting, LINE push, ECPay, payment/refund, and customer-data changes are outside the autonomous boundary.",
+      "owner_action": "Use drafts and reports as reference, then manually publish/send/pay/refund/update only after separate review.",
+      "approval_id": null,
+      "order": 99,
+      "risk_tier": "T3",
+      "prepared_artifact": "weekly_report.md",
+      "current_status": "manual_only",
+      "owner_approval_detected": false,
+      "ready_for_owner_execution": false,
+      "ready_for_autorun": false,
+      "no_autorun": true,
+      "execution_policy": "manual_only",
+      "dependencies": [
+        {
+          "id": "manual_only_owner_action",
+          "ok": false,
+          "reason": "formal posts, LINE push, payments, customer-data changes, and deletes remain manual-only"
+        }
+      ],
+      "dependency_ok": false,
+      "blocked_reasons": [
+        "owner_approval_input.json has no approval entry for this gate.",
+        "gate_status=manual_only; execution is not automated.",
+        "missing_fields=approved_by,approved_at",
+        "manual_only_owner_action: formal posts, LINE push, payments, customer-data changes, and deletes remain manual-only",
+        "manual_only_gate_never_autoruns"
+      ],
+      "resume_command_preview": [],
+      "next_owner_action": "Keep this manual-only; do not convert it into an automated command.",
+      "external_effect": true,
+      "executed": false
+    }
+  ],
+  "next_safe_action": "remote_d1_create_and_migrate: Fill non-secret owner approval metadata in owner_approval_input.json, then rerun npm run approval:plan and npm run gate:readiness.",
+  "parallel_metadata_action_count": 4,
+  "parallel_metadata_actions": [
+    {
+      "gate_id": "remote_d1_create_and_migrate",
+      "approval_id": "approve-d1-create-and-migrate",
+      "order": 1,
+      "status": "capture_or_fix_non_secret_metadata",
+      "metadata_ready_for_owner_review": false,
+      "gate_ready_for_owner_execution": false,
+      "metadata_fields": [
+        "approved_by",
+        "approved_at",
+        "cloudflare_account_alias",
+        "d1_database_name",
+        "d1_database_id"
+      ],
+      "business_metadata_fields": [
+        "cloudflare_account_alias",
+        "d1_database_name",
+        "d1_database_id"
+      ],
+      "fields_needing_input": [
+        "approved_by",
+        "approved_at",
+        "cloudflare_account_alias",
+        "d1_database_name",
+        "d1_database_id"
+      ],
+      "missing_fields": [
+        "approved_by",
+        "approved_at",
+        "cloudflare_account_alias",
+        "d1_database_name",
+        "d1_database_id"
+      ],
+      "placeholder_fields": [],
+      "invalid_fields": [],
+      "sensitive_fields_to_remove": [],
+      "blocking_dependencies": [
+        "approval_metadata.remote_d1_create_and_migrate"
+      ],
+      "owner_artifact": "owner_approval_form.html",
+      "machine_input": "owner_approval_input.json",
+      "rerun_commands": [
+        "npm run approval:plan",
+        "npm run gate:readiness"
+      ],
+      "plan_only": true,
+      "no_execution": true,
+      "execution_order_still_enforced": true,
+      "external_effect": false,
+      "execution_performed": false,
+      "next_owner_action": "Capture or fix non-secret metadata in owner_approval_form.html, download owner_approval_input.json, then rerun npm run approval:plan and npm run gate:readiness."
+    },
+    {
+      "gate_id": "candidate_worker_production_deploy",
+      "approval_id": "approve-candidate-worker-deploy",
+      "order": 2,
+      "status": "capture_or_fix_non_secret_metadata",
+      "metadata_ready_for_owner_review": false,
+      "gate_ready_for_owner_execution": false,
+      "metadata_fields": [
+        "approved_by",
+        "approved_at",
+        "worker_name",
+        "worker_url",
+        "rollback_plan"
+      ],
+      "business_metadata_fields": [
+        "worker_name",
+        "worker_url",
+        "rollback_plan"
+      ],
+      "fields_needing_input": [
+        "approved_by",
+        "approved_at",
+        "worker_name",
+        "worker_url",
+        "rollback_plan"
+      ],
+      "missing_fields": [
+        "approved_by",
+        "approved_at",
+        "worker_name",
+        "worker_url",
+        "rollback_plan"
+      ],
+      "placeholder_fields": [],
+      "invalid_fields": [],
+      "sensitive_fields_to_remove": [],
+      "blocking_dependencies": [
+        "remote_d1_create_and_migrate_owner_executed",
+        "approval_metadata.candidate_worker_production_deploy"
+      ],
+      "owner_artifact": "owner_approval_form.html",
+      "machine_input": "owner_approval_input.json",
+      "rerun_commands": [
+        "npm run approval:plan",
+        "npm run gate:readiness"
+      ],
+      "plan_only": true,
+      "no_execution": true,
+      "execution_order_still_enforced": true,
+      "external_effect": false,
+      "execution_performed": false,
+      "next_owner_action": "Capture or fix non-secret metadata in owner_approval_form.html, download owner_approval_input.json, then rerun npm run approval:plan and npm run gate:readiness."
+    },
+    {
+      "gate_id": "public_ab_small_traffic_link",
+      "approval_id": "approve-small-ab-link",
+      "order": 3,
+      "status": "capture_or_fix_non_secret_metadata",
+      "metadata_ready_for_owner_review": false,
+      "gate_ready_for_owner_execution": false,
+      "metadata_fields": [
+        "approved_by",
+        "approved_at",
+        "champion_url",
+        "public_surface",
+        "rollback_url"
+      ],
+      "business_metadata_fields": [
+        "champion_url",
+        "public_surface",
+        "rollback_url"
+      ],
+      "fields_needing_input": [
+        "approved_by",
+        "approved_at",
+        "champion_url",
+        "public_surface",
+        "rollback_url"
+      ],
+      "missing_fields": [
+        "approved_by",
+        "approved_at",
+        "champion_url",
+        "public_surface",
+        "rollback_url"
+      ],
+      "placeholder_fields": [],
+      "invalid_fields": [],
+      "sensitive_fields_to_remove": [],
+      "blocking_dependencies": [
+        "candidate_worker_production_deploy_owner_executed",
+        "approved_current_champion_url",
+        "approved_rollback_url",
+        "approval_metadata.public_ab_small_traffic_link"
+      ],
+      "owner_artifact": "owner_approval_form.html",
+      "machine_input": "owner_approval_input.json",
+      "rerun_commands": [
+        "npm run approval:plan",
+        "npm run gate:readiness"
+      ],
+      "plan_only": true,
+      "no_execution": true,
+      "execution_order_still_enforced": true,
+      "external_effect": false,
+      "execution_performed": false,
+      "next_owner_action": "Capture or fix non-secret metadata in owner_approval_form.html, download owner_approval_input.json, then rerun npm run approval:plan and npm run gate:readiness."
+    },
+    {
+      "gate_id": "github_repo_branch_pr",
+      "approval_id": "approve-github-repo-and-pr",
+      "order": 4,
+      "status": "capture_or_fix_non_secret_metadata",
+      "metadata_ready_for_owner_review": false,
+      "gate_ready_for_owner_execution": false,
+      "metadata_fields": [
+        "approved_by",
+        "approved_at",
+        "repo_url",
+        "branch_name"
+      ],
+      "business_metadata_fields": [
+        "repo_url",
+        "branch_name"
+      ],
+      "fields_needing_input": [
+        "approved_by",
+        "approved_at",
+        "repo_url",
+        "branch_name"
+      ],
+      "missing_fields": [
+        "approved_by",
+        "approved_at",
+        "repo_url",
+        "branch_name"
+      ],
+      "placeholder_fields": [],
+      "invalid_fields": [],
+      "sensitive_fields_to_remove": [],
+      "blocking_dependencies": [
+        "approval_metadata.github_repo_branch_pr"
+      ],
+      "owner_artifact": "owner_approval_form.html",
+      "machine_input": "owner_approval_input.json",
+      "rerun_commands": [
+        "npm run approval:plan",
+        "npm run gate:readiness"
+      ],
+      "plan_only": true,
+      "no_execution": true,
+      "execution_order_still_enforced": true,
+      "external_effect": false,
+      "execution_performed": false,
+      "next_owner_action": "Capture or fix non-secret metadata in owner_approval_form.html, download owner_approval_input.json, then rerun npm run approval:plan and npm run gate:readiness."
+    }
+  ],
+  "external_effect": false,
+  "execution_performed": false,
+  "remote_d1_create_performed": false,
+  "remote_d1_migration_performed": false,
+  "production_deploy_performed": false,
+  "public_link_change_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Local-only owner-gate readiness matrix. It validates order, prerequisites, plan-only status, and parallel non-secret metadata capture; it never runs external commands."
+}

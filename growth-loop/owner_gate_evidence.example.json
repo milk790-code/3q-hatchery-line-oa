@@ -1,0 +1,55 @@
+{
+  "generated_at": "2026-07-10T21:47:27.530Z",
+  "purpose": "Copy this file to owner_gate_evidence.json only after the owner manually completes an external gate. Keep secrets, customer data, payment data, LINE user IDs, and raw chat content out of this file.",
+  "evidence": [
+    {
+      "gate_id": "remote_d1_create_and_migrate",
+      "operator_alias": "owner",
+      "executed_at": "2026-07-10T21:47:27.530Z",
+      "cloudflare_account_alias": "3q-production-account",
+      "d1_database_name": "3q-growth-loop-candidate",
+      "d1_database_id": "00000000-0000-4000-8000-000000000000",
+      "schema_applied_at": "2026-07-10T21:47:27.530Z",
+      "recurring_aggregate_read_approved": true,
+      "verification_ref": "wrangler remote SELECT count check, no customer rows included",
+      "rollback_ref": "Cloudflare dashboard owner review only; no automatic delete"
+    },
+    {
+      "gate_id": "candidate_worker_production_deploy",
+      "operator_alias": "owner",
+      "executed_at": "2026-07-10T21:47:27.530Z",
+      "worker_name": "3q-growth-loop-candidate",
+      "worker_url": "https://3q-growth-loop-candidate.example.workers.dev",
+      "health_status": "ok",
+      "verification_ref": "GET /health returned ok",
+      "rollback_ref": "Cloudflare dashboard rollback to previous owner-approved Worker version"
+    },
+    {
+      "gate_id": "public_ab_small_traffic_link",
+      "operator_alias": "owner",
+      "executed_at": "2026-07-10T21:47:27.530Z",
+      "champion_url": "https://example.com/3q-main",
+      "public_surface": "owner-approved small traffic surface",
+      "ab_url": "https://3q-growth-loop-candidate.example.workers.dev/ab/ab-week0-cta-text-001",
+      "traffic_share_challenger": 10,
+      "rollback_url": "https://example.com/3q-main",
+      "verification_ref": "Manual public surface check, no primary bio link change"
+    },
+    {
+      "gate_id": "github_repo_branch_pr",
+      "operator_alias": "owner",
+      "executed_at": "2026-07-10T21:47:27.530Z",
+      "repo_url": "https://github.com/milk790-code/3q-hatchery-line-oa.git",
+      "branch_name": "codex/3q-growth-loop-champion-v1",
+      "pr_url": "https://github.com/milk790-code/3q-hatchery-line-oa/pull/1",
+      "commit_ref": "9b6fd00c082f2b67d6cde159e61dc6c407d02ea0"
+    },
+    {
+      "gate_id": "formal_posts_line_push_payment_customer_data",
+      "operator_alias": "owner",
+      "executed_at": "2026-07-10T21:47:27.530Z",
+      "manual_only_acknowledged": true,
+      "notes_ref": "Manual-only actions remain outside automation; no details or customer data stored here."
+    }
+  ]
+}

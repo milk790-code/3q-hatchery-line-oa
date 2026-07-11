@@ -1,0 +1,1805 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-10T21:49:57.210Z",
+  "root": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop",
+  "inventory": {
+    "root": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop",
+    "total_files": 9495,
+    "categories": {
+      "owned": 515,
+      "dependency": 5244,
+      "archive": 1635,
+      "generated": 2038,
+      "cache": 12,
+      "logs": 51
+    },
+    "owned_source_count": 148,
+    "owned_source_files": [
+      ".github/workflows/3q-growth-loop-weekly.yml",
+      "config/growth-loop.config.json",
+      "integrations/3q-site/champion-integration.config.json",
+      "integrations/3q-site/generated/worker.candidate.js",
+      "integrations/3q-site/generated/worker.candidate.patch",
+      "integrations/3q-site/source/worker.origin-main.js",
+      "integrations/3q-site/wrangler.jsonc",
+      "launchd/com.angelia.3q-growth-loop.weekly.plist",
+      "schema/d1-week0.sql",
+      "scripts/approval-resume-fixtures.mjs",
+      "scripts/approval-resume-plan.mjs",
+      "scripts/approved-d1-config.mjs",
+      "scripts/archive-weekly-run.mjs",
+      "scripts/artifact-retention-monitor.mjs",
+      "scripts/artifact-retention-review-pack.mjs",
+      "scripts/browser-smoke.mjs",
+      "scripts/build-champion-integration-candidate.mjs",
+      "scripts/candidate-retirement-fixtures.mjs",
+      "scripts/champion-contract-audit.mjs",
+      "scripts/champion-github-handoff.mjs",
+      "scripts/champion-integration-smoke.mjs",
+      "scripts/champion-local-branch.mjs",
+      "scripts/champion-release-preflight.mjs",
+      "scripts/champion-source-lock-fixtures.mjs",
+      "scripts/cloudflare-d1-readiness.mjs",
+      "scripts/collect-d1-auto.mjs",
+      "scripts/d1-aggregate-export-fixtures.mjs",
+      "scripts/d1-collection-mode-fixtures.mjs",
+      "scripts/d1-schema-contract.mjs",
+      "scripts/data-collection-brief.mjs",
+      "scripts/data-collection-progress.mjs",
+      "scripts/event-contract-smoke.mjs",
+      "scripts/event-input-quality-gate.mjs",
+      "scripts/export-d1-aggregate-events.mjs",
+      "scripts/export-d1-events.mjs",
+      "scripts/funnel-aggregate-fixtures.mjs",
+      "scripts/gate-readiness-matrix.mjs",
+      "scripts/github-export-bundle.mjs",
+      "scripts/github-workflow-guard.mjs",
+      "scripts/growth-loop.mjs",
+      "scripts/high-severity-event-store.test.mjs",
+      "scripts/high-severity-gates.test.mjs",
+      "scripts/high-severity-importers.test.mjs",
+      "scripts/high-severity-scoring.test.mjs",
+      "scripts/import-funnel-aggregates.mjs",
+      "scripts/import-manual-conversions.mjs",
+      "scripts/iteration-history.mjs",
+      "scripts/launchagent.mjs",
+      "scripts/lib/champion-source-lock.mjs",
+      "scripts/lib/gate-policy.mjs",
+      "scripts/lib/idempotent-event-store.mjs",
+      "scripts/lib/mcp-review-audit.mjs",
+      "scripts/lib/mcp-review-core.mjs",
+      "scripts/lib/run-lock-policy.mjs",
+      "scripts/lib/scoring-policy.mjs",
+      "scripts/line-inbound-playbook.mjs",
+      "scripts/live-local-invariant-diff.mjs",
+      "scripts/live-telemetry-readiness-fixtures.mjs",
+      "scripts/live-telemetry-readiness.mjs",
+      "scripts/manual-publish-brief.mjs",
+      "scripts/manual-publish-capture-plan.mjs",
+      "scripts/manual-publish-evidence-fixtures.mjs",
+      "scripts/manual-publish-evidence-form-fixtures.mjs",
+      "scripts/manual-publish-evidence-form.mjs",
+      "scripts/manual-publish-evidence.mjs",
+      "scripts/manual-publish-packet.mjs",
+      "scripts/mcp-review-audit.mjs",
+      "scripts/mcp-review-audit.test.mjs",
+      "scripts/mcp-review-ci-gate.mjs",
+      "scripts/mcp-review-core.test.mjs",
+      "scripts/mcp-review-server.mjs",
+      "scripts/mcp-review-smoke.mjs",
+      "scripts/next-p0-owner-form-fixtures.mjs",
+      "scripts/next-p0-owner-form.mjs",
+      "scripts/next-p0-owner-intake-fixtures.mjs",
+      "scripts/next-p0-owner-intake.mjs",
+      "scripts/next-p0-quick-capture-fixtures.mjs",
+      "scripts/next-p0-quick-capture.mjs",
+      "scripts/north-star-funnel.mjs",
+      "scripts/north-star-outcome-form-fixtures.mjs",
+      "scripts/north-star-outcome-form.mjs",
+      "scripts/north-star-outcome-preflight.mjs",
+      "scripts/objective-sequence-audit.mjs",
+      "scripts/owner-action-launcher.mjs",
+      "scripts/owner-approval-form-fixtures.mjs",
+      "scripts/owner-approval-form.mjs",
+      "scripts/owner-console-smoke.mjs",
+      "scripts/owner-console.mjs",
+      "scripts/owner-data-preflight.mjs",
+      "scripts/owner-gate-evidence-fixtures.mjs",
+      "scripts/owner-gate-evidence.mjs",
+      "scripts/owner-next-action-fixtures.mjs",
+      "scripts/owner-next-action.mjs",
+      "scripts/owner-p0-launcher.mjs",
+      "scripts/owner-p0-now.mjs",
+      "scripts/owner-p0-postfill-check.mjs",
+      "scripts/owner-p1-outcome-intake-fixtures.mjs",
+      "scripts/owner-p1-outcome-intake.mjs",
+      "scripts/owner-p1-outcome-postfill-check.mjs",
+      "scripts/owner-public-url-approval-preview.mjs",
+      "scripts/owner-quality-review-fixtures.mjs",
+      "scripts/owner-quality-review-form-fixtures.mjs",
+      "scripts/owner-quality-review-form.mjs",
+      "scripts/owner-quality-review.mjs",
+      "scripts/owner-sample-count-handoff.mjs",
+      "scripts/owner-sample-count-recovery-fixtures.mjs",
+      "scripts/owner-sample-count-recovery.mjs",
+      "scripts/owner-sample-gate-fixtures.mjs",
+      "scripts/owner-sample-gate-intake-fixtures.mjs",
+      "scripts/owner-sample-gate-intake.mjs",
+      "scripts/owner-sample-gate-status.mjs",
+      "scripts/p0-counts-preflight-fixtures.mjs",
+      "scripts/p0-counts-preflight.mjs",
+      "scripts/post-gate-verification-fixtures.mjs",
+      "scripts/post-gate-verification.mjs",
+      "scripts/prepared-but-blocked-report.mjs",
+      "scripts/public-tracking-url-pack.mjs",
+      "scripts/real-data-apply-fixtures.mjs",
+      "scripts/real-data-decision-replay.mjs",
+      "scripts/real-data-input-pack.mjs",
+      "scripts/real-data-intake-plan.mjs",
+      "scripts/redline-priority.mjs",
+      "scripts/sample-gate-batch-handoff.mjs",
+      "scripts/sample-gate-batch-preflight.mjs",
+      "scripts/sample-gate-capture-calendar.mjs",
+      "scripts/sample-gate-collection-sprint.mjs",
+      "scripts/sample-gate-due-fixtures.mjs",
+      "scripts/sample-gate-due-status.mjs",
+      "scripts/sample-gate-owner-form-fixtures.mjs",
+      "scripts/sample-gate-owner-form.mjs",
+      "scripts/sample-gate-owner-worksheet.mjs",
+      "scripts/sample-gate-recovery-pack.mjs",
+      "scripts/sample-gate-replay-fixtures.mjs",
+      "scripts/schedule-catchup-status.mjs",
+      "scripts/source-capture-compile-fixtures.mjs",
+      "scripts/source-capture-compile.mjs",
+      "scripts/source-capture-pack.mjs",
+      "scripts/source-readiness.mjs",
+      "scripts/source-trust-matrix.mjs",
+      "scripts/tracking-link-smoke.mjs",
+      "scripts/variable-rotation-fixtures.mjs",
+      "scripts/verify-artifacts.mjs",
+      "scripts/week0-owner-capture-queue.mjs",
+      "scripts/weekly-runner-lock-fixtures.mjs",
+      "scripts/weekly-runner.mjs",
+      "scripts/win-rule-fixtures.mjs",
+      "scripts/worker-dry-run-status.mjs",
+      "src/index.ts"
+    ]
+  },
+  "source_audit": {
+    "javascript": {
+      "checked": 140,
+      "failed": []
+    },
+    "json": {
+      "checked": 195,
+      "failed": []
+    },
+    "source_manifest": [
+      {
+        "path": ".github/workflows/3q-growth-loop-weekly.yml",
+        "bytes": 4394,
+        "sha256": "7ca03595bf97abd5accb04b0339d5e722162f598b309d352f4287c9aaa77b5ac"
+      },
+      {
+        "path": "config/growth-loop.config.json",
+        "bytes": 4529,
+        "sha256": "735a8afe6cb4ca0d756ea3336977c36d031efaf4aa18e6f2de3c61f23f1bb896"
+      },
+      {
+        "path": "integrations/3q-site/champion-integration.config.json",
+        "bytes": 1470,
+        "sha256": "6f141320f02cc24cf0d3601a668f00c756553cb6c3541e20ef477c322738d426"
+      },
+      {
+        "path": "integrations/3q-site/generated/worker.candidate.js",
+        "bytes": 144467,
+        "sha256": "d63f07cc8f6fe0944cf9c7279eb4ed2abe4b3b6e1e7d05c4cd87425beb26542a"
+      },
+      {
+        "path": "integrations/3q-site/generated/worker.candidate.patch",
+        "bytes": 105,
+        "sha256": "3856ca145d6c5a3201e07894e331c1914e2c2b2932737b69d325a5d04f45f3e9"
+      },
+      {
+        "path": "integrations/3q-site/source/worker.origin-main.js",
+        "bytes": 144467,
+        "sha256": "d63f07cc8f6fe0944cf9c7279eb4ed2abe4b3b6e1e7d05c4cd87425beb26542a"
+      },
+      {
+        "path": "integrations/3q-site/wrangler.jsonc",
+        "bytes": 384,
+        "sha256": "351b3df7a01017c529262db8fc1b5d699b532db4e733fbb8ec639135ff1f4012"
+      },
+      {
+        "path": "launchd/com.angelia.3q-growth-loop.weekly.plist",
+        "bytes": 1044,
+        "sha256": "fa977071918359741571e3a569c06d9608b212dc1ab8cc3d8375e6932555bb2d"
+      },
+      {
+        "path": "schema/d1-week0.sql",
+        "bytes": 6497,
+        "sha256": "abb969fbc496dea8e4914ea1c447a8e1ddf6a6beaf4ff77278ddd01978522d93"
+      },
+      {
+        "path": "scripts/approval-resume-fixtures.mjs",
+        "bytes": 13619,
+        "sha256": "42a3b7b28a1caf09a013d668bdde2f2c1df2b68db6a8d494e92a0a0a8352bfa8"
+      },
+      {
+        "path": "scripts/approval-resume-plan.mjs",
+        "bytes": 17079,
+        "sha256": "472a33e4759a480a8b2eee7ceca2675cfd11a1cf13f0e9ef6ada8bbc768e789c"
+      },
+      {
+        "path": "scripts/approved-d1-config.mjs",
+        "bytes": 6248,
+        "sha256": "04074d9a05d7806e2a1cbc339a4183e73092710bf23e881f1c4590aa882994ef"
+      },
+      {
+        "path": "scripts/archive-weekly-run.mjs",
+        "bytes": 16682,
+        "sha256": "a0a04c3e1a274275a40a3c61752ce94b33675a765fd6e4193578f9e47a6db80d"
+      },
+      {
+        "path": "scripts/artifact-retention-monitor.mjs",
+        "bytes": 12152,
+        "sha256": "e9a20d6c1a48d53a20f08bab562e42e32cd0398021beadbd7d899325cdc58abd"
+      },
+      {
+        "path": "scripts/artifact-retention-review-pack.mjs",
+        "bytes": 11063,
+        "sha256": "92cf9608012b5ceb91e4f49b3ccb074d6ad1153b2aa5387f139391664a34b6cd"
+      },
+      {
+        "path": "scripts/browser-smoke.mjs",
+        "bytes": 9023,
+        "sha256": "12afb41cf772735efb7eea42578f345842baebfa5e1bf49be0d50acac745fafc"
+      },
+      {
+        "path": "scripts/build-champion-integration-candidate.mjs",
+        "bytes": 21053,
+        "sha256": "72a51b0f372d0b5df27d105c30107cc514a9d3e82cda2cb0fa6b1fb0014516b1"
+      },
+      {
+        "path": "scripts/candidate-retirement-fixtures.mjs",
+        "bytes": 19519,
+        "sha256": "e6906bc1c8ab9ee8691231be658f5fa019efb1cef56814d41d03f9d433cbfacf"
+      },
+      {
+        "path": "scripts/champion-contract-audit.mjs",
+        "bytes": 8629,
+        "sha256": "c57e2a5046cf7b28f5150aab5958b0dc0cd8d082a44288584c5747c05c9ecf70"
+      },
+      {
+        "path": "scripts/champion-github-handoff.mjs",
+        "bytes": 12841,
+        "sha256": "f1df5ec490d42b58b4e48171340f5ff2e26dc3deb61745b98b9cc3c0707f8191"
+      },
+      {
+        "path": "scripts/champion-integration-smoke.mjs",
+        "bytes": 25024,
+        "sha256": "ee1b3dfad6f734ecffbc4bf155eb3cf384f9b9b4d9231f10750a853b761e30b4"
+      },
+      {
+        "path": "scripts/champion-local-branch.mjs",
+        "bytes": 18461,
+        "sha256": "db3f37b6a8b22095213b9df5b763289c9924c1db08ab8df59bbe2f135c015c42"
+      },
+      {
+        "path": "scripts/champion-release-preflight.mjs",
+        "bytes": 45421,
+        "sha256": "7179d84fd02823a95a7cdcbfafba3530bbbbd65c9f05b2663e3d9fa527d8b417"
+      },
+      {
+        "path": "scripts/champion-source-lock-fixtures.mjs",
+        "bytes": 7235,
+        "sha256": "4b3b36e3c3f44d52deca22eff431483ae170a5e2907977d1077e5f3334f725ac"
+      },
+      {
+        "path": "scripts/cloudflare-d1-readiness.mjs",
+        "bytes": 9498,
+        "sha256": "d5798ea17b2025a97ea41540da85b856d86b0324d0ffc80b96697dabe4e6a152"
+      },
+      {
+        "path": "scripts/collect-d1-auto.mjs",
+        "bytes": 11135,
+        "sha256": "fe8f9229712b0828998843c5fef8b21f6a24c676652d5ed6e125c892ed01d37b"
+      },
+      {
+        "path": "scripts/d1-aggregate-export-fixtures.mjs",
+        "bytes": 10213,
+        "sha256": "d8ce9f943eb31fadb6d1d01683dbfc3f47dd54844c0c068e606e93e96915bb6f"
+      },
+      {
+        "path": "scripts/d1-collection-mode-fixtures.mjs",
+        "bytes": 6877,
+        "sha256": "2b831e38bea1cfdfabdd362dcc522ba5e76be81385f13f0f584ed9202c6caa33"
+      },
+      {
+        "path": "scripts/d1-schema-contract.mjs",
+        "bytes": 7839,
+        "sha256": "2ea71d765639b772897447a8f518b9e2f82a68ffae06616df03427ef0c918f6a"
+      },
+      {
+        "path": "scripts/data-collection-brief.mjs",
+        "bytes": 33180,
+        "sha256": "5877fb4c4186461d277cb27b0ef0f147c3b8cf5413f837c4452c037707688d98"
+      },
+      {
+        "path": "scripts/data-collection-progress.mjs",
+        "bytes": 25027,
+        "sha256": "e4ae06cb99e7817ce69eb87878bf04e51d8483c094860a540676eb8f961f7a94"
+      },
+      {
+        "path": "scripts/event-contract-smoke.mjs",
+        "bytes": 35849,
+        "sha256": "3c1a6086227d5ac977eef8cd07df1adc4362767b19a46bbab207f6258d8fcaf0"
+      },
+      {
+        "path": "scripts/event-input-quality-gate.mjs",
+        "bytes": 11915,
+        "sha256": "b56f7ea7b5693d5741ba9acc59f43a60805797c3a13f72850ab0d1c36b560f5c"
+      },
+      {
+        "path": "scripts/export-d1-aggregate-events.mjs",
+        "bytes": 17999,
+        "sha256": "37d3d4cf4827c332d4c57980daa6e0e67da617c7b391b755e7757168ab7e5f92"
+      },
+      {
+        "path": "scripts/export-d1-events.mjs",
+        "bytes": 11383,
+        "sha256": "be2a18b89f96f9991378f47cc04c35d1a111720747bde3bf466ba00efbb891d7"
+      },
+      {
+        "path": "scripts/funnel-aggregate-fixtures.mjs",
+        "bytes": 11716,
+        "sha256": "ebbcb0b6018f2c79ef75dff4e3929d44fc01a0335467a3cb334915f38cd0e63a"
+      },
+      {
+        "path": "scripts/gate-readiness-matrix.mjs",
+        "bytes": 21233,
+        "sha256": "6866f96ce3ae7079c48a7756741f074ef27674a44702c1375c08a92db1ff1623"
+      },
+      {
+        "path": "scripts/github-export-bundle.mjs",
+        "bytes": 8836,
+        "sha256": "04cb24c33068e66dd5ba5a4bd02c6a98d7b6dd0c17149eddb6d2946eb94be60b"
+      },
+      {
+        "path": "scripts/github-workflow-guard.mjs",
+        "bytes": 11967,
+        "sha256": "b1ab30b53ce0d88423120da6bc7f2addeee7624f74b14d4fffdf51e5ab5b9d88"
+      },
+      {
+        "path": "scripts/growth-loop.mjs",
+        "bytes": 356516,
+        "sha256": "0cfdda82f51b15438dc99007ec77cad9c6103132f6f0638929cc1a0b371da71e"
+      },
+      {
+        "path": "scripts/high-severity-event-store.test.mjs",
+        "bytes": 2714,
+        "sha256": "c3ee47dbb52854ca691a089c4b6789cf53c7fa327b97333e9bc0d63cdcb827e4"
+      },
+      {
+        "path": "scripts/high-severity-gates.test.mjs",
+        "bytes": 892,
+        "sha256": "417d77e6a8c4fb390d7e7f9e6c3c4a5e842059fc4c75c6db758cd5be51b4b7fc"
+      },
+      {
+        "path": "scripts/high-severity-importers.test.mjs",
+        "bytes": 3761,
+        "sha256": "e7d30ed0d6742ba84eb577099c14e2d06136f5ce71ec6f36775094372c01b1e4"
+      },
+      {
+        "path": "scripts/high-severity-scoring.test.mjs",
+        "bytes": 1719,
+        "sha256": "29f7e5b50e4d9393f8dc0f8a5bb67c7c7a0932dcf84b0d6574b64a185db6d716"
+      },
+      {
+        "path": "scripts/import-funnel-aggregates.mjs",
+        "bytes": 17251,
+        "sha256": "6594a132599959a262172628937f69a51202adcff71bed42a0e783f441fd71a1"
+      },
+      {
+        "path": "scripts/import-manual-conversions.mjs",
+        "bytes": 16110,
+        "sha256": "5b95f6bc2a11699ab239d10e0d79aae4cb1b985538bdfb75dd3ab8ce9013d1a9"
+      },
+      {
+        "path": "scripts/iteration-history.mjs",
+        "bytes": 20811,
+        "sha256": "eafbde2e2db7660bedd6c03ee8c441c1998dbe0e75f34c52b1762ceb9f1baff0"
+      },
+      {
+        "path": "scripts/launchagent.mjs",
+        "bytes": 8738,
+        "sha256": "b005e22fc59f030f2cc9bf26ff54aea02007f362f00fdd601c09a16f3d6b8e41"
+      },
+      {
+        "path": "scripts/lib/champion-source-lock.mjs",
+        "bytes": 4410,
+        "sha256": "d34e132e9bbe47619a89cb769d07f4f7f00189e2d498aa0e4999a494ed2c9bbf"
+      },
+      {
+        "path": "scripts/lib/gate-policy.mjs",
+        "bytes": 603,
+        "sha256": "c06cea5efae3e61f51e17f7e75289e9f0291f833a3065355c87da3d5ed6dc72d"
+      },
+      {
+        "path": "scripts/lib/idempotent-event-store.mjs",
+        "bytes": 2248,
+        "sha256": "1a0e83bdcd218f50852e3d245384267b5b1d59fd91eae331125f46b489539fd4"
+      },
+      {
+        "path": "scripts/lib/mcp-review-audit.mjs",
+        "bytes": 2952,
+        "sha256": "80ffb6b4eeb9df2178b9c6904ac56191947d2626be35f48dcf1b5e1e6433c61f"
+      },
+      {
+        "path": "scripts/lib/mcp-review-core.mjs",
+        "bytes": 8166,
+        "sha256": "2bc22790982765325eb1a09d4bf5d51604cc923cf984d60cf9667f00c9176081"
+      },
+      {
+        "path": "scripts/lib/run-lock-policy.mjs",
+        "bytes": 1467,
+        "sha256": "9baf6d2101d261d1d04aaf7284bca1eb6c6d29209bfb4f37c57ba001f84f587f"
+      },
+      {
+        "path": "scripts/lib/scoring-policy.mjs",
+        "bytes": 2257,
+        "sha256": "baadf3bf9ae0174166e69019ac2d5f71a0d22a113c8b78b85cb10231341fa20f"
+      },
+      {
+        "path": "scripts/line-inbound-playbook.mjs",
+        "bytes": 18521,
+        "sha256": "31b16716c91b54c811137cfa415fdfd9c266ccc162bb61fec488fb5178994e96"
+      },
+      {
+        "path": "scripts/live-local-invariant-diff.mjs",
+        "bytes": 1698,
+        "sha256": "b5b0e9cfe28c6e28430da4bc09985554d341adde5aae91ca3ba71231a2fec563"
+      },
+      {
+        "path": "scripts/live-telemetry-readiness-fixtures.mjs",
+        "bytes": 12119,
+        "sha256": "369d66ac12982daec3e45b1b45e1667064ef36972ad724301464c212e81bbf0b"
+      },
+      {
+        "path": "scripts/live-telemetry-readiness.mjs",
+        "bytes": 20696,
+        "sha256": "b41bde73c1cd4882b46937b2e10914346666b913e8f9de433aeecaf00a779c11"
+      },
+      {
+        "path": "scripts/manual-publish-brief.mjs",
+        "bytes": 11284,
+        "sha256": "0768ee7cd2841fffcc1e204041defb1f3b5d4f4468b9425602e4b20415b7b944"
+      },
+      {
+        "path": "scripts/manual-publish-capture-plan.mjs",
+        "bytes": 13637,
+        "sha256": "1e0d74f4910f04bae0cde9cfc89253644457bde58539471a9e7876e1e49b3ffd"
+      },
+      {
+        "path": "scripts/manual-publish-evidence-fixtures.mjs",
+        "bytes": 9080,
+        "sha256": "7f37795f7dd9f07670ad75c6b9dfc84673d6008dd5b0dc0966d5352da929fc98"
+      },
+      {
+        "path": "scripts/manual-publish-evidence-form-fixtures.mjs",
+        "bytes": 10068,
+        "sha256": "4d3d231e404e9ec4bf625851da817caf5f61b2399c7d8c6162a1acf9721170e9"
+      },
+      {
+        "path": "scripts/manual-publish-evidence-form.mjs",
+        "bytes": 15695,
+        "sha256": "d8b2f2d46147dbd2b45d1f31206fbe82053bad3ee5529b4a4c30cc69b2988c65"
+      },
+      {
+        "path": "scripts/manual-publish-evidence.mjs",
+        "bytes": 17481,
+        "sha256": "b69fdc42073a1c7f18463579682750c457a86e89dd5916c8e20c4dbb83debfbd"
+      },
+      {
+        "path": "scripts/manual-publish-packet.mjs",
+        "bytes": 11374,
+        "sha256": "43af773870a30b2fd4cdf9f1bafcfcf58feec0be8b79dde958a01632cb8ce2af"
+      },
+      {
+        "path": "scripts/mcp-review-audit.mjs",
+        "bytes": 8139,
+        "sha256": "d0230c325263b6048cd7f969dc95c2544080549322abc1f5f0eaa823e3110a64"
+      },
+      {
+        "path": "scripts/mcp-review-audit.test.mjs",
+        "bytes": 1578,
+        "sha256": "7d800d24da90249b7ab99e78c8456cbf1dd2682fb97e771e942870ca175f2071"
+      },
+      {
+        "path": "scripts/mcp-review-ci-gate.mjs",
+        "bytes": 1190,
+        "sha256": "6148fec0918d27ff4690b1f9516175237cbbfc89142692dac1e475c39f95ff44"
+      },
+      {
+        "path": "scripts/mcp-review-core.test.mjs",
+        "bytes": 5930,
+        "sha256": "8849ab4289988dd88ffe4f1fce2f0eda180b8a18120661720d357eb1ebb904b3"
+      },
+      {
+        "path": "scripts/mcp-review-server.mjs",
+        "bytes": 6102,
+        "sha256": "0207ac7fad2468c966851835acfe7fe50d090f40daef22d866b3cd92187eadd1"
+      },
+      {
+        "path": "scripts/mcp-review-smoke.mjs",
+        "bytes": 1931,
+        "sha256": "9a6e0195932c8c00270a0f910047889c1dd702c66d176f560b87c6cbbd9389a2"
+      },
+      {
+        "path": "scripts/next-p0-owner-form-fixtures.mjs",
+        "bytes": 8729,
+        "sha256": "6f229c011d68bd8e0beb6a34d22216bed69dff870031a4afa52b0bb5b2955a9a"
+      },
+      {
+        "path": "scripts/next-p0-owner-form.mjs",
+        "bytes": 22646,
+        "sha256": "5314f0f944f230913fce5a9bd14e861bcc4a611ab3407576d88e84180af93338"
+      },
+      {
+        "path": "scripts/next-p0-owner-intake-fixtures.mjs",
+        "bytes": 12262,
+        "sha256": "ff97bef8a8aa10afe51b555b44f452ce32647c974729404faf656fedeca2881c"
+      },
+      {
+        "path": "scripts/next-p0-owner-intake.mjs",
+        "bytes": 25697,
+        "sha256": "6ae96955146af701edf181ff77446ccac770635bc310440a3d8bf323f1bcbd1d"
+      },
+      {
+        "path": "scripts/next-p0-quick-capture-fixtures.mjs",
+        "bytes": 14866,
+        "sha256": "709f44a079d2b5bdd931e1071dc2297f55e6a8560206e4d19124d38d41581a15"
+      },
+      {
+        "path": "scripts/next-p0-quick-capture.mjs",
+        "bytes": 25815,
+        "sha256": "0f1d1bf8b38ff0c733eca75187f4c662425f214513b21a7abfebc700f48989dc"
+      },
+      {
+        "path": "scripts/north-star-funnel.mjs",
+        "bytes": 11735,
+        "sha256": "f564e3d47886da4fdde6f93d23d068e7055390fb71f33a8a1449dce4c69df94e"
+      },
+      {
+        "path": "scripts/north-star-outcome-form-fixtures.mjs",
+        "bytes": 9587,
+        "sha256": "f334be72b7c273d03b29e6cf8e6bbfc88a7808205058c6c6ee4c10f88c3686af"
+      },
+      {
+        "path": "scripts/north-star-outcome-form.mjs",
+        "bytes": 23726,
+        "sha256": "d9a90e98762071c88b0f11cafa0506f4cc4636fa51669900f1ca527d702905ad"
+      },
+      {
+        "path": "scripts/north-star-outcome-preflight.mjs",
+        "bytes": 20249,
+        "sha256": "80d03539e1948068319d91826312b7681c5c874d73602aee6b53cf12330b221a"
+      },
+      {
+        "path": "scripts/objective-sequence-audit.mjs",
+        "bytes": 297849,
+        "sha256": "61742ca9743a2e3f9697ca19076cfd21e96f6c55d4ece8ca5b63bdf56290a33e"
+      },
+      {
+        "path": "scripts/owner-action-launcher.mjs",
+        "bytes": 51598,
+        "sha256": "256509ce75625f47ecd1190a88572240cf4a6fe75d211eee873b4b943388e25a"
+      },
+      {
+        "path": "scripts/owner-approval-form-fixtures.mjs",
+        "bytes": 9692,
+        "sha256": "1b4afeb92ca0429a1ca32dae5228b7b58ab446f8e69bc47bb583659dce4f7f88"
+      },
+      {
+        "path": "scripts/owner-approval-form.mjs",
+        "bytes": 18248,
+        "sha256": "99e9c6aeaca5c207a31beb4627ca4dedfbe1fa66e4832651dc464fd3f625a5ba"
+      },
+      {
+        "path": "scripts/owner-console-smoke.mjs",
+        "bytes": 27293,
+        "sha256": "e4e9452326ad8182760c63305ab2c0a9651529fe0fdb77757d743ad8873dfe69"
+      },
+      {
+        "path": "scripts/owner-console.mjs",
+        "bytes": 123793,
+        "sha256": "5cca46a013fba289beb5341d606171cbfc8b477373605cb5cf68b8dc5c39c025"
+      },
+      {
+        "path": "scripts/owner-data-preflight.mjs",
+        "bytes": 29411,
+        "sha256": "ac7adc74d0411dae7446dc0b361fdae094bc52c006b0722a67c9f97ef7e608b5"
+      },
+      {
+        "path": "scripts/owner-gate-evidence-fixtures.mjs",
+        "bytes": 16736,
+        "sha256": "918018e0f083048005239821b75aaa165a8af51723f00742e64987084c27114b"
+      },
+      {
+        "path": "scripts/owner-gate-evidence.mjs",
+        "bytes": 26515,
+        "sha256": "66923733e72cde301eb20802e44d56fe3a65b17fc14ca65aba7038b3b501452b"
+      },
+      {
+        "path": "scripts/owner-next-action-fixtures.mjs",
+        "bytes": 20755,
+        "sha256": "3950b03eaca2a4b468850dcb66ef096559263dcf49e3fa2f0757205b35283385"
+      },
+      {
+        "path": "scripts/owner-next-action.mjs",
+        "bytes": 49457,
+        "sha256": "235dbd12c8aad66cdb83aa9e430a89754094976894f6cb7f7643bcc531c6ec0c"
+      },
+      {
+        "path": "scripts/owner-p0-launcher.mjs",
+        "bytes": 20012,
+        "sha256": "6b070bb6226dd9e8c57c629bd454e21aacef6b82d4b5512a60a9f199e4ef161b"
+      },
+      {
+        "path": "scripts/owner-p0-now.mjs",
+        "bytes": 28219,
+        "sha256": "95c1b76122a9809d4bb821fbceced7207e27684bd7aa27c423463d3399b0c974"
+      },
+      {
+        "path": "scripts/owner-p0-postfill-check.mjs",
+        "bytes": 23469,
+        "sha256": "b68a3caee710aeab871db1edf0c4b01d1d48f9c2dd1cfa2836a894294b47520b"
+      },
+      {
+        "path": "scripts/owner-p1-outcome-intake-fixtures.mjs",
+        "bytes": 9819,
+        "sha256": "6b54f9421515a9644298b1210ad5bb297947d5c3fe7c8abd0e9e0fa89ceeecd3"
+      },
+      {
+        "path": "scripts/owner-p1-outcome-intake.mjs",
+        "bytes": 17008,
+        "sha256": "b1079207f41d7fddb9423750960dac2703d1b7c9c7e7f5bef9d624c8e54e3c92"
+      },
+      {
+        "path": "scripts/owner-p1-outcome-postfill-check.mjs",
+        "bytes": 22865,
+        "sha256": "59ee4a023ed36b693de4952a3dd8946d6a89e52fa7b31aa9daa11aedc9e6874b"
+      },
+      {
+        "path": "scripts/owner-public-url-approval-preview.mjs",
+        "bytes": 14038,
+        "sha256": "5a1c5be8a5b4b56076a28909159b736b875cae6da5123b952dcb4e3de2c87094"
+      },
+      {
+        "path": "scripts/owner-quality-review-fixtures.mjs",
+        "bytes": 15557,
+        "sha256": "7e1548d8c42596b150f2588fbb32afb563715090aadbe44dc7814cd36ddf4666"
+      },
+      {
+        "path": "scripts/owner-quality-review-form-fixtures.mjs",
+        "bytes": 15531,
+        "sha256": "965745162f146ae154bf75f40d593502728630232446c5aa3e3e7ee45d742764"
+      },
+      {
+        "path": "scripts/owner-quality-review-form.mjs",
+        "bytes": 22486,
+        "sha256": "f1fb289aa6ef95f23916d041a89beae44af231d2d7340088cd07f08eb4a613d7"
+      },
+      {
+        "path": "scripts/owner-quality-review.mjs",
+        "bytes": 18572,
+        "sha256": "e07a5ac4b5a95a4cf81e6b13a48ccc95998e1c4dccfd8c614daf21bea0a4f04c"
+      },
+      {
+        "path": "scripts/owner-sample-count-handoff.mjs",
+        "bytes": 20292,
+        "sha256": "b34158d8a48c0eec38ba39a162db03413f8ebd4773767fae7627a09aef2379a8"
+      },
+      {
+        "path": "scripts/owner-sample-count-recovery-fixtures.mjs",
+        "bytes": 28701,
+        "sha256": "70aca1f0918ec41b4add0361fd8b5b00df69dd329af36a570391f4b8bac63f77"
+      },
+      {
+        "path": "scripts/owner-sample-count-recovery.mjs",
+        "bytes": 24369,
+        "sha256": "3660c12a5afd89d7a873ed371c9c55c7fb9aa07bbd008202acf14ce488a9e3be"
+      },
+      {
+        "path": "scripts/owner-sample-gate-fixtures.mjs",
+        "bytes": 17975,
+        "sha256": "865c360fdebb98d5803c782b78fc5e846a5282a99bdde2d95a44489f982c210c"
+      },
+      {
+        "path": "scripts/owner-sample-gate-intake-fixtures.mjs",
+        "bytes": 11143,
+        "sha256": "d98b1431bbec14ea6dd14d394fc512558c260b87eaae5cd35f08be45887821df"
+      },
+      {
+        "path": "scripts/owner-sample-gate-intake.mjs",
+        "bytes": 12439,
+        "sha256": "40b76ed58f7fa329ba1f1c8b67b8c04e43b49391affe2e7dfa72a1aade23147f"
+      },
+      {
+        "path": "scripts/owner-sample-gate-status.mjs",
+        "bytes": 22046,
+        "sha256": "b6380c7e6ec52fc18dde2fb6cc9a5fd32a48cce9021fcf67865e079443046573"
+      },
+      {
+        "path": "scripts/p0-counts-preflight-fixtures.mjs",
+        "bytes": 7734,
+        "sha256": "1cb418ee9cf1e675d143b76bfbc9d51b3a3c87eb423049a2a61118fbe2e2cf00"
+      },
+      {
+        "path": "scripts/p0-counts-preflight.mjs",
+        "bytes": 12853,
+        "sha256": "1b7da1cde371b64fc7790de495664e0109ecca169aadaa98b108f6791751574b"
+      },
+      {
+        "path": "scripts/post-gate-verification-fixtures.mjs",
+        "bytes": 17232,
+        "sha256": "d081c8a1768588fae74588df50694e71c4746cf9bc2ec5bdfc0db4a94f6d9e71"
+      },
+      {
+        "path": "scripts/post-gate-verification.mjs",
+        "bytes": 18501,
+        "sha256": "01209fcad6b4b16bf7bcec09635d29dabe6a4672c182e3c68039cbd063e511ba"
+      },
+      {
+        "path": "scripts/prepared-but-blocked-report.mjs",
+        "bytes": 6330,
+        "sha256": "4e41d410c3a648a0e99d7480eb9f1c3a235e1f5ab8f8feaace25c0bff2b05e15"
+      },
+      {
+        "path": "scripts/public-tracking-url-pack.mjs",
+        "bytes": 16683,
+        "sha256": "8ccaccdab85652e317f2e9d8c2e431b4c6049ffcf9f379d6bff8fa2b7d6c7746"
+      },
+      {
+        "path": "scripts/real-data-apply-fixtures.mjs",
+        "bytes": 9964,
+        "sha256": "a934d164d333f0b9d949e31fc68494c24cd2dd8f8df42f600c511d4f976075b8"
+      },
+      {
+        "path": "scripts/real-data-decision-replay.mjs",
+        "bytes": 46105,
+        "sha256": "322bf5b52095fa71dd39f4c28a2d6b7597d1247b4bbfbbb5136a970c4b41dbdc"
+      },
+      {
+        "path": "scripts/real-data-input-pack.mjs",
+        "bytes": 12497,
+        "sha256": "41a8e05e493a27f4b8e23571d2cf31e940bcb82ffc4b0c0839b4d105399ec503"
+      },
+      {
+        "path": "scripts/real-data-intake-plan.mjs",
+        "bytes": 12270,
+        "sha256": "bda4909f4f3b447b7410d7c8e46d7143f04080abd871b606496fa5de2ea3d342"
+      },
+      {
+        "path": "scripts/redline-priority.mjs",
+        "bytes": 21586,
+        "sha256": "9a3970a9ac532583b4223f2dfd8d158b58336ea38606113b94ea32a4275708c1"
+      },
+      {
+        "path": "scripts/sample-gate-batch-handoff.mjs",
+        "bytes": 14431,
+        "sha256": "9348715e96f22dfbbf8f356aa482220dbff17ef01c179ebb9f57cd4614c0fc04"
+      },
+      {
+        "path": "scripts/sample-gate-batch-preflight.mjs",
+        "bytes": 18189,
+        "sha256": "d373a21fd11c6d9c692f4e2a7550b82ffafe0d7f43cb091d4a4e4ad939eadbba"
+      },
+      {
+        "path": "scripts/sample-gate-capture-calendar.mjs",
+        "bytes": 11859,
+        "sha256": "7b47b89d25a5397b989ffe4f17a3a1525e18e382cae940122ca9b12ed4c96982"
+      },
+      {
+        "path": "scripts/sample-gate-collection-sprint.mjs",
+        "bytes": 16347,
+        "sha256": "bd7c6b0737911c7295f2091a7334c8dbfc4697780ec796426859d6fb078163b7"
+      },
+      {
+        "path": "scripts/sample-gate-due-fixtures.mjs",
+        "bytes": 9913,
+        "sha256": "7daa92bdad22c428b9d2cd3bc5c7d5c750b925e86eb8bc6dc230dfaa31aa4267"
+      },
+      {
+        "path": "scripts/sample-gate-due-status.mjs",
+        "bytes": 16716,
+        "sha256": "e5a49e50f5df24ce03260582d466a30f4e127662bf974df9098135e9be60bed0"
+      },
+      {
+        "path": "scripts/sample-gate-owner-form-fixtures.mjs",
+        "bytes": 20229,
+        "sha256": "f90b760412270a7712a5d1f82b1da5d52dafbb7f643bb492891a8b1d6214e5f4"
+      },
+      {
+        "path": "scripts/sample-gate-owner-form.mjs",
+        "bytes": 23010,
+        "sha256": "fc6030be3fb976ae7a6be4cf40c339bbbc502501e344f90710670196c75a6107"
+      },
+      {
+        "path": "scripts/sample-gate-owner-worksheet.mjs",
+        "bytes": 11666,
+        "sha256": "9c3292e59c90f975275137e99e31adcf593d364e5b1d48be78c60d87f9fc8b9a"
+      },
+      {
+        "path": "scripts/sample-gate-recovery-pack.mjs",
+        "bytes": 12842,
+        "sha256": "dbfded2674b2c63476ddb1c890df359daf4e72947535917e2fe3e2b700031ff3"
+      },
+      {
+        "path": "scripts/sample-gate-replay-fixtures.mjs",
+        "bytes": 21196,
+        "sha256": "29939f8c81b2dda0b51e2641e2a9e61884e2bf170ad29b015dbcdfd4de5c8722"
+      },
+      {
+        "path": "scripts/schedule-catchup-status.mjs",
+        "bytes": 9948,
+        "sha256": "5186c61a6c16c00216c2d9654b7ffea0c6589725d21a7f4441eb270037a12b82"
+      },
+      {
+        "path": "scripts/source-capture-compile-fixtures.mjs",
+        "bytes": 13342,
+        "sha256": "e1818235d9f1470b0c172251204f480702588a36c168b41099c12e22c51c04ff"
+      },
+      {
+        "path": "scripts/source-capture-compile.mjs",
+        "bytes": 18698,
+        "sha256": "f2f39b315760462834aaedca6b9724adadc60b17e74f151388111faf6a94f8a2"
+      },
+      {
+        "path": "scripts/source-capture-pack.mjs",
+        "bytes": 22787,
+        "sha256": "4d29a3b4d97baf323f15ebca815964479981ae7fbb966ce683e517dfbf5a2ae1"
+      },
+      {
+        "path": "scripts/source-readiness.mjs",
+        "bytes": 14201,
+        "sha256": "9d6a1ee15b67646e510da009bfa0db7668944905976f6d4ea89bae509fa55cd8"
+      },
+      {
+        "path": "scripts/source-trust-matrix.mjs",
+        "bytes": 14894,
+        "sha256": "85d155ee5858602637a89435771e370d53e6e6c10a616ebc7b8c0fa609ebc5af"
+      },
+      {
+        "path": "scripts/tracking-link-smoke.mjs",
+        "bytes": 16166,
+        "sha256": "cbb550b496d7526032bf88b64697193231faacbc26956e6111d6691383abfb4b"
+      },
+      {
+        "path": "scripts/variable-rotation-fixtures.mjs",
+        "bytes": 7986,
+        "sha256": "8e593ef5eb31077e8d936e7e721e50e69c0b192f9ae3b5ea52f4907f97378019"
+      },
+      {
+        "path": "scripts/verify-artifacts.mjs",
+        "bytes": 948700,
+        "sha256": "8efa51cad5932456662cc2110b662609d05cd0542fe252cd0f1c707a52f5b522"
+      },
+      {
+        "path": "scripts/week0-owner-capture-queue.mjs",
+        "bytes": 13224,
+        "sha256": "7c733a4aca6393b402173d2ed3e6783dd45e094b9c1cad82d23e9a35d86e1c99"
+      },
+      {
+        "path": "scripts/weekly-runner-lock-fixtures.mjs",
+        "bytes": 8186,
+        "sha256": "c59746c77dfce0227ad9c7d9c0b17b74c39fcf21a627a38cf0d799439e74b249"
+      },
+      {
+        "path": "scripts/weekly-runner.mjs",
+        "bytes": 61436,
+        "sha256": "53a5017bf3cbca8af2102792f1289764904d64155c454c0f6ec6b766e2a5e8a3"
+      },
+      {
+        "path": "scripts/win-rule-fixtures.mjs",
+        "bytes": 19534,
+        "sha256": "d2cd10435db27bd711a7ce32f62fff55b36a7989f4b9bcef6996531fac285ec6"
+      },
+      {
+        "path": "scripts/worker-dry-run-status.mjs",
+        "bytes": 5805,
+        "sha256": "06c9254f71ecb1a41e07a1b1d14e4ca522021a84d2901a3fc4b74b9d0b894263"
+      },
+      {
+        "path": "src/index.ts",
+        "bytes": 40628,
+        "sha256": "e6841fed98d514d566312d510630bfc08832b92d0e98c01fd8e839cef430ad65"
+      }
+    ],
+    "sensitive_filenames": []
+  },
+  "finding_locations": [
+    {
+      "id": "confirmed-001",
+      "file": "scripts/growth-loop.mjs",
+      "line": 1843,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-002",
+      "file": "scripts/growth-loop.mjs",
+      "line": 173,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-003",
+      "file": "scripts/export-d1-aggregate-events.mjs",
+      "line": 55,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-004",
+      "file": "scripts/export-d1-aggregate-events.mjs",
+      "line": 128,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-005",
+      "file": "scripts/import-funnel-aggregates.mjs",
+      "line": 135,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-006",
+      "file": "scripts/import-manual-conversions.mjs",
+      "line": 129,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-007",
+      "file": "scripts/real-data-decision-replay.mjs",
+      "line": 739,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-008",
+      "file": "scripts/owner-data-preflight.mjs",
+      "line": 319,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-009",
+      "file": "scripts/next-p0-quick-capture.mjs",
+      "line": 318,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-010",
+      "file": "scripts/sample-gate-batch-preflight.mjs",
+      "line": 85,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-011",
+      "file": "scripts/weekly-runner.mjs",
+      "line": 1191,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-012",
+      "file": "scripts/growth-loop.mjs",
+      "line": 3642,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-013",
+      "file": "scripts/growth-loop.mjs",
+      "line": 4378,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-014",
+      "file": "scripts/growth-loop.mjs",
+      "line": 5926,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-015",
+      "file": "scripts/export-d1-aggregate-events.mjs",
+      "line": 116,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-016",
+      "file": "scripts/export-d1-events.mjs",
+      "line": 86,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-017",
+      "file": "scripts/import-manual-conversions.mjs",
+      "line": 297,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-018",
+      "file": "scripts/import-manual-conversions.mjs",
+      "line": 380,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-019",
+      "file": "scripts/real-data-input-pack.mjs",
+      "line": 210,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-020",
+      "file": "scripts/win-rule-fixtures.mjs",
+      "line": 324,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-021",
+      "file": "scripts/champion-contract-audit.mjs",
+      "line": 39,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-022",
+      "file": "scripts/champion-release-preflight.mjs",
+      "line": 165,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-023",
+      "file": "scripts/event-input-quality-gate.mjs",
+      "line": 280,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-024",
+      "file": "scripts/owner-action-launcher.mjs",
+      "line": 550,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-025",
+      "file": "scripts/next-p0-quick-capture-fixtures.mjs",
+      "line": 239,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-026",
+      "file": "scripts/next-p0-quick-capture.mjs",
+      "line": 99,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-027",
+      "file": "scripts/next-p0-owner-intake.mjs",
+      "line": 274,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-028",
+      "file": "scripts/sample-gate-batch-preflight.mjs",
+      "line": 87,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-029",
+      "file": "scripts/sample-gate-due-fixtures.mjs",
+      "line": 13,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-030",
+      "file": "scripts/owner-sample-gate-status.mjs",
+      "line": 265,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-031",
+      "file": "scripts/owner-sample-count-recovery.mjs",
+      "line": 219,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-032",
+      "file": "scripts/owner-gate-evidence.mjs",
+      "line": 406,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-033",
+      "file": "scripts/owner-quality-review-form.mjs",
+      "line": 364,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-034",
+      "file": "scripts/north-star-outcome-preflight.mjs",
+      "line": 85,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-035",
+      "file": "scripts/data-collection-progress.mjs",
+      "line": 268,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-036",
+      "file": "scripts/north-star-outcome-form.mjs",
+      "line": 315,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-037",
+      "file": "scripts/gate-readiness-matrix.mjs",
+      "line": 183,
+      "file_exists": true,
+      "line_in_range": true
+    },
+    {
+      "id": "confirmed-038",
+      "file": "scripts/artifact-retention-monitor.mjs",
+      "line": 163,
+      "file_exists": true,
+      "line_in_range": true
+    }
+  ],
+  "findings": {
+    "source": "CLAUDE-REVIEW-FINDINGS-20260710.json",
+    "generated_by": "claude-code full-codebase review 2026-07-10",
+    "note": "38 confirmed findings (adversarially verified, incl. live repro by verifier agents). Worker-side fixes already deployed by Claude (collector version 49ca25f5). These are the remaining LOCAL PIPELINE items for the growth-loop maintainer loop.",
+    "counts": {
+      "confirmed": 38,
+      "unresolved": 28,
+      "unresolved_high": 0,
+      "unresolved_medium": 28,
+      "unresolved_low": 0
+    },
+    "items": [
+      {
+        "id": "confirmed-001",
+        "file": "scripts/growth-loop.mjs",
+        "line": 1843,
+        "severity": "high",
+        "category": "scoring-math-inconsistency",
+        "summary": "scoreAssets computes line_add_rate (and score/decision) with denominator = link_clicks || visits, inverting the worker's canonical visits-first denominator (src/index.ts:406 'visits || link_clicks', comment: visits is the shared denominator because only routed traffic emits link_click), violating the hard invariant that line_add_rate's denominator must be visits.",
+        "failure_scenario": "Challenger week data: link_clicks=20, visits=150, line_adds=6, cta_clicks=25, test_days=4; champion: link_clicks=0, visits=300, line_adds=12. Worker computes challenger line_add_rate=6/150=0.04 vs champion 12/300=0.04 (lift 1.0 -> retire_or_rework_candidate). The orchestrator computes 6/20=0.30 vs 0.04 (lift 7.5 > 1.15) with sample gate met, so growth_scores.json/ab_test_status.json mark the challenger 'eligible_for_human_promotion_review' and buildApprovalQueue enqueues 'review-challenger-promotion', recommending a promotion the canonical worker math rejects. Same inverted fallback also skews lead_rate/close_rate when line_adds/leads are 0.",
+        "status": "resolved",
+        "resolution": {
+          "finding_id": "confirmed-001",
+          "status": "fixed",
+          "fixed_at": "2026-07-11T00:00:00+08:00",
+          "evidence": [
+            "scripts/high-severity-scoring.test.mjs"
+          ]
+        },
+        "waiver": null
+      },
+      {
+        "id": "confirmed-002",
+        "file": "scripts/growth-loop.mjs",
+        "line": 173,
+        "severity": "high",
+        "category": "timezone-window-error",
+        "summary": "The orchestrator labels scores with currentTaipeiWeek (the in-progress week) and scoreAssets aggregates ALL events in data/lp_events.jsonl with no occurred_at filtering, while the hard invariant and the worker (src/index.ts:222 completedTaipeiWeek + SQL 'WHERE occurred_at >= ? AND <= ?' in UTC) require scoring only the completed previous Taipei week.",
+        "failure_scenario": "Challenger accumulates 40 visits/2 line_adds in each of weeks 1-3. On the Sunday 00:10 Taipei run, the worker scores only the completed week (40 visits < min_visits=100 -> keep_testing_sample_insufficient), but growth-loop.mjs sums all 120 visits/6 line_adds, stamps them with week_start/week_end of the current in-progress week (lines 1859-1860), passes the sample gate, and weekly_report.md/growth_scores.json/next_round_plan.json present window-labeled numbers and promotion-review decisions that never occurred in any single scoring week — contradicting the worker's D1 weekly_growth_scores for the same run.",
+        "status": "resolved",
+        "resolution": {
+          "finding_id": "confirmed-002",
+          "status": "fixed",
+          "fixed_at": "2026-07-11T00:00:00+08:00",
+          "evidence": [
+            "scripts/high-severity-scoring.test.mjs"
+          ]
+        },
+        "waiver": null
+      },
+      {
+        "id": "confirmed-003",
+        "file": "scripts/export-d1-aggregate-events.mjs",
+        "line": 55,
+        "severity": "high",
+        "category": "silent-data-loss",
+        "summary": "Approved remote aggregate export atomically REPLACES data/lp_events.jsonl instead of merging, destroying owner-applied manual conversion/funnel events that the manual importers deliberately append ('Apply mode must append to preserve existing local events').",
+        "failure_scenario": "Owner runs import-manual-conversions.mjs --append --apply, adding deal/lead_submit events (offline conversions that never pass through the D1 collector) to data/lp_events.jsonl. The next authorized run of collect:d1:auto / collect:d1:remote:approved calls atomicWriteJsonl(options.output, events) with default output = data/lp_events.jsonl, replacing the whole file with only D1-derived expanded events. All manual deals/leads silently vanish from weekly scoring: close_rate and lead_rate collapse to 0 with no error or warning.",
+        "status": "resolved",
+        "resolution": {
+          "finding_id": "confirmed-003",
+          "status": "fixed",
+          "fixed_at": "2026-07-11T00:00:00+08:00",
+          "evidence": [
+            "scripts/high-severity-event-store.test.mjs"
+          ]
+        },
+        "waiver": null
+      },
+      {
+        "id": "confirmed-004",
+        "file": "scripts/export-d1-aggregate-events.mjs",
+        "line": 128,
+        "severity": "high",
+        "category": "silent-truncation",
+        "summary": "Aggregate SQL has no date filter and uses ORDER BY event_date ASC LIMIT <=10000 (cap unraisable at line 271) with no truncation detection, so once cumulative group count exceeds 10000 the NEWEST Taipei dates — exactly the completed-previous-week scoring window — are silently dropped with ok:true.",
+        "failure_scenario": "Group key is (taipei_date, asset_id, variant_id, content_id, source, medium, campaign, event_type) and the query aggregates all history forever, so group count grows monotonically (~50-70 groups/day organically reaches 10000 in months; an attacker POSTing /e with unique charset-safe utm_campaign values reaches it in minutes). SQLite then returns the OLDEST 10000 groups; there is no check that aggregateRows.length === options.limit. The exported data/lp_events.jsonl contains zero events for the most recent weeks, weekly scoring sees visits=0 for the scoring window, and the status file still reports ok:true / remote_aggregate_export_completed.",
+        "status": "resolved",
+        "resolution": {
+          "finding_id": "confirmed-004",
+          "status": "fixed",
+          "fixed_at": "2026-07-11T00:00:00+08:00",
+          "evidence": [
+            "scripts/high-severity-event-store.test.mjs",
+            "scripts/d1-aggregate-export-fixtures.mjs"
+          ]
+        },
+        "waiver": null
+      },
+      {
+        "id": "confirmed-005",
+        "file": "scripts/import-funnel-aggregates.mjs",
+        "line": 135,
+        "severity": "high",
+        "category": "data-corruption",
+        "summary": "Apply mode has no idempotency or duplicate-event_id guard, so re-running the documented apply command (or two CSV rows sharing the same date/asset/event_type/source/medium/campaign/content_id/variant_id key) appends events with identical deterministic event_ids while reporting ok:true.",
+        "failure_scenario": "Owner runs `npm run import:funnel:apply` twice on the same data/funnel_aggregates.csv (e.g. unsure the first run worked, or re-applying a cumulative CSV mid-week). hashEvent() hashes only row fields + index (line 377-382), so every re-applied row produces byte-identical event_ids; appendFile writes them again and the status says ok:true with no warning. The next `npm run event:quality` (documented follow-up and a weekly-runner step) fails with duplicate_event_id, setting scoring_allowed=false and aborting the whole weekly pipeline; recovery requires hand-editing the append-only data/lp_events.jsonl. Same collision also occurs within a single CSV when two rows share the key with split counts (row A count=5, row B count=3 -> B's 3 event_ids duplicate A's first 3).",
+        "status": "resolved",
+        "resolution": {
+          "finding_id": "confirmed-005",
+          "status": "fixed",
+          "fixed_at": "2026-07-11T00:00:00+08:00",
+          "evidence": [
+            "scripts/high-severity-importers.test.mjs"
+          ]
+        },
+        "waiver": null
+      },
+      {
+        "id": "confirmed-006",
+        "file": "scripts/import-manual-conversions.mjs",
+        "line": 129,
+        "severity": "high",
+        "category": "data-corruption",
+        "summary": "Identical double-append defect as the funnel importer: deterministic event_ids (hashEvent line 368-373) plus no check against existing lp_events.jsonl content means a repeated `npm run import:manual:apply` silently appends duplicate event_ids and reports ok:true.",
+        "failure_scenario": "Owner applies data/manual_conversions.csv, then re-runs the same command (double-click, retry after an unclear terminal, or re-applying an updated cumulative CSV whose old rows are unchanged). All previously applied rows expand to events with byte-identical event_ids and are appended again. event-input-quality-gate.mjs then flags duplicate_event_id and blocks all scoring (scoring_allowed=false, exit 1), halting the weekly runner until data/lp_events.jsonl is manually repaired; the importer itself gave no indication anything was wrong.",
+        "status": "resolved",
+        "resolution": {
+          "finding_id": "confirmed-006",
+          "status": "fixed",
+          "fixed_at": "2026-07-11T00:00:00+08:00",
+          "evidence": [
+            "scripts/high-severity-importers.test.mjs"
+          ]
+        },
+        "waiver": null
+      },
+      {
+        "id": "confirmed-007",
+        "file": "scripts/real-data-decision-replay.mjs",
+        "line": 739,
+        "severity": "high",
+        "category": "replay-divergence",
+        "summary": "Replay computes line_add_rate with denominator `link_clicks || visits`, the inverse of the deployed worker's `visits || link_clicks` (src/index.ts:406), violating the invariant that the denominator must be visits and allowing the replay to bless a promotion the worker would reject.",
+        "failure_scenario": "Real completed week: champion has link_clicks=300 (routed redirects), visits=100, line_adds=10; challenger has link_clicks=100, visits=100, line_adds=6, sample gate met, no quality regression. Worker: champion rate=10/100=0.10, challenger=0.06, lift 0.6 -> retire_or_rework. Replay: champion rate=10/300=0.033, lift=1.8 -> emits challenger_decision=eligible_for_human_promotion_review and ab_decision=queue_human_promotion_review, certifying a promotion the worker's rule denies. Inverse shape (champion visits=400, link_clicks=20 -> replay champion rate 1.0) permanently blocks legitimate winners. The worker's own comment notes only routed traffic emits link_click, so link_clicks != visits is the normal production shape; all six replay scenarios set link_click == page_view, so the divergence is never exercised and the replay reports ok=true.",
+        "status": "resolved",
+        "resolution": {
+          "finding_id": "confirmed-007",
+          "status": "fixed",
+          "fixed_at": "2026-07-11T00:00:00+08:00",
+          "evidence": [
+            "scripts/high-severity-scoring.test.mjs"
+          ]
+        },
+        "waiver": null
+      },
+      {
+        "id": "confirmed-008",
+        "file": "scripts/owner-data-preflight.mjs",
+        "line": 319,
+        "severity": "high",
+        "category": "scoring-math",
+        "summary": "line_add_rate denominator priority is reversed vs the canonical scorer: preview uses `asset.link_clicks || asset.visits` while src/index.ts uses `row.visits || row.link_clicks` (invariant: denominator must be visits), so the preview's lift and challenger_win_rule_met can contradict canonical weekly scoring.",
+        "failure_scenario": "Owner stages the full P0 ledger, so funnel_aggregates has both link_click and page_view rows per asset (the fill template includes both stages). Champion: link_clicks=100, visits=250, line_adds=15; challenger: link_clicks=100, visits=110, line_adds=8. Canonical worker math: champion 15/250=0.06, challenger 8/110=0.0727, lift=1.21 > 1.15 -> eligible. This preflight: champion 15/100=0.15, challenger 8/100=0.08, lift=0.53 -> decision 'retire_or_rework_candidate' / next_round 'retire_underperforming_challenger_plan_next_variable'. With the ratios reversed the preview instead reports challenger_win_rule_met=true ('owner_preview_win_needs_quality_and_promotion_review') for a challenger that canonically loses — the gate preview false-passes or false-blocks the 1.15 win rule whenever click/visit ratios differ between assets, which is the normal case under 90/10 routed traffic.",
+        "status": "resolved",
+        "resolution": {
+          "finding_id": "confirmed-008",
+          "status": "fixed",
+          "fixed_at": "2026-07-11T00:00:00+08:00",
+          "evidence": [
+            "scripts/high-severity-scoring.test.mjs"
+          ]
+        },
+        "waiver": null
+      },
+      {
+        "id": "confirmed-009",
+        "file": "scripts/next-p0-quick-capture.mjs",
+        "line": 318,
+        "severity": "high",
+        "category": "gate-bypass",
+        "summary": "parseCountsText splits raw text on commas/semicolons BEFORE checking the '#' comment prefix, so the generated paste template's own header comments (which contain ',' and ';') shed fragments like 'email', 'LINE user ID', 'or private note.' that become invalid count entries, making a fully and correctly filled template permanently fail validation — the entire documented paste-template auto-read and --counts-file workflows can never succeed.",
+        "failure_scenario": "Verified by execution: generate the template via the script, fill ALL metadata (evidence_ref, reviewer, pii_checked=yes) and ALL 9 counts correctly, rerun with no flags (auto-read) or with --counts-file pointing at the template -> renderPasteTemplate's comment lines 483/485 ('...complete; otherwise run manually:' and '...no phone, email, LINE user ID, customer name, chat text, order ID, payment ID, or private note.') are split on ,/; into fragments that no longer start with '#', each becomes counts.set('invalid:<fragment>','invalid') -> unknown_counts blocking issues -> status is always 'blocked_invalid_quick_counts' with baffling messages ('Unknown ranks: invalid:email, invalid:LINE user ID, ...'), the preview CSV is never created, and the weekly quick-capture pathway is dead no matter what the owner does.",
+        "status": "resolved",
+        "resolution": {
+          "finding_id": "confirmed-009",
+          "status": "fixed",
+          "fixed_at": "2026-07-11T00:00:00+08:00",
+          "evidence": [
+            "scripts/high-severity-gates.test.mjs",
+            "scripts/next-p0-quick-capture-fixtures.mjs"
+          ]
+        },
+        "waiver": null
+      },
+      {
+        "id": "confirmed-010",
+        "file": "scripts/sample-gate-batch-preflight.mjs",
+        "line": 85,
+        "severity": "high",
+        "category": "gate-bypass",
+        "summary": "Preflight reports ready_for_source_compile with ok=true when the handoff file has a missing or empty all_rows array, because zero expected rows yields zero pending/partial rows and statusName() returns ready.",
+        "failure_scenario": "handoff JSON without a usable all_rows (older-format file, a handoff regenerated from a plan with no link_groups, or a wrong --handoff= path) plus any header-valid ledger -> expectedRows=[] -> no missing/pending/partial rows and no issues -> output confirmed by running the script: status=ready_for_source_compile, ok=true, expected_p0_row_count=0, filled_p0_row_count=0, exit 0 (even with --strict), and recommended_commands tells the operator to run source:compile although zero of the 18 required P0 rows were validated.",
+        "status": "resolved",
+        "resolution": {
+          "finding_id": "confirmed-010",
+          "status": "fixed",
+          "fixed_at": "2026-07-11T00:00:00+08:00",
+          "evidence": [
+            "scripts/high-severity-gates.test.mjs"
+          ]
+        },
+        "waiver": null
+      },
+      {
+        "id": "confirmed-011",
+        "file": "scripts/weekly-runner.mjs",
+        "line": 1191,
+        "severity": "medium",
+        "category": "lock-race",
+        "summary": "Stale-lock takeover unlinks the lock file unconditionally, so two runners that both judge the same stale lock can each delete-and-recreate it, letting both acquire the lock and run concurrently — recreating the concurrent-runner status-overwrite incident.",
+        "failure_scenario": "A crashed run leaves a stale lock (dead PID). Launchd fires the Sunday run while the owner (following schedule_catchup_status.md's 'Run npm run weekly:local' advice) starts a second run within the same ~second. Both hit EEXIST on the stale lock, both read the dead owner and judge it stale. Runner A unlinks and recreates the lock (acquired); runner B, milliseconds behind, unlinks A's brand-new lock (unlink is not conditioned on the lock still being the stale one it inspected) and creates its own. Both runners now execute all ~118 steps concurrently: data/weekly_runner_status.json is alternately overwritten by two writers and every artifact-generating step interleaves writes to the same report/queue files, corrupting the weekly evidence set.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-012",
+        "file": "scripts/growth-loop.mjs",
+        "line": 3642,
+        "severity": "medium",
+        "category": "gate-handling",
+        "summary": "The sample_threshold_gate preflight is only 'ok' while abStatus.sample_threshold_met is false, which is the logical inverse of the data-evidence gate at line 3260 that requires sample_threshold_met===true, so 'local preflight pass' and 'data evidence ready' are mutually unsatisfiable and the gate blocks exactly when the underlying condition is met.",
+        "failure_scenario": "Owner completes real data collection so a challenger reaches visits>=100, cta_clicks>=20, line_adds>=5, test_days>=3: scoreAssets sets sample_threshold_met=true and buildAbStatus sets decision='queue_human_promotion_review' (line 1995), making all three conditions at 3642 false. From then on every weekly run writes launch_readiness.json with local_preflight_ok=false, weekly_report.md shows 'Local preflight: attention_required', and owner_approval_pack.md flags attention required — permanently reporting a failure state precisely because the funnel finally hit its target thresholds, with no code path that ever yields preflight-pass plus data-evidence-met.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-013",
+        "file": "scripts/growth-loop.mjs",
+        "line": 4378,
+        "severity": "medium",
+        "category": "correctness",
+        "summary": "renderWeeklyReport hardcodes the BLUF 'no real funnel events are present yet. Champion stays unchanged because sample_threshold_met=false' and the Winners/Losers section 'no winner declared. Sample is insufficient' (lines 4416-4420) as static text, so the weekly report's headline contradicts its own dynamic scoring tables once real events exist.",
+        "failure_scenario": "Owner applies reviewed real aggregates via the documented import:funnel:apply flow (appends to data/lp_events.jsonl); the next weekly run computes sample_threshold_met=true and challenger decision 'eligible_for_human_promotion_review' in the Funnel Scores table and A/B Status JSON of the same weekly_report.md, yet the report's BLUF and Winners/Losers still assert there is no data and no winner — an owner skimming the summary is given a false weekly status and can skip the promotion review the data actually calls for.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-014",
+        "file": "scripts/growth-loop.mjs",
+        "line": 5926,
+        "severity": "medium",
+        "category": "timezone-window",
+        "summary": "currentTaipeiWeek returns the in-progress current Taipei week (Monday of the week containing 'now' through its Sunday), violating the invariant that the weekly scoring window is the COMPLETED previous Taipei week and diverging from the Worker's completedTaipeiWeek (src/index.ts line 1007), so every local artifact stamps aggregates with the wrong window.",
+        "failure_scenario": "The launchd weekly runner fires (or catch-up fires Monday morning after a missed Sunday): growth_scores.json week_start/week_end, weekly_report.md 'Week:', funnel_breakdown, and next_round_plan are all labeled with the still-open (or brand-new, empty) week while the counted events (unfiltered, all-time) belong to the completed prior week; the labeled window never matches the Worker's weekly_growth_scores D1 row for the same data, so week-keyed artifacts and D1 scores for 'the same week' silently disagree.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-015",
+        "file": "scripts/export-d1-aggregate-events.mjs",
+        "line": 116,
+        "severity": "medium",
+        "category": "scoring-math",
+        "summary": "AVG(quality_score) per group plus expandAggregateRow assigning that average to every expanded event destroys the per-event below-0.5 distribution that growth-loop.mjs (lines 1662/1836) uses to count low_quality_flags, so the no_quality_regression gate can falsely pass or falsely fail.",
+        "failure_scenario": "One day's quality_flag group for the challenger contains scores [0.1, 0.9, 0.9]. Raw data yields low_quality_flags=1 (spam_flag_rate=1/3). The aggregate export produces 3 expanded events each with quality_score=0.633, so low_quality_flags=0 and spam_flag_rate=0 — no_quality_regression falsely passes and a challenger-win recommendation can be produced despite a real quality regression. Conversely scores [0.4, 0.45, 0.55] average to 0.467, flagging all 3 events as low quality instead of 2, falsely failing a legitimate challenger.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-016",
+        "file": "scripts/export-d1-events.mjs",
+        "line": 86,
+        "severity": "medium",
+        "category": "data-corruption-guard",
+        "summary": "Local export writes to any --output path with no guard against the real scoring input, despite the script's own policy note (line 113) claiming local smoke rows 'do not overwrite data/lp_events.jsonl'.",
+        "failure_scenario": "Operator runs node scripts/export-d1-events.mjs --local --output=data/lp_events.jsonl (e.g. copying the remote-approved command's output convention). The local miniflare D1 is empty or contains only smoke rows, so the real accumulated event history in data/lp_events.jsonl is replaced by an empty/smoke file; the script exits 0 with ok:true and dataLpEventsWritePerformed=true, and weekly scoring silently loses all real events.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-017",
+        "file": "scripts/import-manual-conversions.mjs",
+        "line": 297,
+        "severity": "medium",
+        "category": "correctness",
+        "summary": "The manual importer never validates asset_id against config/growth-loop.config.json (the funnel twin does at import-funnel-aggregates.mjs line 284), so a typo'd asset_id is accepted and applied to the real event store, which the downstream quality gate then rejects wholesale.",
+        "failure_scenario": "Owner types `champion-3q-line-v1` instead of `champion-3q-line-v0` in data/manual_conversions.csv and runs `npm run import:manual:apply`. The importer reports ok:true and appends the events to data/lp_events.jsonl. The next `npm run event:quality` fails with unknown_asset_id and sets scoring_allowed=false, blocking the entire weekly scoring pipeline; the only fix is hand-deleting the bad lines from the append-only jsonl. The funnel importer blocks the same input before any write, proving the check was intended here too.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-018",
+        "file": "scripts/import-manual-conversions.mjs",
+        "line": 380,
+        "severity": "medium",
+        "category": "pii-red-line",
+        "summary": "looksSensitive() omits the 13-19-digit card-number pattern that the funnel twin includes (import-funnel-aggregates.mjs line 406), so payment-card-like values pass the pre-write PII scan and are persisted to repo artifacts.",
+        "failure_scenario": "Owner pastes a wrong spreadsheet column so a card number like `4111 1111 1111 1111` lands in the campaign or content_id cell of data/manual_conversions.csv. Even in default preview mode (no --apply needed) the importer writes it into data/manual_conversions.preview.jsonl, and with apply into data/lp_events.jsonl — violating the hard invariant that no payment PII is ever written to artifacts. The same input is blocked before any write by the funnel importer, and the downstream quality gate only detects it after the PII is already on disk.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-019",
+        "file": "scripts/real-data-input-pack.mjs",
+        "line": 210,
+        "severity": "medium",
+        "category": "gate-bypass",
+        "summary": "Fill templates prefill a single date (current Taipei Monday, week.start) on every row while instructing the owner to 'Fill only aggregate counts', collapsing a whole week of data onto one noon timestamp so the min_test_days=3 sample gate reports unmet even when data genuinely spanned 3+ days.",
+        "failure_scenario": "Owner collects Mon-Sun real data, fills the count column of funnel_aggregates.fill-template.csv exactly as the report's rules instruct (line 272: 'Fill only aggregate counts'), copies and applies it. Every expanded event lands at 2026-XX-XXT12:00:00+08:00 (+1s increments) on the same Monday, so growth-loop's calculateTestDays(first,last) returns 1; sample_threshold_met stays false on test_days despite 7 days of real data meeting every other threshold, blocking the champion/challenger decision for at least one extra weekly cycle ('gate blocks when the underlying condition IS met'). The template offers no per-day rows, so multi-day attribution is impossible without violating the written instructions, and daily attribution in all downstream artifacts is permanently wrong (everything stamped Monday).",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-020",
+        "file": "scripts/win-rule-fixtures.mjs",
+        "line": 324,
+        "severity": "medium",
+        "category": "gate-bypass",
+        "summary": "The win-rule fixture suite validates a scoreAssets re-implementation whose line_add_rate denominator (`link_clicks || visits`) contradicts the deployed worker (`visits || link_clicks`, src/index.ts:406) and the visits-denominator invariant, and every scenario sets link_click == page_view so the suite can never detect the divergence.",
+        "failure_scenario": "win_rule_fixture_status.json reports ok=true and the report says the win rule is validated, yet on any asset pair where link_clicks != visits (the normal production shape, since only routed traffic emits link_click) this rule implementation produces a different line_add_rate and can flip the promotion decision relative to the worker. The gate certifies 'win rule pass' while the underlying rule it certifies mis-scores real data — a consumer trusting this status as verification of the >1.15 rule is misled.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-021",
+        "file": "scripts/champion-contract-audit.mjs",
+        "line": 39,
+        "severity": "medium",
+        "category": "gate-bypass",
+        "summary": "The contract audit hardcodes ok:true, so partial live-observation failures still produce a passing status whose report and downstream gates claim the champion URL and LINE destination were 'verified read-only'.",
+        "failure_scenario": "During a weekly run the https://lin.ee/... redirect fetch times out (or /health fails) while /contact still loads: fetchObservation returns ok:false for that probe, liveReadOk becomes false and status.status becomes 'live_observation_incomplete', but status.ok stays true and the process exits 0. renderReport's BLUF still prints 'The live champion URL and LINE destination are verified read-only', and downstream consumers gate only on ok===true plus observation flags (growth-loop.mjs buildApprovalQueue championLineOnlyObserved at ~line 2799, objective-sequence-audit.mjs championContractAuditCheck at ~line 2332, verify-artifacts.mjs line 838) and never read live_read_ok — so the owner approval queue and objective audit report a verified LINE-only contract even though the LINE destination observation actually failed.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-022",
+        "file": "scripts/champion-release-preflight.mjs",
+        "line": 165,
+        "severity": "medium",
+        "category": "gate-bypass",
+        "summary": "The release preflight accepts the integration-smoke evidence on smokeStatus.ok===true alone with no binding to the current candidate (the smoke status records no candidate hash and preflight checks no timestamp ordering), so a stale smoke run false-passes the gate after the candidate is rebuilt.",
+        "failure_scenario": "Candidate is regenerated with different bytes (e.g., champion-integration.config.json line_url or telemetry change followed by npm run champion:integration:build), then 'npm run champion:release:preflight' is run standalone without rerunning champion:integration:smoke: data/champion_integration_smoke_status.json still holds ok:true from the previous candidate (buildStatus in champion-integration-smoke.mjs stores no candidate sha256 that preflight or verify-artifacts could cross-check, unlike candidate_source_lock_matches and the local-branch sha bindings), so isolated_two_worker_smoke_ok passes, preflight reports ok:true, and champion_release_owner_packet.md plus champion_github_pr_body.md assert 'isolated champion plus collector smoke passed' for candidate bytes that were never smoke-tested — evidence the owner uses to approve the production deploy.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-023",
+        "file": "scripts/event-input-quality-gate.mjs",
+        "line": 280,
+        "severity": "medium",
+        "category": "pii-red-line",
+        "summary": "scanObjectForSensitiveData never inspects array contents (arrays fail both the object-recursion branch due to !Array.isArray and the typeof === 'string' value check), so sensitive values or objects nested inside arrays in metadata_json pass the PII gate undetected.",
+        "failure_scenario": "Empirically verified: a line in data/lp_events.jsonl with metadata_json {\"contacts\":[\"0912-345-678\",\"someone@example.com\"]} produces zero issues -> status.ok=true, scoring_allowed=true, pii_or_sensitive_data_detected=false, and scoring proceeds over a file containing a Taiwan phone number and an email address; {\"list\":[{\"email\":\"a@b.c\"}]} likewise escapes because the recursion never enters the array.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-024",
+        "file": "scripts/owner-action-launcher.mjs",
+        "line": 550,
+        "severity": "medium",
+        "category": "crash-unhandled-edge-case",
+        "summary": "renderCommand emits an unguarded `open \"$ROOT/<path>\"` line for every target (including ones the launcher itself just detected as missing) into a `set -eu` zsh script, so the first missing file aborts the owner launcher partway and silently skips all remaining review artifacts.",
+        "failure_scenario": "Any one of the 50 open-targets is absent when OPEN-3Q-GROWTH-LOOP.command is generated or later double-clicked (e.g. a partially failed weekly run that never regenerated north_star_outcome_form_fixture_report.md, or an artifact archived/deleted after generation). The launcher still writes the .command unconditionally (line 537) even when it sets ok:false/missing_targets. When the owner double-clicks it, `open` on the missing file exits 1 (verified on macOS) and `set -eu` (line 573) aborts the script, so every target listed after the missing one — prepared_but_blocked.md, approval_queue.json, worker_dry_run.md, owner_quality_review_form.html, etc. — never opens and the trailing 'Opened local files:' confirmation never prints; the owner reviews only a truncated subset of the decision surface believing they launched the full set. Fix is to filter on target.exists or guard each line with `[ -f ... ] &&`.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-025",
+        "file": "scripts/next-p0-quick-capture-fixtures.mjs",
+        "line": 239,
+        "severity": "medium",
+        "category": "gate-bypass",
+        "summary": "buildAutoPasteTemplate/buildPartialAutoPasteTemplate hand-roll a synthetic template containing a single comma-free comment line instead of exercising the template renderPasteTemplate actually generates, so scenarios 'auto_paste_template_preview_ready', 'partial_auto_paste_template_waiting', and 'labelled_counts_file_preview_ready' all pass while the real generated-template flow is completely broken (see the parseCountsText comment-splitting bug).",
+        "failure_scenario": "Verified by execution: node scripts/next-p0-quick-capture-fixtures.mjs reports ok:true with all 9 scenarios green, yet running quick-capture against its own generated template — fully and correctly filled — always yields blocked_invalid_quick_counts; the fixture reports the auto-paste-template gate as working when the underlying condition is not met, so the weekly guard never surfaces the broken owner workflow.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-026",
+        "file": "scripts/next-p0-quick-capture.mjs",
+        "line": 99,
+        "severity": "medium",
+        "category": "silent-data-loss",
+        "summary": "The paste template is preserved only when readAutoCountsFile finds at least one strictly-valid integer count (hasFilledCount); if the owner has filled only the metadata lines (evidence_ref/reviewer/pii_checked) or wrote counts in an invalid format, the next run regenerates the template from placeholders and silently destroys the owner's edits, contradicting the documented 'Weekly runs preserve partial edits'.",
+        "failure_scenario": "Verified by execution: generate template, replace evidence_ref/reviewer/pii_checked with real values but leave counts as <count>, rerun the script (as the weekly runner does) -> hasFilledCount returns false, readAutoCountsFile returns null, preservePasteTemplate stays false, and writeFile overwrites the template — evidence_ref/reviewer/pii_checked revert to <aggregate_ref>/<alias>/<yes_after_aggregate_only_review>, wiping the owner's work with no warning; same wipe occurs if every count was typed in a non-integer format.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-027",
+        "file": "scripts/next-p0-owner-intake.mjs",
+        "line": 274,
+        "severity": "medium",
+        "category": "timezone-window",
+        "summary": "capture_date is validated only as YYYY-MM-DD format and never checked against the expected capture week (nextP0.week is loaded from the same JSON but unused), while candidatePaths() auto-picks a never-archived, never-freshness-checked ~/Downloads/next_p0_owner_inputs.filled.csv on every run, so wrong-week or stale aggregates validate as 'next_p0_owner_download_preview_ready' and can be staged into data/funnel_aggregates.csv / data/manual_conversions.csv.",
+        "failure_scenario": "Owner downloaded next_p0_owner_inputs.filled.csv two weeks ago and left it in ~/Downloads (the intake never consumes/renames it); with the inbox empty and quick preview header-only, every weekly run re-validates that stale file (ranks/tracking ids/event types still match the round definition, capture_date passes the format regex) and reports preview-ready with next_safe_action suggesting staging; after the human runs --stage --confirm-owner-reviewed, rows dated in an already-scored completed Taipei week (or dated after week_end, e.g. counts captured Monday for the prior week) flow via import-funnel-aggregates into occurred_at, where the weekly window filter silently drops them or attributes them to the wrong week, skewing line_add_rate comparisons — the invariant-4 window is never enforced at the only validation gate that sees the data.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-028",
+        "file": "scripts/sample-gate-batch-preflight.mjs",
+        "line": 87,
+        "severity": "medium",
+        "category": "silent-data-loss",
+        "summary": "Ledger rows are deduplicated into a Map keyed by tracking_link_id::stage with last-row-wins and no duplicate detection, so a duplicated CSV row silently shadows the owner-filled one (or silently accepts whichever conflicting count comes last).",
+        "failure_scenario": "Owner fills a row (aggregate_count=150, all metadata valid) but the ledger also contains a later stale/empty duplicate of the same tracking_link_id+stage (e.g. Excel edit left the original template line in place) -> verified by execution: ledger_row_count=19 vs expected 18, the filled row is discarded, the key reports state=pending with empty count, and issue_count=0 / warning_count=0 -- the discrepancy is never flagged; in the reverse order two conflicting counts pass with the last silently chosen, while the downstream source:compile reads the raw CSV and may aggregate differently from what the gate validated.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-029",
+        "file": "scripts/sample-gate-due-fixtures.mjs",
+        "line": 13,
+        "severity": "medium",
+        "category": "gate-bypass",
+        "summary": "Fixture scenarios hardcode absolute dates for the week of 2026-07-06 but invoke sample-gate-due-status.mjs without --next-p0/--config overrides, so the week under test comes from the live next_p0_owner_inputs.json and the guard falsely fails in every other week.",
+        "failure_scenario": "growth-loop.mjs (line 173) regenerates next_p0_owner_inputs.json with currentTaipeiWeek(now) on each weekly run; from 2026-07-13 the live week becomes 2026-07-13..19, so scenario day3_due (--today=2026-07-08) computes minCheckDate=2026-07-15 and classifies waiting_until_day3 instead of day3_due_waiting_for_owner_counts -- day3_due, day3_overdue_recovery and day7_due checks all fail, status.ok=false and the fixture exits 1, permanently blocking the weekly/CI guard even though the due-status logic is correct (a fixture that should be hermetic is coupled to mutable live state).",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-030",
+        "file": "scripts/owner-sample-gate-status.mjs",
+        "line": 265,
+        "severity": "medium",
+        "category": "gate-bypass",
+        "summary": "summarizeRows sums every valid row with no duplicate-row or template-row-count check (and source-capture-compile has none either), so an accidentally duplicated ledger row silently inflates visits/CTA/LINE totals and can report sample_threshold_met when true counts are below the gate.",
+        "failure_scenario": "Owner hand-edits data/source_capture/sample_gate_ledger.filled.csv per the worksheet and accidentally pastes one challenger page_view row (aggregate_count=50) twice, giving 19 rows; validateRow passes each row, rows_read is never compared to the 18-row template, visits become 149 instead of 99, min_visits=100 is reported as met, and status flips to sample_rate_win_needs_quality_review even though the real sample is insufficient — no issue or warning is emitted anywhere in the compile+owner-gate chain.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-031",
+        "file": "scripts/owner-sample-count-recovery.mjs",
+        "line": 219,
+        "severity": "medium",
+        "category": "correctness",
+        "summary": "countsByEventType merges intake.counts_by_event_type with the preflight-selected source's counts precisely when the selected source IS next_p0_owner_intake, and mergeCounts adds them, so every event count is doubled in owner_sample_count_recovery.json/.md once real counts exist.",
+        "failure_scenario": "Owner fills counts; next-p0-owner-intake writes counts_by_event_type {page_view:220, cta_click:48, line_add:12} (countBy sums the count column), owner-data-preflight selects source next_p0_owner_intake whose counts_by_event_type is computed from the same preview rows with the same sums; mergeCounts adds both, and the recovery artifact reports 'Counts by event: {page_view:440, cta_click:96, line_add:24}' — exactly double the owner's actual aggregates. The bundled fixtures never set intake counts_by_event_type, so they cannot catch it.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-032",
+        "file": "scripts/owner-gate-evidence.mjs",
+        "line": 406,
+        "severity": "medium",
+        "category": "security",
+        "summary": "The secret-value detector's regex requires a hyphen after the token prefix (e.g. 'ghp-'), but the real token formats it names use underscores ('ghp_', 'gho_', 'github_pat_', and Stripe 'sk_live_'), so raw secrets pasted into free-text evidence fields pass validation undetected.",
+        "failure_scenario": "Owner pastes a real GitHub PAT into a required free-text field, e.g. owner_gate_evidence.json github gate with verification_ref: \"verified via ghp_16AbCdEf0123456789XYZ\". isSensitiveField('verification_ref') does not match, and looksSensitiveValue fails because /\\b(?:sk|pk|pat|ghp|...)-[A-Za-z0-9_-]{12,}/ demands 'ghp-' with a hyphen. The gate is reported evidence_valid=true, ready_for_post_gate_verification=true, and the status/report assert sensitive_evidence_detected=false, while the live secret sits in the tracked repo artifact owner_gate_evidence.json that the guard claims to have screened. The identical broken pattern exists in scripts/approval-resume-plan.mjs line 186 (looksSecretValue), so the owner-approval-form -> approval-resume-plan round trip misses the same token in e.g. rollback_plan (the browser form's keyword-only check at scripts/owner-approval-form.mjs line 250 also cannot catch a bare token string). Note the fixture owner-approval-form-fixtures.mjs only exercises this path with the field NAME 'api_token' (caught by field-name matching), so the value-level detector's failure is never tested.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-033",
+        "file": "scripts/owner-quality-review-form.mjs",
+        "line": 364,
+        "severity": "medium",
+        "category": "gate-logic",
+        "summary": "The quality-review form conflates export validity with quality PASS: values below the retention thresholds or above the spam threshold disable both download buttons, so the form cannot export honest regression evidence that the downstream validator explicitly accepts as valid 'keep champion' input.",
+        "failure_scenario": "Owner measures a true regression (e.g. close_rate_retention_vs_champion = 0.7 < 0.8) and fills the form. validate() pushes 'close_retention_below_threshold' (lines 364-366), sets downloadJson.disabled = true (lines 372-373), and the documented flow ('place the downloaded JSON at data/owner_quality_review.filled.json, then run npm run owner:quality-review') becomes impossible. Yet owner-quality-review.mjs treats exactly this input as VALID (exit 0, status owner_quality_review_failed_keep_champion, quality regression correctly recorded), and the form's own fixture (owner-quality-review-form-fixtures.mjs scenario quality_form_export_regression_keeps_champion, close=0.7) replays a JSON the real form can never produce. Practical effect: the regression outcome can only be recorded by hand-editing JSON outside the form, and the path of least resistance in the UI is to raise the numbers above threshold, which flips the outcome to no_quality_regression=true and promotion_review_queued=true — converting a true quality regression into a queued promotion review.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-034",
+        "file": "scripts/north-star-outcome-preflight.mjs",
+        "line": 85,
+        "severity": "medium",
+        "category": "gate-bypass",
+        "summary": "rowsByKey is built with new Map(parsed.rows.map(...)), so duplicate (tracking_link_id, stage) rows in the filled ledger are silently collapsed last-wins with no issue or warning, while npm run source:compile sums every duplicate row — the preflight reports ready_for_outcome_source_compile for a batch that will double-count outcomes.",
+        "failure_scenario": "Owner appends a corrected deal row (count=5) below the original mistaken row (count=3) instead of editing it. The preflight validates only the last row, emits zero issues/warnings, and sets ready_for_source_compile=true; source-capture-compile.mjs then compiles both rows into the owner-preview CSV (8 deals instead of 5), inflating deal/lead/link_click outcome aggregates that feed the North Star report and weekly scoring inputs.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-035",
+        "file": "scripts/data-collection-progress.mjs",
+        "line": 268,
+        "severity": "medium",
+        "category": "gate-bypass",
+        "summary": "Filled-task matching keys on (tracking_link_id, event_type) only and ignores the ledger row's week_start, so a stale prior-week source_capture_ledger.filled.csv / sample_gate_ledger.filled.csv marks the new week's entire collection queue as filled.",
+        "failure_scenario": "Week N: owner fills all rows in source_capture_ledger.filled.csv. Week N+1: the weekly runner regenerates data_collection_queue.json with new week dates but the same link_ids/event_types, and the old filled.csv is still on disk. Every taskRow gets filled=true from last week's counts, status becomes all_collection_rows_filled_review_next, next_owner_inputs is empty, and the owner is told nothing needs collecting for a week that actually has zero captured counts.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-036",
+        "file": "scripts/north-star-outcome-form.mjs",
+        "line": 315,
+        "severity": "medium",
+        "category": "silent-data-loss",
+        "summary": "The form's downloaded CSV contains only the 24 P1 outcome rows (rows are pre-filtered to OUTCOME_EVENTS before rendering/toCsv), yet the HTML hard-rules instruct the owner to place it at the shared data/source_capture/source_capture_ledger.filled.csv — overwriting and silently discarding any P0 page_view/cta_click/line_add rows previously filled in that same file.",
+        "failure_scenario": "Owner fills P0 sample-gate rows in source_capture_ledger.filled.csv (the owner_fill_path every P0 task in data_collection_queue.json points to), then later uses north_star_outcome_form.html and follows its instruction to save the download to that path. The 42-row file is replaced by a 24-row file with no page_view/cta_click/line_add rows; the next source:compile and data-collection-progress run lose the P0 counts with no error, regressing the sample-gate progress and any recompiled funnel preview.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-037",
+        "file": "scripts/gate-readiness-matrix.mjs",
+        "line": 183,
+        "severity": "medium",
+        "category": "gate-bypass",
+        "summary": "The launch_readiness.local_preflight_ok dependency never checks the actual local preflight results; it returns ok when gate.status === \"owner_approval_required\", which growth-loop.mjs hardcodes on every owner gate, making this dependency always-true.",
+        "failure_scenario": "launch_readiness.json currently has local_preflight_ok=false (weekly_runner preflight failed), yet data/gate_readiness_status.json shows the remote_d1_create_and_migrate dependency 'launch_readiness.local_preflight_ok' as ok=true. The remote D1 gate's only other dependencies are the hardcoded-true schema check and approval metadata, so the moment the owner fills valid non-secret approval metadata, the matrix reports ready_for_owner_execution=true and tells the owner 'Owner may execute this gate manually' while local preflight is failing — a false-ready that defeats the matrix's stated purpose of validating prerequisites. The needed data (context.localPreflight) is already passed into dependencyStatus but unused.",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      },
+      {
+        "id": "confirmed-038",
+        "file": "scripts/artifact-retention-monitor.mjs",
+        "line": 163,
+        "severity": "medium",
+        "category": "data-loss",
+        "summary": "Cleanup candidates are selected as the first (count - keep_latest_recommended) items after a lexicographic path sort, not by modified time, so for the logs section the owner-facing deletion guidance flags the NEWEST files as 'older' cleanup candidates and keeps older ones.",
+        "failure_scenario": "Live state confirms it: logs/ has 1186 files with mixed name prefixes; the 1066 flagged candidates in data/artifact_retention_status.json include logs/champion-integration-smoke-20260710T091839Z.log (modified 2026-07-10 09:18 — the newest log in the directory), logs/approval-plan-current-state.log (2026-07-10), and logs/.gitkeep (a tracked repo placeholder), while genuinely older weekly-runner-20260708T2055*.log files land in the 'kept newest 120'. The report and review pack tell the owner 'Keep the newest 120 files and manually review older local-only artifacts' — an owner who follows this and deletes the listed candidates destroys the current day's run logs and .gitkeep while retaining stale ones. newest_item/oldest_item are mislabeled by the same path-sort assumption (oldest_item is currently .gitkeep).",
+        "status": "unresolved",
+        "resolution": null,
+        "waiver": null
+      }
+    ]
+  },
+  "checks": [
+    {
+      "name": "unit_tests",
+      "ok": true,
+      "exit_code": 0,
+      "signal": null,
+      "duration_ms": 425,
+      "output_tail": "✔ auditOwnedFiles reports syntax and JSON failures without exposing file contents (151.454042ms)\n✔ inventory classifies every file while isolating owned source (61.930583ms)\n✔ resolveProjectPath rejects traversal and symlink escape (19.09725ms)\n✔ findings are normalized and unresolved confirmed high findings block deployment (15.793584ms)\n✔ deployment readiness requires zero high findings and every verification signal (0.488291ms)\n✔ resolution ledger closes a finding only with dated test evidence (11.806875ms)\n✔ incomplete waiver fails closed (17.16875ms)\nℹ tests 7\nℹ suites 0\nℹ pass 7\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 316.090458"
+    },
+    {
+      "name": "mcp_stdio_smoke",
+      "ok": true,
+      "exit_code": 0,
+      "signal": null,
+      "duration_ms": 1003,
+      "output_tail": "{\n  \"ok\": true,\n  \"tools\": [\n    \"deployment_gate\",\n    \"review_file\",\n    \"review_findings\",\n    \"review_inventory\"\n  ],\n  \"checks\": 5\n}"
+    },
+    {
+      "name": "dependency_audit",
+      "ok": true,
+      "exit_code": 0,
+      "signal": null,
+      "duration_ms": 1380,
+      "output_tail": "{\n  \"auditReportVersion\": 2,\n  \"vulnerabilities\": {},\n  \"metadata\": {\n    \"vulnerabilities\": {\n      \"info\": 0,\n      \"low\": 0,\n      \"moderate\": 0,\n      \"high\": 0,\n      \"critical\": 0,\n      \"total\": 0\n    },\n    \"dependencies\": {\n      \"prod\": 94,\n      \"dev\": 91,\n      \"optional\": 58,\n      \"peer\": 0,\n      \"peerOptional\": 0,\n      \"total\": 184\n    }\n  }\n}"
+    },
+    {
+      "name": "worker_dry_run",
+      "ok": true,
+      "exit_code": 0,
+      "signal": null,
+      "duration_ms": 2001,
+      "output_tail": "> 3q-growth-loop@0.1.0 worker:dry-run\n> wrangler deploy --dry-run\n\n\n ⛅️ wrangler 4.108.0 (update available 4.110.0)\n───────────────────────────────────────────────\nTotal Upload: 36.40 KiB / gzip: 10.03 KiB\nYour Worker has access to the following bindings:\nBinding                                                                     Resource                  \nenv.DB (3q-growth-loop-candidate)                                           D1 Database               \nenv.ENVIRONMENT (\"candidate\")                                               Environment Variable      \nenv.PUBLIC_BASE_URL (\"https://3q-growth-loop-candidate.milk...\")            Environment Variable      \nenv.CHAMPION_URL (\"https://3q-site.milk790.workers.dev/\")                   Environment Variable      \nenv.CHAMPION_ORIGIN (\"https://3q-site.milk790.workers.dev\")                 Environment Variable      \nenv.CHALLENGER_URL (\"/candidate\")                                           Environment Variable      \nenv.LINE_URL (\"https://lin.ee/VZvs7sj\")                                     Environment Variable      \nenv.AB_TEST_ID (\"ab-week0-cta-text-001\")                                    Environment Variable      \nenv.CHAMPION_ASSET_ID (\"champion-3q-line-v0\")                               Environment Variable      \nenv.CHALLENGER_ASSET_ID (\"challenger-week0-cta-text-v1\")                    Environment Variable      \nenv.AB_CHALLENGER_PERCENT (\"10\")                                            Environment Variable      \n\n--dry-run: exiting now."
+    },
+    {
+      "name": "artifact_verifier",
+      "ok": true,
+      "exit_code": 0,
+      "signal": null,
+      "duration_ms": 449,
+      "output_tail": "unt-recovery-fixtures.mjs\",\n      \"ok\": true,\n      \"bytes\": 28701\n    },\n    {\n      \"file\": \"scripts/p0-counts-preflight.mjs\",\n      \"ok\": true,\n      \"bytes\": 12853\n    },\n    {\n      \"file\": \"scripts/p0-counts-preflight-fixtures.mjs\",\n      \"ok\": true,\n      \"bytes\": 7734\n    },\n    {\n      \"file\": \"scripts/owner-action-launcher.mjs\",\n      \"ok\": true,\n      \"bytes\": 51598\n    },\n    {\n      \"file\": \"scripts/owner-approval-form.mjs\",\n      \"ok\": true,\n      \"bytes\": 18020\n    },\n    {\n      \"file\": \"scripts/owner-approval-form-fixtures.mjs\",\n      \"ok\": true,\n      \"bytes\": 9692\n    },\n    {\n      \"file\": \"scripts/growth-loop.mjs\",\n      \"ok\": true,\n      \"bytes\": 356090\n    },\n    {\n      \"file\": \"scripts/line-inbound-playbook.mjs\",\n      \"ok\": true,\n      \"bytes\": 18069\n    },\n    {\n      \"file\": \"scripts/manual-publish-packet.mjs\",\n      \"ok\": true,\n      \"bytes\": 11374\n    },\n    {\n      \"file\": \"scripts/manual-publish-capture-plan.mjs\",\n      \"ok\": true,\n      \"bytes\": 13629\n    },\n    {\n      \"file\": \"scripts/manual-publish-brief.mjs\",\n      \"ok\": true,\n      \"bytes\": 11284\n    },\n    {\n      \"file\": \"scripts/public-tracking-url-pack.mjs\",\n      \"ok\": true,\n      \"bytes\": 16683\n    },\n    {\n      \"file\": \"scripts/owner-public-url-approval-preview.mjs\",\n      \"ok\": true,\n      \"bytes\": 14038\n    },\n    {\n      \"file\": \"scripts/manual-publish-evidence.mjs\",\n      \"ok\": true,\n      \"bytes\": 17481\n    },\n    {\n      \"file\": \"scripts/manual-publish-evidence-form.mjs\",\n      \"ok\": true,\n      \"bytes\": 15387\n    },\n    {\n      \"file\": \"scripts/manual-publish-evidence-form-fixtures.mjs\",\n      \"ok\": true,\n      \"bytes\": 10068\n    },\n    {\n      \"file\": \"scripts/manual-publish-evidence-fixtures.mjs\",\n      \"ok\": true,\n      \"bytes\": 9080\n    },\n    {\n      \"file\": \"scripts/artifact-retention-monitor.mjs\",\n      \"ok\": true,\n      \"bytes\": 12152\n    },\n    {\n      \"file\": \"scripts/artifact-retention-review-pack.mjs\",\n      \"ok\": true,\n      \"bytes\": 11063\n    }\n  ]\n}"
+    }
+  ],
+  "external": {
+    "github": {
+      "pr": 74,
+      "merged": true,
+      "merge_commit": "f86faa7356ac7962d9b429951b67c742370271c0",
+      "workflow_green": false
+    },
+    "live": {
+      "deployed": true,
+      "worker": "3q-site",
+      "build": "growth-loop-telemetry-v2",
+      "collector_configured": true,
+      "collector_url_matches_expected": true
+    }
+  },
+  "gate": {
+    "status": "DEPLOY_READY",
+    "deploy_allowed": false,
+    "external_action_required": true,
+    "blockers": [],
+    "warnings": [
+      "28 unresolved confirmed medium finding(s)"
+    ],
+    "rationale": "Local review checks are green; deployment remains a human-authorized external action."
+  },
+  "exclusions": {
+    "dependency": "inventoried, not treated as owned source; assessed through lockfile and npm audit",
+    "archive": "inventoried, immutable historical evidence",
+    "generated": "inventoried, regenerated outputs or export bundles",
+    "cache": "inventoried, local Wrangler state",
+    "logs": "inventoried, runtime evidence"
+  }
+}

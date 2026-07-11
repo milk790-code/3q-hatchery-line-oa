@@ -1,0 +1,35 @@
+{
+  "generated_at": "2026-07-10T21:48:20.707Z",
+  "test_id": "ab-week0-cta-text-001",
+  "status": "sample_insufficient_keep_champion",
+  "week": {
+    "start": "2026-06-29",
+    "end": "2026-07-05",
+    "startUtc": "2026-06-28T16:00:00.000Z",
+    "endUtc": "2026-07-05T15:59:59.999Z"
+  },
+  "changed_variable": "cta_text",
+  "one_variable_rule_ok": true,
+  "traffic_allocation": {
+    "champion": 90,
+    "challenger": 10
+  },
+  "routing_endpoint": "http://127.0.0.1:8787/ab/ab-week0-cta-text-001",
+  "status_endpoint": "http://127.0.0.1:8787/ab/status",
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "small_traffic_only": true,
+  "events_observed": 0,
+  "champion_asset_id": "champion-3q-line-v0",
+  "challenger_asset_id": "challenger-week0-cta-text-v1",
+  "champion_line_add_rate": 0,
+  "challenger_line_add_rate": 0,
+  "lift": null,
+  "sample_threshold_met": false,
+  "no_quality_regression": true,
+  "quality_regression_reasons": [],
+  "lead_rate_retention_vs_champion": null,
+  "close_rate_retention_vs_champion": null,
+  "challenger_win_rule_met": false,
+  "decision": "do_not_promote_challenger"
+}

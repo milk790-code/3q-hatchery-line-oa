@@ -1,0 +1,38 @@
+# 3Q Growth Loop Next P0 Paste Counts Template
+# Replace metadata placeholders and every <count> with non-sensitive aggregate values.
+# Weekly runs preserve partial edits and auto-read this file only when metadata and all counts are complete; otherwise run manually:
+# npm run next-p0:quick -- --counts-file=data/next_p0_quick_capture/next_p0_owner_inputs.counts-paste-template.txt --capture-date=2026-07-11 --evidence-ref=<aggregate_ref> --reviewer=<alias> --pii-checked=yes
+# Keep this aggregate-only: no phone, email, LINE user ID, customer name, chat text, order ID, payment ID, or private note.
+
+capture_date=2026-07-11
+evidence_ref=<aggregate_ref>
+reviewer=<alias>
+pii_checked=<yes_after_aggregate_only_review>
+
+# rank 1 / champion / page_view / track-champion-3q-line-v0
+champion.visits=<count>
+
+# rank 2 / champion / cta_click / track-champion-3q-line-v0
+champion.cta=<count>
+
+# rank 3 / champion / line_add / track-champion-3q-line-v0
+champion.line=<count>
+
+# rank 4 / challenger / page_view / track-challenger-week0-cta-text-v1
+challenger.visits=<count>
+
+# rank 5 / challenger / cta_click / track-challenger-week0-cta-text-v1
+challenger.cta=<count>
+
+# rank 6 / challenger / line_add / track-challenger-week0-cta-text-v1
+challenger.line=<count>
+
+# rank 7 / line_cta / page_view / track-challenger-week0-cta-text-v1-line
+line_cta.visits=<count>
+
+# rank 8 / line_cta / cta_click / track-challenger-week0-cta-text-v1-line
+line_cta.cta=<count>
+
+# rank 9 / line_cta / line_add / track-challenger-week0-cta-text-v1-line
+line_cta.line=<count>
+

@@ -1,0 +1,270 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:45:44.010Z",
+  "mode": "sample_gate_recovery_pack_local_only",
+  "status": "sample_gate_due_recovery_ready",
+  "week": {
+    "start": "2026-06-29",
+    "end": "2026-07-05",
+    "startUtc": "2026-06-28T16:00:00.000Z",
+    "endUtc": "2026-07-05T15:59:59.999Z"
+  },
+  "current_round": {
+    "changed_variable": "cta_text",
+    "one_variable_rule": [
+      "hook",
+      "offer",
+      "visual_claim",
+      "cta_text"
+    ]
+  },
+  "due_status": "day7_due_waiting_for_owner_counts",
+  "due_phase": "preferred_check_due",
+  "due_date": "2026-07-05",
+  "due_now": true,
+  "days_since_min_check": 10,
+  "preferred_check_date": "2026-07-05",
+  "current_real_event_rows": 0,
+  "p0_input_count": 9,
+  "p0_pending_count": 18,
+  "quick_count_count": 0,
+  "missing_rank_count": 9,
+  "missing_ranks": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+  ],
+  "sample_threshold_met": false,
+  "sample_rate_win_candidate": false,
+  "champion_action": "keep_champion_sample_insufficient",
+  "challenger_promotion_allowed": false,
+  "next_variable_rotation_allowed": false,
+  "sample_gaps": {
+    "visits": 100,
+    "cta_clicks": 20,
+    "line_adds": 5,
+    "test_days": 3
+  },
+  "source_groups": [
+    {
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "row_count": 6,
+      "missing_count": 6,
+      "event_types": [
+        "cta_click",
+        "page_view"
+      ],
+      "target_live_files": [
+        "data/funnel_aggregates.csv"
+      ],
+      "external_effect": false
+    },
+    {
+      "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+      "row_count": 3,
+      "missing_count": 3,
+      "event_types": [
+        "line_add"
+      ],
+      "target_live_files": [
+        "data/manual_conversions.csv"
+      ],
+      "external_effect": false
+    }
+  ],
+  "recovery_rows": [
+    {
+      "rank": 1,
+      "role": "champion",
+      "tracking_link_id": "track-champion-3q-line-v0",
+      "event_type": "page_view",
+      "stage_label": "落地頁瀏覽",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "target_live_file": "data/funnel_aggregates.csv",
+      "evidence_rule": "只記 aggregate page views；不要存 IP、User-Agent、個人識別。",
+      "missing": true,
+      "external_effect": false
+    },
+    {
+      "rank": 2,
+      "role": "champion",
+      "tracking_link_id": "track-champion-3q-line-v0",
+      "event_type": "cta_click",
+      "stage_label": "CTA 點擊",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "target_live_file": "data/funnel_aggregates.csv",
+      "evidence_rule": "只記 aggregate CTA clicks；不要存個別 session 明細。",
+      "missing": true,
+      "external_effect": false
+    },
+    {
+      "rank": 3,
+      "role": "champion",
+      "tracking_link_id": "track-champion-3q-line-v0",
+      "event_type": "line_add",
+      "stage_label": "LINE 進線 / 加好友",
+      "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+      "target_live_file": "data/manual_conversions.csv",
+      "evidence_rule": "只記新增數或進線數；不要貼 LINE user id、暱稱、聊天內容。",
+      "missing": true,
+      "external_effect": false
+    },
+    {
+      "rank": 4,
+      "role": "challenger",
+      "tracking_link_id": "track-challenger-week0-cta-text-v1",
+      "event_type": "page_view",
+      "stage_label": "落地頁瀏覽",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "target_live_file": "data/funnel_aggregates.csv",
+      "evidence_rule": "只記 aggregate page views；不要存 IP、User-Agent、個人識別。",
+      "missing": true,
+      "external_effect": false
+    },
+    {
+      "rank": 5,
+      "role": "challenger",
+      "tracking_link_id": "track-challenger-week0-cta-text-v1",
+      "event_type": "cta_click",
+      "stage_label": "CTA 點擊",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "target_live_file": "data/funnel_aggregates.csv",
+      "evidence_rule": "只記 aggregate CTA clicks；不要存個別 session 明細。",
+      "missing": true,
+      "external_effect": false
+    },
+    {
+      "rank": 6,
+      "role": "challenger",
+      "tracking_link_id": "track-challenger-week0-cta-text-v1",
+      "event_type": "line_add",
+      "stage_label": "LINE 進線 / 加好友",
+      "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+      "target_live_file": "data/manual_conversions.csv",
+      "evidence_rule": "只記新增數或進線數；不要貼 LINE user id、暱稱、聊天內容。",
+      "missing": true,
+      "external_effect": false
+    },
+    {
+      "rank": 7,
+      "role": "line_cta",
+      "tracking_link_id": "track-challenger-week0-cta-text-v1-line",
+      "event_type": "page_view",
+      "stage_label": "落地頁瀏覽",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "target_live_file": "data/funnel_aggregates.csv",
+      "evidence_rule": "只記 aggregate page views；不要存 IP、User-Agent、個人識別。",
+      "missing": true,
+      "external_effect": false
+    },
+    {
+      "rank": 8,
+      "role": "line_cta",
+      "tracking_link_id": "track-challenger-week0-cta-text-v1-line",
+      "event_type": "cta_click",
+      "stage_label": "CTA 點擊",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "target_live_file": "data/funnel_aggregates.csv",
+      "evidence_rule": "只記 aggregate CTA clicks；不要存個別 session 明細。",
+      "missing": true,
+      "external_effect": false
+    },
+    {
+      "rank": 9,
+      "role": "line_cta",
+      "tracking_link_id": "track-challenger-week0-cta-text-v1-line",
+      "event_type": "line_add",
+      "stage_label": "LINE 進線 / 加好友",
+      "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+      "target_live_file": "data/manual_conversions.csv",
+      "evidence_rule": "只記新增數或進線數；不要貼 LINE user id、暱稱、聊天內容。",
+      "missing": true,
+      "external_effect": false
+    }
+  ],
+  "paste_template_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/next_p0_quick_capture/next_p0_owner_inputs.counts-paste-template.txt",
+  "browser_form_path": "next_p0_owner_form.html",
+  "sample_gate_form_path": "sample_gate_owner_form.html",
+  "focused_intake_path": "next_p0_owner_intake.md",
+  "sample_gate_intake_path": "owner_sample_gate_intake.md",
+  "command_sequence_after_owner_counts": [
+    "npm run next-p0:quick",
+    "npm run next-p0:intake",
+    "npm run owner:data-preflight",
+    "npm run data:progress",
+    "npm run owner:sample-gate",
+    "npm run owner:next-action",
+    "npm run sample-gate:recovery",
+    "npm run weekly:local"
+  ],
+  "owner_fast_path": [
+    {
+      "step": 1,
+      "action": "Open the paste template or focused browser form.",
+      "artifact": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/next_p0_quick_capture/next_p0_owner_inputs.counts-paste-template.txt",
+      "external_effect": false
+    },
+    {
+      "step": 2,
+      "action": "Fill only aggregate counts for the missing ranks, plus capture_date, evidence_ref, reviewer, and pii_checked=yes.",
+      "artifact": "next_p0_owner_inputs.json",
+      "external_effect": false
+    },
+    {
+      "step": 3,
+      "action": "Run the local preview commands; do not stage, publish, deploy, change links, push LINE, or mutate customer data.",
+      "artifact": "next_p0_owner_intake.md",
+      "external_effect": false
+    }
+  ],
+  "blocked_actions": [
+    "fake_or_backfill_counts_without_owner_source",
+    "stage_owner_download_without_review",
+    "append_to_data_lp_events_jsonl",
+    "promote_challenger_to_champion",
+    "rotate_next_variable",
+    "formal_social_post_or_schedule",
+    "line_push_or_broadcast",
+    "public_ab_or_bio_link_change",
+    "production_worker_deploy",
+    "github_push_or_pr_creation",
+    "customer_data_mutation",
+    "ecpay_payment_refund_or_capture",
+    "delete_data_or_retire_live_assets"
+  ],
+  "review_artifacts": [
+    "sample_gate_recovery_pack.md",
+    "sample_gate_due_status.md",
+    "owner_next_action.md",
+    "next_p0_quick_capture.md",
+    "data/next_p0_quick_capture/next_p0_owner_inputs.counts-paste-template.txt",
+    "next_p0_owner_form.html",
+    "next_p0_owner_inputs.md",
+    "data_collection_progress.md",
+    "owner_sample_gate_status.md",
+    "sample_gate_capture_calendar.md"
+  ],
+  "outputs": {
+    "recovery_json": "sample_gate_recovery_pack.json",
+    "recovery_md": "sample_gate_recovery_pack.md",
+    "status_json": "data/sample_gate_recovery_pack_status.json"
+  },
+  "external_effect": false,
+  "live_input_files_created": false,
+  "data_lp_events_write_performed": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Local Day 3 / Day 7 recovery pack only. It packages existing sample-gate counts needed from the owner and writes no live input, event, external, deploy, GitHub, post, LINE, payment, customer-data, or delete action."
+}

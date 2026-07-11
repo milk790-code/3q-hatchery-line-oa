@@ -1,0 +1,990 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:45:09.277Z",
+  "mode": "next_p0_quick_capture_fixture_dry_run",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/next_p0_quick_capture_fixture_status.json",
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/next_p0_quick_capture_fixture_report.md",
+  "scenario_count": 9,
+  "scenario_ids": [
+    "waiting_without_counts",
+    "valid_quick_counts_preview_ready",
+    "labelled_quick_counts_preview_ready",
+    "labelled_counts_file_preview_ready",
+    "auto_paste_template_preview_ready",
+    "partial_auto_paste_template_waiting",
+    "incomplete_quick_counts_blocked",
+    "sensitive_evidence_blocked",
+    "strict_sensitive_evidence_fails"
+  ],
+  "row_count": 9,
+  "scenarios": [
+    {
+      "id": "waiting_without_counts",
+      "ok": true,
+      "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-waiting_without_counts-7kaB1G",
+      "command": "node scripts/next-p0-quick-capture.mjs --output-dir=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-waiting_without_counts-7kaB1G/quick --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-waiting_without_counts-7kaB1G/status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-waiting_without_counts-7kaB1G/report.md --real-events=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-waiting_without_counts-7kaB1G/lp_events.jsonl",
+      "exit_code": 0,
+      "status": "waiting_for_quick_counts",
+      "checks": [
+        {
+          "name": "status_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "template_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "paste_template_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "paste_template_path",
+          "ok": true,
+          "expected": "counts-paste-template.txt",
+          "actual": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-waiting_without_counts-7kaB1G/quick/next_p0_owner_inputs.counts-paste-template.txt",
+          "external_effect": false
+        },
+        {
+          "name": "no_live_input",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_inbox_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "exit_success",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "waiting_status",
+          "ok": true,
+          "expected": "waiting_for_quick_counts",
+          "actual": "waiting_for_quick_counts",
+          "external_effect": false
+        },
+        {
+          "name": "filled_preview_not_created",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        }
+      ],
+      "live_project_inputs_created": false,
+      "owner_inbox_write_performed": false,
+      "stage_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "valid_quick_counts_preview_ready",
+      "ok": true,
+      "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-valid_quick_counts_preview_ready-TW3rSk",
+      "command": "node scripts/next-p0-quick-capture.mjs --output-dir=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-valid_quick_counts_preview_ready-TW3rSk/quick --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-valid_quick_counts_preview_ready-TW3rSk/status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-valid_quick_counts_preview_ready-TW3rSk/report.md --real-events=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-valid_quick_counts_preview_ready-TW3rSk/lp_events.jsonl --counts=1=100,2=21,3=7,4=103,5=24,6=10,7=106,8=27,9=13 --capture-date=2026-07-08 --evidence-ref=fixture_aggregate_review --reviewer=fixture-owner --pii-checked=yes",
+      "exit_code": 0,
+      "status": "quick_counts_preview_ready",
+      "checks": [
+        {
+          "name": "status_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "template_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "paste_template_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "paste_template_path",
+          "ok": true,
+          "expected": "counts-paste-template.txt",
+          "actual": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-valid_quick_counts_preview_ready-TW3rSk/quick/next_p0_owner_inputs.counts-paste-template.txt",
+          "external_effect": false
+        },
+        {
+          "name": "no_live_input",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_inbox_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "exit_success",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "preview_status",
+          "ok": true,
+          "expected": "quick_counts_preview_ready",
+          "actual": "quick_counts_preview_ready",
+          "external_effect": false
+        },
+        {
+          "name": "filled_preview_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "rows_created",
+          "ok": true,
+          "expected": 9,
+          "actual": 9,
+          "external_effect": false
+        }
+      ],
+      "live_project_inputs_created": false,
+      "owner_inbox_write_performed": false,
+      "stage_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "labelled_quick_counts_preview_ready",
+      "ok": true,
+      "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-labelled_quick_counts_preview_ready-3DPcTy",
+      "command": "node scripts/next-p0-quick-capture.mjs --output-dir=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-labelled_quick_counts_preview_ready-3DPcTy/quick --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-labelled_quick_counts_preview_ready-3DPcTy/status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-labelled_quick_counts_preview_ready-3DPcTy/report.md --real-events=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-labelled_quick_counts_preview_ready-3DPcTy/lp_events.jsonl --counts=champion.visits=100;champion.cta=21;champion.line=7;challenger.visits=103;challenger.cta=24;challenger.line=10;line_cta.visits=106;line_cta.cta=27;line_cta.line=13 --capture-date=2026-07-08 --evidence-ref=fixture_aggregate_review --reviewer=fixture-owner --pii-checked=yes",
+      "exit_code": 0,
+      "status": "quick_counts_preview_ready",
+      "checks": [
+        {
+          "name": "status_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "template_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "paste_template_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "paste_template_path",
+          "ok": true,
+          "expected": "counts-paste-template.txt",
+          "actual": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-labelled_quick_counts_preview_ready-3DPcTy/quick/next_p0_owner_inputs.counts-paste-template.txt",
+          "external_effect": false
+        },
+        {
+          "name": "no_live_input",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_inbox_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "exit_success",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "preview_status",
+          "ok": true,
+          "expected": "quick_counts_preview_ready",
+          "actual": "quick_counts_preview_ready",
+          "external_effect": false
+        },
+        {
+          "name": "filled_preview_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "rows_created",
+          "ok": true,
+          "expected": 9,
+          "actual": 9,
+          "external_effect": false
+        }
+      ],
+      "live_project_inputs_created": false,
+      "owner_inbox_write_performed": false,
+      "stage_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "labelled_counts_file_preview_ready",
+      "ok": true,
+      "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-labelled_counts_file_preview_ready-xN9X0G",
+      "command": "node scripts/next-p0-quick-capture.mjs --output-dir=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-labelled_counts_file_preview_ready-xN9X0G/quick --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-labelled_counts_file_preview_ready-xN9X0G/status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-labelled_counts_file_preview_ready-xN9X0G/report.md --real-events=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-labelled_counts_file_preview_ready-xN9X0G/lp_events.jsonl --counts-file=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-labelled_counts_file_preview_ready-xN9X0G/counts.txt --capture-date=2026-07-08 --evidence-ref=fixture_aggregate_review --reviewer=fixture-owner --pii-checked=yes",
+      "exit_code": 0,
+      "status": "quick_counts_preview_ready",
+      "checks": [
+        {
+          "name": "status_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "template_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "paste_template_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "paste_template_path",
+          "ok": true,
+          "expected": "counts-paste-template.txt",
+          "actual": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-labelled_counts_file_preview_ready-xN9X0G/quick/next_p0_owner_inputs.counts-paste-template.txt",
+          "external_effect": false
+        },
+        {
+          "name": "no_live_input",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_inbox_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "exit_success",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "preview_status",
+          "ok": true,
+          "expected": "quick_counts_preview_ready",
+          "actual": "quick_counts_preview_ready",
+          "external_effect": false
+        },
+        {
+          "name": "filled_preview_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "rows_created",
+          "ok": true,
+          "expected": 9,
+          "actual": 9,
+          "external_effect": false
+        }
+      ],
+      "live_project_inputs_created": false,
+      "owner_inbox_write_performed": false,
+      "stage_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "auto_paste_template_preview_ready",
+      "ok": true,
+      "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-auto_paste_template_preview_ready-xsIVqu",
+      "command": "node scripts/next-p0-quick-capture.mjs --output-dir=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-auto_paste_template_preview_ready-xsIVqu/quick --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-auto_paste_template_preview_ready-xsIVqu/status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-auto_paste_template_preview_ready-xsIVqu/report.md --real-events=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-auto_paste_template_preview_ready-xsIVqu/lp_events.jsonl",
+      "exit_code": 0,
+      "status": "quick_counts_preview_ready",
+      "checks": [
+        {
+          "name": "status_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "template_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "paste_template_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "paste_template_path",
+          "ok": true,
+          "expected": "counts-paste-template.txt",
+          "actual": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-auto_paste_template_preview_ready-xsIVqu/quick/next_p0_owner_inputs.counts-paste-template.txt",
+          "external_effect": false
+        },
+        {
+          "name": "no_live_input",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_inbox_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "exit_success",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "preview_status",
+          "ok": true,
+          "expected": "quick_counts_preview_ready",
+          "actual": "quick_counts_preview_ready",
+          "external_effect": false
+        },
+        {
+          "name": "filled_preview_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "rows_created",
+          "ok": true,
+          "expected": 9,
+          "actual": 9,
+          "external_effect": false
+        },
+        {
+          "name": "auto_counts_file_used",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "counts_source",
+          "ok": true,
+          "expected": "auto_paste_template",
+          "actual": "auto_paste_template",
+          "external_effect": false
+        },
+        {
+          "name": "paste_template_preserved",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "metadata_from_counts_file",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        }
+      ],
+      "live_project_inputs_created": false,
+      "owner_inbox_write_performed": false,
+      "stage_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "partial_auto_paste_template_waiting",
+      "ok": true,
+      "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-partial_auto_paste_template_waiting-zZZmq6",
+      "command": "node scripts/next-p0-quick-capture.mjs --output-dir=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-partial_auto_paste_template_waiting-zZZmq6/quick --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-partial_auto_paste_template_waiting-zZZmq6/status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-partial_auto_paste_template_waiting-zZZmq6/report.md --real-events=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-partial_auto_paste_template_waiting-zZZmq6/lp_events.jsonl",
+      "exit_code": 0,
+      "status": "partial_quick_counts_waiting",
+      "checks": [
+        {
+          "name": "status_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "template_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "paste_template_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "paste_template_path",
+          "ok": true,
+          "expected": "counts-paste-template.txt",
+          "actual": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-partial_auto_paste_template_waiting-zZZmq6/quick/next_p0_owner_inputs.counts-paste-template.txt",
+          "external_effect": false
+        },
+        {
+          "name": "no_live_input",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_inbox_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "exit_success",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "partial_status",
+          "ok": true,
+          "expected": "partial_quick_counts_waiting",
+          "actual": "partial_quick_counts_waiting",
+          "external_effect": false
+        },
+        {
+          "name": "partial_auto_counts",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "partial_waiting",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "auto_counts_file_used",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "counts_source",
+          "ok": true,
+          "expected": "auto_paste_template",
+          "actual": "auto_paste_template",
+          "external_effect": false
+        },
+        {
+          "name": "filled_rank_progress",
+          "ok": true,
+          "expected": "partial progress",
+          "actual": {
+            "filled": 3,
+            "missing": 6
+          },
+          "external_effect": false
+        },
+        {
+          "name": "filled_preview_not_created",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "paste_template_preserved",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        }
+      ],
+      "live_project_inputs_created": false,
+      "owner_inbox_write_performed": false,
+      "stage_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "incomplete_quick_counts_blocked",
+      "ok": true,
+      "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-incomplete_quick_counts_blocked-tNyTKr",
+      "command": "node scripts/next-p0-quick-capture.mjs --output-dir=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-incomplete_quick_counts_blocked-tNyTKr/quick --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-incomplete_quick_counts_blocked-tNyTKr/status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-incomplete_quick_counts_blocked-tNyTKr/report.md --real-events=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-incomplete_quick_counts_blocked-tNyTKr/lp_events.jsonl --counts=1=100,2=20 --capture-date=2026-07-08 --evidence-ref=fixture_aggregate_review --reviewer=fixture-owner --pii-checked=yes",
+      "exit_code": 0,
+      "status": "blocked_invalid_quick_counts",
+      "checks": [
+        {
+          "name": "status_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "template_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "paste_template_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "paste_template_path",
+          "ok": true,
+          "expected": "counts-paste-template.txt",
+          "actual": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-incomplete_quick_counts_blocked-tNyTKr/quick/next_p0_owner_inputs.counts-paste-template.txt",
+          "external_effect": false
+        },
+        {
+          "name": "no_live_input",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_inbox_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "exit_success_soft_block",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "blocked_status",
+          "ok": true,
+          "expected": "blocked_invalid_quick_counts",
+          "actual": "blocked_invalid_quick_counts",
+          "external_effect": false
+        },
+        {
+          "name": "missing_ranks",
+          "ok": true,
+          "expected": "missing ranks",
+          "actual": [
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9"
+          ],
+          "external_effect": false
+        }
+      ],
+      "live_project_inputs_created": false,
+      "owner_inbox_write_performed": false,
+      "stage_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "sensitive_evidence_blocked",
+      "ok": true,
+      "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-sensitive_evidence_blocked-JiFAO0",
+      "command": "node scripts/next-p0-quick-capture.mjs --output-dir=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-sensitive_evidence_blocked-JiFAO0/quick --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-sensitive_evidence_blocked-JiFAO0/status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-sensitive_evidence_blocked-JiFAO0/report.md --real-events=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-sensitive_evidence_blocked-JiFAO0/lp_events.jsonl --counts=1=100,2=21,3=7,4=103,5=24,6=10,7=106,8=27,9=13 --capture-date=2026-07-08 --evidence-ref=owner@example.com --reviewer=fixture-owner --pii-checked=yes",
+      "exit_code": 0,
+      "status": "blocked_invalid_quick_counts",
+      "checks": [
+        {
+          "name": "status_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "template_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "paste_template_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "paste_template_path",
+          "ok": true,
+          "expected": "counts-paste-template.txt",
+          "actual": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-sensitive_evidence_blocked-JiFAO0/quick/next_p0_owner_inputs.counts-paste-template.txt",
+          "external_effect": false
+        },
+        {
+          "name": "no_live_input",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_inbox_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "exit_success_soft_block",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "blocked_status",
+          "ok": true,
+          "expected": "blocked_invalid_quick_counts",
+          "actual": "blocked_invalid_quick_counts",
+          "external_effect": false
+        },
+        {
+          "name": "sensitive_issue",
+          "ok": true,
+          "expected": "sensitive issue",
+          "actual": [
+            {
+              "row_number": null,
+              "field": "evidence_ref",
+              "message": "Sensitive-looking email detected. Use aggregate evidence refs only.",
+              "code": "invalid_value",
+              "external_effect": false
+            }
+          ],
+          "external_effect": false
+        }
+      ],
+      "live_project_inputs_created": false,
+      "owner_inbox_write_performed": false,
+      "stage_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "strict_sensitive_evidence_fails",
+      "ok": true,
+      "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-strict_sensitive_evidence_fails-uOIQJ8",
+      "command": "node scripts/next-p0-quick-capture.mjs --output-dir=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-strict_sensitive_evidence_fails-uOIQJ8/quick --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-strict_sensitive_evidence_fails-uOIQJ8/status.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-strict_sensitive_evidence_fails-uOIQJ8/report.md --real-events=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-strict_sensitive_evidence_fails-uOIQJ8/lp_events.jsonl --counts=1=100,2=21,3=7,4=103,5=24,6=10,7=106,8=27,9=13 --capture-date=2026-07-08 --evidence-ref=owner@example.com --reviewer=fixture-owner --pii-checked=yes --strict",
+      "exit_code": 1,
+      "status": "blocked_invalid_quick_counts",
+      "checks": [
+        {
+          "name": "status_json_written",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "template_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "paste_template_created",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "paste_template_path",
+          "ok": true,
+          "expected": "counts-paste-template.txt",
+          "actual": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-next-p0-quick-strict_sensitive_evidence_fails-uOIQJ8/quick/next_p0_owner_inputs.counts-paste-template.txt",
+          "external_effect": false
+        },
+        {
+          "name": "no_live_input",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_inbox_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "exit_failed_strict",
+          "ok": true,
+          "expected": "nonzero",
+          "actual": 1,
+          "external_effect": false
+        },
+        {
+          "name": "blocked_status",
+          "ok": true,
+          "expected": "blocked_invalid_quick_counts",
+          "actual": "blocked_invalid_quick_counts",
+          "external_effect": false
+        },
+        {
+          "name": "sensitive_issue",
+          "ok": true,
+          "expected": "sensitive issue",
+          "actual": [
+            {
+              "row_number": null,
+              "field": "evidence_ref",
+              "message": "Sensitive-looking email detected. Use aggregate evidence refs only.",
+              "code": "invalid_value",
+              "external_effect": false
+            }
+          ],
+          "external_effect": false
+        }
+      ],
+      "live_project_inputs_created": false,
+      "owner_inbox_write_performed": false,
+      "stage_performed": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    }
+  ],
+  "local_fixture_commands_executed": true,
+  "live_project_inputs_created": false,
+  "owner_inbox_write_performed": false,
+  "stage_performed": false,
+  "data_lp_events_write_performed": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "external_effect": false,
+  "note": "Fixture-only quick capture guard. It uses temporary paths and never writes project live inputs, inbox files, data/lp_events.jsonl, or external systems."
+}

@@ -1,0 +1,631 @@
+{
+  "generated_at": "2026-07-10T21:48:20.571Z",
+  "status": "owner_approval_required",
+  "mode": "week0_data_collection",
+  "owner_decision_required": true,
+  "local_preflight_ok": true,
+  "local_preflight": [
+    {
+      "id": "weekly_runner",
+      "ok": true,
+      "evidence": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/logs/weekly-runner-20260710T214317Z.log"
+    },
+    {
+      "id": "cloudflare_d1_metadata_readiness",
+      "ok": true,
+      "evidence": "cloudflare_d1_readiness.md"
+    },
+    {
+      "id": "live_telemetry_chain_readiness",
+      "ok": true,
+      "evidence": "live_telemetry_readiness.md"
+    },
+    {
+      "id": "d1_schema_contract",
+      "ok": true,
+      "evidence": "d1_schema_contract.md"
+    },
+    {
+      "id": "approved_d1_config_guard",
+      "ok": true,
+      "evidence": "approved_d1_config.md"
+    },
+    {
+      "id": "champion_github_handoff",
+      "ok": true,
+      "evidence": "champion_github_handoff.md"
+    },
+    {
+      "id": "candidate_worker_dry_run",
+      "ok": true,
+      "evidence": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/worker_dry_run.md"
+    },
+    {
+      "id": "browser_route_smoke",
+      "ok": true,
+      "evidence": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/logs/browser-smoke-20260710T214611Z.log"
+    },
+    {
+      "id": "tracking_link_smoke",
+      "ok": true,
+      "evidence": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/logs/tracking-link-smoke-20260710T214615Z.log"
+    },
+    {
+      "id": "event_contract_smoke",
+      "ok": true,
+      "evidence": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/logs/event-contract-smoke-20260710T214626Z.log"
+    },
+    {
+      "id": "event_input_quality_gate",
+      "ok": true,
+      "evidence": "data/event_input_quality_status.json"
+    },
+    {
+      "id": "funnel_aggregate_preview",
+      "ok": true,
+      "evidence": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/funnel_aggregates.preview.jsonl"
+    },
+    {
+      "id": "funnel_aggregate_fixtures",
+      "ok": true,
+      "evidence": "data/funnel_aggregate_fixture_status.json + funnel_aggregate_fixture_report.md"
+    },
+    {
+      "id": "real_data_apply_fixtures",
+      "ok": true,
+      "evidence": "data/real_data_apply_fixture_status.json + real_data_apply_fixture_report.md"
+    },
+    {
+      "id": "real_data_decision_replay",
+      "ok": true,
+      "evidence": "data/real_data_decision_replay_status.json + real_data_decision_replay_report.md"
+    },
+    {
+      "id": "source_readiness_monitor",
+      "ok": true,
+      "evidence": "data/source_readiness_status.json + source_readiness.md"
+    },
+    {
+      "id": "source_capture_pack",
+      "ok": true,
+      "evidence": "source_capture_pack.md + data/source_capture_status.json"
+    },
+    {
+      "id": "source_capture_compile",
+      "ok": true,
+      "evidence": "source_capture_compile_report.md + data/source_capture_compile_status.json"
+    },
+    {
+      "id": "source_capture_compile_fixtures",
+      "ok": true,
+      "evidence": "source_capture_compile_fixture_report.md + data/source_capture_compile_fixture_status.json"
+    },
+    {
+      "id": "real_data_intake_plan",
+      "ok": true,
+      "evidence": "data/real_data_intake_status.json + real_data_intake_plan.md"
+    },
+    {
+      "id": "data_collection_brief",
+      "ok": true,
+      "evidence": "data_collection_brief.md + data_collection_queue.json + sample_gate_collection_plan.md + data/sample_gate_collection_plan_status.json"
+    },
+    {
+      "id": "data_collection_progress",
+      "ok": true,
+      "evidence": "data_collection_progress.md + data_collection_progress.json + data/data_collection_progress_status.json"
+    },
+    {
+      "id": "next_p0_owner_form",
+      "ok": true,
+      "evidence": "next_p0_owner_form.html + data/next_p0_owner_form_status.json"
+    },
+    {
+      "id": "next_p0_owner_form_fixtures",
+      "ok": true,
+      "evidence": "next_p0_owner_form_fixture_report.md + data/next_p0_owner_form_fixture_status.json"
+    },
+    {
+      "id": "next_p0_owner_intake",
+      "ok": true,
+      "evidence": "next_p0_owner_intake.md + data/next_p0_owner_intake_status.json"
+    },
+    {
+      "id": "next_p0_owner_intake_fixtures",
+      "ok": true,
+      "evidence": "next_p0_owner_intake_fixture_report.md + data/next_p0_owner_intake_fixture_status.json"
+    },
+    {
+      "id": "manual_conversion_preview",
+      "ok": true,
+      "evidence": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/manual_conversions.preview.jsonl"
+    },
+    {
+      "id": "line_inbound_playbook",
+      "ok": true,
+      "evidence": "line_inbound_playbook.md + data/line_inbound_fixture_status.json"
+    },
+    {
+      "id": "manual_publish_evidence_form",
+      "ok": true,
+      "evidence": "manual_publish_evidence_form.html + data/manual_publish_evidence_form_status.json + manual_publish_evidence_form_fixture_report.md"
+    },
+    {
+      "id": "launchagent_local_schedule",
+      "ok": true,
+      "evidence": "data/launchagent_status.json"
+    },
+    {
+      "id": "sample_threshold_gate",
+      "ok": true,
+      "evidence": "growth_scores.json"
+    },
+    {
+      "id": "win_rule_fixtures",
+      "ok": true,
+      "evidence": "data/win_rule_fixture_status.json"
+    },
+    {
+      "id": "next_round_plan",
+      "ok": true,
+      "evidence": "next_round_plan.json"
+    },
+    {
+      "id": "content_variant_tracking",
+      "ok": true,
+      "evidence": "funnel_breakdown.json + tracking_links.json"
+    }
+  ],
+  "pending_human_approval_count": 5,
+  "pending_human_approvals": [
+    {
+      "id": "approve-d1-create-and-migrate",
+      "risk_tier": "T2",
+      "type": "cloudflare_d1_setup",
+      "artifact": "schema/d1-week0.sql",
+      "human_gate": "Confirm the newly observed dedicated D1, separately approve its remote schema migration, and explicitly scope recurring aggregate-only reads."
+    },
+    {
+      "id": "approve-candidate-worker-deploy",
+      "risk_tier": "T3",
+      "type": "candidate_worker_existing_deployment_provenance",
+      "artifact": "live_telemetry_readiness.md",
+      "human_gate": "Confirm the observed Candidate Worker deployment provenance and rollback reference; do not redeploy unless the live version is rejected."
+    },
+    {
+      "id": "approve-small-ab-link",
+      "risk_tier": "T3",
+      "type": "ab_traffic_link_change",
+      "artifact": "ab_test_status.json",
+      "human_gate": "Approve any small-traffic link routing before changing public links."
+    },
+    {
+      "id": "approve-champion-integration-production-deploy",
+      "risk_tier": "T3",
+      "type": "champion_integration_production_deploy",
+      "artifact": "champion_integration_candidate.md",
+      "human_gate": "Confirm the current live integration provenance before approving any redeploy of the exact source-locked patch, collector URL, verification steps, and rollback plan."
+    },
+    {
+      "id": "approve-github-repo-and-pr",
+      "risk_tier": "T2",
+      "type": "github_publish_or_pr",
+      "artifact": "champion_github_handoff.md",
+      "human_gate": "Review the prepared local Champion commit, then explicitly approve its branch push or draft PR. Do not merge from this gate."
+    }
+  ],
+  "owner_gates": [
+    {
+      "id": "remote_d1_create_and_migrate",
+      "display_label": "Existing D1 schema verification and migration approval",
+      "operation_mode": "verify_existing_d1_then_migrate_schema",
+      "resource_create_required": false,
+      "risk_tier": "T2",
+      "status": "owner_approval_required",
+      "approval_id": "approve-d1-create-and-migrate",
+      "prepared_artifact": "schema/d1-week0.sql",
+      "supporting_artifacts": [
+        "d1_schema_contract.md",
+        "cloudflare_d1_readiness.md",
+        "approved_d1_config.md"
+      ],
+      "approval_defaults": {
+        "d1_database_name": "3q-growth-loop-candidate",
+        "d1_database_id": "deb85e19-95fd-4611-8710-9cb6ea6dc7ff"
+      },
+      "current_blocker": "The exact dedicated D1 exists and matches wrangler.jsonc, but its creation provenance is not recorded in owner approval metadata and no remote schema migration or table query has been approved.",
+      "owner_action": "Confirm the observed D1 belongs to this Growth Loop, record only non-secret approval metadata, review the local schema contract, explicitly approve the remote migration, and opt in to recurring aggregate-only reads if desired. Do not create another database.",
+      "resume_commands": [
+        "npm run d1:schema:contract",
+        "npm run cloudflare:d1:readiness:live",
+        "npm run d1:config:preview",
+        "wrangler d1 execute 3q-growth-loop-candidate --remote --file=schema/d1-week0.sql",
+        "wrangler d1 execute 3q-growth-loop-candidate --remote --command='PRAGMA integrity_check; PRAGMA foreign_key_check;' --json",
+        "npm run collect:d1:remote:approved"
+      ],
+      "rollback": "Do not delete or drop the dedicated D1 automatically. Stop before binding/deploy, preserve the database for review, and let the owner decide any cleanup separately.",
+      "external_effect": true
+    },
+    {
+      "id": "candidate_worker_production_deploy",
+      "display_label": "Existing Candidate Worker provenance confirmation",
+      "operation_mode": "verify_existing_candidate_deployment",
+      "resource_deploy_required": false,
+      "risk_tier": "T3",
+      "status": "owner_approval_required",
+      "approval_id": "approve-candidate-worker-deploy",
+      "prepared_artifact": "live_telemetry_readiness.md",
+      "supporting_artifacts": [
+        "worker.ts",
+        "worker_dry_run.md",
+        "live_telemetry_readiness.md"
+      ],
+      "current_blocker": "Candidate deployment 5073984b-bcc0-40f1-a331-daaadd741071 / version 133d27b0-36e5-41e8-96ec-b55925b7b30a is observed healthy; owner provenance and rollback evidence are not yet recorded. Redeploy is not currently required.",
+      "owner_action": "Confirm the observed Worker name, URL, deployment/version reference, health result, and rollback reference. Do not redeploy unless the observed version is rejected.",
+      "resume_commands": [
+        "npm run telemetry:readiness:live",
+        "Review live_telemetry_readiness.md and record non-secret owner evidence.",
+        "npm run owner:evidence && npm run post:verify && npm run telemetry:readiness"
+      ],
+      "rollback": "wrangler rollback 133d27b0-36e5-41e8-96ec-b55925b7b30a --name 3q-growth-loop-candidate -m \"Rollback origin/PII security update\"",
+      "external_effect": true
+    },
+    {
+      "id": "public_ab_small_traffic_link",
+      "risk_tier": "T3",
+      "status": "owner_approval_required",
+      "approval_id": "approve-small-ab-link",
+      "prepared_artifact": "ab_test_status.json",
+      "current_blocker": "The live champion URL is verified, but public link routing still affects the live acquisition funnel.",
+      "owner_action": "Approve the verified champion URL metadata, 90/10 split, test duration, public placement, and rollback URL.",
+      "resume_commands": [
+        "Confirm CHAMPION_URL remains https://3q-site.milk790.workers.dev/.",
+        "Confirm existing Candidate Worker provenance before public traffic; no redeploy is required unless the observed version is rejected.",
+        "Manually place the approved /ab/ab-week0-cta-text-001 URL in the selected small-traffic surface."
+      ],
+      "rollback": "Restore the previous public link manually and keep the challenger as candidate-only.",
+      "external_effect": true
+    },
+    {
+      "id": "github_repo_branch_pr",
+      "risk_tier": "T2",
+      "status": "owner_approval_required",
+      "approval_id": "approve-github-repo-and-pr",
+      "prepared_artifact": "champion_github_handoff.md",
+      "supporting_artifacts": [
+        "champion_local_branch.md",
+        "champion_github_pr_body.md",
+        "champion_release_owner_packet.md",
+        "github_handoff.md"
+      ],
+      "approval_defaults": {
+        "repo_url": "https://github.com/milk790-code/3q-hatchery-line-oa.git",
+        "branch_name": "codex/3q-growth-loop-champion-v1"
+      },
+      "current_blocker": "The remote branch is up_to_date_with_local at 9b6fd00c082f2b67d6cde159e61dc6c407d02ea0; local head 9b6fd00c082f2b67d6cde159e61dc6c407d02ea0 is ahead by 0. Updating it or opening a draft PR is an external GitHub write.",
+      "owner_action": "Review local head 9b6fd00c082f2b67d6cde159e61dc6c407d02ea0 and champion_github_pr_body.md, then explicitly approve any remaining fast-forward push or draft PR in milk790-code/3q-hatchery-line-oa. Do not merge from this gate.",
+      "resume_commands": [
+        "git -C /Users/mac/Documents/Codex/control-center/worktrees/3q-site-growth-loop-champion-v1 status --short --branch",
+        "git -C /Users/mac/Documents/Codex/control-center/worktrees/3q-site-growth-loop-champion-v1 show --stat --oneline HEAD",
+        "git -C /Users/mac/Documents/Codex/control-center/worktrees/3q-site-growth-loop-champion-v1 push -u origin codex/3q-growth-loop-champion-v1",
+        "gh pr create --repo milk790-code/3q-hatchery-line-oa --base main --head codex/3q-growth-loop-champion-v1 --draft --title \"3Q site: persist privacy-safe Growth Loop telemetry\" --body-file champion_github_pr_body.md"
+      ],
+      "rollback": "Close the draft PR if needed and retain the branch for audit. No automatic merge, branch deletion, or repository mutation beyond the explicitly approved push/PR.",
+      "external_effect": true
+    },
+    {
+      "id": "formal_posts_line_push_payment_customer_data",
+      "risk_tier": "T3",
+      "status": "manual_only",
+      "approval_id": null,
+      "prepared_artifact": "weekly_report.md",
+      "current_blocker": "Formal posting, LINE push, ECPay, payment/refund, and customer-data changes are outside the autonomous boundary.",
+      "owner_action": "Use drafts and reports as reference, then manually publish/send/pay/refund/update only after separate review.",
+      "resume_commands": [],
+      "rollback": "Platform-specific manual rollback only; no automatic action.",
+      "external_effect": true
+    }
+  ],
+  "evidence": {
+    "current_real_events": 0,
+    "cloudflare_d1_readiness_status": "dedicated_d1_bound_owner_migration_review_required",
+    "cloudflare_d1_dedicated_database_present": true,
+    "cloudflare_d1_configured_id_matches": true,
+    "cloudflare_d1_remote_table_query_performed": false,
+    "live_telemetry_readiness_status": "live_chain_observed_owner_provenance_and_schema_evidence_required",
+    "live_telemetry_candidate_deployment_observed": true,
+    "live_telemetry_candidate_deploy_required": false,
+    "live_telemetry_observed_chain_ready_for_owner_evidence": true,
+    "live_telemetry_ingest_readiness_proven": false,
+    "live_telemetry_weekly_aggregate_read_authorized": false,
+    "d1_schema_contract_status": "local_schema_idempotency_and_constraints_verified",
+    "d1_schema_contract_ok": true,
+    "d1_schema_contract_migration_idempotent": true,
+    "approved_d1_config_status": "prepared_but_blocked_owner_d1_approval_or_inventory",
+    "approved_d1_config_write_performed": false,
+    "champion_github_handoff_status": "integration_already_merged_followup_repairs_only",
+    "champion_github_repository": "milk790-code/3q-hatchery-line-oa",
+    "champion_github_branch": "codex/3q-growth-loop-champion-v1",
+    "champion_github_push_or_pr_performed": false,
+    "d1_sync_scope": "local",
+    "d1_sync_rows": 0,
+    "event_input_quality_ok": true,
+    "event_input_quality_rows": 0,
+    "event_input_quality_issues": 0,
+    "event_input_quality_sensitive": false,
+    "funnel_preview_events": 48,
+    "funnel_preview_mode": "full_funnel_preview",
+    "funnel_preview_apply_performed": false,
+    "funnel_preview_data_write": false,
+    "funnel_fixture_ok": true,
+    "funnel_fixture_scenarios": 6,
+    "funnel_fixture_data_write": false,
+    "real_data_apply_guard_ok": true,
+    "real_data_apply_guard_scenarios": 4,
+    "real_data_apply_guard_data_write": false,
+    "real_data_decision_replay_ok": true,
+    "real_data_decision_replay_scenarios": 6,
+    "real_data_decision_replay_local_fixture_commands": true,
+    "real_data_decision_replay_local_importer_previews": true,
+    "real_data_decision_replay_source_capture_ledger": true,
+    "real_data_decision_replay_source_compile_commands": true,
+    "real_data_decision_replay_ledger_to_decision": true,
+    "real_data_decision_replay_data_write": false,
+    "real_data_decision_replay_external_effect": false,
+    "real_data_decision_replay_report": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/real_data_decision_replay_report.md",
+    "source_readiness_ok": true,
+    "source_readiness_status": "waiting_for_real_data",
+    "source_readiness_missing_stage_count": 7,
+    "source_readiness_public_ready": false,
+    "source_readiness_data_write": false,
+    "source_capture_ok": true,
+    "source_capture_status": "waiting_for_owner_aggregate_capture",
+    "source_capture_ledger_rows": 42,
+    "source_capture_sample_gate_rows": 18,
+    "source_capture_importable_links": 6,
+    "source_capture_ab_router_gate_count": 1,
+    "source_capture_live_input_files_created": false,
+    "source_capture_data_write": false,
+    "source_compile_ok": true,
+    "source_compile_status": "waiting_for_filled_counts",
+    "source_compile_input_kind": "template",
+    "source_compile_filled_rows": 0,
+    "source_compile_funnel_rows": 0,
+    "source_compile_manual_rows": 0,
+    "source_compile_issue_count": 0,
+    "source_compile_live_input_files_created": false,
+    "source_compile_data_write": false,
+    "source_compile_fixture_ok": true,
+    "source_compile_fixture_scenarios": 7,
+    "source_compile_fixture_data_write": false,
+    "real_data_intake_status": "no_real_input_files",
+    "real_data_intake_ready_apply_count": 0,
+    "real_data_intake_missing_input_count": 2,
+    "real_data_intake_blocked_input_count": 0,
+    "real_data_intake_data_write": false,
+    "data_collection_brief_ok": true,
+    "data_collection_brief_status": "waiting_for_owner_aggregate_counts",
+    "data_collection_brief_tasks": 42,
+    "data_collection_brief_filled_ledger_exists": false,
+    "sample_gate_status": "waiting_for_sample_gate_counts",
+    "sample_gate_p0_tasks": 18,
+    "sample_gate_p0_links": 6,
+    "data_collection_brief_data_write": false,
+    "data_collection_brief_external_effect": false,
+    "data_collection_progress_ok": true,
+    "data_collection_progress_status": "waiting_for_p0_sample_gate_counts",
+    "data_collection_progress_total_tasks": 42,
+    "data_collection_progress_filled_tasks": 0,
+    "data_collection_progress_pending_tasks": 42,
+    "data_collection_progress_p0_pending": 18,
+    "data_collection_progress_p1_pending": 24,
+    "data_collection_progress_next_owner_inputs": 9,
+    "data_collection_progress_data_write": false,
+    "data_collection_progress_external_effect": false,
+    "next_p0_owner_form_ok": true,
+    "next_p0_owner_form_status": "ready_local_next_p0_owner_form",
+    "next_p0_owner_form_rows": 9,
+    "next_p0_owner_form_browser_only": true,
+    "next_p0_owner_form_network_calls": false,
+    "next_p0_owner_form_data_write": false,
+    "next_p0_owner_form_external_effect": false,
+    "next_p0_owner_form_fixture_ok": true,
+    "next_p0_owner_form_fixture_scenarios": 4,
+    "next_p0_owner_form_fixture_static_checks": true,
+    "next_p0_owner_form_fixture_data_write": false,
+    "next_p0_owner_form_fixture_external_effect": false,
+    "next_p0_owner_intake_ok": true,
+    "next_p0_owner_intake_status": "waiting_for_next_p0_owner_download",
+    "next_p0_owner_intake_candidate_found": false,
+    "next_p0_owner_intake_candidate_valid": false,
+    "next_p0_owner_intake_preview_rows": 0,
+    "next_p0_owner_intake_stage_performed": false,
+    "next_p0_owner_intake_live_input_files_created": false,
+    "next_p0_owner_intake_data_write": false,
+    "next_p0_owner_intake_external_effect": false,
+    "next_p0_owner_intake_fixture_ok": true,
+    "next_p0_owner_intake_fixture_scenarios": 5,
+    "next_p0_owner_intake_fixture_live_project_inputs_created": false,
+    "next_p0_owner_intake_fixture_data_write": false,
+    "next_p0_owner_intake_fixture_external_effect": false,
+    "manual_preview_events": 10,
+    "line_inbound_playbook_ok": true,
+    "line_inbound_fixture_scenarios": 6,
+    "line_inbound_external_effect": false,
+    "manual_publish_evidence_form_ok": true,
+    "manual_publish_evidence_form_status": "ready_local_manual_publish_evidence_form",
+    "manual_publish_evidence_form_packets": 3,
+    "manual_publish_evidence_form_browser_only": true,
+    "manual_publish_evidence_form_network_calls": false,
+    "manual_publish_evidence_form_url_fetch": false,
+    "manual_publish_evidence_form_live_input_files_created": false,
+    "manual_publish_evidence_form_fixture_ok": true,
+    "manual_publish_evidence_form_fixture_scenarios": 4,
+    "manual_publish_evidence_form_fixture_data_write": false,
+    "manual_publish_evidence_form_fixture_external_effect": false,
+    "worker_dry_run_ok": true,
+    "worker_dry_run_exit_observed": true,
+    "worker_dry_run_required_markers_present": true,
+    "worker_dry_run_exit_code": 0,
+    "worker_dry_run_total_upload_line": "Total Upload: 36.40 KiB / gzip: 10.03 KiB",
+    "worker_dry_run_report": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/worker_dry_run.md",
+    "worker_dry_run_log": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/logs/worker-dry-run-20260710T214607Z.log",
+    "worker_dry_run_production_deploy_performed": false,
+    "worker_dry_run_external_effect": false,
+    "browser_smoke_ok": true,
+    "browser_smoke_checks": 5,
+    "tracking_link_smoke_ok": true,
+    "tracking_link_smoke_links_checked": 7,
+    "tracking_link_smoke_expected_links": 7,
+    "tracking_link_smoke_real_write": false,
+    "tracking_link_smoke_data_write": false,
+    "event_contract_smoke_ok": true,
+    "event_contract_counts": {
+      "cta_click": 1,
+      "page_view": 1
+    },
+    "event_contract_real_write": false,
+    "win_rule_fixture_ok": true,
+    "win_rule_fixture_scenarios": 6,
+    "week_archive_ok": true,
+    "week_archive_files": 326,
+    "week_archive_dir": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/archive/2026-06-29/20260710T214814771Z",
+    "next_round_plan_status": "continue_current_round",
+    "next_round_decision": "continue_current_round_until_sample_threshold",
+    "next_round_changed_variable": "cta_text",
+    "next_round_start_new_variable": false,
+    "funnel_breakdown_rows": 6,
+    "funnel_breakdown_content_variant_links": 3,
+    "funnel_breakdown_real_events": 0,
+    "weekly_runner_status": "success",
+    "launchagent_installed": true,
+    "champion_retained": true,
+    "sample_threshold_met": false
+  },
+  "safety_invariants": {
+    "formal_post_performed": false,
+    "public_link_change_performed": false,
+    "challenger_promotion_performed": false,
+    "line_push_performed": false,
+    "ecpay_payment_or_refund_performed": false,
+    "customer_data_mutation_performed": false,
+    "production_deploy_performed": false,
+    "data_delete_performed": false
+  },
+  "prepared_artifacts": [
+    "weekly_report.md",
+    "growth_scores.json",
+    "approval_queue.json",
+    "ab_test_status.json",
+    "landing_page_candidate.html",
+    "worker.ts",
+    "worker_dry_run.md",
+    "data/worker_dry_run_status.json",
+    "prepared_but_blocked.json",
+    "github_handoff.md",
+    "champion_github_handoff.md",
+    "champion_github_pr_body.md",
+    "data/champion_github_handoff_status.json",
+    "d1_schema_contract.md",
+    "data/d1_schema_contract_status.json",
+    "approved_d1_config.md",
+    "data/approved_d1_config_status.json",
+    "live_telemetry_readiness.md",
+    "data/live_telemetry_readiness_status.json",
+    "live_telemetry_readiness_fixture_report.md",
+    "data/live_telemetry_readiness_fixture_status.json",
+    "owner_approval_pack.md",
+    "owner_console.html",
+    "approval_resume_plan.md",
+    "data/approval_resume_status.json",
+    "post_gate_verification.md",
+    "data/post_gate_verification_status.json",
+    "owner_approval_input.example.json",
+    "win_rule_fixture_report.md",
+    "data/win_rule_fixture_status.json",
+    "line_inbound_playbook.md",
+    "line_inbound_playbook.json",
+    "line_inbound_fixture_report.md",
+    "data/line_inbound_fixture_status.json",
+    "manual_publish_evidence_form.html",
+    "data/manual_publish_evidence_form_status.json",
+    "manual_publish_evidence_form_fixture_report.md",
+    "data/manual_publish_evidence_form_fixture_status.json",
+    "worker_dry_run.md",
+    "data/worker_dry_run_status.json",
+    "funnel_breakdown.json",
+    "funnel_breakdown.md",
+    "data/funnel_aggregate_status.json",
+    "data/funnel_aggregates.example.csv",
+    "data/funnel_aggregates.preview.jsonl",
+    "data/funnel_aggregate_fixture_status.json",
+    "funnel_aggregate_fixture_report.md",
+    "data/real_data_apply_fixture_status.json",
+    "real_data_apply_fixture_report.md",
+    "data/real_data_decision_replay_status.json",
+    "real_data_decision_replay_report.md",
+    "source_capture_pack.md",
+    "data/source_capture_status.json",
+    "data/source_capture/source_capture_checklist.json",
+    "data/source_capture/source_capture_ledger.fill-template.csv",
+    "data/source_capture/sample_gate_ledger.fill-template.csv",
+    "data/sample_gate_ledger_status.json",
+    "sample_gate_ledger.md",
+    "sample_gate_ledger_compile_probe.md",
+    "data/sample_gate_ledger_compile_probe_status.json",
+    "data/source_capture/sample_gate_compile_probe/funnel_aggregates.owner-preview.csv",
+    "data/source_capture/sample_gate_compile_probe/manual_conversions.owner-preview.csv",
+    "source_capture_compile_report.md",
+    "data/source_capture_compile_status.json",
+    "source_capture_compile_fixture_report.md",
+    "data/source_capture_compile_fixture_status.json",
+    "data/source_capture/compiled/funnel_aggregates.owner-preview.csv",
+    "data/source_capture/compiled/manual_conversions.owner-preview.csv",
+    "data/real_data_intake_status.json",
+    "real_data_intake_plan.md",
+    "data_collection_queue.json",
+    "data_collection_brief.md",
+    "data/data_collection_brief_status.json",
+    "data_collection_progress.md",
+    "data_collection_progress.json",
+    "data/data_collection_progress_status.json",
+    "source_trust_matrix.md",
+    "source_trust_matrix.json",
+    "data/source_trust_matrix_status.json",
+    "next_p0_owner_inputs.md",
+    "next_p0_owner_inputs.json",
+    "data/next_p0_owner_inputs_status.json",
+    "next_p0_owner_form.html",
+    "data/next_p0_owner_form_status.json",
+    "next_p0_owner_form_fixture_report.md",
+    "data/next_p0_owner_form_fixture_status.json",
+    "next_p0_owner_intake.md",
+    "data/next_p0_owner_intake_status.json",
+    "next_p0_owner_intake_fixture_report.md",
+    "data/next_p0_owner_intake_fixture_status.json",
+    "data/next_p0_owner_intake/funnel_aggregates.owner-preview.csv",
+    "data/next_p0_owner_intake/manual_conversions.owner-preview.csv",
+    "sample_gate_collection_plan.json",
+    "sample_gate_collection_plan.md",
+    "data/sample_gate_collection_plan_status.json",
+    "tracking_link_smoke.md",
+    "data/tracking_link_smoke_status.json",
+    "data/event_contract_smoke_status.json",
+    "data/event_input_quality_status.json",
+    "data/week_archive_status.json",
+    "goal_completion_audit.md",
+    "data/goal_completion_audit_status.json",
+    "next_round_plan.json",
+    "next_round_plan.md"
+  ],
+  "blocked_actions": [
+    "verify_existing_cloudflare_d1_and_apply_schema",
+    "confirm_existing_candidate_worker_provenance",
+    "confirm_champion_live_contract_provenance_before_redeploy",
+    "change_primary_social_or_bio_link",
+    "formal_social_post_or_line_push",
+    "github_push_or_pr_creation",
+    "execute_owner_approved_launch_sequence",
+    "customer_data_or_ecpay_payment_mutation"
+  ]
+}

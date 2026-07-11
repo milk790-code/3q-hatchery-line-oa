@@ -1,0 +1,536 @@
+import { access, mkdir, readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
+
+const ROOT = path.resolve(new URL("..", import.meta.url).pathname);
+const NEXT_P0_INPUTS_PATH = path.join(ROOT, "next_p0_owner_inputs.json");
+const NEXT_P0_STATUS_PATH = path.join(ROOT, "data", "next_p0_owner_inputs_status.json");
+const REAL_EVENTS_PATH = path.join(ROOT, "data", "lp_events.jsonl");
+const HTML_PATH = path.join(ROOT, "next_p0_owner_form.html");
+const STATUS_PATH = path.join(ROOT, "data", "next_p0_owner_form_status.json");
+
+const EXPORT_HEADERS = [
+  "rank",
+  "capture_date",
+  "role",
+  "tracking_link_id",
+  "event_type",
+  "stage_label",
+  "source_surface",
+  "target_live_file",
+  "aggregate_count",
+  "evidence_ref",
+  "reviewer",
+  "pii_checked",
+];
+
+async function main() {
+  const generatedAt = new Date();
+  const nextP0 = await readJson(NEXT_P0_INPUTS_PATH);
+  const nextP0Status = await readJson(NEXT_P0_STATUS_PATH);
+  const realEventsBefore = await countLines(REAL_EVENTS_PATH);
+  const inputs = Array.isArray(nextP0.inputs) ? nextP0.inputs : [];
+  const sourceGroups = Array.isArray(nextP0.source_groups) ? nextP0.source_groups : [];
+
+  const status = {
+    ok: true,
+    generated_at: generatedAt.toISOString(),
+    mode: "next_p0_owner_form",
+    status: inputs.length > 0 ? "ready_local_next_p0_owner_form" : "waiting_for_next_p0_inputs",
+    form_html_path: HTML_PATH,
+    status_path: STATUS_PATH,
+    next_p0_inputs_path: NEXT_P0_INPUTS_PATH,
+    next_p0_inputs_status_path: NEXT_P0_STATUS_PATH,
+    source_progress_status: nextP0.source_progress_status ?? nextP0Status.source_progress_status ?? "unknown",
+    owner_sample_gate_status: nextP0.owner_sample_gate_status ?? nextP0Status.owner_sample_gate_status ?? "unknown",
+    row_count: inputs.length,
+    current_input_count: inputs.length,
+    p0_pending_count: nextP0.p0_pending_count ?? nextP0Status.p0_pending_count ?? 0,
+    p1_pending_count: nextP0.p1_pending_count ?? nextP0Status.p1_pending_count ?? 0,
+    source_group_count: sourceGroups.length,
+    sample_threshold_met: Boolean(nextP0.sample_threshold_met),
+    export_headers: EXPORT_HEADERS,
+    download_filename: "next_p0_owner_inputs.filled.csv",
+    json_download_filename: "next_p0_owner_inputs.review.json",
+    target_live_files: Array.from(new Set(inputs.map((row) => row.target_live_file).filter(Boolean))),
+    owner_fill_paths: Array.from(new Set(inputs.map((row) => row.owner_fill_path).filter(Boolean))),
+    browser_only: true,
+    browser_persistence: false,
+    form_action: "none",
+    network_calls_performed: false,
+    validation_rules: [
+      "capture_date must be YYYY-MM-DD.",
+      "aggregate_count must be a non-negative integer.",
+      "evidence_ref is required and must not contain email, phone, LINE IDs, chat text, order IDs, or payment identifiers.",
+      "reviewer is required and must not contain email, phone, or customer identifiers.",
+      "pii_checked must be checked for every row before export.",
+    ],
+    export_contract: "Focused owner-reviewed aggregate-count download only. It is not a live input CSV and does not stage or apply data.",
+    live_input_files_created: false,
+    real_events_before: realEventsBefore,
+    real_events_after: await countLines(REAL_EVENTS_PATH),
+    real_events_unchanged: true,
+    data_lp_events_write_performed: false,
+    public_link_change_performed: false,
+    production_deploy_performed: false,
+    github_push_or_pr_performed: false,
+    formal_post_performed: false,
+    line_push_performed: false,
+    customer_data_mutation_performed: false,
+    payment_action_performed: false,
+    delete_action_performed: false,
+    external_effect: false,
+  };
+
+  status.real_events_unchanged = status.real_events_before === status.real_events_after;
+
+  await writeFile(HTML_PATH, renderHtml({ generatedAt, rows: inputs, sourceGroups, status }));
+  await writeJson(STATUS_PATH, compactStatus(status));
+  console.log(JSON.stringify(compactStatus(status), null, 2));
+}
+
+function compactStatus(status) {
+  return {
+    ok: status.ok,
+    generated_at: status.generated_at,
+    mode: status.mode,
+    status: status.status,
+    form_html_path: status.form_html_path,
+    status_path: status.status_path,
+    next_p0_inputs_path: status.next_p0_inputs_path,
+    next_p0_inputs_status_path: status.next_p0_inputs_status_path,
+    source_progress_status: status.source_progress_status,
+    owner_sample_gate_status: status.owner_sample_gate_status,
+    row_count: status.row_count,
+    current_input_count: status.current_input_count,
+    p0_pending_count: status.p0_pending_count,
+    p1_pending_count: status.p1_pending_count,
+    source_group_count: status.source_group_count,
+    sample_threshold_met: status.sample_threshold_met,
+    export_headers: status.export_headers,
+    download_filename: status.download_filename,
+    json_download_filename: status.json_download_filename,
+    target_live_files: status.target_live_files,
+    owner_fill_paths: status.owner_fill_paths,
+    browser_only: status.browser_only,
+    browser_persistence: status.browser_persistence,
+    form_action: status.form_action,
+    network_calls_performed: status.network_calls_performed,
+    export_contract: status.export_contract,
+    live_input_files_created: status.live_input_files_created,
+    real_events_unchanged: status.real_events_unchanged,
+    data_lp_events_write_performed: status.data_lp_events_write_performed,
+    public_link_change_performed: status.public_link_change_performed,
+    production_deploy_performed: status.production_deploy_performed,
+    github_push_or_pr_performed: status.github_push_or_pr_performed,
+    formal_post_performed: status.formal_post_performed,
+    line_push_performed: status.line_push_performed,
+    customer_data_mutation_performed: status.customer_data_mutation_performed,
+    payment_action_performed: status.payment_action_performed,
+    delete_action_performed: status.delete_action_performed,
+    external_effect: status.external_effect,
+  };
+}
+
+function renderHtml({ generatedAt, rows, sourceGroups, status }) {
+  const safeRows = JSON.stringify(rows).replaceAll("<", "\\u003c");
+  const safeHeaders = JSON.stringify(EXPORT_HEADERS).replaceAll("<", "\\u003c");
+  const safeStatus = JSON.stringify(compactStatus(status)).replaceAll("<", "\\u003c");
+
+  return `<!doctype html>
+<html lang="zh-Hant-TW" data-external-effect="false" data-network="none">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>3Q Growth Loop Next P0 Owner Form</title>
+  <style>
+    :root {
+      --ink: #17211b;
+      --muted: #66736c;
+      --line: #d9dfd9;
+      --paper: #f7f8f4;
+      --panel: #ffffff;
+      --panel2: #eef2ec;
+      --green: #2f6d52;
+      --amber: #875b17;
+      --red: #8b2e2e;
+      --blue: #315f7d;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--paper); color: var(--ink); font-family: var(--sans); }
+    body { margin: 0; min-width: 320px; }
+    .shell { max-width: 1460px; margin: 0 auto; padding: 24px; }
+    h1 { margin: 0 0 8px; font-size: 28px; line-height: 1.1; letter-spacing: 0; }
+    p { margin: 0; color: var(--muted); line-height: 1.55; }
+    .top {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+      gap: 16px;
+      padding-bottom: 18px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .panel { border: 1px solid var(--line); border-radius: 6px; background: var(--panel); overflow: hidden; }
+    .panel header {
+      background: var(--panel2);
+      border-bottom: 1px solid var(--line);
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+    .panel h2 { margin: 0; font-size: 14px; letter-spacing: 0; }
+    .body { padding: 14px; }
+    .facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .fact { min-width: 0; }
+    .label { display: block; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+    .value { display: block; font-family: var(--mono); font-size: 12px; overflow-wrap: anywhere; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
+    button {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 6px;
+      padding: 9px 11px;
+      font: 600 13px var(--sans);
+      cursor: pointer;
+    }
+    button.primary { background: var(--green); color: #fff; border-color: var(--green); }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    .status {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 6px;
+      padding: 9px 11px;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .status.ok { border-color: color-mix(in srgb, var(--green) 36%, var(--line)); color: var(--green); }
+    .status.bad { border-color: color-mix(in srgb, var(--red) 36%, var(--line)); color: var(--red); }
+    .scroll { overflow: auto; border: 1px solid var(--line); border-radius: 6px; }
+    table { width: 100%; border-collapse: collapse; min-width: 1180px; background: #fff; }
+    th, td { border-bottom: 1px solid var(--line); padding: 8px; text-align: left; vertical-align: top; }
+    th { position: sticky; top: 0; z-index: 2; background: var(--panel2); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+    td { font-size: 12px; line-height: 1.35; }
+    .mono { font-family: var(--mono); }
+    input[type="text"], input[type="date"], input[type="number"] {
+      width: 100%;
+      min-width: 120px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 7px 8px;
+      font: 12px var(--sans);
+      background: #fff;
+    }
+    input[type="checkbox"] { width: 18px; height: 18px; }
+    tr.invalid { background: #fff7f7; }
+    .issues { margin-top: 12px; color: var(--red); font-family: var(--mono); font-size: 12px; white-space: pre-wrap; }
+    .rules { display: grid; gap: 8px; margin: 0; padding-left: 18px; color: var(--muted); line-height: 1.5; }
+    .badge { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 4px 8px; font: 11px var(--mono); background: #fff; white-space: nowrap; }
+    .source-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+    .source { border: 1px solid var(--line); border-radius: 6px; padding: 10px; background: #fbfcf9; }
+    .source strong { display: block; font-size: 12px; margin-bottom: 5px; }
+    .source span { display: block; color: var(--muted); font-family: var(--mono); font-size: 11px; overflow-wrap: anywhere; }
+    @media (max-width: 840px) {
+      .shell { padding: 16px; }
+      .top, .source-grid { grid-template-columns: 1fr; }
+      .facts { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="top">
+      <div>
+        <h1>3Q Growth Loop Next P0 Owner Form</h1>
+        <p>BLUF: Fill only the current ${rows.length} focused P0 aggregate rows, validate locally, then download <span class="mono">next_p0_owner_inputs.filled.csv</span>. This page has no network calls, no external links, no browser storage, no staging, and no event writes.</p>
+      </div>
+      <aside class="panel">
+        <header>
+          <h2>Local Contract</h2>
+          <span class="badge">external=false</span>
+        </header>
+        <div class="body facts">
+          <div class="fact"><span class="label">Generated</span><span class="value">${escapeHtml(generatedAt.toISOString())}</span></div>
+          <div class="fact"><span class="label">Rows</span><span class="value">${rows.length}</span></div>
+          <div class="fact"><span class="label">P0 Pending</span><span class="value">${status.p0_pending_count}</span></div>
+          <div class="fact"><span class="label">Download</span><span class="value">next_p0_owner_inputs.filled.csv</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="panel">
+      <header>
+        <h2>Fill Focused P0 Rows</h2>
+        <span id="status" class="status">not validated</span>
+      </header>
+      <div class="body">
+        <div class="toolbar">
+          <button type="button" class="primary" id="validate">Validate</button>
+          <button type="button" id="downloadCsv" disabled>Download CSV</button>
+          <button type="button" id="downloadJson" disabled>Download Review JSON</button>
+          <button type="button" id="clear">Clear owner fields</button>
+        </div>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>rank</th>
+                <th>role</th>
+                <th>event</th>
+                <th>tracking link</th>
+                <th>source</th>
+                <th>capture date</th>
+                <th>aggregate count</th>
+                <th>evidence ref</th>
+                <th>reviewer</th>
+                <th>PII checked</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+        <div id="issues" class="issues" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="source-grid" aria-label="source groups">
+      ${sourceGroups.map((group) => `<div class="source"><strong>${escapeHtml(group.source_surface)}</strong><span>inputs=${escapeHtml(group.input_count)} / events=${escapeHtml((group.event_types ?? []).join(", "))}</span><span>fill=${escapeHtml((group.owner_fill_paths ?? []).join(", "))}</span></div>`).join("")}
+    </section>
+
+    <section class="panel" style="margin-top:14px">
+      <header>
+        <h2>Hard Rules</h2>
+        <span class="badge">aggregate only</span>
+      </header>
+      <div class="body">
+        <ul class="rules">
+          <li>Do not paste phone, email, LINE user ID, customer name, chat text, order ID, payment/refund ID, or private notes.</li>
+          <li>This page only builds downloadable review files. It does not create <span class="mono">data/source_capture/*.filled.csv</span>, append <span class="mono">data/lp_events.jsonl</span>, or stage owner input.</li>
+          <li>After review, use the existing source-capture/sample-gate intake flow. Sample-insufficient rounds keep the champion and do not promote challengers.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <script id="rows-data" type="application/json">${safeRows}</script>
+  <script id="headers-data" type="application/json">${safeHeaders}</script>
+  <script id="status-data" type="application/json">${safeStatus}</script>
+  <script>
+    "use strict";
+
+    const rows = JSON.parse(document.getElementById("rows-data").textContent);
+    const headers = JSON.parse(document.getElementById("headers-data").textContent);
+    const contract = JSON.parse(document.getElementById("status-data").textContent);
+    const body = document.getElementById("rows");
+    const issues = document.getElementById("issues");
+    const statusEl = document.getElementById("status");
+    const downloadCsv = document.getElementById("downloadCsv");
+    const downloadJson = document.getElementById("downloadJson");
+    const sensitivePattern = /(@|\\b09\\d{8}\\b|\\b\\d{4}[- ]?\\d{3}[- ]?\\d{3}\\b|line\\s*id|user\\s*id|uid|order\\s*id|payment|refund|電話|手機|信箱|暱稱|姓名|聊天|訂單|付款|退款)/i;
+
+    function render() {
+      body.innerHTML = "";
+      rows.forEach((row, index) => {
+        const tr = document.createElement("tr");
+        tr.dataset.index = String(index);
+        tr.innerHTML = [
+          cell(row.rank, "mono"),
+          cell(row.role, "mono"),
+          cell(row.stage_label + "<br><span class='mono'>" + escapeHtml(row.event_type) + "</span>"),
+          cell(row.tracking_link_id + "<br>" + escapeHtml(row.evidence_rule), "mono"),
+          cell(row.source_surface),
+          inputCell(index, "capture_date", "date"),
+          inputCell(index, "aggregate_count", "number", "0"),
+          inputCell(index, "evidence_ref", "text"),
+          inputCell(index, "reviewer", "text"),
+          checkboxCell(index, "pii_checked"),
+        ].join("");
+        body.appendChild(tr);
+      });
+    }
+
+    function cell(value, className = "") {
+      return "<td" + (className ? " class='" + className + "'" : "") + ">" + escapeHtml(String(value ?? "")) + "</td>";
+    }
+
+    function inputCell(index, name, type, min) {
+      const id = name + "-" + index;
+      return "<td><input id='" + id + "' data-index='" + index + "' data-name='" + name + "' type='" + type + "'" + (min !== undefined ? " min='" + min + "'" : "") + "></td>";
+    }
+
+    function checkboxCell(index, name) {
+      const id = name + "-" + index;
+      return "<td><input id='" + id + "' data-index='" + index + "' data-name='" + name + "' type='checkbox'></td>";
+    }
+
+    function collect() {
+      const out = rows.map((row) => ({
+        rank: row.rank,
+        capture_date: "",
+        role: row.role,
+        tracking_link_id: row.tracking_link_id,
+        event_type: row.event_type,
+        stage_label: row.stage_label,
+        source_surface: row.source_surface,
+        target_live_file: row.target_live_file,
+        aggregate_count: "",
+        evidence_ref: "",
+        reviewer: "",
+        pii_checked: "",
+      }));
+      document.querySelectorAll("[data-index][data-name]").forEach((input) => {
+        const index = Number(input.dataset.index);
+        const name = input.dataset.name;
+        out[index][name] = input.type === "checkbox" ? (input.checked ? "yes" : "") : input.value.trim();
+      });
+      return out;
+    }
+
+    function validate() {
+      const out = collect();
+      const found = [];
+      document.querySelectorAll("tbody tr").forEach((tr) => tr.classList.remove("invalid"));
+
+      out.forEach((row, index) => {
+        const rowIssues = [];
+        if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(row.capture_date ?? "")) rowIssues.push("capture_date");
+        if (!/^\\d+$/.test(row.aggregate_count ?? "")) rowIssues.push("aggregate_count");
+        if ((row.evidence_ref ?? "").length < 3 || sensitivePattern.test(row.evidence_ref ?? "")) rowIssues.push("evidence_ref");
+        if ((row.reviewer ?? "").length < 1 || sensitivePattern.test(row.reviewer ?? "")) rowIssues.push("reviewer");
+        if (!["yes", "true", "checked", "ok", "1"].includes(String(row.pii_checked ?? "").toLowerCase())) rowIssues.push("pii_checked");
+
+        if (rowIssues.length > 0) {
+          found.push("rank " + row.rank + ": " + rowIssues.join(", "));
+          const tr = document.querySelector("tr[data-index='" + index + "']");
+          if (tr) tr.classList.add("invalid");
+        }
+      });
+
+      const ok = found.length === 0;
+      issues.textContent = ok ? "" : found.join("\\n");
+      statusEl.textContent = ok ? "valid / ready to download" : found.length + " issue(s)";
+      statusEl.className = "status " + (ok ? "ok" : "bad");
+      downloadCsv.disabled = !ok;
+      downloadJson.disabled = !ok;
+      return { ok, rows: out, issues: found };
+    }
+
+    function toCsv(rowsToExport) {
+      const lines = [headers.map(csvCell).join(",")];
+      rowsToExport.forEach((row) => {
+        lines.push(headers.map((header) => csvCell(row[header] ?? "")).join(","));
+      });
+      return lines.join("\\n") + "\\n";
+    }
+
+    function csvCell(value) {
+      const stringValue = String(value ?? "");
+      if (/[",\\n\\r]/.test(stringValue)) {
+        return '"' + stringValue.replaceAll('"', '""') + '"';
+      }
+      return stringValue;
+    }
+
+    function download(filename, text, type) {
+      const blob = new Blob([text], { type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById("validate").addEventListener("click", validate);
+    downloadCsv.addEventListener("click", () => {
+      const result = validate();
+      if (!result.ok) return;
+      download(contract.download_filename, toCsv(result.rows), "text/csv;charset=utf-8");
+    });
+    downloadJson.addEventListener("click", () => {
+      const result = validate();
+      if (!result.ok) return;
+      download(contract.json_download_filename, JSON.stringify({
+        generated_at: new Date().toISOString(),
+        mode: "next_p0_owner_form_review",
+        row_count: result.rows.length,
+        external_effect: false,
+        live_input_files_created: false,
+        data_lp_events_write_performed: false,
+        rows: result.rows,
+      }, null, 2) + "\\n", "application/json");
+    });
+    document.getElementById("clear").addEventListener("click", () => {
+      document.querySelectorAll("[data-index][data-name]").forEach((input) => {
+        if (input.type === "checkbox") input.checked = false;
+        else input.value = "";
+      });
+      downloadCsv.disabled = true;
+      downloadJson.disabled = true;
+      statusEl.textContent = "not validated";
+      statusEl.className = "status";
+      issues.textContent = "";
+      document.querySelectorAll("tbody tr").forEach((tr) => tr.classList.remove("invalid"));
+    });
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    render();
+  </script>
+</body>
+</html>
+`;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+async function readJson(filePath) {
+  return JSON.parse(await readFile(filePath, "utf8"));
+}
+
+async function countLines(filePath) {
+  try {
+    const raw = await readFile(filePath, "utf8");
+    return raw.split(/\r?\n/).filter((line) => line.trim()).length;
+  } catch {
+    return 0;
+  }
+}
+
+async function writeJson(filePath, value) {
+  await mkdir(path.dirname(filePath), { recursive: true });
+  await writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`);
+}
+
+async function exists(filePath) {
+  try {
+    await access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+void exists;
+main();

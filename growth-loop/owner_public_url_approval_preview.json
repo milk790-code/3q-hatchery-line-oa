@@ -1,0 +1,218 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:46:01.477Z",
+  "mode": "owner_public_url_approval_preview_local_only",
+  "status": "prepared_but_blocked_owner_approval_input",
+  "selected_packet_id": "manual-publish-01-week0-post-001-cta-v1-diagnostic",
+  "selected_content_id": "week0-post-001",
+  "selected_variant_id": "cta-v1-diagnostic",
+  "round_id": "week0-cta-text",
+  "changed_variable": "cta_text",
+  "owner_decision_required": true,
+  "public_tracking_url_ready": false,
+  "formal_publish_ready": false,
+  "live_input_file_path": "owner_approval_input.json",
+  "live_input_file_exists": false,
+  "live_input_files_created": false,
+  "owner_approval_input_write_performed": false,
+  "required_gate_ids": [
+    "remote_d1_create_and_migrate",
+    "candidate_worker_production_deploy",
+    "public_ab_small_traffic_link"
+  ],
+  "required_gate_count": 3,
+  "focused_owner_fields": {
+    "remote_d1_create_and_migrate": [
+      "approved_by",
+      "approved_at",
+      "cloudflare_account_alias",
+      "d1_database_name",
+      "d1_database_id"
+    ],
+    "candidate_worker_production_deploy": [
+      "approved_by",
+      "approved_at",
+      "worker_name",
+      "worker_url",
+      "rollback_plan"
+    ],
+    "public_ab_small_traffic_link": [
+      "approved_by",
+      "approved_at",
+      "champion_url",
+      "public_surface",
+      "rollback_url"
+    ]
+  },
+  "required_field_count": 15,
+  "gate_summaries": [
+    {
+      "gate_id": "remote_d1_create_and_migrate",
+      "required_fields": [
+        "approved_by",
+        "approved_at",
+        "cloudflare_account_alias",
+        "d1_database_name",
+        "d1_database_id"
+      ],
+      "readiness_status": "owner_approval_required",
+      "owner_approval_detected": false,
+      "ready_for_owner_execution": false,
+      "post_gate_verification_ready": false,
+      "blocked_reasons": [
+        "owner_approval_input.json has no approval entry for this gate.",
+        "missing_fields=approved_by,approved_at,cloudflare_account_alias,d1_database_name,d1_database_id",
+        "approval_metadata.remote_d1_create_and_migrate: owner approval metadata is missing, placeholder, sensitive, or invalid",
+        "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate."
+      ],
+      "execution_policy": "plan_only_owner_executes",
+      "external_effect": false,
+      "execution_performed": false
+    },
+    {
+      "gate_id": "candidate_worker_production_deploy",
+      "required_fields": [
+        "approved_by",
+        "approved_at",
+        "worker_name",
+        "worker_url",
+        "rollback_plan"
+      ],
+      "readiness_status": "owner_approval_required",
+      "owner_approval_detected": false,
+      "ready_for_owner_execution": false,
+      "post_gate_verification_ready": false,
+      "blocked_reasons": [
+        "owner_approval_input.json has no approval entry for this gate.",
+        "missing_fields=approved_by,approved_at,worker_name,worker_url,rollback_plan",
+        "remote_d1_create_and_migrate_owner_executed: existing D1 schema migration and table verification is a human gate and post-gate evidence is not ready",
+        "approval_metadata.candidate_worker_production_deploy: owner approval metadata is missing, placeholder, sensitive, or invalid",
+        "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+        "worker_dry_run_success:weekly runner worker dry-run succeeded",
+        "remote_d1_evidence_ready:remote D1 evidence must be ready before Worker post-gate verification"
+      ],
+      "execution_policy": "plan_only_owner_executes",
+      "external_effect": false,
+      "execution_performed": false
+    },
+    {
+      "gate_id": "public_ab_small_traffic_link",
+      "required_fields": [
+        "approved_by",
+        "approved_at",
+        "champion_url",
+        "public_surface",
+        "rollback_url"
+      ],
+      "readiness_status": "owner_approval_required",
+      "owner_approval_detected": false,
+      "ready_for_owner_execution": false,
+      "post_gate_verification_ready": false,
+      "blocked_reasons": [
+        "owner_approval_input.json has no approval entry for this gate.",
+        "missing_fields=approved_by,approved_at,champion_url,public_surface,rollback_url",
+        "candidate_worker_production_deploy_owner_executed: candidate Worker provenance or deployment evidence is a human gate and post-gate evidence is not ready",
+        "approved_current_champion_url: approved current champion URL is still missing",
+        "approved_rollback_url: approved rollback URL is still missing",
+        "approval_metadata.public_ab_small_traffic_link: owner approval metadata is missing, placeholder, sensitive, or invalid",
+        "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+        "candidate_worker_evidence_ready:candidate Worker evidence must be ready before public A/B verification"
+      ],
+      "execution_policy": "plan_only_owner_executes",
+      "external_effect": false,
+      "execution_performed": false
+    }
+  ],
+  "post_gate_status": "waiting_for_owner_evidence",
+  "gate_readiness_status": "prepared_but_blocked",
+  "selected_public_tracking_url_preview": "https://<OWNER_APPROVED_WORKER_URL>/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=cta-v1-diagnostic&content_id=week0-post-001",
+  "selected_public_candidate_url_preview": "https://<OWNER_APPROVED_WORKER_URL>/candidate?utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&content_id=week0-post-001&variant_id=cta-v1-diagnostic&asset_id=challenger-week0-cta-text-v1",
+  "line_cta_public_tracking_url_preview": "https://<OWNER_APPROVED_WORKER_URL>/r/challenger-week0-cta-text-v1?to=line&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=challenger-week0-cta-text-v1-line&content_id=2026-06-29-line-cta",
+  "ab_router_public_url_preview": "https://<OWNER_APPROVED_WORKER_URL>/ab/ab-week0-cta-text-001?utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&content_id=2026-06-29-ab-router",
+  "owner_approval_input_patch_preview": {
+    "preview_only": true,
+    "write_target": "owner_approval_input.json",
+    "source_template": "owner_approval_input.example.json",
+    "warning": "Do not paste placeholders as approval. Owner must fill real non-secret metadata only after approving each external gate.",
+    "purpose": "Copy this file to owner_approval_input.json only after the owner approves specific external gates. Keep secrets out of this file.",
+    "approvals": [
+      {
+        "gate_id": "remote_d1_create_and_migrate",
+        "approved_by": "OWNER_NAME",
+        "approved_at": "2026-07-10T21:35:45.454Z",
+        "cloudflare_account_alias": "OWNER_APPROVED_ACCOUNT_ALIAS",
+        "d1_database_name": "3q-growth-loop-candidate",
+        "d1_database_id": "deb85e19-95fd-4611-8710-9cb6ea6dc7ff"
+      },
+      {
+        "gate_id": "candidate_worker_production_deploy",
+        "approved_by": "OWNER_NAME",
+        "approved_at": "2026-07-10T21:35:45.454Z",
+        "worker_name": "3q-growth-loop-candidate",
+        "worker_url": "https://OWNER_APPROVED_WORKER_URL",
+        "rollback_plan": "Use Cloudflare dashboard rollback or redeploy previous approved revision."
+      },
+      {
+        "gate_id": "public_ab_small_traffic_link",
+        "approved_by": "OWNER_NAME",
+        "approved_at": "2026-07-10T21:35:45.454Z",
+        "champion_url": "https://OWNER_APPROVED_CURRENT_CHAMPION_URL",
+        "public_surface": "OWNER_APPROVED_SMALL_TRAFFIC_SURFACE",
+        "rollback_url": "https://OWNER_APPROVED_PREVIOUS_PUBLIC_URL"
+      }
+    ],
+    "context_only_not_part_of_owner_approval_input": {
+      "selected_packet_id": "manual-publish-01-week0-post-001-cta-v1-diagnostic",
+      "selected_content_id": "week0-post-001",
+      "selected_variant_id": "cta-v1-diagnostic",
+      "selected_public_tracking_url_preview": "https://<OWNER_APPROVED_WORKER_URL>/r/challenger-week0-cta-text-v1?to=challenger&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=cta-v1-diagnostic&content_id=week0-post-001",
+      "selected_public_candidate_url_preview": "https://<OWNER_APPROVED_WORKER_URL>/candidate?utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&content_id=week0-post-001&variant_id=cta-v1-diagnostic&asset_id=challenger-week0-cta-text-v1",
+      "line_cta_public_tracking_url_preview": "https://<OWNER_APPROVED_WORKER_URL>/r/challenger-week0-cta-text-v1?to=line&utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&variant_id=challenger-week0-cta-text-v1-line&content_id=2026-06-29-line-cta",
+      "ab_router_public_url_preview": "https://<OWNER_APPROVED_WORKER_URL>/ab/ab-week0-cta-text-001?utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&content_id=2026-06-29-ab-router"
+    }
+  },
+  "commands_after_owner_fills_preview": [
+    "npm run approval:plan",
+    "npm run gate:readiness",
+    "npm run owner:evidence",
+    "npm run post:verify",
+    "npm run public:tracking-pack",
+    "npm run owner:public-url-approval-preview"
+  ],
+  "owner_execution_order": [
+    "Fill owner_approval_input.json with non-secret metadata for the approved gate only.",
+    "Owner runs the external D1 and Worker actions outside this local runner when ready.",
+    "Owner records non-secret evidence in owner_gate_evidence.json.",
+    "Run the local read-only verification commands listed above.",
+    "Only after post-gate verification passes, owner may manually publish exactly one reviewed packet."
+  ],
+  "blocked_actions": [
+    "create_live_owner_approval_input",
+    "remote_d1_create_or_migration",
+    "production_worker_deploy",
+    "public_tracking_url_activation",
+    "public_ab_or_bio_link_change",
+    "formal_social_post_or_schedule",
+    "line_push_or_broadcast",
+    "github_push_or_pr_creation",
+    "customer_data_mutation",
+    "ecpay_payment_refund_or_capture",
+    "delete_data_or_retire_live_assets"
+  ],
+  "issues": [],
+  "outputs": {
+    "preview_json": "owner_public_url_approval_preview.json",
+    "preview_md": "owner_public_url_approval_preview.md",
+    "status_json": "data/owner_public_url_approval_preview_status.json"
+  },
+  "external_effect": false,
+  "data_lp_events_write_performed": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

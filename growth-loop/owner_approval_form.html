@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="zh-Hant-TW" data-external-effect="false" data-network="none">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>3Q Growth Loop Owner Approval Form</title>
+  <style>
+    :root {
+      --ink: #18221d;
+      --muted: #66736d;
+      --line: #d9dfd9;
+      --paper: #f7f8f4;
+      --panel: #fff;
+      --panel2: #eef2ec;
+      --green: #2f6d52;
+      --red: #8b2e2e;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--paper); color: var(--ink); font-family: var(--sans); }
+    body { margin: 0; min-width: 320px; }
+    .shell { max-width: 1180px; margin: 0 auto; padding: 24px; }
+    h1 { margin: 0 0 8px; font-size: 28px; line-height: 1.1; letter-spacing: 0; }
+    p { margin: 0; color: var(--muted); line-height: 1.55; }
+    .top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 380px); gap: 16px; padding-bottom: 18px; margin-bottom: 18px; border-bottom: 1px solid var(--line); }
+    .panel { border: 1px solid var(--line); border-radius: 6px; background: var(--panel); overflow: hidden; margin-bottom: 14px; }
+    .panel header { background: var(--panel2); border-bottom: 1px solid var(--line); padding: 12px 14px; display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+    .panel h2 { margin: 0; font-size: 14px; letter-spacing: 0; }
+    .body { padding: 14px; }
+    .facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .label { display: block; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+    .value { display: block; font-family: var(--mono); font-size: 12px; overflow-wrap: anywhere; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    label.field { display: grid; gap: 6px; }
+    input[type="text"], input[type="datetime-local"], textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 8px 9px;
+      font: 13px var(--sans);
+      background: #fff;
+    }
+    textarea { min-height: 74px; resize: vertical; }
+    .check { display: flex; gap: 8px; align-items: center; margin: 10px 0; }
+    input[type="checkbox"] { width: 18px; height: 18px; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 14px; }
+    button { appearance: none; border: 1px solid var(--line); background: #fff; color: var(--ink); border-radius: 6px; padding: 9px 11px; font: 600 13px var(--sans); cursor: pointer; }
+    button.primary { background: var(--green); color: #fff; border-color: var(--green); }
+    .status { border: 1px solid var(--line); background: #fff; border-radius: 6px; padding: 10px; font: 12px/1.45 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; min-height: 54px; }
+    .bad { color: var(--red); }
+    code { font-family: var(--mono); font-size: 12px; overflow-wrap: anywhere; }
+    @media (max-width: 760px) {
+      .shell { padding: 16px; }
+      .top, .grid, .facts { grid-template-columns: 1fr; }
+      h1 { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="top">
+      <div>
+        <h1>Owner Approval Metadata</h1>
+        <p>只整理非敏感 approval metadata。這不是執行按鈕，不會部署、不會建立 D1、不會 push GitHub、不會改公開連結。</p>
+      </div>
+      <section class="panel">
+        <header><h2>Safety</h2><span class="value">download only</span></header>
+        <div class="body facts">
+          <div><span class="label">Generated</span><span class="value">2026-07-10T21:48:22.109Z</span></div>
+          <div><span class="label">Input exists</span><span class="value">no</span></div>
+          <div><span class="label">Gates</span><span class="value">4</span></div>
+          <div><span class="label">Network</span><span class="value">none</span></div>
+        </div>
+      </section>
+    </section>
+
+    <form id="approval-form" action="none" autocomplete="off">
+      <div id="gate-panels"></div>
+      <section class="panel">
+        <header><h2>Confirmations</h2><span class="value">required</span></header>
+        <div class="body">
+          <label class="check"><input name="owner_reviewed" type="checkbox"> <span>我確認這只是 metadata 準備，不代表自動執行任何外部 gate。</span></label>
+          <label class="check"><input name="no_secrets" type="checkbox"> <span>我確認沒有填入 API key、token、password、cookie、客戶資料、付款或對話內容。</span></label>
+          <label class="check"><input name="separate_execution_required" type="checkbox"> <span>我了解每個外部 gate 仍要在獨立回合明確拍板。</span></label>
+          <div class="toolbar">
+            <button class="primary" type="button" id="download">Download Owner Approval JSON</button>
+            <button type="button" id="review">Download Review JSON</button>
+          </div>
+          <pre class="status" id="status">Ready.</pre>
+        </div>
+      </section>
+    </form>
+  </main>
+  <script id="form-status" type="application/json">{"ok":true,"generated_at":"2026-07-10T21:48:22.109Z","mode":"owner_approval_form","status":"ready_local_owner_approval_form","form_path":"/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/owner_approval_form.html","status_path":"/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/owner_approval_form_status.json","owner_input_path":"/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/owner_approval_input.json","owner_input_exists":false,"approval_resume_status":"prepared_but_blocked","launch_readiness_status":"owner_approval_required","form_gate_count":4,"excluded_manual_gate_count":1,"excluded_manual_gates":["formal_posts_line_push_payment_customer_data"],"required_owner_fields":{"remote_d1_create_and_migrate":["approved_by","approved_at","cloudflare_account_alias","d1_database_name","d1_database_id"],"candidate_worker_production_deploy":["approved_by","approved_at","worker_name","worker_url","rollback_plan"],"public_ab_small_traffic_link":["approved_by","approved_at","champion_url","public_surface","rollback_url"],"github_repo_branch_pr":["approved_by","approved_at","repo_url","branch_name"]},"download_filename":"owner_approval_input.json","review_download_filename":"owner_approval_form.review.json","browser_only":true,"browser_persistence":false,"form_action":"none","network_calls_performed":false,"live_input_files_created":false,"approval_input_write_performed":false,"external_effect":false,"data_lp_events_write_performed":false,"public_link_change_performed":false,"production_deploy_performed":false,"github_push_or_pr_performed":false,"formal_post_performed":false,"line_push_performed":false,"customer_data_mutation_performed":false,"payment_action_performed":false,"delete_action_performed":false}</script>
+  <script id="gate-data" type="application/json">[{"id":"remote_d1_create_and_migrate","display_label":"Existing D1 schema verification and migration approval","operation_mode":"verify_existing_d1_then_migrate_schema","resource_create_required":false,"current_blocker":"The exact dedicated D1 exists and matches wrangler.jsonc, but its creation provenance is not recorded in owner approval metadata and no remote schema migration or table query has been approved.","owner_action":"Confirm the observed D1 belongs to this Growth Loop, record only non-secret approval metadata, review the local schema contract, explicitly approve the remote migration, and opt in to recurring aggregate-only reads if desired. Do not create another database.","approval_id":"approve-d1-create-and-migrate","risk_tier":"T2","status":"owner_approval_required","prepared_artifact":"schema/d1-week0.sql","approval_defaults":{"d1_database_name":"3q-growth-loop-candidate","d1_database_id":"deb85e19-95fd-4611-8710-9cb6ea6dc7ff"},"fields":[{"name":"approved_by","label":"Owner alias"},{"name":"approved_at","label":"Approved at"},{"name":"cloudflare_account_alias","label":"Cloudflare account alias"},{"name":"d1_database_name","label":"D1 database name"},{"name":"d1_database_id","label":"D1 database id"}]},{"id":"candidate_worker_production_deploy","display_label":"Existing Candidate Worker provenance confirmation","operation_mode":"verify_existing_candidate_deployment","resource_create_required":false,"current_blocker":"Candidate deployment 5073984b-bcc0-40f1-a331-daaadd741071 / version 133d27b0-36e5-41e8-96ec-b55925b7b30a is observed healthy; owner provenance and rollback evidence are not yet recorded. Redeploy is not currently required.","owner_action":"Confirm the observed Worker name, URL, deployment/version reference, health result, and rollback reference. Do not redeploy unless the observed version is rejected.","approval_id":"approve-candidate-worker-deploy","risk_tier":"T3","status":"owner_approval_required","prepared_artifact":"live_telemetry_readiness.md","approval_defaults":{},"fields":[{"name":"approved_by","label":"Owner alias"},{"name":"approved_at","label":"Approved at"},{"name":"worker_name","label":"Worker name"},{"name":"worker_url","label":"Worker URL"},{"name":"rollback_plan","label":"Rollback plan"}]},{"id":"public_ab_small_traffic_link","display_label":"public_ab_small_traffic_link","operation_mode":null,"resource_create_required":false,"current_blocker":"The live champion URL is verified, but public link routing still affects the live acquisition funnel.","owner_action":"Approve the verified champion URL metadata, 90/10 split, test duration, public placement, and rollback URL.","approval_id":"approve-small-ab-link","risk_tier":"T3","status":"owner_approval_required","prepared_artifact":"ab_test_status.json","approval_defaults":{},"fields":[{"name":"approved_by","label":"Owner alias"},{"name":"approved_at","label":"Approved at"},{"name":"champion_url","label":"Current champion URL"},{"name":"public_surface","label":"Small-traffic surface"},{"name":"rollback_url","label":"Rollback URL"}]},{"id":"github_repo_branch_pr","display_label":"github_repo_branch_pr","operation_mode":null,"resource_create_required":false,"current_blocker":"The remote branch is up_to_date_with_local at 9b6fd00c082f2b67d6cde159e61dc6c407d02ea0; local head 9b6fd00c082f2b67d6cde159e61dc6c407d02ea0 is ahead by 0. Updating it or opening a draft PR is an external GitHub write.","owner_action":"Review local head 9b6fd00c082f2b67d6cde159e61dc6c407d02ea0 and champion_github_pr_body.md, then explicitly approve any remaining fast-forward push or draft PR in milk790-code/3q-hatchery-line-oa. Do not merge from this gate.","approval_id":"approve-github-repo-and-pr","risk_tier":"T2","status":"owner_approval_required","prepared_artifact":"champion_github_handoff.md","approval_defaults":{"repo_url":"https://github.com/milk790-code/3q-hatchery-line-oa.git","branch_name":"codex/3q-growth-loop-champion-v1"},"fields":[{"name":"approved_by","label":"Owner alias"},{"name":"approved_at","label":"Approved at"},{"name":"repo_url","label":"GitHub repo URL"},{"name":"branch_name","label":"Safe branch name"}]}]</script>
+  <script>
+    const formStatus = JSON.parse(document.getElementById("form-status").textContent);
+    const gates = JSON.parse(document.getElementById("gate-data").textContent);
+    const form = document.getElementById("approval-form");
+    const gatePanels = document.getElementById("gate-panels");
+    const statusEl = document.getElementById("status");
+    const sensitivePattern = /token|secret|password|passwd|cookie|session|authorization|bearer|api[_-]?key|private[_-]?key|client[_-]?secret|line_user_id|customer_name|phone|email|payment|card|chat|conversation|電話|手機|信箱|客戶|付款|訂單|對話/i;
+
+    function fieldInput(gate, field) {
+      const isTime = field.name === "approved_at";
+      const isLong = field.name === "rollback_plan";
+      const name = gate.id + "__" + field.name;
+      const defaultValue = gate.approval_defaults && gate.approval_defaults[field.name] ? gate.approval_defaults[field.name] : "";
+      if (isLong) {
+        return '<label class="field"><span class="label">' + field.label + '</span><textarea name="' + name + '" placeholder="Use non-secret rollback reference only."></textarea></label>';
+      }
+      return '<label class="field"><span class="label">' + field.label + '</span><input name="' + name + '" type="' + (isTime ? "datetime-local" : "text") + '" value="' + escapeAttribute(defaultValue) + '"></label>';
+    }
+
+    function escapeAttribute(value) {
+      return String(value).replace(/[&<>"']/g, (character) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[character]));
+    }
+
+    function renderGates() {
+      gatePanels.innerHTML = gates.map((gate) => {
+        return '<section class="panel" data-gate-id="' + gate.id + '">'
+          + '<header><h2>' + escapeAttribute(gate.display_label || gate.id) + '</h2><span class="value">' + gate.risk_tier + '</span></header>'
+          + '<div class="body">'
+          + '<label class="check"><input name="' + gate.id + '__enabled" type="checkbox"> <span>Include this gate metadata</span></label>'
+          + '<div class="facts">'
+          + '<div><span class="label">Gate ID</span><span class="value">' + escapeAttribute(gate.id) + '</span></div>'
+          + '<div><span class="label">Operation</span><span class="value">' + escapeAttribute(gate.operation_mode || 'n/a') + '</span></div>'
+          + '<div><span class="label">Create resource</span><span class="value">' + (gate.resource_create_required ? 'required' : 'no') + '</span></div>'
+          + '<div><span class="label">Blocker</span><span class="value">' + escapeAttribute(gate.current_blocker || 'n/a') + '</span></div>'
+          + '</div>'
+          + '<div class="grid">' + gate.fields.map((field) => fieldInput(gate, field)).join("") + '</div>'
+          + '<p style="margin-top:10px;">Owner action: ' + escapeAttribute(gate.owner_action || 'Review this gate manually.') + '</p>'
+          + '<p style="margin-top:10px;">Prepared artifact: <code>' + gate.prepared_artifact + '</code></p>'
+          + '</div></section>';
+      }).join("");
+    }
+
+    function normalizeDateTime(value) {
+      if (!value) return "";
+      const parsed = new Date(value);
+      return Number.isNaN(parsed.valueOf()) ? value : parsed.toISOString();
+    }
+
+    function collect() {
+      const approvals = [];
+      const issues = [];
+      for (const gate of gates) {
+        if (!form.elements[gate.id + "__enabled"].checked) continue;
+        const row = { gate_id: gate.id };
+        for (const field of gate.fields) {
+          const element = form.elements[gate.id + "__" + field.name];
+          const value = (element.value || "").trim();
+          row[field.name] = field.name === "approved_at" ? normalizeDateTime(value) : value;
+          if (!value) issues.push(gate.id + "." + field.name + " is required.");
+          if (sensitivePattern.test(field.name) || sensitivePattern.test(value)) {
+            issues.push(gate.id + "." + field.name + " looks sensitive.");
+          }
+        }
+        approvals.push(row);
+      }
+      if (approvals.length === 0) issues.push("Choose at least one owner-approved gate.");
+      if (!form.elements.owner_reviewed.checked) issues.push("Owner review confirmation is required.");
+      if (!form.elements.no_secrets.checked) issues.push("No-secrets confirmation is required.");
+      if (!form.elements.separate_execution_required.checked) issues.push("Separate execution confirmation is required.");
+
+      return {
+        generated_at: new Date().toISOString(),
+        mode: "owner_approval_form_export",
+        purpose: "Owner-reviewed non-secret approval metadata only. External gate execution remains separate.",
+        approvals,
+        confirmations: {
+          owner_reviewed: form.elements.owner_reviewed.checked,
+          no_secrets: form.elements.no_secrets.checked,
+          separate_execution_required: form.elements.separate_execution_required.checked,
+        },
+        form_status: formStatus,
+        issues,
+      };
+    }
+
+    function download(filename, payload) {
+      const blob = new Blob([JSON.stringify(payload, null, 2) + "\n"], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function handleDownload(filename, allowIssues) {
+      const payload = collect();
+      statusEl.textContent = JSON.stringify({ issues: payload.issues, approvals: payload.approvals.map((row) => row.gate_id) }, null, 2);
+      statusEl.className = payload.issues.length ? "status bad" : "status";
+      if (payload.issues.length && !allowIssues) return;
+      download(filename, payload);
+    }
+
+    renderGates();
+    document.getElementById("download").addEventListener("click", () => handleDownload(formStatus.download_filename, false));
+    document.getElementById("review").addEventListener("click", () => handleDownload(formStatus.review_download_filename, true));
+  </script>
+</body>
+</html>

@@ -28,7 +28,8 @@ jobs:
           before=$(mktemp)
           after=$(mktemp)
           upload=$(mktemp)
-          trap 'rm -f "$before" "$after" "$upload"' EXIT
+          stage="initialization"
+          trap 'rc=$?; if [ "$rc" -ne 0 ]; then echo "::error::Deploy 3Q Site failed during: ${stage} (exit ${rc})"; fi; rm -f "$before" "$after" "$upload"' EXIT
 
           get_settings() {
             curl --fail-with-body --silent --show-error \
@@ -51,8 +52,11 @@ jobs:
               | awk '{print $1}'
           }
 
+          stage="read Worker settings before upload (requires Workers Scripts Read)"
           get_settings > "$before"
+          stage="validate Cloudflare settings response before upload"
           jq -e '.success == true' "$before" >/dev/null
+          stage="verify required collector binding before upload"
           jq -e --arg name "$REQUIRED_BINDING" \
             --arg expected "$COLLECTOR_BASE_URL" \
             'any(.result.bindings[]?;
@@ -61,20 +65,27 @@ jobs:
               and .text == $expected)' \
             "$before" >/dev/null
           before_bindings=$(binding_fingerprint "$before")
+          stage="verify collector security contract before upload"
           verify_collector_security_contract
 
+          stage="upload Worker module content (requires Workers Scripts Write)"
           curl --fail-with-body --silent --show-error \
             -X PUT \
             -H "Authorization: Bearer ${CF_TOKEN}" \
             -F 'metadata={"main_module":"worker.js"};type=application/json' \
             -F 'worker.js=@workers/3q-site/worker.js;filename=worker.js;type=application/javascript+module' \
             "${api}/content" > "$upload"
+          stage="validate Worker content upload response"
           jq -e '.success == true' "$upload" >/dev/null
 
+          stage="read Worker settings after upload"
           get_settings > "$after"
+          stage="validate Cloudflare settings response after upload"
           jq -e '.success == true' "$after" >/dev/null
           after_bindings=$(binding_fingerprint "$after")
+          stage="compare complete binding fingerprint before and after upload"
           test "$before_bindings" = "$after_bindings"
+          stage="verify required collector binding after upload"
           jq -e --arg name "$REQUIRED_BINDING" \
             --arg expected "$COLLECTOR_BASE_URL" \
             'any(.result.bindings[]?;
@@ -84,9 +95,12 @@ jobs:
             "$after" >/dev/null
 
           sleep 5
+          stage="verify collector security contract after upload"
           verify_collector_security_contract
+          stage="verify live /health contract"
           curl --fail-with-body --silent --show-error "${LIVE_BASE_URL}/health" \
             | jq -e '.ok == true and .worker == "3q-site" and .build == "growth-loop-telemetry-v2"' >/dev/null
+          stage="verify live /growth-loop/status and collector URL"
           curl --fail-with-body --silent --show-error "${LIVE_BASE_URL}/growth-loop/status" \
             | jq -e --arg expected "$COLLECTOR_BASE_URL" \
               '.ok == true
@@ -94,8 +108,10 @@ jobs:
                and .collector_origin == $expected
                and .collector_url_matches_expected == true
                and .build == "growth-loop-telemetry-v2"' >/dev/null
+          stage="verify live /contact markers"
           contact=$(curl --fail-with-body --silent --show-error "${LIVE_BASE_URL}/contact")
           grep -F 'data-growth-contact-mode="line-only"' <<<"$contact" >/dev/null
           grep -F 'data-growth-loop-telemetry' <<<"$contact" >/dev/null
           grep -F '匿名瀏覽與 CTA 成效事件' <<<"$contact" >/dev/null
+          stage="complete"
           echo "::notice::3q-site content deployed; bindings preserved; collector, build, status, and contact markers verified"

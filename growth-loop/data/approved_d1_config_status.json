@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:44:02.994Z",
+  "mode": "approved_d1_config_preview_local_only",
+  "status": "prepared_but_blocked_owner_d1_approval_or_inventory",
+  "config_path": "wrangler.jsonc",
+  "input_path": "owner_approval_input.json",
+  "input_exists": false,
+  "approval_detected": false,
+  "expected_database_name": "3q-growth-loop-candidate",
+  "approved_database_id": null,
+  "inventory_exact_match": false,
+  "current_database_id": "deb85e19-95fd-4611-8710-9cb6ea6dc7ff",
+  "current_id_is_placeholder": false,
+  "ready_to_apply": false,
+  "issues": [
+    "owner approval metadata is absent"
+  ],
+  "local_config_write_performed": false,
+  "external_effect": false,
+  "remote_d1_create_performed": false,
+  "remote_d1_migration_performed": false,
+  "remote_d1_query_performed": false,
+  "data_lp_events_write_performed": false,
+  "production_deploy_performed": false,
+  "public_link_change_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

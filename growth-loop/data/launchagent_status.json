@@ -1,0 +1,50 @@
+{
+  "ok": true,
+  "action": "status",
+  "label": "com.angelia.3q-growth-loop.weekly",
+  "generated_at": "2026-07-10T21:47:20.026Z",
+  "domain": "gui/501",
+  "service": "gui/501/com.angelia.3q-growth-loop.weekly",
+  "plist_template_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/launchd/com.angelia.3q-growth-loop.weekly.plist",
+  "plist_installed_path": "/Users/mac/Library/LaunchAgents/com.angelia.3q-growth-loop.weekly.plist",
+  "stdout_path": "/Users/mac/Library/Logs/Angelia/3q-growth-loop/weekly-runner.out.log",
+  "stderr_path": "/Users/mac/Library/Logs/Angelia/3q-growth-loop/weekly-runner.err.log",
+  "file_installed": true,
+  "service_loaded": true,
+  "launchd_installed": true,
+  "install_performed": false,
+  "uninstall_performed": false,
+  "local_persistent_schedule": true,
+  "schedule": {
+    "weekday": "Sunday",
+    "hour": 0,
+    "minute": 10,
+    "timezone": "Asia/Taipei"
+  },
+  "program_contains_weekly_runner": true,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "rollback_command": "npm run schedule:uninstall",
+  "launchctl_runtime": {
+    "state": "not running",
+    "active_count": 0,
+    "run_count": 1,
+    "service_pid": null,
+    "last_exit_code": 0,
+    "last_exit_value": "0",
+    "observed_successful_run": true,
+    "current_launchd_invocation_observed": false,
+    "current_process_descends_from_service": false,
+    "proof_kind": "completed_exit_zero"
+  },
+  "launchctl_print": {
+    "code": 0,
+    "output": "gui/501/com.angelia.3q-growth-loop.weekly = {\n\tactive count = 0\n\tpath = /Users/mac/Library/LaunchAgents/com.angelia.3q-growth-loop.weekly.plist\n\ttype = LaunchAgent\n\tstate = not running\n\n\tprogram = /bin/zsh\n\targuments = {\n\t\t/bin/zsh\n\t\t-lc\n\t\texport PATH=\"/Users/mac/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin\"; cd /Users/mac/Documents/Codex/control-center/3q-growth-loop && npm run weekly:local\n\t}\n\n\tstdout path = /Users/mac/Library/Logs/Angelia/3q-growth-loop/weekly-runner.out.log\n\tstderr path = /Users/mac/Library/Logs/Angelia/3q-growth-loop/weekly-runner.err.log\n\tinherited environment = {\n\t\tSSH_AUTH_SOCK => /var/run/com.apple.launchd.TZsUaYDoQP/Listeners\n\t}\n\n\tdefault environment = {\n\t\tPATH => /usr/bin:/bin:/usr/sbin:/sbin\n\t}\n\n\tenvironment = {\n\t\tOSLogRateLimit => 64\n\t\tXPC_SERVICE_NAME => com.angelia.3q-growth-loop.weekly\n\t}\n\n\tdomain = gui/501 [100023]\n\tasid = 100023\n\tminimum runtime = 10\n\texit timeout = 5\n\truns = 1\n\tlast exit code = 0\n\n\tevent triggers = {\n\t\tcom.angelia.3q-growth-loop.weekly.268435470 => {\n\t\t\tkeepalive = 0\n\t\t\tservice = com.angelia.3q-growth-loop.weekly\n\t\t\tstream = com.apple.launchd.calendarinterval"
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:45:56.412Z",
+  "mode": "line_inbound_fixture_dry_run",
+  "playbook_json_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/line_inbound_playbook.json",
+  "playbook_md_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/line_inbound_playbook.md",
+  "scenario_count": 6,
+  "checks": [
+    {
+      "id": "inbound_only_manual_reply",
+      "ok": true,
+      "external_effect": false
+    },
+    {
+      "id": "aggregate_only_no_customer_storage",
+      "ok": true,
+      "external_effect": false
+    },
+    {
+      "id": "required_event_types_mapped",
+      "ok": true,
+      "external_effect": false
+    },
+    {
+      "id": "requested_fields_are_bucket_only",
+      "ok": true,
+      "external_effect": false
+    },
+    {
+      "id": "manual_contract_safe_columns",
+      "ok": true,
+      "external_effect": false
+    },
+    {
+      "id": "manual_contract_allowed_event_types",
+      "ok": true,
+      "external_effect": false
+    },
+    {
+      "id": "one_variable_context_preserved",
+      "ok": true,
+      "external_effect": false
+    },
+    {
+      "id": "red_line_flags_false",
+      "ok": true,
+      "external_effect": false
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "allowed_line_add_count_row",
+      "ok": true,
+      "expected_valid": true,
+      "actual_valid": true,
+      "issues": [],
+      "external_effect": false
+    },
+    {
+      "id": "allowed_lead_submit_count_row",
+      "ok": true,
+      "expected_valid": true,
+      "actual_valid": true,
+      "issues": [],
+      "external_effect": false
+    },
+    {
+      "id": "blocked_phone_column",
+      "ok": true,
+      "expected_valid": false,
+      "actual_valid": false,
+      "issues": [
+        "unknown_columns=phone",
+        "sensitive_columns=phone",
+        "sensitive_values=phone"
+      ],
+      "external_effect": false
+    },
+    {
+      "id": "blocked_email_value",
+      "ok": true,
+      "expected_valid": false,
+      "actual_valid": false,
+      "issues": [
+        "sensitive_values=source"
+      ],
+      "external_effect": false
+    },
+    {
+      "id": "blocked_chat_message_column",
+      "ok": true,
+      "expected_valid": false,
+      "actual_valid": false,
+      "issues": [
+        "unknown_columns=message",
+        "sensitive_columns=message"
+      ],
+      "external_effect": false
+    },
+    {
+      "id": "deal_stays_owner_confirmed_aggregate",
+      "ok": true,
+      "expected_valid": true,
+      "actual_valid": true,
+      "issues": [],
+      "external_effect": false
+    }
+  ],
+  "execution_performed": false,
+  "external_effect": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "data_lp_events_write_performed": false,
+  "note": "Fixture-only LINE inbound playbook guard. It validates aggregate-only manual conversion rows and never sends LINE messages."
+}

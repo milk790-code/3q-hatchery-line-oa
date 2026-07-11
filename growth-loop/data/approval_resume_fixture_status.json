@@ -1,0 +1,1305 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:48:01.253Z",
+  "mode": "approval_resume_fixture_dry_run",
+  "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh",
+  "scenario_count": 11,
+  "scenarios": [
+    {
+      "id": "no_input_keeps_all_gates_blocked",
+      "ok": true,
+      "command": "node scripts/approval-resume-plan.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/no_input_keeps_all_gates_blocked/owner_approval_input.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/no_input_keeps_all_gates_blocked/approval_resume_status.json --plan=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/no_input_keeps_all_gates_blocked/approval_resume_plan.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/no_input_keeps_all_gates_blocked/owner_approval_input.example.json",
+      "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/no_input_keeps_all_gates_blocked/approval_resume_status.json",
+      "plan_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/no_input_keeps_all_gates_blocked/approval_resume_plan.md",
+      "stdout_bytes": 7981,
+      "stderr_bytes": 0,
+      "ready_gate_count": 0,
+      "status": "prepared_but_blocked",
+      "sensitive_approval_detected": false,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "cloudflare_account_alias",
+            "d1_database_name",
+            "d1_database_id"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,cloudflare_account_alias,d1_database_name,d1_database_id"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "worker_name",
+            "worker_url",
+            "rollback_plan"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,worker_name,worker_url,rollback_plan"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "champion_url",
+            "public_surface",
+            "rollback_url"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,champion_url,public_surface,rollback_url"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "repo_url",
+            "branch_name"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,repo_url,branch_name"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "gate_status=manual_only; execution is not automated.",
+            "missing_fields=approved_by,approved_at"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        }
+      ]
+    },
+    {
+      "id": "copied_example_placeholders_block_ready_state",
+      "ok": true,
+      "command": "node scripts/approval-resume-plan.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/copied_example_placeholders_block_ready_state/owner_approval_input.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/copied_example_placeholders_block_ready_state/approval_resume_status.json --plan=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/copied_example_placeholders_block_ready_state/approval_resume_plan.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/copied_example_placeholders_block_ready_state/owner_approval_input.example.json",
+      "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/copied_example_placeholders_block_ready_state/approval_resume_status.json",
+      "plan_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/copied_example_placeholders_block_ready_state/approval_resume_plan.md",
+      "stdout_bytes": 7371,
+      "stderr_bytes": 0,
+      "ready_gate_count": 0,
+      "status": "prepared_but_blocked",
+      "sensitive_approval_detected": false,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": true,
+          "missing_fields": [],
+          "placeholder_fields": [
+            "approved_by",
+            "cloudflare_account_alias"
+          ],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "placeholder_fields=approved_by,cloudflare_account_alias"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": true,
+          "missing_fields": [],
+          "placeholder_fields": [
+            "approved_by",
+            "worker_url"
+          ],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "placeholder_fields=approved_by,worker_url"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": true,
+          "missing_fields": [],
+          "placeholder_fields": [
+            "approved_by",
+            "champion_url",
+            "public_surface",
+            "rollback_url"
+          ],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "placeholder_fields=approved_by,champion_url,public_surface,rollback_url"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": true,
+          "missing_fields": [],
+          "placeholder_fields": [
+            "approved_by"
+          ],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "placeholder_fields=approved_by"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "gate_status=manual_only; execution is not automated.",
+            "missing_fields=approved_by,approved_at"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        }
+      ]
+    },
+    {
+      "id": "valid_github_gate_becomes_plan_only_ready",
+      "ok": true,
+      "command": "node scripts/approval-resume-plan.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/valid_github_gate_becomes_plan_only_ready/owner_approval_input.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/valid_github_gate_becomes_plan_only_ready/approval_resume_status.json --plan=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/valid_github_gate_becomes_plan_only_ready/approval_resume_plan.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/valid_github_gate_becomes_plan_only_ready/owner_approval_input.example.json",
+      "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/valid_github_gate_becomes_plan_only_ready/approval_resume_status.json",
+      "plan_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/valid_github_gate_becomes_plan_only_ready/approval_resume_plan.md",
+      "stdout_bytes": 7772,
+      "stderr_bytes": 0,
+      "ready_gate_count": 1,
+      "status": "owner_approval_detected_plan_only",
+      "sensitive_approval_detected": false,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "cloudflare_account_alias",
+            "d1_database_name",
+            "d1_database_id"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,cloudflare_account_alias,d1_database_name,d1_database_id"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "worker_name",
+            "worker_url",
+            "rollback_plan"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,worker_name,worker_url,rollback_plan"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "champion_url",
+            "public_surface",
+            "rollback_url"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,champion_url,public_surface,rollback_url"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "ready_for_owner_execution": true,
+          "owner_approval_detected": true,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "gate_status=manual_only; execution is not automated.",
+            "missing_fields=approved_by,approved_at"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        }
+      ]
+    },
+    {
+      "id": "sensitive_approval_value_blocks_gate",
+      "ok": true,
+      "command": "node scripts/approval-resume-plan.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/sensitive_approval_value_blocks_gate/owner_approval_input.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/sensitive_approval_value_blocks_gate/approval_resume_status.json --plan=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/sensitive_approval_value_blocks_gate/approval_resume_plan.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/sensitive_approval_value_blocks_gate/owner_approval_input.example.json",
+      "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/sensitive_approval_value_blocks_gate/approval_resume_status.json",
+      "plan_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/sensitive_approval_value_blocks_gate/approval_resume_plan.md",
+      "stdout_bytes": 7944,
+      "stderr_bytes": 0,
+      "ready_gate_count": 0,
+      "status": "prepared_but_blocked",
+      "sensitive_approval_detected": true,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "cloudflare_account_alias",
+            "d1_database_name",
+            "d1_database_id"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,cloudflare_account_alias,d1_database_name,d1_database_id"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "worker_name",
+            "worker_url",
+            "rollback_plan"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,worker_name,worker_url,rollback_plan"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "champion_url",
+            "public_surface",
+            "rollback_url"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,champion_url,public_surface,rollback_url"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": true,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [
+            "api_key"
+          ],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "sensitive_approval_fields=api_key"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "gate_status=manual_only; execution is not automated.",
+            "missing_fields=approved_by,approved_at"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        }
+      ]
+    },
+    {
+      "id": "public_ab_requires_absolute_champion_url",
+      "ok": true,
+      "command": "node scripts/approval-resume-plan.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/public_ab_requires_absolute_champion_url/owner_approval_input.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/public_ab_requires_absolute_champion_url/approval_resume_status.json --plan=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/public_ab_requires_absolute_champion_url/approval_resume_plan.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/public_ab_requires_absolute_champion_url/owner_approval_input.example.json",
+      "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/public_ab_requires_absolute_champion_url/approval_resume_status.json",
+      "plan_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/public_ab_requires_absolute_champion_url/approval_resume_plan.md",
+      "stdout_bytes": 7999,
+      "stderr_bytes": 0,
+      "ready_gate_count": 0,
+      "status": "prepared_but_blocked",
+      "sensitive_approval_detected": false,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "cloudflare_account_alias",
+            "d1_database_name",
+            "d1_database_id"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,cloudflare_account_alias,d1_database_name,d1_database_id"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "worker_name",
+            "worker_url",
+            "rollback_plan"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,worker_name,worker_url,rollback_plan"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": true,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [
+            {
+              "field": "champion_url",
+              "code": "invalid_champion_url",
+              "message": "champion_url must be an absolute http(s) URL."
+            }
+          ],
+          "blocked_reasons": [
+            "champion_url must be an absolute http(s) URL.",
+            "champion_url must be an absolute http(s) URL."
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "repo_url",
+            "branch_name"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,repo_url,branch_name"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "gate_status=manual_only; execution is not automated.",
+            "missing_fields=approved_by,approved_at"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        }
+      ]
+    },
+    {
+      "id": "manual_only_gate_never_becomes_automated",
+      "ok": true,
+      "command": "node scripts/approval-resume-plan.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/manual_only_gate_never_becomes_automated/owner_approval_input.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/manual_only_gate_never_becomes_automated/approval_resume_status.json --plan=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/manual_only_gate_never_becomes_automated/approval_resume_plan.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/manual_only_gate_never_becomes_automated/owner_approval_input.example.json",
+      "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/manual_only_gate_never_becomes_automated/approval_resume_status.json",
+      "plan_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/manual_only_gate_never_becomes_automated/approval_resume_plan.md",
+      "stdout_bytes": 7827,
+      "stderr_bytes": 0,
+      "ready_gate_count": 0,
+      "status": "prepared_but_blocked",
+      "sensitive_approval_detected": false,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "cloudflare_account_alias",
+            "d1_database_name",
+            "d1_database_id"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,cloudflare_account_alias,d1_database_name,d1_database_id"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "worker_name",
+            "worker_url",
+            "rollback_plan"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,worker_name,worker_url,rollback_plan"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "champion_url",
+            "public_surface",
+            "rollback_url"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,champion_url,public_surface,rollback_url"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "repo_url",
+            "branch_name"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,repo_url,branch_name"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": true,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "gate_status=manual_only; execution is not automated."
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        }
+      ]
+    },
+    {
+      "id": "invalid_d1_metadata_blocks_remote_gate",
+      "ok": true,
+      "command": "node scripts/approval-resume-plan.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_d1_metadata_blocks_remote_gate/owner_approval_input.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_d1_metadata_blocks_remote_gate/approval_resume_status.json --plan=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_d1_metadata_blocks_remote_gate/approval_resume_plan.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_d1_metadata_blocks_remote_gate/owner_approval_input.example.json",
+      "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_d1_metadata_blocks_remote_gate/approval_resume_status.json",
+      "plan_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_d1_metadata_blocks_remote_gate/approval_resume_plan.md",
+      "stdout_bytes": 8196,
+      "stderr_bytes": 0,
+      "ready_gate_count": 0,
+      "status": "prepared_but_blocked",
+      "sensitive_approval_detected": false,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": true,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [
+            {
+              "field": "d1_database_id",
+              "code": "invalid_d1_database_id",
+              "message": "d1_database_id must be a UUID-like Cloudflare D1 database id."
+            },
+            {
+              "field": "d1_database_name",
+              "code": "invalid_d1_database_name",
+              "message": "d1_database_name must be a safe Cloudflare resource name."
+            }
+          ],
+          "blocked_reasons": [
+            "d1_database_id must be a UUID-like Cloudflare D1 database id.",
+            "d1_database_name must be a safe Cloudflare resource name."
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "worker_name",
+            "worker_url",
+            "rollback_plan"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,worker_name,worker_url,rollback_plan"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "champion_url",
+            "public_surface",
+            "rollback_url"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,champion_url,public_surface,rollback_url"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "repo_url",
+            "branch_name"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,repo_url,branch_name"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "gate_status=manual_only; execution is not automated.",
+            "missing_fields=approved_by,approved_at"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        }
+      ]
+    },
+    {
+      "id": "invalid_worker_url_blocks_deploy_gate",
+      "ok": true,
+      "command": "node scripts/approval-resume-plan.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_worker_url_blocks_deploy_gate/owner_approval_input.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_worker_url_blocks_deploy_gate/approval_resume_status.json --plan=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_worker_url_blocks_deploy_gate/approval_resume_plan.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_worker_url_blocks_deploy_gate/owner_approval_input.example.json",
+      "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_worker_url_blocks_deploy_gate/approval_resume_status.json",
+      "plan_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_worker_url_blocks_deploy_gate/approval_resume_plan.md",
+      "stdout_bytes": 7933,
+      "stderr_bytes": 0,
+      "ready_gate_count": 0,
+      "status": "prepared_but_blocked",
+      "sensitive_approval_detected": false,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "cloudflare_account_alias",
+            "d1_database_name",
+            "d1_database_id"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,cloudflare_account_alias,d1_database_name,d1_database_id"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": true,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [
+            {
+              "field": "worker_url",
+              "code": "invalid_worker_url",
+              "message": "worker_url must be an absolute http(s) URL."
+            }
+          ],
+          "blocked_reasons": [
+            "worker_url must be an absolute http(s) URL."
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "champion_url",
+            "public_surface",
+            "rollback_url"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,champion_url,public_surface,rollback_url"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "repo_url",
+            "branch_name"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,repo_url,branch_name"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "gate_status=manual_only; execution is not automated.",
+            "missing_fields=approved_by,approved_at"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        }
+      ]
+    },
+    {
+      "id": "invalid_github_metadata_blocks_pr_gate",
+      "ok": true,
+      "command": "node scripts/approval-resume-plan.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_github_metadata_blocks_pr_gate/owner_approval_input.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_github_metadata_blocks_pr_gate/approval_resume_status.json --plan=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_github_metadata_blocks_pr_gate/approval_resume_plan.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_github_metadata_blocks_pr_gate/owner_approval_input.example.json",
+      "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_github_metadata_blocks_pr_gate/approval_resume_status.json",
+      "plan_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_github_metadata_blocks_pr_gate/approval_resume_plan.md",
+      "stdout_bytes": 8189,
+      "stderr_bytes": 0,
+      "ready_gate_count": 0,
+      "status": "prepared_but_blocked",
+      "sensitive_approval_detected": false,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "cloudflare_account_alias",
+            "d1_database_name",
+            "d1_database_id"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,cloudflare_account_alias,d1_database_name,d1_database_id"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "worker_name",
+            "worker_url",
+            "rollback_plan"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,worker_name,worker_url,rollback_plan"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "champion_url",
+            "public_surface",
+            "rollback_url"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,champion_url,public_surface,rollback_url"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": true,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [
+            {
+              "field": "repo_url",
+              "code": "invalid_repo_url",
+              "message": "repo_url must be a GitHub repository URL."
+            },
+            {
+              "field": "branch_name",
+              "code": "invalid_branch_name",
+              "message": "branch_name must be a safe git branch name."
+            }
+          ],
+          "blocked_reasons": [
+            "repo_url must be a GitHub repository URL.",
+            "branch_name must be a safe git branch name."
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "gate_status=manual_only; execution is not automated.",
+            "missing_fields=approved_by,approved_at"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        }
+      ]
+    },
+    {
+      "id": "wrong_valid_github_target_blocks_pr_gate",
+      "ok": true,
+      "command": "node scripts/approval-resume-plan.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/wrong_valid_github_target_blocks_pr_gate/owner_approval_input.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/wrong_valid_github_target_blocks_pr_gate/approval_resume_status.json --plan=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/wrong_valid_github_target_blocks_pr_gate/approval_resume_plan.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/wrong_valid_github_target_blocks_pr_gate/owner_approval_input.example.json",
+      "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/wrong_valid_github_target_blocks_pr_gate/approval_resume_status.json",
+      "plan_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/wrong_valid_github_target_blocks_pr_gate/approval_resume_plan.md",
+      "stdout_bytes": 8319,
+      "stderr_bytes": 0,
+      "ready_gate_count": 0,
+      "status": "prepared_but_blocked",
+      "sensitive_approval_detected": false,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "cloudflare_account_alias",
+            "d1_database_name",
+            "d1_database_id"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,cloudflare_account_alias,d1_database_name,d1_database_id"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "worker_name",
+            "worker_url",
+            "rollback_plan"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,worker_name,worker_url,rollback_plan"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "champion_url",
+            "public_surface",
+            "rollback_url"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,champion_url,public_surface,rollback_url"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": true,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [
+            {
+              "field": "repo_url",
+              "code": "unexpected_repo_url",
+              "message": "repo_url must target milk790-code/3q-hatchery-line-oa for the prepared Champion commit."
+            },
+            {
+              "field": "branch_name",
+              "code": "unexpected_branch_name",
+              "message": "branch_name must match codex/3q-growth-loop-champion-v1."
+            }
+          ],
+          "blocked_reasons": [
+            "repo_url must target milk790-code/3q-hatchery-line-oa for the prepared Champion commit.",
+            "branch_name must match codex/3q-growth-loop-champion-v1."
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "gate_status=manual_only; execution is not automated.",
+            "missing_fields=approved_by,approved_at"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        }
+      ]
+    },
+    {
+      "id": "invalid_approval_timestamp_blocks_gate",
+      "ok": true,
+      "command": "node scripts/approval-resume-plan.mjs --input=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_approval_timestamp_blocks_gate/owner_approval_input.json --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_approval_timestamp_blocks_gate/approval_resume_status.json --plan=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_approval_timestamp_blocks_gate/approval_resume_plan.md --example=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_approval_timestamp_blocks_gate/owner_approval_input.example.json",
+      "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_approval_timestamp_blocks_gate/approval_resume_status.json",
+      "plan_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-growth-loop-approval-fixtures-D7Ifvh/invalid_approval_timestamp_blocks_gate/approval_resume_plan.md",
+      "stdout_bytes": 7978,
+      "stderr_bytes": 0,
+      "ready_gate_count": 0,
+      "status": "prepared_but_blocked",
+      "sensitive_approval_detected": false,
+      "execution_performed": false,
+      "external_effect": false,
+      "gate_summary": [
+        {
+          "gate_id": "remote_d1_create_and_migrate",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "cloudflare_account_alias",
+            "d1_database_name",
+            "d1_database_id"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,cloudflare_account_alias,d1_database_name,d1_database_id"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "candidate_worker_production_deploy",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "worker_name",
+            "worker_url",
+            "rollback_plan"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,worker_name,worker_url,rollback_plan"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "public_ab_small_traffic_link",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at",
+            "champion_url",
+            "public_surface",
+            "rollback_url"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "missing_fields=approved_by,approved_at,champion_url,public_surface,rollback_url"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "github_repo_branch_pr",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": true,
+          "missing_fields": [],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [
+            {
+              "field": "approved_at",
+              "code": "invalid_datetime",
+              "message": "approved_at must be an ISO datetime string."
+            }
+          ],
+          "blocked_reasons": [
+            "approved_at must be an ISO datetime string."
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        },
+        {
+          "gate_id": "formal_posts_line_push_payment_customer_data",
+          "ready_for_owner_execution": false,
+          "owner_approval_detected": false,
+          "missing_fields": [
+            "approved_by",
+            "approved_at"
+          ],
+          "placeholder_fields": [],
+          "sensitive_approval_fields": [],
+          "field_validation_errors": [],
+          "blocked_reasons": [
+            "owner_approval_input.json has no approval entry for this gate.",
+            "gate_status=manual_only; execution is not automated.",
+            "missing_fields=approved_by,approved_at"
+          ],
+          "executed": false,
+          "execution_policy": "dry_run_plan_only"
+        }
+      ]
+    }
+  ],
+  "execution_performed": false,
+  "external_effect": false,
+  "remote_d1_create_performed": false,
+  "remote_d1_migration_performed": false,
+  "production_deploy_performed": false,
+  "public_link_change_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Fixture-only approval resume contract. It uses temporary owner approval inputs and never executes external commands."
+}

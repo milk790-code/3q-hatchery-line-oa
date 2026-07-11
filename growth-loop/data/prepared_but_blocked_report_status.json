@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:48:24.686Z",
+  "mode": "prepared_but_blocked_report_local_only",
+  "status": "prepared_but_blocked",
+  "data_evidence_gate_count": 3,
+  "unmet_data_evidence_gate_count": 3,
+  "data_evidence_ready": false,
+  "blocked_item_count": 8,
+  "pending_human_approval_count": 5,
+  "redline_queue_covered": true,
+  "no_autorun_for_external_gates": true,
+  "next_operator_action": "p0_collect_sample_gate_counts: Open next_p0_owner_form.html or next_p0_quick_capture.md, fill aggregate-only P0 counts, then rerun owner intake/weekly verification.",
+  "outputs": {
+    "report_md": "prepared_but_blocked.md",
+    "status_json": "data/prepared_but_blocked_report_status.json",
+    "source_json": "prepared_but_blocked.json"
+  },
+  "external_effect": false,
+  "data_lp_events_write_performed": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

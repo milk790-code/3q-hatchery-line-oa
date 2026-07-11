@@ -1,0 +1,455 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:44:51.068Z",
+  "mode": "sample_gate_collection_plan",
+  "status": "waiting_for_sample_gate_counts",
+  "operator": "Angelia 3Q Growth Loop Operator",
+  "week": {
+    "start": "2026-06-29",
+    "end": "2026-07-05",
+    "startUtc": "2026-06-28T16:00:00.000Z",
+    "endUtc": "2026-07-05T15:59:59.999Z"
+  },
+  "current_round": {
+    "changed_variable": "cta_text",
+    "one_variable_rule": [
+      "hook",
+      "offer",
+      "visual_claim",
+      "cta_text"
+    ]
+  },
+  "required_event_types": [
+    "page_view",
+    "cta_click",
+    "line_add"
+  ],
+  "sample_stage_count": 3,
+  "p0_task_count": 18,
+  "p0_link_count": 6,
+  "global_sample_gaps": {
+    "visits": 100,
+    "cta_clicks": 20,
+    "line_adds": 5,
+    "test_days": 3
+  },
+  "sample_progress": {
+    "min_visits": 100,
+    "min_cta_clicks": 20,
+    "min_line_adds": 5,
+    "min_test_days": 3,
+    "preferred_test_days": 7,
+    "current_visits": 0,
+    "current_cta_clicks": 0,
+    "current_line_adds": 0,
+    "current_test_days": 0,
+    "gaps": {
+      "visits": 100,
+      "cta_clicks": 20,
+      "line_adds": 5,
+      "test_days": 3
+    },
+    "sample_threshold_met": false
+  },
+  "event_summaries": [
+    {
+      "event_type": "page_view",
+      "sample_gate_key": "visits",
+      "current": 0,
+      "target_minimum": 100,
+      "preferred_target": 100,
+      "global_sample_gap": 100,
+      "p0_task_count": 6,
+      "source_surfaces": [
+        "candidate Worker D1 / landing page analytics"
+      ],
+      "source_metrics": [
+        "page_view count by asset_id / content_id / variant_id"
+      ],
+      "target_live_files": [
+        "data/funnel_aggregates.csv"
+      ]
+    },
+    {
+      "event_type": "cta_click",
+      "sample_gate_key": "cta_clicks",
+      "current": 0,
+      "target_minimum": 20,
+      "preferred_target": 20,
+      "global_sample_gap": 20,
+      "p0_task_count": 6,
+      "source_surfaces": [
+        "candidate Worker D1 / landing page analytics"
+      ],
+      "source_metrics": [
+        "cta_click count by asset_id / content_id / variant_id"
+      ],
+      "target_live_files": [
+        "data/funnel_aggregates.csv"
+      ]
+    },
+    {
+      "event_type": "line_add",
+      "sample_gate_key": "line_adds",
+      "current": 0,
+      "target_minimum": 5,
+      "preferred_target": 5,
+      "global_sample_gap": 5,
+      "p0_task_count": 6,
+      "source_surfaces": [
+        "LINE OA 管理後台 / inbound customer-service aggregate"
+      ],
+      "source_metrics": [
+        "line_add aggregate count by tracking context"
+      ],
+      "target_live_files": [
+        "data/manual_conversions.csv"
+      ]
+    }
+  ],
+  "link_groups": [
+    {
+      "collection_order": 1,
+      "tracking_link_id": "track-champion-3q-line-v0",
+      "role": "champion",
+      "asset_id": "champion-3q-line-v0",
+      "content_id": "2026-06-29-champion",
+      "variant_id": "champion-3q-line-v0",
+      "tasks_by_event_type": {
+        "page_view": {
+          "task_id": "2026-06-29-track-champion-3q-line-v0-page-view",
+          "event_type": "page_view",
+          "sample_gate_key": "visits",
+          "global_sample_gap": 100,
+          "source_surface": "candidate Worker D1 / landing page analytics",
+          "source_metric": "page_view count by asset_id / content_id / variant_id",
+          "target_live_file": "data/funnel_aggregates.csv",
+          "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+          "evidence_rule": "只記 aggregate page views；不要存 IP、User-Agent、個人識別。",
+          "external_effect": false
+        },
+        "cta_click": {
+          "task_id": "2026-06-29-track-champion-3q-line-v0-cta-click",
+          "event_type": "cta_click",
+          "sample_gate_key": "cta_clicks",
+          "global_sample_gap": 20,
+          "source_surface": "candidate Worker D1 / landing page analytics",
+          "source_metric": "cta_click count by asset_id / content_id / variant_id",
+          "target_live_file": "data/funnel_aggregates.csv",
+          "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+          "evidence_rule": "只記 aggregate CTA clicks；不要存個別 session 明細。",
+          "external_effect": false
+        },
+        "line_add": {
+          "task_id": "2026-06-29-track-champion-3q-line-v0-line-add",
+          "event_type": "line_add",
+          "sample_gate_key": "line_adds",
+          "global_sample_gap": 5,
+          "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+          "source_metric": "line_add aggregate count by tracking context",
+          "target_live_file": "data/manual_conversions.csv",
+          "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+          "evidence_rule": "只記新增數或進線數；不要貼 LINE user id、暱稱、聊天內容。",
+          "external_effect": false
+        }
+      }
+    },
+    {
+      "collection_order": 2,
+      "tracking_link_id": "track-challenger-week0-cta-text-v1",
+      "role": "challenger",
+      "asset_id": "challenger-week0-cta-text-v1",
+      "content_id": "2026-06-29-challenger",
+      "variant_id": "challenger-week0-cta-text-v1",
+      "tasks_by_event_type": {
+        "page_view": {
+          "task_id": "2026-06-29-track-challenger-week0-cta-text-v1-page-view",
+          "event_type": "page_view",
+          "sample_gate_key": "visits",
+          "global_sample_gap": 100,
+          "source_surface": "candidate Worker D1 / landing page analytics",
+          "source_metric": "page_view count by asset_id / content_id / variant_id",
+          "target_live_file": "data/funnel_aggregates.csv",
+          "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+          "evidence_rule": "只記 aggregate page views；不要存 IP、User-Agent、個人識別。",
+          "external_effect": false
+        },
+        "cta_click": {
+          "task_id": "2026-06-29-track-challenger-week0-cta-text-v1-cta-click",
+          "event_type": "cta_click",
+          "sample_gate_key": "cta_clicks",
+          "global_sample_gap": 20,
+          "source_surface": "candidate Worker D1 / landing page analytics",
+          "source_metric": "cta_click count by asset_id / content_id / variant_id",
+          "target_live_file": "data/funnel_aggregates.csv",
+          "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+          "evidence_rule": "只記 aggregate CTA clicks；不要存個別 session 明細。",
+          "external_effect": false
+        },
+        "line_add": {
+          "task_id": "2026-06-29-track-challenger-week0-cta-text-v1-line-add",
+          "event_type": "line_add",
+          "sample_gate_key": "line_adds",
+          "global_sample_gap": 5,
+          "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+          "source_metric": "line_add aggregate count by tracking context",
+          "target_live_file": "data/manual_conversions.csv",
+          "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+          "evidence_rule": "只記新增數或進線數；不要貼 LINE user id、暱稱、聊天內容。",
+          "external_effect": false
+        }
+      }
+    },
+    {
+      "collection_order": 3,
+      "tracking_link_id": "track-challenger-week0-cta-text-v1-line",
+      "role": "line_cta",
+      "asset_id": "challenger-week0-cta-text-v1",
+      "content_id": "2026-06-29-line-cta",
+      "variant_id": "challenger-week0-cta-text-v1-line",
+      "tasks_by_event_type": {
+        "page_view": {
+          "task_id": "2026-06-29-track-challenger-week0-cta-text-v1-line-page-view",
+          "event_type": "page_view",
+          "sample_gate_key": "visits",
+          "global_sample_gap": 100,
+          "source_surface": "candidate Worker D1 / landing page analytics",
+          "source_metric": "page_view count by asset_id / content_id / variant_id",
+          "target_live_file": "data/funnel_aggregates.csv",
+          "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+          "evidence_rule": "只記 aggregate page views；不要存 IP、User-Agent、個人識別。",
+          "external_effect": false
+        },
+        "cta_click": {
+          "task_id": "2026-06-29-track-challenger-week0-cta-text-v1-line-cta-click",
+          "event_type": "cta_click",
+          "sample_gate_key": "cta_clicks",
+          "global_sample_gap": 20,
+          "source_surface": "candidate Worker D1 / landing page analytics",
+          "source_metric": "cta_click count by asset_id / content_id / variant_id",
+          "target_live_file": "data/funnel_aggregates.csv",
+          "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+          "evidence_rule": "只記 aggregate CTA clicks；不要存個別 session 明細。",
+          "external_effect": false
+        },
+        "line_add": {
+          "task_id": "2026-06-29-track-challenger-week0-cta-text-v1-line-line-add",
+          "event_type": "line_add",
+          "sample_gate_key": "line_adds",
+          "global_sample_gap": 5,
+          "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+          "source_metric": "line_add aggregate count by tracking context",
+          "target_live_file": "data/manual_conversions.csv",
+          "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+          "evidence_rule": "只記新增數或進線數；不要貼 LINE user id、暱稱、聊天內容。",
+          "external_effect": false
+        }
+      }
+    },
+    {
+      "collection_order": 4,
+      "tracking_link_id": "post-week0-post-001-cta-v1-diagnostic",
+      "role": "content_variant",
+      "asset_id": "challenger-week0-cta-text-v1",
+      "content_id": "week0-post-001",
+      "variant_id": "cta-v1-diagnostic",
+      "tasks_by_event_type": {
+        "page_view": {
+          "task_id": "2026-06-29-post-week0-post-001-cta-v1-diagnostic-page-view",
+          "event_type": "page_view",
+          "sample_gate_key": "visits",
+          "global_sample_gap": 100,
+          "source_surface": "candidate Worker D1 / landing page analytics",
+          "source_metric": "page_view count by asset_id / content_id / variant_id",
+          "target_live_file": "data/funnel_aggregates.csv",
+          "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+          "evidence_rule": "只記 aggregate page views；不要存 IP、User-Agent、個人識別。",
+          "external_effect": false
+        },
+        "cta_click": {
+          "task_id": "2026-06-29-post-week0-post-001-cta-v1-diagnostic-cta-click",
+          "event_type": "cta_click",
+          "sample_gate_key": "cta_clicks",
+          "global_sample_gap": 20,
+          "source_surface": "candidate Worker D1 / landing page analytics",
+          "source_metric": "cta_click count by asset_id / content_id / variant_id",
+          "target_live_file": "data/funnel_aggregates.csv",
+          "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+          "evidence_rule": "只記 aggregate CTA clicks；不要存個別 session 明細。",
+          "external_effect": false
+        },
+        "line_add": {
+          "task_id": "2026-06-29-post-week0-post-001-cta-v1-diagnostic-line-add",
+          "event_type": "line_add",
+          "sample_gate_key": "line_adds",
+          "global_sample_gap": 5,
+          "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+          "source_metric": "line_add aggregate count by tracking context",
+          "target_live_file": "data/manual_conversions.csv",
+          "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+          "evidence_rule": "只記新增數或進線數；不要貼 LINE user id、暱稱、聊天內容。",
+          "external_effect": false
+        }
+      }
+    },
+    {
+      "collection_order": 5,
+      "tracking_link_id": "post-week0-post-002-cta-v2-audit",
+      "role": "content_variant",
+      "asset_id": "challenger-week0-cta-text-v1",
+      "content_id": "week0-post-002",
+      "variant_id": "cta-v2-audit",
+      "tasks_by_event_type": {
+        "page_view": {
+          "task_id": "2026-06-29-post-week0-post-002-cta-v2-audit-page-view",
+          "event_type": "page_view",
+          "sample_gate_key": "visits",
+          "global_sample_gap": 100,
+          "source_surface": "candidate Worker D1 / landing page analytics",
+          "source_metric": "page_view count by asset_id / content_id / variant_id",
+          "target_live_file": "data/funnel_aggregates.csv",
+          "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+          "evidence_rule": "只記 aggregate page views；不要存 IP、User-Agent、個人識別。",
+          "external_effect": false
+        },
+        "cta_click": {
+          "task_id": "2026-06-29-post-week0-post-002-cta-v2-audit-cta-click",
+          "event_type": "cta_click",
+          "sample_gate_key": "cta_clicks",
+          "global_sample_gap": 20,
+          "source_surface": "candidate Worker D1 / landing page analytics",
+          "source_metric": "cta_click count by asset_id / content_id / variant_id",
+          "target_live_file": "data/funnel_aggregates.csv",
+          "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+          "evidence_rule": "只記 aggregate CTA clicks；不要存個別 session 明細。",
+          "external_effect": false
+        },
+        "line_add": {
+          "task_id": "2026-06-29-post-week0-post-002-cta-v2-audit-line-add",
+          "event_type": "line_add",
+          "sample_gate_key": "line_adds",
+          "global_sample_gap": 5,
+          "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+          "source_metric": "line_add aggregate count by tracking context",
+          "target_live_file": "data/manual_conversions.csv",
+          "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+          "evidence_rule": "只記新增數或進線數；不要貼 LINE user id、暱稱、聊天內容。",
+          "external_effect": false
+        }
+      }
+    },
+    {
+      "collection_order": 6,
+      "tracking_link_id": "post-week0-post-003-cta-v3-sample",
+      "role": "content_variant",
+      "asset_id": "challenger-week0-cta-text-v1",
+      "content_id": "week0-post-003",
+      "variant_id": "cta-v3-sample",
+      "tasks_by_event_type": {
+        "page_view": {
+          "task_id": "2026-06-29-post-week0-post-003-cta-v3-sample-page-view",
+          "event_type": "page_view",
+          "sample_gate_key": "visits",
+          "global_sample_gap": 100,
+          "source_surface": "candidate Worker D1 / landing page analytics",
+          "source_metric": "page_view count by asset_id / content_id / variant_id",
+          "target_live_file": "data/funnel_aggregates.csv",
+          "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+          "evidence_rule": "只記 aggregate page views；不要存 IP、User-Agent、個人識別。",
+          "external_effect": false
+        },
+        "cta_click": {
+          "task_id": "2026-06-29-post-week0-post-003-cta-v3-sample-cta-click",
+          "event_type": "cta_click",
+          "sample_gate_key": "cta_clicks",
+          "global_sample_gap": 20,
+          "source_surface": "candidate Worker D1 / landing page analytics",
+          "source_metric": "cta_click count by asset_id / content_id / variant_id",
+          "target_live_file": "data/funnel_aggregates.csv",
+          "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+          "evidence_rule": "只記 aggregate CTA clicks；不要存個別 session 明細。",
+          "external_effect": false
+        },
+        "line_add": {
+          "task_id": "2026-06-29-post-week0-post-003-cta-v3-sample-line-add",
+          "event_type": "line_add",
+          "sample_gate_key": "line_adds",
+          "global_sample_gap": 5,
+          "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+          "source_metric": "line_add aggregate count by tracking context",
+          "target_live_file": "data/manual_conversions.csv",
+          "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+          "evidence_rule": "只記新增數或進線數；不要貼 LINE user id、暱稱、聊天內容。",
+          "external_effect": false
+        }
+      }
+    }
+  ],
+  "owner_fill_path": "data/source_capture/source_capture_ledger.filled.csv",
+  "owner_sample_gate_fill_path": "data/source_capture/sample_gate_ledger.filled.csv",
+  "sample_gate_ledger_template_path": "data/source_capture/sample_gate_ledger.fill-template.csv",
+  "sample_gate_ledger_status_path": "data/sample_gate_ledger_status.json",
+  "sample_gate_ledger_rows": 18,
+  "sample_gate_ledger_ready": true,
+  "sample_gate_compile_preview_command": "npm run source:compile -- --input=data/source_capture/sample_gate_ledger.filled.csv --input-kind=sample_gate_filled",
+  "immediate_actions": [
+    {
+      "id": "open_sample_gate_plan",
+      "status": "ready_local_review",
+      "command": "Open sample_gate_collection_plan.md and collect page_view / cta_click / line_add aggregate counts first.",
+      "external_effect": false
+    },
+    {
+      "id": "create_sample_gate_filled_ledger_copy",
+      "status": "owner_local_review_required",
+      "command": "cp data/source_capture/sample_gate_ledger.fill-template.csv data/source_capture/sample_gate_ledger.filled.csv",
+      "external_effect": false
+    },
+    {
+      "id": "preview_sample_gate_ledger",
+      "status": "ready_after_owner_counts",
+      "command": "npm run source:compile -- --input=data/source_capture/sample_gate_ledger.filled.csv --input-kind=sample_gate_filled",
+      "external_effect": false
+    },
+    {
+      "id": "create_owner_filled_ledger_copy",
+      "status": "owner_local_review_required",
+      "command": "cp data/source_capture/source_capture_ledger.fill-template.csv data/source_capture/source_capture_ledger.filled.csv",
+      "note": "Run locally only after reviewing the template. This creates an owner working copy, not a live scoring input.",
+      "external_effect": false
+    },
+    {
+      "id": "fill_aggregate_counts",
+      "status": "owner_manual_input_required",
+      "command": "Open data/source_capture/source_capture_ledger.filled.csv and fill aggregate_count plus evidence fields.",
+      "note": "Use aggregate counts only. Do not paste customer rows or chat text.",
+      "external_effect": false
+    }
+  ],
+  "safety_rules": [
+    "Use aggregate counts only.",
+    "Do not rotate a new winner until sample thresholds are met and reviewed.",
+    "Do not promote a challenger unless line_add_rate beats champion by 1.15x, sample_threshold_met=true, and no_quality_regression=true.",
+    "Aggregate counts only.",
+    "No phone, email, LINE user ID, customer name, chat text, payment data, private notes, order IDs, or refund details.",
+    "Evidence refs should be local screenshot/export paths or source labels, not raw customer rows.",
+    "This brief never creates live input CSVs, appends data/lp_events.jsonl, deploys, posts, pushes LINE, changes public links, mutates customer data, touches payments, or deletes data."
+  ],
+  "real_events_before": 0,
+  "real_events_after": 0,
+  "real_events_unchanged": true,
+  "filled_ledger_exists": false,
+  "live_input_files_created": false,
+  "apply_performed": false,
+  "append_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false
+}

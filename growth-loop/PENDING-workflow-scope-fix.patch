@@ -1,0 +1,42 @@
+From f91704de61580b576fa712f388f61d42b932ebff Mon Sep 17 00:00:00 2001
+From: milk790-code <milk790@gmail.com>
+Date: Fri, 10 Jul 2026 10:36:18 +0800
+Subject: [PATCH] ci(3q-site): preserve GROWTH_LOOP_COLLECTOR_URL binding on
+ deploy
+
+The script-upload API replaces the full binding set on every push; with
+bindings:[] the Growth Loop collector env var was wiped each deploy and
+live-site telemetry silently stopped. Re-declare it from a workflow env.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+---
+ .github/workflows/deploy-3q-site.yml | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/.github/workflows/deploy-3q-site.yml b/.github/workflows/deploy-3q-site.yml
+index d774b78..750a43b 100644
+--- a/.github/workflows/deploy-3q-site.yml
++++ b/.github/workflows/deploy-3q-site.yml
+@@ -13,6 +13,9 @@ jobs:
+     runs-on: ubuntu-latest
+     env:
+       WORKER_NAME: 3q-site
++      # Growth Loop collector origin. Must be re-declared on every deploy, otherwise the
++      # script-upload API wipes the binding and the live-site telemetry silently stops.
++      GROWTH_LOOP_COLLECTOR_URL: https://3q-growth-loop-candidate.milk790.workers.dev
+     steps:
+       - uses: actions/checkout@v4
+       - name: Deploy
+@@ -21,7 +24,8 @@ jobs:
+           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+         run: |
+           set -euo pipefail
+-          jq -n '{ main_module:"worker.js", compatibility_date:"2024-12-01", bindings:[] }' > /tmp/meta.json
++          jq -n --arg collector "$GROWTH_LOOP_COLLECTOR_URL" \
++            '{ main_module:"worker.js", compatibility_date:"2024-12-01", bindings:[{ type:"plain_text", name:"GROWTH_LOOP_COLLECTOR_URL", text:$collector }] }' > /tmp/meta.json
+           resp=$(curl -sS -X PUT \
+             "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}" \
+             -H "Authorization: Bearer $CF_TOKEN" \
+-- 
+2.39.5 (Apple Git-154)
+

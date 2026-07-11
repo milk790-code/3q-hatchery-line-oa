@@ -1,0 +1,214 @@
+{
+  "generated_at": "2026-07-10T21:44:41.023Z",
+  "mode": "source_capture_checklist",
+  "operator": "Angelia 3Q Growth Loop Operator",
+  "week": {
+    "start": "2026-06-29",
+    "end": "2026-07-05",
+    "startUtc": "2026-06-28T16:00:00.000Z",
+    "endUtc": "2026-07-05T15:59:59.999Z"
+  },
+  "one_variable": "cta_text",
+  "source_readiness": {
+    "status": "waiting_for_real_data",
+    "real_event_rows": 0,
+    "missing_stage_count": 7,
+    "missing_stages": [
+      "link_click",
+      "page_view",
+      "cta_click",
+      "line_add",
+      "lead_submit",
+      "deal",
+      "quality_flag"
+    ]
+  },
+  "input_pack": {
+    "ok": true,
+    "status": "template_ready",
+    "template_count": 2,
+    "live_input_files_created": false
+  },
+  "links": [
+    {
+      "link_id": "track-champion-3q-line-v0",
+      "role": "champion",
+      "target": "champion",
+      "asset_id": "champion-3q-line-v0",
+      "content_id": "2026-06-29-champion",
+      "variant_id": "champion-3q-line-v0",
+      "importable_in_current_templates": true,
+      "human_gate": "Live champion URL verified read-only; do not change public routing without owner approval."
+    },
+    {
+      "link_id": "track-challenger-week0-cta-text-v1",
+      "role": "challenger",
+      "target": "challenger",
+      "asset_id": "challenger-week0-cta-text-v1",
+      "content_id": "2026-06-29-challenger",
+      "variant_id": "challenger-week0-cta-text-v1",
+      "importable_in_current_templates": true,
+      "human_gate": "Do not place this URL in public bio/post until owner approves small-traffic test."
+    },
+    {
+      "link_id": "track-challenger-week0-cta-text-v1-line",
+      "role": "line_cta",
+      "target": "line",
+      "asset_id": "challenger-week0-cta-text-v1",
+      "content_id": "2026-06-29-line-cta",
+      "variant_id": "challenger-week0-cta-text-v1-line",
+      "importable_in_current_templates": true,
+      "human_gate": "Do not use this LINE tracking redirect in public traffic until owner approves."
+    },
+    {
+      "link_id": "post-week0-post-001-cta-v1-diagnostic",
+      "role": "content_variant",
+      "target": "challenger",
+      "asset_id": "challenger-week0-cta-text-v1",
+      "content_id": "week0-post-001",
+      "variant_id": "cta-v1-diagnostic",
+      "importable_in_current_templates": true,
+      "human_gate": "Draft-only post tracking link. Do not publish, schedule, or place it in public traffic until owner approves the exact surface and copy."
+    },
+    {
+      "link_id": "post-week0-post-002-cta-v2-audit",
+      "role": "content_variant",
+      "target": "challenger",
+      "asset_id": "challenger-week0-cta-text-v1",
+      "content_id": "week0-post-002",
+      "variant_id": "cta-v2-audit",
+      "importable_in_current_templates": true,
+      "human_gate": "Draft-only post tracking link. Do not publish, schedule, or place it in public traffic until owner approves the exact surface and copy."
+    },
+    {
+      "link_id": "post-week0-post-003-cta-v3-sample",
+      "role": "content_variant",
+      "target": "challenger",
+      "asset_id": "challenger-week0-cta-text-v1",
+      "content_id": "week0-post-003",
+      "variant_id": "cta-v3-sample",
+      "importable_in_current_templates": true,
+      "human_gate": "Draft-only post tracking link. Do not publish, schedule, or place it in public traffic until owner approves the exact surface and copy."
+    },
+    {
+      "link_id": "ab-ab-week0-cta-text-001",
+      "role": "ab_small_traffic",
+      "target": "ab_router",
+      "asset_id": "champion-3q-line-v0:challenger-week0-cta-text-v1",
+      "content_id": "2026-06-29-ab-router",
+      "variant_id": null,
+      "importable_in_current_templates": false,
+      "human_gate": "Do not use this A/B router in public traffic until owner confirms champion URL, 10% challenger allocation, duration, and rollback."
+    }
+  ],
+  "stages": [
+    {
+      "event_type": "link_click",
+      "label": "連結點擊",
+      "source_surface": "社群平台連結點擊報表 / remote D1 link_click",
+      "source_metric": "link clicks by content_id / variant_id",
+      "target_template": "data/real_data_input_pack/funnel_aggregates.fill-template.csv",
+      "target_live_file": "data/funnel_aggregates.csv",
+      "evidence_rule": "只記 aggregate count 與報表截圖/匯出檔路徑；不要貼使用者名單。"
+    },
+    {
+      "event_type": "page_view",
+      "label": "落地頁瀏覽",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "source_metric": "page_view count by asset_id / content_id / variant_id",
+      "target_template": "data/real_data_input_pack/funnel_aggregates.fill-template.csv",
+      "target_live_file": "data/funnel_aggregates.csv",
+      "evidence_rule": "只記 aggregate page views；不要存 IP、User-Agent、個人識別。"
+    },
+    {
+      "event_type": "cta_click",
+      "label": "CTA 點擊",
+      "source_surface": "candidate Worker D1 / landing page analytics",
+      "source_metric": "cta_click count by asset_id / content_id / variant_id",
+      "target_template": "data/real_data_input_pack/funnel_aggregates.fill-template.csv",
+      "target_live_file": "data/funnel_aggregates.csv",
+      "evidence_rule": "只記 aggregate CTA clicks；不要存個別 session 明細。"
+    },
+    {
+      "event_type": "line_add",
+      "label": "LINE 進線 / 加好友",
+      "source_surface": "LINE OA 管理後台 / inbound customer-service aggregate",
+      "source_metric": "line_add aggregate count by tracking context",
+      "target_template": "data/real_data_input_pack/manual_conversions.fill-template.csv",
+      "target_live_file": "data/manual_conversions.csv",
+      "evidence_rule": "只記新增數或進線數；不要貼 LINE user id、暱稱、聊天內容。"
+    },
+    {
+      "event_type": "lead_submit",
+      "label": "留資",
+      "source_surface": "LINE 客服手動分桶 / lead qualification aggregate",
+      "source_metric": "lead_submit aggregate count",
+      "target_template": "data/real_data_input_pack/manual_conversions.fill-template.csv",
+      "target_live_file": "data/manual_conversions.csv",
+      "evidence_rule": "只記合格留資數；不要貼姓名、電話、email、公司私密資料。"
+    },
+    {
+      "event_type": "deal",
+      "label": "成交",
+      "source_surface": "owner-confirmed aggregate deal log",
+      "source_metric": "deal aggregate count",
+      "target_template": "data/real_data_input_pack/manual_conversions.fill-template.csv",
+      "target_live_file": "data/manual_conversions.csv",
+      "evidence_rule": "只記成交筆數與金額桶；不要貼付款資訊、ECPay 訂單或退款資料。"
+    },
+    {
+      "event_type": "quality_flag",
+      "label": "品質 / 垃圾訊號",
+      "source_surface": "LINE 客服手動分桶 / quality aggregate",
+      "source_metric": "quality_flag count and optional aggregate quality_score",
+      "target_template": "data/real_data_input_pack/manual_conversions.fill-template.csv",
+      "target_live_file": "data/manual_conversions.csv",
+      "evidence_rule": "只記品質旗標數；不要貼對話原文或客戶資料。"
+    }
+  ],
+  "ab_router_gates": [
+    {
+      "link_id": "ab-ab-week0-cta-text-001",
+      "tracking_url": "http://127.0.0.1:8787/ab/ab-week0-cta-text-001?utm_source=manual_review&utm_medium=growth_loop&utm_campaign=week0-cta-text&content_id=2026-06-29-ab-router",
+      "status": "owner_gate_before_public_traffic",
+      "note": "Do not place this A/B router in public traffic until owner approves champion URL, candidate Worker production deploy, test duration, and rollback."
+    }
+  ],
+  "ledger": {
+    "template_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/source_capture/source_capture_ledger.fill-template.csv",
+    "filled_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/source_capture/source_capture_ledger.filled.csv",
+    "sample_gate_template_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/source_capture/sample_gate_ledger.fill-template.csv",
+    "sample_gate_filled_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/source_capture/sample_gate_ledger.filled.csv",
+    "rows": 42,
+    "sample_gate_rows": 18,
+    "required_columns": [
+      "week_start",
+      "week_end",
+      "capture_date",
+      "stage",
+      "stage_label",
+      "asset_id",
+      "content_id",
+      "variant_id",
+      "tracking_link_id",
+      "tracking_url",
+      "source_surface",
+      "source_metric",
+      "target_template",
+      "target_live_file",
+      "aggregate_count",
+      "quality_score",
+      "evidence_ref",
+      "reviewer",
+      "pii_checked",
+      "notes"
+    ]
+  },
+  "safety_rules": [
+    "Collect aggregate counts only.",
+    "Do not paste customer names, phone, email, LINE user ID, profile URLs, chat text, private notes, payment IDs, order IDs, or refund details.",
+    "Evidence references should be local screenshot/export paths or short source labels, not raw customer rows.",
+    "This pack does not publish, deploy, change public links, push LINE, mutate customer data, touch payments, or delete data."
+  ],
+  "external_effect": false
+}

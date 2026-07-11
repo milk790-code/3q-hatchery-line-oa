@@ -1,0 +1,10 @@
+{
+  "reviewer": "owner",
+  "pii_checked": "yes",
+  "evidence_ref": "aggregate-quality-review/week0-cta-text",
+  "lead_rate_retention_vs_champion": 0.8,
+  "close_rate_retention_vs_champion": 0.8,
+  "spam_flag_rate": 0.05,
+  "low_quality_flag_count": 0,
+  "notes": "Aggregate-only. Do not include names, phone numbers, emails, LINE IDs, messages, payment data, or customer rows."
+}

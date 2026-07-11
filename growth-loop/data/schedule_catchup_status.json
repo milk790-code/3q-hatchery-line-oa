@@ -1,0 +1,58 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:48:20.084Z",
+  "mode": "weekly_schedule_catchup_monitor",
+  "status": "current_weekly_run_confirmed",
+  "timezone": "Asia/Taipei",
+  "schedule": {
+    "cadence": "weekly_sunday",
+    "weekday": "Sunday",
+    "hour": 0,
+    "minute": 10,
+    "timezone": "Asia/Taipei",
+    "utc_equivalent": "Saturday 16:10 UTC"
+  },
+  "latest_expected_run": {
+    "utc": "2026-07-04T16:10:00.000Z",
+    "taipei": "2026-07-05, 00:10:00 Asia/Taipei"
+  },
+  "next_expected_run": {
+    "utc": "2026-07-11T16:10:00.000Z",
+    "taipei": "2026-07-12, 00:10:00 Asia/Taipei"
+  },
+  "weekly_runner": {
+    "path": "data/weekly_runner_status.json",
+    "file_found": true,
+    "ok": true,
+    "status": "success",
+    "finished_at": "2026-07-10T21:48:19.360Z",
+    "log_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/logs/weekly-runner-20260710T214317Z.log",
+    "commands": 126,
+    "failed_commands": 0,
+    "pending_commands": 0,
+    "run_covers_latest_expected_run": true,
+    "missed_schedule_windows": 0
+  },
+  "launchagent": {
+    "path": "data/launchagent_status.json",
+    "file_found": true,
+    "ok": true,
+    "launchd_installed": true,
+    "local_persistent_schedule": true,
+    "rollback_command": "npm run schedule:uninstall"
+  },
+  "catchup_required": false,
+  "next_safe_action": "No catch-up needed. Review owner_console.html and wait for the next Sunday local run.",
+  "catchup_run_performed": false,
+  "weekly_runner_invoked": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Local read-only monitor. It detects missed weekly windows and never runs weekly:local automatically."
+}

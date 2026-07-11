@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:45:25.966Z",
+  "mode": "owner_sample_gate_intake",
+  "status": "waiting_for_owner_download",
+  "candidate_found": false,
+  "candidate_valid": false,
+  "candidate_paths_checked": [
+    "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/source_capture/inbox/sample_gate_ledger.filled.csv",
+    "/Users/mac/Downloads/sample_gate_ledger.filled.csv"
+  ],
+  "target_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/source_capture/sample_gate_ledger.filled.csv",
+  "stage_requested": false,
+  "confirm_owner_reviewed": false,
+  "stage_performed": false,
+  "live_input_files_created": false,
+  "real_events_before": 0,
+  "real_events_after": 0,
+  "real_events_unchanged": true,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "next_safe_action": "Download sample_gate_ledger.filled.csv from sample_gate_owner_form.html, then place it in data/source_capture/inbox/ or run owner:intake with --input.",
+  "note": "No owner-downloaded sample gate CSV was found. This is a safe waiting state."
+}

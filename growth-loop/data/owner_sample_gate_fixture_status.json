@@ -1,0 +1,1023 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:45:30.226Z",
+  "mode": "owner_sample_gate_fixture_dry_run",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/owner_sample_gate_fixture_status.json",
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/owner_sample_gate_fixture_report.md",
+  "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn",
+  "scenario_count": 7,
+  "scenarios": [
+    {
+      "id": "missing_input_waits_for_owner_counts",
+      "ok": true,
+      "description": "No owner-filled sample-gate ledger exists, so the status stays waiting and does not fail the weekly loop.",
+      "expected": {
+        "exitCode": 0,
+        "status": "waiting_for_owner_sample_gate_counts",
+        "decision": "continue_collecting_sample_gate_counts",
+        "sample_threshold_met": false,
+        "sample_rate_win_candidate": false,
+        "owner_review_required": false
+      },
+      "assertions": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "compact_status_written",
+          "ok": true,
+          "expected": "compact status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "full_status_written",
+          "ok": true,
+          "expected": "full status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "waiting_for_owner_sample_gate_counts",
+          "actual": "waiting_for_owner_sample_gate_counts",
+          "external_effect": false
+        },
+        {
+          "name": "decision",
+          "ok": true,
+          "expected": "continue_collecting_sample_gate_counts",
+          "actual": "continue_collecting_sample_gate_counts",
+          "external_effect": false
+        },
+        {
+          "name": "sample_threshold_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "sample_rate_win_candidate",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "quality_not_evaluated",
+          "ok": true,
+          "expected": "not_evaluated_from_sample_gate",
+          "actual": "not_evaluated_from_sample_gate",
+          "external_effect": false
+        },
+        {
+          "name": "no_final_win_rule",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_promotion",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "ok_flag",
+          "ok": true,
+          "expected": true,
+          "actual": "true:true",
+          "external_effect": false
+        }
+      ],
+      "command_exit_code": 0,
+      "status": "waiting_for_owner_sample_gate_counts",
+      "decision": "continue_collecting_sample_gate_counts",
+      "input_exists": false,
+      "filled_rows": 0,
+      "pending_rows": 18,
+      "issue_count": 0,
+      "sample_threshold_met": false,
+      "sample_rate_win_candidate": false,
+      "challenger_win_rule_met": false,
+      "quality_guard_status": "not_evaluated_from_sample_gate",
+      "promotion_performed": false,
+      "owner_review_required": false,
+      "challenger_gaps": {
+        "visits": 100,
+        "cta_clicks": 20,
+        "line_adds": 5,
+        "test_days": 3
+      },
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "temp_files": {
+        "input_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/missing_input_waits_for_owner_counts/sample_gate_ledger.filled.csv",
+        "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/missing_input_waits_for_owner_counts/owner_sample_gate_status.compact.json",
+        "json_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/missing_input_waits_for_owner_counts/owner_sample_gate_status.json",
+        "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/missing_input_waits_for_owner_counts/owner_sample_gate_status.md"
+      }
+    },
+    {
+      "id": "partial_counts_keep_collecting",
+      "ok": true,
+      "description": "Only some rows are filled, so the owner must finish remaining aggregate counts or enter 0 intentionally.",
+      "expected": {
+        "exitCode": 0,
+        "status": "owner_counts_incomplete",
+        "decision": "continue_collecting_sample_gate_counts",
+        "sample_threshold_met": false,
+        "sample_rate_win_candidate": false,
+        "owner_review_required": false
+      },
+      "assertions": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "compact_status_written",
+          "ok": true,
+          "expected": "compact status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "full_status_written",
+          "ok": true,
+          "expected": "full status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "owner_counts_incomplete",
+          "actual": "owner_counts_incomplete",
+          "external_effect": false
+        },
+        {
+          "name": "decision",
+          "ok": true,
+          "expected": "continue_collecting_sample_gate_counts",
+          "actual": "continue_collecting_sample_gate_counts",
+          "external_effect": false
+        },
+        {
+          "name": "sample_threshold_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "sample_rate_win_candidate",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "quality_not_evaluated",
+          "ok": true,
+          "expected": "not_evaluated_from_sample_gate",
+          "actual": "not_evaluated_from_sample_gate",
+          "external_effect": false
+        },
+        {
+          "name": "no_final_win_rule",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_promotion",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "ok_flag",
+          "ok": true,
+          "expected": true,
+          "actual": "true:true",
+          "external_effect": false
+        }
+      ],
+      "command_exit_code": 0,
+      "status": "owner_counts_incomplete",
+      "decision": "continue_collecting_sample_gate_counts",
+      "input_exists": true,
+      "filled_rows": 6,
+      "pending_rows": 12,
+      "issue_count": 0,
+      "sample_threshold_met": false,
+      "sample_rate_win_candidate": false,
+      "challenger_win_rule_met": false,
+      "quality_guard_status": "not_evaluated_from_sample_gate",
+      "promotion_performed": false,
+      "owner_review_required": false,
+      "challenger_gaps": {
+        "visits": 76,
+        "cta_clicks": 15,
+        "line_adds": 3,
+        "test_days": 2
+      },
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "temp_files": {
+        "input_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/partial_counts_keep_collecting/sample_gate_ledger.filled.csv",
+        "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/partial_counts_keep_collecting/owner_sample_gate_status.compact.json",
+        "json_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/partial_counts_keep_collecting/owner_sample_gate_status.json",
+        "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/partial_counts_keep_collecting/owner_sample_gate_status.md"
+      }
+    },
+    {
+      "id": "sample_insufficient_due_visits",
+      "ok": true,
+      "description": "The challenger has enough CTA and LINE adds but not enough visits, so the champion stays unchanged.",
+      "expected": {
+        "exitCode": 0,
+        "status": "sample_insufficient_keep_champion",
+        "decision": "continue_collecting_sample_gate_counts",
+        "sample_threshold_met": false,
+        "sample_rate_win_candidate": false,
+        "owner_review_required": false
+      },
+      "assertions": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "compact_status_written",
+          "ok": true,
+          "expected": "compact status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "full_status_written",
+          "ok": true,
+          "expected": "full status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "sample_insufficient_keep_champion",
+          "actual": "sample_insufficient_keep_champion",
+          "external_effect": false
+        },
+        {
+          "name": "decision",
+          "ok": true,
+          "expected": "continue_collecting_sample_gate_counts",
+          "actual": "continue_collecting_sample_gate_counts",
+          "external_effect": false
+        },
+        {
+          "name": "sample_threshold_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "sample_rate_win_candidate",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "quality_not_evaluated",
+          "ok": true,
+          "expected": "not_evaluated_from_sample_gate",
+          "actual": "not_evaluated_from_sample_gate",
+          "external_effect": false
+        },
+        {
+          "name": "no_final_win_rule",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_promotion",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "ok_flag",
+          "ok": true,
+          "expected": true,
+          "actual": "true:true",
+          "external_effect": false
+        }
+      ],
+      "command_exit_code": 0,
+      "status": "sample_insufficient_keep_champion",
+      "decision": "continue_collecting_sample_gate_counts",
+      "input_exists": true,
+      "filled_rows": 18,
+      "pending_rows": 0,
+      "issue_count": 0,
+      "sample_threshold_met": false,
+      "sample_rate_win_candidate": false,
+      "challenger_win_rule_met": false,
+      "quality_guard_status": "not_evaluated_from_sample_gate",
+      "promotion_performed": false,
+      "owner_review_required": false,
+      "challenger_gaps": {
+        "visits": 1,
+        "cta_clicks": 0,
+        "line_adds": 0,
+        "test_days": 0
+      },
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "temp_files": {
+        "input_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/sample_insufficient_due_visits/sample_gate_ledger.filled.csv",
+        "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/sample_insufficient_due_visits/owner_sample_gate_status.compact.json",
+        "json_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/sample_insufficient_due_visits/owner_sample_gate_status.json",
+        "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/sample_insufficient_due_visits/owner_sample_gate_status.md"
+      }
+    },
+    {
+      "id": "sample_insufficient_due_test_days",
+      "ok": true,
+      "description": "Counts clear numeric thresholds but all evidence is on one date, so min_test_days blocks the sample gate.",
+      "expected": {
+        "exitCode": 0,
+        "status": "sample_insufficient_keep_champion",
+        "decision": "continue_collecting_sample_gate_counts",
+        "sample_threshold_met": false,
+        "sample_rate_win_candidate": false,
+        "owner_review_required": false,
+        "challenger_test_day_gap_positive": true
+      },
+      "assertions": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "compact_status_written",
+          "ok": true,
+          "expected": "compact status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "full_status_written",
+          "ok": true,
+          "expected": "full status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "sample_insufficient_keep_champion",
+          "actual": "sample_insufficient_keep_champion",
+          "external_effect": false
+        },
+        {
+          "name": "decision",
+          "ok": true,
+          "expected": "continue_collecting_sample_gate_counts",
+          "actual": "continue_collecting_sample_gate_counts",
+          "external_effect": false
+        },
+        {
+          "name": "sample_threshold_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "sample_rate_win_candidate",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "quality_not_evaluated",
+          "ok": true,
+          "expected": "not_evaluated_from_sample_gate",
+          "actual": "not_evaluated_from_sample_gate",
+          "external_effect": false
+        },
+        {
+          "name": "no_final_win_rule",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_promotion",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "ok_flag",
+          "ok": true,
+          "expected": true,
+          "actual": "true:true",
+          "external_effect": false
+        },
+        {
+          "name": "challenger_test_day_gap_positive",
+          "ok": true,
+          "expected": ">0",
+          "actual": 2,
+          "external_effect": false
+        }
+      ],
+      "command_exit_code": 0,
+      "status": "sample_insufficient_keep_champion",
+      "decision": "continue_collecting_sample_gate_counts",
+      "input_exists": true,
+      "filled_rows": 18,
+      "pending_rows": 0,
+      "issue_count": 0,
+      "sample_threshold_met": false,
+      "sample_rate_win_candidate": false,
+      "challenger_win_rule_met": false,
+      "quality_guard_status": "not_evaluated_from_sample_gate",
+      "promotion_performed": false,
+      "owner_review_required": false,
+      "challenger_gaps": {
+        "visits": 0,
+        "cta_clicks": 0,
+        "line_adds": 0,
+        "test_days": 2
+      },
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "temp_files": {
+        "input_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/sample_insufficient_due_test_days/sample_gate_ledger.filled.csv",
+        "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/sample_insufficient_due_test_days/owner_sample_gate_status.compact.json",
+        "json_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/sample_insufficient_due_test_days/owner_sample_gate_status.json",
+        "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/sample_insufficient_due_test_days/owner_sample_gate_status.md"
+      }
+    },
+    {
+      "id": "sample_rate_win_needs_quality_review",
+      "ok": true,
+      "description": "The challenger clears sample thresholds and beats the champion rate, but final promotion stays blocked because quality is not evaluated here.",
+      "expected": {
+        "exitCode": 0,
+        "status": "sample_rate_win_needs_quality_review",
+        "decision": "queue_owner_quality_review_no_auto_promotion",
+        "sample_threshold_met": true,
+        "sample_rate_win_candidate": true,
+        "owner_review_required": true
+      },
+      "assertions": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "compact_status_written",
+          "ok": true,
+          "expected": "compact status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "full_status_written",
+          "ok": true,
+          "expected": "full status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "sample_rate_win_needs_quality_review",
+          "actual": "sample_rate_win_needs_quality_review",
+          "external_effect": false
+        },
+        {
+          "name": "decision",
+          "ok": true,
+          "expected": "queue_owner_quality_review_no_auto_promotion",
+          "actual": "queue_owner_quality_review_no_auto_promotion",
+          "external_effect": false
+        },
+        {
+          "name": "sample_threshold_met",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "sample_rate_win_candidate",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "quality_not_evaluated",
+          "ok": true,
+          "expected": "not_evaluated_from_sample_gate",
+          "actual": "not_evaluated_from_sample_gate",
+          "external_effect": false
+        },
+        {
+          "name": "no_final_win_rule",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_promotion",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "ok_flag",
+          "ok": true,
+          "expected": true,
+          "actual": "true:true",
+          "external_effect": false
+        }
+      ],
+      "command_exit_code": 0,
+      "status": "sample_rate_win_needs_quality_review",
+      "decision": "queue_owner_quality_review_no_auto_promotion",
+      "input_exists": true,
+      "filled_rows": 18,
+      "pending_rows": 0,
+      "issue_count": 0,
+      "sample_threshold_met": true,
+      "sample_rate_win_candidate": true,
+      "challenger_win_rule_met": false,
+      "quality_guard_status": "not_evaluated_from_sample_gate",
+      "promotion_performed": false,
+      "owner_review_required": true,
+      "challenger_gaps": {
+        "visits": 0,
+        "cta_clicks": 0,
+        "line_adds": 0,
+        "test_days": 0
+      },
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "temp_files": {
+        "input_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/sample_rate_win_needs_quality_review/sample_gate_ledger.filled.csv",
+        "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/sample_rate_win_needs_quality_review/owner_sample_gate_status.compact.json",
+        "json_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/sample_rate_win_needs_quality_review/owner_sample_gate_status.json",
+        "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/sample_rate_win_needs_quality_review/owner_sample_gate_status.md"
+      }
+    },
+    {
+      "id": "sample_ready_challenger_underperforms",
+      "ok": true,
+      "description": "The challenger clears sample thresholds but fails to beat champion rate, so the next move is local rework/next variable review.",
+      "expected": {
+        "exitCode": 0,
+        "status": "sample_ready_challenger_underperforms",
+        "decision": "plan_rework_or_next_variable_after_owner_review",
+        "sample_threshold_met": true,
+        "sample_rate_win_candidate": false,
+        "owner_review_required": true
+      },
+      "assertions": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 0,
+          "actual": 0,
+          "external_effect": false
+        },
+        {
+          "name": "compact_status_written",
+          "ok": true,
+          "expected": "compact status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "full_status_written",
+          "ok": true,
+          "expected": "full status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "sample_ready_challenger_underperforms",
+          "actual": "sample_ready_challenger_underperforms",
+          "external_effect": false
+        },
+        {
+          "name": "decision",
+          "ok": true,
+          "expected": "plan_rework_or_next_variable_after_owner_review",
+          "actual": "plan_rework_or_next_variable_after_owner_review",
+          "external_effect": false
+        },
+        {
+          "name": "sample_threshold_met",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "sample_rate_win_candidate",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": true,
+          "actual": true,
+          "external_effect": false
+        },
+        {
+          "name": "quality_not_evaluated",
+          "ok": true,
+          "expected": "not_evaluated_from_sample_gate",
+          "actual": "not_evaluated_from_sample_gate",
+          "external_effect": false
+        },
+        {
+          "name": "no_final_win_rule",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_promotion",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "ok_flag",
+          "ok": true,
+          "expected": true,
+          "actual": "true:true",
+          "external_effect": false
+        }
+      ],
+      "command_exit_code": 0,
+      "status": "sample_ready_challenger_underperforms",
+      "decision": "plan_rework_or_next_variable_after_owner_review",
+      "input_exists": true,
+      "filled_rows": 18,
+      "pending_rows": 0,
+      "issue_count": 0,
+      "sample_threshold_met": true,
+      "sample_rate_win_candidate": false,
+      "challenger_win_rule_met": false,
+      "quality_guard_status": "not_evaluated_from_sample_gate",
+      "promotion_performed": false,
+      "owner_review_required": true,
+      "challenger_gaps": {
+        "visits": 0,
+        "cta_clicks": 0,
+        "line_adds": 0,
+        "test_days": 0
+      },
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "temp_files": {
+        "input_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/sample_ready_challenger_underperforms/sample_gate_ledger.filled.csv",
+        "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/sample_ready_challenger_underperforms/owner_sample_gate_status.compact.json",
+        "json_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/sample_ready_challenger_underperforms/owner_sample_gate_status.json",
+        "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/sample_ready_challenger_underperforms/owner_sample_gate_status.md"
+      }
+    },
+    {
+      "id": "sensitive_evidence_blocks_status",
+      "ok": true,
+      "description": "Sensitive-looking evidence refs block the ledger and keep all external actions false.",
+      "expected": {
+        "exitCode": 1,
+        "status": "blocked_invalid_owner_sample_gate",
+        "decision": "fix_owner_sample_gate_ledger",
+        "ok": false,
+        "issue_count_positive": true,
+        "sample_threshold_met": false,
+        "sample_rate_win_candidate": false,
+        "owner_review_required": false
+      },
+      "assertions": [
+        {
+          "name": "exit_code",
+          "ok": true,
+          "expected": 1,
+          "actual": 1,
+          "external_effect": false
+        },
+        {
+          "name": "compact_status_written",
+          "ok": true,
+          "expected": "compact status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "full_status_written",
+          "ok": true,
+          "expected": "full status json",
+          "actual": "present",
+          "external_effect": false
+        },
+        {
+          "name": "status",
+          "ok": true,
+          "expected": "blocked_invalid_owner_sample_gate",
+          "actual": "blocked_invalid_owner_sample_gate",
+          "external_effect": false
+        },
+        {
+          "name": "decision",
+          "ok": true,
+          "expected": "fix_owner_sample_gate_ledger",
+          "actual": "fix_owner_sample_gate_ledger",
+          "external_effect": false
+        },
+        {
+          "name": "sample_threshold_met",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "sample_rate_win_candidate",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "owner_review_required",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "quality_not_evaluated",
+          "ok": true,
+          "expected": "not_evaluated_from_sample_gate",
+          "actual": "not_evaluated_from_sample_gate",
+          "external_effect": false
+        },
+        {
+          "name": "no_final_win_rule",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_promotion",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false,
+          "external_effect": false
+        },
+        {
+          "name": "ok_flag",
+          "ok": true,
+          "expected": false,
+          "actual": "false:false",
+          "external_effect": false
+        },
+        {
+          "name": "issue_count_positive",
+          "ok": true,
+          "expected": ">0",
+          "actual": 18,
+          "external_effect": false
+        }
+      ],
+      "command_exit_code": 1,
+      "status": "blocked_invalid_owner_sample_gate",
+      "decision": "fix_owner_sample_gate_ledger",
+      "input_exists": true,
+      "filled_rows": 0,
+      "pending_rows": 0,
+      "issue_count": 18,
+      "sample_threshold_met": false,
+      "sample_rate_win_candidate": false,
+      "challenger_win_rule_met": false,
+      "quality_guard_status": "not_evaluated_from_sample_gate",
+      "promotion_performed": false,
+      "owner_review_required": false,
+      "challenger_gaps": {
+        "visits": 100,
+        "cta_clicks": 20,
+        "line_adds": 5,
+        "test_days": 3
+      },
+      "data_lp_events_write_performed": false,
+      "external_effect": false,
+      "temp_files": {
+        "input_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/sensitive_evidence_blocks_status/sample_gate_ledger.filled.csv",
+        "status_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/sensitive_evidence_blocks_status/owner_sample_gate_status.compact.json",
+        "json_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/sensitive_evidence_blocks_status/owner_sample_gate_status.json",
+        "report_path": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-owner-sample-gate-fixtures-HGCrdn/sensitive_evidence_blocks_status/owner_sample_gate_status.md"
+      }
+    }
+  ],
+  "owner_sample_gate_commands_executed": true,
+  "real_events_unchanged": true,
+  "execution_performed": false,
+  "real_event_write_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Fixture-only owner sample-gate contract. It uses temporary filled ledgers and never creates data/source_capture/sample_gate_ledger.filled.csv, applies CSVs, appends data/lp_events.jsonl, promotes a challenger, changes public links, deploys, posts, pushes LINE, mutates customer data, touches payments, or deletes data."
+}

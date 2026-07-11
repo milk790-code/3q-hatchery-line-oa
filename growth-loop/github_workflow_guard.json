@@ -1,0 +1,515 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:48:05.864Z",
+  "mode": "github_workflow_guard_local_only",
+  "workflow_path": "../.github/workflows/3q-growth-loop-weekly.yml",
+  "package_path": "package.json",
+  "status_path": "data/github_workflow_guard_status.json",
+  "report_path": "github_workflow_guard.md",
+  "workflow_runs_verify_only": true,
+  "workflow_uses_read_only_permissions": true,
+  "workflow_uploads_review_artifacts": true,
+  "workflow_avoids_macos_launchagent_readback": true,
+  "verify_avoids_owner_apply_or_external_gates": true,
+  "required_artifact_count": 48,
+  "check_count": 80,
+  "failed_check_count": 0,
+  "failed_checks": [],
+  "checks": [
+    {
+      "name": "workflow_title",
+      "ok": true,
+      "message": "workflow has expected title",
+      "external_effect": false
+    },
+    {
+      "name": "manual_dispatch",
+      "ok": true,
+      "message": "workflow supports manual dispatch",
+      "external_effect": false
+    },
+    {
+      "name": "sunday_taipei_cron",
+      "ok": true,
+      "message": "workflow cron is Sunday 00:10 Asia/Taipei",
+      "external_effect": false
+    },
+    {
+      "name": "ubuntu_runner",
+      "ok": true,
+      "message": "workflow runs on ubuntu-latest for artifact verification only",
+      "external_effect": false
+    },
+    {
+      "name": "read_only_contents",
+      "ok": true,
+      "message": "workflow uses contents: read only",
+      "external_effect": false
+    },
+    {
+      "name": "npm_ci",
+      "ok": true,
+      "message": "workflow installs with npm ci",
+      "external_effect": false
+    },
+    {
+      "name": "runs_verify_only",
+      "ok": true,
+      "message": "workflow runs verify, not weekly:local",
+      "external_effect": false
+    },
+    {
+      "name": "uploads_artifacts",
+      "ok": true,
+      "message": "workflow uploads review artifacts",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_missing_policy",
+      "ok": true,
+      "message": "artifact upload fails if review files are missing",
+      "external_effect": false
+    },
+    {
+      "name": "retention_bounded",
+      "ok": true,
+      "message": "artifact retention is bounded",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_weekly_report_md",
+      "ok": true,
+      "message": "workflow uploads weekly_report.md",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_growth_scores_json",
+      "ok": true,
+      "message": "workflow uploads growth_scores.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_approval_queue_json",
+      "ok": true,
+      "message": "workflow uploads approval_queue.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_ab_test_status_json",
+      "ok": true,
+      "message": "workflow uploads ab_test_status.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_worker_dry_run_md",
+      "ok": true,
+      "message": "workflow uploads worker_dry_run.md",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_cloudflare_d1_readiness_md",
+      "ok": true,
+      "message": "workflow uploads cloudflare_d1_readiness.md",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_data_cloudflare_d1_readiness_status_json",
+      "ok": true,
+      "message": "workflow uploads data/cloudflare_d1_readiness_status.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_data_cloudflare_d1_inventory_snapshot_json",
+      "ok": true,
+      "message": "workflow uploads data/cloudflare_d1_inventory_snapshot.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_live_telemetry_readiness_md",
+      "ok": true,
+      "message": "workflow uploads live_telemetry_readiness.md",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_data_live_telemetry_readiness_status_json",
+      "ok": true,
+      "message": "workflow uploads data/live_telemetry_readiness_status.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_data_live_telemetry_observation_snapshot_json",
+      "ok": true,
+      "message": "workflow uploads data/live_telemetry_observation_snapshot.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_live_telemetry_readiness_fixture_report_md",
+      "ok": true,
+      "message": "workflow uploads live_telemetry_readiness_fixture_report.md",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_data_live_telemetry_readiness_fixture_status_json",
+      "ok": true,
+      "message": "workflow uploads data/live_telemetry_readiness_fixture_status.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_champion_source_lock_fixtures_md",
+      "ok": true,
+      "message": "workflow uploads champion_source_lock_fixtures.md",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_data_champion_source_lock_fixture_status_json",
+      "ok": true,
+      "message": "workflow uploads data/champion_source_lock_fixture_status.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_weekly_runner_lock_fixtures_md",
+      "ok": true,
+      "message": "workflow uploads weekly_runner_lock_fixtures.md",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_data_weekly_runner_lock_fixture_status_json",
+      "ok": true,
+      "message": "workflow uploads data/weekly_runner_lock_fixture_status.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_d1_schema_contract_md",
+      "ok": true,
+      "message": "workflow uploads d1_schema_contract.md",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_data_d1_schema_contract_status_json",
+      "ok": true,
+      "message": "workflow uploads data/d1_schema_contract_status.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_approved_d1_config_md",
+      "ok": true,
+      "message": "workflow uploads approved_d1_config.md",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_data_approved_d1_config_status_json",
+      "ok": true,
+      "message": "workflow uploads data/approved_d1_config_status.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_champion_local_branch_md",
+      "ok": true,
+      "message": "workflow uploads champion_local_branch.md",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_data_champion_local_branch_status_json",
+      "ok": true,
+      "message": "workflow uploads data/champion_local_branch_status.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_champion_release_preflight_md",
+      "ok": true,
+      "message": "workflow uploads champion_release_preflight.md",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_data_champion_release_preflight_status_json",
+      "ok": true,
+      "message": "workflow uploads data/champion_release_preflight_status.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_data_champion_live_deployment_snapshot_json",
+      "ok": true,
+      "message": "workflow uploads data/champion_live_deployment_snapshot.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_champion_release_owner_packet_md",
+      "ok": true,
+      "message": "workflow uploads champion_release_owner_packet.md",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_champion_release_owner_packet_json",
+      "ok": true,
+      "message": "workflow uploads champion_release_owner_packet.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_champion_github_handoff_md",
+      "ok": true,
+      "message": "workflow uploads champion_github_handoff.md",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_champion_github_pr_body_md",
+      "ok": true,
+      "message": "workflow uploads champion_github_pr_body.md",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_data_champion_github_handoff_status_json",
+      "ok": true,
+      "message": "workflow uploads data/champion_github_handoff_status.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_data_worker_dry_run_status_json",
+      "ok": true,
+      "message": "workflow uploads data/worker_dry_run_status.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_prepared_but_blocked_json",
+      "ok": true,
+      "message": "workflow uploads prepared_but_blocked.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_objective_sequence_audit_md",
+      "ok": true,
+      "message": "workflow uploads objective_sequence_audit.md",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_d1_collection_guard_md",
+      "ok": true,
+      "message": "workflow uploads d1_collection_guard.md",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_github_export_manifest_md",
+      "ok": true,
+      "message": "workflow uploads github_export_manifest.md",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_owner_approval_pack_md",
+      "ok": true,
+      "message": "workflow uploads owner_approval_pack.md",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_sample_gate_collection_sprint_md",
+      "ok": true,
+      "message": "workflow uploads sample_gate_collection_sprint.md",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_sample_gate_collection_sprint_json",
+      "ok": true,
+      "message": "workflow uploads sample_gate_collection_sprint.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_data_sample_gate_collection_sprint_status_json",
+      "ok": true,
+      "message": "workflow uploads data/sample_gate_collection_sprint_status.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_source_trust_matrix_md",
+      "ok": true,
+      "message": "workflow uploads source_trust_matrix.md",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_source_trust_matrix_json",
+      "ok": true,
+      "message": "workflow uploads source_trust_matrix.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_data_source_trust_matrix_status_json",
+      "ok": true,
+      "message": "workflow uploads data/source_trust_matrix_status.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_artifact_retention_review_pack_md",
+      "ok": true,
+      "message": "workflow uploads artifact_retention_review_pack.md",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_artifact_retention_review_pack_json",
+      "ok": true,
+      "message": "workflow uploads artifact_retention_review_pack.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_data_artifact_retention_review_status_json",
+      "ok": true,
+      "message": "workflow uploads data/artifact_retention_review_status.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_data_weekly_runner_status_json",
+      "ok": true,
+      "message": "workflow uploads data/weekly_runner_status.json",
+      "external_effect": false
+    },
+    {
+      "name": "artifact_data_gate_readiness_status_json",
+      "ok": true,
+      "message": "workflow uploads data/gate_readiness_status.json",
+      "external_effect": false
+    },
+    {
+      "name": "no_wrangler_deploy",
+      "ok": true,
+      "message": "workflow must not match forbidden pattern wrangler_deploy",
+      "external_effect": false
+    },
+    {
+      "name": "no_worker_deploy_script",
+      "ok": true,
+      "message": "workflow must not match forbidden pattern worker_deploy_script",
+      "external_effect": false
+    },
+    {
+      "name": "no_git_write",
+      "ok": true,
+      "message": "workflow must not match forbidden pattern git_write",
+      "external_effect": false
+    },
+    {
+      "name": "no_gh_pr_create",
+      "ok": true,
+      "message": "workflow must not match forbidden pattern gh_pr_create",
+      "external_effect": false
+    },
+    {
+      "name": "no_secret_context",
+      "ok": true,
+      "message": "workflow must not match forbidden pattern secret_context",
+      "external_effect": false
+    },
+    {
+      "name": "no_line_or_payment_secret",
+      "ok": true,
+      "message": "workflow must not match forbidden pattern line_or_payment_secret",
+      "external_effect": false
+    },
+    {
+      "name": "no_mutating_network_tool",
+      "ok": true,
+      "message": "workflow must not match forbidden pattern mutating_network_tool",
+      "external_effect": false
+    },
+    {
+      "name": "no_macos_runner",
+      "ok": true,
+      "message": "workflow must not match forbidden pattern macos_runner",
+      "external_effect": false
+    },
+    {
+      "name": "no_macos_launchctl",
+      "ok": true,
+      "message": "workflow must not match forbidden pattern macos_launchctl",
+      "external_effect": false
+    },
+    {
+      "name": "no_launchagent_status_in_ci",
+      "ok": true,
+      "message": "workflow must not match forbidden pattern launchagent_status_in_ci",
+      "external_effect": false
+    },
+    {
+      "name": "no_weekly_local_in_ci",
+      "ok": true,
+      "message": "workflow must not match forbidden pattern weekly_local_in_ci",
+      "external_effect": false
+    },
+    {
+      "name": "verify_script_exists",
+      "ok": true,
+      "message": "package.json exposes verify script",
+      "external_effect": false
+    },
+    {
+      "name": "verify_includes_artifact_verifier",
+      "ok": true,
+      "message": "verify ends with artifact verifier",
+      "external_effect": false
+    },
+    {
+      "name": "verify_no_remote_d1_export",
+      "ok": true,
+      "message": "verify script must not run remote_d1_export",
+      "external_effect": false
+    },
+    {
+      "name": "verify_no_funnel_apply",
+      "ok": true,
+      "message": "verify script must not run funnel_apply",
+      "external_effect": false
+    },
+    {
+      "name": "verify_no_manual_apply",
+      "ok": true,
+      "message": "verify script must not run manual_apply",
+      "external_effect": false
+    },
+    {
+      "name": "verify_no_schedule_install",
+      "ok": true,
+      "message": "verify script must not run schedule_install",
+      "external_effect": false
+    },
+    {
+      "name": "verify_no_schedule_uninstall",
+      "ok": true,
+      "message": "verify script must not run schedule_uninstall",
+      "external_effect": false
+    },
+    {
+      "name": "verify_no_schedule_status_macos_readback",
+      "ok": true,
+      "message": "verify script must not run schedule_status_macos_readback",
+      "external_effect": false
+    },
+    {
+      "name": "verify_no_worker_deploy",
+      "ok": true,
+      "message": "verify script must not run worker_deploy",
+      "external_effect": false
+    },
+    {
+      "name": "verify_no_approved_d1_config_apply",
+      "ok": true,
+      "message": "verify script must not run approved_d1_config_apply",
+      "external_effect": false
+    },
+    {
+      "name": "verify_no_champion_branch_prepare",
+      "ok": true,
+      "message": "verify script must not run champion_branch_prepare",
+      "external_effect": false
+    }
+  ],
+  "external_effect": false,
+  "git_init_performed": false,
+  "git_add_performed": false,
+  "git_commit_performed": false,
+  "git_remote_add_performed": false,
+  "git_push_or_pr_performed": false,
+  "github_push_or_pr_performed": false,
+  "production_deploy_performed": false,
+  "public_link_change_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Local GitHub workflow safety guard only. It reads workflow/package files and never runs git, GitHub writes, deploys, posts, LINE, payments, customer-data mutation, or deletion."
+}

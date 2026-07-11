@@ -1,0 +1,249 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:45:12.973Z",
+  "mode": "p0_counts_preflight_fixture_dry_run",
+  "scenario_count": 4,
+  "scenario_ids": [
+    "waiting_placeholders",
+    "partial_counts_waiting",
+    "ready_for_quick",
+    "sensitive_metadata_blocked"
+  ],
+  "scenarios": [
+    {
+      "id": "waiting_placeholders",
+      "ok": true,
+      "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-p0-preflight-waiting_placeholders-h460AV",
+      "command": "node scripts/p0-counts-preflight.mjs --paste-template=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-p0-preflight-waiting_placeholders-h460AV/counts.txt --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-p0-preflight-waiting_placeholders-h460AV/status.json --json=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-p0-preflight-waiting_placeholders-h460AV/preflight.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-p0-preflight-waiting_placeholders-h460AV/preflight.md",
+      "exit_code": 0,
+      "status": "waiting_for_owner_p0_counts",
+      "checks": [
+        {
+          "name": "exit_success",
+          "ok": true,
+          "expected": 0,
+          "actual": 0
+        },
+        {
+          "name": "no_live_input",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "waiting_status",
+          "ok": true,
+          "expected": "waiting_for_owner_p0_counts",
+          "actual": "waiting_for_owner_p0_counts"
+        },
+        {
+          "name": "placeholder_count",
+          "ok": true,
+          "expected": 9,
+          "actual": 9
+        },
+        {
+          "name": "not_ready",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        }
+      ],
+      "live_project_inputs_created": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "partial_counts_waiting",
+      "ok": true,
+      "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-p0-preflight-partial_counts_waiting-AbnRSR",
+      "command": "node scripts/p0-counts-preflight.mjs --paste-template=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-p0-preflight-partial_counts_waiting-AbnRSR/counts.txt --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-p0-preflight-partial_counts_waiting-AbnRSR/status.json --json=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-p0-preflight-partial_counts_waiting-AbnRSR/preflight.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-p0-preflight-partial_counts_waiting-AbnRSR/preflight.md",
+      "exit_code": 0,
+      "status": "partial_p0_counts_waiting",
+      "checks": [
+        {
+          "name": "exit_success",
+          "ok": true,
+          "expected": 0,
+          "actual": 0
+        },
+        {
+          "name": "no_live_input",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "partial_status",
+          "ok": true,
+          "expected": "partial_p0_counts_waiting",
+          "actual": "partial_p0_counts_waiting"
+        },
+        {
+          "name": "some_filled",
+          "ok": true,
+          "expected": "filled > 0",
+          "actual": 3
+        },
+        {
+          "name": "some_missing",
+          "ok": true,
+          "expected": "placeholder > 0",
+          "actual": 6
+        }
+      ],
+      "live_project_inputs_created": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "ready_for_quick",
+      "ok": true,
+      "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-p0-preflight-ready_for_quick-cXAT51",
+      "command": "node scripts/p0-counts-preflight.mjs --paste-template=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-p0-preflight-ready_for_quick-cXAT51/counts.txt --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-p0-preflight-ready_for_quick-cXAT51/status.json --json=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-p0-preflight-ready_for_quick-cXAT51/preflight.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-p0-preflight-ready_for_quick-cXAT51/preflight.md",
+      "exit_code": 0,
+      "status": "ready_for_next_p0_quick",
+      "checks": [
+        {
+          "name": "exit_success",
+          "ok": true,
+          "expected": 0,
+          "actual": 0
+        },
+        {
+          "name": "no_live_input",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "ready_status",
+          "ok": true,
+          "expected": "ready_for_next_p0_quick",
+          "actual": "ready_for_next_p0_quick"
+        },
+        {
+          "name": "ready",
+          "ok": true,
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "all_filled",
+          "ok": true,
+          "expected": 9,
+          "actual": 9
+        }
+      ],
+      "live_project_inputs_created": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    },
+    {
+      "id": "sensitive_metadata_blocked",
+      "ok": true,
+      "temp_dir": "/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-p0-preflight-sensitive_metadata_blocked-RdA5V2",
+      "command": "node scripts/p0-counts-preflight.mjs --paste-template=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-p0-preflight-sensitive_metadata_blocked-RdA5V2/counts.txt --status=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-p0-preflight-sensitive_metadata_blocked-RdA5V2/status.json --json=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-p0-preflight-sensitive_metadata_blocked-RdA5V2/preflight.json --report=/var/folders/y1/xtffpl7x0mx416zw23bkp8n40000gn/T/3q-p0-preflight-sensitive_metadata_blocked-RdA5V2/preflight.md",
+      "exit_code": 0,
+      "status": "blocked_invalid_p0_counts",
+      "checks": [
+        {
+          "name": "exit_success",
+          "ok": true,
+          "expected": 0,
+          "actual": 0
+        },
+        {
+          "name": "no_live_input",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "no_real_event_write",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "no_external_effect",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        },
+        {
+          "name": "blocked_status",
+          "ok": true,
+          "expected": "blocked_invalid_p0_counts",
+          "actual": "blocked_invalid_p0_counts"
+        },
+        {
+          "name": "issue_count",
+          "ok": true,
+          "expected": "issue_count > 0",
+          "actual": 1
+        },
+        {
+          "name": "not_ok",
+          "ok": true,
+          "expected": false,
+          "actual": false
+        }
+      ],
+      "live_project_inputs_created": false,
+      "data_lp_events_write_performed": false,
+      "external_effect": false
+    }
+  ],
+  "local_fixture_commands_executed": true,
+  "live_project_inputs_created": false,
+  "owner_inbox_write_performed": false,
+  "stage_performed": false,
+  "data_lp_events_write_performed": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "external_effect": false,
+  "note": "Fixture-only P0 counts preflight guard. Uses temporary paste templates and never writes project live inputs, data/lp_events.jsonl, or external systems."
+}

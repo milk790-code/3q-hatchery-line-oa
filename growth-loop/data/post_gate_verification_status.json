@@ -1,0 +1,354 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:47:33.067Z",
+  "mode": "post_gate_verification_plan",
+  "status": "waiting_for_owner_evidence",
+  "status_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/post_gate_verification_status.json",
+  "report_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/post_gate_verification.md",
+  "owner_gate_evidence_status": "waiting_for_owner_evidence",
+  "owner_gate_evidence_input_exists": false,
+  "owner_evidence_issue_count": 0,
+  "gate_count": 5,
+  "non_manual_gate_count": 4,
+  "evidence_ready_count": 0,
+  "ready_gate_count": 0,
+  "issue_count": 9,
+  "ready_for_post_gate_read_only_verification": false,
+  "no_network_read_performed": true,
+  "no_remote_cli_performed": true,
+  "no_actual_evidence_values_persisted": true,
+  "gates": [
+    {
+      "gate_id": "remote_d1_create_and_migrate",
+      "approval_id": "approve-d1-create-and-migrate",
+      "risk_tier": "T2",
+      "prepared_artifact": "schema/d1-week0.sql",
+      "manual_only": false,
+      "owner_evidence_detected": false,
+      "owner_evidence_valid": false,
+      "recurring_aggregate_read_approved": false,
+      "post_gate_verification_ready": false,
+      "safe_to_run_automatically": false,
+      "read_only_followup_required": false,
+      "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+      "checks": [
+        {
+          "id": "schema_artifact_present",
+          "ok": true,
+          "reason": "schema/d1-week0.sql exists",
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "id": "local_schema_contract_linked",
+          "ok": true,
+          "reason": "launch gate links the isolated two-pass D1 schema contract",
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "id": "post_migration_integrity_command_present",
+          "ok": true,
+          "reason": "launch gate includes post-migration integrity verification",
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "id": "remote_collect_script_present",
+          "ok": true,
+          "reason": "collect:d1:remote:approved npm script exists",
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "id": "guarded_d1_export_seen",
+          "ok": true,
+          "reason": "a local export or owner-approved aggregate-only remote export is present without raw/customer reads",
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "id": "approval_resume_plan_only",
+          "ok": true,
+          "reason": "approval resume remains plan-only",
+          "external_effect": false,
+          "execution_performed": false
+        }
+      ],
+      "blocked_reasons": [
+        "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate."
+      ],
+      "recommended_followup": "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+      "external_effect": false,
+      "execution_performed": false,
+      "remote_d1_create_performed": false,
+      "remote_d1_migration_performed": false,
+      "production_deploy_performed": false,
+      "public_link_change_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false
+    },
+    {
+      "gate_id": "candidate_worker_production_deploy",
+      "approval_id": "approve-candidate-worker-deploy",
+      "risk_tier": "T3",
+      "prepared_artifact": "live_telemetry_readiness.md",
+      "manual_only": false,
+      "owner_evidence_detected": false,
+      "owner_evidence_valid": false,
+      "recurring_aggregate_read_approved": null,
+      "post_gate_verification_ready": false,
+      "safe_to_run_automatically": false,
+      "read_only_followup_required": false,
+      "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+      "checks": [
+        {
+          "id": "worker_dry_run_success",
+          "ok": true,
+          "reason": "weekly runner worker dry-run succeeded",
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "id": "browser_route_smoke_ok",
+          "ok": true,
+          "reason": "local browser route smoke passed without event write",
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "id": "event_contract_smoke_ok",
+          "ok": true,
+          "reason": "isolated event contract smoke passed",
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "id": "remote_d1_evidence_ready",
+          "ok": false,
+          "reason": "remote D1 evidence must be ready before Worker post-gate verification",
+          "external_effect": false,
+          "execution_performed": false
+        }
+      ],
+      "blocked_reasons": [
+        "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+        "remote_d1_evidence_ready:remote D1 evidence must be ready before Worker post-gate verification"
+      ],
+      "recommended_followup": "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+      "external_effect": false,
+      "execution_performed": false,
+      "remote_d1_create_performed": false,
+      "remote_d1_migration_performed": false,
+      "production_deploy_performed": false,
+      "public_link_change_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false
+    },
+    {
+      "gate_id": "public_ab_small_traffic_link",
+      "approval_id": "approve-small-ab-link",
+      "risk_tier": "T3",
+      "prepared_artifact": "ab_test_status.json",
+      "manual_only": false,
+      "owner_evidence_detected": false,
+      "owner_evidence_valid": false,
+      "recurring_aggregate_read_approved": null,
+      "post_gate_verification_ready": false,
+      "safe_to_run_automatically": false,
+      "read_only_followup_required": false,
+      "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+      "checks": [
+        {
+          "id": "candidate_worker_evidence_ready",
+          "ok": false,
+          "reason": "candidate Worker evidence must be ready before public A/B verification",
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "id": "ab_allocation_90_10",
+          "ok": true,
+          "reason": "A/B allocation remains 90/10",
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "id": "no_challenger_auto_promotion",
+          "ok": true,
+          "reason": "challenger was not promoted and public link was not changed by this engine",
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "id": "ab_router_link_present",
+          "ok": true,
+          "reason": "tracking_links.json includes A/B small traffic router link",
+          "external_effect": false,
+          "execution_performed": false
+        }
+      ],
+      "blocked_reasons": [
+        "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+        "candidate_worker_evidence_ready:candidate Worker evidence must be ready before public A/B verification"
+      ],
+      "recommended_followup": "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+      "external_effect": false,
+      "execution_performed": false,
+      "remote_d1_create_performed": false,
+      "remote_d1_migration_performed": false,
+      "production_deploy_performed": false,
+      "public_link_change_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false
+    },
+    {
+      "gate_id": "github_repo_branch_pr",
+      "approval_id": "approve-github-repo-and-pr",
+      "risk_tier": "T2",
+      "prepared_artifact": "champion_github_handoff.md",
+      "manual_only": false,
+      "owner_evidence_detected": false,
+      "owner_evidence_valid": false,
+      "recurring_aggregate_read_approved": null,
+      "post_gate_verification_ready": false,
+      "safe_to_run_automatically": false,
+      "read_only_followup_required": false,
+      "execution_policy": "plan_only_owner_or_separately_approved_read_only",
+      "checks": [
+        {
+          "id": "champion_handoff_exact",
+          "ok": true,
+          "reason": "launch gate uses the exact Champion GitHub handoff",
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "id": "champion_repo_exact",
+          "ok": true,
+          "reason": "launch gate targets the known Champion repository",
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "id": "champion_branch_exact",
+          "ok": true,
+          "reason": "launch gate targets the prepared Champion branch",
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "id": "no_git_init_for_champion",
+          "ok": true,
+          "reason": "Champion handoff never initializes a new repository",
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "id": "github_export_bundle_ok",
+          "ok": true,
+          "reason": "local GitHub export bundle is ready",
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "id": "github_export_excludes_owner_evidence",
+          "ok": true,
+          "reason": "GitHub export excludes owner_gate_evidence.json",
+          "external_effect": false,
+          "execution_performed": false
+        },
+        {
+          "id": "no_git_push_by_engine",
+          "ok": true,
+          "reason": "engine did not commit, push, or create PR",
+          "external_effect": false,
+          "execution_performed": false
+        }
+      ],
+      "blocked_reasons": [
+        "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate."
+      ],
+      "recommended_followup": "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+      "external_effect": false,
+      "execution_performed": false,
+      "remote_d1_create_performed": false,
+      "remote_d1_migration_performed": false,
+      "production_deploy_performed": false,
+      "public_link_change_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false
+    },
+    {
+      "gate_id": "formal_posts_line_push_payment_customer_data",
+      "approval_id": null,
+      "risk_tier": "T3",
+      "prepared_artifact": "weekly_report.md",
+      "manual_only": true,
+      "owner_evidence_detected": false,
+      "owner_evidence_valid": false,
+      "recurring_aggregate_read_approved": null,
+      "post_gate_verification_ready": false,
+      "safe_to_run_automatically": false,
+      "read_only_followup_required": false,
+      "execution_policy": "manual_only_no_automation",
+      "checks": [
+        {
+          "id": "manual_only_acknowledged_by_policy",
+          "ok": false,
+          "reason": "formal posts, LINE push, payment, customer data, and deletion remain outside automation",
+          "external_effect": false,
+          "execution_performed": false
+        }
+      ],
+      "blocked_reasons": [
+        "owner_evidence_not_ready:owner_gate_evidence.json has no evidence entry for this gate.",
+        "manual_only_acknowledged_by_policy:formal posts, LINE push, payment, customer data, and deletion remain outside automation",
+        "manual_only_gate_no_automated_post_verification"
+      ],
+      "recommended_followup": "Manual-only. Keep drafts, LINE actions, payments, customer data, and deletes outside automation.",
+      "external_effect": false,
+      "execution_performed": false,
+      "remote_d1_create_performed": false,
+      "remote_d1_migration_performed": false,
+      "production_deploy_performed": false,
+      "public_link_change_performed": false,
+      "github_push_or_pr_performed": false,
+      "formal_post_performed": false,
+      "line_push_performed": false,
+      "customer_data_mutation_performed": false,
+      "payment_action_performed": false,
+      "delete_action_performed": false
+    }
+  ],
+  "next_safe_action": "Wait for owner-executed external gates, then fill owner_gate_evidence.json and rerun npm run owner:evidence && npm run post:verify.",
+  "external_effect": false,
+  "execution_performed": false,
+  "remote_d1_create_performed": false,
+  "remote_d1_migration_performed": false,
+  "production_deploy_performed": false,
+  "public_link_change_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Local-only post-gate verification plan. It evaluates owner evidence and local prerequisite status, but it never calls Cloudflare, GitHub, public URLs, LINE, payment systems, customer systems, or delete APIs."
+}

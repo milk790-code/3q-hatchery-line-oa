@@ -1,0 +1,39 @@
+{
+  "scanner": {
+    "repository": "https://github.com/getsentry/skills",
+    "commit": "5a64b36c62d042d3981b7937d9d6ca7bd1753b9a",
+    "mode": "static_scan",
+    "note": "The bundled scanner was run with an isolated PyYAML dependency. A zero-finding result is not a security certification."
+  },
+  "results": [
+    {"skill": "writing-plans", "findings": 0, "assessment": "clean_static_scan"},
+    {"skill": "using-git-worktrees", "findings": 0, "assessment": "clean_static_scan"},
+    {"skill": "test-driven-development", "findings": 0, "assessment": "clean_static_scan"},
+    {"skill": "systematic-debugging", "findings": 0, "assessment": "clean_static_scan"},
+    {"skill": "requesting-code-review", "findings": 0, "assessment": "clean_static_scan"},
+    {
+      "skill": "receiving-code-review",
+      "source_commit": "d884ae04edebef577e82ff7c4e143debd0bbec99",
+      "sha256": "647036bbdab7bf2317e14e079595e984c9030f64295e2b4c0fb57dbeb48f25dd",
+      "findings": 0,
+      "assessment": "clean_static_and_manual_scan",
+      "structure": "SKILL.md only; no scripts, hooks, URLs, or requested tool permissions"
+    },
+    {
+      "skill": "verification-before-completion",
+      "source_commit": "d884ae04edebef577e82ff7c4e143debd0bbec99",
+      "sha256": "ea52d15aabaf72bc6b558efe2c126f161b53961090ddcd712000273bfe8c7b6c",
+      "findings": 0,
+      "assessment": "clean_static_and_manual_scan",
+      "structure": "SKILL.md only; no scripts, hooks, URLs, or requested tool permissions"
+    },
+    {"skill": "finishing-a-development-branch", "findings": 0, "assessment": "clean_static_scan"},
+    {
+      "skill": "skill-scanner",
+      "findings": 36,
+      "severity_counts": {"critical": 23, "high": 12, "medium": 1},
+      "assessment": "expected_reference_examples_reviewed",
+      "reason": "Findings are in the scanner's own dangerous-code and prompt-injection reference examples (including evil.com examples); they document threats rather than execute them. The SKILL.md explicitly requires this false-positive distinction."
+    }
+  ]
+}

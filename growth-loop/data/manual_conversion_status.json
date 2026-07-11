@@ -1,0 +1,51 @@
+{
+  "ok": true,
+  "generated_at": "2026-07-10T21:45:55.604Z",
+  "mode": "preview",
+  "input_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/manual_conversions.example.csv",
+  "output_path": "/Users/mac/Documents/Codex/control-center/worktrees/3q-growth-loop-high-fixes/growth-loop/data/manual_conversions.preview.jsonl",
+  "aggregate_rows_read": 5,
+  "events_prepared": 10,
+  "events_written": 10,
+  "existing_event_ids_skipped": 0,
+  "counts_by_event_type": {
+    "line_add": 7,
+    "lead_submit": 2,
+    "quality_flag": 1
+  },
+  "allowed_columns": [
+    "date",
+    "asset_id",
+    "event_type",
+    "count",
+    "source",
+    "medium",
+    "campaign",
+    "content_id",
+    "variant_id",
+    "quality_score"
+  ],
+  "allowed_event_types": [
+    "line_add",
+    "lead_submit",
+    "deal",
+    "quality_flag"
+  ],
+  "contains_sensitive_columns": false,
+  "contains_sensitive_values": false,
+  "confirm_real_data": false,
+  "example_input_detected": false,
+  "apply_performed": false,
+  "append_performed": false,
+  "data_lp_events_write_performed": false,
+  "external_effect": false,
+  "public_link_change_performed": false,
+  "production_deploy_performed": false,
+  "github_push_or_pr_performed": false,
+  "formal_post_performed": false,
+  "line_push_performed": false,
+  "customer_data_mutation_performed": false,
+  "payment_action_performed": false,
+  "delete_action_performed": false,
+  "note": "Preview only. These aggregate conversion rows are not scored until explicitly applied to data/lp_events.jsonl."
+}
