@@ -1,0 +1,49 @@
+name: Deploy weather-touch
+
+# 手動觸發專用(workflow_dispatch)。刻意不掛 push 觸發:條件觸發關懷屬於「驗證後才自動」的功能,
+# 部署與 cron 啟用都由人決定。cron 不在此 metadata 內 → 部署後預設不自動發,先用 /run?key= 驗證。
+on:
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      WORKER_NAME: weather-touch
+      CRM_D1_ID: e54671b1-d15e-4552-babf-cef367267568
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set CF account ID
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: echo "CF_ACCOUNT_ID=$CF_ACCOUNT_ID" >> $GITHUB_ENV
+      - name: Deploy (inherit-safe secrets, no cron)
+        env:
+          CF_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CWA_API_KEY: ${{ secrets.CWA_API_KEY }}
+          LINE_CHANNEL_TOKEN_POPMONSTER: ${{ secrets.POP_LINE_TOKEN }}
+          RUN_KEY: ${{ secrets.WEATHER_TOUCH_RUN_KEY }}
+        run: |
+          set -euo pipefail
+          existing=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/settings" \
+            | jq -c '[.result.bindings[]? | select(.type=="secret_text") | .name]' || echo '[]')
+          secrets_json=$(jq -n --argjson existing "$existing" '
+            [ {name:"CWA_API_KEY",val:(env.CWA_API_KEY//"")},
+              {name:"LINE_CHANNEL_TOKEN_POPMONSTER",val:(env.LINE_CHANNEL_TOKEN_POPMONSTER//"")},
+              {name:"RUN_KEY",val:(env.RUN_KEY//"")} ]
+            | map( if .val!="" then {name:.name,type:"secret_text",text:.val}
+                   elif ([.name]|inside($existing)) then {name:.name,type:"inherit"}
+                   else empty end )')
+          jq -n --argjson secrets "$secrets_json" --arg d1 "$CRM_D1_ID" '
+            { main_module:"worker.js", compatibility_date:"2024-12-01",
+              bindings: ([ {name:"DB",type:"d1",id:$d1} ] + $secrets) }' > /tmp/meta.json
+          resp=$(curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -F "metadata=@/tmp/meta.json;type=application/json" \
+            -F "worker.js=@workers/weather-touch/worker.js;type=application/javascript+module")
+          echo "$resp" | jq -e '.success==true' >/dev/null || { echo "$resp" | jq -c '.errors'; exit 1; }
+          curl -sS -X POST "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/subdomain" \
+            -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" -d '{"enabled":true}' | jq -e '.success==true' >/dev/null
+          echo "::notice::weather-touch deployed (cron off — verify via /run first)"

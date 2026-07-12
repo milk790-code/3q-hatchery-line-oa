@@ -21,7 +21,7 @@
       "medical_efficacy_claims": "deny",
       "stock_promise": "deny_and_handoff"
     },
-    "refund_policy_script": "退換貨依蝦皮平台規則(七天鑑賞期),直接在蝦皮訂單頁申請就可以。其他狀況我請真人夥伴處理。",
+    "refund_policy_script": "退換貨的部分我先幫您記下來,直接請真人夥伴依您的實際狀況協助處理到好,不會讓您為難。",
     "degraded_mode_script": "我現在訊號不太穩,你的訊息我都記下了不會漏,真人夥伴上班時間(09:00-18:00)會親自回覆你。",
     "tone_profile": "popmonster"
   }

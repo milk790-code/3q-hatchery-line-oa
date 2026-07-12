@@ -1,0 +1,19 @@
+{
+  // weather-touch — 條件觸發關懷 Worker
+  // 部署走 .github/workflows/deploy-weather-touch.yml(CF API PUT,workflow_dispatch 手動觸發)。
+  // 本檔供本機 `wrangler dev` 與綁定說明用。
+  "name": "weather-touch",
+  "main": "worker.js",
+  "compatibility_date": "2024-12-01",
+  "d1_databases": [
+    {
+      // 與 pop-line-oa 同一顆 CRM(customer_profiles 就在這裡)
+      "binding": "DB",
+      "database_name": "pop-line-crm",
+      "database_id": "e54671b1-d15e-4552-babf-cef367267568"
+    }
+  ]
+  // ⚠ cron 預設關閉。驗證話術與觸發率(手動 /run?key=)確認有效後,再取消下面註解啟用每日 06:30(台灣)一次:
+  // "triggers": { "crons": ["30 22 * * *"] }
+  // Secrets(用 Dashboard 或 wrangler secret put 設):CWA_API_KEY、LINE_CHANNEL_TOKEN_POPMONSTER、RUN_KEY
+}
