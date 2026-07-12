@@ -171,7 +171,7 @@ function campaignCard(slots) {
 // ─────────────────────────────────────────────────────────────────────────
 
 const QTY_LABELS  = { '1-3': '1-3 個產品', '4-10': '4-10 個產品', '10+': '10 個以上' };
-const USE_LABELS  = { ig: 'IG 社群', shop: '蝦皮/官網', channel: '通路上架/包裝', all: '全部都要' };
+const USE_LABELS  = { ig: 'IG 社群', shop: '電商/官網上架', channel: '通路上架/包裝', all: '全部都要' };
 const RUSH_LABELS = { week: '一週內', biweek: '兩週內', month: '一個月內' };
 
 function quotePriceRange(qty, use, rush) {
@@ -204,7 +204,7 @@ function quoteUseCard(qty) {
       { type: 'text', text: '主要用在哪？', color: '#1A1A1A', size: 'md', weight: 'bold' },
       { type: 'separator', margin: 'sm', color: '#E8DFD0' },
       BTN('📱 IG / 社群',     `flow:use=ig&q=${qty}`,      true, 'IG'),
-      BTN('🛒 蝦皮 / 官網',   `flow:use=shop&q=${qty}`,    true, '蝦皮/官網'),
+      BTN('🛒 電商 / 官網上架', `flow:use=shop&q=${qty}`,    true, '電商/官網'),
       BTN('📦 通路 / 包裝',   `flow:use=channel&q=${qty}`, true, '通路/包裝'),
       BTN('🎯 全部都要',       `flow:use=all&q=${qty}`,     true, '全部'),
     ]),

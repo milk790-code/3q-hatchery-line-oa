@@ -84,5 +84,27 @@ curl "https://pop-line-oa.<subdomain>.workers.dev/admin/selftest?key=<SETUP_KEY>
    - 申請 CWA 授權碼（opendata.cwa.gov.tw），設 secret `CWA_API_KEY`。
    - GitHub Actions → Deploy weather-touch → Run。
    - 手動 `/run?key=` 驗證幾天話術 → 滿意再開 cron。
+6. **leads-board 看板上線**：設 repo secret `LEADS_BOARD_PASS`（看板密碼）→ Actions → Deploy leads-board → Run → 開 `https://leads-board.<subdomain>.workers.dev`。
+7. **A 級跟進飛輪開 go**：先 `/admin/nurture?key=<SETUP_KEY>` dry-run 看話術幾天，滿意後加 `&go=1` 真發（或設每日 cron 打這支）。
 
 > 已確認：`pop-sales-ai` 由 `deploy-sales-ai.yml` 在 `workers/pop-sales-ai/worker.js` 一有變動就自動部署。所以做法 A 的那個 `git push` 會同時觸發 pop-line-oa 與 pop-sales-ai 兩支的部署，一次到位。
+
+---
+
+## 六、四個延伸功能（第二輪 loop 加的，都在同一分支、未部署）
+
+**① A 級意向自動跟進飛輪**（`pop-line-oa`）
+筆記超能力現在不只通知你——A 級客戶聊到一半 24h 沒下文，可自動用他的車型/痛點生成一則「主動追」訊息。端點 `/admin/nurture?key=<SETUP_KEY>`：**預設 dry-run**（只列出會發給誰＋預覽，不送）；確認話術後加 `&go=1` 才真的發。每次最多 20 位、同一人 3 天內不重複追。上線後可設每日 cron 打這支（先 dry-run 看幾天再開 go）。
+
+**② 3Q 蝦皮 → 已「去品牌化」不刪功能**
+審查說 `webhook/worker.js` 有蝦皮鈕，我查了——那其實是 3Q（品牌孵化所）**幫客戶拍產品照時,問客戶「照片要用在哪」的選單**（IG／蝦皮＝電商上架／通路），還連動報價。它不是 3Q 在蝦皮賣東西，**刪掉會弄壞一個有效的服務選項**。所以我沒刪，只把「蝦皮 / 官網」這個字改成「電商 / 官網上架」——去掉蝦皮品牌字、功能與報價完全不動。要不要進一步處理，你決定。
+
+**③ weather-touch 升級成 v2「洗車時機引擎」**
+除了雷雨／高溫關懷，新增「連續 ≥3 天沒下雨 → 該洗車了、上鍍膜好時機」——直接對到你的成交場景。連晴天數用 `weather_state` 表每城每天算一次。一樣 cron 關、5 天冷卻、`/run?key=` 手動驗證。
+
+**④ 三品牌客戶統一看板**（新 worker `leads-board`）
+唯讀＋密碼保護的網頁看板：A 級意向名單置頂（城市／車型／預算／痛點／意向分／最後互動／追過沒），各品牌分組統計。目前只有泡泡怪獸有資料，3Q/土地公接上同款筆記後自動顯示。
+- 上線：GitHub → Actions → **Deploy leads-board** → Run（需先設 repo secret `LEADS_BOARD_PASS`＝看板密碼）。
+- 開 `https://leads-board.<subdomain>.workers.dev` → 輸密碼看板。
+
+**⑤ 引流連結改用 canonical**：pop 下單卡按鈕 + pop-sales-ai `/shop` 轉跳，都改成你指定的 `https://popmonster.vip/go?v=92d9874`（`src=` 追來源）。符合你「對外引流一律用完整 /go 連結」的政策。

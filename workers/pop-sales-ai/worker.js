@@ -20,7 +20,7 @@ function pickModel(history) {
 
 const LINE_URL = 'https://line.me/R/ti/p/@150tiznd';
 const LINE_ID = '@150tiznd';
-const SHOPEE_URL = 'https://popmonster.vip';  // v2:B2C 導官網(蝦皮全撤);/shop 路徑不斷鏈,變數名沿用不動
+const SHOPEE_URL = 'https://popmonster.vip/go?v=92d9874&src=shop';  // v2:B2C 導官網 canonical /go(蝦皮全撤;src 追來源);變數名沿用不動
 const BRAND = '泡泡怪獸 POP MONSTER';
 const CAMPAIGN = 'pop-sales-ai';
 

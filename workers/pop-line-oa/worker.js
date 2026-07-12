@@ -506,8 +506,10 @@ async function ensureTables(env) {
     await env.CRM.prepare("CREATE TABLE IF NOT EXISTS seed_insights (id INTEGER PRIMARY KEY AUTOINCREMENT, insight TEXT, analyzed INTEGER, created_at TEXT)").run();
     // v5:延遲擬真 A/B 遙測(測試一/測試二判讀用)
     await env.CRM.prepare("CREATE TABLE IF NOT EXISTS pop_line_delivery (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, ab_group TEXT, emotion TEXT, path TEXT, delay_ms INTEGER DEFAULT 0, delivered_at TEXT, created_at TEXT DEFAULT (datetime('now')))").run();
-    // v5.2:客戶筆記檔(城市/車型/行業/預算/grade;weather-touch 條件關懷讀 city+care_last_sent_at)
-    await env.CRM.prepare("CREATE TABLE IF NOT EXISTS customer_profiles (brand TEXT, sid TEXT, city TEXT, vehicle TEXT, industry TEXT, budget TEXT, grade TEXT, pain TEXT, intent_score REAL DEFAULT 0, care_last_sent_at INTEGER, updated_at TEXT DEFAULT (datetime('now')), PRIMARY KEY(brand, sid))").run();
+    // v5.2:客戶筆記檔(城市/車型/行業/預算/grade;weather-touch 讀 city+care_last_sent_at;nurture 讀 grade+updated_at+nurtured_at)
+    await env.CRM.prepare("CREATE TABLE IF NOT EXISTS customer_profiles (brand TEXT, sid TEXT, city TEXT, vehicle TEXT, industry TEXT, budget TEXT, grade TEXT, pain TEXT, intent_score REAL DEFAULT 0, care_last_sent_at INTEGER, nurtured_at INTEGER, nurture_count INTEGER DEFAULT 0, updated_at TEXT DEFAULT (datetime('now')), PRIMARY KEY(brand, sid))").run();
+    await env.CRM.prepare("ALTER TABLE customer_profiles ADD COLUMN nurtured_at INTEGER").run().catch(() => {});      // 舊表補欄位(已存在則無害忽略)
+    await env.CRM.prepare("ALTER TABLE customer_profiles ADD COLUMN nurture_count INTEGER DEFAULT 0").run().catch(() => {});
   } catch (e) { console.error('[pop-line] tables', e.message); }
 }
 
@@ -562,7 +564,7 @@ const SHOP_FLEX = () => ({
       { type: 'text', text: 'IG 13.6 萬・TikTok 實作影片・品項效果公開可查', color: '#9A9A9E', size: 'xs', wrap: true },
     ] },
     footer: { type: 'box', layout: 'vertical', backgroundColor: '#0E0E10', paddingAll: '14px', contents: [
-      { type: 'button', style: 'primary', color: '#caa64a', height: 'md', action: { type: 'uri', label: '前往官網選購', uri: 'https://popmonster.vip/?utm_source=line&utm_medium=bot&utm_campaign=pop-line-v52' } },
+      { type: 'button', style: 'primary', color: '#caa64a', height: 'md', action: { type: 'uri', label: '前往官網選購', uri: 'https://popmonster.vip/go?v=92d9874&src=line' } },
     ] },
   },
 });
@@ -827,6 +829,35 @@ ${transcript}`;
   return new Response(JSON.stringify({ ok: true, evolved: !!insight, analyzed: convos.length, gems_saved: gemsSaved, insight }, null, 2), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 }
 
+// ═══ A 級意向自動跟進飛輪:A 級但 24h 沒動靜 → 用車型/痛點生成個人化「主動追」訊息 ═══
+// 安全:預設 dry-run(列出會發給誰+預覽,不送);加 &go=1 才真的推。每次最多 20 位;同一人 3 天內不重複追。
+// 上線後可由 cron 或外部排程每天打 /admin/nurture?key=&go=1;先手動 dry-run 看話術再開 go。
+async function handleNurture(env, cfg, url) {
+  if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
+  await ensureTables(env);
+  if (!env.CRM) return new Response(JSON.stringify({ ok: false, note: '無 D1' }), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+  if (!cfg.lineToken) return new Response(JSON.stringify({ ok: false, note: '無 LINE token' }), { status: 503, headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+  const go = url.searchParams.get('go') === '1';
+  const reNurtureFloor = Date.now() - 3 * 864e5;   // 同一人 3 天內不重複追
+  // 上限:同一人最多追 2 次(避免長期不回的客人被無限追);每批最多 10 位(控 AI 成本與逾時)
+  const rows = (await env.CRM.prepare("SELECT sid, city, vehicle, industry, budget, pain FROM customer_profiles WHERE brand='popmonster' AND grade='A' AND updated_at <= datetime('now','-24 hours') AND (nurtured_at IS NULL OR nurtured_at < ?) AND COALESCE(nurture_count,0) < 2 LIMIT 10").bind(reNurtureFloor).all()).results || [];
+  const out = [];
+  for (const r of rows) {
+    const prompt = `這是一位 A 級高意向客戶,大約一天前跟你聊到一半就沒下文了。他的筆記:車型/案型「${r.vehicle || '未記'}」,最在意「${r.pain || '未記'}」${r.city ? ',在' + r.city : ''}${r.budget ? ',預算感 ' + r.budget : ''}。請寫一則「主動追」的 LINE 訊息:自然喚起他上次在意的重點(叫得出他的車型跟痛點,讓他覺得你記得他),不催不逼,給一個低門檻的下一步(上官網 popmonster.vip 看,或直接回你一句)。繁中台灣口語,120 字內,1~2 個 emoji,不要像罐頭、不要「親愛的顧客」。只輸出那則訊息本身,不要任何標籤。`;
+    let text = '';
+    try { text = clean(await callBrain([{ role: 'user', content: prompt }], env, cfg, buildSystemPrompt(''), 300)); } catch (_) {}
+    if (!text) continue;
+    if (go) {
+      const ok = await linePush(cfg.lineToken, r.sid, text, env);
+      if (ok) await env.CRM.prepare("UPDATE customer_profiles SET nurtured_at=?, nurture_count=COALESCE(nurture_count,0)+1 WHERE brand='popmonster' AND sid=?").bind(Date.now(), r.sid).run().catch(() => {});
+      out.push({ sid: r.sid.slice(0, 8) + '…', sent: ok, text });
+    } else {
+      out.push({ sid: r.sid.slice(0, 8) + '…', vehicle: r.vehicle || '', pain: r.pain || '', preview: text });
+    }
+  }
+  return new Response(JSON.stringify({ ok: true, mode: go ? 'sent' : 'dry-run(加 &go=1 才真的發)', count: out.length, leads: out }, null, 2), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+}
+
 const SETUP_HTML = (done) => `<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>泡泡怪獸 LINE bot 設定</title>
 <body style="font-family:system-ui;max-width:520px;margin:30px auto;padding:0 16px;background:#0c0f14;color:#e8edf5">
 <h2>泡泡怪獸 LINE 成交 bot 設定</h2>
@@ -866,6 +897,7 @@ export default {
     const url = new URL(request.url);
     if (url.pathname === '/setup') return handleSetup(request, env, url);
     if (url.pathname === '/admin/evolve') { const cfg = await getCfg(env); return handleEvolve(env, cfg, url); }
+    if (url.pathname === '/admin/nurture') { const cfg = await getCfg(env); return handleNurture(env, cfg, url); }   // A級自動跟進飛輪(dry-run 預設,&go=1 才發)
     // 大腦直測:不經 LINE,直接呼叫 callBrain 看回什麼/炸哪層
     if (url.pathname === '/admin/selftest') {
       if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });

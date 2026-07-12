@@ -1,0 +1,11 @@
+{
+  // leads-board — 三品牌客戶筆記統一看板(唯讀 + 密碼)
+  // 部署走 .github/workflows/deploy-leads-board.yml(workflow_dispatch)。本檔供本機 wrangler dev。
+  "name": "leads-board",
+  "main": "worker.js",
+  "compatibility_date": "2024-12-01",
+  "d1_databases": [
+    { "binding": "DB", "database_name": "pop-line-crm", "database_id": "e54671b1-d15e-4552-babf-cef367267568" }
+  ]
+  // Secret:BOARD_PASS(看板登入密碼)。用 Dashboard 或 wrangler secret put 設。
+}
