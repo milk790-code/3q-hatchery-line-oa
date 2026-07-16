@@ -15,6 +15,7 @@ jobs:
     env:
       WORKER_NAME: pop-line-oa
       SESSION_KV_ID: 20a68b10afc84764ba770b64f0f33f30
+      CLICK_KV_ID: b7c18769105143aeb3b1557b49b12455
       CRM_D1_ID: e54671b1-d15e-4552-babf-cef367267568
     steps:
       - uses: actions/checkout@v4
@@ -42,9 +43,10 @@ jobs:
             | map( if .val!="" then {name:.name,type:"secret_text",text:.val}
                    elif ([.name]|inside($existing)) then {name:.name,type:"inherit"}
                    else empty end )')
-          jq -n --argjson secrets "$secrets_json" --arg kv "$SESSION_KV_ID" --arg d1 "$CRM_D1_ID" '
+          jq -n --argjson secrets "$secrets_json" --arg kv "$SESSION_KV_ID" --arg click_kv "$CLICK_KV_ID" --arg d1 "$CRM_D1_ID" '
             { main_module:"worker.js", compatibility_date:"2024-12-01",
               bindings: ([ {name:"SESSION",type:"kv_namespace",namespace_id:$kv},
+                           {name:"CLICK_KV",type:"kv_namespace",namespace_id:$click_kv},
                            {name:"CRM",type:"d1",id:$d1},
                            {name:"GENOME",type:"d1",id:"f0419cec-f26d-452b-b2a9-9fe3851a4174"},
                            {name:"AI",type:"ai"},
