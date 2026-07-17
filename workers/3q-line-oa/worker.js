@@ -49,6 +49,96 @@ const PRICE_TABLE = {
 };
 const DEFAULT_SKU = '3q-starter';
 
+// ═══ POP /go 三問式免費成果採集(v1)═══
+const GO_INTAKE_ALLOWED_SOURCES = new Set(['direct', 'business-card', 'package-insert', 'social', 'legacy-worker']);
+const GO_INTAKE_FB_SOURCE = /^fb-[0-9a-f]{6}$/;
+const GO_INTAKE_CODE = /(?:【)?GO:([a-z0-9-]+):([a-z0-9-]+)(?:】)?/i;
+const GO_INTAKE_RESET = /^(重新開始|重來|reset)$/i;
+const GO_INTAKE_TTL_SECONDS = 24 * 60 * 60;
+const GO_INTAKE_SERVICE = Object.freeze({
+  slug: 'brand-content',
+  hook: '先免費做一個可比較版本，看成品再決定要不要合作。',
+  questions: Object.freeze([
+    '第 1／3 題｜你想改善哪一份內容？請貼頁面或連結；圖片／影片傳完後請輸入「素材傳完」。',
+    '第 2／3 題｜這份內容最希望觀眾做什麼？',
+    '第 3／3 題｜現在最卡的是看不懂、沒吸引力，還是沒人行動？',
+  ]),
+  delivery: '我會回一份可直接比較的免費樣張，並標示改動理由。',
+  boundary: '每人一次、一次聚焦一項；不含完整製作、素材採購與無限修改。',
+});
+
+function normalizeGoIntakeSource(source) {
+  const candidate = String(source || '').trim().toLowerCase();
+  return GO_INTAKE_ALLOWED_SOURCES.has(candidate) || GO_INTAKE_FB_SOURCE.test(candidate) ? candidate : 'direct';
+}
+
+function goIntakeQuestion(step) {
+  return GO_INTAKE_SERVICE.hook + '\n\n' + GO_INTAKE_SERVICE.questions[step]
+    + '\n\n隱私提醒：文件、畫面與對話請先遮姓名、電話、帳號與付款資料。輸入「重新開始」可退出。';
+}
+
+function goIntakeTransition({ text, state }) {
+  const input = String(text || '').trim();
+  if (GO_INTAKE_RESET.test(input)) {
+    return { handled: true, state: null, reply: '已清除這次採集進度。回到 POP 免費接線台即可重新開始。' };
+  }
+  if (state) {
+    if (state.slug !== GO_INTAKE_SERVICE.slug) {
+      return { handled: true, state: null, reply: '這次進度已失效，請從 POP 免費接線台重新選擇。' };
+    }
+    const nextStep = Number(state.step) + 1;
+    if (nextStep < GO_INTAKE_SERVICE.questions.length) {
+      return {
+        handled: true,
+        state: { slug: GO_INTAKE_SERVICE.slug, source: normalizeGoIntakeSource(state.source), step: nextStep },
+        reply: goIntakeQuestion(nextStep),
+      };
+    }
+    return {
+      handled: true,
+      state: null,
+      reply: '三題已收齊。' + GO_INTAKE_SERVICE.delivery + '\n\n免費範圍：' + GO_INTAKE_SERVICE.boundary
+        + '\n請不要再補傳未遮蔽的身分證、付款卡號或完整合約個資。',
+    };
+  }
+  const match = input.match(GO_INTAKE_CODE);
+  if (!match || match[1] !== GO_INTAKE_SERVICE.slug) return { handled: false, state: null, reply: null };
+  const nextState = { slug: GO_INTAKE_SERVICE.slug, source: normalizeGoIntakeSource(match[2]), step: 0 };
+  return { handled: true, state: nextState, reply: goIntakeQuestion(0) };
+}
+
+async function goIntakeStorageKey(userId, secret) {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey('raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const digest = await crypto.subtle.sign('HMAC', key, encoder.encode(userId));
+  return 'go-intake:' + [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+async function maybeHandleGoIntake(ev, env, cfg) {
+  if (ev.type !== 'message' || !ev.source?.userId || !ev.replyToken || !env.SESSION || !cfg.lineSecret) return false;
+  const key = await goIntakeStorageKey(ev.source.userId, cfg.lineSecret);
+  const raw = await env.SESSION.get(key);
+  let state = null;
+  if (raw) { try { state = JSON.parse(raw); } catch (_) {} }
+  if (ev.message?.type !== 'text') {
+    if (!state) return false;
+    await lineReply(cfg.lineToken, ev.replyToken, '素材已收到，可以繼續傳；傳完後請輸入「素材傳完」，我再問下一題。');
+    return true;
+  }
+  const result = goIntakeTransition({ text: ev.message.text, state });
+  if (!result.handled) return false;
+  if (result.state) await env.SESSION.put(key, JSON.stringify(result.state), { expirationTtl: GO_INTAKE_TTL_SECONDS });
+  else await env.SESSION.delete(key);
+  await lineReply(cfg.lineToken, ev.replyToken, result.reply);
+  return true;
+}
+
+function goIntakeHealthResponse() {
+  return new Response(JSON.stringify({ ok: true, feature: 'go-intake-v1', slug: GO_INTAKE_SERVICE.slug, questions: 3 }), {
+    headers: { 'content-type': 'application/json; charset=utf-8' },
+  });
+}
+
 // ═══ v5 情緒優先 × 延遲擬真(方案C 動態)═══
 const ACK_POOL = {
   '抱怨': ['先跟您說聲抱歉讓您有這種感覺😔 您說的我馬上看,稍等我一下', '收到,您先別急😔 我立刻看您的狀況,等我一下'],
@@ -695,6 +785,7 @@ async function handleEvent(ev, env, cfg) {
   // follow 不在 webhook 發歡迎:LINE 後台已設「加入好友的歡迎訊息+圖文按鈕」,webhook 再發會雙重歡迎
   if (ev.type === 'follow') return;
   if (ev.type !== 'message') return;
+  if (await maybeHandleGoIntake(ev, env, cfg)) return;
   const mtype = ev.message?.type;
   if (mtype === 'image') return handleImage(ev, env, cfg);
   const uid = ev.source?.userId || 'unknown';
@@ -910,6 +1001,7 @@ export default {
   async fetch(request, env, ctx) {
     SETUP_KEY = env.SETUP_KEY || crypto.randomUUID();
     const url = new URL(request.url);
+    if (url.pathname === '/go-intake-health') return goIntakeHealthResponse();
     if (url.pathname === '/setup') return handleSetup(request, env, url);
     if (url.pathname === '/admin/evolve') { const cfg = await getCfg(env); return handleEvolve(env, cfg, url); }
     // 診斷端點:webhook 指向/官方實測/bot 身分/token 活性,一次看清(&set=1 順便把 endpoint 指回本 worker)
@@ -1041,3 +1133,4 @@ export default {
   },
 };
 
+export { GO_INTAKE_SERVICE, goIntakeTransition };

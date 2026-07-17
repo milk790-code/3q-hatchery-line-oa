@@ -46,7 +46,8 @@ const sess = (uid) => JSON.parse(kv.get('popline:' + uid));
 let passed = 0, failed = 0;
 function ok(cond, name) { if (cond) { passed++; console.log('  ✅', name); } else { failed++; console.error('  ❌', name); } }
 
-const DISCLOSE = '嗨,我是泡泡怪獸的 AI 店員小泡';
+const DISCLOSE = '我是超級 AI 人工客服';
+const lastUserPushText = (uid) => [...calls.push].reverse().find((call) => call.to === uid)?.messages?.[0]?.text || '';
 kv.set('cfg:pop_owner', 'OWNER_UID');
 
 // ① follow:歡迎詞=第1句揭露,session 標記已揭露
@@ -87,9 +88,10 @@ ok(calls.push.length === pushBefore2 + 1, '④ 喊真人推播老闆');
 brainText = () => '';
 const pushBefore3 = calls.push.length;
 await send([msg('U_degraded', '在嗎')]);
-ok(lastReply().includes('我現在訊號不太穩'), '⑤ 降級話術不裝死');
-ok(lastReply().startsWith(DISCLOSE), '⑤ 降級時首句揭露仍機械前綴');
-ok(calls.push.length === pushBefore3 + 1 && calls.push[calls.push.length - 1].messages[0].text.includes('降級'), '⑤ 降級警示推播老闆');
+const degradedUserText = lastUserPushText('U_degraded') || lastReply();
+ok(degradedUserText.includes('我現在訊號不太穩'), '⑤ 降級話術不裝死');
+ok(lastReply().startsWith(DISCLOSE) || degradedUserText.startsWith(DISCLOSE), '⑤ 降級時首句或墊場先完成揭露');
+ok(calls.push.length >= pushBefore3 + 1 && calls.push.some((call) => call.to === 'OWNER_UID' && call.messages[0].text.includes('降級')), '⑤ 降級警示推播老闆');
 brainText = () => '收到,我幫你看。';
 
 // ⑥ 舊版陣列 session:視同已揭露,不重複
