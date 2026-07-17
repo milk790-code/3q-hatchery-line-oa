@@ -33,27 +33,26 @@ jobs:
           T_LINE_TOKEN: ${{ secrets.TUDIGONG_LINE_CHANNEL_ACCESS_TOKEN }}
           T_ANTHROPIC: ${{ secrets.TUDIGONG_ANTHROPIC_API_KEY }}
           T_OWNER: ${{ secrets.TUDIGONG_OWNER_LINE_USER_ID }}
+          GO_FUNNEL_ADMIN_KEY: ${{ secrets.GO_FUNNEL_ADMIN_KEY }}
         run: |
           set -euo pipefail
-          existing=$(curl -sS -H "Authorization: Bearer $CF_TOKEN" \
-            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/settings" \
-            | jq -c '[.result.bindings[]? | select(.type=="secret_text") | .name]' || echo '[]')
-          [ "$existing" = "null" ] && existing='[]'
+          settings_json=$(curl -fsS -H "Authorization: Bearer $CF_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}/settings")
+          existing=$(printf '%s' "$settings_json" | jq -ce 'if .success == true and (.result | type == "object") and (.result.bindings | type == "array") then [.result.bindings[] | select(.type=="secret_text") | .name] else error("Worker settings lookup failed") end')
           echo "existing secret bindings: $existing"
 
           secrets_json=$(jq -n --argjson existing "$existing" '
-            [
+            def desired: [
               {name:"LINE_CHANNEL_SECRET", val:(env.T_LINE_SECRET // "")},
               {name:"LINE_CHANNEL_ACCESS_TOKEN", val:(env.T_LINE_TOKEN // "")},
               {name:"ANTHROPIC_API_KEY", val:(env.T_ANTHROPIC // "")},
-              {name:"OWNER_LINE_USER_ID", val:(env.T_OWNER // "")}
-            ]
-            | map(
-              if .val != "" then {name:.name, type:"secret_text", text:.val}
-              elif ([.name] | inside($existing)) then {name:.name, type:"inherit"}
-              else empty
-              end
-            )')
+              {name:"OWNER_LINE_USER_ID", val:(env.T_OWNER // "")},
+              {name:"GO_FUNNEL_ADMIN_KEY", val:(env.GO_FUNNEL_ADMIN_KEY // "")}
+            ];
+            ($existing | map({name:., type:"inherit"})) as $inherited
+            | (desired | map(select(.val != "") | {name:.name,type:"secret_text",text:.val})) as $provided
+            | ($provided | map(.name)) as $provided_names
+            | [$inherited[] | select(.name as $name | ($provided_names | index($name) | not))] + $provided')
 
           jq -n --argjson secrets "$secrets_json" --arg kv "$STATE_KV_ID" --arg d1 "$DB_D1_ID" '
             {
@@ -72,7 +71,7 @@ jobs:
           jq '(.bindings[] | select(.type=="secret_text") | .text) = "***MASKED***"' /tmp/metadata.json
 
           resp=$(curl -sS -X PUT \
-            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}" \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}?bindings_inherit=strict" \
             -H "Authorization: Bearer $CF_TOKEN" \
             -F "metadata=@/tmp/metadata.json;type=application/json" \
             -F "worker.js=@workers/tudigong/worker.js;type=application/javascript+module")
@@ -128,3 +127,4 @@ jobs:
           echo "- TUDIGONG_LINE_CHANNEL_ACCESS_TOKEN (Messaging API tab > Issue)" >> $GITHUB_STEP_SUMMARY
           echo "- TUDIGONG_ANTHROPIC_API_KEY" >> $GITHUB_STEP_SUMMARY
           echo "- TUDIGONG_OWNER_LINE_USER_ID (say 我是老闆 to the bot after secrets set)" >> $GITHUB_STEP_SUMMARY
+          echo "- GO_FUNNEL_ADMIN_KEY (shared funnel report + delivery marker admin key)" >> $GITHUB_STEP_SUMMARY

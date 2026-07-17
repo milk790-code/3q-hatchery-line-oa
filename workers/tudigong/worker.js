@@ -65,6 +65,11 @@ var GO_INTAKE_FB_SOURCE = /^fb-[0-9a-f]{6}$/;
 var GO_INTAKE_CODE = /(?:【)?GO:([a-z0-9-]+):([a-z0-9-]+)(?:】)?/i;
 var GO_INTAKE_RESET = /^(重新開始|重來|reset)$/i;
 var GO_INTAKE_TTL_SECONDS = 24 * 60 * 60;
+var GO_INTAKE_WEBHOOK_TTL_SECONDS = 7 * 24 * 60 * 60;
+var GO_FUNNEL_EVENT_TTL_SECONDS = 120 * 24 * 60 * 60;
+var GO_FUNNEL_DELIVERY_TTL_SECONDS = 90 * 24 * 60 * 60;
+var GO_FUNNEL_EVENTS = new Set(["started", "first_answer", "third_answer", "delivered"]);
+var GO_FUNNEL_CASE_PATTERN = /^GO-[A-F0-9]{12}$/;
 var GO_INTAKE_SERVICE = Object.freeze({
   slug: "rental-check",
   hook: "地址一貼，免費領一頁地段機能與簽約風險清單。",
@@ -81,6 +86,212 @@ function normalizeGoIntakeSource(source) {
   return GO_INTAKE_ALLOWED_SOURCES.has(candidate) || GO_INTAKE_FB_SOURCE.test(candidate) ? candidate : "direct";
 }
 __name(normalizeGoIntakeSource, "normalizeGoIntakeSource");
+function goFunnelDay(timestamp = Date.now()) {
+  return new Date(Number(timestamp) + 8 * 60 * 60 * 1e3).toISOString().slice(0, 10);
+}
+__name(goFunnelDay, "goFunnelDay");
+function createGoFunnelMeta(source) {
+  const startedAt = Date.now();
+  return {
+    caseId: "GO-" + crypto.randomUUID().replaceAll("-", "").slice(0, 12).toUpperCase(),
+    source: normalizeGoIntakeSource(source),
+    cohortDay: goFunnelDay(startedAt),
+    startedAt
+  };
+}
+__name(createGoFunnelMeta, "createGoFunnelMeta");
+function goFunnelMetaKey(intakeKey) {
+  return intakeKey.replace("go-intake:", "go-intake-meta:");
+}
+__name(goFunnelMetaKey, "goFunnelMetaKey");
+function goFunnelEventKey(meta, event) {
+  return `go-funnel:v1:${GO_INTAKE_SERVICE.slug}:${meta.cohortDay}:${normalizeGoIntakeSource(meta.source)}:${event}:${meta.caseId}`;
+}
+__name(goFunnelEventKey, "goFunnelEventKey");
+async function recordGoFunnelEvent(kv, meta, event, value = "1") {
+  if (!kv || !meta || !GO_FUNNEL_CASE_PATTERN.test(meta.caseId) || !GO_FUNNEL_EVENTS.has(event)) return;
+  await kv.put(goFunnelEventKey(meta, event), String(value), { expirationTtl: GO_FUNNEL_EVENT_TTL_SECONDS });
+}
+__name(recordGoFunnelEvent, "recordGoFunnelEvent");
+async function retryGoFunnelWrite(operation) {
+  try { return await operation(); } catch (_) { return operation(); }
+}
+__name(retryGoFunnelWrite, "retryGoFunnelWrite");
+async function rollbackGoIntakeReplyFailure(kv, details) {
+  const { key, metaKey, previousState, previousMeta, activeMeta, isStart, isFirstAnswer, isCompletion } = details;
+  await retryGoFunnelWrite(() => previousState
+    ? kv.put(key, JSON.stringify(previousState), { expirationTtl: GO_INTAKE_TTL_SECONDS })
+    : kv.delete(key));
+  await retryGoFunnelWrite(() => previousMeta
+    ? kv.put(metaKey, JSON.stringify(previousMeta), { expirationTtl: GO_INTAKE_TTL_SECONDS })
+    : kv.delete(metaKey));
+  if (!activeMeta) return;
+  if (isStart || (!previousMeta && (isFirstAnswer || isCompletion))) {
+    await retryGoFunnelWrite(() => kv.delete(goFunnelEventKey(activeMeta, "started")));
+  }
+  if (isFirstAnswer || (isCompletion && !previousMeta)) await retryGoFunnelWrite(() => kv.delete(goFunnelEventKey(activeMeta, "first_answer")));
+  if (isCompletion) {
+    await retryGoFunnelWrite(() => kv.delete(goFunnelEventKey(activeMeta, "third_answer")));
+    await retryGoFunnelWrite(() => kv.delete(`go-delivery:v1:${GO_INTAKE_SERVICE.slug}:${activeMeta.caseId}`));
+  }
+}
+__name(rollbackGoIntakeReplyFailure, "rollbackGoIntakeReplyFailure");
+function newGoFunnelBucket(source = null) {
+  return {
+    source,
+    started: /* @__PURE__ */ new Set(),
+    first_answer: /* @__PURE__ */ new Set(),
+    third_answer: /* @__PURE__ */ new Set(),
+    delivered: /* @__PURE__ */ new Set(),
+    deliveryMinutes: []
+  };
+}
+__name(newGoFunnelBucket, "newGoFunnelBucket");
+function goFunnelRate(numerator, denominator) {
+  return denominator ? Math.round(numerator / denominator * 1e4) / 1e4 : 0;
+}
+__name(goFunnelRate, "goFunnelRate");
+function goFunnelStats(bucket) {
+  const starts = bucket.started.size;
+  const firstAnswers = bucket.first_answer.size;
+  const thirdAnswers = bucket.third_answer.size;
+  const deliveries = bucket.delivered.size;
+  const averageDeliveryMinutes = bucket.deliveryMinutes.length ? Math.round(bucket.deliveryMinutes.reduce((sum, value) => sum + value, 0) / bucket.deliveryMinutes.length * 10) / 10 : null;
+  return {
+    ...(bucket.source ? { source: bucket.source } : {}),
+    starts,
+    firstAnswers,
+    thirdAnswers,
+    deliveries,
+    firstAnswerRate: goFunnelRate(firstAnswers, starts),
+    thirdAnswerRate: goFunnelRate(thirdAnswers, starts),
+    deliveryRate: goFunnelRate(deliveries, starts),
+    averageDeliveryMinutes
+  };
+}
+__name(goFunnelStats, "goFunnelStats");
+async function listGoFunnelKeys(kv, prefix) {
+  const keys = [];
+  let cursor = "";
+  do {
+    const page = await kv.list(cursor ? { prefix, cursor } : { prefix });
+    keys.push(...page.keys);
+    cursor = page.list_complete ? "" : page.cursor;
+  } while (cursor);
+  return keys;
+}
+__name(listGoFunnelKeys, "listGoFunnelKeys");
+async function buildGoFunnelSummary(kv, daysInput) {
+  const days = Math.min(90, Math.max(1, Number.parseInt(String(daysInput || "30"), 10) || 30));
+  const shiftedNow = Date.now() + 8 * 60 * 60 * 1e3;
+  const cohortDays = Array.from({ length: days }, (_, index) => new Date(shiftedNow - (days - index - 1) * 24 * 60 * 60 * 1e3).toISOString().slice(0, 10));
+  const overall = newGoFunnelBucket();
+  const bySource = /* @__PURE__ */ new Map();
+  const allowedDays = /* @__PURE__ */ new Set(cohortDays);
+  const keys = await listGoFunnelKeys(kv, `go-funnel:v1:${GO_INTAKE_SERVICE.slug}:`);
+  for (const item of keys) {
+    const [, , , cohortDay, rawSource, event, caseId] = item.name.split(":");
+    if (!allowedDays.has(cohortDay) || !GO_FUNNEL_EVENTS.has(event) || !GO_FUNNEL_CASE_PATTERN.test(caseId)) continue;
+    const source = normalizeGoIntakeSource(rawSource);
+    if (!bySource.has(source)) bySource.set(source, newGoFunnelBucket(source));
+    bySource.get(source)[event].add(caseId);
+    overall[event].add(caseId);
+    if (event === "delivered") {
+      const rawMinutes = await kv.get(item.name);
+      const minutes = rawMinutes === null ? Number.NaN : Number(rawMinutes);
+      if (Number.isFinite(minutes) && minutes >= 0) {
+        bySource.get(source).deliveryMinutes.push(minutes);
+        overall.deliveryMinutes.push(minutes);
+      }
+    }
+  }
+  return {
+    ok: true,
+    feature: "go-funnel-v1",
+    slug: GO_INTAKE_SERVICE.slug,
+    range: { from: cohortDays[0], to: cohortDays.at(-1), days },
+    totals: goFunnelStats(overall),
+    sources: [...bySource.values()].sort((a, b) => a.source.localeCompare(b.source)).map(goFunnelStats),
+    definitions: {
+      firstAnswerRate: "firstAnswers / starts",
+      thirdAnswerRate: "thirdAnswers / starts",
+      deliveryRate: "deliveries / starts",
+      averageDeliveryMinutes: "三題完成到人工標記成果已交付的平均分鐘；沒有已交付案件時為 null"
+    }
+  };
+}
+__name(buildGoFunnelSummary, "buildGoFunnelSummary");
+async function safeGoFunnelAdminKey(request, expected) {
+  if (!expected) return false;
+  const encoder = new TextEncoder();
+  const supplied = request.headers.get("X-Admin-Key") || "";
+  const [suppliedHash, expectedHash] = await Promise.all([
+    crypto.subtle.digest("SHA-256", encoder.encode(supplied)),
+    crypto.subtle.digest("SHA-256", encoder.encode(expected))
+  ]);
+  const left = new Uint8Array(suppliedHash), right = new Uint8Array(expectedHash);
+  let difference = 0;
+  for (let index = 0; index < left.length; index += 1) difference |= left[index] ^ right[index];
+  return difference === 0 && supplied.length > 0;
+}
+__name(safeGoFunnelAdminKey, "safeGoFunnelAdminKey");
+function goFunnelJson(value, status = 200) {
+  return new Response(JSON.stringify(value), {
+    status,
+    headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" }
+  });
+}
+__name(goFunnelJson, "goFunnelJson");
+async function markGoFunnelDelivered(kv, rawCaseId) {
+  const caseId = String(rawCaseId || "").trim().toUpperCase();
+  if (!GO_FUNNEL_CASE_PATTERN.test(caseId)) return { status: 400, body: { ok: false, error: "invalid caseId" } };
+  const receiptRaw = await kv.get(`go-delivery:v1:${GO_INTAKE_SERVICE.slug}:${caseId}`);
+  if (!receiptRaw) return { status: 404, body: { ok: false, error: "case not found" } };
+  let receipt;
+  try {
+    receipt = JSON.parse(receiptRaw);
+  } catch (_) {
+    return { status: 409, body: { ok: false, error: "invalid receipt" } };
+  }
+  if (receipt.slug !== GO_INTAKE_SERVICE.slug || !/^\d{4}-\d{2}-\d{2}$/.test(receipt.cohortDay || "")) {
+    return { status: 409, body: { ok: false, error: "receipt mismatch" } };
+  }
+  const meta = { caseId, source: normalizeGoIntakeSource(receipt.source), cohortDay: receipt.cohortDay };
+  const eventKey = goFunnelEventKey(meta, "delivered");
+  const existing = await kv.get(eventKey);
+  if (existing !== null) return { status: 200, body: { ok: true, caseId, deliveryMinutes: Number(existing), duplicate: true } };
+  const completedAt = Number(receipt.completedAt);
+  if (!Number.isFinite(completedAt) || completedAt <= 0) return { status: 409, body: { ok: false, error: "invalid completion time" } };
+  const deliveryMinutes = Math.max(0, Math.round((Date.now() - completedAt) / 6e4 * 10) / 10);
+  await retryGoFunnelWrite(() => recordGoFunnelEvent(kv, meta, "started"));
+  await retryGoFunnelWrite(() => recordGoFunnelEvent(kv, meta, "first_answer"));
+  await retryGoFunnelWrite(() => recordGoFunnelEvent(kv, meta, "third_answer"));
+  await retryGoFunnelWrite(() => recordGoFunnelEvent(kv, meta, "delivered", deliveryMinutes));
+  return { status: 200, body: { ok: true, caseId, deliveryMinutes, duplicate: false } };
+}
+__name(markGoFunnelDelivered, "markGoFunnelDelivered");
+async function handleGoFunnelAdmin(request, env, kv) {
+  if (!kv || !env.GO_FUNNEL_ADMIN_KEY) return goFunnelJson({ ok: false, error: "go funnel admin not configured" }, 503);
+  if (!await safeGoFunnelAdminKey(request, env.GO_FUNNEL_ADMIN_KEY)) return goFunnelJson({ ok: false, error: "unauthorized" }, 401);
+  const url = new URL(request.url);
+  if (url.pathname === "/admin/go-funnel" && request.method === "GET") return goFunnelJson(await buildGoFunnelSummary(kv, url.searchParams.get("days")));
+  if (url.pathname === "/admin/go-funnel/delivered" && request.method === "POST") {
+    const declaredLength = Number(request.headers.get("content-length") || "0");
+    if (declaredLength > 1024) return goFunnelJson({ ok: false, error: "payload too large" }, 413);
+    const bodyText = await request.text();
+    if (bodyText.length > 1024) return goFunnelJson({ ok: false, error: "payload too large" }, 413);
+    let body;
+    try {
+      body = JSON.parse(bodyText);
+    } catch (_) {
+      return goFunnelJson({ ok: false, error: "invalid json" }, 400);
+    }
+    const result = await markGoFunnelDelivered(kv, body.caseId);
+    return goFunnelJson(result.body, result.status);
+  }
+  return goFunnelJson({ ok: false, error: "method not allowed" }, 405);
+}
+__name(handleGoFunnelAdmin, "handleGoFunnelAdmin");
 function goIntakeQuestion(step) {
   return GO_INTAKE_SERVICE.hook + "\n\n" + GO_INTAKE_SERVICE.questions[step]
     + "\n\n隱私提醒：地址可遮門牌，文件請遮姓名、電話、帳號與付款資料。輸入「重新開始」可退出。";
@@ -123,22 +334,97 @@ async function goIntakeStorageKey(userId, secret) {
   return "go-intake:" + [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 __name(goIntakeStorageKey, "goIntakeStorageKey");
+async function goIntakeWebhookKey(webhookEventId) {
+  const value = String(webhookEventId || "").trim();
+  if (!value) return null;
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  return `go-intake-webhook:v1:${GO_INTAKE_SERVICE.slug}:` + [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+__name(goIntakeWebhookKey, "goIntakeWebhookKey");
+async function rememberGoIntakeWebhook(kv, webhookKey) {
+  if (webhookKey) await kv.put(webhookKey, "1", { expirationTtl: GO_INTAKE_WEBHOOK_TTL_SECONDS });
+}
+__name(rememberGoIntakeWebhook, "rememberGoIntakeWebhook");
 async function maybeHandleGoIntake(ev, env, cfg) {
   if (ev.type !== "message" || !ev.source?.userId || !ev.replyToken || !env.STATE || !cfg.lineSecret) return false;
   const key = await goIntakeStorageKey(ev.source.userId, cfg.lineSecret);
-  const raw = await env.STATE.get(key);
-  let state = null;
+  const webhookKey = await goIntakeWebhookKey(ev.webhookEventId);
+  if (webhookKey && await env.STATE.get(webhookKey)) return true;
+  const metaKey = goFunnelMetaKey(key);
+  const [raw, metaRaw] = await Promise.all([env.STATE.get(key), env.STATE.get(metaKey)]);
+  let state = null, meta = null;
   if (raw) { try { state = JSON.parse(raw); } catch (_) {} }
+  if (metaRaw) { try { meta = JSON.parse(metaRaw); } catch (_) {} }
+  const previousState = state;
+  const previousMeta = meta;
   if (ev.message?.type !== "text") {
     if (!state) return false;
-    await replyLine(ev.replyToken, ["附件或位置已收到。請再用一句文字回答目前這一題，輸入後我再問下一題。"], cfg);
+    const replySent = await replyLine(ev.replyToken, ["附件或位置已收到。請再用一句文字回答目前這一題，輸入後我再問下一題。"], cfg);
+    if (replySent) await retryGoFunnelWrite(() => rememberGoIntakeWebhook(env.STATE, webhookKey)).catch(() => {});
     return true;
   }
   const result = goIntakeTransition({ text: ev.message.text, state });
   if (!result.handled) return false;
-  if (result.state) await env.STATE.put(key, JSON.stringify(result.state), { expirationTtl: GO_INTAKE_TTL_SECONDS });
-  else await env.STATE.delete(key);
-  await replyLine(ev.replyToken, [result.reply], cfg);
+  let replyText = result.reply;
+  const isStart = !state && Number(result.state?.step) === 0;
+  const isFirstAnswer = state?.slug === GO_INTAKE_SERVICE.slug && Number(state.step) === 0 && Number(result.state?.step) === 1;
+  const isCompletion = state?.slug === GO_INTAKE_SERVICE.slug && Number(state.step) === 2 && result.state === null && !GO_INTAKE_RESET.test(String(ev.message.text || "").trim());
+  let trackingFailed = false;
+  try {
+    if (!state && Number(result.state?.step) === 0) {
+      meta = createGoFunnelMeta(result.state.source);
+      await env.STATE.put(metaKey, JSON.stringify(meta), { expirationTtl: GO_INTAKE_TTL_SECONDS });
+      await recordGoFunnelEvent(env.STATE, meta, "started");
+    } else if (isFirstAnswer) {
+      if (!meta) {
+        meta = createGoFunnelMeta(state.source);
+        await env.STATE.put(metaKey, JSON.stringify(meta), { expirationTtl: GO_INTAKE_TTL_SECONDS });
+      }
+      await Promise.all([
+        recordGoFunnelEvent(env.STATE, meta, "started"),
+        recordGoFunnelEvent(env.STATE, meta, "first_answer")
+      ]);
+    } else if (isCompletion) {
+      if (!meta) {
+        meta = createGoFunnelMeta(state.source);
+        await env.STATE.put(metaKey, JSON.stringify(meta), { expirationTtl: GO_INTAKE_TTL_SECONDS });
+      }
+      const completedAt = Date.now();
+      await retryGoFunnelWrite(() => env.STATE.put(`go-delivery:v1:${GO_INTAKE_SERVICE.slug}:${meta.caseId}`, JSON.stringify({
+          slug: GO_INTAKE_SERVICE.slug,
+          source: normalizeGoIntakeSource(meta.source),
+          cohortDay: meta.cohortDay,
+          completedAt
+        }), { expirationTtl: GO_FUNNEL_DELIVERY_TTL_SECONDS }));
+      replyText += `\n\n案件碼：${meta.caseId}（只用於交付計時，不含你的資料）`;
+      await retryGoFunnelWrite(() => recordGoFunnelEvent(env.STATE, meta, "started"));
+      await retryGoFunnelWrite(() => recordGoFunnelEvent(env.STATE, meta, "first_answer"));
+      await retryGoFunnelWrite(() => recordGoFunnelEvent(env.STATE, meta, "third_answer"));
+    }
+  } catch (error) {
+    console.error(JSON.stringify({ event: "go_funnel_write_error", slug: GO_INTAKE_SERVICE.slug, message: String(error?.message || error) }));
+    if (isCompletion) {
+      trackingFailed = true;
+      replyText = "第 3 題已收到，但案件碼暫時無法建立。請稍後再傳「完成」，我會從這題重試，不用重填前兩題。";
+    }
+  }
+  if (trackingFailed) {
+    await retryGoFunnelWrite(() => env.STATE.put(key, JSON.stringify(previousState), { expirationTtl: GO_INTAKE_TTL_SECONDS }));
+    if (meta) await retryGoFunnelWrite(() => env.STATE.put(metaKey, JSON.stringify(meta), { expirationTtl: GO_INTAKE_TTL_SECONDS }));
+  } else if (result.state) await retryGoFunnelWrite(() => env.STATE.put(key, JSON.stringify(result.state), { expirationTtl: GO_INTAKE_TTL_SECONDS }));
+  else {
+    await retryGoFunnelWrite(() => env.STATE.delete(key));
+    await retryGoFunnelWrite(() => env.STATE.delete(metaKey));
+  }
+  const replySent = await replyLine(ev.replyToken, [replyText], cfg);
+  if (!replySent) {
+    await rollbackGoIntakeReplyFailure(env.STATE, {
+      key, metaKey, previousState, previousMeta, activeMeta: meta, isStart, isFirstAnswer, isCompletion
+    }).catch((error) => console.error(JSON.stringify({ event: "go_intake_reply_rollback_error", slug: GO_INTAKE_SERVICE.slug, message: String(error?.message || error) })));
+    return true;
+  }
+  if (trackingFailed) return true;
+  await retryGoFunnelWrite(() => rememberGoIntakeWebhook(env.STATE, webhookKey)).catch(() => {});
   return true;
 }
 __name(maybeHandleGoIntake, "maybeHandleGoIntake");
@@ -402,6 +688,7 @@ var worker_default = {
     SETUP_KEY = env.SETUP_KEY || crypto.randomUUID();
     const url = new URL(request.url);
     if (url.pathname === "/go-intake-health") return goIntakeHealthResponse();
+    if (url.pathname === "/admin/go-funnel" || url.pathname === "/admin/go-funnel/delivered") return handleGoFunnelAdmin(request, env, env.STATE);
     if (url.pathname === "/setup") return handleSetup(request, env, url);
     if (url.pathname === "/health") {
       const cfg2 = await loadCfg(env);
@@ -1019,7 +1306,7 @@ async function logIntake(env, userId, kind, raw) {
 }
 __name(logIntake, "logIntake");
 async function replyLine(replyToken, texts, cfg) {
-  await lineApi("https://api.line.me/v2/bot/message/reply", { replyToken, messages: texts.map((t) => ({ type: "text", text: t })) }, cfg);
+  return lineApi("https://api.line.me/v2/bot/message/reply", { replyToken, messages: texts.map((t) => ({ type: "text", text: t })) }, cfg);
 }
 __name(replyLine, "replyLine");
 async function pushLine(to, texts, cfg) {
@@ -1028,12 +1315,18 @@ async function pushLine(to, texts, cfg) {
 }
 __name(pushLine, "pushLine");
 async function lineApi(url, payload, cfg) {
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "content-type": "application/json", authorization: `Bearer ${cfg.lineToken}` },
-    body: JSON.stringify(payload)
-  });
-  if (!res.ok) console.error("line api", res.status, await res.text());
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${cfg.lineToken}` },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) console.error("line api", res.status, await res.text());
+    return res.ok;
+  } catch (error) {
+    console.error("line api", error.message);
+    return false;
+  }
 }
 __name(lineApi, "lineApi");
 function constantTimeEqual(a, b) {
