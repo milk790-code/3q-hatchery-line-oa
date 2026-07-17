@@ -12,6 +12,96 @@ const CDG_CORE_URL   = "https://cdg-core.milk790.workers.dev";
 const LINE_ID        = "@186vktox";
 const LINE_URL       = "https://line.me/R/ti/p/@186vktox";
 
+// ── POP /go 三問式免費成果採集(v1) ──────────────────────
+const GO_INTAKE_ALLOWED_SOURCES = new Set(["direct", "business-card", "package-insert", "social", "legacy-worker"]);
+const GO_INTAKE_FB_SOURCE = /^fb-[0-9a-f]{6}$/;
+const GO_INTAKE_CODE = /(?:【)?GO:([a-z0-9-]+):([a-z0-9-]+)(?:】)?/i;
+const GO_INTAKE_RESET = /^(重新開始|重來|reset)$/i;
+const GO_INTAKE_TTL_SECONDS = 24 * 60 * 60;
+const GO_INTAKE_SERVICE = Object.freeze({
+  slug: "luxury-check",
+  hook: "先別急著買，免費做來源、價格與照片疑點初篩。",
+  questions: Object.freeze([
+    "第 1／3 題｜品牌、款式、賣家來源與開價是多少？",
+    "第 2／3 題｜請傳正面、背面、序號／標籤與細節照片；照片傳完後輸入「照片傳完」。",
+    "第 3／3 題｜最擔心真偽、價格、品況，還是來源？",
+  ]),
+  delivery: "我會回一份初篩結果與還需要補證的照片、資料清單。",
+  boundary: "每人一次、一件商品；僅為初步資訊整理，不是真偽鑑定、估價保證或購買背書。",
+});
+
+function normalizeGoIntakeSource(source) {
+  const candidate = String(source || "").trim().toLowerCase();
+  return GO_INTAKE_ALLOWED_SOURCES.has(candidate) || GO_INTAKE_FB_SOURCE.test(candidate) ? candidate : "direct";
+}
+
+function goIntakeQuestion(step) {
+  return `${GO_INTAKE_SERVICE.hook}\n\n${GO_INTAKE_SERVICE.questions[step]}`
+    + "\n\n隱私提醒：購買紀錄、對話與照片請先遮姓名、電話、帳號與付款資料。輸入「重新開始」可退出。";
+}
+
+function goIntakeTransition({ text, state }) {
+  const input = String(text || "").trim();
+  if (GO_INTAKE_RESET.test(input)) {
+    return { handled: true, state: null, reply: "已清除這次採集進度。回到 POP 免費接線台即可重新開始。" };
+  }
+  if (state) {
+    if (state.slug !== GO_INTAKE_SERVICE.slug) {
+      return { handled: true, state: null, reply: "這次進度已失效，請從 POP 免費接線台重新選擇。" };
+    }
+    const nextStep = Number(state.step) + 1;
+    if (nextStep < GO_INTAKE_SERVICE.questions.length) {
+      return {
+        handled: true,
+        state: { slug: GO_INTAKE_SERVICE.slug, source: normalizeGoIntakeSource(state.source), step: nextStep },
+        reply: goIntakeQuestion(nextStep),
+      };
+    }
+    return {
+      handled: true,
+      state: null,
+      reply: `三題已收齊。${GO_INTAKE_SERVICE.delivery}\n\n免費範圍：${GO_INTAKE_SERVICE.boundary}`
+        + "\n請不要再補傳未遮蔽的身分證、付款卡號或完整合約個資。",
+    };
+  }
+  const match = input.match(GO_INTAKE_CODE);
+  if (!match || match[1] !== GO_INTAKE_SERVICE.slug) return { handled: false, state: null, reply: null };
+  const nextState = { slug: GO_INTAKE_SERVICE.slug, source: normalizeGoIntakeSource(match[2]), step: 0 };
+  return { handled: true, state: nextState, reply: goIntakeQuestion(0) };
+}
+
+async function goIntakeStorageKey(userId, secret) {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey("raw", encoder.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const digest = await crypto.subtle.sign("HMAC", key, encoder.encode(userId));
+  return `go-intake:${[...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, "0")).join("")}`;
+}
+
+async function maybeHandleGoIntake(ev, env) {
+  if (ev.type !== "message" || !ev.source?.userId || !ev.replyToken || !env.KV || !env.LINE_CHANNEL_SECRET) return false;
+  const key = await goIntakeStorageKey(ev.source.userId, env.LINE_CHANNEL_SECRET);
+  const raw = await env.KV.get(key);
+  let state = null;
+  if (raw) { try { state = JSON.parse(raw); } catch (_error) {} }
+  if (ev.message?.type !== "text") {
+    if (!state) return false;
+    await replyLine(ev.replyToken, ["照片已收到，可以繼續傳；傳完後請輸入「照片傳完」，我再問下一題。"], env.LINE_CHANNEL_ACCESS_TOKEN);
+    return true;
+  }
+  const result = goIntakeTransition({ text: ev.message.text, state });
+  if (!result.handled) return false;
+  if (result.state) await env.KV.put(key, JSON.stringify(result.state), { expirationTtl: GO_INTAKE_TTL_SECONDS });
+  else await env.KV.delete(key);
+  await replyLine(ev.replyToken, [result.reply], env.LINE_CHANNEL_ACCESS_TOKEN);
+  return true;
+}
+
+function goIntakeHealthResponse() {
+  return new Response(JSON.stringify({ ok: true, feature: "go-intake-v1", slug: GO_INTAKE_SERVICE.slug, questions: 3 }), {
+    headers: { "content-type": "application/json; charset=utf-8" },
+  });
+}
+
 const RICHMENU_NAME  = "luxury-main-v1";
 const RICHMENU_IMG   = "https://raw.githubusercontent.com/milk790-code/3q-hatchery-line-oa/main/assets/luxury/richmenu_luxury.png";
 
@@ -131,7 +221,9 @@ LINE：${LINE_ID}`
 async function handleEvents(events, env) {
   for (const ev of events) {
     try {
-      if (ev.type === "message" && ev.message?.type === "text") {
+      if (await maybeHandleGoIntake(ev, env)) {
+        continue;
+      } else if (ev.type === "message" && ev.message?.type === "text") {
         await onText(ev, env);
       } else if (ev.type === "follow") {
         await onFollow(ev, env);
@@ -238,6 +330,8 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
 
+    if (path === "/go-intake-health") return goIntakeHealthResponse();
+
     if (request.method === "OPTIONS") {
       return new Response(null, {
         headers: {
@@ -282,3 +376,5 @@ export default {
     return new Response("OK");
   }
 };
+
+export { GO_INTAKE_SERVICE, goIntakeTransition };
