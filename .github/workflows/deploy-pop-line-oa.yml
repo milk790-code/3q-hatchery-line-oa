@@ -53,7 +53,8 @@ jobs:
                            {name:"CRM",type:"d1",id:$d1},
                            {name:"GENOME",type:"d1",id:"f0419cec-f26d-452b-b2a9-9fe3851a4174"},
                            {name:"AI",type:"ai"},
-                           {name:"DELAY_DO",type:"durable_object_namespace",class_name:"DelayReplyDO"} ] + $secrets) }' > /tmp/meta.json
+                           {name:"DELAY_DO",type:"durable_object_namespace",class_name:"DelayReplyDO"},
+                           {name:"QUIET_MODE",type:"plain_text",text:"off"} ] + $secrets) }' > /tmp/meta.json
           resp=$(curl -sS -X PUT \
             "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}?bindings_inherit=strict" \
             -H "Authorization: Bearer $CF_TOKEN" \
