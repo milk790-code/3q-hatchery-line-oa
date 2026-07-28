@@ -7,6 +7,10 @@
 //     dashboard at /queue/dashboard so queue state no longer depends on Actions logs.
 //   - /queue/add skipped rows include reason + duplicate fields.
 //
+// v2.7-draft-smoke (2026-06-21):
+//   - /queue/draft-smoke validates cross-platform payloads without D1 writes,
+//     queue inserts, or public publish calls.
+//
 // v2.5 (2026-06-17):
 //   - /queue/add 去重納入 link_url + scheduled_at，允許同文不同日期/UTM 的
 //     30 天 campaign feed 正常排入，仍防止完全相同 pending row 雙投。
@@ -41,6 +45,7 @@
 // Platform daily limits (to avoid spam signals)
 // ─────────────────────────────────────────────────────────────────────────
 // 2026-06-07 衝刺模式:FB 1→3、IG 1→2(短期獲客衝刺,基線出來後可調回)
+const WORKER_VERSION = '2.7-draft-smoke';
 const DAILY_LIMITS = { threads: 3, instagram: 2, facebook: 3, tiktok: 1, google_biz: 1 };
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -538,6 +543,83 @@ const PLATFORM_FNS = {
   google_biz: publishToGoogleBiz,
 };
 
+async function platformReadiness(platform, post, env) {
+  const blockers = [];
+  let configured = false;
+
+  if (platform === 'threads') {
+    const [token, userId] = await Promise.all([
+      getToken('threads', 'THREADS_ACCESS_TOKEN', env),
+      getToken('threads', 'THREADS_USER_ID', env),
+    ]);
+    configured = Boolean(token && userId);
+    if (!configured) blockers.push('threads OAuth token/user_id missing');
+  } else if (platform === 'instagram') {
+    const [token, userId] = await Promise.all([
+      getToken('ig', 'IG_ACCESS_TOKEN', env),
+      getToken('ig', 'IG_USER_ID', env),
+    ]);
+    configured = Boolean(token && userId);
+    if (!configured) blockers.push('instagram token/user_id missing');
+    if (!post.image_url) blockers.push('instagram requires image_url');
+  } else if (platform === 'facebook') {
+    const token = await getToken('fb', 'FB_PAGE_ACCESS_TOKEN', env);
+    configured = Boolean(token && env.FB_PAGE_ID);
+    if (!configured) blockers.push('facebook page token or FB_PAGE_ID missing');
+  } else if (platform === 'tiktok') {
+    configured = Boolean(env.TIKTOK_ACCESS_TOKEN);
+    if (!configured) blockers.push('TIKTOK_ACCESS_TOKEN missing');
+    if (!post.image_url) blockers.push('tiktok photo post requires image_url');
+  } else if (platform === 'google_biz') {
+    configured = Boolean(env.GOOGLE_SERVICE_ACCOUNT && env.GOOGLE_LOCATION_NAME);
+    if (!configured) blockers.push('GOOGLE_SERVICE_ACCOUNT or GOOGLE_LOCATION_NAME missing');
+  }
+
+  return { configured, blockers };
+}
+
+async function draftSmokeItem(post, index, env) {
+  const p = post || {};
+  const errors = [];
+  const warnings = [];
+
+  if (!PLATFORM_FNS[p.platform]) errors.push(`unknown platform: ${p.platform}`);
+  if (!p.caption && !p.caption_seed) errors.push('caption or caption_seed required');
+  if (p.scheduled_at && Number.isNaN(Date.parse(p.scheduled_at))) {
+    errors.push('scheduled_at must be ISO-parseable');
+  }
+
+  const readiness = errors.length === 0
+    ? await platformReadiness(p.platform, p, env)
+    : { configured: false, blockers: [] };
+
+  if (p.caption_seed && !p.caption) {
+    warnings.push('caption_seed present; live queue may generate final caption with Workers AI');
+  }
+
+  return {
+    index,
+    platform: p.platform || null,
+    ok: errors.length === 0,
+    publish_ready: errors.length === 0 && readiness.blockers.length === 0,
+    configured: readiness.configured,
+    errors,
+    blockers: readiness.blockers,
+    warnings,
+    normalized: {
+      platform: p.platform || null,
+      has_caption: Boolean(p.caption),
+      has_caption_seed: Boolean(p.caption_seed),
+      has_image_url: Boolean(p.image_url),
+      has_link_url: Boolean(p.link_url),
+      topic_tag: p.topic_tag || null,
+      scheduled_at: p.scheduled_at || null,
+      source_oa: p.source_oa || '3q-hatchery',
+      caption_preview: String(p.caption || p.caption_seed || '').slice(0, 160),
+    },
+  };
+}
+
 async function publishPost(post, env) {
   const fn = PLATFORM_FNS[post.platform];
   if (!fn) return { ok: false, error: `Unknown platform: ${post.platform}` };
@@ -874,7 +956,7 @@ export default {
       return json({
         ok: true,
         worker: '3q-social-publisher',
-        version: '2.6',
+        version: WORKER_VERSION,
         platforms: Object.keys(DAILY_LIMITS),
         configured: {
           threads:    Boolean(threadsToken),
@@ -887,6 +969,30 @@ export default {
           auto_refresh: Boolean(env.THREADS_APP_SECRET && env.THREADS_APP_ID),
         },
       });
+    }
+
+    // Draft smoke gate: validates payload readiness without queue writes or publish.
+    // Body: single post object, bare array, or { posts: [...] }.
+    if (url.pathname === '/queue/draft-smoke' && request.method === 'POST') {
+      if (!requireToken()) return new Response('forbidden', { status: 403 });
+      const body = await request.json().catch(() => null);
+      if (!body) return json({ ok: false, error: 'invalid JSON body' }, 400);
+      const items = Array.isArray(body) ? body : Array.isArray(body.posts) ? body.posts : [body];
+      const checked = [];
+      for (let i = 0; i < items.length; i++) {
+        checked.push(await draftSmokeItem(items[i], i, env));
+      }
+      const invalid = checked.filter(item => !item.ok);
+      return json({
+        ok: invalid.length === 0,
+        mode: 'draft_smoke',
+        worker: '3q-social-publisher',
+        version: WORKER_VERSION,
+        writes: { d1: false, queue: false, publish: false },
+        all_publish_ready: checked.every(item => item.publish_ready),
+        checked,
+        next_gate: 'After human review, use /queue/add to enqueue. /publish remains a separate public-posting gate.',
+      }, invalid.length ? 400 : 200);
     }
 
     // Add posts to the content queue: POST /queue/add (TRIGGER_TOKEN protected)
@@ -1079,6 +1185,6 @@ export default {
       return json({ ok: true, caption });
     }
 
-    return json({ service: '3q-social-publisher', ok: true, version: '2.6' });
+    return json({ service: '3q-social-publisher', ok: true, version: WORKER_VERSION });
   },
 };

@@ -71,12 +71,14 @@ function pickModel(messages) {
   return MODELS.chat;
 }
 var CLAUDE_MODEL = "claude-sonnet-4-6";
-var SETUP_KEY = "tdg-setup-9k2m7x";
+let SETUP_KEY = '';  // 由 env.SETUP_KEY 注入（fetch/scheduled 開頭，未設用隨機值 fail-closed）
 var worker_default = {
   async scheduled(event, env, ctx) {
+    SETUP_KEY = env.SETUP_KEY || crypto.randomUUID();
     ctx.waitUntil(handleCron(env));
   },
   async fetch(request, env, ctx) {
+    SETUP_KEY = env.SETUP_KEY || crypto.randomUUID();
     const url = new URL(request.url);
     if (url.pathname === "/setup") return handleSetup(request, env, url);
     if (url.pathname === "/health") {

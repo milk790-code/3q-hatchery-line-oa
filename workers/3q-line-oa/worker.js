@@ -20,7 +20,7 @@ function pickModel(history) {
 }
 const CLAUDE_MODEL = MODELS.chat; // 舊引用點安全預設
 const AI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
-const SETUP_KEY = '3q-setup-8m4w2r';
+let SETUP_KEY = '';  // 由 env.SETUP_KEY 注入（fetch 開頭，未設用隨機值 fail-closed）
 const LINE_ID = '@121lkspe';
 const SITE = 'https://3q-art-portfolio.milk790.workers.dev';
 const SEED_VER = 'v4.4';
@@ -383,6 +383,7 @@ async function handleSetup(req, env, url) {
 
 export default {
   async fetch(request, env, ctx) {
+    SETUP_KEY = env.SETUP_KEY || crypto.randomUUID();
     const url = new URL(request.url);
     if (url.pathname === '/setup') return handleSetup(request, env, url);
     if (url.pathname === '/admin/evolve') { const cfg = await getCfg(env); return handleEvolve(env, cfg, url); }

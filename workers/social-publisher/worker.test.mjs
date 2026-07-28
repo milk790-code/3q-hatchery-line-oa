@@ -72,6 +72,12 @@ const addReq = (body, token = 't') => new Request('https://x/queue/add', {
   body: JSON.stringify(body),
 });
 
+const draftReq = (body, token = 't') => new Request('https://x/queue/draft-smoke', {
+  method: 'POST',
+  headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+  body: JSON.stringify(body),
+});
+
 async function runScheduled(env) {
   let tail;
   await worker.scheduled({ cron: 'test' }, env, { waitUntil(p) { tail = p; } });
@@ -137,7 +143,7 @@ async function runScheduled(env) {
     FB_PAGE_ID: '1006044165915714',
   };
   const health = await (await worker.fetch(new Request('https://x/health'), env)).json();
-  assert.equal(health.version, '2.6', 't3: version bumped');
+  assert.equal(health.version, '2.7-draft-smoke', 't3: version bumped');
   assert.equal(health.configured.facebook, true, 't3: fb configured via page_token KV key');
   assert.equal(health.configured.threads, false, 't3: threads still unconfigured');
   console.log('T3 fb page_token fallback ✓');
@@ -165,4 +171,54 @@ async function runScheduled(env) {
   console.log('T4 IG refresh ✓');
 }
 
-console.log('\nAll social-publisher v2.6 harness tests passed.');
+// ---- T5: /queue/draft-smoke is auth-protected and side-effect free -----------
+
+{
+  const d1 = makeD1();
+  const env = {
+    TRIGGER_TOKEN: 't',
+    CRM: d1,
+    SESSION: makeKV({
+      'token:threads:access': 'TH',
+      'token:threads:user_id': 'TU',
+      'token:ig:access': 'IG',
+      'token:ig:user_id': 'IU',
+      'token:fb:page_token': 'FB',
+    }),
+    FB_PAGE_ID: '1006044165915714',
+    TIKTOK_ACCESS_TOKEN: 'TT',
+    GOOGLE_SERVICE_ACCOUNT: '{"client_email":"x","private_key":"y"}',
+    GOOGLE_LOCATION_NAME: 'accounts/1/locations/2',
+  };
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async () => { throw new Error('draft smoke must not call external fetch'); };
+  try {
+    const badAuth = await worker.fetch(draftReq({ platform: 'facebook', caption: 'x' }, 'wrong'), env);
+    assert.equal(badAuth.status, 403, 't5: bad token rejected');
+
+    const body = {
+      posts: [
+        { platform: 'threads', caption: '[t5] thread only' },
+        { platform: 'instagram', caption_seed: '[t5] ig seed', image_url: 'https://example.com/a.png' },
+        { platform: 'facebook', caption: '[t5] fb' },
+        { platform: 'tiktok', caption: '[t5] missing image' },
+        { platform: 'google_biz', caption: '[t5] google' },
+      ],
+    };
+    const res = await worker.fetch(draftReq(body), env);
+    const data = await res.json();
+    assert.equal(res.status, 200, 't5: structurally valid draft smoke returns 200');
+    assert.equal(data.ok, true, 't5: payload validation passed');
+    assert.equal(data.mode, 'draft_smoke', 't5: reports draft smoke mode');
+    assert.deepEqual(data.writes, { d1: false, queue: false, publish: false }, 't5: side effects disabled');
+    assert.equal(d1.rows.length, 0, 't5: no D1 rows inserted');
+    assert.equal(data.checked.find((p) => p.platform === 'instagram').publish_ready, true, 't5: ig with image is ready');
+    assert.equal(data.checked.find((p) => p.platform === 'tiktok').publish_ready, false, 't5: tiktok without image is blocked');
+    assert.ok(data.checked.find((p) => p.platform === 'tiktok').blockers.includes('tiktok photo post requires image_url'), 't5: tiktok image blocker returned');
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+  console.log('T5 draft smoke gate ✓');
+}
+
+console.log('\nAll social-publisher v2.7-draft-smoke harness tests passed.');
