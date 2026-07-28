@@ -48,13 +48,23 @@ const KEYWORD_REPLIES = {
 
 // ── LINE 簽名驗證 ──────────────────────────────────────
 async function verifySignature(body, signature, secret) {
+  if (!body || !signature || !secret) return false;
   const encoder = new TextEncoder();
   const key = await crypto.subtle.importKey(
     "raw", encoder.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
   );
   const sig = await crypto.subtle.sign("HMAC", key, encoder.encode(body));
   const expected = btoa(String.fromCharCode(...new Uint8Array(sig)));
-  return expected === signature;
+  return constantTimeEqual(expected, signature);
+}
+
+function constantTimeEqual(a, b) {
+  a = String(a || "");
+  b = String(b || "");
+  if (!a || !b || a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i += 1) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
 }
 
 // ── LINE API helpers ───────────────────────────────────
@@ -204,8 +214,11 @@ async function setupRichMenu(env) {
 
 // ── Admin: 手動觸發 Rich Menu 部署 ─────────────────────
 async function handleAdmin(request, env, pathname) {
+  if (!env.ADMIN_KEY) {
+    return new Response(JSON.stringify({ error: "admin not configured" }), { status: 503 });
+  }
   const adminKey = request.headers.get("X-Admin-Key") || "";
-  if (adminKey !== (env.ADMIN_KEY || "")) {
+  if (adminKey !== env.ADMIN_KEY) {
     return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401 });
   }
   if (pathname === "/admin/deploy-richmenu" && request.method === "POST") {
@@ -249,7 +262,15 @@ export default {
 
     if (path === "/health") {
       return new Response(JSON.stringify({
-        ok: true, brand: BRAND, ts: Date.now(), version: "v1.0"
+        ok: true,
+        brand: BRAND,
+        webhook: "/",
+        line_secret_set: Boolean(env.LINE_CHANNEL_SECRET),
+        line_token_set: Boolean(env.LINE_CHANNEL_ACCESS_TOKEN),
+        admin_key_set: Boolean(env.ADMIN_KEY),
+        cdg_core_url: CDG_CORE_URL,
+        ts: Date.now(),
+        version: "v1.0"
       }), { headers: { "content-type": "application/json" } });
     }
 
@@ -258,11 +279,18 @@ export default {
       return new Response(`${BRAND_NAME} LINE OA — OK`, { headers: { "content-type": "text/plain" } });
     }
 
+    if (!env.LINE_CHANNEL_SECRET) {
+      return new Response("LINE channel secret missing", { status: 503 });
+    }
+    if (!env.LINE_CHANNEL_ACCESS_TOKEN) {
+      return new Response("LINE channel access token missing", { status: 503 });
+    }
+
     const rawBody = await request.text();
     const sig = request.headers.get("x-line-signature") || "";
 
     // 簽名驗證
-    const valid = await verifySignature(rawBody, sig, env.LINE_CHANNEL_SECRET || "");
+    const valid = await verifySignature(rawBody, sig, env.LINE_CHANNEL_SECRET);
     if (!valid) return new Response("Unauthorized", { status: 401 });
 
     let body;

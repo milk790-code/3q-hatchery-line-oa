@@ -18,6 +18,13 @@
 
 ```bash
 cd luxury-line-oa
+npm run secret-gate
+```
+
+`secret-gate` 會把值直接 pipe 給 `wrangler secret put`，不落地、不輸出 secret。若你要手動設定，等價命令如下：
+
+```bash
+cd luxury-line-oa
 
 # LINE Channel Secret（LINE Developers → Messaging API → Channel secret）
 wrangler secret put LINE_CHANNEL_SECRET
@@ -88,7 +95,8 @@ curl -X POST https://luxury-line-oa.milk790.workers.dev/admin/deploy-richmenu \
 | 點「真偽鑑賞」| 即時快回 |
 | 傳自由文字「Chanel CF 的真偽重點」| AI 回應（cdg-core 路由） |
 | 點「轉真人」| 即時快回轉接訊息 |
-| GET `/health` | `{"ok":true,"brand":"luxury"}` |
+| GET `/health` | `{"ok":true,"brand":"luxury","line_token_set":true,"line_secret_set":true}` |
+| fake signature POST `/` | `401 Unauthorized`，不是 `503 LINE channel access token missing` |
 
 ---
 
