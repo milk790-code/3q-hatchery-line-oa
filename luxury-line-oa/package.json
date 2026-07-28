@@ -1,0 +1,14 @@
+{
+  "name": "luxury-line-oa",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check src/index.js",
+    "dry-run": "npx --yes wrangler@4.103.0 deploy --dry-run --outdir dist/preflight",
+    "health": "curl -sS https://luxury-line-oa.milk790.workers.dev/health",
+    "secret-gate": "./scripts/set-line-secrets-and-verify.command"
+  },
+  "devDependencies": {
+    "wrangler": "^4.103.0"
+  }
+}
