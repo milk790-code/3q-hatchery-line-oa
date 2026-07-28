@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+if [ "${DEPLOY_CONFIRMED:-}" != "1" ]; then printf "⚠️  deploy.sh 會 git push／wrangler 部署。輸入 DEPLOY 確認（或設 DEPLOY_CONFIRMED=1）："; read -r __c; [ "$__c" = "DEPLOY" ] || { echo "已取消。"; exit 1; }; fi
 # 3Q Hatchery — 一鍵上傳同步腳本
 # ───────────────────────────────────────────────────────────────────────────
 # 用法：
