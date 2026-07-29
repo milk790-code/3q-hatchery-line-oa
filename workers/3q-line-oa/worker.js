@@ -49,6 +49,45 @@ const PRICE_TABLE = {
 };
 const DEFAULT_SKU = '3q-starter';
 
+// ═══ CreatorKit → LINE OA 六路由(v1)═══
+const CREATORKIT_ROUTE_TTL_SECONDS = 120 * 24 * 60 * 60;
+const CREATORKIT_ROUTES = Object.freeze({
+  'CK-爆款拆解-S': Object.freeze({ tool: 'viral', label: '爆款拆解', style: 'short', caseEnv: 'LINE_CASE_VIRAL_URL' }),
+  'CK-爆款拆解-C': Object.freeze({ tool: 'viral', label: '爆款拆解', style: 'consult', caseEnv: 'LINE_CASE_VIRAL_URL' }),
+  'CK-短影音腳本-S': Object.freeze({ tool: 'script', label: '短影音腳本', style: 'short', caseEnv: 'LINE_CASE_SCRIPT_URL' }),
+  'CK-短影音腳本-C': Object.freeze({ tool: 'script', label: '短影音腳本', style: 'consult', caseEnv: 'LINE_CASE_SCRIPT_URL' }),
+  'CK-多平台改寫-S': Object.freeze({ tool: 'rewrite', label: '多平台改寫', style: 'short', caseEnv: 'LINE_CASE_REWRITE_URL' }),
+  'CK-多平台改寫-C': Object.freeze({ tool: 'rewrite', label: '多平台改寫', style: 'consult', caseEnv: 'LINE_CASE_REWRITE_URL' }),
+});
+const CREATORKIT_INQUIRY_PATTERN = /^CKI-[A-F0-9]{12}$/;
+
+function creatorKitRouteTransition(text, caseUrls = {}) {
+  const routeCode = String(text || '').trim();
+  const route = CREATORKIT_ROUTES[routeCode];
+  if (!route) return { handled: false };
+  const opening = route.style === 'short'
+    ? `收到，你是從 CreatorKit 的「${route.label}」來的。請直接貼素材，再告訴我最想改善的一件事。`
+    : `收到，你想把「${route.label}」做成可用成果。請給我：①素材或連結 ②目標客群 ③希望觀眾採取的行動，我會先幫你抓優先順序。`;
+  const caseUrl = String(caseUrls[route.tool] || '').trim();
+  const safeCaseLine = /^https:\/\/[^\s]+$/i.test(caseUrl) ? `\n作品參考：${caseUrl}` : '';
+  return {
+    handled: true,
+    routeCode,
+    tool: route.tool,
+    style: route.style,
+    reply: `${opening}\n報價由負責人依需求確認，不先承諾成效。${safeCaseLine}`,
+  };
+}
+
+async function creatorKitInquiryId(userId, routeCode, webhookEventId, secret) {
+  const input = `${userId}\n${routeCode}\n${webhookEventId || ''}`;
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const digest = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(input));
+  const hex = [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('');
+  return 'CKI-' + hex.slice(0, 12).toUpperCase();
+}
+
 // ═══ POP /go 三問式免費成果採集(v1)═══
 const GO_INTAKE_ALLOWED_SOURCES = new Set(['direct', 'business-card', 'package-insert', 'social', 'legacy-worker']);
 const GO_INTAKE_FB_SOURCE = /^fb-[0-9a-f]{6}$/;
@@ -806,6 +845,72 @@ async function linePush(token, to, text, env) {
   }
 }
 
+async function maybeHandleCreatorKitRoute(ev, env, cfg) {
+  if (ev.type !== 'message' || ev.message?.type !== 'text' || !ev.source?.userId
+      || !ev.replyToken || !env.SESSION || !cfg.lineSecret || !cfg.lineToken) return false;
+  const uid = ev.source.userId;
+  const text = String(ev.message.text || '').trim();
+
+  const statusMatch = text.match(/^(CKI-[A-F0-9]{12})\s+(已回覆|成交|退款)$/);
+  if (statusMatch && cfg.ownerId && uid === cfg.ownerId) {
+    const inquiryId = statusMatch[1];
+    const key = `ck-line:v1:inquiry:${inquiryId}`;
+    const raw = await env.SESSION.get(key);
+    if (!raw) {
+      await lineReply(cfg.lineToken, ev.replyToken, `找不到 ${inquiryId}。`);
+      return true;
+    }
+    let record;
+    try { record = JSON.parse(raw); } catch (_) { record = null; }
+    if (!record || !CREATORKIT_INQUIRY_PATTERN.test(inquiryId)) {
+      await lineReply(cfg.lineToken, ev.replyToken, `無法更新 ${inquiryId}。`);
+      return true;
+    }
+    const status = { '已回覆': 'replied', '成交': 'won', '退款': 'refunded' }[statusMatch[2]];
+    record.status = status;
+    record.updatedAt = new Date().toISOString();
+    await env.SESSION.put(key, JSON.stringify(record), { expirationTtl: CREATORKIT_ROUTE_TTL_SECONDS });
+    await env.SESSION.put(`ck-line:v1:event:${record.routeCode}:${status}:${inquiryId}`, '1',
+      { expirationTtl: CREATORKIT_ROUTE_TTL_SECONDS });
+    await lineReply(cfg.lineToken, ev.replyToken, `${inquiryId} 已更新為「${statusMatch[2]}」。`);
+    return true;
+  }
+
+  const transition = creatorKitRouteTransition(text, {
+    viral: env.LINE_CASE_VIRAL_URL,
+    script: env.LINE_CASE_SCRIPT_URL,
+    rewrite: env.LINE_CASE_REWRITE_URL,
+  });
+  if (!transition.handled) return false;
+
+  const inquiryId = await creatorKitInquiryId(uid, transition.routeCode, ev.webhookEventId, cfg.lineSecret);
+  const key = `ck-line:v1:inquiry:${inquiryId}`;
+  const existing = await env.SESSION.get(key);
+  if (existing) return true;
+  const now = new Date().toISOString();
+  const record = {
+    routeCode: transition.routeCode,
+    tool: transition.tool,
+    style: transition.style,
+    status: 'new',
+    createdAt: now,
+    updatedAt: now,
+  };
+  await env.SESSION.put(key, JSON.stringify(record), { expirationTtl: CREATORKIT_ROUTE_TTL_SECONDS });
+  const replied = await lineReply(cfg.lineToken, ev.replyToken, `${transition.reply}\n詢價碼：${inquiryId}`);
+  if (!replied) {
+    await env.SESSION.delete(key);
+    return true;
+  }
+  await env.SESSION.put(`ck-line:v1:event:${transition.routeCode}:new:${inquiryId}`, '1',
+    { expirationTtl: CREATORKIT_ROUTE_TTL_SECONDS });
+  if (cfg.ownerId) {
+    await linePush(cfg.lineToken, cfg.ownerId,
+      `CreatorKit 新詢價\n${transition.routeCode}\n詢價碼：${inquiryId}\n回寫：${inquiryId} 已回覆／成交／退款`, env);
+  }
+  return true;
+}
+
 // 三層大禮包引導:① 開場文字(建信任)② Flex 大禮包卡(視覺重擊)③ 行業氣泡(讓他點)
 function GIFT_FLOW() {
   return [
@@ -1071,6 +1176,7 @@ async function handleEvent(ev, env, cfg) {
   // follow 不在 webhook 發歡迎:LINE 後台已設「加入好友的歡迎訊息+圖文按鈕」,webhook 再發會雙重歡迎
   if (ev.type === 'follow') return;
   if (ev.type !== 'message') return;
+  if (await maybeHandleCreatorKitRoute(ev, env, cfg)) return;
   if (await maybeHandleGoIntake(ev, env, cfg)) return;
   const mtype = ev.message?.type;
   if (mtype === 'image') return handleImage(ev, env, cfg);
@@ -1420,4 +1526,4 @@ export default {
   },
 };
 
-export { GO_INTAKE_SERVICE, goIntakeTransition };
+export { GO_INTAKE_SERVICE, goIntakeTransition, creatorKitRouteTransition };
