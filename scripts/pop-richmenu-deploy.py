@@ -40,7 +40,9 @@ def switch(alias, data): return {'type': 'richmenuswitch', 'richMenuAliasId': al
 SHOPEE = 'https://shopee.tw/milk790'          # 完整網址,不用 s.shopee.tw 短碼(可能夾帶別人的分潤參數)
 GO_FREE = 'https://popmonster.vip/go?src=line-free-first'   # src 必須是 /go 白名單內的值
 POPCARD_DEMO = 'https://popcard-saas-preview.milk790.workers.dev/s/jilin'
-PLAN_PAGE = 'https://carcare-shop.milk790.workers.dev/s/pop/plan'
+# 靜態版走 GitHub Pages(carcare-shop Worker 要 wrangler,本機 token 已過期)。
+# wrangler 恢復後可改回 https://carcare-shop.milk790.workers.dev/s/pop/plan(同一份內容)。
+PLAN_PAGE = 'https://milk790-code.github.io/3q-hatchery-line-oa/pop-card-plan/'
 JOIN_TEMPLATE = '店名：\n城市：\n最想解決：'
 
 MENUS = {
