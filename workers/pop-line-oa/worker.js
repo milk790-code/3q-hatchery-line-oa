@@ -886,6 +886,9 @@ async function ensureTables(env) {
     await env.CRM.prepare("CREATE TABLE IF NOT EXISTS pop_line_delivery (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, ab_group TEXT, emotion TEXT, path TEXT, delay_ms INTEGER DEFAULT 0, delivered_at TEXT, created_at TEXT DEFAULT (datetime('now')))").run();
     // v5.2:客戶筆記檔(城市/車型/行業/預算/grade;weather-touch 讀 city+care_last_sent_at;nurture 讀 grade+updated_at+nurtured_at)
     await env.CRM.prepare("CREATE TABLE IF NOT EXISTS customer_profiles (brand TEXT, sid TEXT, city TEXT, vehicle TEXT, industry TEXT, budget TEXT, grade TEXT, pain TEXT, intent_score REAL DEFAULT 0, care_last_sent_at INTEGER, nurtured_at INTEGER, nurture_count INTEGER DEFAULT 0, updated_at TEXT DEFAULT (datetime('now')), PRIMARY KEY(brand, sid))").run();
+    // v5.3 選單逐鈕點擊台帳:官方 richmenu insight 有「整段期間不重複點擊<20人就不回任何數據」的隱私門檻,
+    //      以目前 519 好友的量級幾乎永遠拿不到 → 第一手統計自己記,否則上線後對「哪格有效」全瞎。
+    await env.CRM.prepare("CREATE TABLE IF NOT EXISTS pop_line_menu_taps (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, data TEXT, created_at TEXT DEFAULT (datetime('now')))").run();
     await env.CRM.prepare("ALTER TABLE customer_profiles ADD COLUMN nurtured_at INTEGER").run().catch(() => {});      // 舊表補欄位(已存在則無害忽略)
     await env.CRM.prepare("ALTER TABLE customer_profiles ADD COLUMN nurture_count INTEGER DEFAULT 0").run().catch(() => {});
   } catch (e) { console.error('[pop-line] tables', e.message); }
@@ -942,7 +945,9 @@ const SHOP_FLEX = () => ({
       { type: 'text', text: 'IG 13.6 萬・TikTok 實作影片・品項效果公開可查', color: '#9A9A9E', size: 'xs', wrap: true },
     ] },
     footer: { type: 'box', layout: 'vertical', backgroundColor: '#0E0E10', paddingAll: '14px', contents: [
-      { type: 'button', style: 'primary', color: '#caa64a', height: 'md', action: { type: 'uri', label: '前往官網選購', uri: 'https://popmonster.vip/go?v=92d9874&src=line' } },
+      // src 必須是 /go 白名單內的值:'line' 不在 17 個合法值裡,前端會靜默改判 direct、go-events worker 整筆丟掉
+      // → 這張卡帶進來的人本來全部算不到帳。改成合法的 line-connect。
+      { type: 'button', style: 'primary', color: '#caa64a', height: 'md', action: { type: 'uri', label: '前往官網選購', uri: 'https://popmonster.vip/go?v=92d9874&src=line-connect' } },
     ] },
   },
 });
@@ -998,12 +1003,99 @@ async function handleImage(ev, env, cfg) {
   } catch (_) {}
 }
 
-async function handleEvent(ev, env, cfg) {
+// ═══ v5.3 圖文選單 postback:選單即對話 ═══
+// LINE 官方明文:用 replyToken 回覆(reply message)不計入月額度,只有 push/broadcast 才計費。
+// 所以每顆鈕都走 postback → 合成一句「客人說的話」+ 本輪指令 → 原封走既有 text 管線,
+// session/限流/墊場/大腦/[STATE]落庫/A級推播/nurture 飛輪全部自動生效,一行不用改。
+// data 格式固定 m=<線>&b=<鈕>,方便日後在 D1 逐鈕統計(官方 richmenu insight 有「不重複點擊<20人不給數據」門檻,量級不夠,得自記)。
+const MENU = {
+  // ── 車主線 ──
+  'm=car&b=pick': { text: '我想知道我的車該用什麼產品', rush: true,
+    dir: '【本輪指令】客人從選單按了「我的車該用什麼」。先用一句話接住,然後一次只問一件事:先問他車現在最困擾的是什麼(水痕/鐵粉/漆面沒光/內裝),問完再依症狀推具體品項。不要一次丟一堆問題。' },
+  'm=car&b=howto': { text: '我想看施工教學', rush: true,
+    dir: '【本輪指令】客人想看施工教學。給他官網教學入口 https://popmonster.vip/go?src=line-free-first ,並順口問他打算處理哪個部位,好推對應的實作影片。' },
+  'm=car&b=human': { text: '我想找真人', rush: true },
+  // ── 店家線(B2B,這條是主戰場)──
+  'm=shop&b=audit': { text: '我是汽車美容店家,想做免費獲利健檢', rush: true, flow: 'shop_audit',
+    profile: { industry: '汽美店家', grade: 'B', pain: '', completion: 40, next: '完成三題健檢' } },
+  'm=shop&b=wholesale': { text: '我是店家,想問母料批發進貨價', rush: true,
+    profile: { industry: '汽美店家', grade: 'B', pain: '想談進貨', completion: 50, next: '收品項+月用量+聯絡方式轉真人' },
+    dir: '【本輪指令】店家問母料批發。**絕對不報任何批發價數字**(批發價目表尚未定版,報錯就出事),改成:一句話說明我們是母料直供、店家價與零售價分開,然後直接要三件事——「您想進哪幾支品項」「一個月大概用多少量」「方便聯絡的電話或 LINE」,說明負責人會一個工作天內把報價單給他。' },
+  'm=shop&b=join': { text: '我要登記成為合作店家', rush: true,
+    profile: { industry: '汽美店家', grade: 'B', pain: '', completion: 55, next: '收店家登記資料' },
+    dir: '【本輪指令】店家要登記合作。用一句話歡迎,然後請他把鍵盤裡已經帶出來的三行(店名/城市/最想解決)填一填傳回來就好,說明填完負責人會親自看過再聯絡。不要再多問別的。' },
+  // ── 分頁切換(richmenuswitch 也會送 postback;靜默記錄,不回話免得洗版)──
+  'm=tab&b=shop': { silent: true, profile: { industry: '汽美店家', grade: 'B', pain: '', completion: 20, next: '看了店家專區' } },
+  'm=tab&b=car': { silent: true },
+};
+
+// 健檢流三題(一次一題;答完給算帳+轉真人)。只用客人自己講的數字算,我方價格一律不報。
+const SHOP_AUDIT_Q = [
+  '您店裡一個月大概洗多少台車?',
+  '現在用的藥水,施工完平均撐多久?客人有回來抱怨過嗎?',
+  '如果只能先解決一件事,是進貨成本、客人不回頭、還是施工效率?',
+];
+const SHOP_AUDIT_CLOSE = '【本輪指令】三題健檢問完了。本輪要做三件事:①用他自己講過的數字幫他算一次帳(例如月洗幾台 × 回頭率差多少 = 一年少賺多少),**只准用他講過的數字,不准自己編任何數字,我方任何價格一律不報**;②針對他選的那個痛點給對應解法(進貨成本→母料直供;客人不回頭→POP CARD 回店系統,丟展示連結 https://popcard-saas-preview.milk790.workers.dev/s/jilin;施工效率→產品線搭配);③說負責人會親自看他的狀況再聊,問他方便的聯絡方式。講完就收尾,不要再問新問題。';
+
+// 健檢流本輪指令(postback 之後的每一輪都帶著,直到問完)
+function auditDirective(sess) {
+  const f = sess.flow;
+  if (!f || f.name !== 'shop_audit') return '';
+  if (f.step >= SHOP_AUDIT_Q.length) return SHOP_AUDIT_CLOSE;
+  return '【本輪指令】你正在幫這位汽美店家做「免費獲利健檢」,現在是第 ' + (f.step + 1) + ' 題(共 ' + SHOP_AUDIT_Q.length + ' 題)。先用一句話承接他剛才說的,然後**只問這一題**:「' + SHOP_AUDIT_Q[f.step] + '」。一次只問一題,不跳題不連問,不報任何我方價格數字。';
+}
+
+// 店家登記範本回傳偵測(選單的鍵盤會預填「店名:」三行)→ 直接推播老闆,不等 grade 升 A
+const SHOP_JOIN_RE = /店名[:：]/;
+
+// 選單點擊訊號落庫。刻意不走 saveProfile:那支的 grade/pain 是「每輪覆寫」語意(模型讀到什麼寫什麼),
+// 點一下選單就套用會把已經升到 A 的客人降級、把已摸到的痛點洗成空字串。這裡只補 industry、grade 只升不降。
+async function saveMenuSignal(env, uid, p) {
+  if (!env.CRM || !uid || uid === 'unknown' || !p) return;
+  try {
+    const prev = await env.CRM.prepare("SELECT grade FROM customer_profiles WHERE brand='popmonster' AND sid=?").bind(uid).first().catch(() => null);
+    if (prev?.grade === 'A' || prev?.grade === 'B') return;   // 已經有等級了就不動,交給對話流程判
+    await env.CRM.prepare("INSERT INTO customer_profiles (brand, sid, industry, grade, intent_score, updated_at) VALUES ('popmonster',?,?,?,?,datetime('now')) ON CONFLICT(brand, sid) DO UPDATE SET industry=COALESCE(NULLIF(excluded.industry,''),customer_profiles.industry), grade=excluded.grade, updated_at=datetime('now')")
+      .bind(uid, p.industry || '', p.grade || 'C', Math.max(0, Math.min(1, (Number(p.completion) || 0) / 100))).run();
+  } catch (e) { console.error('[pop-line] saveMenuSignal', e.message); }
+}
+
+async function handlePostback(ev, env, cfg) {
+  const uid = ev.source?.userId || 'unknown';
+  const data = (ev.postback?.data || '').slice(0, 300);
+  const m = MENU[data];
+  if (env.CRM) await env.CRM.prepare("INSERT INTO pop_line_menu_taps (user_id, data) VALUES (?,?)").bind(uid, data).run().catch(() => {});
+  if (m?.profile) await saveMenuSignal(env, uid, m.profile);
+  if (!m) return;
+  if (m.silent) {   // 分頁切換:只記錄不回話(切過去已經看到店家選單了,再發訊息是洗版)
+    if (data === 'm=tab&b=shop' && env.SESSION) {
+      const seen = await env.SESSION.get('tabshop:' + uid);   // 第一次切進店家專區才打招呼,之後靜默
+      if (!seen) {
+        await env.SESSION.put('tabshop:' + uid, '1', { expirationTtl: 30 * 24 * 3600 }).catch(() => {});
+        await lineReply(cfg.lineToken, ev.replyToken, '這區是給開店的老闆看的👇\n\n下面那顆「免費幫你算」是三個問題,答完我直接算給你看你的店一年少賺多少回頭錢——不用留資料,先算再說。', env);
+      }
+    }
+    return;
+  }
+  if (m.flow && env.SESSION) {   // 啟動多輪流程(健檢)
+    const raw = await env.SESSION.get('popline:' + uid);
+    let sess = { hist: [], n: 0, ho: false, dc: false };
+    try { const p = JSON.parse(raw || 'null'); if (p && Array.isArray(p.hist)) sess = { hist: p.hist, n: p.n || 0, ho: !!p.ho, dc: !!p.dc }; } catch (_) {}
+    sess.flow = { name: m.flow, step: 0 };
+    await env.SESSION.put('popline:' + uid, JSON.stringify(sess), { expirationTtl: 7 * 24 * 3600 }).catch(() => {});
+  }
+  // 合成成一句「客人說的話」,走既有管線(displayText 已讓客人在聊天室看到自己說了什麼,對話感一致)
+  const synth = { ...ev, type: 'message', message: { type: 'text', text: m.text } };
+  return handleEvent(synth, env, cfg, { directive: m.dir || '', rush: !!m.rush });
+}
+
+async function handleEvent(ev, env, cfg, inject) {
   if (ev.type === 'follow') {   // 新好友第一印象:立刻接住(歡迎詞已含揭露 → session 標記已揭露)+ 歡迎貼圖
     await lineReplyMsgs(cfg.lineToken, ev.replyToken, withSticker(WELCOME_MSG, '歡迎'), env);
     if (env.SESSION) await env.SESSION.put('popline:' + (ev.source?.userId || 'unknown'), JSON.stringify({ hist: [], n: 0, ho: false, dc: true }), { expirationTtl: 7 * 24 * 3600 }).catch(() => {});
     return;
   }
+  if (ev.type === 'postback') return handlePostback(ev, env, cfg);
   if (ev.type !== 'message') return;
   if (await maybeHandleGoIntake(ev, env, cfg)) return;
   const mtype = ev.message?.type;
@@ -1053,7 +1145,7 @@ async function handleEvent(ev, env, cfg) {
         try {
           const p = JSON.parse(raw);
           if (Array.isArray(p)) sess = { hist: p, n: p.filter((m) => m.role === 'user').length, ho: false, dc: true };  // 舊版陣列 session:聊過=視同已揭露
-          else if (p && Array.isArray(p.hist)) sess = { hist: p.hist, n: p.n || 0, ho: !!p.ho, dc: !!p.dc };
+          else if (p && Array.isArray(p.hist)) sess = { hist: p.hist, n: p.n || 0, ho: !!p.ho, dc: !!p.dc, flow: p.flow || null };
         } catch (_) {}
       }
     }
@@ -1067,7 +1159,7 @@ async function handleEvent(ev, env, cfg) {
     // ═══ v5 方案C 動態分類 ═══
     emo = stickerIn ? '閒聊' : guessEmotion(userMsg);
     quiet = inQuietHours(env);
-    isRush = emo === '趕時間' || (!stickerIn && LITE_RX.test(userMsg.trim())) || wantsHuman;   // 趕時間/純事實短問/喊真人 → 秒回不延遲
+    isRush = emo === '趕時間' || (!stickerIn && LITE_RX.test(userMsg.trim())) || wantsHuman || !!inject?.rush;   // 趕時間/純事實短問/喊真人/點選單 → 秒回不延遲
     ab = (env.AB_TEST || 'on') === 'on' ? abGroup(uid) : 'delay';
     const oneToOne = (ev.source?.type || 'user') === 'user';
 
@@ -1101,6 +1193,12 @@ async function handleEvent(ev, env, cfg) {
       turnDirective = '【本輪指令】' + (wantsHuman ? '客人要求真人。' : '對話已達第 ' + AI_EMPLOYEE.handoff_threshold + ' 句交接檢查點。')
         + '本輪回覆改為交接:把目前摸到的需求按「' + AI_EMPLOYEE.handoff_card_fields.join('、') + '」整理成一句話摘要(沒摸到的欄位寫「未知」,不准編),套用:「'
         + AI_EMPLOYEE.handoff_script.replace('{summary}', '(摘要)') + '」。保持原本聲腔,不加多餘客套。';
+    } else if (SHOP_JOIN_RE.test(userMsg)) {   // v5.3 店家登記範本回傳:最高價值訊號,當場確認並收尾
+      turnDirective = '【本輪指令】客人把店家登記資料填回來了。逐項複誦一次確認(只複誦他真的有填的,沒填的就問),說明負責人會親自看過再聯絡,並問他方便被聯絡的時段。不要報任何價格。';
+    } else if (inject?.directive) {   // v5.3 選單 postback 的本輪指令
+      turnDirective = inject.directive + (firstContact ? '\n(這是第一次對話,系統會自動加上 AI 店員揭露開場,你不要再自我介紹。)' : '');
+    } else if (auditDirective(sess)) {   // v5.3 健檢流:按下健檢後的每一輪都帶著,直到三題問完
+      turnDirective = auditDirective(sess);
     } else if (firstContact) {
       turnDirective = '【本輪指令】這是與這位客人的第一次對話,系統會自動在你的回覆前面加上 AI 店員揭露開場,所以你不要再自我介紹,直接接住對方這句話。';
     }
@@ -1114,6 +1212,10 @@ async function handleEvent(ev, env, cfg) {
     if (STICKER_BLOCK_EMO.includes(emo)) stk = '';     // 雙保險:抱怨/售後絕不帶貼圖
     stateJson = extractState(raw);                      // v5.2 客戶筆記(城市/車型/grade…),下面落庫
     reply = clean(raw);
+    if (sess.flow?.name === 'shop_audit') {             // v5.3 健檢流推進一題;算帳那輪跑完就結束
+      sess.flow.step = (sess.flow.step || 0) + 1;
+      if (sess.flow.step > SHOP_AUDIT_Q.length) sess.flow = null;
+    }
   } catch (e) {
     console.error('[pop-line] brain pipeline', e.message);
     await env.SESSION?.put('dbg:last_error', e.message + ' @' + new Date().toISOString()).catch(() => {});
@@ -1157,6 +1259,10 @@ async function handleEvent(ev, env, cfg) {
     }
     if (degraded && cfg.ownerId) {
       await linePush(cfg.lineToken, cfg.ownerId, '⚠ AI 降級回覆(大腦無回應),已向客人承諾真人會回,記得接:\n客人 ' + uid.slice(0, 8) + '…:' + userMsg.slice(0, 120), env);
+    }
+    // v5.3 店家登記表回傳=全站最高價值訊號,不等 grade 升 A,當場推老闆(這是「回覆端閉環」的觸發點)
+    if (SHOP_JOIN_RE.test(userMsg) && cfg.ownerId) {
+      await linePush(cfg.lineToken, cfg.ownerId, '🏪 有店家登記了(泡泡怪獸 LINE 店家專區)\n客人 ' + uid.slice(0, 8) + '…\n\n' + userMsg.slice(0, 300) + '\n\n→ 這是熱線索,今天內親自回。', env);
     }
     sess.hist.push({ role: 'assistant', content: reply });
     sess.hist = sess.hist.slice(-20);
@@ -1352,6 +1458,15 @@ export default {
         emoOut = extractEmo(raw); reply = clean(raw);
       } catch (e) { err = e.message; }
       return new Response(JSON.stringify({ ok: !!reply, ms: Date.now() - t0, brain: cfg.anthropicKey ? 'claude(keyLen=' + cfg.anthropicKey.length + ')' : 'workers-ai-70b', emotion: emoOut, reply, err }, null, 2), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+    }
+    // v5.3 選單成效:逐鈕點擊數與不重複人數(官方 insight 有 <20 人不給數據的門檻,這支是第一手台帳)
+    if (url.pathname === '/admin/menu-taps') {
+      if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
+      if (!env.CRM) return new Response(JSON.stringify({ ok: false, note: '無 D1' }), { headers: { 'Content-Type': 'application/json' } });
+      const days = Math.min(90, Math.max(1, parseInt(url.searchParams.get('days') || '30', 10)));
+      const r = await env.CRM.prepare("SELECT data, COUNT(*) taps, COUNT(DISTINCT user_id) people FROM pop_line_menu_taps WHERE created_at >= datetime('now','-' || ? || ' days') GROUP BY data ORDER BY taps DESC").bind(days).all().catch(() => null);
+      const j = await env.CRM.prepare("SELECT COUNT(*) n FROM pop_line_convos WHERE role='user' AND text LIKE '%店名%'").first().catch(() => null);
+      return new Response(JSON.stringify({ ok: true, days, buttons: r?.results || [], shop_registrations: j?.n || 0 }, null, 2), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
     }
     if (url.pathname === '/health') {
       const cfg = await getCfg(env);
