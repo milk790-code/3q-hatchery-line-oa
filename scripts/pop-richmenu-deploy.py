@@ -22,11 +22,12 @@ ALIAS = {'driver': 'pop-driver', 'shop': 'pop-shop'}
 CHATBAR = '泡泡怪獸選單'          # ≤14 字
 
 # 版面座標必須跟 pop-richmenu-build.py 的常數一致,否則點擊區會對不到畫面上的字
-W, H, TAB_H, SPLIT = 2500, 1686, 236, 1064   # SPLIT 這裡存的是右欄寬
-LEFT = W - SPLIT                              # 1436
-A_Y, A_H = TAB_H, 754 - TAB_H
-B_Y, B_H = 754, 1148 - 754
-C_Y, C_H = 1148, H - 1148
+W, H, TAB_H = 2500, 1686, 214
+A_LEFT = 1436                 # A 列左格寬
+B_LEFT = 1064                 # B 列左格寬(雜誌式交錯網格,兩列的直線刻意錯開)
+A_Y, A_H = TAB_H, 700 - TAB_H
+B_Y, B_H = 700, 1120 - 700
+C_Y, C_H = 1120, H - 1120
 
 def area(x, y, w, h, action):
     return {'bounds': {'x': x, 'y': y, 'width': w, 'height': h}, 'action': action}
@@ -42,39 +43,41 @@ GO_FREE = 'https://popmonster.vip/go?src=line-free-first'   # src 必須是 /go 
 POPCARD_DEMO = 'https://popcard-saas-preview.milk790.workers.dev/s/jilin'
 # 靜態版走 GitHub Pages(carcare-shop Worker 要 wrangler,本機 token 已過期)。
 # wrangler 恢復後可改回 https://carcare-shop.milk790.workers.dev/s/pop/plan(同一份內容)。
-PLAN_PAGE = 'https://milk790-code.github.io/3q-hatchery-line-oa/pop-card-plan/'
+PLAN_PAGE = 'https://milk790-code.github.io/3q-hatchery-line-oa/pop-card-plan/'   # 現在由 AI 在對話中給,不直接掛鈕
 JOIN_TEMPLATE = '店名：\n城市：\n最想解決：'
 
 MENUS = {
   'driver': {
     'size': {'width': W, 'height': H}, 'selected': True,
     'name': NAME_PREFIX + ' driver', 'chatBarText': CHATBAR,
+    # ⚠️ 「目前所在的那一頁」刻意不放任何 area:放了 postback 的話,老闆再點一次同一個分頁
+    #    就會再觸發一次,同一則招呼發兩遍(2026-08-23 實機截圖抓到)。沒有 area = 點了沒事。
     'areas': [
-      area(0, 0, LEFT, TAB_H, pb('m=tab&b=car')),                       # 目前這頁,靜默
-      area(LEFT, 0, SPLIT, TAB_H, switch(ALIAS['shop'], 'm=tab&b=shop')),
-      area(0, A_Y, LEFT, A_H, uri(GO_FREE)),
-      area(LEFT, A_Y, SPLIT, A_H, uri(SHOPEE)),
-      area(0, B_Y, LEFT, B_H, pb('m=car&b=howto', '我想看施工教學')),
-      area(LEFT, B_Y, SPLIT, B_H, pb('m=car&b=human', '我想找真人')),
-      area(0, C_Y, W, C_H, pb('m=car&b=pick', '我的車該用什麼？')),
+      area(A_LEFT, 0, W - A_LEFT, TAB_H, switch(ALIAS['shop'], 'm=tab&b=shop')),
+      area(0, A_Y, A_LEFT, A_H, uri(GO_FREE)),                                  # 官網品項與教學
+      area(A_LEFT, A_Y, W - A_LEFT, A_H, uri(SHOPEE)),                           # 蝦皮商城
+      area(0, B_Y, B_LEFT, B_H, pb('m=car&b=human', '我想找真人')),               # 找真人
+      area(B_LEFT, B_Y, W - B_LEFT, B_H, pb('m=car&b=howto', '我想看施工教學')),   # 施工教學影片
+      area(0, C_Y, W, C_H, pb('m=car&b=pick', '我想知道我的車該用什麼產品')),
     ],
-    'image': 'assets/pop/richmenu-driver-v5.jpg',
+    'image': 'assets/pop/richmenu-driver-v6.jpg',
   },
   'shop': {
     'size': {'width': W, 'height': H}, 'selected': True,
     'name': NAME_PREFIX + ' shop', 'chatBarText': CHATBAR,
     'areas': [
-      area(0, 0, LEFT, TAB_H, switch(ALIAS['driver'], 'm=tab&b=car')),
-      area(LEFT, 0, SPLIT, TAB_H, pb('m=tab&b=shop')),                  # 目前這頁,靜默
-      area(0, A_Y, LEFT, A_H, uri(POPCARD_DEMO)),
-      area(LEFT, A_Y, SPLIT, A_H, uri(PLAN_PAGE)),
-      area(0, B_Y, LEFT, B_H, pb('m=shop&b=wholesale', '我想問母料批發進貨價')),
+      area(0, 0, A_LEFT, TAB_H, switch(ALIAS['driver'], 'm=tab&b=car')),
+      area(0, A_Y, A_LEFT, A_H, uri(POPCARD_DEMO)),                              # 輕鬆贏過同行的黑科技
+      # 「免繳費限量搶先體驗」走對話不丟價格頁:落地頁寫月付 799,跟按鈕承諾對不上,點進去會直接跳走。
+      # 改成 AI 先確認資格與城市,條件頁由 AI 在對話裡給。
+      area(A_LEFT, A_Y, W - A_LEFT, A_H, pb('m=shop&b=trial', '我想了解免繳費限量搶先體驗')),
+      area(0, B_Y, B_LEFT, B_H, pb('m=shop&b=wholesale', '我想問耗材批發的店家價')),
       # 鍵盤預填三行範本 = 零前端成本的半結構化表單(不必蓋 LIFF 頁)
-      area(LEFT, B_Y, SPLIT, B_H, pb('m=shop&b=join', '我要登記成為合作店家',
-                                     inputOption='openKeyboard', fillInText=JOIN_TEMPLATE)),
-      area(0, C_Y, W, C_H, pb('m=shop&b=audit', '幫我免費算一下')),
+      area(B_LEFT, B_Y, W - B_LEFT, B_H, pb('m=shop&b=join', '我想了解城市限定的扶持方案',
+                                            inputOption='openKeyboard', fillInText=JOIN_TEMPLATE)),
+      area(0, C_Y, W, C_H, pb('m=shop&b=audit', '幫我算一下我的店一個月少賺多少錢')),
     ],
-    'image': 'assets/pop/richmenu-shop-v5.jpg',
+    'image': 'assets/pop/richmenu-shop-v6.jpg',
   },
 }
 

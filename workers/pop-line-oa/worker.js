@@ -1016,14 +1016,22 @@ const MENU = {
     dir: '【本輪指令】客人想看施工教學。給他官網教學入口 https://popmonster.vip/go?src=line-free-first ,並順口問他打算處理哪個部位,好推對應的實作影片。' },
   'm=car&b=human': { text: '我想找真人', rush: true },
   // ── 店家線(B2B,這條是主戰場)──
-  'm=shop&b=audit': { text: '我是汽車美容店家,想做免費獲利健檢', rush: true, flow: 'shop_audit',
+  'm=shop&b=audit': { text: '幫我算一下我的店一個月少賺多少錢', rush: true, flow: 'shop_audit',
     profile: { industry: '汽美店家', grade: 'B', pain: '', completion: 40, next: '完成三題健檢' } },
-  'm=shop&b=wholesale': { text: '我是店家,想問母料批發進貨價', rush: true,
+  'm=shop&b=trial': { text: '我想了解免繳費限量搶先體驗', rush: true,
+    profile: { industry: '汽美店家', grade: 'B', pain: '', completion: 50, next: '確認名額資格轉真人' },
+    dir: '【本輪指令】店家問限量搶先體驗名額。可以講的:這是共創店家名額(總共 10 家)、系統是月付 799 起不綁約、'
+       + '上線後 30 天不合用全額退現金、每個月含一次客製微調,完整條件在 https://milk790-code.github.io/3q-hatchery-line-oa/pop-card-plan/ 。'
+       + '**不要自己承諾「完全免費」或編任何優惠數字**——體驗名額的實際條件一律說「由負責人一對一跟你確認」。'
+       + '本輪要問到兩件事:他的店在哪個城市、現在最想解決什麼。' },
+  'm=shop&b=wholesale': { text: '我想問耗材批發的店家價', rush: true,
     profile: { industry: '汽美店家', grade: 'B', pain: '想談進貨', completion: 50, next: '收品項+月用量+聯絡方式轉真人' },
     dir: '【本輪指令】店家問母料批發。**絕對不報任何批發價數字**(批發價目表尚未定版,報錯就出事),改成:一句話說明我們是母料直供、店家價與零售價分開,然後直接要三件事——「您想進哪幾支品項」「一個月大概用多少量」「方便聯絡的電話或 LINE」,說明負責人會一個工作天內把報價單給他。' },
-  'm=shop&b=join': { text: '我要登記成為合作店家', rush: true,
+  'm=shop&b=join': { text: '我想了解城市限定的扶持方案', rush: true,
     profile: { industry: '汽美店家', grade: 'B', pain: '', completion: 55, next: '收店家登記資料' },
-    dir: '【本輪指令】店家要登記合作。用一句話歡迎,然後請他把鍵盤裡已經帶出來的三行(店名/城市/最想解決)填一填傳回來就好,說明填完負責人會親自看過再聯絡。不要再多問別的。' },
+    dir: '【本輪指令】店家想了解城市限定扶持方案。用一句話說明我們一次只在一個城市找配合的店,'
+       + '然後請他把鍵盤裡已經帶出來的三行(店名/城市/最想解決)填一填傳回來,說明填完負責人會親自看過再聯絡。'
+       + '不要報任何價格,也不要承諾一定排得進去。不要再多問別的。' },
   // ── 分頁切換(richmenuswitch 也會送 postback;靜默記錄,不回話免得洗版)──
   'm=tab&b=shop': { silent: true, profile: { industry: '汽美店家', grade: 'B', pain: '', completion: 20, next: '看了店家專區' } },
   'm=tab&b=car': { silent: true },
@@ -1067,12 +1075,17 @@ async function handlePostback(ev, env, cfg) {
   if (env.CRM) await env.CRM.prepare("INSERT INTO pop_line_menu_taps (user_id, data) VALUES (?,?)").bind(uid, data).run().catch(() => {});
   if (m?.profile) await saveMenuSignal(env, uid, m.profile);
   if (!m) return;
+  // 連點兩下／LINE 重送 → 只處理第一次。用 D1 不用 KV:KV 是最終一致,秒內連點第二次還讀得到舊值,
+  // 結果就是同一則回覆發兩次(2026-08-23 實機截圖抓到)。D1 強一致,插入後立刻算得準。
+  if (env.CRM) {
+    const dup = await env.CRM.prepare("SELECT COUNT(*) n FROM pop_line_menu_taps WHERE user_id=? AND data=? AND created_at >= datetime('now','-12 seconds')").bind(uid, data).first().catch(() => null);
+    if ((dup?.n || 0) > 1) return;
+  }
   if (m.silent) {   // 分頁切換:只記錄不回話(切過去已經看到店家選單了,再發訊息是洗版)
-    if (data === 'm=tab&b=shop' && env.SESSION) {
-      const seen = await env.SESSION.get('tabshop:' + uid);   // 第一次切進店家專區才打招呼,之後靜默
-      if (!seen) {
-        await env.SESSION.put('tabshop:' + uid, '1', { expirationTtl: 30 * 24 * 3600 }).catch(() => {});
-        await lineReply(cfg.lineToken, ev.replyToken, '這區是給開店的老闆看的👇\n\n下面那顆「免費幫你算」是三個問題,答完我直接算給你看你的店一年少賺多少回頭錢——不用留資料,先算再說。', env);
+    if (data === 'm=tab&b=shop' && env.CRM) {
+      const seen = await env.CRM.prepare("SELECT COUNT(*) n FROM pop_line_menu_taps WHERE user_id=? AND data='m=tab&b=shop'").bind(uid).first().catch(() => null);
+      if ((seen?.n || 0) <= 1) {   // 剛剛那筆就是第一次 → 打一次招呼,之後靜默
+        await lineReply(cfg.lineToken, ev.replyToken, '這區是給開店的老闆看的👇\n\n最下面那條「幫你算一個月少賺多少錢」是三個問題,答完我直接算給你看——不用留資料,先算再說。', env);
       }
     }
     return;

@@ -24,6 +24,11 @@ const CRM = {
       },
       async first() {
         if (sql.includes('SELECT grade FROM customer_profiles')) return d1rows.profiles.get(st._b[0]) || null;
+        if (sql.includes('FROM pop_line_menu_taps')) {
+          // 兩種查詢:去重(uid+data,12 秒內)與分頁首訪(uid+固定 data)。測試裡所有 tap 都算「剛剛」。
+          const [uid, data] = st._b.length > 1 ? st._b : [st._b[0], 'm=tab&b=shop'];
+          return { n: d1rows.taps.filter((t) => t.user_id === uid && t.data === data).length };
+        }
         return { n: 0 };
       },
       async all() { return { results: [] }; },
@@ -135,6 +140,26 @@ console.log('\n── ⑨ 已升級客戶不會被選單點擊降級 ──');
 d1rows.profiles.set('U_vip', { grade: 'A', industry: '汽美店家' });
 await send([tap('U_vip', 'm=tab&b=shop')]);
 ok(d1rows.profiles.get('U_vip').grade === 'A', '⑨ A 級客人點選單後仍是 A(不被覆寫成 B)');
+
+console.log('\n── ⑨b 連點兩下只處理一次(D1 強一致去重;KV 最終一致會漏)──');
+const dupBefore = replies();
+await send([tap('U_dup', 'm=car&b=howto')]);
+const afterFirst = replies();
+await send([tap('U_dup', 'm=car&b=howto')]);
+ok(afterFirst === dupBefore + 1, '⑨b 第一次有回');
+ok(replies() === afterFirst, '⑨b 12 秒內第二次完全不處理(不再重複回覆)');
+ok(d1rows.taps.filter((t) => t.user_id === 'U_dup').length === 2, '⑨b 但兩次點擊都照記進台帳(成效不失真)');
+
+const tabDupBefore = replies();
+await send([tap('U_tab2', 'm=tab&b=shop')]);
+await send([tap('U_tab2', 'm=tab&b=shop')]);
+ok(replies() === tabDupBefore + 1, '⑨b 分頁切換連點兩下也只打一次招呼');
+
+console.log('\n── ⑨c 免繳費限量搶先體驗鈕 ──');
+await send([tap('U_tr', 'm=shop&b=trial')]);
+ok(directive().includes('不要自己承諾「完全免費」'), '⑨c 明文禁止 AI 自己承諾免費或編優惠');
+ok(directive().includes('pop-card-plan'), '⑨c 帶完整條件頁連結');
+ok(directive().includes('城市'), '⑨c 本輪要問到城市');
 
 console.log('\n── ⑩ 未知 postback 不炸 ──');
 await send([tap('U_x', 'm=bogus&b=nope')]);
