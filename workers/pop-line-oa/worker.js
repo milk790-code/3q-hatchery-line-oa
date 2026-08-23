@@ -930,7 +930,7 @@ async function loadGems(env) {
 }
 
 // 歡迎詞=第 1 句人格化揭露(v3 固定開場,逐字):加好友當下就亮 AI 身分,之後對話不再重複標示。
-const WELCOME_MSG = AI_EMPLOYEE.disclosure_script + '\n\n先跟我說:您是店家要進貨,還是自己的車要用?\n\n開店的老闆 👉 下面選單右上角切到「店家老闆」,那一頁是專門給你的\n(官網看品項:https://popmonster.vip)';
+const WELCOME_MSG = AI_EMPLOYEE.disclosure_script + '\n\n先跟我說一句就好:您是店家要進貨,還是自己的車要用?\n\n🏪 開店的老闆 —— 下面選單右上角切到「店家老闆」那一頁,裡面有:\n・耗材批發的店家價(跟零售完全分開算)\n・限量體驗名額,只收 10 家\n・一個城市只找一家的扶持方案\n・最下面那條「一個月少賺多少錢,我算給你看」——三個問題,不用留資料,先算再說\n\n🚗 自己的車要用 —— 拍張照傳給我,30 秒告訴你該用哪一支;不想跟 AI 聊,按「找真人」就好。\n\n蝦皮 5.0 分・864 則評價:https://shopee.tw/milk790\n免費教學與工具:https://popmonster.vip/go?src=line-free-first';
 
 const WANTS_HUMAN_RE = /真人|人工|客服|專人|找人/;
 

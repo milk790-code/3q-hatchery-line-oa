@@ -54,6 +54,12 @@ kv.set('cfg:pop_owner', 'OWNER_UID');
 await send([{ type: 'follow', replyToken: 'rt', source: { userId: 'U_follow' } }]);
 ok(lastReply().startsWith(DISCLOSE), '① follow 歡迎詞以揭露開場');
 ok(sess('U_follow').dc === true, '① follow 後 session dc=true');
+{ const w = lastReply();
+  ok(w.startsWith(DISCLOSE), '①b 歡迎詞第一句仍是 AI 揭露(法遵不能被行銷文案擠掉)');
+  ok(w.includes('店家老闆'), '①b 歡迎詞指路店家專區');
+  ok(w.includes('只收 10 家') && w.includes('一個月少賺多少錢'), '①b 帶上店家亮點');
+  ok(w.includes('src=line-free-first'), '①b /go 連結帶白名單內的 src(否則追蹤被靜默丟掉)');
+  ok(!/免繳費|免費體驗/.test(w), '①b 不寫「免繳費」——條件未定義,寫了就是空頭支票'); }
 
 // ① 後續:已揭露者不重複(once)
 await send([msg('U_follow', '鍍膜怎麼選')]);
