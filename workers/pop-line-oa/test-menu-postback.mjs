@@ -44,7 +44,7 @@ const env = {
 const pending = [];
 const ctx = { waitUntil: (p) => pending.push(p) };
 
-const calls = { reply: [], push: [], brain: [] };
+const calls = { reply: [], push: [], brain: [], link: [], aliasLookup: 0 };
 let brainText = () => '好的,我幫你看。';
 globalThis.fetch = async (url, opts) => {
   const u = String(url);
@@ -53,6 +53,8 @@ globalThis.fetch = async (url, opts) => {
     calls.brain.push(body);
     return new Response(JSON.stringify({ content: [{ type: 'text', text: brainText(body) }] }), { status: 200, headers: { 'content-type': 'application/json' } });
   }
+  if (u.includes('/v2/bot/richmenu/alias/pop-shop')) { calls.aliasLookup++; return new Response(JSON.stringify({ richMenuId: 'richmenu-SHOP' }), { headers: { 'content-type': 'application/json' } }); }
+  if (/\/v2\/bot\/user\/[^/]+\/richmenu\//.test(u)) { calls.link.push(u.split('/v2/bot/user/')[1]); return new Response('{}'); }
   if (u.includes('/v2/bot/message/reply')) { calls.reply.push(JSON.parse(opts.body)); return new Response('{}'); }
   if (u.includes('/v2/bot/message/push')) { calls.push.push(JSON.parse(opts.body)); return new Response('{}'); }
   return new Response('{}');
@@ -160,6 +162,23 @@ await send([tap('U_tr', 'm=shop&b=trial')]);
 ok(directive().includes('不要自己承諾「完全免費」'), '⑨c 明文禁止 AI 自己承諾免費或編優惠');
 ok(directive().includes('pop-card-plan'), '⑨c 帶完整條件頁連結');
 ok(directive().includes('城市'), '⑨c 本輪要問到城市');
+
+console.log('\n── ⑨d 店家專屬選單自動綁定(per-user rich menu)──');
+calls.link.length = 0; calls.aliasLookup = 0; kv.delete('richmenu:pop-shop');   // 清快取才量得到查詢次數
+await send([tap('U_bind', 'm=shop&b=audit')]);
+ok(calls.link.some((x) => x.startsWith('U_bind/richmenu/richmenu-SHOP')), '⑨d 按下健檢 → 店家版綁成他的專屬選單');
+await send([tap('U_bind2', 'm=shop&b=wholesale')]);
+ok(calls.link.some((x) => x.startsWith('U_bind2/')), '⑨d 批發鈕也綁');
+ok(calls.aliasLookup === 1, '⑨d menuId 走 alias 查一次就快取(改版換 id 時 alias 不變,不會綁到舊選單)');
+const linksBefore = calls.link.length;
+await send([tap('U_browse', 'm=tab&b=shop')]);
+ok(calls.link.length === linksBefore, '⑨d 只是切分頁逛逛 → 不綁(避免車主誤判成店家)');
+await send([tap('U_browse2', 'm=car&b=pick')]);
+ok(calls.link.length === linksBefore, '⑨d 車主鈕更不會綁');
+
+console.log('\n── ⑨e 新好友歡迎詞要指路到店家專區 ──');
+await send([{ type: 'follow', replyToken: 'rt', source: { userId: 'U_new', type: 'user' } }]);
+ok(calls.reply[calls.reply.length - 1].messages[0].text.includes('店家老闆'), '⑨e 歡迎詞明講「切到店家老闆那一頁」');
 
 console.log('\n── ⑩ 未知 postback 不炸 ──');
 await send([tap('U_x', 'm=bogus&b=nope')]);

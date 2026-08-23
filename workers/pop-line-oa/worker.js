@@ -930,7 +930,7 @@ async function loadGems(env) {
 }
 
 // 歡迎詞=第 1 句人格化揭露(v3 固定開場,逐字):加好友當下就亮 AI 身分,之後對話不再重複標示。
-const WELCOME_MSG = AI_EMPLOYEE.disclosure_script + '\n\n先跟我說:您是店家要進貨,還是自己的車要用?\n\n(官網看品項:https://popmonster.vip)';
+const WELCOME_MSG = AI_EMPLOYEE.disclosure_script + '\n\n先跟我說:您是店家要進貨,還是自己的車要用?\n\n開店的老闆 👉 下面選單右上角切到「店家老闆」,那一頁是專門給你的\n(官網看品項:https://popmonster.vip)';
 
 const WANTS_HUMAN_RE = /真人|人工|客服|專人|找人/;
 
@@ -1016,18 +1016,18 @@ const MENU = {
     dir: '【本輪指令】客人想看施工教學。給他官網教學入口 https://popmonster.vip/go?src=line-free-first ,並順口問他打算處理哪個部位,好推對應的實作影片。' },
   'm=car&b=human': { text: '我想找真人', rush: true },
   // ── 店家線(B2B,這條是主戰場)──
-  'm=shop&b=audit': { text: '幫我算一下我的店一個月少賺多少錢', rush: true, flow: 'shop_audit',
+  'm=shop&b=audit': { bindShop: true, text: '幫我算一下我的店一個月少賺多少錢', rush: true, flow: 'shop_audit',
     profile: { industry: '汽美店家', grade: 'B', pain: '', completion: 40, next: '完成三題健檢' } },
-  'm=shop&b=trial': { text: '我想了解免繳費限量搶先體驗', rush: true,
+  'm=shop&b=trial': { bindShop: true, text: '我想了解免繳費限量搶先體驗', rush: true,
     profile: { industry: '汽美店家', grade: 'B', pain: '', completion: 50, next: '確認名額資格轉真人' },
     dir: '【本輪指令】店家問限量搶先體驗名額。可以講的:這是共創店家名額(總共 10 家)、系統是月付 799 起不綁約、'
        + '上線後 30 天不合用全額退現金、每個月含一次客製微調,完整條件在 https://milk790-code.github.io/3q-hatchery-line-oa/pop-card-plan/ 。'
        + '**不要自己承諾「完全免費」或編任何優惠數字**——體驗名額的實際條件一律說「由負責人一對一跟你確認」。'
        + '本輪要問到兩件事:他的店在哪個城市、現在最想解決什麼。' },
-  'm=shop&b=wholesale': { text: '我想問耗材批發的店家價', rush: true,
+  'm=shop&b=wholesale': { bindShop: true, text: '我想問耗材批發的店家價', rush: true,
     profile: { industry: '汽美店家', grade: 'B', pain: '想談進貨', completion: 50, next: '收品項+月用量+聯絡方式轉真人' },
     dir: '【本輪指令】店家問母料批發。**絕對不報任何批發價數字**(批發價目表尚未定版,報錯就出事),改成:一句話說明我們是母料直供、店家價與零售價分開,然後直接要三件事——「您想進哪幾支品項」「一個月大概用多少量」「方便聯絡的電話或 LINE」,說明負責人會一個工作天內把報價單給他。' },
-  'm=shop&b=join': { text: '我想了解城市限定的扶持方案', rush: true,
+  'm=shop&b=join': { bindShop: true, text: '我想了解城市限定的扶持方案', rush: true,
     profile: { industry: '汽美店家', grade: 'B', pain: '', completion: 55, next: '收店家登記資料' },
     dir: '【本輪指令】店家想了解城市限定扶持方案。用一句話說明我們一次只在一個城市找配合的店,'
        + '然後請他把鍵盤裡已經帶出來的三行(店名/城市/最想解決)填一填傳回來,說明填完負責人會親自看過再聯絡。'
@@ -1068,6 +1068,27 @@ async function saveMenuSignal(env, uid, p) {
   } catch (e) { console.error('[pop-line] saveMenuSignal', e.message); }
 }
 
+// v6.1 店家專屬選單:老闆按過店家專區任何一顆「內容鈕」→ 把店家版綁成他個人的選單。
+// per-user rich menu 優先權高於全員預設,所以他之後每次打開 LINE 看到的就直接是店家版,
+// 不用每次自己切分頁(車主完全不受影響,看到的還是車主版)。
+// 只在「明確意圖」時綁:分頁切換只是逛逛不算,按下體驗/批發/扶持方案/健檢才算。
+async function linkShopMenu(env, cfg, uid) {
+  if (!cfg.lineToken || !uid || uid === 'unknown') return false;
+  try {
+    let rid = env.SESSION ? await env.SESSION.get('richmenu:pop-shop') : null;
+    if (!rid) {
+      // 走 alias 不寫死 menuId:選單改版一定會換 id(圖片不可替換,改版都是建新的),alias 才是穩定的錨
+      const r = await fetch('https://api.line.me/v2/bot/richmenu/alias/pop-shop', { headers: { Authorization: 'Bearer ' + cfg.lineToken } });
+      if (!r.ok) return false;
+      rid = (await r.json()).richMenuId;
+      await env.SESSION?.put('richmenu:pop-shop', rid, { expirationTtl: 3600 }).catch(() => {});   // 只快取 1 小時,免得綁到已刪的舊選單
+    }
+    const res = await fetch('https://api.line.me/v2/bot/user/' + uid + '/richmenu/' + rid, { method: 'POST', headers: { Authorization: 'Bearer ' + cfg.lineToken } });
+    if (!res.ok) { await env.SESSION?.put('richmenu:pop-shop', '', { expirationTtl: 60 }).catch(() => {}); return false; }
+    return true;
+  } catch (_) { return false; }
+}
+
 async function handlePostback(ev, env, cfg) {
   const uid = ev.source?.userId || 'unknown';
   const data = (ev.postback?.data || '').slice(0, 300);
@@ -1081,6 +1102,7 @@ async function handlePostback(ev, env, cfg) {
     const dup = await env.CRM.prepare("SELECT COUNT(*) n FROM pop_line_menu_taps WHERE user_id=? AND data=? AND created_at >= datetime('now','-12 seconds')").bind(uid, data).first().catch(() => null);
     if ((dup?.n || 0) > 1) return;
   }
+  if (m.bindShop) await linkShopMenu(env, cfg, uid);
   if (m.silent) {   // 分頁切換:只記錄不回話(切過去已經看到店家選單了,再發訊息是洗版)
     if (data === 'm=tab&b=shop' && env.CRM) {
       const seen = await env.CRM.prepare("SELECT COUNT(*) n FROM pop_line_menu_taps WHERE user_id=? AND data='m=tab&b=shop'").bind(uid).first().catch(() => null);
