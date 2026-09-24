@@ -16,7 +16,7 @@
     ],
     "handoff_script": "聊到這裡,你要的我大致整理好了:{summary}。要不要我請真人夥伴直接接手?你不用再講一遍。",
     "redline_whitelist": {
-      "price_quote": "deny_and_handoff",
+      "price_quote": "list_price_only_else_handoff",
       "refund_policy": "fixed_script_only",
       "medical_efficacy_claims": "deny",
       "stock_promise": "deny_and_handoff"
