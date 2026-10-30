@@ -1,0 +1,68 @@
+{
+ "079": {
+  "line": "angel",
+  "slot": "angel.main",
+  "caption": "上過天使塗層的引擎蓋，一沖水整片水膜直接滑掉",
+  "duration_s": 24.47,
+  "bytes": 9615707,
+  "preview_bytes": 86356,
+  "audio": "keep",
+  "inputs": [
+   "079_一剪到底_鍍膜_深灰引擎蓋整片水膜.mp4"
+  ],
+  "sha256": "6bb302591e438f0f75810dc324eb61eb150d9df117b22a7921025e30c18545c4"
+ },
+ "069": {
+  "line": "angel",
+  "slot": "angel.backup",
+  "caption": "車門一沖水，水膜整片往下退，退完倒影清清楚楚",
+  "duration_s": 17.3,
+  "bytes": 6895154,
+  "preview_bytes": 174408,
+  "audio": "keep",
+  "inputs": [
+   "069_一剪到底_鍍膜_車門沖水撥水.mp4"
+  ],
+  "sha256": "c6f7045bd197e5ac6931e661c1a3796a97b322446f2bf461554b5d55e8382c61"
+ },
+ "G03": {
+  "line": "polish",
+  "slot": "polish.full",
+  "caption": "米速伍號中拋走完，停機換盤換拾號細拋，擦掉再看倒影",
+  "duration_s": 178.0,
+  "bytes": 42946262,
+  "preview_bytes": 108931,
+  "audio": "from_083",
+  "inputs": [
+   "POP_拋光_G03_粗到細.mp4",
+   "083_一剪到底_拋光_紅漆伍號換拾號.mp4"
+  ],
+  "sha256": "3a709e2938d7ef7b35f0dae6ef19e26cba453aa59f743caaaa3335275696ca81"
+ },
+ "082": {
+  "line": "polish",
+  "slot": "polish.wool",
+  "caption": "霧掉的黑色後車廂蓋，米速拾號配羊毛盤，拋過那塊跟旁邊差多少一看就知道",
+  "duration_s": 158.9,
+  "bytes": 43442499,
+  "preview_bytes": 145450,
+  "audio": "keep",
+  "inputs": [
+   "082_一剪到底_拋光_Elantra行李箱蓋.mp4"
+  ],
+  "sha256": "5da153373f60a8e0f7be2f5b67aa79d429ebed3178440ce03c9e5eb4a7e3b125"
+ },
+ "G02": {
+  "line": "polish",
+  "slot": "polish.edge",
+  "caption": "拋完一小圈先別盯中間，擦掉換個角度看那一圈的邊",
+  "duration_s": 54.9,
+  "bytes": 10437757,
+  "preview_bytes": 86814,
+  "audio": "none",
+  "inputs": [
+   "POP_拋光_G02_交界.mp4"
+  ],
+  "sha256": "7ceb18d31819e92e012f3971dee77197f3b6e0cba89e59ac269a682f0317c55e"
+ }
+}

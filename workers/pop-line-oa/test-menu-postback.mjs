@@ -3,6 +3,8 @@
 // 覆蓋:①postback 不再被丟棄、會走完整管線 ②選單鈕帶本輪指令進大腦 ③分頁切換靜默(只第一次打招呼)
 //      ④健檢流三題一次一題、第四輪算帳、跑完自動結束 ⑤店家登記表回傳當場推老闆
 //      ⑥批發鈕明確禁止報價 ⑦點選單=秒回不延遲 ⑧選單點擊逐鈕落庫 ⑨已升級客戶不被選單降級
+// v6.1:「我想知道我的車該用什麼產品」(pick)改成不經大腦直回拍照 quick reply(拍照/從相簿選/用打字描述);
+//      舊的問診指令搬到 describe(走大腦)
 import worker from './worker.js';
 
 const kv = new Map();
@@ -83,14 +85,25 @@ let passed = 0, failed = 0;
 function ok(cond, name) { if (cond) { passed++; console.log('  ✅', name); } else { failed++; console.error('  ❌', name); } }
 kv.set('cfg:pop_owner', 'OWNER_UID');
 
-console.log('\n── ① postback 不再被靜默丟棄 ──');
+console.log('\n── ①-pick 拍照格直回:不經大腦,reply 一則文字 + 三顆 quick reply ──');
+const brainBeforePick = calls.brain.length, pushBeforePick = calls.push.length;
 const before = replies();
 await send([tap('U_car', 'm=car&b=pick')]);
-ok(replies() > before, '① 車主選單鈕有回覆(舊版 postback 直接 return,等於死鈕)');
+{ const r = calls.reply[calls.reply.length - 1]; const m0 = r.messages[0]; const items = m0.quickReply?.items || [];
+  ok(replies() === before + 1 && r.messages.length === 1, '① pick:一次 reply 一則訊息');
+  ok(m0.text === '拍一張漆面或玻璃的近照傳上來，我看了直接說用哪一支。打字描述也可以。', '① pick:文字逐字符合');
+  ok(items.length === 3 && items[0].action.type === 'camera' && items[0].action.label === '拍照' && items[1].action.type === 'cameraRoll' && items[1].action.label === '從相簿選', '① pick:前兩顆是 camera「拍照」、cameraRoll「從相簿選」');
+  ok(items[2].action.type === 'postback' && items[2].action.label === '用打字描述' && items[2].action.data === 'm=car&b=describe' && items[2].action.displayText === '我用打字描述', '① pick:第三顆是 postback m=car&b=describe(displayText「我用打字描述」)');
+  ok(calls.brain.length === brainBeforePick && calls.push.length === pushBeforePick, '① pick:不經大腦、不 push'); }
+
+console.log('\n── ① postback 不再被靜默丟棄(describe 走大腦)──');
+const b1 = replies();
+await send([tap('U_car', 'm=car&b=describe')]);
+ok(replies() > b1 && calls.brain.length === brainBeforePick + 1, '① 「用打字描述」鈕有回覆且走大腦(舊版 postback 直接 return,等於死鈕)');
 ok(sess('U_car')?.hist?.some((h) => h.role === 'user' && h.content.includes('我的車該用什麼')), '① 合成訊息進了對話歷史(CRM/[STATE] 鏈才會生效)');
 
 console.log('\n── ② 選單鈕把本輪指令送進大腦 ──');
-ok(directive().includes('一次只問一件事'), '② 選品鈕的 directive 送達');
+ok(directive().includes('一次只問一件事'), '② 選品(打字描述)鈕的 directive 送達');
 ok(lastBrain().system.length === 2 && lastBrain().system[0].cache_control, '② 主 system 塊仍掛 cache_control(prompt cache 沒破)');
 
 console.log('\n── ③ 分頁切換:第一次打招呼,之後靜默 ──');
@@ -178,7 +191,8 @@ ok(calls.link.length === linksBefore, '⑨d 車主鈕更不會綁');
 
 console.log('\n── ⑨e 新好友歡迎詞要指路到店家專區 ──');
 await send([{ type: 'follow', replyToken: 'rt', source: { userId: 'U_new', type: 'user' } }]);
-ok(calls.reply[calls.reply.length - 1].messages[0].text.includes('店家老闆'), '⑨e 歡迎詞明講「切到店家老闆那一頁」');
+{ const wtxt = calls.reply[calls.reply.length - 1].messages.filter((m) => m.type === 'text').map((m) => m.text).join('\n');   // v6:第一則是價格表圖,看全部文字則
+  ok(wtxt.includes('店家老闆') || (wtxt.includes('切到') && wtxt.includes('店家')), '⑨e 歡迎詞(文字則)明講「切到店家老闆」那一頁怎麼切(不能只出現「店家」兩個字)'); }
 
 console.log('\n── ⑩ 未知 postback 不炸 ──');
 await send([tap('U_x', 'm=bogus&b=nope')]);

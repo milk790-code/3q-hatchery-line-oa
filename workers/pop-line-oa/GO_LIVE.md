@@ -36,3 +36,35 @@
 ## 回退(出事就切回)
 
 - 🔴 同第 3-4 步,把 Webhook URL 改回原本的舊 bot URL 即可(切換前先把舊 URL 抄下來存這裡:`_____________`)
+
+---
+
+## v6.1 談單腦(2026-10-30)上線補充 — 跑 `scripts/deploy-pop-line-v6.sh` 之後
+
+> v6.1 改了什麼:加好友第一則=價格表圖、問產品附蝦皮產品卡(蝦皮連結改外部瀏覽器開)、問效果附自家一剪到底影片、貼圖限流、鄭經說/心理學談單腦;主回覆走 reply 不花 push 額度(本月 push 只剩約 23 則)、打「價格表」直接回圖、選單「拍照選品」三顆快速鍵、同一則事件不重複回、多張照片一次看完。
+> 一鍵腳本已經做掉:gh 登入 → 閘門(資料同步/AI_EMPLOYEE/三套測試)→ push main → 等 Actions → /health 驗 seed → GitHub Pages 驗圖 → 圖文選單 v7 → webhook URL。
+
+### 後台 10-30 已經改好的(不用再動)
+- 基本檔案:背景圖黑金 1600×800、帳號名稱「泡泡怪獸 PopMonster 汽車美容」(11-06 前不能再改)、狀態消息「加好友先拿價格表・店家價另外算」
+- 加入好友的歡迎訊息:價格表圖 + 介紹文(246 字)——這是 Webhook 開之前的過渡版,第 2 步會關掉
+- 營業時間 7 天 24 小時 + 「AI 客服 24 小時回覆;真人 09:00–18:00」、付款 Visa/Mastercard/JCB + 蝦皮結帳說明、線上服務「蝦皮出貨:全台超商取貨/宅配」、網站 popmonster.vip、YouTube 頻道、通話鍵已關(電話沒設,按了是壞鍵)
+
+### 只有 OA 後台能做(🔴 manager.line.biz/account/@150tiznd/setting/response)
+1. 🔴 **自動回應訊息 → 關**(不關就是 07-18 那次洗版:罐頭＋AI 各回一則)
+2. 🔴 **加入好友的歡迎訊息 → 關**(`manager.line.biz/account/@150tiznd/autoresponse/welcome` 右上角開關;v6.1 的歡迎包由 worker 送:價格表圖→貼圖→介紹;後台再開一份就變兩份)
+3. 🔴 **Webhook → 開**(v6 之前關了 49 天;開了 AI 才會接客)
+4. 🟡 狀態消息換成「加好友先拿價格表・拍照問用哪支」(page.line.biz 基本檔案 → 帳號;1 小時只能改一次)
+5. 🟡 舊圖文選單「Pop Monster · MENU (postback v1)」要不要刪:v7 設成預設後它不會顯示,留著不影響;要刪就 `python3 scripts/pop-richmenu-deploy.py` 看清單再決定
+
+### 驗收(🟢 用自己的手機)
+6. 🟢 封鎖再解除封鎖泡泡怪獸(或用另一支手機加好友)→ 第一則必須是**價格表圖**,接著貼圖、介紹(含「AI 人工客服」揭露)、下面有快速按鈕
+7. 🟢 傳「價格表」→ 直接回價格表圖 + 一句話(同一天第二次改由 AI 回);傳「拾號怎麼用」→ 只回一則文字 + 一張黑金產品卡(蝦皮主圖、價格、「蝦皮購買」「看施工影片」),蝦皮連結在外部瀏覽器開
+8. 🟢 點選單「拍照選品」→ 回拍照說明 + 三顆快速鍵(拍照/從相簿選/用打字描述);一次連傳 3 張照片 → 數一下回幾則:LINE 常把多張拆成多個 webhook,只有同一個 webhook 裡的才會合併成一則(反駁席實測提醒);若回了 3 則、每則都講得通也算過,回 3 則一樣的才是問題
+9. 🟢 點「看施工影片」→ 直接收到自家影片(第一次);再點 → 給 YouTube 合集,不重發同一支
+10. 🟢 連傳 4 句普通話 → 貼圖最多出現 1 次,抱怨句一定沒貼圖;每句先「已讀 + 輸入中」再回,不會先丟一句墊場文字
+11. 🟢 開 `https://pop-line-oa.milk790.workers.dev/health` → `seed: "v6.1.0"`、`reply_first: true`、`ack_text: "off"`、`catalog` ≥ 30、`welcome_pack` = 2、`videos` ≥ 5
+12. 🟢 隔天看 push 額度:`curl -sS https://api.line.me/v2/bot/message/quota/consumption -H "Authorization: Bearer <token>"`,totalUsage 從 177 往上只該多老闆通知那幾則
+
+### 回退
+- 🔴 LINE Developers Console 把 Webhook URL 改回舊值,或 OA 後台把 Webhook 關掉(AI 立刻停,罐頭自動回應與後台歡迎訊息記得再開)
+- 🟡 只退談單腦不退設定:`git revert` v6.1 那個 commit 再 push(worker 會自動重部署成 v5.2)

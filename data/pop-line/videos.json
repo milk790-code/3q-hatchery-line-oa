@@ -1,0 +1,1144 @@
+{
+  "generated_at": "2026-10-30",
+  "revision_note": "第二輪修正（2026-10-30）：①天使主片改 069（相機原檔、來源已驗），079 降為備用（來源未驗，字幕改成不綁產品）；②G02、G03 片尾 4 秒多的 QR 卡（解碼＝src=social，不是 LINE 用的來源碼）已切掉並重轉，成品結尾不含 QR；③畫面層的大陸痕跡統一標準：依他 08-15 的規則一律不處理、不扣分，入選 5 支重掃一遍；④YouTube 清單顯示用標題把大陸說法改成台灣用詞，原標題另存；⑤拋光預設改送最短的 G02；⑥082 檔頭有抖音下載標記、G02／G03 母帶來源標 unknown，已標「來源有疑問／未驗」，待他裁決。細節見 videos-notes.md 最後兩節。",
+  "spec": {
+    "output": "720×1280 直式、H.264 High、AAC 128k 48kHz、+faststart",
+    "loudness": "-14 LUFS／TP -1.5（兩段式 loudnorm，第一段量測值已附）；083、082 是機器聲，AAC 128k 會把真峰值往上推 2–2.5 dB，所以這兩支 TP 設 -4.5（AAC 後實測 -2.1／-2.4）",
+    "size": "每支 ≤45 MB（GitHub 單檔超過 50 MB 會警告、100 MB 擋）",
+    "line_limits": "LINE 影片 mp4、https、≤200 MB；previewImageUrl ≤1 MB（實測 76–168 KB）",
+    "watermark": "程式另外加，接在 scale 後面",
+    "hosting": "hosted_url／preview_url 是預定放的位置（assets/pop/ 底下、英數檔名），檔案還沒上傳；out/ 裡的是沒加浮水印的試轉檔",
+    "qr": "入選 5 支成品（out/）都不含 QR。來源檔 G02、G03 片尾有 4 秒多的 QR 卡（解碼＝https://popmonster.vip/go?src=social，社群影片用的來源碼），LINE 一對一導流要用 src=line-connect 或 src=line-free-first，所以那段已切掉（G02 54.9→50.6 秒、G03 178.0→173.8 秒）；要在影片裡放 QR 就由程式用 line-* 的來源碼另外疊。"
+  },
+  "videos": [
+    {
+      "id": "069",
+      "src": "/Users/mac/.local/share/fb-personal-publisher/queue/069_一剪到底_鍍膜_車門沖水撥水.mp4",
+      "sha256": "6d652f06b305bbcc0809313dcfdc55692912a05f70356e8a96b17e9450da7c02",
+      "line": "angel",
+      "slot": "angel.main",
+      "duration_s": 17.25,
+      "size_mb": 9.7,
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "preview_ts": 12.0,
+      "caption": "車門一沖水，水膜整片往下退，退完倒影清清楚楚",
+      "caption_chars": 22,
+      "why_best": "1080×1920 相機原檔（0 切點、頭尾都在，來源已驗）、17 秒；水退完以後藍色車門像鏡子一樣倒映整個洗車區，規則分數 11 是天使線最高；畫面裡讀得出來的字沒有別牌 logo，沒有人臉。079 前 3 秒就看到效果（10 分），但它只證明沒被剪過、查不到是不是自家拍的，所以來源有保證的 069 當主片、079 當備用；兩支一個拍車門、一個拍引擎蓋，客人再看第二支不會重複。073 效果也強，但原片是橫拍貼在模糊底上、手機上只剩中間三分之一，放備選。小缺點（分數沒扣，E 項只看別牌 logo、人臉、雜亂背景）：效果要到第 10 秒才出現，前 10 秒只有水一條條往下流；約 9 秒倒影裡有人經過，只看得到腿（沒有臉）；倒影裡黃色水桶的標籤左右反過來又模糊，讀不出字，看不出是哪個牌子。",
+      "score": 11,
+      "score_detail": {
+        "product_action": 1,
+        "effect": 2,
+        "stable_clear": 2,
+        "light": 2,
+        "clean": 2,
+        "length": 2
+      },
+      "transcode_target_mb": 8,
+      "transcode": {
+        "inputs": [
+          "/Users/mac/.local/share/fb-personal-publisher/queue/069_一剪到底_鍍膜_車門沖水撥水.mp4"
+        ],
+        "audio": "keep",
+        "audio_note": "保留原聲（水聲），whisper 沒聽到講話；LRA 21.7 偏大，loudnorm 會自動改用動態模式。",
+        "vf": "scale=720:1280:flags=lanczos,setsar=1,format=yuv420p",
+        "af": "loudnorm=I=-14:TP=-1.5:LRA=11:measured_I=-12.96:measured_TP=-0.19:measured_LRA=21.70:measured_thresh=-26.05:offset=0.90:linear=true,aresample=48000",
+        "measured_loudness_source": {
+          "input_i": -12.96,
+          "input_tp": -0.19,
+          "input_lra": 21.7,
+          "input_thresh": -26.05,
+          "target_offset": 0.9
+        },
+        "v_args": "-c:v libx264 -preset slow -profile:v high -level:v 4.0 -crf 21 -maxrate 3000k -bufsize 6000k -g 60 -pix_fmt yuv420p",
+        "a_args": "-c:a aac -b:a 128k -ar 48000 -ac 2",
+        "size_ceiling_mb": 7.2,
+        "size_ceiling_note": "最壞情況：影像整段都頂到 maxrate＋一個 VBV 緩衝（2 秒）＋音訊 128k＋1% 封裝，MiB。",
+        "cmd": "ffmpeg -nostdin -y -i '/Users/mac/.local/share/fb-personal-publisher/queue/069_一剪到底_鍍膜_車門沖水撥水.mp4' -map 0:v:0 -map 0:a:0 -vf scale=720:1280:flags=lanczos,setsar=1,format=yuv420p -af loudnorm=I=-14:TP=-1.5:LRA=11:measured_I=-12.96:measured_TP=-0.19:measured_LRA=21.70:measured_thresh=-26.05:offset=0.90:linear=true,aresample=48000 -c:v libx264 -preset slow -profile:v high -level:v 4.0 -crf 21 -maxrate 3000k -bufsize 6000k -g 60 -pix_fmt yuv420p -c:a aac -b:a 128k -ar 48000 -ac 2 -movflags +faststart /private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/out/pop-angel-069.mp4",
+        "preview_cmd": "ffmpeg -nostdin -y -ss 12.0 -i '/Users/mac/.local/share/fb-personal-publisher/queue/069_一剪到底_鍍膜_車門沖水撥水.mp4' -frames:v 1 -vf scale=720:1280:flags=lanczos -q:v 3 /private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/out/pop-angel-069-preview.jpg",
+        "watermark_note": "浮水印接在 scale 之後；放右下角最安全（G02／G03 開頭 0–2.5 秒左上有標題字卡、右上有品牌小標；片尾的 QR 卡已經切掉，成品結尾沒有 QR，要放 QR 由程式用 line-* 的來源碼另外疊）。",
+        "crop": null
+      },
+      "hosted_url": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/pop/pop-angel-069.mp4",
+      "preview_url": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/pop/pop-angel-069-preview.jpg",
+      "preview_frame": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/preview/069_12.0.jpg",
+      "sku_hint": [
+        {
+          "item_id": "40055380374",
+          "name": "泡泡怪獸 千倍濃縮天使塗層",
+          "url": "https://shopee.tw/product/1072078949/40055380374?openExternalBrowser=1",
+          "note": "這是素材所屬產品線（sidecar 註明），畫面本身看不出是不是這款；字幕不寫產品名，只放在按鈕"
+        }
+      ],
+      "seen": "1.7 秒水一條條往下流；約 9 秒倒影裡有人經過，只看得到腿（深色褲管、橘色的鞋，沒有臉）；10–15 秒水退完，藍色車門像鏡子一樣倒映層架、黃色水桶（標籤在倒影裡左右反過來又模糊，讀不出字）、踏凳、黃色地墊；沒拍到臉。",
+      "provenance": "相機原檔 5059_raw.MP4（HEVC HLG），0 切點、頭尾都在原檔裡，只做 HLG→bt709 轉色＋轉檔；sidecar 註明連結是素材所屬產品線，不是畫面上看到的產品。「來源已驗」的依據是原始格式（HEVC HLG、1080×1920、檔名 5059_raw，不是平台下載或轉檔過的格式）加 0 切點；ffprobe 看不到機型與拍攝時間，這點跟 079 一樣。",
+      "provenance_flag": "相機原檔，來源已驗",
+      "frames": [
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/069-1.jpg",
+          "t": 1.73
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/069-2.jpg",
+          "t": 6.04
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/069-3.jpg",
+          "t": 10.35
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/069-4.jpg",
+          "t": 14.66
+        }
+      ],
+      "test_encode": {
+        "ok": true,
+        "scope": "full_length",
+        "mp4": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/out/pop-angel-069.mp4",
+        "size_mb": 6.5,
+        "duration_out_s": 17.3,
+        "streams": [
+          {
+            "codec_type": "video",
+            "codec_name": "h264",
+            "width": 720,
+            "height": 1280
+          },
+          {
+            "codec_type": "audio",
+            "codec_name": "aac",
+            "sample_rate": "48000"
+          }
+        ],
+        "preview": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/out/pop-angel-069-preview.jpg",
+        "preview_kb": 169,
+        "loudness_out": {
+          "I": -13.8,
+          "true_peak_dbfs": -2.2
+        },
+        "audio_xcorr": null,
+        "encode_seconds": 153.9,
+        "watermark": "none (test encode)"
+      }
+    },
+    {
+      "id": "079",
+      "src": "/Users/mac/.local/share/fb-personal-publisher/queue/079_一剪到底_鍍膜_深灰引擎蓋整片水膜.mp4",
+      "sha256": "94eb2f4bbf3bcf0b6407cec9fe85557c2ada8def7c1d1dd3750b952b8da9ea6b",
+      "line": "angel",
+      "slot": "angel.backup",
+      "duration_s": 24.45,
+      "size_mb": 8.4,
+      "width": 720,
+      "height": 1280,
+      "fps": 30.0,
+      "preview_ts": 2.4,
+      "caption": "深灰引擎蓋一沖水，整片水膜直接滑掉",
+      "caption_chars": 17,
+      "why_best": "天使 7 支裡點開 0.5–3 秒就看到整片水膜滑掉的，客人不用等；720×1280、24 秒剛好。但它只證明沒被剪過，查不到是不是自家拍的（來源未驗）；8–10 秒噴頭有 FUOU 字樣、2–3.5 秒畫面最上緣一截手臂（沒臉），分數 10。所以降成備用，主片換來源有保證的 069，客人問第二次再送這支。字幕不再寫「上過天使塗層」：畫面沒拍到噴天使塗層，產品只放在按鈕。",
+      "score": 10,
+      "score_detail": {
+        "product_action": 1,
+        "effect": 2,
+        "stable_clear": 2,
+        "light": 2,
+        "clean": 1,
+        "length": 2
+      },
+      "transcode_target_mb": 10,
+      "transcode": {
+        "inputs": [
+          "/Users/mac/.local/share/fb-personal-publisher/queue/079_一剪到底_鍍膜_深灰引擎蓋整片水膜.mp4"
+        ],
+        "audio": "keep",
+        "audio_note": "保留原聲（水聲），whisper 沒聽到講話；兩段式 loudnorm 拉到 -14 LUFS。",
+        "vf": "scale=720:1280:flags=lanczos,setsar=1,format=yuv420p",
+        "af": "loudnorm=I=-14:TP=-1.5:LRA=11:measured_I=-16.57:measured_TP=-4.51:measured_LRA=0.80:measured_thresh=-26.57:offset=-0.09:linear=true,aresample=48000",
+        "measured_loudness_source": {
+          "input_i": -16.57,
+          "input_tp": -4.51,
+          "input_lra": 0.8,
+          "input_thresh": -26.57,
+          "target_offset": -0.09
+        },
+        "v_args": "-c:v libx264 -preset slow -profile:v high -level:v 4.0 -crf 21 -maxrate 3000k -bufsize 6000k -g 60 -pix_fmt yuv420p",
+        "a_args": "-c:a aac -b:a 128k -ar 48000 -ac 2",
+        "size_ceiling_mb": 9.9,
+        "size_ceiling_note": "最壞情況：影像整段都頂到 maxrate＋一個 VBV 緩衝（2 秒）＋音訊 128k＋1% 封裝，MiB。",
+        "cmd": "ffmpeg -nostdin -y -i '/Users/mac/.local/share/fb-personal-publisher/queue/079_一剪到底_鍍膜_深灰引擎蓋整片水膜.mp4' -map 0:v:0 -map 0:a:0 -vf scale=720:1280:flags=lanczos,setsar=1,format=yuv420p -af loudnorm=I=-14:TP=-1.5:LRA=11:measured_I=-16.57:measured_TP=-4.51:measured_LRA=0.80:measured_thresh=-26.57:offset=-0.09:linear=true,aresample=48000 -c:v libx264 -preset slow -profile:v high -level:v 4.0 -crf 21 -maxrate 3000k -bufsize 6000k -g 60 -pix_fmt yuv420p -c:a aac -b:a 128k -ar 48000 -ac 2 -movflags +faststart /private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/out/pop-angel-079.mp4",
+        "preview_cmd": "ffmpeg -nostdin -y -ss 2.4 -i '/Users/mac/.local/share/fb-personal-publisher/queue/079_一剪到底_鍍膜_深灰引擎蓋整片水膜.mp4' -frames:v 1 -vf scale=720:1280:flags=lanczos -q:v 3 /private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/out/pop-angel-079-preview.jpg",
+        "watermark_note": "浮水印接在 scale 之後；放右下角最安全（G02／G03 開頭 0–2.5 秒左上有標題字卡、右上有品牌小標；片尾的 QR 卡已經切掉，成品結尾沒有 QR，要放 QR 由程式用 line-* 的來源碼另外疊）。",
+        "crop": null
+      },
+      "hosted_url": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/pop/pop-angel-079.mp4",
+      "preview_url": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/pop/pop-angel-079-preview.jpg",
+      "preview_frame": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/preview/079_2.4.jpg",
+      "sku_hint": [
+        {
+          "item_id": "40055380374",
+          "name": "泡泡怪獸 千倍濃縮天使塗層",
+          "url": "https://shopee.tw/product/1072078949/40055380374?openExternalBrowser=1",
+          "note": "這是素材所屬產品線（sidecar 註明）；這支畫面沒拍到噴天使塗層，字幕不寫產品名，只放在按鈕"
+        }
+      ],
+      "seen": "0.5–3.5 秒水柱打上深灰引擎蓋，整片水膜一起滑掉；8.56 秒右下 FUOU 噴頭 logo；14.67 秒水線退過乾淨漆面；20.78 秒鏡頭往後拉，店內整齊（左上黃色布品上有個很小的 logo，看不清字）；沒拍到臉。",
+      "provenance": "來源未驗：檔案在他的 Drive 06-手機直傳-未分類（F5A7F1C7-….medium.MP4，720×1280），白名單只證明沒被剪過，沒有任何文件寫明是他自己拍的；ffprobe 只有 Apple Core Media 的串流名稱，沒有拍攝時間與機型；同一個鏡頭出現在廣告 104C8A7C（有「60訂單」字），這支是無字版，但那支是不是自家拍的也沒查；場景偵測 0 切點。",
+      "provenance_flag": "來源未驗",
+      "frames": [
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/079-1.jpg",
+          "t": 2.44
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/079-2.jpg",
+          "t": 8.56
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/079-3.jpg",
+          "t": 14.67
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/079-4.jpg",
+          "t": 20.78
+        }
+      ],
+      "test_encode": {
+        "ok": true,
+        "scope": "full_length",
+        "mp4": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/out/pop-angel-079.mp4",
+        "size_mb": 8.9,
+        "duration_out_s": 24.47,
+        "streams": [
+          {
+            "codec_type": "video",
+            "codec_name": "h264",
+            "width": 720,
+            "height": 1280
+          },
+          {
+            "codec_type": "audio",
+            "codec_name": "aac",
+            "sample_rate": "48000"
+          }
+        ],
+        "preview": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/out/pop-angel-079-preview.jpg",
+        "preview_kb": 79,
+        "loudness_out": {
+          "I": -14.0,
+          "true_peak_dbfs": -1.0
+        },
+        "audio_xcorr": null,
+        "encode_seconds": 98.2,
+        "watermark": "none (test encode)"
+      }
+    },
+    {
+      "id": "G03",
+      "src": "/Users/mac/.local/share/polish-tiktok-2x/lib/01_可發布影片/G批_一剪到底_20261005/POP_拋光_G03_粗到細.mp4",
+      "sha256": "6b9cdc8cc4ef9c191234f7cd8bf03bdbf5b292155b8f741c65ecc10b381184fa",
+      "line": "polish",
+      "slot": "polish.full",
+      "duration_s": 173.8,
+      "source_duration_s": 178.0,
+      "size_mb": 151.6,
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "preview_ts": 1.5,
+      "caption": "米速伍號中拋走完，停機換盤換拾號細拋，擦掉再看倒影",
+      "caption_chars": 25,
+      "why_best": "唯一把伍號、拾號兩罐、換盤、擦掉看倒影整套走完的片，正好一次介紹兩支產品；開頭 2.5 秒有他自己的字卡「中拋走完 換盤接細拋」，靜音也看得懂；紅漆加燈條倒影最好判斷亮度。用 G03 的畫面（位元率比 083 高一倍）配 083 的現場原聲：兩支逐格對齊，G03 自己的音軌是 G 批三支共用的低音量墊底，不拿來放大。缺點是 174 秒長（原檔 178 秒，成品已切掉片尾 4.2 秒的 QR 卡）；母帶來源未驗，見 provenance。",
+      "score": 10,
+      "score_detail": {
+        "product_action": 2,
+        "effect": 2,
+        "stable_clear": 2,
+        "light": 2,
+        "clean": 2,
+        "length": 0
+      },
+      "transcode_target_mb": 45,
+      "transcode": {
+        "inputs": [
+          "/Users/mac/.local/share/polish-tiktok-2x/lib/01_可發布影片/G批_一剪到底_20261005/POP_拋光_G03_粗到細.mp4",
+          "/Users/mac/.local/share/fb-personal-publisher/queue/083_一剪到底_拋光_紅漆伍號換拾號.mp4"
+        ],
+        "audio": "from_083",
+        "audio_note": "畫面用 G03、聲音用 083：G03 的音軌是 G 批共用的低音量墊底（-36 LUFS，跟 G02、G04 同一段，相關係數 0.995），不是現場聲；083 是同一段畫面的原聲（機器聲，whisper 沒抓到講話），兩支畫面逐格對齊（位移 0 格），不用 itsoffset。",
+        "vf": "scale=720:1280:flags=lanczos,setsar=1,format=yuv420p",
+        "af": "loudnorm=I=-14:TP=-4.5:LRA=11:measured_I=-11.83:measured_TP=1.09:measured_LRA=6.40:measured_thresh=-21.84:offset=0.13:linear=true,aresample=48000",
+        "measured_loudness_source": {
+          "input_i": -11.83,
+          "input_tp": 1.09,
+          "input_lra": 6.4,
+          "input_thresh": -21.84,
+          "target_offset": 0.13
+        },
+        "v_args": "-c:v libx264 -preset slow -profile:v high -level:v 4.0 -crf 21 -maxrate 1800k -bufsize 3600k -g 60 -pix_fmt yuv420p",
+        "a_args": "-c:a aac -b:a 128k -ar 48000 -ac 2",
+        "size_ceiling_mb": 40.8,
+        "size_ceiling_note": "最壞情況：影像整段都頂到 maxrate＋一個 VBV 緩衝（2 秒）＋音訊 128k＋1% 封裝，MiB。（以裁短後的 173.8 秒計）",
+        "cmd": "ffmpeg -nostdin -y -i '/Users/mac/.local/share/polish-tiktok-2x/lib/01_可發布影片/G批_一剪到底_20261005/POP_拋光_G03_粗到細.mp4' -i '/Users/mac/.local/share/fb-personal-publisher/queue/083_一剪到底_拋光_紅漆伍號換拾號.mp4' -map 0:v:0 -map 1:a:0 -vf scale=720:1280:flags=lanczos,setsar=1,format=yuv420p -af loudnorm=I=-14:TP=-4.5:LRA=11:measured_I=-11.83:measured_TP=1.09:measured_LRA=6.40:measured_thresh=-21.84:offset=0.13:linear=true,aresample=48000 -c:v libx264 -preset slow -profile:v high -level:v 4.0 -crf 21 -maxrate 1800k -bufsize 3600k -g 60 -pix_fmt yuv420p -c:a aac -b:a 128k -ar 48000 -ac 2 -t 173.8 -shortest -movflags +faststart /private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/out/pop-polish-g03.mp4",
+        "preview_cmd": "ffmpeg -nostdin -y -ss 1.5 -i '/Users/mac/.local/share/polish-tiktok-2x/lib/01_可發布影片/G批_一剪到底_20261005/POP_拋光_G03_粗到細.mp4' -frames:v 1 -vf scale=720:1280:flags=lanczos -q:v 3 /private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/out/pop-polish-g03-preview.jpg",
+        "watermark_note": "浮水印接在 scale 之後；放右下角最安全（G02／G03 開頭 0–2.5 秒左上有標題字卡、右上有品牌小標；片尾的 QR 卡已經切掉，成品結尾沒有 QR，要放 QR 由程式用 line-* 的來源碼另外疊）。",
+        "crop": null,
+        "trim": {
+          "ffmpeg_arg": "-t 173.8",
+          "t_s": 173.8,
+          "source_duration_s": 178.0,
+          "cut_tail_s": 4.2,
+          "qr_card": {
+            "fade_in_s": 173.95,
+            "opaque_s": 174.4,
+            "decodes": "https://popmonster.vip/go?src=social"
+          },
+          "why": "片尾 173.95 秒起是 QR 卡，解碼＝https://popmonster.vip/go?src=social（社群影片用的來源碼）；LINE 一對一導流要用 src=line-connect 或 src=line-free-first，所以成品在 QR 出現前 0.15 秒收尾；只切片尾、開頭沒動（one-take 規則：只准修尾）。"
+        }
+      },
+      "hosted_url": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/pop/pop-polish-g03.mp4",
+      "preview_url": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/pop/pop-polish-g03-preview.jpg",
+      "preview_frame": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/preview/G03_1.5.jpg",
+      "sku_hint": [
+        {
+          "item_id": "42163627106",
+          "name": "米速 MISO 伍號 600番一劑拋研磨劑",
+          "url": "https://shopee.tw/product/1072078949/42163627106?openExternalBrowser=1"
+        },
+        {
+          "item_id": "40213627112",
+          "name": "米速 MISO 拾號",
+          "url": "https://shopee.tw/product/1072078949/40213627112?openExternalBrowser=1"
+        }
+      ],
+      "seen": "0–2.5 秒字卡「泡泡怪獸 粗到細／整段沒剪／中拋走完 換盤接細拋」；手拿羊毛盤（盤背印著 POP MONSTER 和「泡泡怪獸」，1.0 秒最清楚，中間另有一行很小的 From China）；漆面上立著米速拾號、伍號兩罐和橘毛巾；中段換盤續拋；170 秒紅漆上 LED 燈條倒影非常清楚；173.95 秒起左下浮出 QR 卡（解碼＝https://popmonster.vip/go?src=social，174.4 秒完全不透明），成品已切掉。手臂有刺青，沒拍到臉。",
+      "provenance": "母帶30（Google 相簿拋光相簿 30_AF1QipM…），只修尾到 178.0 秒；one_take_check PASS 24 點；083 是同一個 Google 項目的乾淨版（原聲照留）。成品只切片尾 QR 卡（178.0→173.8 秒），開頭沒動；連母帶 191.27 秒到 178.0 秒那一刀，累計尾端修剪 17.5 秒，在 one-take 規則上限 28.7 秒內。來源未驗：他 10-20 的個人 FB 盤點把 G02／G03／G04（母帶 69／30／13）標成 provenance unknown（格式被洗過、30 還沒有聲音），這支也算在內。",
+      "provenance_flag": "來源未驗（母帶30，格式被洗過）",
+      "frames": [
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/G03-1.jpg",
+          "t": 17.8
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/G03-2.jpg",
+          "t": 62.3
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/G03-3.jpg",
+          "t": 106.8
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/G03-4.jpg",
+          "t": 151.3
+        }
+      ],
+      "test_encode": {
+        "ok": true,
+        "scope": "full_length_trimmed",
+        "mp4": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/out/pop-polish-g03.mp4",
+        "size_mb": 39.9,
+        "duration_out_s": 173.8,
+        "streams": [
+          {
+            "codec_type": "video",
+            "codec_name": "h264",
+            "width": 720,
+            "height": 1280
+          },
+          {
+            "codec_type": "audio",
+            "codec_name": "aac",
+            "sample_rate": "48000"
+          }
+        ],
+        "preview": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/out/pop-polish-g03-preview.jpg",
+        "preview_kb": 108,
+        "loudness_out": {
+          "I": -14.3,
+          "true_peak_dbfs": -2.1,
+          "LRA": 4.5
+        },
+        "audio_xcorr": {
+          "vs_083": 0.949,
+          "vs_G03_own_track": 0.008
+        },
+        "encode_seconds": 1009.7,
+        "watermark": "none (test encode)",
+        "recipe_matches_current": true,
+        "qr_in_tail": "none（172.0／173.0／173.6／173.75 秒四格都解不出 QR）",
+        "earlier_first20s_test": {
+          "size_mb": 5.01,
+          "loudness_out": {
+            "I_first20s": -12.0,
+            "true_peak_dbfs": 0.4
+          },
+          "audio_xcorr": {
+            "vs_083": 0.98,
+            "vs_G03_own_track": 0.021
+          },
+          "recipe": "第一輪：TP=-1.5、G03 maxrate 1900k"
+        },
+        "previous_full_run": {
+          "recipe": {
+            "maxrate_k": 1800,
+            "af": "loudnorm=I=-14:TP=-2.5:LRA=11:measured_I=-11.83:measured_TP=1.09:measured_LRA=6.40:measured_thresh=-21.84:offset=0.13:linear=true,aresample=48000"
+          },
+          "size_mb": 40.96,
+          "loudness_out": {
+            "I": -13.7,
+            "true_peak_dbfs": -0.0,
+            "LRA": 6.2
+          },
+          "note": "第二輪：TP=-2.5 整支，真峰值還是太高，改 -4.5 重轉"
+        },
+        "previous_untrimmed": {
+          "size_mb": 41.0,
+          "duration_out_s": 178.0,
+          "loudness_out": {
+            "I": -14.3,
+            "true_peak_dbfs": -2.1,
+            "LRA": 5.1
+          },
+          "audio_xcorr": {
+            "vs_083": 0.949,
+            "vs_G03_own_track": -0.024
+          },
+          "encode_seconds": 464.0,
+          "note": "含片尾 QR 卡 4.2 秒；已被裁短版取代，舊檔留在 out/_scratch/fix/old-full/"
+        }
+      },
+      "whitelist_sha256_match": true
+    },
+    {
+      "id": "082",
+      "src": "/Users/mac/.local/share/fb-personal-publisher/queue/082_一剪到底_拋光_Elantra行李箱蓋.mp4",
+      "sha256": "9034ecd0a5d1e61283ec1d2705ff74b623b49296d420f734d403a96d13b5f63d",
+      "line": "polish",
+      "slot": "polish.wool",
+      "duration_s": 158.9,
+      "size_mb": 36.5,
+      "width": 720,
+      "height": 1280,
+      "fps": 30.0,
+      "preview_ts": 150.0,
+      "caption": "霧掉的黑色後車廂蓋，米速拾號配羊毛盤，拋過那塊跟旁邊差多少一看就知道",
+      "caption_chars": 34,
+      "why_best": "全部拋光片裡前後差最明顯的一支：滿是霧面刮痕的黑色後車廂蓋，羊毛盤配拾號拋出一塊黑到能照出燈的方塊，沒拋的對照就在同一個畫面。085 也是羊毛盤（機器有泡泡怪獸塗裝、在台灣店裡拍），但手持繞拍會糊、看不到前後對比；068 有前後字卡，但片尾字卡寫「留言告訴我」是社群用語、179 秒又更長。缺點是 159 秒長、地上有黃色電線。",
+      "score": 9,
+      "score_detail": {
+        "product_action": 2,
+        "effect": 2,
+        "stable_clear": 2,
+        "light": 2,
+        "clean": 1,
+        "length": 0
+      },
+      "transcode_target_mb": 45,
+      "transcode": {
+        "inputs": [
+          "/Users/mac/.local/share/fb-personal-publisher/queue/082_一剪到底_拋光_Elantra行李箱蓋.mp4"
+        ],
+        "audio": "keep",
+        "audio_note": "保留原聲；原聲很大（-9.3 LUFS、真峰值 +4.2 已破音），loudnorm 會壓下來。whisper 在 0–14 秒、60–94 秒抓到像歌詞的片段（信心低，可能是店裡收音機也可能是機器聲幻聽），沒人耳確認。",
+        "vf": "scale=720:1280:flags=lanczos,setsar=1,format=yuv420p",
+        "af": "loudnorm=I=-14:TP=-4.5:LRA=11:measured_I=-9.30:measured_TP=4.20:measured_LRA=2.00:measured_thresh=-19.36:offset=0.26:linear=true,aresample=48000",
+        "measured_loudness_source": {
+          "input_i": -9.3,
+          "input_tp": 4.2,
+          "input_lra": 2.0,
+          "input_thresh": -19.36,
+          "target_offset": 0.26
+        },
+        "v_args": "-c:v libx264 -preset slow -profile:v high -level:v 4.0 -crf 21 -maxrate 2100k -bufsize 4200k -g 60 -pix_fmt yuv420p",
+        "a_args": "-c:a aac -b:a 128k -ar 48000 -ac 2",
+        "size_ceiling_mb": 43.1,
+        "size_ceiling_note": "最壞情況：影像整段都頂到 maxrate＋一個 VBV 緩衝（2 秒）＋音訊 128k＋1% 封裝，MiB。",
+        "cmd": "ffmpeg -nostdin -y -i '/Users/mac/.local/share/fb-personal-publisher/queue/082_一剪到底_拋光_Elantra行李箱蓋.mp4' -map 0:v:0 -map 0:a:0 -vf scale=720:1280:flags=lanczos,setsar=1,format=yuv420p -af loudnorm=I=-14:TP=-4.5:LRA=11:measured_I=-9.30:measured_TP=4.20:measured_LRA=2.00:measured_thresh=-19.36:offset=0.26:linear=true,aresample=48000 -c:v libx264 -preset slow -profile:v high -level:v 4.0 -crf 21 -maxrate 2100k -bufsize 4200k -g 60 -pix_fmt yuv420p -c:a aac -b:a 128k -ar 48000 -ac 2 -movflags +faststart /private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/out/pop-polish-082.mp4",
+        "preview_cmd": "ffmpeg -nostdin -y -ss 150.0 -i '/Users/mac/.local/share/fb-personal-publisher/queue/082_一剪到底_拋光_Elantra行李箱蓋.mp4' -frames:v 1 -vf scale=720:1280:flags=lanczos -q:v 3 /private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/out/pop-polish-082-preview.jpg",
+        "watermark_note": "浮水印接在 scale 之後；放右下角最安全（G02／G03 開頭 0–2.5 秒左上有標題字卡、右上有品牌小標；片尾的 QR 卡已經切掉，成品結尾沒有 QR，要放 QR 由程式用 line-* 的來源碼另外疊）。",
+        "crop": null
+      },
+      "hosted_url": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/pop/pop-polish-082.mp4",
+      "preview_url": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/pop/pop-polish-082-preview.jpg",
+      "preview_frame": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/preview/082_150.0.jpg",
+      "sku_hint": [
+        {
+          "item_id": "40213627112",
+          "name": "米速 MISO 拾號",
+          "url": "https://shopee.tw/product/1072078949/40213627112?openExternalBrowser=1"
+        },
+        {
+          "item_id": "43120451521",
+          "name": "羊毛盤 重切削",
+          "url": "https://shopee.tw/product/1072078949/43120451521?openExternalBrowser=1",
+          "note": "畫面是羊毛盤，是不是這款沒對過"
+        }
+      ],
+      "seen": "3 秒黑色 ELANTRA 後車廂蓋滿是霧面刮痕；104–136 秒手拿米速拾號（瓶身看得到「拾」，120 秒最清楚）配白色羊毛盤（藍綠圈）；150 秒拋過的方塊黑到能照出燈，旁邊還是霧的；後擋放黃毛巾、地上黃色電線；沒拍到臉。",
+      "provenance": "他自己 FB reel 1354903440014232 的完整長版 11CD00FB-…MP4（720×1280、158.9 秒，自然開頭結尾；FB 上那版剪掉了前 9.5 秒，所以沒用 FB 版）；場景偵測 0 切點。來源有疑問：檔頭有 comment「vid:…」（抖音下載檔才有的標記，佇列 06x–08x 這批裡只有這支有），他 10-20 的個人 FB 盤點又寫「1354（Elantra）也是米速官方」，跟上面「他自己 FB reel」對不起來，可能是品牌方的片；待他確認，不放行的話羊毛盤槽改備選 085（085 的來源也還沒查）。",
+      "provenance_flag": "來源有疑問（檔頭 vid: 抖音標記；他 10-20 記為米速官方）",
+      "frames": [
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/082-1.jpg",
+          "t": 15.89
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/082-2.jpg",
+          "t": 55.62
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/082-3.jpg",
+          "t": 95.34
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/082-4.jpg",
+          "t": 135.06
+        }
+      ],
+      "test_encode": {
+        "ok": true,
+        "scope": "full_length",
+        "mp4": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/out/pop-polish-082.mp4",
+        "size_mb": 41.4,
+        "duration_out_s": 158.9,
+        "streams": [
+          {
+            "codec_type": "video",
+            "codec_name": "h264",
+            "width": 720,
+            "height": 1280
+          },
+          {
+            "codec_type": "audio",
+            "codec_name": "aac",
+            "sample_rate": "48000"
+          }
+        ],
+        "preview": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/out/pop-polish-082-preview.jpg",
+        "preview_kb": 138,
+        "loudness_out": {
+          "I": -14.0,
+          "true_peak_dbfs": -2.4,
+          "LRA": 1.8
+        },
+        "audio_xcorr": {
+          "vs_082": 0.997
+        },
+        "encode_seconds": 178.7,
+        "watermark": "none (test encode)",
+        "recipe_matches_current": true,
+        "earlier_first20s_test": {
+          "size_mb": 5.23,
+          "loudness_out": {
+            "I_first20s": -13.5,
+            "true_peak_dbfs": -0.7
+          },
+          "audio_xcorr": {
+            "vs_082": 0.997
+          },
+          "recipe": "第一輪：TP=-1.5、G03 maxrate 1900k"
+        },
+        "previous_full_run": {
+          "recipe": {
+            "maxrate_k": 2100,
+            "af": "loudnorm=I=-14:TP=-2.5:LRA=11:measured_I=-9.30:measured_TP=4.20:measured_LRA=2.00:measured_thresh=-19.36:offset=0.26:linear=true,aresample=48000"
+          },
+          "size_mb": 41.44,
+          "loudness_out": {
+            "I": -13.9,
+            "true_peak_dbfs": -0.7,
+            "LRA": 2.0
+          },
+          "note": "第二輪：TP=-2.5 整支，真峰值還是太高，改 -4.5 重轉"
+        }
+      }
+    },
+    {
+      "id": "G02",
+      "src": "/Users/mac/.local/share/polish-tiktok-2x/lib/01_可發布影片/G批_一剪到底_20261005/POP_拋光_G02_交界.mp4",
+      "sha256": "04e70f2aeeffecd6fe4da91e4535364f58286b784d2f9c3d303c7bdf5895d2b2",
+      "line": "polish",
+      "slot": "polish.edge",
+      "duration_s": 50.6,
+      "source_duration_s": 54.9,
+      "size_mb": 45.3,
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "preview_ts": 33.5,
+      "caption": "拋完一小圈先別盯中間，擦掉換個角度看那一圈的邊",
+      "caption_chars": 23,
+      "why_best": "55 秒原生直拍（成品切掉片尾 QR 卡後 50.6 秒）、不用裁，只講一件事：拋完擦掉換角度，看拋過跟沒拋的交界；26–40 秒那一圈最清楚。開頭字卡「拋完先別看中間 看那一圈的邊」告訴客人要看哪裡，規則分數 12 是拋光線最高，也是最短的，點開最快，所以拋光預設送這支。G04（補劑）是橫拍貼模糊底、偏暗，留作備用。小缺點（都不扣分）：約 42 秒起鏡頭拉遠，背景有寫著「消火栓」的白色箱子和門外紅磚樓，屬畫面層的在地字樣，依他 08-15 的規則不處理；手上那瓶看不到字，所以不綁特定產品；母帶來源未驗，見 provenance。",
+      "score": 12,
+      "score_detail": {
+        "product_action": 2,
+        "effect": 2,
+        "stable_clear": 2,
+        "light": 2,
+        "clean": 2,
+        "length": 2
+      },
+      "transcode_target_mb": 21,
+      "transcode": {
+        "inputs": [
+          "/Users/mac/.local/share/polish-tiktok-2x/lib/01_可發布影片/G批_一剪到底_20261005/POP_拋光_G02_交界.mp4"
+        ],
+        "audio": "none",
+        "audio_note": "去掉音軌（-an）：G02 只有 G 批共用的低音量墊底（-36 LUFS），不是現場聲，拉到 -14 LUFS 等於把來源不明的聲音放大 22 dB；白名單裡也沒有它的原聲版。",
+        "vf": "scale=720:1280:flags=lanczos,setsar=1,format=yuv420p",
+        "af": null,
+        "measured_loudness_source": null,
+        "v_args": "-c:v libx264 -preset slow -profile:v high -level:v 4.0 -crf 21 -maxrate 3000k -bufsize 6000k -g 60 -pix_fmt yuv420p",
+        "a_args": "-an",
+        "size_ceiling_mb": 19.0,
+        "size_ceiling_note": "最壞情況：影像整段都頂到 maxrate＋一個 VBV 緩衝（2 秒）＋音訊 128k＋1% 封裝，MiB。（以裁短後的 50.6 秒計）",
+        "cmd": "ffmpeg -nostdin -y -i '/Users/mac/.local/share/polish-tiktok-2x/lib/01_可發布影片/G批_一剪到底_20261005/POP_拋光_G02_交界.mp4' -map 0:v:0 -an -vf scale=720:1280:flags=lanczos,setsar=1,format=yuv420p -c:v libx264 -preset slow -profile:v high -level:v 4.0 -crf 21 -maxrate 3000k -bufsize 6000k -g 60 -pix_fmt yuv420p -t 50.6 -movflags +faststart /private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/out/pop-polish-g02.mp4",
+        "preview_cmd": "ffmpeg -nostdin -y -ss 33.5 -i '/Users/mac/.local/share/polish-tiktok-2x/lib/01_可發布影片/G批_一剪到底_20261005/POP_拋光_G02_交界.mp4' -frames:v 1 -vf scale=720:1280:flags=lanczos -q:v 3 /private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/out/pop-polish-g02-preview.jpg",
+        "watermark_note": "浮水印接在 scale 之後；放右下角最安全（G02／G03 開頭 0–2.5 秒左上有標題字卡、右上有品牌小標；片尾的 QR 卡已經切掉，成品結尾沒有 QR，要放 QR 由程式用 line-* 的來源碼另外疊）。",
+        "crop": null,
+        "trim": {
+          "ffmpeg_arg": "-t 50.6",
+          "t_s": 50.6,
+          "source_duration_s": 54.9,
+          "cut_tail_s": 4.3,
+          "qr_card": {
+            "fade_in_s": 50.9,
+            "opaque_s": 51.3,
+            "decodes": "https://popmonster.vip/go?src=social"
+          },
+          "why": "片尾約 50.9 秒起是 QR 卡，解碼＝https://popmonster.vip/go?src=social（社群影片用的來源碼）；LINE 一對一導流要用 src=line-connect 或 src=line-free-first，所以成品在 QR 出現前 0.3 秒收尾；只切片尾、開頭沒動；累計尾端修剪 4.3 秒，在 one-take 規則上限 8.2 秒內。"
+        }
+      },
+      "hosted_url": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/pop/pop-polish-g02.mp4",
+      "preview_url": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/pop/pop-polish-g02-preview.jpg",
+      "preview_frame": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/preview/G02_33.5.jpg",
+      "sku_hint": [],
+      "seen": "0–2.5 秒字卡「泡泡怪獸 交界／整段沒剪／拋完先別看中間 看那一圈的邊／擦掉之後，換個角度看反光」；5.5 秒手拿黑瓶點劑（瓶身看不到字）；10–19 秒紅黑機器配黃／藍綠海綿盤拋香檳色後葉子板；26–40 秒擦掉後那一圈比旁邊透；約 42 秒起鏡頭拉遠，背景白色「消火栓」箱、門外紅磚樓與戶外（畫面層，不處理）；約 50.9 秒起左下浮出 QR 卡（字「掃碼｜看完整用法」，解碼＝https://popmonster.vip/go?src=social，51.3 秒完全不透明），成品已切掉。後窗反射有掛著的衣物和彩色小物，沒有人臉、沒有字。",
+      "provenance": "母帶69，54.90 秒整段；one_take_check PASS 24 點、cropdetect 53/53；白名單裡沒有它的乾淨版（fb 佇列沒有母帶69）。成品只切片尾 QR 卡（54.9→50.6 秒，切掉 4.3 秒，在 one-take 規則尾端修剪上限 8.2 秒內），開頭沒動。來源未驗：他 10-20 的個人 FB 盤點把 G02／G03／G04（母帶 69／30／13）標成 provenance unknown（格式被洗過），這支也算在內。",
+      "provenance_flag": "來源未驗（母帶69，格式被洗過）",
+      "frames": [
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/G02-1.jpg",
+          "t": 5.49
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/G02-2.jpg",
+          "t": 19.21
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/G02-3.jpg",
+          "t": 32.94
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/G02-4.jpg",
+          "t": 46.66
+        }
+      ],
+      "test_encode": {
+        "ok": true,
+        "scope": "full_length_trimmed",
+        "mp4": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/out/pop-polish-g02.mp4",
+        "size_mb": 8.7,
+        "duration_out_s": 50.6,
+        "streams": [
+          {
+            "codec_type": "video",
+            "codec_name": "h264",
+            "width": 720,
+            "height": 1280
+          }
+        ],
+        "preview": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/out/pop-polish-g02-preview.jpg",
+        "preview_kb": 77,
+        "loudness_out": null,
+        "audio_xcorr": null,
+        "encode_seconds": 141.0,
+        "watermark": "none (test encode)",
+        "recipe_matches_current": true,
+        "qr_in_tail": "none（48.0／50.0／50.5／50.55 秒四格都解不出 QR）",
+        "earlier_first20s_test": {
+          "size_mb": 3.47,
+          "loudness_out": null,
+          "audio_xcorr": null,
+          "recipe": "第一輪：TP=-1.5、G03 maxrate 1900k"
+        },
+        "previous_untrimmed": {
+          "size_mb": 9.5,
+          "duration_out_s": 54.9,
+          "loudness_out": null,
+          "audio_xcorr": null,
+          "encode_seconds": 62.9,
+          "note": "含片尾 QR 卡 4.3 秒；已被裁短版取代，舊檔留在 out/_scratch/fix/old-full/"
+        }
+      },
+      "whitelist_sha256_match": true
+    }
+  ],
+  "line_map": {
+    "angel": [
+      "069",
+      "079"
+    ],
+    "polish": [
+      "G02",
+      "G03",
+      "082"
+    ]
+  },
+  "slot_map": {
+    "angel.main": "069",
+    "angel.backup": "079",
+    "polish.full": "G03",
+    "polish.wool": "082",
+    "polish.edge": "G02"
+  },
+  "pick_rule": "預設送清單第一支（天使＝069；拋光＝G02，50 秒、約 9 MB，點開最快）；客人問完整流程、粗到細、換盤送 G03；問羊毛盤送 082；問怎麼看拋好了沒、交界、邊送 G02；同一位客人送過的就換下一支（拋光依序 G02→G03→082）；天使客人再問一次才送 079。",
+  "yt_fallback": {
+    "wash": "https://www.youtube.com/playlist?list=PLSk3kbuy0rz4",
+    "wheel": "https://www.youtube.com/playlist?list=PLSuJIu3-yk_c",
+    "tire": "https://www.youtube.com/playlist?list=PLSuJIu3-yk_c",
+    "decon": "https://www.youtube.com/playlist?list=PLSuJIu3-yk_c",
+    "glass": "https://www.youtube.com/playlist?list=PLHLLpJl_ai80",
+    "leather": "https://www.youtube.com/playlist?list=PLBt5iCYZdcxM",
+    "angel": "https://www.youtube.com/playlist?list=PLCCgTJRYB-AY",
+    "polish": "https://www.youtube.com/playlist?list=PLDQDIDeUJ8K0",
+    "shop_owner": "https://www.youtube.com/playlist?list=PLeMRtoyeEuHY",
+    "live": "https://www.youtube.com/playlist?list=PLJHFpZQ5ayA4",
+    "all": "https://www.youtube.com/playlist?list=PLBt5iCYZdcxM"
+  },
+  "yt_fallback_titles": {
+    "PLSk3kbuy0rz4": "免刷預洗與洗車系統",
+    "PLSuJIu3-yk_c": "輪圈輪胎・鐵粉柏油・黏土",
+    "PLHLLpJl_ai80": "玻璃油膜・雨天視線・亮條修復",
+    "PLBt5iCYZdcxM": "泡泡怪獸 全片馬拉松｜依主題連貫播放",
+    "PLCCgTJRYB-AY": "天使塗層｜千倍濃縮鍍膜全集",
+    "PLDQDIDeUJ8K0": "米速研磨拋光系統｜門市省時省成本全集",
+    "PLeMRtoyeEuHY": "汽美老闆賺錢法｜門市經營與商機",
+    "PLJHFpZQ5ayA4": "泡泡怪獸 現場實錄｜短影音全紀錄"
+  },
+  "yt_fallback_titles_raw": {
+    "PLSk3kbuy0rz4": "免刷預洗與洗車系統",
+    "PLSuJIu3-yk_c": "輪圈輪胎・鐵粉柏油・黏土",
+    "PLHLLpJl_ai80": "玻璃油膜・雨天視線・亮條修復",
+    "PLBt5iCYZdcxM": "泡泡怪獸 全片馬拉松｜依主題連貫播放",
+    "PLCCgTJRYB-AY": "天使塗層｜千倍濃縮鍍膜全集",
+    "PLDQDIDeUJ8K0": "米速研磨拋光系統｜門店降本增效全集",
+    "PLeMRtoyeEuHY": "汽美老闆賺錢法｜門店經營與商機",
+    "PLJHFpZQ5ayA4": "泡泡怪獸 現場實錄｜短影音全紀錄"
+  },
+  "yt_fallback_note": "8 個清單 2026-10-30 用 YouTube oEmbed 逐一查過都回 200。decon 放輪圈輪胎清單（標題就含鐵粉柏油黏土）；leather 沒有專屬清單，先放全片馬拉松（假設）。yt_fallback_titles 是顯示給客人看的標題：polish、shop_owner 兩個清單在 YouTube 上的原標題用了大陸說法，顯示層已改成台灣用詞（原標題存在 yt_fallback_titles_raw，只供對照、不要顯示）；YouTube 上的真標題只有帳號擁有者能改。",
+  "alternates": [
+    {
+      "id": "073",
+      "src": "/Users/mac/.local/share/fb-personal-publisher/queue/073_一剪到底_鍍膜_引擎蓋沖水.mp4",
+      "slot": "angel.backup",
+      "duration_s": 19.94,
+      "size_mb": 11.5,
+      "width": 1080,
+      "height": 1920,
+      "preview_ts": 7.0,
+      "why_not_main": "水膜像水母一樣整片滑掉、效果強，但原片是橫拍貼在模糊底上，手機上內容只剩中間三分之一；原聲很小（-30.9 LUFS）。",
+      "how_to_use": "裁中間內容條：-vf 'crop=1080:608:0:656,scale=1280:720:flags=lanczos,setsar=1,format=yuv420p'（內容條 y=656–1263 是逐列細節量出來的）；loudnorm 量測值見 checks.loudness。",
+      "frames": [
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/073-1.jpg",
+          "t": 1.99
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/073-2.jpg",
+          "t": 6.98
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/073-3.jpg",
+          "t": 11.97
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/073-4.jpg",
+          "t": 16.95
+        }
+      ]
+    },
+    {
+      "id": "085",
+      "src": "/Users/mac/.local/share/fb-personal-publisher/queue/085_一剪到底_拋光_羊毛盤繞著黑板件走.mp4",
+      "slot": "polish.wool",
+      "duration_s": 59.67,
+      "size_mb": 33.3,
+      "width": 1080,
+      "height": 1920,
+      "preview_ts": 20.9,
+      "why_not_main": "機器有泡泡怪獸塗裝、白色工作室有「消防栓 119」牌子（台灣店）、60 秒短；但手持繞拍偏糊、看不到前後對比，原聲有人聲（聽不出內容）。",
+      "how_to_use": "直拍 1080×1920，照主片同一套 scale＋loudnorm（measured_I=-8.90 等見 checks.loudness）。",
+      "frames": [
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/085-1.jpg",
+          "t": 5.97
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/085-2.jpg",
+          "t": 20.89
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/085-3.jpg",
+          "t": 35.8
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/085-4.jpg",
+          "t": 50.72
+        }
+      ]
+    },
+    {
+      "id": "G04",
+      "src": "/Users/mac/.local/share/polish-tiktok-2x/lib/01_可發布影片/G批_一剪到底_20261005/POP_拋光_G04_補劑.mp4",
+      "slot": "polish.edge",
+      "duration_s": 75.57,
+      "size_mb": 64.4,
+      "width": 1080,
+      "height": 1920,
+      "preview_ts": 64.2,
+      "why_not_main": "米速伍號瓶身清楚、有開頭字卡「盤先移開 補一輪劑再走」，但原片是橫拍貼模糊底、偏暗、手持晃。",
+      "how_to_use": "畫面用 G04＋聲音用 087（同畫面逐格對齊）；可裁內容條 crop=1080:608:0:656 再 scale=1280:720。G04 片尾右上有 QR 卡（約 71.5 秒起解得出，解碼＝https://popmonster.vip/go?src=social），要用就加 -t 71.1 切掉（只切尾巴 4.5 秒）。",
+      "frames": [
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/G04-1.jpg",
+          "t": 7.56
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/G04-2.jpg",
+          "t": 26.45
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/G04-3.jpg",
+          "t": 45.34
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/G04-4.jpg",
+          "t": 64.23
+        }
+      ]
+    },
+    {
+      "id": "083",
+      "src": "/Users/mac/.local/share/fb-personal-publisher/queue/083_一剪到底_拋光_紅漆伍號換拾號.mp4",
+      "slot": "polish.full",
+      "duration_s": 178.0,
+      "size_mb": 78.2,
+      "width": 1080,
+      "height": 1920,
+      "preview_ts": 1.5,
+      "why_not_main": "跟 G03 同一段畫面，乾淨無字卡、原聲正常，但位元率只有 G03 一半。",
+      "how_to_use": "程式如果只能吃一個輸入檔，polish.full 直接改用 083 單檔（原聲 loudnorm 到 -14）。 083 片尾沒有 QR 卡（174.5–177.9 秒五格都解不出），單檔用它不用切尾。",
+      "frames": [
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/083-1.jpg",
+          "t": 17.8
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/083-2.jpg",
+          "t": 62.3
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/083-3.jpg",
+          "t": 106.8
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-mac/0b214561-dac9-4a68-b46b-365eaf1dd6db/scratchpad/wf/frames/083-4.jpg",
+          "t": 151.3
+        }
+      ]
+    }
+  ],
+  "rejected": [
+    {
+      "id": "068",
+      "why": "179 秒、101 MB；有前後對比字卡，但片尾字卡寫「留言告訴我／COMMENT BELOW」是社群用語，放在 LINE 一對一聊天不對；FLEX 機器 logo。羊毛盤改用 082。"
+    },
+    {
+      "id": "070",
+      "why": "夜拍黑車、顆粒粗、輪框有泥，170 秒，效果看不清楚。"
+    },
+    {
+      "id": "071",
+      "why": "FUOU 噴頭紅色 logo 很大，畫面有人腿、倒影裡有人。"
+    },
+    {
+      "id": "072",
+      "why": "拍攝者蹲著的身影整段倒映在車門上（臉被手機擋一半）。"
+    },
+    {
+      "id": "074",
+      "why": "效果普通，FUOU 標籤露一截，有手臂倒影。"
+    },
+    {
+      "id": "075",
+      "why": "黑邊信箱格式、偏暗偏軟，RUPES 機器 logo，拍到操作者頭髮；122 秒。"
+    },
+    {
+      "id": "076",
+      "why": "只有 6 秒太短，FUOU logo 很大。"
+    },
+    {
+      "id": "077",
+      "why": "黑邊格式，KYOCERA logo，強光過曝，看不到米速也看不出效果。"
+    },
+    {
+      "id": "078",
+      "why": "黑邊格式，FLEX logo，有頭部倒影，效果看不清楚。"
+    },
+    {
+      "id": "080",
+      "why": "看得到的是 FLEX 機器配黑色噴瓶、不是米速，客人看完對不上商品；沒有相機原檔，不能排除被剪過頭。（下緣的藍底白字車牌屬畫面層，依他 08-15 的規則不當理由；分數重算是 10，比 082 高 1 分，但 082 看得到米速拾號、080 看不到，所以仍刷掉。）"
+    },
+    {
+      "id": "081",
+      "why": "操作者側臉部分入鏡，瓶子沒標籤。"
+    },
+    {
+      "id": "084",
+      "why": "被加速 1.14 倍（不是實際速度）、加了配樂、橫拍貼模糊底，179 秒。"
+    },
+    {
+      "id": "086",
+      "why": "橫拍貼模糊底、加了配樂，152.5 秒，效果只是一塊霧擦掉。"
+    },
+    {
+      "id": "087",
+      "why": "跟 G04 同一段畫面的乾淨版（有 POP 貼紙、沒字卡、位元率較低）；G04 本身也只是備用。要用 G04 時拿 087 的原聲。"
+    },
+    {
+      "id": "088",
+      "why": "賓士標誌和 KYOCERA 機器（別牌 logo）很明顯，工作台很亂（有 QR 的箱子、工具散著）。（紙箱上的大陸電商字樣屬畫面層，依他 08-15 的規則不當理由。）"
+    },
+    {
+      "id": "089",
+      "why": "漆面倒影清楚拍到一位年輕男生的臉（31.7 秒、76.9 秒），而且橫拍貼模糊底＋配樂。"
+    },
+    {
+      "id": "M01–M19",
+      "why": "米速官方抖音片（品牌方），規則明訂白名單外一律不准，沒有抽幀評分。"
+    }
+  ],
+  "checks": {
+    "loudness": {
+      "079": {
+        "input_i": -16.57,
+        "input_tp": -4.51,
+        "input_lra": 0.8,
+        "input_thresh": -26.57,
+        "target_offset": -0.09
+      },
+      "069": {
+        "input_i": -12.96,
+        "input_tp": -0.19,
+        "input_lra": 21.7,
+        "input_thresh": -26.05,
+        "target_offset": 0.9
+      },
+      "073": {
+        "input_i": -30.94,
+        "input_tp": -12.29,
+        "input_lra": 11.0,
+        "input_thresh": -40.94,
+        "target_offset": 0.53
+      },
+      "G02": {
+        "input_i": -36.02,
+        "input_tp": -7.76,
+        "input_lra": 6.4,
+        "input_thresh": -46.06,
+        "target_offset": 2.79
+      },
+      "G03": {
+        "input_i": -35.76,
+        "input_tp": -7.77,
+        "input_lra": 6.1,
+        "input_thresh": -45.8,
+        "target_offset": 2.48
+      },
+      "083": {
+        "input_i": -11.83,
+        "input_tp": 1.09,
+        "input_lra": 6.4,
+        "input_thresh": -21.84,
+        "target_offset": 0.13
+      },
+      "082": {
+        "input_i": -9.3,
+        "input_tp": 4.2,
+        "input_lra": 2.0,
+        "input_thresh": -19.36,
+        "target_offset": 0.26
+      },
+      "085": {
+        "input_i": -8.9,
+        "input_tp": 1.79,
+        "input_lra": 3.6,
+        "input_thresh": -18.9,
+        "target_offset": 0.29
+      },
+      "G04": {
+        "input_i": -35.74,
+        "input_tp": -7.84,
+        "input_lra": 6.0,
+        "input_thresh": -45.82,
+        "target_offset": 2.63
+      },
+      "087": {
+        "input_i": -13.91,
+        "input_tp": -0.53,
+        "input_lra": 4.4,
+        "input_thresh": -24.55,
+        "target_offset": -0.15
+      },
+      "080": {
+        "input_i": -14.19,
+        "input_tp": -1.54,
+        "input_lra": 2.5,
+        "input_thresh": -24.19,
+        "target_offset": -0.48
+      },
+      "068": {
+        "input_i": -9.55,
+        "input_tp": 3.39,
+        "input_lra": 4.4,
+        "input_thresh": -19.57,
+        "target_offset": -0.21
+      }
+    },
+    "qr_in_video": {
+      "G02": "https://popmonster.vip/go?src=social",
+      "G03": "https://popmonster.vip/go?src=social",
+      "G04": "https://popmonster.vip/go?src=social",
+      "068": "https://popmonster.vip/go?src=social"
+    },
+    "g_batch_shared_bed": "G02、G03、G04 的音軌是同一段低音量墊底（G02 的 5–13 秒、30–38 秒在 G03、G04 找到相關係數 0.995 的同段），整體約 -36 LUFS，跟 083／087 原聲的相關係數約 0。",
+    "twin_alignment": "083 vs G03、087 vs G04：中段 4–5 個時間點灰階比對，位移 0 格最像（083/G03 差 0.2–0.45）。",
+    "tp_sweep_aac128": {
+      "method": "只拿聲音跑同一條 loudnorm 鏈，再用 ebur128 peak=true 量 AAC 解出來的真峰值（dBTP）",
+      "rows": [
+        {
+          "audio": "083",
+          "tp_target": -2.5,
+          "codec": "pcm_f32le（還沒壓 AAC）",
+          "I": -14.0,
+          "tp_out": -2.5
+        },
+        {
+          "audio": "083",
+          "tp_target": -2.5,
+          "codec": "aac 128k",
+          "I": -13.7,
+          "tp_out": -0.0
+        },
+        {
+          "audio": "083",
+          "tp_target": -2.5,
+          "codec": "aac 192k",
+          "I": -14.0,
+          "tp_out": -1.5
+        },
+        {
+          "audio": "083",
+          "tp_target": -2.5,
+          "codec": "aac 128k＋alimiter -4 dBFS",
+          "I": -14.2,
+          "tp_out": -2.2
+        },
+        {
+          "audio": "083",
+          "tp_target": -3.5,
+          "codec": "aac 128k",
+          "I": -13.9,
+          "tp_out": -1.3
+        },
+        {
+          "audio": "083",
+          "tp_target": -4.0,
+          "codec": "aac 128k",
+          "I": -14.1,
+          "tp_out": -1.0
+        },
+        {
+          "audio": "083",
+          "tp_target": -4.5,
+          "codec": "aac 128k",
+          "I": -14.3,
+          "tp_out": -2.1
+        },
+        {
+          "audio": "082",
+          "tp_target": -2.5,
+          "codec": "aac 128k",
+          "I": -13.9,
+          "tp_out": -0.7
+        },
+        {
+          "audio": "082",
+          "tp_target": -3.5,
+          "codec": "aac 128k",
+          "I": -14.0,
+          "tp_out": -1.9
+        },
+        {
+          "audio": "082",
+          "tp_target": -4.0,
+          "codec": "aac 128k",
+          "I": -14.0,
+          "tp_out": -1.8
+        },
+        {
+          "audio": "082",
+          "tp_target": -4.5,
+          "codec": "aac 128k",
+          "I": -14.0,
+          "tp_out": -2.4
+        },
+        {
+          "audio": "079",
+          "tp_target": -1.5,
+          "codec": "aac 128k",
+          "I": -14.0,
+          "tp_out": -1.0
+        },
+        {
+          "audio": "079",
+          "tp_target": -2.0,
+          "codec": "aac 128k",
+          "I": -14.0,
+          "tp_out": -1.1
+        }
+      ],
+      "conclusion": "loudnorm 本身準（還沒壓 AAC 剛好 -2.5）；是 ffmpeg 內建 AAC 128k 把機器聲的峰值往上推，而且推多少不規則。083、082 用 TP -4.5；如果程式改用別的 AAC 編碼器或碼率，要重量一次。"
+    },
+    "whisper_base": "079、069、073、080、083、085、G02、G03、G04 沒有可信的人聲（no_speech 高、內容是重複幻聽）；082 有低信心的歌詞狀片段。",
+    "qr_in_video_note": "上面是「來源檔」片尾 QR 的解碼結果，全是 src=social（社群影片用），不是 LINE 一對一導流該用的 src=line-connect／src=line-free-first，放進 LINE 會被算成社群來的。入選的 G02、G03 已切掉那段（見 qr_after_trim）；G04、068 若要用也要先切尾（G04 加 -t 71.1）。",
+    "qr_after_trim": {
+      "G02": "成品 50.6 秒；48.0／50.0／50.5／50.55 秒解不出 QR",
+      "G03": "成品 173.8 秒；172.0／173.0／173.6／173.75 秒解不出 QR",
+      "069": "本來就沒有；16.5、17.2 秒解不出 QR",
+      "079": "本來就沒有；24.4 秒解不出 QR",
+      "082": "本來就沒有；155.0、158.0、158.8 秒解不出 QR",
+      "083": "本來就沒有；174.5–177.9 秒五格解不出 QR"
+    },
+    "mainland_trace_scan": {
+      "standard": "他 2026-08-15 定的規則：畫面裡本來就有的簡體字、大陸車牌、「中国制造」標示、「消火栓」這類招牌一律不處理（不裁、不蓋、不避開），也不拿來扣分或刷片；在地化只套在我們自己寫的字（字幕、按鈕、清單標題）。E 項只扣別牌 logo、人臉、雜亂背景。",
+      "method": "入選 5 支各做接觸表逐格看：079、069 每 3 秒一格，G02 每 4 秒一格，G03、082 每 8 秒一格；另外放大看 069 的 9.0／10.5 秒倒影、G03 盤背 1.0 秒、G02 後窗背景、079 左上與右上。圖在 out/_scratch/fix/rescan/ 和 chk/。畫面上讀不出來的小字不下結論。",
+      "results": {
+        "069": "沒有畫面層大陸痕跡；約 9 秒倒影裡有人經過、只看得到腿（沒有臉）；水桶標籤在倒影裡模糊讀不出字。",
+        "079": "沒有畫面層大陸痕跡；8.6–9 秒噴頭紅色 FUOU 字樣；18–24 秒左上黃色布品有個很小的 logo，看不清字。",
+        "G02": "約 42 秒起白色箱子寫著「消火栓」、門外紅磚樓與戶外（畫面層，不處理、不扣分）；後窗反射有掛著的衣物和彩色小物，沒有臉、沒有字。",
+        "G03": "盤背印 POP MONSTER 和「泡泡怪獸」，中間一行很小的 From China（畫面層，不處理）；手臂刺青，沒有臉。",
+        "082": "沒有畫面層大陸痕跡（車尾 ELANTRA 字標）；104–136 秒瓶身「拾」；沒有臉。"
+      },
+      "score_changes": "G02 clean 1→2（總分 11→12）；080 E 0→1（總分 9→10，仍因看不到米速、沒有相機原檔刷掉）；088 理由只留別牌 logo 和雜亂（分數不變）。"
+    },
+    "provenance_status": {
+      "069": "相機原檔（HEVC HLG 1080×1920、5059_raw），來源已驗",
+      "079": "來源未驗：白名單只證明沒被剪過，沒有文件寫明是他自己拍的",
+      "G03": "來源未驗：母帶30，他 10-20 的盤點標 provenance unknown（格式被洗過）",
+      "G02": "來源未驗：母帶69，他 10-20 的盤點標 provenance unknown（格式被洗過）",
+      "082": "有疑問：檔頭有 vid: 抖音標記；他 10-20 記「1354（Elantra）也是米速官方」"
+    }
+  }
+}

@@ -7,6 +7,8 @@ on:
     paths:
       - 'workers/pop-line-oa/worker.js'
       - 'brands/popmonster.json'
+      - 'data/pop-line/**'
+      - 'scripts/pop-line-gen-data.mjs'
       - '.github/workflows/deploy-pop-line-oa.yml'
 
 jobs:
@@ -20,6 +22,16 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync gate(brands/popmonster.json ↔ AI_EMPLOYEE 漂移即擋)
         run: node scripts/check-sync.mjs
+      - name: Data gate(data/pop-line/*.json ↔ worker DATA 區塊漂移即擋;v6)
+        run: node scripts/pop-line-gen-data.mjs --check
+      - name: Copy gate(痛點/賣點/禁語)
+        run: python3 scripts/pop-line-copy-gate.py
+      - name: Local harness(v6 談單/產品卡/影片/貼圖閘 + 揭露 + 選單)
+        run: |
+          cd workers/pop-line-oa
+          node test-v6.mjs
+          node test-b-disclosure.mjs
+          node test-menu-postback.mjs
       - name: Set CF account ID
         env:
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}

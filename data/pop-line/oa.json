@@ -1,0 +1,709 @@
+{
+  "_meta": {
+    "seat": "LINE 官方帳號原生設定＋歡迎包",
+    "date": "2026-10-30",
+    "live_probe": "2026-10-30 Messaging API 唯讀查：名稱「Pop Monster汽車美容專家\"」、chatMode=chat、webhook 端點有設但 active=false、本月 push 200 已用 177、預設圖文選單＝v5.3 車主版、好友 541／可觸及 463／封鎖 74（10-28）",
+    "notes": "同資料夾 oa-notes.md（現在→改成→為什麼、查證來源、後台步驟、不做清單）",
+    "revision": "2026-10-30 修正席依反駁發現（技術 12 條、文案 13 條）改過一輪；標 needs_owner 的地方要他拍板；go_live_gates 三條沒全過，Webhook 不開",
+    "message_objects_are_line_valid": "welcome_package.messages 只放 LINE 合法欄位，可直接餵 data/pop-line/oa.json；待他拍板的標記放在 welcome_package.needs_owner，不放進訊息物件裡"
+  },
+  "go_live_gates": {
+    "rule": "三條全過才開 Webhook、才換狀態消息第一句、才貼 description_after_gate；任何一條沒過，Webhook 維持關，後台歡迎訊息備援照開（內容見 response.fallback_greeting）",
+    "gates": [
+      {
+        "id": "G1",
+        "what": "價格表圖兩個網址 curl 回 200：pricelist-1028.jpg、pricelist-1028-preview.jpg（2026-10-30 實測 404）",
+        "who": "主代理推上 GitHub Pages"
+      },
+      {
+        "id": "G2",
+        "what": "videos.json 的 line_map 用到的每支影片（天使 079／069、拋光 G03／082／G02），mp4 和預覽 jpg 網址都要 curl 回 200。2026-10-30 實測這 10 個網址全部 404：影片席轉好的是還沒加浮水印的試轉檔，放在 wf/out/，還沒放進專案 assets/pop/、也沒推上 GitHub Pages。LINE 收影片訊息時不會先檢查網址能不能開，缺檔的話客人會看到壞掉的影片。補齊之前 line_map 只是設計稿；補不齊的那幾支就從 line_map 拿掉，只給 YouTube 合集",
+        "who": "主代理"
+      },
+      {
+        "id": "G3",
+        "what": "worker 的照片和正文全部改走 reply：handleImage（L1088 先 reply「收到照片」、L1119–1120 分析結果走 push）和 push_now（L1469–1470，A/B 分到 delay 組的打字客人也一樣）改成「已讀＋載入動畫，一分鐘內用同一個 reply token 一次送」，reply 失敗才 push；test-v6 要有斷言：正常流程 calls.push 為 0。本月 push 200 已用 177，用完 LINE 直接回錯誤、訊息不送，客人只看得到「收到照片」",
+        "who": "主代理（worker 部署本人按）"
+      }
+    ],
+    "if_g3_not_done": "不換狀態消息第一句（含「拍照問用哪支」）、description 貼不含「拍照傳上來」的安全版、手機測試不傳照片（測試本身也會用掉 push）"
+  },
+  "account": {
+    "display_name": "泡泡怪獸 汽車美容用品",
+    "display_name_current": "Pop Monster汽車美容專家\"",
+    "display_name_alternates": [
+      "汽車美容泡泡怪獸",
+      "泡泡怪獸 Pop Monster 汽美"
+    ],
+    "display_name_rule": "改名後 7 天不能再改；認證帳號不能改名 → 先改名，再申請認證",
+    "char_limit_note": "帳號名稱、狀態消息的字數上限，官方說明頁（oa-manager）沒寫；20 字是第三方（lme.jp）和 Messaging API 規格表的數字，以後台輸入框計數為準。字數：帳號名稱 11／8／19（備選的 19 字那個貼著上限，上傳前先看計數）、狀態消息 15／16／15",
+    "status_message": [
+      "加好友先拿價格表・拍照問用哪支",
+      "漆面拍照傳上來，直接告訴你用哪支",
+      "全世界統一零售價，店家價另外算"
+    ],
+    "status_message_when": "go_live_gates 三條都過、Webhook 開好、手機測過歡迎包之後才換第一句（不然「先拿價格表」「拍照問」不成立）；G3 沒過之前只能用第三句「全世界統一零售價，店家價另外算」；狀態消息改完 1 小時內不能再改",
+    "cover": {
+      "size_px": "【官方】200×200px 以上、10MB 以下，檔案格式和推薦尺寸官方都沒公布（oa-manager-setmobilesite 只寫這兩項）｜【第三方】2:1，1080×540（wenk-media 2026-06-09，不是官方數字）｜【我們自選】2160×1080，第三方建議的兩倍解析度，檔案壓在 10MB 內，上傳後用手機預覽看一次",
+      "legacy_cover": "帳號設定裡的「封面照片」建議 1080×878、3MB 以下，LINE App 11.9.0 以上不顯示 → 用同一張圖裁一張順手換，不換也不影響",
+      "text_on_cover": [
+        "汽美之道（DM 封面同一張毛筆飛白字圖，不重寫）",
+        "研磨拋光・泡沫洗車・天使塗層"
+      ],
+      "design_brief": {
+        "版面": "2:1 橫幅。主體是真實施工影格：黑漆拋完的鏡面反光，光帶斜切過畫面。飛白字放中間偏上，副標在它下面一行。左右各留 15%、下緣 30% 不放字（大頭照可能壓在下方中央，實際遮擋位置未查證，上傳後用手機預覽看一次）",
+        "色票": "底 #0E0E10、字與細線 #CAA64A 金、整張只准一個朱砂紅點綴（DM 同一顆印章）；跟圖文選單 v7 同一套黑金",
+        "字體": "主標用 DM 那張飛白字圖；副標 Noto Sans TC Bold，2160 寬時字高 ≥56px，字距 +4%",
+        "元素": "真實影格（一剪到底白名單：084_一剪到底_拋光_黑色引擎蓋從上劑到擦乾淨 或 083_一剪到底_拋光_紅漆伍號換拾號），一條細金線",
+        "不放": "價格、評價數、QR、網址、LINE ID、蝦皮字樣或 logo、老闆名字、AI 生成的車或奢華臉、超過兩行字、英文大標、emoji"
+      },
+      "source": "影格：一剪到底白名單 084／083 原檔截靜止幀；飛白字：DM 封面（dm-cover-config.txt「大標（毛筆飛白）：汽美之道」）"
+    },
+    "profile_buttons": [
+      {
+        "type": "聊天",
+        "label": "聊天",
+        "url": null,
+        "note": "必選。平均回覆時間那類顯示不開（怎麼算的未查證）"
+      },
+      {
+        "type": "商品服務",
+        "label": "蝦皮賣場",
+        "url": "https://shopee.tw/milk790?openExternalBrowser=1",
+        "note": "後台若不能自訂字就用預設字；若只能連基本檔案內的商品區塊，改用「網址」型按鍵（選項以後台為準，未查證）。手機測 openExternalBrowser 不順就拿掉參數"
+      },
+      {
+        "type": "追蹤貼文",
+        "label": "追蹤貼文",
+        "url": null,
+        "note": "VOOM 一週兩則才有東西可追"
+      }
+    ],
+    "basic_info": {
+      "業種": "汽車用品（選單若有「汽車美容用品」就選那個；後台選項未查證）",
+      "地址或服務區": "地址不填（官網沒有門市地址，不自己編）；服務區寫「全台線上訂購，蝦皮賣場出貨」",
+      "營業時間": "AI 客服 24 小時；真人 09:00–18:00（星期幾待他補）",
+      "description": "這裡是泡泡怪獸。米速研磨拋光劑與拋光盤、超濃縮泡沫洗車精、天使塗層，加上鐵粉、柏油、水垢、玻璃油膜等功能性藥劑，車主自己用、汽美店營業用都有。全世界統一零售價，店家價跟零售分開算，找真人報。",
+      "description_after_gate": "這裡是泡泡怪獸。米速研磨拋光劑與拋光盤、超濃縮泡沫洗車精、天使塗層，加上鐵粉、柏油、水垢、玻璃油膜等功能性藥劑，車主自己用、汽美店營業用都有。加好友先拿價格表；漆面拍照傳上來，直接告訴你該用哪一支。全世界統一零售價，店家價跟零售分開算，找真人報。",
+      "description_rule": "go_live_gates 三條全過、步驟 5 手機測過 → 貼 description_after_gate；任何一條沒過 → 貼 description（不含「加好友先拿價格表」「漆面拍照傳上來」兩個還沒成立的承諾）",
+      "description_chars": {
+        "description": 95,
+        "description_after_gate": 123
+      },
+      "description_limit_note": "介紹的字數上限，官方說明頁（oa-manager-setmobilesite）沒寫，以後台輸入框的計數為準。貼上 description_after_gate 後看計數，被截斷就把最後一句「店家價跟零售分開算，找真人報」移到狀態消息備選或刪掉",
+      "publish": "每次改完先按「儲存」（不按「儲存」就無法公開），再按「公開」（有擴充區塊的按「公開儲存內容」），客人才看得到；只按「儲存」不會公開，沒儲存就按「公開」會把未儲存的內容刪掉（官方 oa-manager-setmobilesite）"
+    }
+  },
+  "response": {
+    "chat_mode": "聊天",
+    "auto_response": "off",
+    "webhook": "on",
+    "webhook_when": "go_live_gates 三條全過之後才開",
+    "greeting_message": "off",
+    "why": "加好友歡迎包改由 webhook 收到加好友事件後用 reply 送（免費、不吃每月 200 則），後台歡迎訊息再開，同一個人會收到兩份；後台自動回應跟 webhook 同時開也會雙回。所以：回應方式只留手動聊天、自動回應全部未啟用、AI 聊天機器人(β)關、歡迎訊息關、Webhook 開。只有 webhook 測不過時，才把歡迎訊息開回來當備援（內容見 fallback_greeting）",
+    "ai_chatbot_beta": "off",
+    "response_hours": "不設定（設了，非回應時間會顯示「目前非回應時間」，跟 AI 24 小時對不上）",
+    "reply_status_display": "隱藏（預設顯示；手動聊天會顯示「由負責人員回覆訊息」，跟 AI 揭露句打架）",
+    "fallback_greeting": {
+      "use_only_if": "webhook 測試失敗、回滾的時候",
+      "messages": [
+        "價格表圖（同 welcome_package 第一則）",
+        "這裡是泡泡怪獸。價格表在上面，看到想問的直接打字或拍照傳上來，真人 09:00–18:00 回覆。"
+      ],
+      "why_no_ai_line": "備援時 AI 是關的，不能寫 AI 客服"
+    },
+    "worker_text_fallback": {
+      "use_only_if": "worker 的歡迎包被 LINE 拒收（例如圖片網址暫時壞）時退回的純文字：worker.js L1017 WELCOME_MSG、L1299 退回那一行",
+      "why_not_fallback_greeting": "fallback_greeting 是後台歡迎訊息備援（AI 關著、有價格表圖）；這裡 AI 開著，而且圖片可能正是壞掉的原因，所以不能寫「價格表在上面」，改成回「價格表」再要一次",
+      "text_before": "AI_EMPLOYEE.disclosure_script（揭露句，跟歡迎包第 2 行同一句，「您」或「你」跟著他的決定）",
+      "text_after_disclosure": "想問哪一支，直接打字，或把漆面拍一張傳上來，我幫你配。\n要看價格表，回我「價格表」。\n要找真人，回我「找真人」，真人 09:00–18:00 回覆。\n\n開店的老闆：店裡拋不亮的漆，不是難，是還沒用過泡泡怪獸。\n下面選單右上角切到「店家老闆」，店家價和方案都在那頁。",
+      "removed_from_old": "舊 WELCOME_MSG 有「30 秒」（沒量過）、「只收 10 家」（條件沒定）、「蝦皮 5.0 分・864 則評價」（沒標查證日期）。要保留評價數的話，改寫成「蝦皮 5.0 分・864 則評價（2026-10-xx 截）」並附截圖來源"
+    }
+  },
+  "welcome_package": {
+    "messages": [
+      {
+        "type": "image",
+        "originalContentUrl": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/pop/pricelist-1028.jpg",
+        "previewImageUrl": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/pop/pricelist-1028-preview.jpg"
+      },
+      {
+        "type": "text",
+        "text": "這裡是泡泡怪獸。\n我是超級 AI 人工客服😊 老闆~您不要把我們當作一般一板一眼的殭屍客服🤖 您儘量把您的需求直接和我們說,我們這邊會直接幫您介紹完畢,到最後之後請真人過來👍\n\n價格表在上面，看到想問的直接打字或拍照。\n不知道用哪一支？漆面或玻璃拍一張傳上來，我幫你配。\n決定好了，我直接給你那一支的蝦皮連結。\n要找真人，點下面「找真人」，真人 09:00–18:00 回覆。\n\n開店的老闆：店裡拋不亮的漆，不是難，是還沒用過泡泡怪獸。\n下面選單右上角切到「店家老闆」，店家價和方案都在那頁。",
+        "quickReply": {
+          "items": [
+            {
+              "type": "action",
+              "action": {
+                "type": "postback",
+                "label": "我是車主",
+                "data": "m=wel&b=car",
+                "displayText": "我是車主"
+              }
+            },
+            {
+              "type": "action",
+              "action": {
+                "type": "postback",
+                "label": "我是店家",
+                "data": "m=wel&b=shop",
+                "displayText": "我是汽車美容店家"
+              }
+            },
+            {
+              "type": "action",
+              "action": {
+                "type": "camera",
+                "label": "拍照問用哪支"
+              }
+            },
+            {
+              "type": "action",
+              "action": {
+                "type": "postback",
+                "label": "看拋光影片",
+                "data": "m=vid&l=polish",
+                "displayText": "我想看拋光影片"
+              }
+            },
+            {
+              "type": "action",
+              "action": {
+                "type": "postback",
+                "label": "看天使塗層影片",
+                "data": "m=vid&l=angel",
+                "displayText": "我想看天使塗層影片"
+              }
+            },
+            {
+              "type": "action",
+              "action": {
+                "type": "postback",
+                "label": "找真人",
+                "data": "m=car&b=human",
+                "displayText": "我想找真人"
+              }
+            },
+            {
+              "type": "action",
+              "action": {
+                "type": "cameraRoll",
+                "label": "從相簿傳照片"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "intro_chars": 246,
+    "sticker": "worker 在歡迎包少於 5 則、而且裡面沒有貼圖的時候，一定會在價格表後面插一張歡迎貼圖（worker.js L1296，條件寫死在程式裡），所以只改 oa.json 擋不住：實際送出是三則（價格表、貼圖、介紹）。要不插就得改那行條件（例如讓 oa.json 的旗標來控制）；不改程式就以三則為準做手機測試。建議仍是不插（選單打開時聊天區大約只剩半個螢幕，這是推論、沒量過，價格表容易被擠到要往上滑），他決定",
+    "optional_flex_split_card": {
+      "use": false,
+      "why": "快速回覆已經分流；多一張卡會把價格表再往上擠，而且快速回覆只掛在最後一則。要常駐分流按鈕時才用（放最後一則、quickReply 搬到它身上）",
+      "message": {
+        "type": "flex",
+        "altText": "你是車主還是汽美店家？點一下，我照你的情況介紹。",
+        "contents": {
+          "type": "bubble",
+          "size": "kilo",
+          "styles": {
+            "body": {
+              "backgroundColor": "#0E0E10"
+            }
+          },
+          "body": {
+            "type": "box",
+            "layout": "vertical",
+            "spacing": "md",
+            "contents": [
+              {
+                "type": "text",
+                "text": "你是哪一種？",
+                "color": "#CAA64A",
+                "weight": "bold",
+                "size": "md"
+              },
+              {
+                "type": "text",
+                "text": "點一下，我照你的情況介紹。",
+                "color": "#D8D8DC",
+                "size": "sm",
+                "wrap": true
+              },
+              {
+                "type": "button",
+                "style": "secondary",
+                "color": "#CAA64A",
+                "height": "sm",
+                "action": {
+                  "type": "postback",
+                  "label": "我是車主",
+                  "data": "m=wel&b=car",
+                  "displayText": "我是車主"
+                }
+              },
+              {
+                "type": "button",
+                "style": "link",
+                "color": "#CAA64A",
+                "height": "sm",
+                "action": {
+                  "type": "postback",
+                  "label": "我是汽美店家",
+                  "data": "m=wel&b=shop",
+                  "displayText": "我是汽車美容店家"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "imagemap_pricelist": "不用（pricelist-1028-map 那組）：imagemap 不能點開放大，手機上字太小",
+    "alt_intro_if_owner_wants_you_not_nin": "這裡是泡泡怪獸。\n我是超級 AI 人工客服😊 老闆~你不要把我們當作一般一板一眼的殭屍客服🤖 你儘量把你的需求直接和我們說，我們這邊會直接幫你介紹完畢，到最後之後請真人過來👍\n\n價格表在上面，看到想問的直接打字或拍照。\n不知道用哪一支？漆面或玻璃拍一張傳上來，我幫你配。\n決定好了，我直接給你那一支的蝦皮連結。\n要找真人，點下面「找真人」，真人 09:00–18:00 回覆。\n\n開店的老闆：店裡拋不亮的漆，不是難，是還沒用過泡泡怪獸。\n下面選單右上角切到「店家老闆」，店家價和方案都在那頁。",
+    "needs_owner": [
+      {
+        "item": "揭露句的「您」要不要改「你」",
+        "default": "照他的原文（您）放在 messages[1] 第 2 行；原文的兩個半形逗號也是他的原文，先留著。alt_intro_if_owner_wants_you_not_nin 是「你」版（逗號已換全形，也已加上店家頁指路那一句）",
+        "if_you": "選「你」版要三處一起改，口徑才一致：brands/popmonster.json 正本、worker.js L444 的 AI_EMPLOYEE.disclosure_script（L1017 WELCOME_MSG 和 L1384 首次對話墊場都吃這個變數）、oa.json 歡迎包第 2 行"
+      },
+      {
+        "item": "歡迎貼圖插不插",
+        "default": "worker 預設會插（價格表後面），實際送出三則",
+        "if_no": "要不插得改 worker.js L1296 的條件（例如 oa.json 加旗標）；不改程式就是三則"
+      }
+    ]
+  },
+  "rich_menu_v7": {
+    "driver": [
+      {
+        "cell": "tab_shop",
+        "bounds": {
+          "x": 1436,
+          "y": 0,
+          "width": 1064,
+          "height": 214
+        },
+        "label": "切到店家老闆",
+        "action": {
+          "type": "richmenuswitch",
+          "richMenuAliasId": "pop-shop",
+          "data": "m=tab&b=shop"
+        },
+        "image_text": "車主（目前頁，不設點擊區）｜店家老闆"
+      },
+      {
+        "cell": "A_left",
+        "bounds": {
+          "x": 0,
+          "y": 214,
+          "width": 1436,
+          "height": 486
+        },
+        "label": "價格表",
+        "action": {
+          "type": "postback",
+          "data": "m=car&b=price",
+          "displayText": "我想看價格表"
+        },
+        "image_text": "最新定價／價格表／常用品項一張圖，點開就看",
+        "note": "價格表圖上沒有天使塗層、輪胎塑件精油、雨刷精，所以圖上不寫「全部品項」；補了第二張價格表才准寫「全部」（oa-notes §12 第 9 點）"
+      },
+      {
+        "cell": "A_right",
+        "bounds": {
+          "x": 1436,
+          "y": 214,
+          "width": 1064,
+          "height": 486
+        },
+        "label": "蝦皮賣場",
+        "action": {
+          "type": "uri",
+          "uri": "https://shopee.tw/milk790?openExternalBrowser=1"
+        },
+        "image_text": "官方賣場／蝦皮賣場",
+        "diff_vs_main_v7": "圖上「蝦皮商城」改「蝦皮賣場」（蝦皮商城是 Mall 資格，未查證有沒有）；拿掉「864 則評價」（會過期、沒查證）；網址加 ?openExternalBrowser=1，手機實測能直接跳蝦皮 App 再上"
+      },
+      {
+        "cell": "B_left",
+        "bounds": {
+          "x": 0,
+          "y": 700,
+          "width": 1064,
+          "height": 420
+        },
+        "label": "找真人",
+        "action": {
+          "type": "postback",
+          "data": "m=car&b=human",
+          "displayText": "我想找真人"
+        },
+        "image_text": "不想跟 AI 聊／找真人／直接把人叫來，不用重講一遍"
+      },
+      {
+        "cell": "B_right",
+        "bounds": {
+          "x": 1064,
+          "y": 700,
+          "width": 1436,
+          "height": 420
+        },
+        "label": "施工影片",
+        "action": {
+          "type": "postback",
+          "data": "m=car&b=howto",
+          "displayText": "我想看施工影片"
+        },
+        "image_text": "自家實拍／施工影片／選你要處理的部位，馬上給你看實拍",
+        "diff_vs_main_v7": "圖上不寫「影片直接傳給你」：影片席的 videos.json 已填 line_map（天使 079／069、拋光 G03／082／G02），但 10 個影片和預覽圖網址 2026-10-30 實測全部 404（檔案還沒推上 GitHub Pages，見 go_live_gates G2）；洗車、輪圈、輪胎、玻璃、皮革、鐵粉柏油沒有自家片，只給 YouTube 合集。「馬上給你看實拍」兩種情況都說得通"
+      },
+      {
+        "cell": "C",
+        "bounds": {
+          "x": 0,
+          "y": 1120,
+          "width": 2500,
+          "height": 566
+        },
+        "label": "拍照問該用哪一支",
+        "action": {
+          "type": "postback",
+          "data": "m=car&b=pick",
+          "displayText": "我想拍照問該用哪一支"
+        },
+        "image_text": "拍照選品／拍張照，我告訴你該用哪一支／效果↑ 買錯↓ 花的錢↓",
+        "diff_vs_main_v7": "圖上寫「拍張照」，點下去現在只是丟一句文字給大腦；改成 worker 直接回一則拍照說明＋快速回覆「拍照」「從相簿選」（camera／cameraRoll，免費 reply）。「30 秒選品」沒有量過，改「拍照選品」"
+      }
+    ],
+    "shop": [
+      {
+        "cell": "tab_car",
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 1436,
+          "height": 214
+        },
+        "label": "切到車主",
+        "action": {
+          "type": "richmenuswitch",
+          "richMenuAliasId": "pop-driver",
+          "data": "m=tab&b=car"
+        },
+        "image_text": "車主｜店家老闆（目前頁，不設點擊區）"
+      },
+      {
+        "cell": "A_left",
+        "bounds": {
+          "x": 0,
+          "y": 214,
+          "width": 1436,
+          "height": 486
+        },
+        "label": "贏過同行的黑科技",
+        "action": {
+          "type": "uri",
+          "uri": "https://popcard-saas-preview.milk790.workers.dev/s/jilin"
+        },
+        "image_text": "不用註冊先看／輕鬆贏過同行的黑科技／客人只來一次？這套讓他自己想回來",
+        "diff_vs_main_v7": "維持。若他要在店家頁放耗材鉤子，就把這格換成「店裡拋不亮的漆，拍來看」（快速回覆開相機），POP CARD 範例改由 AI 在試算對話裡給（要他拍板）",
+        "needs_owner": true,
+        "exception_note": "action.uri 在連結白名單外（白名單只有蝦皮、官方 LINE、/go?src=line-connect 或 line-free-first、YouTube 合集）：這是 v6 沿用下來的他的既有設定（POP CARD Demo，scripts/pop-richmenu-deploy.py 的 POPCARD_DEMO），不是這一席新加的，刻意保留"
+      },
+      {
+        "cell": "A_right",
+        "bounds": {
+          "x": 1436,
+          "y": 214,
+          "width": 1064,
+          "height": 486
+        },
+        "label": "免繳費限量體驗",
+        "action": {
+          "type": "postback",
+          "data": "m=shop&b=trial",
+          "displayText": "我想了解免繳費限量搶先體驗"
+        },
+        "image_text": "店家限定／免繳費限量體驗／先用看看，適合再談",
+        "needs_owner": true,
+        "owner_note": "免繳費條件未定義，AI 一律轉真人、不講條件；圖上「只收 10 家」也跟著他定的條件走，條件沒定之前不能當已查證的說法（oa-notes §12 第 13 點）｜2026-10-30 整合:底圖與這裡的「只收 10 家」都改成「店家限定」,他定了條件再放回數字"
+      },
+      {
+        "cell": "B_left",
+        "bounds": {
+          "x": 0,
+          "y": 700,
+          "width": 1064,
+          "height": 420
+        },
+        "label": "耗材批發好價格",
+        "action": {
+          "type": "postback",
+          "data": "m=shop&b=wholesale",
+          "displayText": "我想問耗材批發的店家價"
+        },
+        "image_text": "母料直供／耗材批發好價格／店家價，跟零售完全分開算"
+      },
+      {
+        "cell": "B_right",
+        "bounds": {
+          "x": 1064,
+          "y": 700,
+          "width": 1436,
+          "height": 420
+        },
+        "label": "城市限定扶持方案",
+        "action": {
+          "type": "postback",
+          "data": "m=shop&b=join",
+          "displayText": "我想了解城市限定的扶持方案",
+          "inputOption": "openKeyboard",
+          "fillInText": "店名：\n城市：\n最想解決："
+        },
+        "image_text": "一個城市只找一家／城市限定唯一扶持方案／幫你把來客數做起來，填三行就好",
+        "needs_owner": true,
+        "owner_note": "圖上「幫你把來客數做起來」是承諾，條件他還沒定；AI 一律轉真人、不講條件、不保證排得進去（oa-notes §12 第 13 點）"
+      },
+      {
+        "cell": "C",
+        "bounds": {
+          "x": 0,
+          "y": 1120,
+          "width": 2500,
+          "height": 566
+        },
+        "label": "一個月少賺多少錢",
+        "action": {
+          "type": "postback",
+          "data": "m=shop&b=audit",
+          "displayText": "幫我算一下我的店一個月少賺多少錢"
+        },
+        "image_text": "店家必問／一個月少賺多少錢，我算給你看"
+      }
+    ],
+    "chat_bar": "價格表・拍照問・施工影片",
+    "chat_bar_shop": "店家：批發價・算少賺多少",
+    "geometry": "沿用 pop-richmenu-deploy.py：2500×1686，分頁高 214，A 列左寬 1436、B 列左寬 1064；圖 ≤1MB（driver-v7 810KB OK）",
+    "why_changed": "跟主代理 v7 草稿一致的部分不動（價格表、蝦皮、找真人、施工影片、拍照選品五格）。只改七件事：①「蝦皮商城」改「蝦皮賣場」、拿掉評價數；②C 格點下去要真的能拍照（現在只丟文字）；③拿掉「30 秒」沒量過的數字；④選單列文字從「泡泡怪獸選單」改成說得出裡面有什麼；⑤店家頁維持，耗材鉤子先放到切到店家頁那則回覆裡（逐字稿見 shop_hook_replies）；⑥價格表格圖上字「全部品項」改「常用品項」（價格表沒有天使塗層、輪胎塑件精油、雨刷精）；⑦施工影片格圖上字「影片直接傳給你」改「馬上給你看實拍」（沒有自家片的線只給 YouTube 合集）。跟線上 v5.3 比：A 左「免費入門（官網）」換成「價格表」，因為老闆要的是價格表隨手可拿、成交走蝦皮；官網連結還在蝦皮卡片的第二顆按鈕"
+  },
+  "shop_hook_replies": {
+    "why": "店家鉤子要加進兩則回覆，這裡給逐字稿，開頭固定用鉤子原句，主代理照放、不要改寫走樣（brain-directives.json 的 shop_line 主句現在寫成「店裡卡關的車，不是難，是還沒用過泡泡怪獸」，跟固定框不同，要改回來）",
+    "m=tab&b=shop": {
+      "when": "客人點車主頁選單的「切到店家老闆」（richmenuswitch 也會送 postback）；worker 只在第一次回，之後靜默（worker.js L1274 現在回的是舊的「這區是給開店的老闆看的」）",
+      "text": "店裡拋不亮的漆，不是難，是還沒用過泡泡怪獸。\n這頁是給開店的老闆：上面四格看方案和店家價。\n最下面那條「幫你算一個月少賺多少錢」是三個問題，答完我直接算給你看，不用留資料，先算再說。"
+    },
+    "m=wel&b=shop": {
+      "when": "客人點歡迎包快速回覆「我是店家」；worker 現在這顆走大腦（worker.js L1154，dirKey shop_line），要用逐字稿就改成直接回覆，或把這則開頭兩句寫進 shop_line 指令當固定開場",
+      "text": "店裡拋不亮的漆，不是難，是還沒用過泡泡怪獸。\n下面選單右上角切到「店家老闆」，方案和店家價都在那頁。\n你店裡最頭痛的那台，拍一張傳上來，我幫你配一組。"
+    }
+  },
+  "keyword_auto_replies": [
+    {
+      "keyword": "價格表|價目表|價目|報價單",
+      "where": "worker 關鍵字別名（不是後台自動回應）",
+      "reply": "直接回價格表圖＋「價格表在上面。看到想問的，直接打字或拍照給我，我幫你配。」同一人一天最多一次，第二次改一句「價格表在上面那張」（worker.js L522 PRICELIST_MSGS 的半形逗號一起改全形）",
+      "why": "現在打「價格表」會先被 PAY_INTENT_RX_BASE 的「價格」吃掉，變成產品卡或賣場卡；這條要排在它前面"
+    },
+    {
+      "keyword": "多少錢|價格|價錢|售價（有提到品名）",
+      "where": "worker 既有 PAY_INTENT",
+      "reply": "附那支的產品卡（最多 2 張，同一支 3 輪內不重發）；沒提品名就先問「你想問哪一支？」再附價格表",
+      "why": "問價是成交前一步，給卡比給整張表少一步"
+    },
+    {
+      "keyword": "影片|示範|怎麼用|怎麼拋|教學|實測|真的有用",
+      "where": "worker video_moments",
+      "reply": "有產品脈絡就傳那條線的影片（videos.json）；沒脈絡給影片選單快速回覆；沒有自家片的線（洗車、輪圈、輪胎、玻璃、皮革、鐵粉柏油）給 YouTube 合集，合集點第二次仍然重送合集，不回「都看過了」（oa-notes §9 第 14 點）",
+      "why": "老闆指定：客人問的時候自動傳對應產品影片"
+    },
+    {
+      "keyword": "真人|人工|客服|專人|找人",
+      "where": "worker 既有 WANTS_HUMAN_RE",
+      "reply": "交接句＋真人接手（後台聊天標籤由真人貼）",
+      "why": "安全網，不讓客人卡在 AI"
+    },
+    {
+      "keyword": "下單|怎麼買|哪裡買|購買|結帳|給我連結|要買|想買",
+      "where": "worker 既有 PAY_INTENT",
+      "reply": "附那支的產品卡（蝦皮購買按鈕）；不知道哪支就問一句再附賣場卡",
+      "why": "老闆指定：談到可以成交就丟產品資訊和蝦皮連結"
+    },
+    {
+      "keyword": "批發|店家價|進貨|叫貨|大量|經銷|代理",
+      "where": "worker 既有店家批發流程",
+      "reply": "一句「店家價跟零售分開算，我請真人報給你」，再要四件事：店名、城市、想進哪幾支、一個月大概用多少（跟預設訊息「店家價」同一組；LINE 本身就是聯絡管道，不用再要聯絡方式）；不報任何批發數字",
+      "why": "三種價格身份不混用；批發價目表還沒定版"
+    },
+    {
+      "keyword": "退貨|退換|退款|瑕疵|破損|漏液|壞掉",
+      "where": "worker 固定話術",
+      "reply": "固定退換貨話術（worker.js L450 refund_policy_script 改成「你」版：「退換貨的部分我先幫你記下來，直接請真人夥伴依你的實際狀況協助處理到好，不會讓你為難。」，跟預設訊息「退換貨」同一個口氣）＋「麻煩拍商品和瓶身照片，連同蝦皮訂單編號傳上來」＋轉真人；不貼貼圖",
+      "why": "退換貨照蝦皮規範，真人處理"
+    },
+    {
+      "keyword": "運費|出貨|多久到|寄送|宅配|幾天到",
+      "where": "worker 新增",
+      "reply": "下單走蝦皮賣場，運費和出貨時間以蝦皮商品頁為準，下單後照蝦皮的時程出貨。",
+      "why": "官網服務承諾就是這句；官網舊段落「宅配 120、滿 2000 免運、轉帳對帳」跟蝦皮流程衝突，不用"
+    },
+    {
+      "keyword": "稀釋|比例|兌水|加多少水|倍數",
+      "where": "worker 新增",
+      "reply": "價格表上有標泡沫壺建議比例的那幾支，照表上寫的；其他照瓶身標示。你用的是泡沫壺、PA 壺還是一般噴壺？跟我說，我幫你看哪一支最適合你的工具。",
+      "why": "規則：AI 自己不報稀釋數字；價格表圖上他已經印了泡沫壺建議比例，客人看得到，所以回法指向那張圖，其他照瓶身標示，不另外報數字"
+    },
+    {
+      "keyword": "天使塗層|鍍膜|撥水",
+      "where": "worker 產品別名 A001",
+      "reply": "附天使塗層產品卡＋標準回法：每次洗完車直接噴，濕上濕下，單層就夠不用堆疊，效果大約一個月",
+      "why": "天使塗層標準回法（官網：濕上濕下、單層不堆疊；耐久約一個月）"
+    },
+    {
+      "keyword": "太貴|好貴|便宜一點|打折|折扣|別家",
+      "where": "worker 異議處理",
+      "reply": "不比價、不打折。店家：換算成一台車的工位時間；車主：跟送店一次的錢放在一起比；都不報沒根據的數字",
+      "why": "全世界統一零售價；研磨劑嫌貴＝工位時間論述"
+    },
+    {
+      "keyword": "門市|地址|在哪裡|自取|現場",
+      "where": "worker 新增",
+      "reply": "下單走蝦皮賣場，全台出貨。其他想問的直接打字，要真人就點「找真人」。",
+      "why": "官網沒有門市地址，不能自己編"
+    }
+  ],
+  "coupons": [
+    {
+      "name": "加好友首購贈品",
+      "mechanic": "後台優惠券「無條件」型，在對話裡用 reply 附領取連結（不群發）。客人在蝦皮下單後把訂單編號傳到 LINE，真人出貨時加附贈品。不折價、零售價不動。贈品品項與數量他定",
+      "why": "全世界統一零售價＋不打折不能破；贈品讓第一次下單的人把訂單編號留在 LINE，之後售後和回購都在這裡",
+      "needs_owner": true
+    },
+    {
+      "name": "店家介紹店家",
+      "mechanic": "後台優惠券「好友介紹」型：老店家分享出去，新店家加好友領；兩邊各一份贈品，新店家要是第一次加好友（細節以後台為準）",
+      "why": "汽美老闆彼此認識，同行推薦比廣告可信",
+      "needs_owner": true
+    },
+    {
+      "name": "（設定，不是券）刊登至 LY 服務＋服務選單列",
+      "mechanic": "券建好後勾「刊登至 LY 服務」增加曝光；開「服務選單列」把券釘在聊天室上方（2025-07-02 起的功能，封鎖的人看不到）",
+      "why": "不花推播額度的曝光與留存",
+      "needs_owner": true
+    }
+  ],
+  "loyalty_card": {
+    "use": false,
+    "why": "買賣在蝦皮成交，LINE 這邊沒有門市可以掃點；靠真人手動發點會變成每天要盯的雜事。回購改用成交後收尾的預設訊息＋產品卡"
+  },
+  "survey": {
+    "use": false,
+    "why": "問卷要靠群發或歡迎訊息帶出去：群發吃額度，歡迎包已經是價格表＋介紹；AI 對話本來就在收需求",
+    "later": "等額度升級或辦活動時，做一份店家需求調查（店型、月用量、最頭痛的漆面問題）",
+    "limit": "問卷設定只有電腦版"
+  },
+  "voom": {
+    "cadence": "每週 2 則（週二、週五晚上），跑 4 週看數據再調時間",
+    "rules": "照 seo-geo.json 本人定版：拋光文第一行「汽車美容拋光，有手就可以」、米速固定段整段放最上面（拋光文在鉤子下一行）、結尾聯絡四行、一條 https（/go?src=line-connect）、hashtag ≤5。影片只用一剪到底白名單；M 批（米速官方抖音素材）不發；VOOM 算不算訊息額度未查證，發前在後台確認。發前跑 seo-geo-gate.py --platform line",
+    "first_3_posts": [
+      {
+        "video": "083_一剪到底_拋光_紅漆伍號換拾號",
+        "text": "汽車美容拋光，有手就可以\n米速·商用極致拋光汽美門店特製\n\n施工工時-100% 鏡面亮度+100%\n\n智能研磨新科技｜降本增效作弊器\n粉塵極少不亂飛｜門店接車多一倍\n\n米速研磨有妙招，研磨拋光大絕招\n智能研磨新科技，門店賺錢大殺技\n\n專用拋光盤店內裡擺，提效省時多賺好幾百\n\n紅漆上那層霧霧的細紋，這段一剪到底，從頭拍到尾。\n細紋用米速伍號先切，再用拾號收尾把亮度拉回來，這段就是兩支接著用。\n你的車哪裡有紋路，拍一張傳到泡泡怪獸 LINE，直接說該用哪一支。\nhttps://popmonster.vip/go?src=line-connect\n\n🛒 蝦皮搜尋【泡泡怪獸】\n💬 LINE 搜尋 ID @150tiznd\n📱 WhatsApp +886 970 527 037\n目前因外貿業務繁忙 回覆稍長 但訊息我們都會看到\n\n#泡泡怪獸 #汽車拋光 #太陽紋 #研磨拋光 #汽車美容用品"
+      },
+      {
+        "video": "069_一剪到底_鍍膜_車門沖水撥水",
+        "text": "米速·商用極致拋光汽美門店特製\n\n施工工時-100% 鏡面亮度+100%\n\n智能研磨新科技｜降本增效作弊器\n粉塵極少不亂飛｜門店接車多一倍\n\n米速研磨有妙招，研磨拋光大絕招\n智能研磨新科技，門店賺錢大殺技\n\n專用拋光盤店內裡擺，提效省時多賺好幾百\n\n泡泡怪獸天使塗層怎麼用？每次洗完車，直接噴。\n濕上濕下，不用先擦乾，單層就夠，不用一層一層疊。\n這段一剪到底，水一沖下去，撥水就在眼前。\n效果大約撐一個月，所以最實在的用法就是洗完就噴。\nhttps://popmonster.vip/go?src=line-connect\n\n🛒 蝦皮搜尋【泡泡怪獸】\n💬 LINE 搜尋 ID @150tiznd\n📱 WhatsApp +886 970 527 037\n目前因外貿業務繁忙 回覆稍長 但訊息我們都會看到\n\n#泡泡怪獸 #天使塗層 #汽車鍍膜 #洗車"
+      },
+      {
+        "video": "084_一剪到底_拋光_黑色引擎蓋從上劑到擦乾淨",
+        "text": "汽車美容拋光，有手就可以\n米速·商用極致拋光汽美門店特製\n\n施工工時-100% 鏡面亮度+100%\n\n智能研磨新科技｜降本增效作弊器\n粉塵極少不亂飛｜門店接車多一倍\n\n米速研磨有妙招，研磨拋光大絕招\n智能研磨新科技，門店賺錢大殺技\n\n專用拋光盤店內裡擺，提效省時多賺好幾百\n\n黑色引擎蓋，先上劑，再拋，最後擦乾淨，一剪到底。\n黑漆最藏不住紋路，拋得夠不夠，一看就知道。\n開店的老闆：店裡拋不亮的漆，不是難，是還沒用過泡泡怪獸。\n你店裡最頭痛的那台，拍一張傳到 LINE，我幫你配。\nhttps://popmonster.vip/go?src=line-connect\n\n🛒 蝦皮搜尋【泡泡怪獸】\n💬 LINE 搜尋 ID @150tiznd\n📱 WhatsApp +886 970 527 037\n目前因外貿業務繁忙 回覆稍長 但訊息我們都會看到\n\n#泡泡怪獸 #汽車拋光 #汽美耗材 #汽車美容用品批發 #研磨拋光"
+      }
+    ]
+  },
+  "segmented_push": {
+    "plan": "這個月不推。剩下的 push 留給 webhook 出狀況時的保底。下個月起最多一次：受眾用聊天標籤「店家待報價」或加好友管道，發一則拋光實測影片＋店家鉤子。發之前兩件事要先確認，沒過就不發：①後台「受眾」裡有「聊天標籤受眾」（官方說明頁 oa-mange-daududience 有列這種類型，這個帳號的後台有沒有開要看實際畫面）或「加入管道受眾」；②受眾人數 ≤ 當月剩餘 push 額度（群發按人頭算，超過的直接不送）",
+    "why_not_now": "push 額度：每月 200 則已用 177，只剩 23；群發按人頭算，可觸及 463 人發一次就超過，超過的直接回錯誤、不送",
+    "conditions": "依屬性分眾要目標好友 100 人以上，屬性資料是 3 天前的；漸進式訊息也吃額度；升級方案要錢，價格以後台為準（未查證）"
+  },
+  "chat_tags": [
+    {
+      "tag": "店家待報價",
+      "when": "店家問批發或店家價，還沒報"
+    },
+    {
+      "tag": "店家已報價",
+      "when": "報過價，等他回"
+    },
+    {
+      "tag": "已成交",
+      "when": "傳了蝦皮訂單編號或確認下單"
+    },
+    {
+      "tag": "售後處理中",
+      "when": "退換貨、瑕疵、用法卡關"
+    },
+    {
+      "tag": "不再跟進",
+      "when": "明講不需要、同業探價"
+    }
+  ],
+  "chat_tags_note": "沒買聊天進階方案：一個聊天室只能貼 1 個標籤、總共 5 個 → 這 5 個剛好當成交階段用。進階方案每月 100 元可到 300 個標籤（要不要買他決定）",
+  "canned_replies": [
+    {
+      "name": "真人接手",
+      "text": "這裡是泡泡怪獸，我是真人夥伴。前面 AI 客服跟你聊的內容我都看過了，接下來由我直接幫你處理。"
+    },
+    {
+      "name": "店家價",
+      "text": "店家價跟零售分開算，我直接幫你報。麻煩給我四件事：店名、城市、想進哪幾支、一個月大概用多少。"
+    },
+    {
+      "name": "蝦皮下單",
+      "text": "這支在蝦皮下單：https://shopee.tw/product/1072078949/（商品編號）?openExternalBrowser=1\n下單後照蝦皮的時程出貨，用起來有問題直接回這裡問。"
+    },
+    {
+      "name": "天使塗層用法",
+      "text": "天使塗層的用法：每次洗完車直接噴，濕上濕下，單層就夠，不用堆疊。效果大約一個月，所以洗完就噴最實在。"
+    },
+    {
+      "name": "研磨劑嫌貴（店家）",
+      "text": "研磨劑要算的不是一罐多少錢，是一台車花掉多少工位時間。你現在拋一台大概做多久？跟我說，我幫你換算。"
+    },
+    {
+      "name": "嫌貴（車主）",
+      "text": "換個方式算：送店拋光一次要花多少，自己買一罐能做幾次，兩個放在一起比就清楚。"
+    },
+    {
+      "name": "退換貨",
+      "text": "退換貨照蝦皮的規範處理。麻煩先拍商品和瓶身照片，連同蝦皮訂單編號傳上來，我直接幫你處理到好。"
+    },
+    {
+      "name": "稀釋",
+      "text": "價格表上有標泡沫壺建議比例的那幾支，照表上寫的；其他照瓶身標示。你用的是泡沫壺、PA 壺還是一般噴壺？跟我說，我幫你看哪一支最適合你的工具。"
+    },
+    {
+      "name": "非上班時間",
+      "text": "訊息收到了，不會漏。真人 09:00–18:00 上班，上班後回你；想先看商品，上面的價格表可以先看。"
+    },
+    {
+      "name": "拍照指引",
+      "text": "拍照這樣最準：在日光下或燈下，斜斜拍最傷的那一塊，再拍一張整台車。兩張一起傳上來，我直接幫你看。"
+    },
+    {
+      "name": "成交收尾",
+      "text": "謝謝你下單。收到貨用起來有任何問題，直接回這裡問；怎麼用的影片，點下面選單的「施工影片」就有。"
+    },
+    {
+      "name": "店家開場",
+      "text": "店裡拋不亮的漆，不是難，是還沒用過泡泡怪獸。拍一張你店裡最頭痛的那台給我，我幫你配一組。"
+    }
+  ],
+  "add_friend": {
+    "url": "https://line.me/R/ti/p/@150tiznd",
+    "qr_note": "後台「加好友管道」每個載體各開一個 QR（DM、包裹卡、官網、FB），才分得出好友從哪來，也能對那批人做受眾；同一面放兩個 QR 要隔 25mm 以上、各自標籤；請店家轉給同行用 https://line.me/R/nv/recommendOA/%40150tiznd（Android 13.8.0 以前不支援）；oaMessage 預填訊息的連結不會觸發加好友，不能當加好友入口；蝦皮站內一律不放（QR 也算）"
+  },
+  "line_shopping": {
+    "available_tw": "LINE 購物在台灣有在營運，商家要怎麼上架、條件是什麼這次沒查到官方說明（未查證）；官方帳號內建「開店幫手」有官方說明頁",
+    "decision": "都不做。成交、評價、出貨都集中在蝦皮，多開一個店面要兩邊顧庫存和客服；LINE 專心做「談單 → 丟那一支的蝦皮連結」"
+  }
+}

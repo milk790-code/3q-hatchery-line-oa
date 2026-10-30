@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""泡泡怪獸 LINE 圖文選單 v6 底圖(車主／店家雙分頁)
+"""泡泡怪獸 LINE 圖文選單 v7 底圖(車主／店家雙分頁;v6 的 v7 改版見 DRIVER_CELLS 註解)
 
 設計方向(2026-08-23 學誼指定):高級、精緻、視覺張力、每一格都要抓住眼球、飽滿不空。
 做法:
@@ -196,7 +196,7 @@ SHOP_CELLS = [
     #                     ②「免繳費」跟同一格的「月付 799 起」直接自相矛盾 → 價格移到對話裡講
     #                     ③「城市限定」在標題與眉標各出現一次
     ('輕鬆贏過同行的黑科技', '客人只來一次？這套讓他自己想回來', '不用註冊先看'),
-    ('免繳費限量體驗', '先用看看，適合再談', '只收 10 家'),
+    ('免繳費限量體驗', '先用看看，適合再談', '店家限定'),   # 2026-10-30:「只收 10 家」是沒定義條件的數字(oa-notes §12 第 13 點),他定了條件再放回
     ('耗材批發好價格', '店家價，跟零售完全分開算', '母料直供'),
     ('城市限定唯一扶持方案', '幫你把來客數做起來，填三行就好', '一個城市只找一家'),
 ]
@@ -206,12 +206,14 @@ SHOP_CTA = ('店家必問', '一個月少賺多少錢，我算給你看',
 DRIVER_CELLS = [
     # 眉標刻意不用全大寫英文:那是 AI hero 的招牌動作(anti-ai-craft 一票否決條)
     # 修過:原本「找真人」的眉標也是「真人接手」(同詞重複);A1 與 B2 的說明都寫「跟著做」
-    ('官網品項與教學', '每一支都有實作影片，照著做就會', '母料直供'),
-    ('蝦皮商城', '5.0 分，864 則評價', '官方賣場'),
+    # v7(2026-10-30):A1 由「官網品項」改成「價格表」——學誼:客人加好友第一時間要看價格表;點了直接回那張圖,不經大腦
+    #                B2「施工教學影片」點了跳出選線 quick reply,直接傳自家一剪到底影片
+    ('價格表', '最新定價一張圖，點開就看', '最新定價'),
+    ('蝦皮賣場', '全世界統一零售價，點進去下單', '官方賣場'),
     ('找真人', '直接把人叫來，不用重講一遍', '不想跟 AI 聊'),
-    ('施工教學影片', '跟著影片做，新手也弄得出來', '零經驗也行'),
+    ('施工影片', '選你要處理的部位，影片直接傳給你', '自家實拍'),
 ]
-DRIVER_CTA = ('30 秒選品', '拍張照，我告訴你該用哪一支',
+DRIVER_CTA = ('拍照選品', '拍張照，我告訴你該用哪一支',
               [('效果', '↑'), ('買錯', '↓'), ('花的錢', '↓')])
 
 _song = [c[0] for c in SHOP_CELLS + DRIVER_CELLS] + [SHOP_CTA[1], DRIVER_CTA[1]]
@@ -221,6 +223,7 @@ _hei = [c[1] for c in SHOP_CELLS + DRIVER_CELLS] + [c[2] or '' for c in SHOP_CEL
 assert_glyphs(*[(s, SONGTI, 2) for s in _song], *[(s, HEITI_L, 0) for s in _hei],
               *[(s, HEITI_M, 0) for s in _hei])
 
-print('產生圖文選單底圖 v6:')
-build('driver', DRIVER_CELLS, DRIVER_CTA, os.path.join(OUT, 'richmenu-driver-v6.jpg'))
-build('shop', SHOP_CELLS, SHOP_CTA, os.path.join(OUT, 'richmenu-shop-v6.jpg'))
+VER = 'v7'   # v7 = 車主版 A1 改價格表、B2 改施工影片選線(2026-10-30);店家版文案不變、底圖重產
+print('產生圖文選單底圖 ' + VER + ':')
+build('driver', DRIVER_CELLS, DRIVER_CTA, os.path.join(OUT, 'richmenu-driver-' + VER + '.jpg'))
+build('shop', SHOP_CELLS, SHOP_CTA, os.path.join(OUT, 'richmenu-shop-' + VER + '.jpg'))

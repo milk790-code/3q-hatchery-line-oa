@@ -17,7 +17,7 @@ import json, os, sys, urllib.request, urllib.error
 
 API, DATA_API = 'https://api.line.me', 'https://api-data.line.me'
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
-NAME_PREFIX = 'popmonster v5.3'
+NAME_PREFIX = 'popmonster v6'
 ALIAS = {'driver': 'pop-driver', 'shop': 'pop-shop'}
 CHATBAR = '泡泡怪獸選單'          # ≤14 字
 
@@ -54,13 +54,13 @@ MENUS = {
     #    就會再觸發一次,同一則招呼發兩遍(2026-08-23 實機截圖抓到)。沒有 area = 點了沒事。
     'areas': [
       area(A_LEFT, 0, W - A_LEFT, TAB_H, switch(ALIAS['shop'], 'm=tab&b=shop')),
-      area(0, A_Y, A_LEFT, A_H, uri(GO_FREE)),                                  # 官網品項與教學
+      area(0, A_Y, A_LEFT, A_H, pb('m=car&b=price', '我想看價格表')),             # v7:價格表(worker 直回圖,不經大腦)
       area(A_LEFT, A_Y, W - A_LEFT, A_H, uri(SHOPEE)),                           # 蝦皮商城
       area(0, B_Y, B_LEFT, B_H, pb('m=car&b=human', '我想找真人')),               # 找真人
-      area(B_LEFT, B_Y, W - B_LEFT, B_H, pb('m=car&b=howto', '我想看施工教學')),   # 施工教學影片
+      area(B_LEFT, B_Y, W - B_LEFT, B_H, pb('m=car&b=howto', '我想看施工影片')),   # v7:跳 quick reply 選線 → 自家影片
       area(0, C_Y, W, C_H, pb('m=car&b=pick', '我想知道我的車該用什麼產品')),
     ],
-    'image': 'assets/pop/richmenu-driver-v6.jpg',
+    'image': 'assets/pop/richmenu-driver-v7.jpg',
   },
   'shop': {
     'size': {'width': W, 'height': H}, 'selected': True,
@@ -77,7 +77,7 @@ MENUS = {
                                             inputOption='openKeyboard', fillInText=JOIN_TEMPLATE)),
       area(0, C_Y, W, C_H, pb('m=shop&b=audit', '幫我算一下我的店一個月少賺多少錢')),
     ],
-    'image': 'assets/pop/richmenu-shop-v6.jpg',
+    'image': 'assets/pop/richmenu-shop-v7.jpg',
   },
 }
 
