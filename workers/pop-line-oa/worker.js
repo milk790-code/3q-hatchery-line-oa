@@ -472,7 +472,7 @@ const AI_EMPLOYEE = {
   handoff_threshold: 10,
   handoff_card_fields: ['身分(B2B經銷/B2C消費者)', '使用場景', '預算帶', '急迫度', '決策角色'],
   handoff_script: '聊到這裡,你要的我大致整理好了:{summary}。要不要我請真人夥伴直接接手?你不用再講一遍。',
-  redline_whitelist: { price_quote: 'deny_and_handoff', refund_policy: 'fixed_script_only', medical_efficacy_claims: 'deny', stock_promise: 'deny_and_handoff' },
+  redline_whitelist: { price_quote: 'list_price_only_else_handoff', refund_policy: 'fixed_script_only', medical_efficacy_claims: 'deny', stock_promise: 'deny_and_handoff' },
   refund_policy_script: '退換貨的部分我先幫您記下來,直接請真人夥伴依您的實際狀況協助處理到好,不會讓您為難。',
   degraded_mode_script: '我現在訊號不太穩,你的訊息我都記下了不會漏,真人夥伴上班時間(09:00-18:00)會親自回覆你。',
   tone_profile: 'popmonster',
