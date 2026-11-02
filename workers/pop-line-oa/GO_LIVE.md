@@ -62,9 +62,14 @@
 8. 🟢 點選單「拍照選品」→ 回拍照說明 + 三顆快速鍵(拍照/從相簿選/用打字描述);一次連傳 3 張照片 → 數一下回幾則:LINE 常把多張拆成多個 webhook,只有同一個 webhook 裡的才會合併成一則(反駁席實測提醒);若回了 3 則、每則都講得通也算過,回 3 則一樣的才是問題
 9. 🟢 點「看施工影片」→ 直接收到自家影片(第一次);再點 → 給 YouTube 合集,不重發同一支
 10. 🟢 連傳 4 句普通話 → 貼圖最多出現 1 次,抱怨句一定沒貼圖;每句先「已讀 + 輸入中」再回,不會先丟一句墊場文字
-11. 🟢 開 `https://pop-line-oa.milk790.workers.dev/health` → `seed: "v6.1.0"`、`reply_first: true`、`ack_text: "off"`、`catalog` ≥ 30、`welcome_pack` = 2、`videos` ≥ 5
+11. 🟢 開 `https://pop-line-oa.milk790.workers.dev/health` → `seed: "v6.1.1"`、`reply_first: true`、`ack_text: "off"`、`catalog` ≥ 30、`welcome_pack` = 2、`videos` ≥ 5
 12. 🟢 隔天看 push 額度:`curl -sS https://api.line.me/v2/bot/message/quota/consumption -H "Authorization: Bearer <token>"`,totalUsage 從 177 往上只該多老闆通知那幾則
 
 ### 回退
 - 🔴 LINE Developers Console 把 Webhook URL 改回舊值,或 OA 後台把 Webhook 關掉(AI 立刻停,罐頭自動回應與後台歡迎訊息記得再開)
 - 🟡 只退談單腦不退設定:`git revert` v6.1 那個 commit 再 push(worker 會自動重部署成 v5.2)
+
+## v6.1.1（2026-11-02 真機測後修）
+- 產品詢問指令多一段【產品事實】：命中 SKU 的用法／賣點／不准說逐字給模型（之前只給名稱＋價格，木瓜被編成「清油漆」）。
+- 回覆回讀閘多一層簡中用語替換（信息→資訊 等 17 組）。
+- YouTube 合集只在客人明講要影片（影片／教學／示範／怎麼用…）或按「看影片」鍵時才給；自家一剪到底片照舊。
