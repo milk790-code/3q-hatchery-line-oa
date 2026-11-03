@@ -69,7 +69,7 @@ const AI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 let SETUP_KEY = '';  // 由 env.SETUP_KEY 注入（fetch 開頭，未設用隨機值 fail-closed）
 const LINE_ID = '@150tiznd';
 // SHOPEE(蝦皮賣場網址)在 DATA 區塊後面定義:取 DATA 的 SHOP_URL(gen-data 已加 openExternalBrowser=1)
-const SEED_VER = 'v6.1.2';
+const SEED_VER = 'v6.1.3';
 // v6.1 reply-first 時間常數:reply token 約 1 分鐘內有效;主回覆 notBefore 不超過 issuedAt+45s,alarm 時 50 秒內才用 reply,過了直接 push
 const REPLY_SOFT_CAP_MS = 45000, REPLY_TOKEN_MAX_MS = 50000;
 const ACK_SOFT_CAP_MS = 40000;   // v6.1 追加:ack(已讀+loading)上限比 main 早 5 秒,保證每一則的已讀先於自己的主回覆
@@ -1725,7 +1725,10 @@ async function handleEvent(ev, env, cfg, inject) {
       else if (isPayIntent(userMsg)) mainMsgs.push(SHOP_FLEX());
     }
     // v6 影片:模型標 [VID] 或命中影片時機;同一線 7 天一次;總則數不超過 5
-    const line = vidLine || matchVideoLine(userMsg);
+    // v6.1.3 影片線以命中的產品為準(11-03 真機:問「酸洗」送出拋光片);產品線沒自家片就只給該線合集(且要客人問影片)
+    const hitForVid = prodSkus.length ? prodSkus : matchCatalog(userMsg);
+    const prodLine = hitForVid.map((x) => CATALOG[x] && CATALOG[x].vl).find((l) => l && l !== 'none' && (VIDEOS.lines[l] || VIDEOS.yt[l])) || '';
+    const line = prodLine || vidLine || matchVideoLine(userMsg);
     if (line) for (const vmsg of videoMsgs(line, sess, VIDEO_ASK_RX.test(userMsg || ''))) if (mainMsgs.length < 5) mainMsgs.push(vmsg);
   }
   if (plImgs.length) { mainMsgs = [...plImgs, ...mainMsgs]; while (mainMsgs.length > 5) mainMsgs.pop(); }   // 交接檢查點補價格表圖:同一次 reply、圖在最前面、總則數 ≤5(從尾端砍貼圖/影片,文字保留)
