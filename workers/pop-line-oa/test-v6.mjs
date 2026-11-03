@@ -83,7 +83,7 @@ let ms = main(b, 'U_new');
 ok(b.length >= 1 && b[0].kind === 'reply', '① 用 reply token 回(免費),不是 push');
 ok(ms[0]?.type === 'image' && /pricelist/.test(ms[0].originalContentUrl) && /pricelist/.test(ms[0].previewImageUrl), '① 第一則是價格表圖(原圖+預覽圖都指向價格表)');
 ok(ms.length <= 5, '① 一次 reply 不超過 5 則(LINE 硬限制)');
-ok(ms.slice(0, 4).every((m) => m.type === 'image' && /pricelist-1103-\d\.jpg$/.test(m.originalContentUrl)) && ms.some((m) => m.type === 'text'), '① 價格表 4 張直式單欄圖在前、介紹文字一定在(貼圖讓位給 5 則上限)');
+ok(ms.slice(0, 4).every((m) => m.type === 'image' && /pricelist-1103-\d+b?\.jpg$/.test(m.originalContentUrl)) && ms.some((m) => m.type === 'text'), '① 價格表 4 張直式單欄圖在前、介紹文字一定在(貼圖讓位給 5 則上限)');
 ok(ms.some((m) => m.type === 'text' && /AI|人工客服|泡泡怪獸/.test(m.text)), '① 介紹文含 AI 揭露或品牌自稱');
 ok(sess('U_new')?.dc === true && sess('U_new')?.pl === true, '① session 標記已揭露 + 已送價格表');
 ok(kv.has('pl:U_new:' + taipeiYmd()), '① 加好友送過價格表 → 記當天 pl 鍵(之後打「價格表」不重發圖)');
@@ -181,7 +181,7 @@ ok(r.status === 200 && /image\/jpeg/.test(r.ct) && calls.upstream.some((u) => /p
 r = await admin('/img/pricelist/999');
 ok(r.status === 404, '⑩ 非 imagemap 尺寸 404');
 r = await admin('/health');
-ok(/"seed":"v6\.1\.12"/.test(r.body) && /"catalog":\d+/.test(r.body) && /"welcome_pack":\d+/.test(r.body) && /"reply_first":true/.test(r.body), '⑩ /health 報 seed v6.1.3 + reply_first + 目錄/歡迎包計數');
+ok(/"seed":"v6\.1\.13"/.test(r.body) && /"catalog":\d+/.test(r.body) && /"welcome_pack":\d+/.test(r.body) && /"reply_first":true/.test(r.body), '⑩ /health 報 seed v6.1.3 + reply_first + 目錄/歡迎包計數');
 r = await admin('/admin/catalog?key=testkey');
 ok(r.status === 200 && /"A001"/.test(r.body), '⑩ /admin/catalog 列目錄');
 
@@ -613,5 +613,15 @@ console.log('\n── ㉘ E:文案事實(全檔 grep,AI_EMPLOYEE 區塊除外)�
   ok(pb.includes('真實背書') && !/[0-9.]+\s*分/.test(pb), '㉘ PRODUCTS 提示詞沒有評分數字');
   ok(outside.includes('價格表上的品項都在蝦皮賣場') && flexStr(main(await send([msg('U_sf', '我要買 怎麼下單')]), 'U_sf')).includes('價格表上的品項都在蝦皮賣場'), '㉘ 賣場卡副標改成不帶承諾的「價格表上的品項都在蝦皮賣場」'); }
 
+
+console.log('\n── ㉙ v6.1.13 商品補齊:第一組第 2 張換 2b(含火山泥／潤滑液)、「看更多價格表」回第二組 4 張 ──');
+{ const w = main(await send([{ type: 'follow', replyToken: 'rt', source: { userId: 'U_pl2w', type: 'user' } }]), 'U_pl2w');
+  ok(w.some((m) => m.type === 'image' && /pricelist-1103-2b\.jpg$/.test(m.originalContentUrl)) && !w.some((m) => m.type === 'image' && /pricelist-1103-2\.jpg$/.test(m.originalContentUrl)), '㉙ 歡迎包第 2 張是新版 2b');
+  ok((w.find((m) => m.type === 'text')?.quickReply?.items || []).some((x) => x.action.data === 'm=pl&b=2'), '㉙ 歡迎包按鈕有「看更多價格表」');
+  const k = main(await send([msg('U_pl2k', '價格表')]), 'U_pl2k');
+  ok((k.find((m) => m.type === 'text')?.quickReply?.items || []).some((x) => x.action.data === 'm=pl&b=2'), '㉙ 打「價格表」直回的文字帶「看更多價格表」按鈕');
+  const n = calls.brain.length; const g = main(await send([tap('U_pl2k', 'm=pl&b=2')]), 'U_pl2k');
+  ok(calls.brain.length === n && g.length === 5 && g.slice(0, 4).every((m, i) => m.type === 'image' && m.originalContentUrl.endsWith('pricelist-1103-' + (i + 5) + '.jpg')) && g[4].type === 'text', '㉙ 點「看更多價格表」→ reply 第二組 4 張(5～8)＋文字,不經大腦');
+}
 console.log(failed ? `\n🔴 ${passed} passed, ${failed} failed` : `\n🟢 ${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);
