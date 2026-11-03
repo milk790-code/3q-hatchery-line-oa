@@ -6,9 +6,10 @@
 import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
 import { tmpdir, homedir } from 'node:os';
-import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { join, dirname } from 'node:path';
 
-const REPO = new URL('..', import.meta.url).pathname;
+const REPO = fileURLToPath(new URL('..', import.meta.url));
 const LEADS = join(REPO, 'workers/leads-board');
 const CHAT_BOT = 'U09946b50120a3f9617ff6253af4b7c8b';   // 泡泡怪獸在 chat.line.biz 的帳號 ID(跟 Messaging API 的 bot userId 不同)
 const NOTE_HEAD = '【泡泡怪獸 AI 筆記】';
@@ -17,9 +18,8 @@ const DRY = args.has('--dry'), BACKFILL = args.has('--backfill');
 const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
 
 function d1(sql) {
-  const dir = mkdtempSync(join(tmpdir(), 'plns-'));
-  const f = join(dir, 'q.sql'); writeFileSync(f, sql);
-  const out = execFileSync('npx', ['wrangler', 'd1', 'execute', 'pop-line-crm', '--remote', '--json', '--file', f], { cwd: LEADS, encoding: 'utf-8', stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 50e6 });
+  const NPX = join(dirname(process.execPath), 'npx');
+  const out = execFileSync(NPX, ['wrangler', 'd1', 'execute', 'pop-line-crm', '--remote', '--json', '--command', sql], { cwd: LEADS, encoding: 'utf-8', stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 50e6 });
   const j = JSON.parse(out.slice(out.indexOf('[')));
   return j;
 }
@@ -46,7 +46,7 @@ if (BACKFILL) {
     const prof = d1("SELECT city, vehicle, industry, budget, grade, pain FROM customer_profiles WHERE brand='popmonster' AND sid=" + q(m.user_id))[0]?.results?.[0] || null;
     const hist = conv.reverse().map((r) => ({ role: r.role === 'user' ? 'user' : 'assistant', content: r.text }));
     if (!hist.some((h) => h.role === 'user' && String(h.content).length >= 2)) continue;
-    const note = buildCustomerNote(m.user_id, { hist, last_seen: Date.parse(m.last_seen + 'Z') || Date.now() }, prof, null);
+    const note = buildCustomerNote(m.user_id, { hist, last_seen: Date.parse(m.last_seen) || Date.now() }, prof, null);
     if (!DRY) d1("INSERT INTO pop_line_notes (user_id, note, updated_at) VALUES (" + q(m.user_id) + "," + q(note) + ",datetime('now')) ON CONFLICT(user_id) DO UPDATE SET note=excluded.note, updated_at=excluded.updated_at");
     rows.push({ user_id: m.user_id, note, chat_id: null, note_id: null });
   }
@@ -88,7 +88,7 @@ else {
     const H = { "Content-Type": "application/json", [cs.headerName]: cs.token };
     const chats = []; let next = "";
     for (let i = 0; i < 10; i++) {
-      const r = await fetch("/api/v2/bots/" + BOT + "/chats?folderType=ALL&limit=100" + (next ? "&next=" + encodeURIComponent(next) : ""), { credentials: "include" });
+      const r = await fetch("/api/v2/bots/" + BOT + "/chats?folderType=ALL&limit=25" + (next ? "&next=" + encodeURIComponent(next) : ""), { credentials: "include" });
       const j = await r.json(); chats.push(...(j.list || [])); next = j.next || ""; if (!next) break;
     }
     const byName = new Map();

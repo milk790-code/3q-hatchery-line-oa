@@ -1185,7 +1185,8 @@ function buildCustomerNote(uid, sess, prof, st) {
   const all = users.join('\n');
   const P = prof && typeof prof === 'object' ? prof : {};
   const S = st && typeof st === 'object' ? st : {};
-  const pick = (k, k2) => (S[k] && S[k] !== 'unknown' ? S[k] : (P[k2 || k] || ''));
+  const nz = (v) => (v && !/^(unknown|未知|無|none|null|n\/a|-)$/i.test(String(v).trim()) ? String(v).trim() : '');
+  const pick = (k, k2) => nz(S[k]) || nz(P[k2 || k]);
   const lineTag = S.line === 'B2B' || sess?.line === 'shop' || /店|批發|進貨|老闆/.test(all) ? '店家老闆' : (S.line === 'B2C' ? '車主' : '未知');
   const machine = (all.match(/\b(RO|GA|DA)\b/i) || [])[1];
   const vol = (all.match(/(?:月|一個月|每月)[^\d]{0,6}(\d{1,4})\s*台/) || all.match(/(\d{1,4})\s*台/) || [])[1];
@@ -1197,7 +1198,8 @@ function buildCustomerNote(uid, sess, prof, st) {
   const shop = [pick('city'), pick('industry'), machine ? '拋光機 ' + machine.toUpperCase() : '', vol ? '月洗約 ' + vol + ' 台' : ''].filter(Boolean).join('・');
   const likes = [pick('pain') ? '痛點:' + pick('pain') : '', pick('vehicle') ? '車型:' + pick('vehicle') : '', pick('budget') ? '預算:' + pick('budget') : ''].filter(Boolean).join(';');
   const grade = pick('grade');
-  const lines = [NOTE_HEAD + '更新 ' + fmtTaipei(), '身分:' + lineTag];
+  const lines = [NOTE_HEAD + '更新 ' + fmtTaipei()];
+  if (lineTag !== '未知') lines.push('身分:' + lineTag);
   if (shop) lines.push('店面資訊:' + shop);
   if (items.length) lines.push('上次談的商品:' + items.join('、'));
   lines.push('購買意向:' + (payT ? '有(問過「' + payT.slice(0, 20) + '」)' : '還沒問到價'));

@@ -281,7 +281,7 @@ console.log('\n── ⑬ v6.1.11 LINE 備註欄筆記 ──');
   ok(/【泡泡怪獸 AI 筆記】/.test(n) && /身分:店家老闆/.test(n) && /台中/.test(n) && /拋光機 RO/.test(n) && /月洗約 60 台/.test(n), '⑬a 身分/店面資訊(城市/機型/月洗台數)');
   ok(/上次談的商品:米速研磨劑三件組\(4,099\)/.test(n) && /購買意向:有/.test(n) && /電話:0983617084/.test(n), '⑬b 商品(定價)/購買意向/電話');
   ok(/痛點:太陽紋/.test(n) && /A 級/.test(n) && /喊過真人/.test(n) && /下一步 報店家價/.test(n) && n.length <= 900, '⑬c 喜好/等級/真人/下一步,900 字內');
-  const e = buildCustomerNote('U2', { hist: [] }, null, null); ok(/身分:未知/.test(e) && /還沒問到價/.test(e), '⑬d 空資料不炸');
+  const e = buildCustomerNote('U2', { hist: [] }, null, null); ok(!/身分:/.test(e) && !/未知/.test(e) && /還沒問到價/.test(e), "⑬d 空資料不炸且不印未知");
   const uidN = 'U_note1';
   brainText = () => '好,我幫你看 [STATE]{"completion":40,"line":"B2C","city":"高雄","grade":"B","pain":"水痕","next":"推天使"}[/STATE]';
   await send([msg(uidN, '天使塗層多少錢')]);
