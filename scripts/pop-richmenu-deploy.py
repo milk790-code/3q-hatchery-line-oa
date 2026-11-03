@@ -40,7 +40,6 @@ def switch(alias, data): return {'type': 'richmenuswitch', 'richMenuAliasId': al
 
 SHOPEE = 'https://shopee.tw/milk790'          # 完整網址,不用 s.shopee.tw 短碼(可能夾帶別人的分潤參數)
 GO_FREE = 'https://popmonster.vip/go?src=line-free-first'   # src 必須是 /go 白名單內的值
-POPCARD_DEMO = 'https://popcard-saas-preview.milk790.workers.dev/s/jilin'
 # 靜態版走 GitHub Pages(carcare-shop Worker 要 wrangler,本機 token 已過期)。
 # wrangler 恢復後可改回 https://carcare-shop.milk790.workers.dev/s/pop/plan(同一份內容)。
 PLAN_PAGE = 'https://milk790-code.github.io/3q-hatchery-line-oa/pop-card-plan/'   # 現在由 AI 在對話中給,不直接掛鈕
@@ -60,14 +59,14 @@ MENUS = {
       area(B_LEFT, B_Y, W - B_LEFT, B_H, pb('m=car&b=howto', '我想看施工影片')),   # v7:跳 quick reply 選線 → 自家影片
       area(0, C_Y, W, C_H, pb('m=car&b=pick', '我想知道我的車該用什麼產品')),
     ],
-    'image': 'assets/pop/richmenu-driver-v7.jpg',
+    'image': 'assets/pop/richmenu-driver-v8.jpg',
   },
   'shop': {
     'size': {'width': W, 'height': H}, 'selected': True,
     'name': NAME_PREFIX + ' shop', 'chatBarText': CHATBAR,
     'areas': [
       area(0, 0, A_LEFT, TAB_H, switch(ALIAS['driver'], 'm=tab&b=car')),
-      area(0, A_Y, A_LEFT, A_H, uri(POPCARD_DEMO)),                              # 輕鬆贏過同行的黑科技
+      area(0, A_Y, A_LEFT, A_H, pb('m=car&b=pick', '店裡有台拋不亮的漆，我拍給你看')),   # v8:拋不亮的漆拍來看(開相機 quick reply;原 POP CARD Demo 已停,只做汽美)
       # 「免繳費限量搶先體驗」走對話不丟價格頁:落地頁寫月付 799,跟按鈕承諾對不上,點進去會直接跳走。
       # 改成 AI 先確認資格與城市,條件頁由 AI 在對話裡給。
       area(A_LEFT, A_Y, W - A_LEFT, A_H, pb('m=shop&b=trial', '我想了解免繳費限量搶先體驗')),
@@ -77,7 +76,7 @@ MENUS = {
                                             inputOption='openKeyboard', fillInText=JOIN_TEMPLATE)),
       area(0, C_Y, W, C_H, pb('m=shop&b=audit', '幫我算一下我的店一個月少賺多少錢')),
     ],
-    'image': 'assets/pop/richmenu-shop-v7.jpg',
+    'image': 'assets/pop/richmenu-shop-v8.jpg',
   },
 }
 

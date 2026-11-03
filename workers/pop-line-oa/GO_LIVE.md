@@ -97,3 +97,4 @@
 - SEED_GENOME 的「POP CARD 回店系統」段整段換成鐵律：業務只有汽美藥劑／研磨拋光劑／拋光盤的零售與批發；系統／網站／補助／代操／接案一律「這塊我們現在沒做」一句帶過，不丟連結、不說請真人確認。
 - 店家三題健檢收尾（SHOP_AUDIT_CLOSE）「客人不回頭」解法改用天使塗層這類耗材做回店理由，不推系統。
 - ⏳ 未動：店家老闆選單左上「贏過同行的黑科技」按鈕仍連 POP CARD Demo（oa.json A_left，他的既有設定、要重做選單圖才能換）。
+- v8 選單（2026-11-03 14:00 他說「換掉」）：店家頁左上「贏過同行的黑科技→POP CARD Demo」換成「拋不亮的漆，拍來看」（postback m=car&b=pick，開相機 quick reply）。底圖 richmenu-{driver,shop}-v8.jpg 已上傳、alias 已指、車主版已設全員預設；LINE 回讀六格動作確認。POPCARD_DEMO 常數移除。

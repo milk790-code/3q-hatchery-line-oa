@@ -401,15 +401,15 @@
           "width": 1436,
           "height": 486
         },
-        "label": "贏過同行的黑科技",
+        "label": "拋不亮的漆，拍來看",
         "action": {
-          "type": "uri",
-          "uri": "https://popcard-saas-preview.milk790.workers.dev/s/jilin"
+          "type": "postback",
+          "data": "m=car&b=pick",
+          "displayText": "店裡有台拋不亮的漆，我拍給你看"
         },
-        "image_text": "不用註冊先看／輕鬆贏過同行的黑科技／客人只來一次？這套讓他自己想回來",
-        "diff_vs_main_v7": "維持。若他要在店家頁放耗材鉤子，就把這格換成「店裡拋不亮的漆，拍來看」（快速回覆開相機），POP CARD 範例改由 AI 在試算對話裡給（要他拍板）",
-        "needs_owner": true,
-        "exception_note": "action.uri 在連結白名單外（白名單只有蝦皮、官方 LINE、/go?src=line-connect 或 line-free-first、YouTube 合集）：這是 v6 沿用下來的他的既有設定（POP CARD Demo，scripts/pop-richmenu-deploy.py 的 POPCARD_DEMO），不是這一席新加的，刻意保留"
+        "image_text": "店家判漆／拋不亮的漆，拍來看／拍一張，告訴你該切幾番、用哪一支",
+        "diff_vs_main_v7": "v8（2026-11-03 他指定「只做汽美」，說「換掉」）：原 POP CARD Demo 連結格換成汽美鉤子，點了走 campick quick reply（拍照／相簿／打字）",
+        "needs_owner": false
       },
       {
         "cell": "A_right",

@@ -195,7 +195,7 @@ SHOP_CELLS = [
     # ⚠️ 修過的三處不通順:①原本標題與說明都出現「同行」,而且「贏過同行」跟「同行都在用」邏輯打架
     #                     ②「免繳費」跟同一格的「月付 799 起」直接自相矛盾 → 價格移到對話裡講
     #                     ③「城市限定」在標題與眉標各出現一次
-    ('輕鬆贏過同行的黑科技', '客人只來一次？這套讓他自己想回來', '不用註冊先看'),
+    ('拋不亮的漆，拍來看', '拍一張，告訴你該切幾番、用哪一支', '店家判漆'),   # v8(2026-11-03 他指定「只做汽美」):原本連 POP CARD Demo 的格子換成汽美鉤子,點了開相機 quick reply
     ('免繳費限量體驗', '先用看看，適合再談', '店家限定'),   # 2026-10-30:「只收 10 家」是沒定義條件的數字(oa-notes §12 第 13 點),他定了條件再放回
     ('耗材批發好價格', '店家價，跟零售完全分開算', '母料直供'),
     ('城市限定唯一扶持方案', '幫你把來客數做起來，填三行就好', '一個城市只找一家'),
@@ -223,7 +223,7 @@ _hei = [c[1] for c in SHOP_CELLS + DRIVER_CELLS] + [c[2] or '' for c in SHOP_CEL
 assert_glyphs(*[(s, SONGTI, 2) for s in _song], *[(s, HEITI_L, 0) for s in _hei],
               *[(s, HEITI_M, 0) for s in _hei])
 
-VER = 'v7'   # v7 = 車主版 A1 改價格表、B2 改施工影片選線(2026-10-30);店家版文案不變、底圖重產
+VER = 'v8'   # v8 = 店家版 A_left 換汽美鉤子(2026-11-03); v7 = 車主版 A1 改價格表、B2 改施工影片選線(2026-10-30);店家版文案不變、底圖重產
 print('產生圖文選單底圖 ' + VER + ':')
 build('driver', DRIVER_CELLS, DRIVER_CTA, os.path.join(OUT, 'richmenu-driver-' + VER + '.jpg'))
 build('shop', SHOP_CELLS, SHOP_CTA, os.path.join(OUT, 'richmenu-shop-' + VER + '.jpg'))
