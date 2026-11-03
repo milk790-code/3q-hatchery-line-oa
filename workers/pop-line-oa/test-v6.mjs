@@ -83,7 +83,7 @@ let ms = main(b, 'U_new');
 ok(b.length >= 1 && b[0].kind === 'reply', '① 用 reply token 回(免費),不是 push');
 ok(ms[0]?.type === 'image' && /pricelist/.test(ms[0].originalContentUrl) && /pricelist/.test(ms[0].previewImageUrl), '① 第一則是價格表圖(原圖+預覽圖都指向價格表)');
 ok(ms.length <= 5, '① 一次 reply 不超過 5 則(LINE 硬限制)');
-ok(ms.some((m) => m.type === 'sticker'), '① 歡迎貼圖有帶(只有這一次是免費送的)');
+ok(ms.slice(0, 4).every((m) => m.type === 'image' && /pricelist-1103-\d\.jpg$/.test(m.originalContentUrl)) && ms.some((m) => m.type === 'text'), '① 價格表 4 張直式單欄圖在前、介紹文字一定在(貼圖讓位給 5 則上限)');
 ok(ms.some((m) => m.type === 'text' && /AI|人工客服|泡泡怪獸/.test(m.text)), '① 介紹文含 AI 揭露或品牌自稱');
 ok(sess('U_new')?.dc === true && sess('U_new')?.pl === true, '① session 標記已揭露 + 已送價格表');
 ok(kv.has('pl:U_new:' + taipeiYmd()), '① 加好友送過價格表 → 記當天 pl 鍵(之後打「價格表」不重發圖)');
@@ -181,7 +181,7 @@ ok(r.status === 200 && /image\/jpeg/.test(r.ct) && calls.upstream.some((u) => /p
 r = await admin('/img/pricelist/999');
 ok(r.status === 404, '⑩ 非 imagemap 尺寸 404');
 r = await admin('/health');
-ok(/"seed":"v6\.1\.11"/.test(r.body) && /"catalog":\d+/.test(r.body) && /"welcome_pack":\d+/.test(r.body) && /"reply_first":true/.test(r.body), '⑩ /health 報 seed v6.1.3 + reply_first + 目錄/歡迎包計數');
+ok(/"seed":"v6\.1\.12"/.test(r.body) && /"catalog":\d+/.test(r.body) && /"welcome_pack":\d+/.test(r.body) && /"reply_first":true/.test(r.body), '⑩ /health 報 seed v6.1.3 + reply_first + 目錄/歡迎包計數');
 r = await admin('/admin/catalog?key=testkey');
 ok(r.status === 200 && /"A001"/.test(r.body), '⑩ /admin/catalog 列目錄');
 
@@ -493,6 +493,7 @@ Object.assign(DIRECTIVES.turn, { price_list: '【要價格表】T-pl23 他今天
   ok(lastDirective().includes('交接檢查點') && !lastDirective().includes('T-pl23') && !lastDirective().includes('往上滑'), '㉓ 今天沒收過價格表圖 → 不疊「已收過、往上滑」的 price_list 指令');
   ok(ms[0]?.type === 'image' && ms.length <= 5 && b.filter((c) => c.kind === 'reply').length === 1 && sess('U_cp').pl === true, '㉓ 沒收過 → 這輪回覆最前面補價格表圖、總則數 ≤5、sess.pl=true');
   ok(b.filter((c) => c.kind === 'push' && c.to === 'U_cp').length === 0, '㉓ 補圖與文字同一次 reply,沒有額外 push 給客人');
+  ok(ms.filter((m) => m.type === 'image' && /pricelist-1103-/.test(m.originalContentUrl)).length >= 3 && ms[ms.length - 1].type === 'text', '㉓ 4 張價格表圖排前面、大腦文字保留在最後(超過 5 則先砍貼圖再併文字)');
   ok(sess('U_cp').ho === true, '㉓ 交接照舊:sess.ho=true');
   ok(ownerPushes(b).length === 1 && ownerPushes(b)[0].messages[0].text.includes('AI 店員交接') && !ownerPushes(b)[0].messages[0].text.includes('價格表在上面'), '㉓ 老闆收到的是真正的交接摘要(不是價格表罐頭)');
   // 今天已經收過圖(加好友歡迎包或稍早直回)→ 疊 price_list 指令、不再補圖
