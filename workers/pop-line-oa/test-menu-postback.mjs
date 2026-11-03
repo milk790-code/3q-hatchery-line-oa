@@ -6,7 +6,7 @@ import fs from 'node:fs';
 //      ⑥批發鈕明確禁止報價 ⑦點選單=秒回不延遲 ⑧選單點擊逐鈕落庫 ⑨已升級客戶不被選單降級
 // v6.1:「我想知道我的車該用什麼產品」(pick)改成不經大腦直回拍照 quick reply(拍照/從相簿選/用打字描述);
 //      舊的問診指令搬到 describe(走大腦)
-import worker from './worker.js';
+import worker, { clean, stripLeak, capEmoji, handoffDraft } from './worker.js';
 
 const kv = new Map();
 const d1rows = { taps: [], profiles: new Map() };
@@ -250,6 +250,29 @@ const img = (uid) => ({ type: 'message', replyToken: 'rt', source: { userId: uid
   r = await g(''); ok(r.st === 200 && r.j.muted.some((m) => m.uid.startsWith('U_h')), '⑪j /admin/human 不帶 uid 列出掛著的人');
   r = await g('&uid=U_h&on=0'); ok(r.j.human === false && !sess('U_h')?.human, '⑪j /admin/human on=0 解除');
   const f = await worker.fetch(new Request('https://x.test/admin/human?key=wrong'), env, ctx); ok(f.status === 403, '⑪j 沒 key 擋 403'); }
+
+
+console.log('\n── ⑫ v6.1.10 輸出閘/emoji 上限/揭露去重/交接草稿 ──');
+{ const leak = '明白😊\n\n看來你已經了解了泡泡怪獸官方 LINE 的店員工作內容和相關規範。你的任務是讓每個加好友的人從第一句聊到按「蝦皮購買」。\n\n如果你有任何問題或需要幫助,請隨時問我!';
+  const c = clean(leak); ok(!/你的任務|相關規範/.test(c) && /明白/.test(c), '⑫a 複誦系統提示的段落被剝掉,正常段保留');
+  ok(stripLeak(leak).leaked === true && stripLeak('天使塗層洗完直接噴。').leaked === false, '⑫b stripLeak 旗正確');
+  const allLeak = clean('【本輪指令】你的任務是賣東西。'); ok(allLeak.length > 5 && !/本輪指令/.test(allLeak), '⑫c 全剝光換安全句');
+  const e = capEmoji('😊 丹若預洗 🚗 很好用 🌟 真的 😊 讚 👍'); ok((e.match(/\p{Extended_Pictographic}/gu) || []).length === 2 && /丹若預洗/.test(e), '⑫d emoji 只留前兩個');
+  ok((clean('😊 好 🚗 用 🌟 讚 ✨').match(/\p{Extended_Pictographic}/gu) || []).length === 2, '⑫e clean 也套 emoji 上限');
+  const d = handoffDraft({ hist: [{ role: 'user', content: '研磨劑三件組怎麼買 0983617084' }, { role: 'assistant', content: 'x' }, { role: 'user', content: '我用 RO 機,一個月洗 60 台' }] }, { line: 'B2B', city: '台中' });
+  ok(/給你貼的草稿/.test(d) && /0983617084/.test(d) && /line:B2B/.test(d) && /洗 60 台/.test(d) && /泡泡怪獸負責人/.test(d), '⑫f 交接草稿有商品/電話/筆記/原話/開場');
+  ok(handoffDraft(null, null) === '' || typeof handoffDraft({hist:[]}, null) === 'string', '⑫g 草稿永不拋錯');
+  // 揭露去重:同一新客連傳兩句,第二句讀到的 session 還沒寫回(dc=false),但 KV 旗已在 → 不再帶自介
+  const uidD = 'U_dc1';
+  await send([msg(uidD, '天使怎麼用')]);
+  ok(kv.get('dc:' + uidD) === '1', '⑫h 第一句立刻插 dc 旗');
+  const r1 = JSON.stringify(calls.reply[calls.reply.length - 1]); ok(/超級 AI 人工客服/.test(r1), '⑫h2 第一句有自介');
+  const s0 = sess(uidD); s0.dc = false; kv.set('popline:' + uidD, JSON.stringify(s0));   // 模擬 race:第二句進來時 session 還沒寫回
+  const n0 = calls.reply.length;
+  await send([msg(uidD, '木瓜怎麼用')]);
+  const r2 = calls.reply.slice(n0).map((x) => JSON.stringify(x)).join('');
+  ok(calls.reply.length > n0 && !/超級 AI 人工客服/.test(r2), '⑫i 旗在,第二句不再重複自介');
+  ok(sess(uidD).dc === true, '⑫j 第二句把 dc 補回 true'); }
 
 console.log(failed === 0 ? `\n🟢 ${passed} passed, 0 failed\n` : `\n🔴 ${passed} passed, ${failed} failed\n`);
 process.exit(failed === 0 ? 0 : 1);

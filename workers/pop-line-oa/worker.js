@@ -76,7 +76,7 @@ const AI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 let SETUP_KEY = '';  // 由 env.SETUP_KEY 注入（fetch 開頭，未設用隨機值 fail-closed）
 const LINE_ID = '@150tiznd';
 // SHOPEE(蝦皮賣場網址)在 DATA 區塊後面定義:取 DATA 的 SHOP_URL(gen-data 已加 openExternalBrowser=1)
-const SEED_VER = 'v6.1.9';
+const SEED_VER = 'v6.1.10';
 // v6.1 reply-first 時間常數:reply token 約 1 分鐘內有效;主回覆 notBefore 不超過 issuedAt+45s,alarm 時 50 秒內才用 reply,過了直接 push
 const REPLY_SOFT_CAP_MS = 45000, REPLY_TOKEN_MAX_MS = 50000;
 const ACK_SOFT_CAP_MS = 40000;   // v6.1 追加:ack(已讀+loading)上限比 main 早 5 秒,保證每一則的已讀先於自己的主回覆
@@ -971,8 +971,24 @@ const RISK = /(先享後付|先用再付|分期|月費|保證賺|穩賺|最便�
 // v5:不再剝除 emoji(依 emoji 準則交給模型自律);驚嘆號連發收斂為一個;剝 [STATE]/[EMO]/[STK] 標籤
 // v5.2 出口守門(v4 A1):刪節號/雙破折號/「首先總之」連接詞收斂,根治 AI 腔洩底
 const CN_WORDS = [[/信息/g, '資訊'], [/視頻/g, '影片'], [/軟件/g, '軟體'], [/硬件/g, '硬體'], [/網絡/g, '網路'], [/默認/g, '預設'], [/鼠標/g, '滑鼠'], [/小貼士/g, '小提醒'], [/挺好/g, '很好'], [/靠譜/g, '可靠'], [/性價比/g, 'CP值'], [/質量(?=好|差|問題|很|不)/g, '品質'], [/立馬/g, '馬上'], [/估計(?=是|會|要)/g, '應該'], [/打call/gi, '支持'], [/幫助你/g, '幫你'], [/很樂意/g, '可以']];
+// v6.1.10 輸出閘:模型把系統提示複誦給客人(11-03 真機:「看來你已經了解了泡泡怪獸官方 LINE 的店員工作內容和相關規範。你的任務是…」)→ 整段剝掉;全剝光就換安全句
+const LEAK_RX = /(你的任務|本輪指令|本輪補充|工作內容和相關規範|系統會自動|店員工作內容|相關規範|system prompt|以上(是|為)(你|我)的(規範|設定|指令)|看來你已經了解)/;
+const LEAK_FALLBACK = '你想問哪一支產品?跟我說車況或用途,我直接講用法。';
+function stripLeak(t) {
+  const paras = (t || '').split(/\n{2,}/);
+  const kept = paras.filter((pp) => !LEAK_RX.test(pp));
+  if (kept.length === paras.length) return { s: t || '', leaked: false };
+  const out = kept.join('\n\n').trim();
+  return { s: out || LEAK_FALLBACK, leaked: true };
+}
+// v6.1.10 emoji 上限:一則最多 2 個(11-03 稽核:每人 5–18 個,像機器);留前兩個,其餘拿掉
+const EMOJI_RX = /(\p{Extended_Pictographic}|\p{Emoji_Presentation})(\uFE0F|\u200D\p{Extended_Pictographic})*/gu;
+function capEmoji(t, max = 2) {
+  let cnt = 0;
+  return (t || '').replace(EMOJI_RX, (m) => (++cnt <= max ? m : '')).replace(/[ \t]+\n/g, '\n').replace(/ {2,}/g, ' ');
+}
 function clean(t) {
-  let s = (t || '').replace(/\[STATE\][\s\S]*?(\[\/STATE\]|$)/g, '')
+  let s = stripLeak((t || '').replace(/\[STATE\][\s\S]*?(\[\/STATE\]|$)/g, '')).s
     .replace(/\[EMO\][\s\S]*?(\[\/EMO\]|$)/g, '')
     .replace(/\[STK\][\s\S]*?(\[\/STK\]|$)/g, '')
     .replace(/\[PROD\][\s\S]*?(\[\/PROD\]|$)/g, '')   // v6 產品卡標籤
@@ -986,6 +1002,7 @@ function clean(t) {
   for (const [rx, to] of CN_WORDS) s = s.replace(rx, to);   // v6.1.1 簡中用語閘
   s = s.replace(/[（(]\s*[A-Z]{1,2}\d{1,3}\s*[）)]/g, '').replace(/(^|[\s（(、，,。；：])[A-Z]{1,2}\d{1,3}\s*(?=[\u4e00-\u9fff])/g, '$1');   // v6.1.2 客人看不懂的 SKU 編號不唸出來
   if (RISK.test(s)) s = s.replace(RISK, '(此項負責人確認)');
+  s = capEmoji(s);
   return s.trim().slice(0, 900);
 }
 function extractEmo(t) {
@@ -1100,6 +1117,26 @@ async function linePush(token, to, text, env) {
 
 // v6.1 追加:老闆推播合併 + 每日上限。同一輪的通知用空一行隔開合成 1 則;KV ownerpush:<台北日期> 計當天已推幾則,
 // 到 OWNER_PUSH_DAILY_CAP(15)就不推,只寫 diag(diag:owner_push_capped=最近一次、ownerdrop:<日期>:<時間> 留全文 3 天,老闆事後可查)。沒有 KV 綁定時照舊直接推。
+// v6.1.10 交接包附「老闆可直接貼」的報價草稿:客人提過的商品(定價)、電話、他講過的需求原句、一句可貼的開場
+function handoffDraft(sess, state) {
+  try {
+    const users = (sess.hist || []).filter((m) => m.role === 'user').map((m) => String(m.content || ''));
+    const allText = users.join('\n');
+    const skus = [...new Set(users.flatMap((t) => matchCatalog(t)))].slice(0, 4);
+    const items = skus.map((x) => CATALOG[x] ? '·' + CATALOG[x].n + (CATALOG[x].p ? ' 定價 ' + CATALOG[x].p : '') : '').filter(Boolean);
+    const phone = (allText.match(/09\d{2}[-\s]?\d{3}[-\s]?\d{3}/) || [])[0] || '';
+    const need = users.filter((t) => t.length >= 4 && !/^【/.test(t)).slice(-4).map((t) => '·' + t.replace(/\s+/g, ' ').slice(0, 60));
+    const st = state && typeof state === 'object' ? state : {};
+    const tags = ['line', 'city', 'car', 'industry', 'budget', 'grade'].map((k) => (st[k] && st[k] !== 'unknown') ? k + ':' + st[k] : '').filter(Boolean).join(' ');
+    const lines = ['\n\n📋 給你貼的草稿'];
+    if (items.length) lines.push('提過的商品:\n' + items.join('\n'));
+    if (phone) lines.push('電話:' + phone);
+    if (tags) lines.push('筆記:' + tags);
+    if (need.length) lines.push('他的原話:\n' + need.join('\n'));
+    lines.push('建議開場(改價再貼):\n「哈囉,這裡是泡泡怪獸負責人。你問的' + (items.length ? CATALOG[skus[0]].n : '這幾支') + '我直接報給你:____。要的話回我數量,今天安排出貨。」');
+    return lines.join('\n');
+  } catch (_) { return ''; }
+}
 async function pushOwnerNotes(env, cfg, notes) {
   if (!Array.isArray(notes) || !notes.length || !cfg.ownerId || !cfg.lineToken) return false;
   const text = notes.join('\n\n').slice(0, 4900);
@@ -1607,6 +1644,11 @@ async function handleEvent(ev, env, cfg, inject) {
     if (inject?.shop) sess.line = 'shop';
 
     firstContact = !sess.dc;
+    if (firstContact && env.SESSION) {   // v6.1.10 揭露去重(11-03 真機:連傳兩句各帶一次自介):session 還沒寫回前先插一支 10 分鐘旗
+      const dcKey = 'dc:' + uid;
+      if (await env.SESSION.get(dcKey).catch(() => null)) { firstContact = false; sess.dc = true; }
+      else await env.SESSION.put(dcKey, '1', { expirationTtl: 600 }).catch(() => {});
+    }
     wantsHuman = WANTS_HUMAN_RE.test(userMsg);
     checkpoint = !sess.ho && sess.n >= AI_EMPLOYEE.handoff_threshold;   // >=:錯過一輪也補觸發,ho 鎖一次性
 
@@ -1752,6 +1794,7 @@ async function handleEvent(ev, env, cfg, inject) {
       prodSkus = extractProd(raw); vidLine = extractVid(raw);   // v6 產品卡/影片(標籤在 clean 裡剝掉)
       stateJson = extractState(raw);                      // v5.2 客戶筆記(城市/車型/grade…),下面落庫
       if (stateJson && stateJson.line === 'B2B') sess.line = 'shop';   // v6.1 模型判成 B2B → 記成店家線
+      if (stripLeak(raw).leaked) await env.SESSION?.put('dbg:last_leak', uid.slice(0, 8) + ' @' + new Date().toISOString() + '\n' + String(raw).slice(0, 400)).catch(() => {});   // v6.1.10 指令外洩留證
       reply = clean(raw);
       if (sess.flow?.name === 'shop_audit') {             // v5.3 健檢流推進一題;算帳那輪跑完就結束
         sess.flow.step = (sess.flow.step || 0) + 1;
@@ -1820,6 +1863,7 @@ async function handleEvent(ev, env, cfg, inject) {
   try {
     if (((checkpoint && !directMsgs) || wantsHuman) && !degraded && cfg.ownerId) {   // 老闆交接包
       ownerNotes.push('🤝 AI 店員交接' + (wantsHuman ? '(客人喊真人)' : '(第' + AI_EMPLOYEE.handoff_threshold + '句檢查點)') + '\n客人 ' + uid.slice(0, 8) + '…\n情緒:' + emo + '\n\n' + reply
+        + handoffDraft(sess, stateJson)
         + (wantsHuman ? '\n\n⏸ 已暫停對他的自動回覆 24 小時,他接下來的訊息會原文轉給你。到 LINE 官方帳號後台聊天室回他;回我「放 ' + uid.slice(0, 8) + '」就恢復自動。' : ''));
     }
     if (degraded && cfg.ownerId) {
@@ -2130,4 +2174,4 @@ export default {
   },
 };
 
-export { GO_INTAKE_SERVICE, goIntakeTransition, DIRECTIVES };
+export { GO_INTAKE_SERVICE, goIntakeTransition, DIRECTIVES, clean, stripLeak, capEmoji, handoffDraft };
