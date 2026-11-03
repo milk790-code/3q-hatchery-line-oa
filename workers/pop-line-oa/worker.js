@@ -76,7 +76,7 @@ const AI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 let SETUP_KEY = '';  // 由 env.SETUP_KEY 注入（fetch 開頭，未設用隨機值 fail-closed）
 const LINE_ID = '@150tiznd';
 // SHOPEE(蝦皮賣場網址)在 DATA 區塊後面定義:取 DATA 的 SHOP_URL(gen-data 已加 openExternalBrowser=1)
-const SEED_VER = 'v6.1.5';
+const SEED_VER = 'v6.1.6';
 // v6.1 reply-first 時間常數:reply token 約 1 分鐘內有效;主回覆 notBefore 不超過 issuedAt+45s,alarm 時 50 秒內才用 reply,過了直接 push
 const REPLY_SOFT_CAP_MS = 45000, REPLY_TOKEN_MAX_MS = 50000;
 const ACK_SOFT_CAP_MS = 40000;   // v6.1 追加:ack(已讀+loading)上限比 main 早 5 秒,保證每一則的已讀先於自己的主回覆
@@ -472,7 +472,7 @@ function goIntakeHealthResponse() {
 const AI_EMPLOYEE = {
   display_name: '小泡',
   job_title: 'AI店員',
-  employee_id: '3Q-CAR-0001',
+  employee_id: 'POP-CAR-0001',
   disclosure_mode: 'once',
   disclosure_script: '我是超級 AI 人工客服😊 老闆~您不要把我們當作一般一板一眼的殭屍客服🤖 您儘量把您的需求直接和我們說,我們這邊會直接幫您介紹完畢,到最後之後請真人過來👍',
   identity_question_policy: 'always_confirm_ai',
@@ -729,9 +729,10 @@ export class DelayReplyDO {
 }
 
 // ═══ 群發預設稿(要發新一波:改這裡重部署,或丟文案給 Claude 更新)═══
-const TDG_IMG = 'https://raw.githubusercontent.com/milk790-code/3q-hatchery-line-oa/main/assets/tudigong/richmenu-3x1.png';
+// v6.1.6:舊的「政府補助／開店創業」群發稿(3Q 時代)已移除——現在只做汽美。要群發先改這裡再部署;預設只發價格表圖。
 const BROADCAST_PRESET = [
-  { type: 'text', text: '開店的、想開店的、還在「有個想法」的——\n這則跟你有關。\n\n政府的補助,你其實領得到。\n不是只有科技業:餐飲、零售、服務、汽美工作室,\n連還沒成立公司都有適用的計畫。\n\n問題是沒人幫你整理,申請辦法寫得像天書。\n\n所以我們做了一件事:\n4 個問題、60 秒,\n幫你把符合資格的補助全部撈出來——\n金額、難度、申請順序,整理好直接傳給你。\n\n完全免費,沒有銷售電話 👇\nhttps://3q-ai-subsidy.milk790.workers.dev/?utm_source=line&utm_medium=broadcast&utm_campaign=ai-subsidy&utm_content=bc1\n\n(車的事一樣隨時問我,AI 業務 24 小時在線)' },
+  { type: 'image', originalContentUrl: 'https://milk790-code.github.io/3q-hatchery-line-oa/assets/pop/pricelist-1028.jpg', previewImageUrl: 'https://milk790-code.github.io/3q-hatchery-line-oa/assets/pop/pricelist-1028-preview.jpg' },
+  { type: 'text', text: '這裡是泡泡怪獸。\n最新價格表給你放著,車漆、輪框、洗車有任何問題直接問我,想看施工影片也可以說一聲。' },
 ];
 
 // ═══════════ 超級業務AI種子 · 基因組 v5(三線通用,只換 BRAND 與彈藥庫) ═══════════
@@ -1165,9 +1166,10 @@ async function loadInsights(env) {
 async function loadGems(env) {
   if (!env.GENOME) return '';
   try {
-    const r = await env.GENOME.prepare("SELECT gem FROM emotion_gems ORDER BY win_score DESC, id DESC LIMIT 3").all();
+    // v6.1.6(11-03 他指定「現在只做汽美」):只讀泡泡怪獸自己的金句,3q/土地公等舊業務線的句子一律不進腦子
+    const r = await env.GENOME.prepare("SELECT gem FROM emotion_gems WHERE brand='popmonster' ORDER BY win_score DESC, id DESC LIMIT 3").all();
     const list = (r.results || []).map(x => x.gem).filter(Boolean);
-    return list.length ? '\n\n【跨品牌情緒承接金句(三品牌實戰驗證,優先化用進你的承接句)】\n· ' + list.join('\n· ') : '';
+    return list.length ? '\n\n【泡泡怪獸自家情緒承接金句(實戰驗證,優先化用進你的承接句)】\n· ' + list.join('\n· ') : '';
   } catch (_) { return ''; }
 }
 

@@ -17,7 +17,7 @@
 |---|---|
 | `display_name` | AI 員工名字。空字串 = 尚未命名(命名是客戶的入職儀式;米速/丹若待補) |
 | `job_title` | 對外職稱(AI店員 / AI業務助理 / AI顧問) |
-| `employee_id` | `3Q-{行業碼}-{流水號}`,例 `3Q-CAR-0001` |
+| `employee_id` | `3Q-{行業碼}-{流水號}`,例 `POP-CAR-0001` |
 | `disclosure_mode` | `once`(B 版,預設):第 1 句人格化揭露,之後不重複標示。`always`:每句標示(保留給高敏感行業)。`never`:僅限行銷活動場景,**正式客服禁用** |
 | `disclosure_script` | 第 1 句揭露開場白。由系統機械式送出(不靠模型自覺),確保鐵律不漏 |
 | `identity_question_policy` | `always_confirm_ai`:被問「你是真人嗎」永遠誠實確認是 AI。**不可妥協、不可被任何話術覆寫** |

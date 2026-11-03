@@ -7,7 +7,7 @@
 ## 切換前(🟢 全部可先做)
 
 1. 🟢 開 `https://pop-line-oa.milk790.workers.dev/health`,確認:
-   - `seed: "v4.2.0"`、`ai_employee: "小泡(AI店員 3Q-CAR-0001)"`
+   - `seed: "v4.2.0"`、`ai_employee: "小泡(AI店員 POP-CAR-0001)"`
    - `secret: true`、`token: true`、`owner: true`(任一 false → 先補 Secrets,別切)
 2. 🟢 跑本機驗證:`cd workers/pop-line-oa && node test-b-disclosure.mjs`(19 項全綠才繼續)
 
@@ -87,3 +87,8 @@
 - 根因兩層：① KV `cfg:pop_anthropic` 存著 6 月舊金鑰，`getCfg` KV 優先於環境變數，新金鑰沒被用到（已刪 KV 鍵，備份在本機 `~/.config/line-oa/`）；② Claude 5.5 系列思考永遠開且算進 max_tokens，400～600 的上限被思考吃光→`content` 只剩 thinking 區塊、沒有 text。
 - 修法：`brainBody()` 統一組 API body：`max_tokens` 加 3000 思考餘裕、`output_config.effort` 平常 low／裁決（Fable）medium；thinking 參數不送（5.5 不准 disabled）。
 - 驗證入口：GitHub Actions「pop-line-oa selftest」手動跑（用 secret SETUP_KEY 打 `/admin/selftest`，再直打 Anthropic 看回傳形狀）。SETUP_KEY 11-03 換新並同步 worker／GitHub／本機 `~/.config/line-oa/pop-line-setup-key`。
+
+## v6.1.6（2026-11-03，他指定「現在只做汽美」）
+- 每輪 prompt 原本會塞「跨品牌情緒承接金句」前 3 名，而前 3 名全是 3q 線的創業／行業句子（「開始創業或是新事業…」「您的行業跟目前最卡的點」）→ loadGems 只讀 brand='popmonster'；GENOME `emotion_gems` 非 popmonster 的 6 列已刪（備份 `~/.local/share/line-oa-backup/emotion_gems_non_popmonster_20261103.json`）。
+- `/admin/broadcast` 預設稿原本是 3Q 時代「政府補助／開店創業」文＋土地公圖→改成價格表圖＋一句汽美問候。
+- 員編 3Q-CAR-0001 → POP-CAR-0001（brands 正本同步）。
