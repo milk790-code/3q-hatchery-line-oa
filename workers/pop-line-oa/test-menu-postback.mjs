@@ -126,7 +126,7 @@ await send([msg('U_shop', '大概撐兩個月就沒了')]);
 ok(directive().includes('第 3 題') && directive().includes('客人不回頭'), '④ 第3題');
 await send([msg('U_shop', '最痛的是客人不回頭')]);
 ok(directive().includes('用他自己講過的數字') && directive().includes('不准自己編任何數字'), '④ 第4輪=算帳收尾,且明文禁止編數字');
-ok(directive().includes('popcard-saas-preview.milk790.workers.dev/s/jilin'), '④ 收尾帶 POP CARD 定版展示連結');
+ok(!directive().includes('popcard') && directive().includes('不推任何系統或軟體'), '④ 收尾不再推 POP CARD(11-03 只做汽美)');
 await send([msg('U_shop', '好啊')]);
 ok(sess('U_shop').flow === null || sess('U_shop').flow === undefined, '④ 算帳跑完流程自動結束,不會卡住');
 ok(!directive().includes('第 1 題'), '④ 結束後不再重問第1題');

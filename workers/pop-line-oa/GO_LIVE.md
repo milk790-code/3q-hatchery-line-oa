@@ -92,3 +92,8 @@
 - 每輪 prompt 原本會塞「跨品牌情緒承接金句」前 3 名，而前 3 名全是 3q 線的創業／行業句子（「開始創業或是新事業…」「您的行業跟目前最卡的點」）→ loadGems 只讀 brand='popmonster'；GENOME `emotion_gems` 非 popmonster 的 6 列已刪（備份 `~/.local/share/line-oa-backup/emotion_gems_non_popmonster_20261103.json`）。
 - `/admin/broadcast` 預設稿原本是 3Q 時代「政府補助／開店創業」文＋土地公圖→改成價格表圖＋一句汽美問候。
 - 員編 3Q-CAR-0001 → POP-CAR-0001（brands 正本同步）。
+
+## v6.1.7（2026-11-03，續「只做汽美」）
+- SEED_GENOME 的「POP CARD 回店系統」段整段換成鐵律：業務只有汽美藥劑／研磨拋光劑／拋光盤的零售與批發；系統／網站／補助／代操／接案一律「這塊我們現在沒做」一句帶過，不丟連結、不說請真人確認。
+- 店家三題健檢收尾（SHOP_AUDIT_CLOSE）「客人不回頭」解法改用天使塗層這類耗材做回店理由，不推系統。
+- ⏳ 未動：店家老闆選單左上「贏過同行的黑科技」按鈕仍連 POP CARD Demo（oa.json A_left，他的既有設定、要重做選單圖才能換）。
