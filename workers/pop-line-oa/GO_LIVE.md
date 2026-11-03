@@ -82,3 +82,8 @@
 - 拋光線影片換成個人 FB 爆款版（開頭 3 秒「為什麼…？」標題卡＋燒好的聯絡三行）：剪接點偵測 0 點才收；天使線主片改 079（前 3 秒就看到效果）、069 第二支。每支前面的文字都重寫成四要素。
 - 木瓜輪框那批片檔頭全是抖音標記（品牌方素材），不進 LINE；輪框、洗車等線維持合集備援。
 - 轉檔腳本新增 `transcode.watermark=false`（成片已有聯絡三行就不再疊第二個）。
+
+## v6.1.5（2026-11-03 下午，熱修：Opus 5.5 回文變空）
+- 根因兩層：① KV `cfg:pop_anthropic` 存著 6 月舊金鑰，`getCfg` KV 優先於環境變數，新金鑰沒被用到（已刪 KV 鍵，備份在本機 `~/.config/line-oa/`）；② Claude 5.5 系列思考永遠開且算進 max_tokens，400～600 的上限被思考吃光→`content` 只剩 thinking 區塊、沒有 text。
+- 修法：`brainBody()` 統一組 API body：`max_tokens` 加 3000 思考餘裕、`output_config.effort` 平常 low／裁決（Fable）medium；thinking 參數不送（5.5 不准 disabled）。
+- 驗證入口：GitHub Actions「pop-line-oa selftest」手動跑（用 secret SETUP_KEY 打 `/admin/selftest`，再直打 Anthropic 看回傳形狀）。SETUP_KEY 11-03 換新並同步 worker／GitHub／本機 `~/.config/line-oa/pop-line-setup-key`。

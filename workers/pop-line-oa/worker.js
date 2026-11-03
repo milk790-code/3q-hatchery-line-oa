@@ -64,12 +64,19 @@ function pickModel(history) {
   if (t.length <= 12 && LITE_RX.test(t)) return MODELS.lite;
   return MODELS.chat;
 }
+// v6.1.5:Claude 5.5 系列思考永遠開、關不掉,思考字數會算進 max_tokens;上限太小(400~600)會被思考吃光→回文變空。
+// 所以 API 的 max_tokens 一律加思考餘裕,回覆長度靠提示詞管;思考深度用 output_config.effort:平常 low 省錢省時,裁決(Fable)用 medium。
+const THINK_HEADROOM = 3000;
+function brainBody(model, maxTokens, extra) {
+  const effort = model === MODELS.escalate ? 'medium' : 'low';
+  return Object.assign({ model, max_tokens: (maxTokens || 600) + THINK_HEADROOM, output_config: { effort } }, extra);
+}
 const CLAUDE_MODEL = MODELS.chat; // 舊引用點安全預設
 const AI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 let SETUP_KEY = '';  // 由 env.SETUP_KEY 注入（fetch 開頭，未設用隨機值 fail-closed）
 const LINE_ID = '@150tiznd';
 // SHOPEE(蝦皮賣場網址)在 DATA 區塊後面定義:取 DATA 的 SHOP_URL(gen-data 已加 openExternalBrowser=1)
-const SEED_VER = 'v6.1.4';
+const SEED_VER = 'v6.1.5';
 // v6.1 reply-first 時間常數:reply token 約 1 分鐘內有效;主回覆 notBefore 不超過 issuedAt+45s,alarm 時 50 秒內才用 reply,過了直接 push
 const REPLY_SOFT_CAP_MS = 45000, REPLY_TOKEN_MAX_MS = 50000;
 const ACK_SOFT_CAP_MS = 40000;   // v6.1 追加:ack(已讀+loading)上限比 main 早 5 秒,保證每一則的已讀先於自己的主回覆
@@ -931,12 +938,11 @@ async function callBrain(history, env, cfg, systemPrompt, maxTokens, turnDirecti
       let r = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: HDRS,
-        body: JSON.stringify({ model: pickModel(history), max_tokens: maxTokens || 600,
-          system: sysBlocks, messages: history }),
+        body: JSON.stringify(brainBody(pickModel(history), maxTokens, { system: sysBlocks, messages: history })),
       });
       if (!r.ok && [400, 403, 404].includes(r.status)) {
       console.error('anthropic', r.status, '-> fallback opus-4-8');
-      r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: HDRS, body: JSON.stringify({ model: MODELS.fallback, max_tokens: maxTokens || 600, system: sysBlocks, messages: history }) });
+      r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: HDRS, body: JSON.stringify(brainBody(MODELS.fallback, maxTokens, { system: sysBlocks, messages: history })) });
       }
       if (r.ok) { const d = await r.json(); return d.content?.find(b => b.type === 'text')?.text || ''; }
       const errBody = (await r.text().catch(() => '')).slice(0, 200);
@@ -1272,9 +1278,9 @@ async function handleImages(evs, env, cfg) {
         const r = await fetch('https://api.anthropic.com/v1/messages', {
           method: 'POST',
           headers: { 'x-api-key': cfg.anthropicKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-          body: JSON.stringify({ model: MODELS.chat, max_tokens: many ? 600 : 500,
+          body: JSON.stringify(brainBody(MODELS.chat, many ? 600 : 500, {
             system: [{ type: 'text', text: buildSystemPrompt(''), cache_control: { type: 'ephemeral' } }],
-            messages: [{ role: 'user', content: [...imgs, { type: 'text', text: ask }] }] }),
+            messages: [{ role: 'user', content: [...imgs, { type: 'text', text: ask }] }] })),
         });
         if (r.ok) { const d = await r.json(); reply = clean(d.content?.find(b => b.type === 'text')?.text || ''); }
       }
