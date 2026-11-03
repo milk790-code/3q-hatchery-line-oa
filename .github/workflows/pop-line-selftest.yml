@@ -17,7 +17,7 @@ jobs:
         run: |
           curl -sS --get "https://pop-line-oa.milk790.workers.dev/admin/selftest" --data-urlencode "key=$SETUP_KEY" --data-urlencode "q=$Q" | tee out.json
           echo
-          python3 -c "import json;d=json.load(open('out.json'));assert d.get('ok') and not str(d.get('dbg',{}).get('anthropic','')).startswith('400'), d"
+          python3 -c "import json;d=json.load(open('out.json'));assert d.get('ok') and d.get('reply_preview') not in ('', '(空)') and '**' not in d.get('reply_preview',''), d"
       - name: 直接打 Anthropic 看回傳形狀(不印金鑰)
         if: always()
         env:

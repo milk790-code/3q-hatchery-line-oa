@@ -976,6 +976,7 @@ function clean(t) {
     .replace(/\[STK\][\s\S]*?(\[\/STK\]|$)/g, '')
     .replace(/\[PROD\][\s\S]*?(\[\/PROD\]|$)/g, '')   // v6 產品卡標籤
     .replace(/\[VID\][\s\S]*?(\[\/VID\]|$)/g, '')     // v6 影片標籤
+    .replace(/\*\*([^*\n]+)\*\*/g, '$1').replace(/(^|\n)\s*#{1,6}\s+/g, '$1').replace(/`+/g, '')   // v6.1.5 LINE 不吃 markdown:粗體星號/標題井號/反引號原樣顯示會很醜,拆掉
     .replace(/[!！]{2,}/g, '!')
     .replace(/\.{3,}/g, '').replace(/[…⋯]+/g, '')
     .replace(/[—–]{2,}/g, '，')
