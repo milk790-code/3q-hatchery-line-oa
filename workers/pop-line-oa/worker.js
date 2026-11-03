@@ -76,7 +76,7 @@ const AI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 let SETUP_KEY = '';  // 由 env.SETUP_KEY 注入（fetch 開頭，未設用隨機值 fail-closed）
 const LINE_ID = '@150tiznd';
 // SHOPEE(蝦皮賣場網址)在 DATA 區塊後面定義:取 DATA 的 SHOP_URL(gen-data 已加 openExternalBrowser=1)
-const SEED_VER = 'v6.1.10';
+const SEED_VER = 'v6.1.11';
 // v6.1 reply-first 時間常數:reply token 約 1 分鐘內有效;主回覆 notBefore 不超過 issuedAt+45s,alarm 時 50 秒內才用 reply,過了直接 push
 const REPLY_SOFT_CAP_MS = 45000, REPLY_TOKEN_MAX_MS = 50000;
 const ACK_SOFT_CAP_MS = 40000;   // v6.1 追加:ack(已讀+loading)上限比 main 早 5 秒,保證每一則的已讀先於自己的主回覆
@@ -1168,12 +1168,52 @@ async function ensureTables(env) {
     // v5.3 選單逐鈕點擊台帳:官方 richmenu insight 有「整段期間不重複點擊<20人就不回任何數據」的隱私門檻,
     //      以目前 519 好友的量級幾乎永遠拿不到 → 第一手統計自己記,否則上線後對「哪格有效」全瞎。
     await env.CRM.prepare("CREATE TABLE IF NOT EXISTS pop_line_menu_taps (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, data TEXT, created_at TEXT DEFAULT (datetime('now')))").run();
+    // v6.1.11 LINE 備註欄同步佇列(11-03 他指定「談完自動在 LINE 備註欄記店面資訊/上次購買/喜好」):worker 每輪生筆記存這張表,本機 pop-line-note-sync 用 ego 寫進 chat.line.biz 再回填 synced_*
+    await env.CRM.prepare("CREATE TABLE IF NOT EXISTS pop_line_notes (user_id TEXT PRIMARY KEY, note TEXT, updated_at TEXT, synced_at TEXT, synced_note TEXT, chat_id TEXT, note_id TEXT)").run();
     await env.CRM.prepare("ALTER TABLE customer_profiles ADD COLUMN nurtured_at INTEGER").run().catch(() => {});      // 舊表補欄位(已存在則無害忽略)
     await env.CRM.prepare("ALTER TABLE customer_profiles ADD COLUMN nurture_count INTEGER DEFAULT 0").run().catch(() => {});
   } catch (e) { console.error('[pop-line] tables', e.message); }
 }
 
 // v5.2 筆記超能力後端:把 [STATE] 客戶筆記 upsert 落庫(空欄不覆寫舊值);A 級意向即時推播老闆。永不阻斷回覆(全 try 包)。
+// v6.1.11 給 LINE 備註欄的客戶筆記(老闆在後台聊天室右側看得到):身分/店面資訊/上次談的商品/購買意向/喜好與注意/電話/狀態
+const NOTE_HEAD = '【泡泡怪獸 AI 筆記】';
+function fmtTaipei(ms) { const d = new Date((ms || Date.now()) + 8 * 3600 * 1000); return d.toISOString().slice(5, 16).replace('T', ' '); }
+function buildCustomerNote(uid, sess, prof, st) {
+  const hist = Array.isArray(sess?.hist) ? sess.hist : [];
+  const users = hist.filter((m) => m.role === 'user').map((m) => String(m.content || '')).filter((t) => !/^【/.test(t));
+  const all = users.join('\n');
+  const P = prof && typeof prof === 'object' ? prof : {};
+  const S = st && typeof st === 'object' ? st : {};
+  const pick = (k, k2) => (S[k] && S[k] !== 'unknown' ? S[k] : (P[k2 || k] || ''));
+  const lineTag = S.line === 'B2B' || sess?.line === 'shop' || /店|批發|進貨|老闆/.test(all) ? '店家老闆' : (S.line === 'B2C' ? '車主' : '未知');
+  const machine = (all.match(/\b(RO|GA|DA)\b/i) || [])[1];
+  const vol = (all.match(/(?:月|一個月|每月)[^\d]{0,6}(\d{1,4})\s*台/) || all.match(/(\d{1,4})\s*台/) || [])[1];
+  const phone = (all.match(/09\d{2}[-\s]?\d{3}[-\s]?\d{3}/) || [])[0];
+  const skus = [...new Set(users.flatMap((t) => matchCatalog(t)))].slice(0, 5);
+  const items = skus.map((x) => CATALOG[x] ? CATALOG[x].n + (CATALOG[x].p ? '(' + CATALOG[x].p + ')' : '') : '').filter(Boolean);
+  const payT = users.filter((t) => isPayIntent(t)).slice(-1)[0];
+  const wantsH = users.some((t) => WANTS_HUMAN_RE.test(t));
+  const shop = [pick('city'), pick('industry'), machine ? '拋光機 ' + machine.toUpperCase() : '', vol ? '月洗約 ' + vol + ' 台' : ''].filter(Boolean).join('・');
+  const likes = [pick('pain') ? '痛點:' + pick('pain') : '', pick('vehicle') ? '車型:' + pick('vehicle') : '', pick('budget') ? '預算:' + pick('budget') : ''].filter(Boolean).join(';');
+  const grade = pick('grade');
+  const lines = [NOTE_HEAD + '更新 ' + fmtTaipei(), '身分:' + lineTag];
+  if (shop) lines.push('店面資訊:' + shop);
+  if (items.length) lines.push('上次談的商品:' + items.join('、'));
+  lines.push('購買意向:' + (payT ? '有(問過「' + payT.slice(0, 20) + '」)' : '還沒問到價'));
+  if (likes) lines.push('喜好與注意:' + likes);
+  if (phone) lines.push('電話:' + phone);
+  lines.push('狀態:' + [grade ? grade + ' 級' : '', '最後聊 ' + fmtTaipei(Number(sess?.last_seen) || Date.now()), wantsH ? '喊過真人' : '', S.next ? '下一步 ' + S.next : ''].filter(Boolean).join('・'));
+  return lines.join('\n').slice(0, 900);
+}
+async function upsertCustomerNote(env, uid, sess, st) {
+  if (!env.CRM || !uid || uid === 'unknown') return;
+  try {
+    const prof = await env.CRM.prepare("SELECT city, vehicle, industry, budget, grade, pain FROM customer_profiles WHERE brand='popmonster' AND sid=?").bind(uid).first().catch(() => null);
+    const note = buildCustomerNote(uid, sess, prof, st);
+    await env.CRM.prepare("INSERT INTO pop_line_notes (user_id, note, updated_at) VALUES (?,?,datetime('now')) ON CONFLICT(user_id) DO UPDATE SET note=excluded.note, updated_at=excluded.updated_at").bind(uid, note).run();
+  } catch (e) { console.error('[pop-line] note', e.message); }
+}
 async function saveProfile(env, cfg, uid, st, notes) {
   if (!env.CRM || !st || !uid || uid === 'unknown') return;
   try {
@@ -1633,6 +1673,7 @@ async function handleEvent(ev, env, cfg, inject) {
       sess.hist.push({ role: 'user', content: userMsg }); sess.hist = sess.hist.slice(-20); sess.last_seen = Date.now();
       if (env.SESSION) await env.SESSION.put(kvKey, JSON.stringify(sess), { expirationTtl: 7 * 24 * 3600 }).catch(() => {});
       if (env.CRM) await env.CRM.prepare("INSERT INTO pop_line_convos (user_id, role, text) VALUES (?, 'user', ?)").bind(uid, userMsg).run().catch(() => {});
+      await upsertCustomerNote(env, uid, sess, null);   // v6.1.11 真人接手中客人講的(電話/機型)也進備註
       await pushOwnerNotes(env, cfg, ['👤 真人接手中(AI 不回)\n客人 ' + uid.slice(0, 8) + '…:' + (stickerIn ? '(貼圖)' : userMsg.slice(0, 300)) + '\n\n到 LINE 官方帳號後台聊天室回他;回我「放 ' + uid.slice(0, 8) + '」就恢復自動。']);
       return;
     }
@@ -1883,6 +1924,7 @@ async function handleEvent(ev, env, cfg, inject) {
       await env.CRM.prepare("INSERT INTO pop_line_convos (user_id, role, text) VALUES (?, 'assistant', ?)").bind(uid, reply).run().catch(() => {});
       await env.CRM.prepare("INSERT INTO pop_line_delivery (user_id, ab_group, emotion, path, delay_ms) VALUES (?,?,?,?,?)").bind(uid, ab, emo, path, delayMs).run().catch(() => {});
       await saveProfile(env, cfg, uid, stateJson, ownerNotes);   // v5.2 筆記超能力:客戶筆記落庫 + A 級通知老闆(v6.1 追加:收進 ownerNotes 一起推)
+      if (stateJson || checkpoint || wantsHuman || isPayIntent(userMsg) || /09\d{8}/.test(userMsg) || sess.n % 5 === 0) await upsertCustomerNote(env, uid, sess, stateJson);   // v6.1.11 LINE 備註欄筆記
     }
   } catch (e) { console.error('[pop-line] post-reply log', e.message); }
   await pushOwnerNotes(env, cfg, ownerNotes);
@@ -2174,4 +2216,4 @@ export default {
   },
 };
 
-export { GO_INTAKE_SERVICE, goIntakeTransition, DIRECTIVES, clean, stripLeak, capEmoji, handoffDraft };
+export { GO_INTAKE_SERVICE, goIntakeTransition, DIRECTIVES, clean, stripLeak, capEmoji, handoffDraft, buildCustomerNote };

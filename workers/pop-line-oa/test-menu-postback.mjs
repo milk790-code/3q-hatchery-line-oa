@@ -6,10 +6,10 @@ import fs from 'node:fs';
 //      ⑥批發鈕明確禁止報價 ⑦點選單=秒回不延遲 ⑧選單點擊逐鈕落庫 ⑨已升級客戶不被選單降級
 // v6.1:「我想知道我的車該用什麼產品」(pick)改成不經大腦直回拍照 quick reply(拍照/從相簿選/用打字描述);
 //      舊的問診指令搬到 describe(走大腦)
-import worker, { clean, stripLeak, capEmoji, handoffDraft } from './worker.js';
+import worker, { clean, stripLeak, capEmoji, handoffDraft, buildCustomerNote } from './worker.js';
 
 const kv = new Map();
-const d1rows = { taps: [], profiles: new Map() };
+const d1rows = { taps: [], profiles: new Map(), notes: new Map() };
 // 極簡 D1 mock:只認本測試會用到的幾條 SQL 形狀
 const CRM = {
   prepare(sql) {
@@ -18,6 +18,7 @@ const CRM = {
       bind(...a) { st._b = a; return st; },
       async run() {
         if (sql.includes('INSERT INTO pop_line_menu_taps')) d1rows.taps.push({ user_id: st._b[0], data: st._b[1] });
+        if (sql.includes('INSERT INTO pop_line_notes')) d1rows.notes.set(st._b[0], st._b[1]);
         if (sql.includes('INSERT INTO customer_profiles')) {
           const [sid, industry, grade] = st._b;
           const prev = d1rows.profiles.get(sid) || {};
@@ -273,6 +274,19 @@ console.log('\n── ⑫ v6.1.10 輸出閘/emoji 上限/揭露去重/交接草�
   const r2 = calls.reply.slice(n0).map((x) => JSON.stringify(x)).join('');
   ok(calls.reply.length > n0 && !/超級 AI 人工客服/.test(r2), '⑫i 旗在,第二句不再重複自介');
   ok(sess(uidD).dc === true, '⑫j 第二句把 dc 補回 true'); }
+
+
+console.log('\n── ⑬ v6.1.11 LINE 備註欄筆記 ──');
+{ const n = buildCustomerNote('U1', { hist: [{ role: 'user', content: '研磨劑三件組怎麼買' }, { role: 'assistant', content: 'x' }, { role: 'user', content: '我店裡用 RO 機,一個月洗 60 台,電話 0983617084,再麻煩請真人報價' }], last_seen: Date.now(), line: 'shop' }, { city: '台中', grade: 'A', pain: '太陽紋' }, { line: 'B2B', next: '報店家價' });
+  ok(/【泡泡怪獸 AI 筆記】/.test(n) && /身分:店家老闆/.test(n) && /台中/.test(n) && /拋光機 RO/.test(n) && /月洗約 60 台/.test(n), '⑬a 身分/店面資訊(城市/機型/月洗台數)');
+  ok(/上次談的商品:米速研磨劑三件組\(4,099\)/.test(n) && /購買意向:有/.test(n) && /電話:0983617084/.test(n), '⑬b 商品(定價)/購買意向/電話');
+  ok(/痛點:太陽紋/.test(n) && /A 級/.test(n) && /喊過真人/.test(n) && /下一步 報店家價/.test(n) && n.length <= 900, '⑬c 喜好/等級/真人/下一步,900 字內');
+  const e = buildCustomerNote('U2', { hist: [] }, null, null); ok(/身分:未知/.test(e) && /還沒問到價/.test(e), '⑬d 空資料不炸');
+  const uidN = 'U_note1';
+  brainText = () => '好,我幫你看 [STATE]{"completion":40,"line":"B2C","city":"高雄","grade":"B","pain":"水痕","next":"推天使"}[/STATE]';
+  await send([msg(uidN, '天使塗層多少錢')]);
+  ok(d1rows.notes.has(uidN) && /高雄|購買意向:有/.test(d1rows.notes.get(uidN)), '⑬e 大腦回了 [STATE]/問價 → 筆記落 pop_line_notes');
+  brainText = () => '好的,我幫你看。'; }
 
 console.log(failed === 0 ? `\n🟢 ${passed} passed, 0 failed\n` : `\n🔴 ${passed} passed, ${failed} failed\n`);
 process.exit(failed === 0 ? 0 : 1);

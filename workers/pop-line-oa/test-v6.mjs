@@ -181,7 +181,7 @@ ok(r.status === 200 && /image\/jpeg/.test(r.ct) && calls.upstream.some((u) => /p
 r = await admin('/img/pricelist/999');
 ok(r.status === 404, '⑩ 非 imagemap 尺寸 404');
 r = await admin('/health');
-ok(/"seed":"v6\.1\.10"/.test(r.body) && /"catalog":\d+/.test(r.body) && /"welcome_pack":\d+/.test(r.body) && /"reply_first":true/.test(r.body), '⑩ /health 報 seed v6.1.3 + reply_first + 目錄/歡迎包計數');
+ok(/"seed":"v6\.1\.11"/.test(r.body) && /"catalog":\d+/.test(r.body) && /"welcome_pack":\d+/.test(r.body) && /"reply_first":true/.test(r.body), '⑩ /health 報 seed v6.1.3 + reply_first + 目錄/歡迎包計數');
 r = await admin('/admin/catalog?key=testkey');
 ok(r.status === 200 && /"A001"/.test(r.body), '⑩ /admin/catalog 列目錄');
 

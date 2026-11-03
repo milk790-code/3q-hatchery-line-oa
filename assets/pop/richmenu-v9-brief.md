@@ -87,3 +87,8 @@
 - emoji 上限:一則最多 2 個(稽核每人 5–18 個)。
 - 交接包附「給你貼的草稿」:提過的商品＋定價、電話、[STATE] 筆記、他的原話、一句改價即貼的開場。
 - 測試 195／32／76 全綠,資料同步閘綠。
+
+## 第八版（v6.1.11，2026-11-03）：LINE 備註欄自動記錄
+- worker 每位客人維護一份「【泡泡怪獸 AI 筆記】」（身分／店面資訊／上次談的商品／購買意向／喜好與注意／電話／狀態），存 D1 `pop_line_notes`；有狀態變化、交接、留電話、每 5 句更新一次。
+- LINE 沒開備註欄公開 API → 本機 `scripts/pop-line-note-sync.mjs` 用 ego 瀏覽器（他登入的商用 ID）走 chat.line.biz 內部 API 寫進聊天室備註；同一人只維護一則、有就改寫。launchd `com.popmonster.line-note-sync` 每 30 分鐘跑；log `~/.local/share/coo/perf/pop-line-note-sync.log`。
+- 關掉：`launchctl unload ~/Library/LaunchAgents/com.popmonster.line-note-sync.plist`（worker 照常生筆記，只是不寫進後台）。
