@@ -2,67 +2,66 @@
  "079": {
   "line": "angel",
   "slot": "angel.main",
-  "caption": "上過天使塗層的引擎蓋，一沖水整片水膜直接滑掉",
+  "caption": "洗完車亮不了幾天，水一碰又一片水痕，很累對吧？\n看這支：引擎蓋一沖水，整片水膜直接滑掉，這就是撥水做出來的樣子。\n用法：洗完車趁車身還濕直接噴天使塗層，用洗車手套輕帶一遍再沖水收乾，單層不堆疊。\n每次洗完補一次，大約撐一個月。",
   "duration_s": 24.47,
-  "bytes": 9615707,
-  "preview_bytes": 86356,
+  "bytes": 9613890,
+  "preview_bytes": 86249,
   "audio": "keep",
   "inputs": [
    "079_一剪到底_鍍膜_深灰引擎蓋整片水膜.mp4"
   ],
-  "sha256": "6bb302591e438f0f75810dc324eb61eb150d9df117b22a7921025e30c18545c4"
+  "sha256": "807e2da9e29c13f2b0bb501ae4bf5da49a95b4523bfa8dea132df87dd6e15d96"
  },
  "069": {
   "line": "angel",
   "slot": "angel.backup",
-  "caption": "車門一沖水，水膜整片往下退，退完倒影清清楚楚",
+  "caption": "車門一沖水，水膜整片往下退，退完倒影清清楚楚。\n前 10 秒只是水在流，撐到第 10 秒你就懂為什麼叫天使塗層。\n用法一樣：洗完趁濕噴、手套輕帶一遍、沖水收乾。",
   "duration_s": 17.3,
-  "bytes": 6895154,
-  "preview_bytes": 174408,
+  "bytes": 6898550,
+  "preview_bytes": 175311,
   "audio": "keep",
   "inputs": [
    "069_一剪到底_鍍膜_車門沖水撥水.mp4"
   ],
-  "sha256": "c6f7045bd197e5ac6931e661c1a3796a97b322446f2bf461554b5d55e8382c61"
+  "sha256": "f99ca7dc5c53c61687a3d120ac3c298e47db8cf7638bf1f47df541f311b00247"
  },
- "G03": {
+ "P08": {
   "line": "polish",
-  "slot": "polish.full",
-  "caption": "米速伍號中拋走完，停機換盤換拾號細拋，擦掉再看倒影",
-  "duration_s": 178.0,
-  "bytes": 42946262,
-  "preview_bytes": 108931,
-  "audio": "from_083",
-  "inputs": [
-   "POP_拋光_G03_粗到細.mp4",
-   "083_一剪到底_拋光_紅漆伍號換拾號.mp4"
-  ],
-  "sha256": "3a709e2938d7ef7b35f0dae6ef19e26cba453aa59f743caaaa3335275696ca81"
- },
- "082": {
-  "line": "polish",
-  "slot": "polish.wool",
-  "caption": "霧掉的黑色後車廂蓋，米速拾號配羊毛盤，拋過那塊跟旁邊差多少一看就知道",
-  "duration_s": 158.9,
-  "bytes": 43442499,
-  "preview_bytes": 145450,
+  "slot": "polish.main",
+  "caption": "拋完亮了，燈一照那道刮痕還在，心裡很悶對吧？\n這不是你技術差，太深的直線刮痕吃進清漆，一道研磨本來就帶不完。\n硬追只會把漆切薄。深的先用參號重切一次，再伍號、拾號收，拋淡就好，不硬追。\n看這支整段沒剪，怎麼判斷該停在哪。",
+  "duration_s": 52.1,
+  "bytes": 17530316,
+  "preview_bytes": 143821,
   "audio": "keep",
   "inputs": [
-   "082_一剪到底_拋光_Elantra行李箱蓋.mp4"
+   "08_3854866174643642.mp4"
   ],
-  "sha256": "5da153373f60a8e0f7be2f5b67aa79d429ebed3178440ce03c9e5eb4a7e3b125"
+  "sha256": "ba45e577eec1767bb6cc5118c06dab0b933561131f4e01e04676fdd2d2403577"
  },
- "G02": {
+ "P09": {
   "line": "polish",
-  "slot": "polish.edge",
-  "caption": "拋完一小圈先別盯中間，擦掉換個角度看那一圈的邊",
-  "duration_s": 54.9,
-  "bytes": 10437757,
-  "preview_bytes": 86814,
-  "audio": "none",
+  "slot": "polish.section",
+  "caption": "整片推、推到乾，研磨劑還沒作用就乾掉，拋半天不亮，是不是很洩氣？\n問題不在你手，是劑乾了就沒在切。\n用法：一區一區走，每塊切到位再換下一塊；中度太陽紋米速伍號一劑拋就夠，要更亮再接拾號。\n這支整段沒剪，看一區走完擦開的差別。",
+  "duration_s": 90.1,
+  "bytes": 35594970,
+  "preview_bytes": 103924,
+  "audio": "keep",
   "inputs": [
-   "POP_拋光_G02_交界.mp4"
+   "09_1715511589483933.mp4"
   ],
-  "sha256": "7ceb18d31819e92e012f3971dee77197f3b6e0cba89e59ac269a682f0317c55e"
+  "sha256": "e6c4b0a8e2d853c25e2d0854b1a729b7c4e281e6f8ba8104135d38c7594610b0"
+ },
+ "P10": {
+  "line": "polish",
+  "slot": "polish.inspect",
+  "caption": "白天看還好，檢查燈一照整片細刮痕，交車前最怕這一下。\n細刮痕只在清漆最上層，不用重烤。\n用法：先打燈看一次決定切多重；中度太陽紋伍號一劑拋就夠，要更亮接拾號。\n整段沒剪，看燈下前後差多少。",
+  "duration_s": 62.2,
+  "bytes": 22414577,
+  "preview_bytes": 96172,
+  "audio": "keep",
+  "inputs": [
+   "10_916170187625653.mp4"
+  ],
+  "sha256": "319fcd2b49ec1f1ded956a84743f8c8ee1e3fa5f3c6609829e3e0ec3a329d437"
  }
 }

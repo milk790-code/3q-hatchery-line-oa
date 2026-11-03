@@ -77,11 +77,14 @@ def main():
         v_args = shlex.split(t.get('v_args') or DEF_V)
         a_args = shlex.split(t.get('a_args') or DEF_A)
         # 浮水印接在 vf 之後、右下角(G02/G03 開頭左上有字卡、右上有品牌小標、片尾左下有 QR;右下最安全)
-        fc = f'[0:v]{vf}[v];[v][{len(inputs)}:v]overlay=W-w-{round(TW*0.04)}:H-h-{round(TH*0.05)}:format=auto[vo]'
+        if t.get('watermark') is False:   # v6.1.4:成片本身已經燒好聯絡三行(個人 FB 爆款版)就不再疊第二個
+            fc = f'[0:v]{vf}[vo]'
+        else:
+            fc = f'[0:v]{vf}[v];[v][{len(inputs)}:v]overlay=W-w-{round(TW*0.04)}:H-h-{round(TH*0.05)}:format=auto[vo]'
         cmd = ['ffmpeg', '-nostdin', '-v', 'error', '-y']
         for src in inputs:
             cmd += ['-i', src]
-        cmd += ['-i', wm, '-filter_complex', fc, '-map', '[vo]']
+        cmd += ([] if t.get('watermark') is False else ['-i', wm]) + ['-filter_complex', fc, '-map', '[vo]']
         if audio == 'none' or '-an' in a_args:
             cmd += ['-an']
         else:

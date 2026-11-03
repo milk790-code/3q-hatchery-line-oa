@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-30",
+  "generated_at": "2026-11-03",
   "revision_note": "第二輪修正（2026-10-30）：①天使主片改 069（相機原檔、來源已驗），079 降為備用（來源未驗，字幕改成不綁產品）；②G02、G03 片尾 4 秒多的 QR 卡（解碼＝src=social，不是 LINE 用的來源碼）已切掉並重轉，成品結尾不含 QR；③畫面層的大陸痕跡統一標準：依他 08-15 的規則一律不處理、不扣分，入選 5 支重掃一遍；④YouTube 清單顯示用標題把大陸說法改成台灣用詞，原標題另存；⑤拋光預設改送最短的 G02；⑥082 檔頭有抖音下載標記、G02／G03 母帶來源標 unknown，已標「來源有疑問／未驗」，待他裁決。細節見 videos-notes.md 最後兩節。",
   "spec": {
     "output": "720×1280 直式、H.264 High、AAC 128k 48kHz、+faststart",
@@ -16,14 +16,14 @@
       "src": "/Users/mac/.local/share/fb-personal-publisher/queue/069_一剪到底_鍍膜_車門沖水撥水.mp4",
       "sha256": "6d652f06b305bbcc0809313dcfdc55692912a05f70356e8a96b17e9450da7c02",
       "line": "angel",
-      "slot": "angel.main",
+      "slot": "angel.backup",
       "duration_s": 17.25,
       "size_mb": 9.7,
       "width": 1080,
       "height": 1920,
       "fps": 30.0,
       "preview_ts": 12.0,
-      "caption": "車門一沖水，水膜整片往下退，退完倒影清清楚楚",
+      "caption": "車門一沖水，水膜整片往下退，退完倒影清清楚楚。\n前 10 秒只是水在流，撐到第 10 秒你就懂為什麼叫天使塗層。\n用法一樣：洗完趁濕噴、手套輕帶一遍、沖水收乾。",
       "caption_chars": 22,
       "why_best": "1080×1920 相機原檔（0 切點、頭尾都在，來源已驗）、17 秒；水退完以後藍色車門像鏡子一樣倒映整個洗車區，規則分數 11 是天使線最高；畫面裡讀得出來的字沒有別牌 logo，沒有人臉。079 前 3 秒就看到效果（10 分），但它只證明沒被剪過、查不到是不是自家拍的，所以來源有保證的 069 當主片、079 當備用；兩支一個拍車門、一個拍引擎蓋，客人再看第二支不會重複。073 效果也強，但原片是橫拍貼在模糊底上、手機上只剩中間三分之一，放備選。小缺點（分數沒扣，E 項只看別牌 logo、人臉、雜亂背景）：效果要到第 10 秒才出現，前 10 秒只有水一條條往下流；約 9 秒倒影裡有人經過，只看得到腿（沒有臉）；倒影裡黃色水桶的標籤左右反過來又模糊，讀不出字，看不出是哪個牌子。",
       "score": 11,
@@ -127,14 +127,14 @@
       "src": "/Users/mac/.local/share/fb-personal-publisher/queue/079_一剪到底_鍍膜_深灰引擎蓋整片水膜.mp4",
       "sha256": "94eb2f4bbf3bcf0b6407cec9fe85557c2ada8def7c1d1dd3750b952b8da9ea6b",
       "line": "angel",
-      "slot": "angel.backup",
+      "slot": "angel.main",
       "duration_s": 24.45,
       "size_mb": 8.4,
       "width": 720,
       "height": 1280,
       "fps": 30.0,
       "preview_ts": 2.4,
-      "caption": "深灰引擎蓋一沖水，整片水膜直接滑掉",
+      "caption": "洗完車亮不了幾天，水一碰又一片水痕，很累對吧？\n看這支：引擎蓋一沖水，整片水膜直接滑掉，這就是撥水做出來的樣子。\n用法：洗完車趁車身還濕直接噴天使塗層，用洗車手套輕帶一遍再沖水收乾，單層不堆疊。\n每次洗完補一次，大約撐一個月。",
       "caption_chars": 17,
       "why_best": "天使 7 支裡點開 0.5–3 秒就看到整片水膜滑掉的，客人不用等；720×1280、24 秒剛好。但它只證明沒被剪過，查不到是不是自家拍的（來源未驗）；8–10 秒噴頭有 FUOU 字樣、2–3.5 秒畫面最上緣一截手臂（沒臉），分數 10。所以降成備用，主片換來源有保證的 069，客人問第二次再送這支。字幕不再寫「上過天使塗層」：畫面沒拍到噴天使塗層，產品只放在按鈕。",
       "score": 10,
@@ -672,27 +672,117 @@
         }
       },
       "whitelist_sha256_match": true
+    },
+    {
+      "id": "P08",
+      "src": "/Users/mac/.local/share/fb-personal-top50-20261020/out/08_3854866174643642.mp4",
+      "line": "polish",
+      "slot": "polish.main",
+      "duration_s": 51.99,
+      "size_mb": 53.9,
+      "width": 1080,
+      "height": 1920,
+      "preview_ts": 20.0,
+      "caption": "拋完亮了，燈一照那道刮痕還在，心裡很悶對吧？\n這不是你技術差，太深的直線刮痕吃進清漆，一道研磨本來就帶不完。\n硬追只會把漆切薄。深的先用參號重切一次，再伍號、拾號收，拋淡就好，不硬追。\n看這支整段沒剪，怎麼判斷該停在哪。",
+      "caption_chars": 110,
+      "hook_title": "為什麼拋到會反光了，刮痕還在？",
+      "fb_reel_id": "3854866174643642",
+      "provenance": "個人 FB 爆款版（fb-personal-top50 out/，開頭 3 秒標題卡＋燒好的聯絡三行；來源是他個人主頁已發布的一剪到底片，FB 再壓過一次）",
+      "one_take_evidence": "scene>0.2 剪接點偵測 0 點（11-03，fb-bulk-upload dl 原檔 52.0s）",
+      "transcode": {
+        "inputs": [
+          "/Users/mac/.local/share/fb-personal-top50-20261020/out/08_3854866174643642.mp4"
+        ],
+        "audio": "keep",
+        "watermark": false,
+        "vf": "scale=720:1280:flags=lanczos,setsar=1,format=yuv420p",
+        "af": "loudnorm=I=-14:TP=-1.5:LRA=11",
+        "v_args": "-c:v libx264 -preset slow -profile:v high -level:v 4.0 -crf 21 -maxrate 3000k -bufsize 6000k -g 60 -pix_fmt yuv420p",
+        "a_args": "-c:a aac -b:a 128k -ar 48000 -ac 2"
+      },
+      "hosted_url": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/pop/video/P08.mp4",
+      "preview_url": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/pop/video/P08.jpg"
+    },
+    {
+      "id": "P09",
+      "src": "/Users/mac/.local/share/fb-personal-top50-20261020/out/09_1715511589483933.mp4",
+      "line": "polish",
+      "slot": "polish.section",
+      "duration_s": 90.02,
+      "size_mb": 93.1,
+      "width": 1080,
+      "height": 1920,
+      "preview_ts": 30.0,
+      "caption": "整片推、推到乾，研磨劑還沒作用就乾掉，拋半天不亮，是不是很洩氣？\n問題不在你手，是劑乾了就沒在切。\n用法：一區一區走，每塊切到位再換下一塊；中度太陽紋米速伍號一劑拋就夠，要更亮再接拾號。\n這支整段沒剪，看一區走完擦開的差別。",
+      "caption_chars": 112,
+      "hook_title": "為什麼研磨要一區一區，不整片推？",
+      "fb_reel_id": "1715511589483933",
+      "provenance": "個人 FB 爆款版（fb-personal-top50 out/，開頭 3 秒標題卡＋燒好的聯絡三行；來源是他個人主頁已發布的一剪到底片，FB 再壓過一次）",
+      "one_take_evidence": "scene>0.2 剪接點偵測 0 點（11-03，fb-bulk-upload dl 原檔 90.0s）",
+      "transcode": {
+        "inputs": [
+          "/Users/mac/.local/share/fb-personal-top50-20261020/out/09_1715511589483933.mp4"
+        ],
+        "audio": "keep",
+        "watermark": false,
+        "vf": "scale=720:1280:flags=lanczos,setsar=1,format=yuv420p",
+        "af": "loudnorm=I=-14:TP=-1.5:LRA=11",
+        "v_args": "-c:v libx264 -preset slow -profile:v high -level:v 4.0 -crf 21 -maxrate 3000k -bufsize 6000k -g 60 -pix_fmt yuv420p",
+        "a_args": "-c:a aac -b:a 128k -ar 48000 -ac 2"
+      },
+      "hosted_url": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/pop/video/P09.mp4",
+      "preview_url": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/pop/video/P09.jpg"
+    },
+    {
+      "id": "P10",
+      "src": "/Users/mac/.local/share/fb-personal-top50-20261020/out/10_916170187625653.mp4",
+      "line": "polish",
+      "slot": "polish.inspect",
+      "duration_s": 62.13,
+      "size_mb": 63.8,
+      "width": 1080,
+      "height": 1920,
+      "preview_ts": 35.0,
+      "caption": "白天看還好，檢查燈一照整片細刮痕，交車前最怕這一下。\n細刮痕只在清漆最上層，不用重烤。\n用法：先打燈看一次決定切多重；中度太陽紋伍號一劑拋就夠，要更亮接拾號。\n整段沒剪，看燈下前後差多少。",
+      "caption_chars": 94,
+      "hook_title": "為什麼看起來還好的引擎蓋，燈一照全是刮痕？",
+      "fb_reel_id": "916170187625653",
+      "provenance": "個人 FB 爆款版（fb-personal-top50 out/，開頭 3 秒標題卡＋燒好的聯絡三行；來源是他個人主頁已發布的一剪到底片，FB 再壓過一次）",
+      "one_take_evidence": "scene>0.2 偵測 3 點（0.97／7.03／49.73），人眼三連圖判讀：同機位同角度，0.97 是打燈亮度跳、7.03 膠帶同位置、49.73 盤移開換毛巾擦，都是連續動作不是剪接（11-03）",
+      "transcode": {
+        "inputs": [
+          "/Users/mac/.local/share/fb-personal-top50-20261020/out/10_916170187625653.mp4"
+        ],
+        "audio": "keep",
+        "watermark": false,
+        "vf": "scale=720:1280:flags=lanczos,setsar=1,format=yuv420p",
+        "af": "loudnorm=I=-14:TP=-1.5:LRA=11",
+        "v_args": "-c:v libx264 -preset slow -profile:v high -level:v 4.0 -crf 21 -maxrate 3000k -bufsize 6000k -g 60 -pix_fmt yuv420p",
+        "a_args": "-c:a aac -b:a 128k -ar 48000 -ac 2"
+      },
+      "hosted_url": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/pop/video/P10.mp4",
+      "preview_url": "https://milk790-code.github.io/3q-hatchery-line-oa/assets/pop/video/P10.jpg"
     }
   ],
   "line_map": {
     "angel": [
-      "069",
-      "079"
+      "079",
+      "069"
     ],
     "polish": [
-      "G02",
-      "G03",
-      "082"
+      "P08",
+      "P10",
+      "P09"
     ]
   },
   "slot_map": {
-    "angel.main": "069",
-    "angel.backup": "079",
-    "polish.full": "G03",
-    "polish.wool": "082",
-    "polish.edge": "G02"
+    "angel.main": "079",
+    "angel.backup": "069",
+    "polish.main": "P08",
+    "polish.section": "P09",
+    "polish.inspect": "P10"
   },
-  "pick_rule": "預設送清單第一支（天使＝069；拋光＝G02，50 秒、約 9 MB，點開最快）；客人問完整流程、粗到細、換盤送 G03；問羊毛盤送 082；問怎麼看拋好了沒、交界、邊送 G02；同一位客人送過的就換下一支（拋光依序 G02→G03→082）；天使客人再問一次才送 079。",
+  "pick_rule": "11-03 第三輪：拋光依序 P08（52 秒，拋完刮痕還在）→ P10（62 秒，燈一照全是刮痕）→ P09（90 秒，一區一區走）；天使 079 → 069。G02／G03／082 退到 alternates。",
   "yt_fallback": {
     "wash": "https://www.youtube.com/playlist?list=PLSk3kbuy0rz4",
     "wheel": "https://www.youtube.com/playlist?list=PLSuJIu3-yk_c",
@@ -728,6 +818,18 @@
   },
   "yt_fallback_note": "8 個清單 2026-10-30 用 YouTube oEmbed 逐一查過都回 200。decon 放輪圈輪胎清單（標題就含鐵粉柏油黏土）；leather 沒有專屬清單，先放全片馬拉松（假設）。yt_fallback_titles 是顯示給客人看的標題：polish、shop_owner 兩個清單在 YouTube 上的原標題用了大陸說法，顯示層已改成台灣用詞（原標題存在 yt_fallback_titles_raw，只供對照、不要顯示）；YouTube 上的真標題只有帳號擁有者能改。",
   "alternates": [
+    {
+      "id": "G02",
+      "note": "11-03 退出 line_map：來源未驗或太長"
+    },
+    {
+      "id": "G03",
+      "note": "11-03 退出 line_map：來源未驗或太長"
+    },
+    {
+      "id": "082",
+      "note": "11-03 退出 line_map：來源未驗或太長"
+    },
     {
       "id": "073",
       "src": "/Users/mac/.local/share/fb-personal-publisher/queue/073_一剪到底_鍍膜_引擎蓋沖水.mp4",
@@ -850,6 +952,11 @@
     }
   ],
   "rejected": [
+    {
+      "id": "P06",
+      "fb": "4324973691106232",
+      "reason": "scene 偵測 3.5 秒與 33 秒兩叢，三連圖看到換鏡位＋燒字幕「然後給個蠟」，是剪過的片"
+    },
     {
       "id": "068",
       "why": "179 秒、101 MB；有前後對比字卡，但片尾字卡寫「留言告訴我／COMMENT BELOW」是社群用語，放在 LINE 一對一聊天不對；FLEX 機器 logo。羊毛盤改用 082。"
