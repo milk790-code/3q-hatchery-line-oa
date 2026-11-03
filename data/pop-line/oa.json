@@ -419,6 +419,110 @@
           "width": 1064,
           "height": 486
         },
+        "label": "盤劑怎麼配",
+        "action": {
+          "type": "postback",
+          "data": "m=shop&b=recipe",
+          "displayText": "幫我配盤跟劑,我講機型"
+        },
+        "image_text": "施工配方／盤劑怎麼配／講你的機型，配到番數",
+        "diff_vs_main_v9": "v9（2026-11-03 他說「沒有免費體驗」）：免繳費限量體驗格下架（它綁的是月付 799 系統，只做汽美後也不成立），換成盤＋劑配方鉤子；AI 問機型與漆況後給組合，不報價不講轉速",
+        "needs_owner": false
+      },
+      {
+        "cell": "B_left",
+        "bounds": {
+          "x": 0,
+          "y": 700,
+          "width": 1064,
+          "height": 420
+        },
+        "label": "找真人",
+        "action": {
+          "type": "postback",
+          "data": "m=car&b=human",
+          "displayText": "我想找真人"
+        },
+        "image_text": "不想跟 AI 聊／找真人／直接把人叫來，不用重講一遍"
+      },
+      {
+        "cell": "B_right",
+        "bounds": {
+          "x": 1064,
+          "y": 700,
+          "width": 1436,
+          "height": 420
+        },
+        "label": "施工影片",
+        "action": {
+          "type": "postback",
+          "data": "m=car&b=howto",
+          "displayText": "我想看施工影片"
+        },
+        "image_text": "自家實拍／施工影片／選你要處理的部位，馬上給你看實拍",
+        "diff_vs_main_v7": "圖上不寫「影片直接傳給你」：影片席的 videos.json 已填 line_map（天使 079／069、拋光 G03／082／G02），但 10 個影片和預覽圖網址 2026-10-30 實測全部 404（檔案還沒推上 GitHub Pages，見 go_live_gates G2）；洗車、輪圈、輪胎、玻璃、皮革、鐵粉柏油沒有自家片，只給 YouTube 合集。「馬上給你看實拍」兩種情況都說得通"
+      },
+      {
+        "cell": "C",
+        "bounds": {
+          "x": 0,
+          "y": 1120,
+          "width": 2500,
+          "height": 566
+        },
+        "label": "拍照問該用哪一支",
+        "action": {
+          "type": "postback",
+          "data": "m=car&b=pick",
+          "displayText": "我想拍照問該用哪一支"
+        },
+        "image_text": "拍照選品／拍張照，我告訴你該用哪一支／效果↑ 買錯↓ 花的錢↓",
+        "diff_vs_main_v7": "圖上寫「拍張照」，點下去現在只是丟一句文字給大腦；改成 worker 直接回一則拍照說明＋快速回覆「拍照」「從相簿選」（camera／cameraRoll，免費 reply）。「30 秒選品」沒有量過，改「拍照選品」"
+      }
+    ],
+    "shop": [
+      {
+        "cell": "tab_car",
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 1436,
+          "height": 214
+        },
+        "label": "切到車主",
+        "action": {
+          "type": "richmenuswitch",
+          "richMenuAliasId": "pop-driver",
+          "data": "m=tab&b=car"
+        },
+        "image_text": "車主｜店家老闆（目前頁，不設點擊區）"
+      },
+      {
+        "cell": "A_left",
+        "bounds": {
+          "x": 0,
+          "y": 214,
+          "width": 1436,
+          "height": 486
+        },
+        "label": "拋不亮的漆，拍來看",
+        "action": {
+          "type": "postback",
+          "data": "m=car&b=pick",
+          "displayText": "店裡有台拋不亮的漆，我拍給你看"
+        },
+        "image_text": "店家判漆／拋不亮的漆，拍來看／拍一張，告訴你該切幾番、用哪一支",
+        "diff_vs_main_v7": "v8（2026-11-03 他指定「只做汽美」，說「換掉」）：原 POP CARD Demo 連結格換成汽美鉤子，點了走 campick quick reply（拍照／相簿／打字）",
+        "needs_owner": false
+      },
+      {
+        "cell": "A_right",
+        "bounds": {
+          "x": 1436,
+          "y": 214,
+          "width": 1064,
+          "height": 486
+        },
         "label": "免繳費限量體驗",
         "action": {
           "type": "postback",

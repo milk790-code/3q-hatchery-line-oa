@@ -59,7 +59,7 @@ MENUS = {
       area(B_LEFT, B_Y, W - B_LEFT, B_H, pb('m=car&b=howto', '我想看施工影片')),   # v7:跳 quick reply 選線 → 自家影片
       area(0, C_Y, W, C_H, pb('m=car&b=pick', '我想知道我的車該用什麼產品')),
     ],
-    'image': 'assets/pop/richmenu-driver-v8.jpg',
+    'image': 'assets/pop/richmenu-driver-v9.jpg',
   },
   'shop': {
     'size': {'width': W, 'height': H}, 'selected': True,
@@ -67,16 +67,14 @@ MENUS = {
     'areas': [
       area(0, 0, A_LEFT, TAB_H, switch(ALIAS['driver'], 'm=tab&b=car')),
       area(0, A_Y, A_LEFT, A_H, pb('m=car&b=pick', '店裡有台拋不亮的漆，我拍給你看')),   # v8:拋不亮的漆拍來看(開相機 quick reply;原 POP CARD Demo 已停,只做汽美)
-      # 「免繳費限量搶先體驗」走對話不丟價格頁:落地頁寫月付 799,跟按鈕承諾對不上,點進去會直接跳走。
-      # 改成 AI 先確認資格與城市,條件頁由 AI 在對話裡給。
-      area(A_LEFT, A_Y, W - A_LEFT, A_H, pb('m=shop&b=trial', '我想了解免繳費限量搶先體驗')),
+      area(A_LEFT, A_Y, W - A_LEFT, A_H, pb('m=shop&b=recipe', '幫我配盤跟劑,我講機型')),   # v9:免繳費體驗下架(11-03「沒有免費體驗」),換盤劑配方鉤子
       area(0, B_Y, B_LEFT, B_H, pb('m=shop&b=wholesale', '我想問耗材批發的店家價')),
       # 鍵盤預填三行範本 = 零前端成本的半結構化表單(不必蓋 LIFF 頁)
       area(B_LEFT, B_Y, W - B_LEFT, B_H, pb('m=shop&b=join', '我想了解城市限定的扶持方案',
                                             inputOption='openKeyboard', fillInText=JOIN_TEMPLATE)),
       area(0, C_Y, W, C_H, pb('m=shop&b=audit', '幫我算一下我的店一個月少賺多少錢')),
     ],
-    'image': 'assets/pop/richmenu-shop-v8.jpg',
+    'image': 'assets/pop/richmenu-shop-v9.jpg',
   },
 }
 

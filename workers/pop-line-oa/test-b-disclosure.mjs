@@ -74,7 +74,7 @@ replyFail = 0;
 { const w = lastReply();
   ok(calls.reply.length >= 2 && w.startsWith(DISCLOSE), '①c 歡迎包被拒 → 退回純文字,第一句仍是 AI 揭露(法遵不能被行銷文案擠掉)');
   ok(w.includes('店家老闆'), '①c 備援歡迎詞指路店家專區');
-  ok(w.includes('限量體驗名額') && w.includes('一個月少賺多少錢'), '①c 備援歡迎詞帶上店家亮點');
+  ok(w.includes('盤跟劑怎麼配') && w.includes('一個月少賺多少錢'), '①c 備援歡迎詞帶上店家亮點(11-03 體驗名額下架)');
   ok(!/30 秒|只收 10 家|864|5\.0 分/.test(w), '①c 備援歡迎詞沒有未查證數字');
   ok(!stripDisclosure(w).includes('您'), '①c 備援歡迎詞揭露句以外不用「您」');
   ok(w.includes('src=line-free-first'), '①c 備援歡迎詞 /go 連結帶白名單內的 src');

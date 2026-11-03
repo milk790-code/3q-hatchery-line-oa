@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 // v5.3 圖文選單 postback + 店家健檢流 — 本地驗證 harness(零依賴,部署前跑一次)
 // 用法:cd workers/pop-line-oa && node test-menu-postback.mjs
 // 覆蓋:①postback 不再被丟棄、會走完整管線 ②選單鈕帶本輪指令進大腦 ③分頁切換靜默(只第一次打招呼)
@@ -39,7 +40,8 @@ const CRM = {
   },
 };
 const env = {
-  SESSION: { get: async (k) => (kv.has(k) ? kv.get(k) : null), put: async (k, v) => { kv.set(k, v); } },
+  SESSION: { get: async (k) => (kv.has(k) ? kv.get(k) : null), put: async (k, v) => { kv.set(k, v); }, list: async ({ prefix }) => ({ keys: [...kv.keys()].filter((k) => k.startsWith(prefix)).map((name) => ({ name })) }) },
+  SETUP_KEY: 'testkey',
   CRM, AI: null, AB_TEST: 'off', READ_DELAY: 'off', QUIET_MODE: 'off',
   POP_LINE_SECRET: 'testsecret', POP_LINE_TOKEN: 'testtoken', ANTHROPIC_API_KEY: 'sk-test',
 };
@@ -170,11 +172,13 @@ await send([tap('U_tab2', 'm=tab&b=shop')]);
 await send([tap('U_tab2', 'm=tab&b=shop')]);
 ok(replies() === tabDupBefore + 1, '⑨b 分頁切換連點兩下也只打一次招呼');
 
-console.log('\n── ⑨c 免繳費限量搶先體驗鈕 ──');
-await send([tap('U_tr', 'm=shop&b=trial')]);
-ok(directive().includes('不要自己承諾「完全免費」'), '⑨c 明文禁止 AI 自己承諾免費或編優惠');
-ok(directive().includes('pop-card-plan'), '⑨c 帶完整條件頁連結');
-ok(directive().includes('城市'), '⑨c 本輪要問到城市');
+console.log('\n── ⑨c 盤劑配方鈕(免繳費體驗 11-03 已下架)──');
+await send([tap('U_tr', 'm=shop&b=recipe')]);
+ok(directive().includes('RO') && directive().includes('番'), '⑨c 本輪要問機型並給盤＋劑番數組合');
+ok(directive().includes('不報任何批發價'), '⑨c 明文禁止報價');
+ok(!directive().includes('免費') && !directive().includes('799'), '⑨c 沒有免費/月付字樣');
+{ const src = fs.readFileSync(new URL('./worker.js', import.meta.url), 'utf8');
+  ok(!src.includes("'m=shop&b=trial'") && !/免繳費|免費體驗/.test(src), '⑨c 原始碼沒有體驗鈕與「免繳費」字樣'); }
 
 console.log('\n── ⑨d 店家專屬選單自動綁定(per-user rich menu)──');
 calls.link.length = 0; calls.aliasLookup = 0; kv.delete('richmenu:pop-shop');   // 清快取才量得到查詢次數
@@ -197,6 +201,55 @@ await send([{ type: 'follow', replyToken: 'rt', source: { userId: 'U_new', type:
 console.log('\n── ⑩ 未知 postback 不炸 ──');
 await send([tap('U_x', 'm=bogus&b=nope')]);
 ok(true, '⑩ 未知 data 安全略過,沒有拋例外');
+
+console.log('\n── ⑪ 真人接手靜音(v6.1.9):喊真人後只停這一個人,其他人照答 ──');
+for (const k of [...kv.keys()]) if (k.startsWith('ownerpush:')) kv.delete(k);   // 老闆推播每日上限歸零,免得前面段落吃掉額度
+const ownerPush = () => [...calls.push].reverse().find((c) => c.to === 'OWNER_UID')?.messages?.[0]?.text || '';
+const img = (uid) => ({ type: 'message', replyToken: 'rt', source: { userId: uid, type: 'user' }, message: { type: 'image', id: '1', contentProvider: { type: 'line' } } });
+{ const b0 = calls.brain.length, r0 = replies();
+  await send([msg('U_h', '我要找真人')]);
+  ok(calls.brain.length === b0 + 1 && replies() === r0 + 1 && directive().includes('客人要求真人'), '⑪a 喊真人那輪照舊走大腦回交接摘要');
+  ok(sess('U_h')?.human > 0, '⑪a session 記了真人接手旗子');
+  ok(ownerPush().includes('客人喊真人') && ownerPush().includes('已暫停') && ownerPush().includes('放 U_h'), '⑪a 老闆交接包寫明已暫停 24 小時與怎麼放回'); }
+{ const b0 = calls.brain.length, r0 = replies(), p0 = calls.push.length;
+  await send([msg('U_h', '還在嗎 我要問鍍膜')]);
+  ok(calls.brain.length === b0 && replies() === r0, '⑪b 靜音中第二句:不經大腦、不回');
+  ok(calls.push.length === p0 + 1 && ownerPush().includes('真人接手中') && ownerPush().includes('還在嗎 我要問鍍膜'), '⑪b 原文轉推老闆');
+  ok(sess('U_h')?.hist?.some((h) => h.role === 'user' && h.content.includes('還在嗎')), '⑪b 訊息仍進對話歷史(放回後 AI 接得上)'); }
+{ const b0 = calls.brain.length, r0 = replies();
+  await send([msg('U_other', '你好 想問洗車精')]);
+  ok(calls.brain.length === b0 + 1 && replies() === r0 + 1, '⑪c 其他客人照常自動回覆'); }
+{ const b0 = calls.brain.length, r0 = replies(), p0 = calls.push.length;
+  await send([img('U_h')]);
+  ok(calls.brain.length === b0 && replies() === r0 && calls.push.length === p0 + 1 && ownerPush().includes('照片'), '⑪d 靜音中傳照片:不判圖,通知老闆去後台看'); }
+{ const r0 = replies();
+  await send([msg('OWNER_UID', '放 U_h')]);
+  const rp = calls.reply[calls.reply.length - 1].messages[0].text;
+  ok(replies() === r0 + 1 && rp.includes('已放回') && !sess('U_h')?.human, '⑪e 老闆傳「放 前8碼」→ 解除');
+  const b0 = calls.brain.length;
+  await send([msg('U_h', '那我問一下鍍膜')]);
+  ok(calls.brain.length === b0 + 1, '⑪e 放回後這個人恢復自動回覆'); }
+{ await send([msg('OWNER_UID', '接 U_h')]);
+  ok(calls.reply[calls.reply.length - 1].messages[0].text.includes('已接手') && sess('U_h')?.human > 0, '⑪f 老闆傳「接 前8碼」→ 手動掛上');
+  const b0 = calls.brain.length;
+  await send([msg('U_h', '在嗎')]);
+  ok(calls.brain.length === b0, '⑪f 掛上後靜音');
+  await send([msg('OWNER_UID', '放 ZZZZ')]);
+  ok(calls.reply[calls.reply.length - 1].messages[0].text.includes('找不到'), '⑪f 前8碼對不到人 → 回找不到,不炸'); }
+{ const r0 = replies();
+  await send([tap('U_h', 'm=car&b=pick')]);
+  ok(replies() === r0 + 1 && !sess('U_h')?.human, '⑪g 靜音中按任何選單鈕=回到自動(旗子清掉、鈕正常回)'); }
+{ await send([tap('U_h2', 'm=car&b=human')]);
+  ok(sess('U_h2')?.human > 0 && directive().includes('客人要求真人'), '⑪h 選單「找真人」鈕也會掛上旗子'); }
+{ const s = sess('U_h2'); s.human = Date.now() - 25 * 3600 * 1000; kv.set('popline:U_h2', JSON.stringify(s));
+  const b0 = calls.brain.length;
+  await send([msg('U_h2', '請問還有在嗎')]);
+  ok(calls.brain.length === b0 + 1 && !sess('U_h2')?.human, '⑪i 超過 24 小時自動放回'); }
+{ const g = async (qs) => { const r = await worker.fetch(new Request('https://x.test/admin/human?key=testkey' + qs), env, ctx); return { st: r.status, j: await r.json() }; };
+  let r = await g('&uid=U_h&on=1'); ok(r.st === 200 && r.j.human === true && sess('U_h')?.human > 0, '⑪j /admin/human on=1 掛上');
+  r = await g(''); ok(r.st === 200 && r.j.muted.some((m) => m.uid.startsWith('U_h')), '⑪j /admin/human 不帶 uid 列出掛著的人');
+  r = await g('&uid=U_h&on=0'); ok(r.j.human === false && !sess('U_h')?.human, '⑪j /admin/human on=0 解除');
+  const f = await worker.fetch(new Request('https://x.test/admin/human?key=wrong'), env, ctx); ok(f.status === 403, '⑪j 沒 key 擋 403'); }
 
 console.log(failed === 0 ? `\n🟢 ${passed} passed, 0 failed\n` : `\n🔴 ${passed} passed, ${failed} failed\n`);
 process.exit(failed === 0 ? 0 : 1);

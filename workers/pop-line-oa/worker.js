@@ -76,7 +76,7 @@ const AI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 let SETUP_KEY = '';  // 由 env.SETUP_KEY 注入（fetch 開頭，未設用隨機值 fail-closed）
 const LINE_ID = '@150tiznd';
 // SHOPEE(蝦皮賣場網址)在 DATA 區塊後面定義:取 DATA 的 SHOP_URL(gen-data 已加 openExternalBrowser=1)
-const SEED_VER = 'v6.1.7';
+const SEED_VER = 'v6.1.9';
 // v6.1 reply-first 時間常數:reply token 約 1 分鐘內有效;主回覆 notBefore 不超過 issuedAt+45s,alarm 時 50 秒內才用 reply,過了直接 push
 const REPLY_SOFT_CAP_MS = 45000, REPLY_TOKEN_MAX_MS = 50000;
 const ACK_SOFT_CAP_MS = 40000;   // v6.1 追加:ack(已讀+loading)上限比 main 早 5 秒,保證每一則的已讀先於自己的主回覆
@@ -1174,9 +1174,33 @@ async function loadGems(env) {
 }
 
 // 歡迎詞=第 1 句人格化揭露(v3 固定開場,逐字):加好友當下就亮 AI 身分,之後對話不再重複標示。
-const WELCOME_MSG = AI_EMPLOYEE.disclosure_script + '\n\n先跟我說一句就好:你是店家要進貨,還是自己的車要用?\n\n🏪 開店的老闆 —— 下面選單右上角切到「店家老闆」那一頁,裡面有:\n・耗材批發的店家價(跟零售完全分開算)\n・限量體驗名額\n・一個城市只找一家的扶持方案\n・最下面那條「一個月少賺多少錢,我算給你看」——三個問題,不用留資料,先算再說\n\n🚗 自己的車要用 —— 拍張照傳給我,我幫你看該用哪一支;不想跟 AI 聊,按「找真人」就好。\n\n蝦皮賣場:' + SHOPEE + '\n免費教學與工具:https://popmonster.vip/go?src=line-free-first';
+const WELCOME_MSG = AI_EMPLOYEE.disclosure_script + '\n\n先跟我說一句就好:你是店家要進貨,還是自己的車要用?\n\n🏪 開店的老闆 —— 下面選單右上角切到「店家老闆」那一頁,裡面有:\n・耗材批發的店家價(跟零售完全分開算)\n・盤跟劑怎麼配,講機型就配到番數\n・一個城市只找一家的扶持方案\n・最下面那條「一個月少賺多少錢,我算給你看」——三個問題,不用留資料,先算再說\n\n🚗 自己的車要用 —— 拍張照傳給我,我幫你看該用哪一支;不想跟 AI 聊,按「找真人」就好。\n\n蝦皮賣場:' + SHOPEE + '\n免費教學與工具:https://popmonster.vip/go?src=line-free-first';
 
 const WANTS_HUMAN_RE = /真人|人工|客服|專人|找人/;
+// v6.1.9 真人接手靜音(11-03 他指定「喊真人後就先不繼續自動回覆」):客人喊真人那輪照舊回交接摘要,之後 24 小時內這個人的訊息不經大腦、不回,
+// 原文轉推老闆(走 pushOwnerNotes,受每日上限);其他客人照常。解除三路:老闆傳「放 <客人前8碼>」/ 客人按任何選單鈕 / 24 小時到期。老闆傳「接 <前8碼>」可手動掛上。
+const HUMAN_MUTE_MS = 24 * 3600 * 1000;
+const HUMAN_CMD_RE = /^(放|接)\s*([A-Za-z0-9_]{2,40})$/;
+function humanActive(sess) { return !!(sess && sess.human && Date.now() - Number(sess.human) < HUMAN_MUTE_MS); }
+async function findUidByPrefix(env, pre) {
+  if (!env.SESSION) return null;
+  const hit = await env.SESSION.get('humanidx:' + pre).catch(() => null);
+  if (hit) return hit;
+  if (typeof env.SESSION.list === 'function') {
+    const r = await env.SESSION.list({ prefix: 'popline:' + pre, limit: 2 }).catch(() => null);
+    const k = r?.keys?.[0]?.name;
+    if (k) return k.slice('popline:'.length);
+  }
+  return null;
+}
+async function setHuman(env, uid, on) {
+  const sess = await loadSess(env, uid);
+  if (on) { sess.human = Date.now(); if (env.SESSION) await env.SESSION.put('humanidx:' + uid.slice(0, 8), uid, { expirationTtl: 48 * 3600 }).catch(() => {}); }
+  else sess.human = 0;
+  await saveSess(env, uid, sess);
+  return sess;
+}
+
 
 // v6 高意向下單卡:B2C 回到蝦皮賣場(沒有對到具體 SKU 時用;對到 SKU 走 productFlex)
 const SHOP_FLEX = () => ({
@@ -1259,6 +1283,10 @@ async function handleImages(evs, env, cfg) {
   const issuedAt = eventIssuedAt(ev);
   const many = evs.length > 1;
   const batch = evs.slice(0, MAX_IMAGES_PER_TURN);
+  if (env.SESSION && humanActive(await loadSess(env, uid))) {   // v6.1.9 真人接手中:照片不判、不標已讀,通知老闆去後台看
+    await pushOwnerNotes(env, cfg, ['👤 真人接手中(AI 不回)\n客人 ' + uid.slice(0, 8) + '… 傳了 ' + evs.length + ' 張照片,到 LINE 官方帳號後台聊天室看;回我「放 ' + uid.slice(0, 8) + '」就恢復自動。']);
+    return;
+  }
   await Promise.all(evs.map((e) => markAsRead(cfg.lineToken, e.message?.markAsReadToken)));
   if (oneToOne) await showLoading(uid, cfg.lineToken, 60);
   let reply = '';
@@ -1335,12 +1363,12 @@ const MENU = {
   // ── 店家線(B2B,這條是主戰場)──
   'm=shop&b=audit': { bindShop: true, text: '幫我算一下我的店一個月少賺多少錢', rush: true, flow: 'shop_audit',
     profile: { industry: '汽美店家', grade: 'B', pain: '', completion: 40, next: '完成三題健檢' } },
-  'm=shop&b=trial': { bindShop: true, text: '我想了解免繳費限量搶先體驗', rush: true,
-    profile: { industry: '汽美店家', grade: 'B', pain: '', completion: 50, next: '確認名額資格轉真人' },
-    dir: '【本輪指令】店家問限量搶先體驗名額。可以講的:這是共創店家名額(名額有限,但總共幾家負責人還沒定,**不要講任何家數**)、系統是月付 799 起不綁約、'
-       + '上線後 30 天不合用全額退現金、每個月含一次客製微調,完整條件在 https://milk790-code.github.io/3q-hatchery-line-oa/pop-card-plan/ 。'
-       + '**不要自己承諾「完全免費」或編任何優惠數字**——體驗名額的實際條件一律說「由負責人一對一跟你確認」。'
-       + '本輪要問到兩件事:他的店在哪個城市、現在最想解決什麼。' },
+  'm=shop&b=recipe': { bindShop: true, text: '幫我配盤跟劑,我講機型', rush: true,
+    profile: { industry: '汽美店家', grade: 'B', pain: '盤劑配不準', completion: 50, next: '問機型/漆況後給盤＋劑組合' },
+    dir: '【本輪指令】店家要配盤跟劑(11-03 他指定:體驗格已下架,只做汽美)。先問兩件事:他用 RO、GA 還是 DA 拋光機;'
+       + '漆是什麼狀況(深刮/太陽紋/只要收光/素黑或鋼琴烤漆)。問到了就直接給一組「盤＋劑」:'
+       + '重切=羊毛盤或粗棉＋參號 80 番,中修=中棉＋伍號 600 番,收光=細棉或細羊毛＋拾號 1000 番;能用細番數解決的絕不用粗番數。'
+       + '**不報任何批發價、不講轉速壓力數字、不保證不燒漆**。要批發價就接 m=shop&b=wholesale 那套:問品項、月用量、聯絡方式,負責人一個工作天內給報價單。' },
   'm=shop&b=wholesale': { bindShop: true, text: '我想問耗材批發的店家價', rush: true,
     profile: { industry: '汽美店家', grade: 'B', pain: '想談進貨', completion: 50, next: '收品項+月用量+聯絡方式轉真人' },
     dir: '【本輪指令】店家問母料批發。**絕對不報任何批發價數字**(批發價目表尚未定版,報錯就出事),改成:一句話說明我們是母料直供、店家價與零售價分開,然後直接要三件事——「你想進哪幾支品項」「一個月大概用多少量」「方便聯絡的電話或 LINE」,說明負責人會一個工作天內把報價單給他。' },
@@ -1388,7 +1416,7 @@ async function saveMenuSignal(env, uid, p) {
 // v6.1 店家專屬選單:老闆按過店家專區任何一顆「內容鈕」→ 把店家版綁成他個人的選單。
 // per-user rich menu 優先權高於全員預設,所以他之後每次打開 LINE 看到的就直接是店家版,
 // 不用每次自己切分頁(車主完全不受影響,看到的還是車主版)。
-// 只在「明確意圖」時綁:分頁切換只是逛逛不算,按下體驗/批發/扶持方案/健檢才算。
+// 只在「明確意圖」時綁:分頁切換只是逛逛不算,按下配盤劑/批發/扶持方案/健檢才算。
 async function linkShopMenu(env, cfg, uid) {
   if (!cfg.lineToken || !uid || uid === 'unknown') return false;
   try {
@@ -1440,6 +1468,10 @@ async function handlePostback(ev, env, cfg) {
     return;
   }
   if (!m) return;
+  if (env.SESSION && data !== 'm=car&b=human') {   // v6.1.9 真人接手中按了別的選單鈕=客人要回來用自動,放回
+    const s0 = await loadSess(env, uid);
+    if (s0.human) { s0.human = 0; await saveSess(env, uid, s0); }
+  }
   if (m.direct) {   // v6 直接回覆型:價格表 / 蝦皮賣場卡 / 影片選線
     const msgs = m.direct === 'pricelist' ? PRICELIST_MSGS() : m.direct === 'vidmenu' ? [VIDEO_MENU_MSG()] : m.direct === 'campick' ? [CAMPICK_MSG()] : [SHOP_FLEX()];
     await lineReplyMsgs(cfg.lineToken, ev.replyToken, msgs, env);
@@ -1516,6 +1548,18 @@ async function handleEvent(ev, env, cfg, inject) {
     return;
   }
 
+  // v6.1.9 老闆指令:「放 <前8碼>」解除真人接手、「接 <前8碼>」手動掛上(只認老闆本人的 LINE)
+  if (cfg.ownerId && uid === cfg.ownerId) {
+    const hc = userMsg.trim().match(HUMAN_CMD_RE);
+    if (hc) {
+      const target = await findUidByPrefix(env, hc[2]);
+      if (!target) { await lineReply(cfg.lineToken, ev.replyToken, '找不到前8碼是「' + hc[2] + '」的客人(可能已超過 7 天沒說話)。', env); return; }
+      await setHuman(env, target, hc[1] === '接');
+      await lineReply(cfg.lineToken, ev.replyToken, (hc[1] === '接' ? '已接手:客人 ' + target.slice(0, 8) + '… 的自動回覆暫停 24 小時,他的訊息會轉給你。' : '已放回:客人 ' + target.slice(0, 8) + '… 恢復自動回覆。'), env);
+      return;
+    }
+  }
+
   // 每人每分鐘限流:真好友狂傳也擋得住,超過就罐頭回覆不打 AI(止血 Anthropic 帳單)
   if (env.SESSION && uid !== 'unknown') {
     const rlKey = 'rl:popline:' + uid + ':' + Math.floor(Date.now() / 60000);
@@ -1544,10 +1588,18 @@ async function handleEvent(ev, env, cfg, inject) {
         try {
           const p = JSON.parse(raw);
           if (Array.isArray(p)) sess = { hist: p, n: p.filter((m) => m.role === 'user').length, ho: false, dc: true };  // 舊版陣列 session:聊過=視同已揭露
-          else if (p && Array.isArray(p.hist)) sess = { hist: p.hist, n: p.n || 0, ho: !!p.ho, dc: !!p.dc, flow: p.flow || null, stk: p.stk || null, vids: p.vids || null, pc: p.pc || null, pl: !!p.pl, line: p.line || null, last_seen: p.last_seen || 0 };
+          else if (p && Array.isArray(p.hist)) sess = { hist: p.hist, n: p.n || 0, ho: !!p.ho, dc: !!p.dc, flow: p.flow || null, stk: p.stk || null, vids: p.vids || null, pc: p.pc || null, pl: !!p.pl, line: p.line || null, last_seen: p.last_seen || 0, human: Number(p.human) || 0 };
         } catch (_) {}
       }
     }
+    if (humanActive(sess)) {   // v6.1.9 真人接手中:不回、不經大腦、不標已讀(後台聊天室才會顯示未讀),原文轉推老闆
+      sess.hist.push({ role: 'user', content: userMsg }); sess.hist = sess.hist.slice(-20); sess.last_seen = Date.now();
+      if (env.SESSION) await env.SESSION.put(kvKey, JSON.stringify(sess), { expirationTtl: 7 * 24 * 3600 }).catch(() => {});
+      if (env.CRM) await env.CRM.prepare("INSERT INTO pop_line_convos (user_id, role, text) VALUES (?, 'user', ?)").bind(uid, userMsg).run().catch(() => {});
+      await pushOwnerNotes(env, cfg, ['👤 真人接手中(AI 不回)\n客人 ' + uid.slice(0, 8) + '…:' + (stickerIn ? '(貼圖)' : userMsg.slice(0, 300)) + '\n\n到 LINE 官方帳號後台聊天室回他;回我「放 ' + uid.slice(0, 8) + '」就恢復自動。']);
+      return;
+    }
+    if (sess.human) sess.human = 0;   // 24 小時到期:自動放回
     prevN = sess.n; prevSeen = Number(sess.last_seen) || 0;
     sess.n += 1;
     sess.last_seen = Date.now();
@@ -1713,6 +1765,10 @@ async function handleEvent(ev, env, cfg, inject) {
   if (!reply) { reply = AI_EMPLOYEE.degraded_mode_script; degraded = true; }   // 降級不裝死:固定話術+下面推播老闆
   if (firstContact && !directMsgs && !ackTextSent && !ackTextScheduled) { reply = AI_EMPLOYEE.disclosure_script + '\n\n' + reply; sess.dc = true; }   // 揭露沒搭上墊場文字就搭主回覆(預設就是這條)
   if (checkpoint && !degraded && !directMsgs) sess.ho = true;   // 直回價格表那輪不算交接(v6.1 追加:本來就不該走到,雙保險)
+  if (wantsHuman && !degraded && !directMsgs) {   // v6.1.9 喊真人:這輪回交接摘要,之後 24 小時這個人靜音
+    sess.human = Date.now();
+    if (env.SESSION) await env.SESSION.put('humanidx:' + uid.slice(0, 8), uid, { expirationTtl: 48 * 3600 }).catch(() => {});
+  }
 
   // ③ 主回覆遞送(v6.1 reply-first):reply token 先行、push 只當備援
   //    rush/instant/降級=馬上 reply;其餘=DO 延遲(10~35 秒,notBefore≤issuedAt+45s),alarm 時 50 秒內用 reply、非 2xx 才 push
@@ -1763,7 +1819,8 @@ async function handleEvent(ev, env, cfg, inject) {
   const ownerNotes = [];   // v6.1 追加:同一輪要通知老闆的事(交接/降級/店家登記/首次升 A)先收集,結尾合併成 1 則 push
   try {
     if (((checkpoint && !directMsgs) || wantsHuman) && !degraded && cfg.ownerId) {   // 老闆交接包
-      ownerNotes.push('🤝 AI 店員交接' + (wantsHuman ? '(客人喊真人)' : '(第' + AI_EMPLOYEE.handoff_threshold + '句檢查點)') + '\n客人 ' + uid.slice(0, 8) + '…\n情緒:' + emo + '\n\n' + reply);
+      ownerNotes.push('🤝 AI 店員交接' + (wantsHuman ? '(客人喊真人)' : '(第' + AI_EMPLOYEE.handoff_threshold + '句檢查點)') + '\n客人 ' + uid.slice(0, 8) + '…\n情緒:' + emo + '\n\n' + reply
+        + (wantsHuman ? '\n\n⏸ 已暫停對他的自動回覆 24 小時,他接下來的訊息會原文轉給你。到 LINE 官方帳號後台聊天室回他;回我「放 ' + uid.slice(0, 8) + '」就恢復自動。' : ''));
     }
     if (degraded && cfg.ownerId) {
       ownerNotes.push('⚠ AI 降級回覆(大腦無回應),已向客人承諾真人會回,記得接:\n客人 ' + uid.slice(0, 8) + '…:' + userMsg.slice(0, 120));
@@ -1904,6 +1961,24 @@ export default {
     if (url.pathname === '/admin/catalog') {
       if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
       return new Response(JSON.stringify({ seed: SEED_VER, products: Object.keys(CATALOG).length, videos: VIDEOS, welcome: WELCOME_PACK.length, directives: Object.keys(DIRECTIVES.turn), catalog: CATALOG }, null, 2), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+    }
+    if (url.pathname === '/admin/human') {   // v6.1.9 真人接手:?uid=<前8碼或完整>&on=1|0 掛上/解除;不帶 uid 列出目前掛著的
+      if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });
+      const q = url.searchParams.get('uid') || '', on = url.searchParams.get('on');
+      const J = (o, st = 200) => new Response(JSON.stringify(o, null, 2), { status: st, headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+      if (!q) {
+        const out = [];
+        if (env.SESSION && typeof env.SESSION.list === 'function') {
+          const r = await env.SESSION.list({ prefix: 'humanidx:', limit: 200 }).catch(() => null);
+          for (const k of r?.keys || []) { const full = await env.SESSION.get(k.name).catch(() => null); if (!full) continue; const s = await loadSess(env, full); if (humanActive(s)) out.push({ uid: full.slice(0, 8) + '…', since: new Date(Number(s.human)).toISOString(), expires: new Date(Number(s.human) + HUMAN_MUTE_MS).toISOString() }); }
+        }
+        return J({ seed: SEED_VER, muted: out });
+      }
+      const full = q.length > 8 ? q : await findUidByPrefix(env, q);
+      if (!full) return J({ error: '找不到客人 ' + q }, 404);
+      if (on === null) { const s = await loadSess(env, full); return J({ uid: full.slice(0, 8) + '…', human: humanActive(s), since: s.human ? new Date(Number(s.human)).toISOString() : null }); }
+      const s = await setHuman(env, full, on === '1');
+      return J({ ok: true, uid: full.slice(0, 8) + '…', human: humanActive(s) });
     }
     if (url.pathname === '/admin/card') {
       if (url.searchParams.get('key') !== SETUP_KEY) return new Response('forbidden', { status: 403 });

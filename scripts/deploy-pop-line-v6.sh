@@ -19,7 +19,7 @@ git add workers/pop-line-oa/worker.js workers/pop-line-oa/test-v6.mjs workers/po
 git add .github/workflows/deploy-pop-line-oa.yml scripts/pop-line-gen-data.mjs scripts/pop-line-video-prep.py scripts/deploy-pop-line-v6.sh scripts/pop-line-copy-gate.py
 git add data/pop-line assets/pop/pricelist-1028.jpg assets/pop/pricelist-1028-preview.jpg assets/pop/pricelist-1028-map
 [ -d assets/pop/video ] && git add assets/pop/video
-for f in assets/pop/richmenu-driver-v8.jpg assets/pop/richmenu-shop-v8.jpg assets/pop/cover-v7.jpg assets/pop/cover-v7-wide.jpg assets/pop/cover-v7-wide-phone.jpg scripts/pop-richmenu-build.py scripts/pop-richmenu-deploy.py scripts/pop-cover-build.py assets/pop/cover-v7-phone.jpg workers/pop-line-oa/GO_LIVE.md; do
+for f in assets/pop/richmenu-driver-v9.jpg assets/pop/richmenu-shop-v9.jpg assets/pop/cover-v7.jpg assets/pop/cover-v7-wide.jpg assets/pop/cover-v7-wide-phone.jpg scripts/pop-richmenu-build-v9.py scripts/pop-richmenu-deploy.py scripts/pop-cover-build.py assets/pop/cover-v7-phone.jpg workers/pop-line-oa/GO_LIVE.md; do
   [ -e "$f" ] && git add "$f"
 done
 git status --short | grep -v "^ D\|^??" || true
@@ -45,8 +45,8 @@ echo "⑥ 驗 worker 活體 seed"
 curl -sS https://pop-line-oa.milk790.workers.dev/health | python3 -c "
 import json,sys; d=json.load(sys.stdin)
 print('   seed =', d.get('seed'), '| reply_first =', d.get('reply_first'), '| ack_text =', d.get('ack_text'), '| catalog =', d.get('catalog'), '| videos =', d.get('videos'), '| welcome_pack =', d.get('welcome_pack'), '| token =', d.get('token'), '| owner =', d.get('owner'))
-ok = d.get('seed')=='v6.1.7' and d.get('reply_first') is True and d.get('ack_text')!='on' and (d.get('catalog') or 0)>=30 and d.get('welcome_pack')==2
-print('   活體檢查', '通過' if ok else '❌ 沒過:seed 要 v6.1.7、reply_first true、ack_text 不是 on、catalog>=30、welcome_pack==2')
+ok = d.get('seed')=='v6.1.9' and d.get('reply_first') is True and d.get('ack_text')!='on' and (d.get('catalog') or 0)>=30 and d.get('welcome_pack')==2
+print('   活體檢查', '通過' if ok else '❌ 沒過:seed 要 v6.1.9、reply_first true、ack_text 不是 on、catalog>=30、welcome_pack==2')
 sys.exit(0 if ok else 7)"
 echo "⑦ 驗 GitHub Pages 素材(價格表圖要回 image/jpeg)"
 for i in 1 2 3 4 5 6; do
@@ -55,7 +55,7 @@ for i in 1 2 3 4 5 6; do
   echo "   Pages 還在建(第 $i 次),30 秒後再看"; sleep 30
 done
 echo "   pricelist content-type = ${CT:-尚未就緒}"
-if [ -e assets/pop/richmenu-driver-v8.jpg ]; then
+if [ -e assets/pop/richmenu-driver-v9.jpg ]; then
   echo "⑧ 圖文選單 v7:先建立再設預設(worker 已部署,順序正確)"
   python3 scripts/pop-richmenu-deploy.py
   python3 scripts/pop-richmenu-deploy.py --set-default
