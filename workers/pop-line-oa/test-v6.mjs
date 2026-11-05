@@ -181,7 +181,7 @@ ok(r.status === 200 && /image\/jpeg/.test(r.ct) && calls.upstream.some((u) => /p
 r = await admin('/img/pricelist/999');
 ok(r.status === 404, '⑩ 非 imagemap 尺寸 404');
 r = await admin('/health');
-ok(/"seed":"v6\.1\.17"/.test(r.body) && /"catalog":\d+/.test(r.body) && /"welcome_pack":\d+/.test(r.body) && /"reply_first":true/.test(r.body), '⑩ /health 報 seed v6.1.17 + reply_first + 目錄/歡迎包計數');
+ok(/"seed":"v6\.1\.18"/.test(r.body) && /"catalog":\d+/.test(r.body) && /"welcome_pack":\d+/.test(r.body) && /"reply_first":true/.test(r.body), '⑩ /health 報 seed v6.1.18 + reply_first + 目錄/歡迎包計數');
 r = await admin('/admin/catalog?key=testkey');
 ok(r.status === 200 && /"A001"/.test(r.body), '⑩ /admin/catalog 列目錄');
 
@@ -616,11 +616,12 @@ console.log('\n── ㉘ E:文案事實(全檔 grep,AI_EMPLOYEE 區塊除外)�
 
 console.log('\n── ㉙ v6.1.17 A3 菜單對半兩張 A4;看更多 b=2 鍍膜玻璃、b=3 內裝輪圈 ──');
 { const w = main(await send([{ type: 'follow', replyToken: 'rt', source: { userId: 'U_pl2w', type: 'user' } }]), 'U_pl2w');
-  ok(w.filter((m) => m.type === 'image').map((m) => m.originalContentUrl.split('/').pop()).join() === 'pricelist-1105c-1.jpg,pricelist-1105c-2.jpg', '㉙ 歡迎包是 A3 對半兩張');
+  ok(w.filter((m) => m.type === 'image').map((m) => m.originalContentUrl.split('/').pop()).join() === 'pricelist-1105c-1.jpg,pricelist-1105c-2.jpg,pricelist-1105b-05.jpg', '㉙ 歡迎包是 A3 對半兩張＋拋光前處理(火山去污泥/磨泥潤滑液)');
   ok((w.find((m) => m.type === 'text')?.quickReply?.items || []).some((x) => x.action.data === 'm=pl&b=2'), '㉙ 歡迎包按鈕有「看更多價格表」');
   const k = main(await send([msg('U_pl2k', '價格表')]), 'U_pl2k');
   ok((k.find((m) => m.type === 'text')?.quickReply?.items || []).some((x) => x.action.data === 'm=pl&b=2'), '㉙ 打「價格表」直回的文字帶「看更多價格表」按鈕');
   const imgs = (g) => g.filter((m) => m.type === 'image').map((m) => m.originalContentUrl.match(/pricelist-(1105[bc]-\d+)\.jpg$/)?.[1]).join();
+  ok(imgs(k) === '1105c-1,1105c-2,1105b-05' || imgs(k) === '', '㉙ 打「價格表」第一組 3 張(今天收過就不重發)');
   const qr = (g) => (g[g.length - 1].quickReply?.items || []).map((x) => x.action.data || x.action.type).join();
   const n = calls.brain.length; let g = main(await send([tap('U_pl2k', 'm=pl&b=2')]), 'U_pl2k');
   ok(calls.brain.length === n && imgs(g) === '1105b-10,1105b-11,1105b-12,1105b-13' && g[4].type === 'text' && qr(g) === 'm=pl&b=3,camera', '㉙ b=2 → 鍍膜玻璃 4 張＋文字、看更多接 b=3');
