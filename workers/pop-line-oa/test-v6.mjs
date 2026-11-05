@@ -83,7 +83,7 @@ let ms = main(b, 'U_new');
 ok(b.length >= 1 && b[0].kind === 'reply', '① 用 reply token 回(免費),不是 push');
 ok(ms[0]?.type === 'image' && /pricelist/.test(ms[0].originalContentUrl) && /pricelist/.test(ms[0].previewImageUrl), '① 第一則是價格表圖(原圖+預覽圖都指向價格表)');
 ok(ms.length <= 5, '① 一次 reply 不超過 5 則(LINE 硬限制)');
-ok(ms.slice(0, 4).every((m) => m.type === 'image' && /pricelist-1103-\d+b?\.jpg$/.test(m.originalContentUrl)) && ms.some((m) => m.type === 'text'), '① 價格表 4 張直式單欄圖在前、介紹文字一定在(貼圖讓位給 5 則上限)');
+ok(ms.slice(0, 4).every((m) => m.type === 'image' && /pricelist-1105-0[1-4]\.jpg$/.test(m.originalContentUrl)) && ms.some((m) => m.type === 'text'), '① 價格表 4 張 A4 直式圖(01～04)在前、介紹文字一定在(貼圖讓位給 5 則上限)');
 ok(ms.some((m) => m.type === 'text' && /AI|人工客服|泡泡怪獸/.test(m.text)), '① 介紹文含 AI 揭露或品牌自稱');
 ok(sess('U_new')?.dc === true && sess('U_new')?.pl === true, '① session 標記已揭露 + 已送價格表');
 ok(kv.has('pl:U_new:' + taipeiYmd()), '① 加好友送過價格表 → 記當天 pl 鍵(之後打「價格表」不重發圖)');
@@ -181,7 +181,7 @@ ok(r.status === 200 && /image\/jpeg/.test(r.ct) && calls.upstream.some((u) => /p
 r = await admin('/img/pricelist/999');
 ok(r.status === 404, '⑩ 非 imagemap 尺寸 404');
 r = await admin('/health');
-ok(/"seed":"v6\.1\.13"/.test(r.body) && /"catalog":\d+/.test(r.body) && /"welcome_pack":\d+/.test(r.body) && /"reply_first":true/.test(r.body), '⑩ /health 報 seed v6.1.3 + reply_first + 目錄/歡迎包計數');
+ok(/"seed":"v6\.1\.14"/.test(r.body) && /"catalog":\d+/.test(r.body) && /"welcome_pack":\d+/.test(r.body) && /"reply_first":true/.test(r.body), '⑩ /health 報 seed v6.1.14 + reply_first + 目錄/歡迎包計數');
 r = await admin('/admin/catalog?key=testkey');
 ok(r.status === 200 && /"A001"/.test(r.body), '⑩ /admin/catalog 列目錄');
 
@@ -493,7 +493,7 @@ Object.assign(DIRECTIVES.turn, { price_list: '【要價格表】T-pl23 他今天
   ok(lastDirective().includes('交接檢查點') && !lastDirective().includes('T-pl23') && !lastDirective().includes('往上滑'), '㉓ 今天沒收過價格表圖 → 不疊「已收過、往上滑」的 price_list 指令');
   ok(ms[0]?.type === 'image' && ms.length <= 5 && b.filter((c) => c.kind === 'reply').length === 1 && sess('U_cp').pl === true, '㉓ 沒收過 → 這輪回覆最前面補價格表圖、總則數 ≤5、sess.pl=true');
   ok(b.filter((c) => c.kind === 'push' && c.to === 'U_cp').length === 0, '㉓ 補圖與文字同一次 reply,沒有額外 push 給客人');
-  ok(ms.filter((m) => m.type === 'image' && /pricelist-1103-/.test(m.originalContentUrl)).length >= 3 && ms[ms.length - 1].type === 'text', '㉓ 4 張價格表圖排前面、大腦文字保留在最後(超過 5 則先砍貼圖再併文字)');
+  ok(ms.filter((m) => m.type === 'image' && /pricelist-1105-/.test(m.originalContentUrl)).length >= 3 && ms[ms.length - 1].type === 'text', '㉓ 4 張價格表圖排前面、大腦文字保留在最後(超過 5 則先砍貼圖再併文字)');
   ok(sess('U_cp').ho === true, '㉓ 交接照舊:sess.ho=true');
   ok(ownerPushes(b).length === 1 && ownerPushes(b)[0].messages[0].text.includes('AI 店員交接') && !ownerPushes(b)[0].messages[0].text.includes('價格表在上面'), '㉓ 老闆收到的是真正的交接摘要(不是價格表罐頭)');
   // 今天已經收過圖(加好友歡迎包或稍早直回)→ 疊 price_list 指令、不再補圖
@@ -614,14 +614,20 @@ console.log('\n── ㉘ E:文案事實(全檔 grep,AI_EMPLOYEE 區塊除外)�
   ok(outside.includes('價格表上的品項都在蝦皮賣場') && flexStr(main(await send([msg('U_sf', '我要買 怎麼下單')]), 'U_sf')).includes('價格表上的品項都在蝦皮賣場'), '㉘ 賣場卡副標改成不帶承諾的「價格表上的品項都在蝦皮賣場」'); }
 
 
-console.log('\n── ㉙ v6.1.13 商品補齊:第一組第 2 張換 2b(含火山泥／潤滑液)、「看更多價格表」回第二組 4 張 ──');
+console.log('\n── ㉙ v6.1.14 價格表改 A4 直式 17 頁分 4 組:歡迎包 01～04、看更多 b=2→b=3→b=4 一路接下去 ──');
 { const w = main(await send([{ type: 'follow', replyToken: 'rt', source: { userId: 'U_pl2w', type: 'user' } }]), 'U_pl2w');
-  ok(w.some((m) => m.type === 'image' && /pricelist-1103-2b\.jpg$/.test(m.originalContentUrl)) && !w.some((m) => m.type === 'image' && /pricelist-1103-2\.jpg$/.test(m.originalContentUrl)), '㉙ 歡迎包第 2 張是新版 2b');
+  ok(w.filter((m) => m.type === 'image').map((m) => m.originalContentUrl.split('/').pop()).join() === ['01', '02', '03', '04'].map((i) => 'pricelist-1105-' + i + '.jpg').join() && !JSON.stringify(w).includes('pricelist-1103'), '㉙ 歡迎包是 A4 第 01～04 頁,沒有舊長條圖');
   ok((w.find((m) => m.type === 'text')?.quickReply?.items || []).some((x) => x.action.data === 'm=pl&b=2'), '㉙ 歡迎包按鈕有「看更多價格表」');
   const k = main(await send([msg('U_pl2k', '價格表')]), 'U_pl2k');
   ok((k.find((m) => m.type === 'text')?.quickReply?.items || []).some((x) => x.action.data === 'm=pl&b=2'), '㉙ 打「價格表」直回的文字帶「看更多價格表」按鈕');
-  const n = calls.brain.length; const g = main(await send([tap('U_pl2k', 'm=pl&b=2')]), 'U_pl2k');
-  ok(calls.brain.length === n && g.length === 5 && g.slice(0, 4).every((m, i) => m.type === 'image' && m.originalContentUrl.endsWith('pricelist-1103-' + (i + 5) + '.jpg')) && g[4].type === 'text', '㉙ 點「看更多價格表」→ reply 第二組 4 張(5～8)＋文字,不經大腦');
+  const imgs = (g) => g.filter((m) => m.type === 'image').map((m) => m.originalContentUrl.match(/pricelist-1105-(\d+)\.jpg$/)?.[1]).join();
+  const qr = (g) => (g[g.length - 1].quickReply?.items || []).map((x) => x.action.data || x.action.type).join();
+  let n = calls.brain.length; let g = main(await send([tap('U_pl2k', 'm=pl&b=2')]), 'U_pl2k');
+  ok(calls.brain.length === n && g.length === 5 && imgs(g) === '05,06,07,08,09' && qr(g) === 'm=pl&b=3,camera', '㉙ b=2 → 05～09 五張圖、按鈕掛最後一張(看更多 b=3＋拍照),不經大腦');
+  g = main(await send([tap('U_pl2k', 'm=pl&b=3')]), 'U_pl2k');
+  ok(calls.brain.length === n && g.length === 5 && imgs(g) === '10,11,12,13' && g[4].type === 'text' && qr(g) === 'm=pl&b=4,camera', '㉙ b=3 → 10～13＋文字、看更多接 b=4');
+  g = main(await send([tap('U_pl2k', 'm=pl&b=4')]), 'U_pl2k');
+  ok(calls.brain.length === n && g.length === 5 && imgs(g) === '14,15,16,17' && g[4].type === 'text' && qr(g) === 'camera', '㉙ b=4 → 14～17＋文字、最後一組只剩拍照按鈕');
 }
 console.log(failed ? `\n🔴 ${passed} passed, ${failed} failed` : `\n🟢 ${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);
