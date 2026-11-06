@@ -139,16 +139,70 @@
       },
       {
         "type": "text",
-        "text": "這裡是泡泡怪獸。\n我是超級 AI 人工客服😊 老闆~您不要把我們當作一般一板一眼的殭屍客服🤖 您儘量把您的需求直接和我們說,我們這邊會直接幫您介紹完畢,到最後之後請真人過來👍\n\n價格表在上面，看到想問的直接打字或拍照。\n鍍膜、玻璃、內裝、輪圈的價格表，點下面「看更多價格表」。\n不知道用哪一支？漆面或玻璃拍一張傳上來，我幫你配。\n決定好了，我直接給你那一支的蝦皮連結。\n要找真人，點下面「找真人」，真人 09:00–18:00 回覆。\n\n開店的老闆：店裡拋不亮的漆，不是難，是還沒用過泡泡怪獸。\n下面選單右上角切到「店家老闆」，店家價和方案都在那頁。",
+        "text": "這裡是泡泡怪獸。價格表在上面，店家價在下面選單右上角「店家老闆」。\n\n開店的老闆，先問你一句，最近店裡有沒有卡在這些？\n・拋完有太陽紋，客人嫌不夠亮\n・研磨劑、拋光盤用很快，耗材成本壓不下來\n・一台車拋太久，工時拖到排不下車\n・水垢、鐵粉、柏油清不乾淨\n・不知道該換哪種盤、哪支藥劑\n\n對現在用的耗材有什麼不滿意，都可以直接跟我說。\n我們的產品跟市面上完全是不同概念，就是要幫你省成本、省工時、效果更好，店裡的客單價和營業額也一起拉上來。\n店裡拋不亮的漆，不是難，是還沒用過泡泡怪獸。\n施工、耗材、客人抱怨，開店遇到什麼都可以問，不買也沒關係。\n\n我是超級 AI 人工客服😊 老闆~您不要把我們當作一般一板一眼的殭屍客服🤖 您儘量把您的需求直接和我們說,我們這邊會直接幫您介紹完畢,到最後之後請真人過來👍\n半夜問也會回，問得再基本也不會不耐煩。要真人，點下面「找真人」，09:00–18:00 回覆。\n\n👇 你現在用的耗材，最不滿意哪裡？\n點下面、打字或拍照傳上來都可以。自己開車不是開店的，也一樣直接問。",
         "quickReply": {
           "items": [
             {
               "type": "action",
               "action": {
-                "type": "postback",
-                "label": "我是車主",
-                "data": "m=wel&b=car",
-                "displayText": "我是車主"
+                "type": "message",
+                "label": "現在耗材不滿意",
+                "text": "我對現在用的耗材不太滿意"
+              }
+            },
+            {
+              "type": "action",
+              "action": {
+                "type": "message",
+                "label": "想拉高客單價",
+                "text": "想提高店裡的客單價和營業額"
+              }
+            },
+            {
+              "type": "action",
+              "action": {
+                "type": "message",
+                "label": "太陽紋拋不亮",
+                "text": "拋完有太陽紋，客人嫌不夠亮"
+              }
+            },
+            {
+              "type": "action",
+              "action": {
+                "type": "message",
+                "label": "耗材用太快",
+                "text": "研磨劑、拋光盤用很快，耗材成本壓不下來"
+              }
+            },
+            {
+              "type": "action",
+              "action": {
+                "type": "message",
+                "label": "拋太久工時長",
+                "text": "一台車拋太久，工時拖到排不下車"
+              }
+            },
+            {
+              "type": "action",
+              "action": {
+                "type": "message",
+                "label": "水垢鐵粉清不掉",
+                "text": "水垢、鐵粉、柏油清不乾淨"
+              }
+            },
+            {
+              "type": "action",
+              "action": {
+                "type": "message",
+                "label": "不知道換哪種盤",
+                "text": "不知道該換哪種盤、哪支藥劑"
+              }
+            },
+            {
+              "type": "action",
+              "action": {
+                "type": "camera",
+                "label": "拍照問用哪支"
               }
             },
             {
@@ -164,34 +218,18 @@
               "type": "action",
               "action": {
                 "type": "postback",
+                "label": "我是車主",
+                "data": "m=wel&b=car",
+                "displayText": "我是車主"
+              }
+            },
+            {
+              "type": "action",
+              "action": {
+                "type": "postback",
                 "label": "看更多價格表",
                 "data": "m=pl&b=2",
                 "displayText": "看更多價格表"
-              }
-            },
-            {
-              "type": "action",
-              "action": {
-                "type": "camera",
-                "label": "拍照問用哪支"
-              }
-            },
-            {
-              "type": "action",
-              "action": {
-                "type": "postback",
-                "label": "看拋光影片",
-                "data": "m=vid&l=polish",
-                "displayText": "我想看拋光影片"
-              }
-            },
-            {
-              "type": "action",
-              "action": {
-                "type": "postback",
-                "label": "看天使塗層影片",
-                "data": "m=vid&l=angel",
-                "displayText": "我想看天使塗層影片"
               }
             },
             {
@@ -202,19 +240,12 @@
                 "data": "m=car&b=human",
                 "displayText": "我想找真人"
               }
-            },
-            {
-              "type": "action",
-              "action": {
-                "type": "cameraRoll",
-                "label": "從相簿傳照片"
-              }
             }
           ]
         }
       }
     ],
-    "intro_chars": 246,
+    "intro_chars": 453,
     "sticker": "worker 在歡迎包少於 5 則、而且裡面沒有貼圖的時候，一定會在價格表後面插一張歡迎貼圖（worker.js L1296，條件寫死在程式裡），所以只改 oa.json 擋不住：實際送出是三則（價格表、貼圖、介紹）。要不插就得改那行條件（例如讓 oa.json 的旗標來控制）；不改程式就以三則為準做手機測試。建議仍是不插（選單打開時聊天區大約只剩半個螢幕，這是推論、沒量過，價格表容易被擠到要往上滑），他決定",
     "optional_flex_split_card": {
       "use": false,

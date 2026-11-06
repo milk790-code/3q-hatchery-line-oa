@@ -45,8 +45,8 @@ echo "⑥ 驗 worker 活體 seed"
 curl -sS https://pop-line-oa.milk790.workers.dev/health | python3 -c "
 import json,sys; d=json.load(sys.stdin)
 print('   seed =', d.get('seed'), '| reply_first =', d.get('reply_first'), '| ack_text =', d.get('ack_text'), '| catalog =', d.get('catalog'), '| videos =', d.get('videos'), '| welcome_pack =', d.get('welcome_pack'), '| token =', d.get('token'), '| owner =', d.get('owner'))
-ok = d.get('seed')=='v6.1.18' and d.get('reply_first') is True and d.get('ack_text')!='on' and (d.get('catalog') or 0)>=30 and d.get('welcome_pack')==4
-print('   活體檢查', '通過' if ok else '❌ 沒過:seed 要 v6.1.18、reply_first true、ack_text 不是 on、catalog>=30、welcome_pack==4')
+ok = d.get('seed')=='v6.1.19' and d.get('reply_first') is True and d.get('ack_text')!='on' and (d.get('catalog') or 0)>=30 and d.get('welcome_pack')==4
+print('   活體檢查', '通過' if ok else '❌ 沒過:seed 要 v6.1.19、reply_first true、ack_text 不是 on、catalog>=30、welcome_pack==4')
 sys.exit(0 if ok else 7)"
 echo "⑦ 驗 GitHub Pages 素材(價格表圖要回 image/jpeg)"
 for i in 1 2 3 4 5 6; do
