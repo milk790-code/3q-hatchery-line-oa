@@ -72,7 +72,7 @@ MENUS = {
       # 鍵盤預填三行範本 = 零前端成本的半結構化表單(不必蓋 LIFF 頁)
       area(B_LEFT, B_Y, W - B_LEFT, B_H, pb('m=shop&b=join', '我想了解城市限定的扶持方案',
                                             inputOption='openKeyboard', fillInText=JOIN_TEMPLATE)),
-      area(0, C_Y, W, C_H, pb('m=shop&b=audit', '幫我算一下我的店一個月少賺多少錢')),
+      area(0, C_Y, W, C_H, pb('m=shop&b=wholesale', '我要大量叫貨，想問一下')),
     ],
     'image': 'assets/pop/richmenu-shop-v9.jpg',
   },
